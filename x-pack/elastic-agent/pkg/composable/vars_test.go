@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package composable
 
 import (
@@ -19,10 +23,10 @@ func TestVars_Replace(t *testing.T) {
 			},
 		},
 	}
-	tests := []struct{
-		Input string
-		Result string
-		Error bool
+	tests := []struct {
+		Input   string
+		Result  string
+		Error   bool
 		NoMatch bool
 	}{
 		{
@@ -122,7 +126,7 @@ func TestVars_Replace(t *testing.T) {
 			if test.Error {
 				assert.Error(t, err)
 			} else if test.NoMatch {
-				assert.Error(t, NoMatchErr, err)
+				assert.Error(t, ErrNoMatch, err)
 			} else {
 				require.NoError(t, err)
 				assert.Equal(t, test.Result, res)
@@ -149,7 +153,7 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 			},
 		},
 		ProcessorsKey: "dynamic",
-		Processors: processers,
+		Processors:    processers,
 	}
 
 	res, resProcessors, err := vars.Replace("{{testing.key1}}")

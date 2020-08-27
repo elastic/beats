@@ -7,6 +7,8 @@ package application
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
@@ -102,9 +104,16 @@ func newLocal(
 	}
 	localApplication.router = router
 
+	composableCtrl, err := composable.New(rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	emit := emitter(
+	emit, err := emitter(
+		localApplication.bgContext,
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -112,6 +121,9 @@ func newLocal(
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {

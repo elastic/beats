@@ -5,7 +5,10 @@
 package application
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
@@ -173,8 +176,11 @@ func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[
 func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][]program.Program, error) {
 	monitor := noop.NewMonitor()
 	router := &inmemRouter{}
-	emit := emitter(
+	composableCtrl := &nilController{}
+	emit, err := emitter(
+		context.Background(),
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -182,6 +188,9 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := emit(cfg); err != nil {
 		return nil, err
@@ -200,4 +209,10 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 
 func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+}
+
+type nilController struct{}
+
+func (*nilController) Run(_ context.Context, _ composable.VarsCallback) error {
+	return nil
 }

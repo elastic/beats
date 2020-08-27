@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -699,6 +701,123 @@ func TestSelector(t *testing.T) {
 				t.Logf(
 					`received: %+v
 					 expected: %+v`, v, test.expected)
+			}
+		})
+	}
+}
+
+func TestAST_Apply(t *testing.T) {
+	testcases := map[string]struct {
+		input    map[string]interface{}
+		expected *AST
+		vars     composable.Vars
+		matchErr bool
+	}{
+		"2 vars missing with default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/{{var1.key1}}", "/var/log/{{var1.missing|'other'}}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: &Dict{
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/value1"},
+												&StrVal{value: "/var/log/other"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								},
+							}},
+					},
+				},
+			},
+			vars: composable.Vars{
+				Mapping: map[string]interface{}{
+					"var1": map[string]interface{}{
+						"key1": "value1",
+					},
+				},
+			},
+		},
+		"2 vars missing no default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/{{var1.key1}}", "/var/log/{{var1.missing}}"},
+				},
+			},
+			vars: composable.Vars{
+				Mapping: map[string]interface{}{
+					"var1": map[string]interface{}{
+						"key1": "value1",
+					},
+				},
+			},
+			matchErr: true,
+		},
+		"vars not string": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/{{var1.key1}}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: &Dict{
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/1"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								},
+							}},
+					},
+				},
+			},
+			vars: composable.Vars{
+				Mapping: map[string]interface{}{
+					"var1": map[string]interface{}{
+						"key1": 1,
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range testcases {
+		t.Run(name, func(t *testing.T) {
+			v, err := NewAST(test.input)
+			require.NoError(t, err)
+			err = v.Apply(test.vars)
+			if test.matchErr {
+				require.Equal(t, composable.ErrNoMatch, err)
+			} else {
+				require.NoError(t, err)
+				if !assert.True(t, reflect.DeepEqual(test.expected, v)) {
+					t.Logf(
+						`received: %+v
+					 expected: %+v`, v, test.expected)
+				}
 			}
 		})
 	}

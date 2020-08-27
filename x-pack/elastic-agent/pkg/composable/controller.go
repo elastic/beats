@@ -18,17 +18,27 @@ import (
 )
 
 // Controller manages the state of the providers current context.
-type Controller struct {
+type Controller interface {
+	// Run runs the controller.
+	//
+	// Cancelling the context stops the controller.
+	Run(ctx context.Context, cb VarsCallback) error
+}
+
+// controller manages the state of the providers current context.
+type controller struct {
 	contextProviders map[string]*contextProviderState
 	dynamicProviders map[string]*dynamicProviderState
 }
 
 // New creates a new controller.
-func New(c *config.Config) (*Controller, error) {
+func New(c *config.Config) (Controller, error) {
 	var providersCfg Config
-	err := c.Unpack(&providersCfg)
-	if err != nil {
-		return nil, errors.New(err, "failed to unpack providers config", errors.TypeConfig)
+	if c != nil {
+		err := c.Unpack(&providersCfg)
+		if err != nil {
+			return nil, errors.New(err, "failed to unpack providers config", errors.TypeConfig)
+		}
 	}
 
 	// build all the context providers
@@ -66,14 +76,14 @@ func New(c *config.Config) (*Controller, error) {
 		}
 	}
 
-	return &Controller{
+	return &controller{
 		contextProviders: contextProviders,
 		dynamicProviders: dynamicProviders,
 	}, nil
 }
 
 // Run runs the controller.
-func (c *Controller) Run(ctx context.Context, cb VarsCallback) error {
+func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	// large number not to block performing Run on the provided providers
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)

@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package composable
 
 import (
@@ -11,8 +15,8 @@ import (
 
 var varsRegex = regexp.MustCompile(`{{([\p{L}\d\s\\\-|.'"]*)}}`)
 
-// NoMatchErr is return when the replace didn't fail, just that no vars match to perform the replace.
-var NoMatchErr = fmt.Errorf("no matching vars")
+// ErrNoMatch is return when the replace didn't fail, just that no vars match to perform the replace.
+var ErrNoMatch = fmt.Errorf("no matching vars")
 
 // Vars is a context of variables that also contain a list of processors that go with the mapping.
 type Vars struct {
@@ -67,7 +71,7 @@ func (v *Vars) Replace(value string) (string, []map[string]interface{}, error) {
 				}
 			}
 			if !set {
-				return "", nil, NoMatchErr
+				return "", nil, ErrNoMatch
 			}
 			lastIndex = r[1]
 		}

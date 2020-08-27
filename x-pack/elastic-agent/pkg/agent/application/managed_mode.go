@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -147,8 +149,15 @@ func newManaged(
 	}
 	managedApplication.router = router
 
-	emit := emitter(
+	composableCtrl, err := composable.New(rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
+	emit, err := emitter(
+		managedApplication.bgContext,
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -156,6 +165,9 @@ func newManaged(
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err

@@ -10,11 +10,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"reflect"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
 const selectorSep = "."
@@ -197,6 +198,9 @@ func (k *Key) Hash() []byte {
 
 // Apply applies the vars to the value.
 func (k *Key) Apply(vars composable.Vars) error {
+	if k.value == nil {
+		return nil
+	}
 	return k.value.Apply(vars)
 }
 
@@ -275,7 +279,7 @@ func (l *List) Apply(vars composable.Vars) error {
 
 // StrVal represents a string.
 type StrVal struct {
-	value string
+	value      string
 	processors []map[string]interface{}
 }
 
