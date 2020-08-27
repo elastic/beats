@@ -10,11 +10,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -118,7 +117,7 @@ func (e *emitterController) Set(vars []composable.Vars) {
 	if ast != nil {
 		err := e.update()
 		if err != nil {
-			e.logger.Errorf("Failed to render new configuration with latest context from composable controller: %s", err)
+			e.logger.Errorf("Failed to render configuration with latest context from composable controller: %s", err)
 		}
 	}
 }
