@@ -84,6 +84,18 @@ func TestVars_Replace(t *testing.T) {
 			false,
 		},
 		{
+			`{{un-der_score.missing`,
+			"",
+			true,
+			false,
+		},
+		{
+			`{{un-der_score.missing  {{other}}`,
+			"",
+			true,
+			false,
+		},
+		{
 			`{{}}`,
 			"",
 			true,

@@ -36,6 +36,9 @@ func (v *Vars) Replace(value string) (string, []map[string]interface{}, error) {
 	if err != nil {
 		return "", nil, err
 	}
+	if !validBrackets(value) {
+		return "", nil, fmt.Errorf("malformatted variable substitution")
+	}
 
 	result := ""
 	lastIndex := 0
@@ -77,6 +80,24 @@ func (v *Vars) Replace(value string) (string, []map[string]interface{}, error) {
 		}
 	}
 	return result + value[lastIndex:], processors, nil
+}
+
+// validBrackets returns true when all starting {{ have a matching ending }}.
+func validBrackets(s string) bool {
+	result := ""
+	lastIndex := 0
+	match := false
+	for _, r := range varsRegex.FindAllSubmatchIndex([]byte(s), -1) {
+		match = true
+		for i := 0; i < len(r); i += 4 {
+			result += s[lastIndex:r[0]]
+			lastIndex = r[1]
+		}
+	}
+	if !match {
+		return !strings.Contains(s, "{{")
+	}
+	return !strings.Contains(result, "{{")
 }
 
 // stripSpace removes all the spaces unless they are quoted
