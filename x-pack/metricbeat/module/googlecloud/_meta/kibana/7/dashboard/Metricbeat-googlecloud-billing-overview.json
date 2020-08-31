@@ -6,29 +6,7 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "cloud.provider",
-                  "negate": false,
-                  "params": {
-                    "query": "googlecloud"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "cloud.provider": "googlecloud"
-                  }
-                }
-              }
-            ],
+            "filter": [],
             "query": {
               "language": "kuery",
               "query": ""
@@ -54,7 +32,7 @@
             "panelIndex": "2552123b-6ad6-4d63-89c3-0672ab428580",
             "panelRefName": "panel_0",
             "title": "Filter",
-            "version": "7.9.0"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -70,7 +48,7 @@
             "panelIndex": "b737e597-cc4d-4437-859c-6d491679599d",
             "panelRefName": "panel_1",
             "title": "Cost Per Project ID",
-            "version": "7.9.0"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -86,7 +64,7 @@
             "panelIndex": "9eedb0c7-2089-4e0f-af98-721034203aad",
             "panelRefName": "panel_2",
             "title": "Total Number Of Projects",
-            "version": "7.9.0"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -102,7 +80,7 @@
             "panelIndex": "f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a",
             "panelRefName": "panel_3",
             "title": "Cost Per Invoice Month",
-            "version": "7.9.0"
+            "version": "7.8.0"
           },
           {
             "embeddableConfig": {
@@ -118,7 +96,7 @@
             "panelIndex": "991e60a8-68eb-4c2b-ac9a-b553e90dd49d",
             "panelRefName": "panel_4",
             "title": "Total Billing Cost",
-            "version": "7.9.0"
+            "version": "7.8.0"
           }
         ],
         "timeRestore": false,
@@ -133,11 +111,6 @@
         "default"
       ],
       "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
         {
           "id": "5d2f9160-e88e-11ea-bf8c-d13ebf358a78",
           "name": "panel_0",
@@ -165,37 +138,15 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-08-31T02:50:55.190Z",
-      "version": "WzUzMzIsOF0="
+      "updated_at": "2020-08-31T17:11:19.055Z",
+      "version": "WzU1MjksOF0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "cloud.provider",
-                  "negate": false,
-                  "params": {
-                    "query": "googlecloud"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "cloud.provider": "googlecloud"
-                  }
-                }
-              }
-            ],
+            "filter": [],
             "query": {
               "language": "kuery",
               "query": ""
@@ -210,9 +161,24 @@
           "params": {
             "controls": [
               {
-                "fieldName": "cloud.account.id",
+                "fieldName": "cloud.provider",
                 "id": "1598550838945",
                 "indexPatternRefName": "control_0_index_pattern",
+                "label": "Cloud Provider ",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": false,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "cloud.account.id",
+                "id": "1598893530938",
+                "indexPatternRefName": "control_1_index_pattern",
                 "label": "Account ID",
                 "options": {
                   "dynamicOptions": true,
@@ -221,7 +187,7 @@
                   "size": 5,
                   "type": "terms"
                 },
-                "parent": "",
+                "parent": "1598550838945",
                 "type": "list"
               }
             ],
@@ -243,18 +209,18 @@
       "references": [
         {
           "id": "metricbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
           "id": "metricbeat-*",
-          "name": "control_0_index_pattern",
+          "name": "control_1_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-08-31T02:45:35.628Z",
-      "version": "WzUxNzUsOF0="
+      "updated_at": "2020-08-31T17:07:09.810Z",
+      "version": "WzU0MTYsOF0="
     },
     {
       "attributes": {
@@ -412,7 +378,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true  aggConfigs=\"[{\\\"id\\\":\\\"e25f49de-f161-4be8-a8fc-519188a7776c\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.project_id\\\",\\\"orderBy\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":5,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.invoice_month\\\",\\\"orderBy\\\":\\\"_key\\\",\\\"order\\\":\\\"asc\\\",\\\"size\\\":5,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"max\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.total\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-e25f49de-f161-4be8-a8fc-519188a7776c\\\":{\\\"label\\\":\\\"Monthly Cost\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.billing.project_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":5,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"e25f49de-f161-4be8-a8fc-519188a7776c\\\"},\\\"col-2-b92edf5e-58bc-4382-9cd5-19db2c332c93\\\":{\\\"label\\\":\\\"Invoice Month\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.billing.invoice_month\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":5,\\\"orderBy\\\":{\\\"type\\\":\\\"alphabetical\\\"},\\\"orderDirection\\\":\\\"asc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\"},\\\"col-3-af747bf6-66e9-4760-bbd8-3dae9c97159d\\\":{\\\"label\\\":\\\"Total Billing Cost\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"max\\\",\\\"sourceField\\\":\\\"googlecloud.billing.total\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\"}}\"}\n| lens_xy_chart xTitle=\"Monthly Cost\" yTitle=\"Total Billing Cost\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" hide=false xAccessor=\"e25f49de-f161-4be8-a8fc-519188a7776c\" yScaleType=\"linear\" xScaleType=\"ordinal\" isHistogram=false splitAccessor=\"b92edf5e-58bc-4382-9cd5-19db2c332c93\"  seriesType=\"bar_stacked\" accessors=\"af747bf6-66e9-4760-bbd8-3dae9c97159d\" columnToLabel=\"{\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\":\\\"Total Billing Cost\\\",\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\":\\\"Invoice Month\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true  aggConfigs=\"[{\\\"id\\\":\\\"e25f49de-f161-4be8-a8fc-519188a7776c\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.project_id\\\",\\\"orderBy\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":10,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.invoice_month\\\",\\\"orderBy\\\":\\\"_key\\\",\\\"order\\\":\\\"asc\\\",\\\"size\\\":5,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"max\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.total\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-e25f49de-f161-4be8-a8fc-519188a7776c\\\":{\\\"label\\\":\\\"Monthly Cost\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.billing.project_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":10,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"e25f49de-f161-4be8-a8fc-519188a7776c\\\"},\\\"col-2-b92edf5e-58bc-4382-9cd5-19db2c332c93\\\":{\\\"label\\\":\\\"Invoice Month\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.billing.invoice_month\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":5,\\\"orderBy\\\":{\\\"type\\\":\\\"alphabetical\\\"},\\\"orderDirection\\\":\\\"asc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\"},\\\"col-3-af747bf6-66e9-4760-bbd8-3dae9c97159d\\\":{\\\"label\\\":\\\"Total Billing Cost\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"max\\\",\\\"sourceField\\\":\\\"googlecloud.billing.total\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\"}}\"}\n| lens_xy_chart xTitle=\"Monthly Cost\" yTitle=\"Total Billing Cost\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" hide=false xAccessor=\"e25f49de-f161-4be8-a8fc-519188a7776c\" yScaleType=\"linear\" xScaleType=\"ordinal\" isHistogram=false splitAccessor=\"b92edf5e-58bc-4382-9cd5-19db2c332c93\"  seriesType=\"bar_stacked\" accessors=\"af747bf6-66e9-4760-bbd8-3dae9c97159d\" columnToLabel=\"{\\\"af747bf6-66e9-4760-bbd8-3dae9c97159d\\\":\\\"Total Billing Cost\\\",\\\"b92edf5e-58bc-4382-9cd5-19db2c332c93\\\":\\\"Invoice Month\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -470,7 +436,7 @@
                           "type": "column"
                         },
                         "orderDirection": "desc",
-                        "size": 5
+                        "size": 10
                       },
                       "scale": "ordinal",
                       "sourceField": "googlecloud.billing.project_id"
@@ -518,13 +484,13 @@
       ],
       "references": [],
       "type": "lens",
-      "updated_at": "2020-08-31T02:46:52.450Z",
-      "version": "WzUyMzIsOF0="
+      "updated_at": "2020-08-31T17:12:47.088Z",
+      "version": "WzU1NjksOF0="
     },
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"1164563d-d2b3-4067-bc7b-d694179182ed\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1d\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"10b91492-efef-490d-bc7a-c2074b2eae84\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"sum\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.total\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-1164563d-d2b3-4067-bc7b-d694179182ed\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1d\\\"},\\\"id\\\":\\\"1164563d-d2b3-4067-bc7b-d694179182ed\\\"},\\\"col-1-10b91492-efef-490d-bc7a-c2074b2eae84\\\":{\\\"label\\\":\\\"Total Billing Cost\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"sum\\\",\\\"sourceField\\\":\\\"googlecloud.billing.total\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"10b91492-efef-490d-bc7a-c2074b2eae84\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Total Billing Cost\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"4ca843af-63d7-46b9-a719-51a81eebf1f7\" hide=false xAccessor=\"1164563d-d2b3-4067-bc7b-d694179182ed\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true   seriesType=\"bar\" accessors=\"10b91492-efef-490d-bc7a-c2074b2eae84\" columnToLabel=\"{\\\"10b91492-efef-490d-bc7a-c2074b2eae84\\\":\\\"Total Billing Cost\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"325e60ce-0fbd-42b0-82f6-b10df31fef6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"faaaaf23-f362-4a00-be9e-8a155208a39e\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.project_id\\\",\\\"orderBy\\\":\\\"3041fc1b-ceb8-4188-b55d-d354819f267e\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":5,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"c4bc659c-3e7c-41f2-bc38-32d9edee95e8\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1d\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"3041fc1b-ceb8-4188-b55d-d354819f267e\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"max\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.billing.total\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-faaaaf23-f362-4a00-be9e-8a155208a39e\\\":{\\\"label\\\":\\\"Project ID\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.billing.project_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":5,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"3041fc1b-ceb8-4188-b55d-d354819f267e\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"faaaaf23-f362-4a00-be9e-8a155208a39e\\\"},\\\"col-2-c4bc659c-3e7c-41f2-bc38-32d9edee95e8\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1d\\\"},\\\"id\\\":\\\"c4bc659c-3e7c-41f2-bc38-32d9edee95e8\\\"},\\\"col-3-3041fc1b-ceb8-4188-b55d-d354819f267e\\\":{\\\"label\\\":\\\"Total Billing\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"max\\\",\\\"sourceField\\\":\\\"googlecloud.billing.total\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"3041fc1b-ceb8-4188-b55d-d354819f267e\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Total Billing\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"325e60ce-0fbd-42b0-82f6-b10df31fef6c\" hide=false xAccessor=\"c4bc659c-3e7c-41f2-bc38-32d9edee95e8\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"faaaaf23-f362-4a00-be9e-8a155208a39e\"  seriesType=\"bar_stacked\" accessors=\"3041fc1b-ceb8-4188-b55d-d354819f267e\" columnToLabel=\"{\\\"3041fc1b-ceb8-4188-b55d-d354819f267e\\\":\\\"Total Billing\\\",\\\"faaaaf23-f362-4a00-be9e-8a155208a39e\\\":\\\"Project ID\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -538,6 +504,53 @@
             "indexpattern": {
               "currentIndexPatternId": "metricbeat-*",
               "layers": {
+                "325e60ce-0fbd-42b0-82f6-b10df31fef6c": {
+                  "columnOrder": [
+                    "faaaaf23-f362-4a00-be9e-8a155208a39e",
+                    "c4bc659c-3e7c-41f2-bc38-32d9edee95e8",
+                    "3041fc1b-ceb8-4188-b55d-d354819f267e"
+                  ],
+                  "columns": {
+                    "3041fc1b-ceb8-4188-b55d-d354819f267e": {
+                      "customLabel": true,
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "Total Billing",
+                      "operationType": "max",
+                      "scale": "ratio",
+                      "sourceField": "googlecloud.billing.total"
+                    },
+                    "c4bc659c-3e7c-41f2-bc38-32d9edee95e8": {
+                      "dataType": "date",
+                      "isBucketed": true,
+                      "label": "@timestamp",
+                      "operationType": "date_histogram",
+                      "params": {
+                        "interval": "1d"
+                      },
+                      "scale": "interval",
+                      "sourceField": "@timestamp"
+                    },
+                    "faaaaf23-f362-4a00-be9e-8a155208a39e": {
+                      "customLabel": true,
+                      "dataType": "string",
+                      "isBucketed": true,
+                      "label": "Project ID",
+                      "operationType": "terms",
+                      "params": {
+                        "orderBy": {
+                          "columnId": "3041fc1b-ceb8-4188-b55d-d354819f267e",
+                          "type": "column"
+                        },
+                        "orderDirection": "desc",
+                        "size": 5
+                      },
+                      "scale": "ordinal",
+                      "sourceField": "googlecloud.billing.project_id"
+                    }
+                  },
+                  "indexPatternId": "metricbeat-*"
+                },
                 "4ca843af-63d7-46b9-a719-51a81eebf1f7": {
                   "columnOrder": [
                     "1164563d-d2b3-4067-bc7b-d694179182ed",
@@ -597,18 +610,19 @@
             "layers": [
               {
                 "accessors": [
-                  "10b91492-efef-490d-bc7a-c2074b2eae84"
+                  "3041fc1b-ceb8-4188-b55d-d354819f267e"
                 ],
-                "layerId": "4ca843af-63d7-46b9-a719-51a81eebf1f7",
-                "seriesType": "bar",
-                "xAccessor": "1164563d-d2b3-4067-bc7b-d694179182ed"
+                "layerId": "325e60ce-0fbd-42b0-82f6-b10df31fef6c",
+                "seriesType": "bar_stacked",
+                "splitAccessor": "faaaaf23-f362-4a00-be9e-8a155208a39e",
+                "xAccessor": "c4bc659c-3e7c-41f2-bc38-32d9edee95e8"
               }
             ],
             "legend": {
               "isVisible": true,
               "position": "right"
             },
-            "preferredSeriesType": "bar"
+            "preferredSeriesType": "bar_stacked"
           }
         },
         "title": "Total Cost Bar Chart [Metricbeat Googlecloud]",
@@ -623,9 +637,9 @@
       ],
       "references": [],
       "type": "lens",
-      "updated_at": "2020-08-31T02:48:58.845Z",
-      "version": "WzUyOTIsOF0="
+      "updated_at": "2020-08-31T17:09:38.329Z",
+      "version": "WzU0OTYsOF0="
     }
   ],
-  "version": "7.9.0"
+  "version": "7.8.0"
 }
