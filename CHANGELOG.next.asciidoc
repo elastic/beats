@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
 - Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
 - Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
+- Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
 
 *Packetbeat*
 
