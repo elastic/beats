@@ -1,0 +1,51 @@
+description: Pipeline for parsing checkpoint firewall logs
+processors:
+- 
+  grok:
+    field: message
+    patterns:
+    - '%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-)
+    +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
+    +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
+    +\[%{GREEDYDATA:syslog5424_content}\]$'
+-
+  grok:
+    field: syslog5424_content
+    patterns:
+    - 'ASM:%{DATA:asm_version}###%{DATA}###%{DATA}###%{DATA:source_port}###%{DATA:destination_ip}###%{DATA:destination_port}###%{DATA:protocol}###%{DATA:method}###%{DATA:uri}###%{DATA:source_ip}###%{DATA:event_result}###%{DATA:support_id}###%{DATA}###${DATA:policy-name}############${DATA:request}###${DATA:reason}###'
+-
+  remove:
+    ignore_missing: true
+    field:
+    - syslog5424_content
+    - syslog5424_sd
+    - syslog5424_app
+    - syslog5424_host
+    - syslog5424_msgid
+    - syslog5424_pri
+    - syslog5424_proc
+    - syslog5424_ver
+    - message
+    - host
+-
+  set:
+    field: '@timestamp'
+    value: '{{syslog5424_ts}}'
+-
+  set:
+    field: event.module
+    value: F5
+-
+  set:
+    field: event.category
+    value: network
+-
+  set:
+    field: observer.vendor
+    value: F5 Networks
+-
+  set:
+    field: observer.type
+    value: firewall
+-
+  

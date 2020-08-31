@@ -1,0 +1,47 @@
+{{ if eq .input "syslog" }}
+
+type: syslog
+protocol.udp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+  {{ if ne .pipeline "" }}
+  pipeline: "{{.pipeline}}"
+  {{ end }}
+
+{{ else if eq .input "tls" }}
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl:
+  enabled: true
+  certificate_authorities: ["{{.cafile}}"]
+  certificate: "{{.certfile}}"
+  key: "{{.keyfile}}"
+  client_authentication: "required"
+{{ if ne .pipeline "" }}
+pipeline: "{{.pipeline}}"
+{{ end }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+fields:
+  observer:
+    vendor: "F5"
+    product: "Big-IP"
+    type: "ASM"
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+- add_fields:
+    target: ''
+    fields:
+        ecs.version: 1.5.0
