@@ -56,6 +56,12 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -132,6 +138,12 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -204,6 +216,12 @@
         "message": "APP-DETECT failed FTP login attempt",
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -276,6 +294,12 @@
         "message": "APP-DETECT failed FTP login attempt",
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
