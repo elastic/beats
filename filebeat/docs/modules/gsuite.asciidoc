@@ -32,10 +32,12 @@ It is compatible with a subset of applications under the https://developers.goog
 | Groups https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups[api docs] https://support.google.com/a/answer/6270454?hl=en&ref_topic=9027054[help]                    | Track changes to groups, group memberships and group messages.                                                                                                                |
 |===========================================================================================================================================================================================================================
 
+[float]
 === Configure the module
 
 In order for filebeat to ingest data from the Google Reports API you must https://support.google.com/gsuitemigrate/answer/9222993?hl=en[set up a ServiceAccount] that https://support.google.com/gsuitemigrate/answer/9222865?hl=en[has access to the Admin SDK API].
 
+NOTE: It is required that the account used to set up the service account *is an administrator account*.
 
 Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
 
