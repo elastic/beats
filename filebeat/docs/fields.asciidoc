@@ -20679,6 +20679,116 @@ type: keyword
 
 --
 
+*`cisco.asa.command_line_arguments`*::
++
+--
+The command line arguments logged by the local audit log
+
+
+type: keyword
+
+--
+
+*`cisco.asa.assigned_ip`*::
++
+--
+The IP address assigned to a VPN client successfully connecting
+
+
+type: ip
+
+--
+
+*`cisco.asa.privilege.old`*::
++
+--
+When a users privilege is changed this is the old value
+
+
+type: keyword
+
+--
+
+*`cisco.asa.privilege.new`*::
++
+--
+When a users privilege is changed this is the new value
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.object`*::
++
+--
+The related object for burst warnings
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.id`*::
++
+--
+The related rate ID for burst warnings
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.current_rate`*::
++
+--
+The current burst rate seen
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.configured_rate`*::
++
+--
+The current configured burst rate
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.avg_rate`*::
++
+--
+The current average burst rate seen
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.configured_avg_rate`*::
++
+--
+The current configured average burst rate allowed
+
+
+type: keyword
+
+--
+
+*`cisco.asa.burst.cumulative_count`*::
++
+--
+The total count of burst rate hits since the object was created or cleared
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 

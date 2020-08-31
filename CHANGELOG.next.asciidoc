@@ -461,6 +461,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
+- Added support for more message types for Cisco ASA and FTD. {pull}20565[20565]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 
 *Auditbeat*
