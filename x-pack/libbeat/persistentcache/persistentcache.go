@@ -5,7 +5,6 @@
 package persistentcache
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -28,8 +27,8 @@ var expiredError = errors.New("key expired")
 type PersistentCache struct {
 	log *logp.Logger
 
-	useCount uint32
 	store    *Store
+	codec    codec
 	registry *Registry
 
 	refreshOnAccess bool
@@ -67,7 +66,7 @@ func (c *PersistentCache) Put(k string, v interface{}) error {
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
 func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.Duration) error {
-	d, err := json.Marshal(v)
+	d, err := c.codec.Encode(v)
 	if err != nil {
 		return fmt.Errorf("encoding item to store in cache: %w", err)
 	}
@@ -87,7 +86,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 	if c.refreshOnAccess && c.timeout > 0 {
 		c.store.Set([]byte(k), d, c.timeout)
 	}
-	err = json.Unmarshal(d, v)
+	err = c.codec.Decode(d, v)
 	if err != nil {
 		return fmt.Errorf("decoding item stored in cache: %w", err)
 	}

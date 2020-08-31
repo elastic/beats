@@ -35,6 +35,7 @@ func (r *Registry) NewCache(name string, opts Options) (*PersistentCache, error)
 	return &PersistentCache{
 		log:      logger,
 		store:    store,
+		codec:    newCBORCodec(),
 		registry: r,
 
 		refreshOnAccess: opts.RefreshOnAccess,
