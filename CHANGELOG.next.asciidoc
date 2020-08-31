@@ -370,6 +370,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 - Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
+- Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
 - Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
 - Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
