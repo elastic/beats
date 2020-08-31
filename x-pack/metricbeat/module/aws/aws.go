@@ -26,6 +26,7 @@ import (
 type Config struct {
 	Period     time.Duration       `config:"period" validate:"nonzero,required"`
 	Regions    []string            `config:"regions"`
+	Latency    time.Duration       `config:"latency"`
 	AWSConfig  awscommon.ConfigAWS `config:",inline"`
 	TagsFilter []Tag               `config:"tags_filter"`
 }
@@ -36,6 +37,7 @@ type MetricSet struct {
 	RegionsList []string
 	Endpoint    string
 	Period      time.Duration
+	Latency     time.Duration
 	AwsConfig   *awssdk.Config
 	AccountName string
 	AccountID   string
@@ -86,6 +88,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricSet := MetricSet{
 		BaseMetricSet: base,
 		Period:        config.Period,
+		Latency:       config.Latency,
 		AwsConfig:     &awsConfig,
 		TagsFilter:    config.TagsFilter,
 	}
