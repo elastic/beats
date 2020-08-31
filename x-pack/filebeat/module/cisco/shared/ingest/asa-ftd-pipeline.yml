@@ -24,7 +24,6 @@ processors:
         # exactly match the syntax for firepower management logs
         PROCESS_HOST: "(?:%{PROCESS:process.name}:\\s%{SYSLOGHOST:host.name})"
         HOST_PROCESS: "(?:%{SYSLOGHOST:host.hostname}:?\\s+)?(?:%{PROCESS:process.name}?(?:\\[%{POSINT:process.pid:long}\\])?)?"
-
   #
   # Parse FTD/ASA style message
   #
@@ -39,7 +38,6 @@ processors:
         FTD_SUFFIX: "[^0-9-]+"
         # Before version 6.3, FTD used ASA prefix in syslog messages
         FTD_PREFIX: "%{DATA}%(?:[A-Z]+)"
-
   #
   # Create missing fields when no %FTD label is present
   #
@@ -48,7 +46,6 @@ processors:
       field: _temp_.cisco.message_id
       value: ""
       if: "ctx?._temp_?.cisco?.message_id == null"
-
   #
   # set default event.severity to 7 (debug):
   #
@@ -60,13 +57,11 @@ processors:
       field: event.severity
       value: 7
       if: "ctx?.event?.severity == null"
-
   #
   # Drop messages above configured log_level
   #
   - drop:
       if: "ctx.event.severity > {< .log_level >}"
-
   #
   # Parse the date included in FTD logs
   #
@@ -135,7 +130,6 @@ processors:
               },
           },
         ]
-
   #
   # Set log.level
   #
@@ -171,7 +165,6 @@ processors:
       field: "log.level"
       if: "ctx.event.severity == 7"
       value: debug
-
   #
   # Firewall messages
   #
@@ -571,88 +564,86 @@ processors:
       field: "_temp_.cisco.dap_records"
       separator: ",\\s+"
       ignore_missing: true
-
   - dissect:
-      if: "ctx._temp_.cisco.message_id == '434002'",
-	  field: "message",
-	  pattern: "SFR requested to %{event.action} %{network.protocol} packet from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+      if: "ctx._temp_.cisco.message_id == '434002'"
+      field: "message"
+      pattern: "SFR requested to %{event.action} %{network.protocol} packet from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
   - dissect:
-      if: "ctx._temp_.cisco.message_id == '434004'",
-	  field: "message",
-	  pattern: "SFR requested ASA to %{event.action} further packet redirection and process %{network.protocol} flow from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} locally"
+      if: "ctx._temp_.cisco.message_id == '434004'"
+      field: "message"
+      pattern: "SFR requested ASA to %{event.action} further packet redirection and process %{network.protocol} flow from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} locally"
   - dissect:
-      if: "ctx._temp_.cisco.message_id == '110002'",
-	  field: "message",
-	  pattern: "%{event.reason} for %{network.protocol} from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{destination.address}/%{destination.port}"
-   - dissect:
-      if: "ctx._temp_.cisco.message_id == '419002'",
-	  field: "message",
-	  pattern: "%{event.reason}from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} %{+event.reason}"
+      if: "ctx._temp_.cisco.message_id == '110002'"
+      field: "message"
+      pattern: "%{event.reason} for %{network.protocol} from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{destination.address}/%{destination.port}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '419002'"
+      field: "message"
+      pattern: "%{event.reason}from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} %{+event.reason}"
   - dissect:
       if: '["602303", "602304"].contains(ctx._temp_.cisco.message_id)'
-	  field: "message",
-	  pattern: "%{network.type}: An %{network.direction} %{network.inner} SA (SPI= %{}) between %{source.address} and %{destination.address} (user= %{user.name}) has been %{event.action}"	  
-   - dissect:
-      if: "ctx._temp_.cisco.message_id == '750002'",
-	  field: "message",
-	  pattern: "Local:%{source.address}:%{source.port} Remote:%{destination.address}:%{destination.port} Username:%{user.name} %{event.reason}"
-   - dissect:
-      if: "ctx._temp_.cisco.message_id == '713120'",
-	  field: "message",
-	  pattern: "%{event.reason} (msgid=%{event.id})"
-   - dissect:
-      if: "ctx._temp_.cisco.message_id == '713202'",
-	  field: "message",
-	  pattern: "IP = %{IP:source.address}, %{event.reason}. %{} packet."
-   - dissect:
-      if: "ctx._temp_.cisco.message_id == '750003'",
-	  field: "message",
-	  pattern: "Local:%{source.address}:%{source.port} Remote:%{destination.address}:%{destination.port} Username:%{user.name} %{event.reason} ERROR:%{+event.reason}"
-   - dissect:
+      field: "message"
+      pattern: "%{network.type}: An %{network.direction} %{network.inner} SA (SPI= %{}) between %{source.address} and %{destination.address} (user= %{user.name}) has been %{event.action}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '750002'"
+      field: "message"
+      pattern: "Local:%{source.address}:%{source.port} Remote:%{destination.address}:%{destination.port} Username:%{user.name} %{event.reason}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '713120'"
+      field: "message"
+      pattern: "%{event.reason} (msgid=%{event.id})"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '713202'"
+      field: "message"
+      pattern: "IP = %{IP:source.address}, %{event.reason}. %{} packet."
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '750003'"
+      field: "message"
+      pattern: "Local:%{source.address}:%{source.port} Remote:%{destination.address}:%{destination.port} Username:%{user.name} %{event.reason} ERROR:%{+event.reason}"
+  - dissect:
       if: '["713905", "713904", "713906", "713902", "713901"].contains(ctx._temp_.cisco.message_id)'
-	  field: "message",
-	  pattern: "%{event.reason}"
-
+      field: "message"
+      pattern: "%{event.reason}"
    # Handle ecs action outcome protocol
-   - set:
+  - set:
       if: '["434002", "434004"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
       value: "unknown"
-   - set:
+  - set:
       if: '["419002"].contains(ctx._temp_.cisco.message_id)'
       field: "network.protocol"
-      value: "tcp"	  
-   - set:
+      value: "tcp"
+  - set:
       if: '["110002"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
-      value: "failure"	 
-   - set:
+      value: "failure"
+  - set:
       if: '["713120"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
       value: "success"
-   - set:
+  - set:
       if: '["602303", "602304"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
-      value: "success"	  
-   - set:
+      value: "success"
+  - set:
       if: '["713905", "713904", "713906", "713902", "713901"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
-      value: "failure"	 
-   - set:
+      value: "failure"
+  - set:
       if: '["750002", "750003"].contains(ctx._temp_.cisco.message_id)'
       field: "event.action"
-      value: "connection-started"	 
-   - set:
+      value: "connection-started"
+  - set:
       if: '["750003", "713905", "713904", "713906", "713902", "713901"].contains(ctx._temp_.cisco.message_id)'
       field: "event.action"
-      value: "error"	 
-   - append:
+      value: "error"
+  - append:
       if: '["750003", "713905", "713904", "713906", "713902", "713901"].contains(ctx._temp_.cisco.message_id)'
       field: "event.type"
-      value: "error"	 	  
-	  
-	  
-   
+      value: "error"
+
+
+
   #
   # Handle 302xxx messages (Flow expiration a.k.a "Teardown")
   #
@@ -671,7 +662,6 @@ processors:
         ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
         ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
         MAPPEDSRC: "(?:%{DATA:_temp_.natsrcip}|%{HOSTNAME})"
-
   #
   # Decode FTD's Security Event Syslog Messages
   #
@@ -688,7 +678,6 @@ processors:
       trim_key: " "
       trim_value: " "
       ignore_failure: true
-
   #
   # Remove message.
   #
@@ -699,7 +688,6 @@ processors:
       field:
         - message
       ignore_missing: true
-
   #
   # Populate ECS fields from Security Events
   #
@@ -1083,7 +1071,6 @@ processors:
   #*******************************************************************************
   # End of generated code.
   #*******************************************************************************
-
   #
   # Normalize ECS field values
   #
@@ -1098,7 +1085,6 @@ processors:
             "430003": connection-finished
             "430004": file-detected
             "430005": malware-detected
-
         "dns.question.type":
           map:
             "a host address": A
@@ -1110,14 +1096,12 @@ processors:
             "marks the start of a zone of authority": SOA
             "mail exchange": MX
             "server selection": SRV
-
         "dns.response_code":
           map:
             "non-existent domain": NXDOMAIN
             "server failure": SERVFAIL
             "query refused": REFUSED
             "no error": NOERROR
-
       source: |
         def getField(Map src, String[] path) {
          for (int i=0; i<path.length-1; i++) {
@@ -1145,12 +1129,10 @@ processors:
             setField(ctx, dstField.splitOnToken('.'), newVal);
           }
         }
-
   - set:
       if: "ctx.dns?.question?.type != null && ctx.dns?.response_code == null"
       field: dns.response_code
       value: NOERROR
-
   - set:
       if: 'ctx._temp_.cisco.message_id == "430001"'
       field: event.action
@@ -1171,7 +1153,6 @@ processors:
       if: 'ctx._temp_.cisco.message_id == "430005"'
       field: event.action
       value: malware-detected
-
   #
   # Handle event.duration
   #
@@ -1182,7 +1163,6 @@ processors:
       field: "_temp_.duration_hms"
       value: "{{event.duration}}"
       ignore_empty_value: true
-
   #
   # Process the flow duration "hh:mm:ss" present in some messages
   # This will fill event.start, event.end and event.duration
@@ -1215,7 +1195,6 @@ processors:
         ctx.event['start'] = ZonedDateTime.ofInstant(
             Instant.parse(end).minusNanos(nanos),
             ZoneOffset.UTC);
-
   #
   # Normalize protocol names
   #
@@ -1236,7 +1215,7 @@ processors:
       ignore_failure: true
   - lowercase:
       field: "network.type"
-      ignore_failure: true	  
+      ignore_failure: true
   #
   # Populate network.iana_number from network.transport. Also does reverse
   # mapping in case network.transport contains the iana_number.
@@ -1284,7 +1263,6 @@ processors:
           net['iana_number'] = net.transport;
           net['transport'] = trans;
         }
-
   #
   # Normalize event.outcome
   #
@@ -1307,12 +1285,10 @@ processors:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "dropped"'
       value: failure
-
   - set:
       field: "network.transport"
       if: 'ctx.network?.transport == "icmpv6"'
       value: "ipv6-icmp"
-
   #
   # Convert integer fields, as output of dissect and kv processors is always a string
   #
@@ -1360,7 +1336,6 @@ processors:
       field: "network.iana_number"
       type: integer
       ignore_failure: true
-
   #
   # Assign ECS .ip fields from .address is a valid IP address is found,
   # otherwise set .domain field.
@@ -1385,7 +1360,6 @@ processors:
       patterns:
         - "^(?:%{IP:server.ip}|%{GREEDYDATA:server.domain})$"
       ignore_failure: true
-
   #
   # Geolocation for source and destination addresses
   #
@@ -1397,7 +1371,6 @@ processors:
       field: "destination.ip"
       target_field: "destination.geo"
       ignore_missing: true
-
   #
   # IP Autonomous System (AS) Lookup
   #
@@ -1433,7 +1406,6 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
-
   #
   # Set mapped_{src|dst}_ip fields only if they consist of a valid IP address.
   #
@@ -1473,7 +1445,6 @@ processors:
       value: "{{_temp_.cisco.mapped_destination_port}}"
       if: "ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port"
       ignore_empty_value: true
-
   #
   # Populate ECS event.code
   #
@@ -1482,14 +1453,12 @@ processors:
       target_field: event.code
       type: integer
       ignore_failure: true
-
   - remove:
       field:
         - _temp_.cisco.message_id
         - event.code
       if: 'ctx._temp_.cisco.message_id == ""'
       ignore_failure: true
-
   #
   # Copy _temp_.cisco to its final destination, cisco.asa or cisco.ftd.
   #
@@ -1497,14 +1466,12 @@ processors:
       field: _temp_.cisco
       target_field: "cisco.{< .internal_prefix >}"
       ignore_failure: true
-
   #
   # Remove temporary fields
   #
   - remove:
       field: _temp_
       ignore_missing: true
-
   #
   # Rename some 7.x fields
   #
@@ -1516,7 +1483,6 @@ processors:
       field: cisco.{< .internal_prefix >}.list_id
       target_field: cisco.{< .internal_prefix >}.rule_name
       ignore_missing: true
-
   # ECS categorization
   - script:
       lang: painless
@@ -1586,7 +1552,7 @@ processors:
           type:
             - info
             - deletion
-            - user 
+            - user
         creation:
           kind: event
           category:
@@ -1594,7 +1560,7 @@ processors:
           type:
             - info
             - creation
-            - user    
+            - user
       source: >-
         if (ctx?.event?.action == null || !params.containsKey(ctx.event.action)) {
           return;
@@ -1602,7 +1568,6 @@ processors:
         ctx.event.kind = params.get(ctx.event.action).get('kind');
         ctx.event.category = params.get(ctx.event.action).get('category').clone();
         ctx.event.type = params.get(ctx.event.action).get('type').clone();
-
         if (ctx?.event?.outcome == null) {
           return;
         }
@@ -1617,7 +1582,6 @@ processors:
             ctx.event.type.add('failure');
           }
         }
-
   # Configures observer fields with a copy from cisco and host fields. Later on these might replace host.hostname.
   - set:
       field: observer.hostname
