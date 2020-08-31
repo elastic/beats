@@ -244,6 +244,7 @@ func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 
 	event.RootFields.Put("cloud.provider", "googlecloud")
 	event.RootFields.Put("cloud.account.id", accountID)
+	event.RootFields.Put("cloud.account.name", accountID)
 
 	event.MetricSetFields.Put("invoice_month", rowItems[0])
 	event.MetricSetFields.Put("project_id", rowItems[1])
