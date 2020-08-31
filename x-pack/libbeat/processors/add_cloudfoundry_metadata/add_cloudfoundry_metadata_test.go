@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 

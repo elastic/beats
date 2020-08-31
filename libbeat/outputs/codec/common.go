@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
-	"github.com/elastic/go-structform"
 )
 
 // MakeTimestampEncoder creates encoder function that formats time

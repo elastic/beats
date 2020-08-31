@@ -19,8 +19,6 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
-
-	"github.com/elastic/go-perf"
 )
 
 var (

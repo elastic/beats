@@ -25,7 +25,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"

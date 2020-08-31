@@ -20,8 +20,6 @@ package tcp
 import (
 	"time"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 )

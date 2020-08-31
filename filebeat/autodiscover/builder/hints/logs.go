@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/go-ucfg"
-
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"

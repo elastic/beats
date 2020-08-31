@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
 )

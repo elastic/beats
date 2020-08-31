@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"

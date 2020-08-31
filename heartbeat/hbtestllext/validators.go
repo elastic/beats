@@ -17,10 +17,6 @@
 
 package hbtestllext
 
-import (
-	"github.com/elastic/go-lookslike"
-)
-
 // MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
 var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
 	"monitor": map[string]interface{}{

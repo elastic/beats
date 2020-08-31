@@ -28,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/pq"
 )
 
