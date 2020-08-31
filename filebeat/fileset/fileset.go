@@ -32,8 +32,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/elastic/go-ucfg"
-
 	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 

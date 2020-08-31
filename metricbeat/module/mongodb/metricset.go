@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 	"net"
 
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"

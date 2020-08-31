@@ -20,8 +20,6 @@ package cfgtype
 import (
 	"unicode"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 

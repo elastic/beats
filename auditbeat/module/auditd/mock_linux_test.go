@@ -23,7 +23,6 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/auparse"
 )
 

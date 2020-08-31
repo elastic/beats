@@ -54,8 +54,8 @@ function process(evt) {
 	}
 
 	for ip, typ := range map[string]interface{}{
-		"192.168.0.1":        "ipv4",
-		"::ffff:192.168.0.1": "ipv4",
+		"192.168.0.1":                             "ipv4",
+		"::ffff:192.168.0.1":                      "ipv4",
 		"2001:0db8:0000:0000:0000:ff00:0042:8329": "ipv6",
 		"2001:db8:0:0:0:ff00:42:8329":             "ipv6",
 		"2001:db8::ff00:42:8329":                  "ipv6",

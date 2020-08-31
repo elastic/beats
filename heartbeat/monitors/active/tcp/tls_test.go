@@ -38,7 +38,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
 

@@ -210,8 +210,8 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 			Handler:                      handlerName,
 			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
 			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
-			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
-			Tags:                         ts,
+			Timeout: int(lambdaConfig.Timeout.Seconds()),
+			Tags:    ts,
 		},
 		DependsOn: dependsOn,
 	}
