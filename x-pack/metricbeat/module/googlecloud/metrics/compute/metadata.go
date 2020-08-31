@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 

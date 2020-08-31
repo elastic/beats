@@ -18,8 +18,6 @@
 package replstatus
 
 import (
-	"gopkg.in/mgo.v2"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"

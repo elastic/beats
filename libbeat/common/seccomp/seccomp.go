@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-seccomp-bpf"
 )
 
 // PolicyChangeType specifies the type of change to make to a seccomp policy.

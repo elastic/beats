@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 )
 

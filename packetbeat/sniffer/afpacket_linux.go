@@ -59,8 +59,8 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 	}
 
 	h := &afpacketHandle{
-		promiscPreviousState:         promiscEnabled,
-		device:                       device,
+		promiscPreviousState: promiscEnabled,
+		device:               device,
 		promiscPreviousStateDetected: autoPromiscMode && err == nil,
 	}
 

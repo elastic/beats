@@ -22,8 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/go-ucfg"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"

@@ -50,10 +50,10 @@ func TestEventMapping(t *testing.T) {
 		UsageDetails: []consumption.UsageDetail{
 			{
 				UsageDetailProperties: &prop1,
-				ID:                    nil,
-				Name:                  nil,
-				Type:                  nil,
-				Tags:                  nil,
+				ID:   nil,
+				Name: nil,
+				Type: nil,
+				Tags: nil,
 			},
 		},
 		ActualCosts: []consumption.Forecast{
