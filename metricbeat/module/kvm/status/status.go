@@ -24,7 +24,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
 	"github.com/elastic/beats/v7/libbeat/common"
