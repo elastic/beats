@@ -17,6 +17,8 @@ type Registry struct {
 	mutex sync.Mutex
 	path  string
 
+	closed bool
+
 	stores map[string]*sharedStore
 }
 
@@ -45,6 +47,10 @@ func (r *Registry) NewCache(name string, opts Options) (*PersistentCache, error)
 func (r *Registry) OpenStore(logger *logp.Logger, name string) (*Store, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+
+	if r.closed {
+		return nil, fmt.Errorf("registry is closed")
+	}
 
 	if r.stores == nil {
 		r.stores = make(map[string]*sharedStore)
@@ -75,7 +81,7 @@ func (r *Registry) ReleaseStore(name string) error {
 
 	store, ok := r.stores[name]
 	if !ok {
-		panic(fmt.Sprintf("store '%s' not managed by this registry", name))
+		return fmt.Errorf("store '%s' not managed by this registry", name)
 	}
 
 	store.useCount--
@@ -84,6 +90,20 @@ func (r *Registry) ReleaseStore(name string) error {
 		return store.Close()
 	}
 	return nil
+}
+
+// ForceClose closes all stores managed by the registry. Operations on consumers that haven't
+// released the store will fail.
+func (r *Registry) ForceClose() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	r.closed = true
+
+	for name, store := range r.stores {
+		store.Close()
+		delete(r.stores, name)
+	}
 }
 
 type sharedStore struct {

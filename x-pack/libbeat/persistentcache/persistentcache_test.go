@@ -196,6 +196,26 @@ func TestRefreshOnAccess(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestForceCloseRegistry(t *testing.T) {
+	logp.TestingSetup()
+	t.Parallel()
+
+	registry := newTestRegistry(t)
+
+	cache, err := registry.NewCache("test", Options{})
+	require.NoError(t, err)
+
+	registry.ForceClose()
+
+	err = cache.Put("somekey", "somevalue")
+	assert.Error(t, err)
+
+	assert.Error(t, cache.Close())
+
+	cache, err = registry.NewCache("test", Options{})
+	require.Error(t, err)
+}
+
 var benchmarkCacheSizes = []int{10, 100, 1000, 10000, 100000}
 
 func BenchmarkPut(b *testing.B) {
