@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // Controller manages the state of the providers current context.
@@ -33,6 +34,12 @@ type controller struct {
 
 // New creates a new controller.
 func New(c *config.Config) (Controller, error) {
+	l, err := logger.New("composable")
+	if err != nil {
+		return nil, err
+	}
+	l.Info("EXPERIMENTAL - Dynamic Inputs are currently experimental and should not be used in production")
+
 	var providersCfg Config
 	if c != nil {
 		err := c.Unpack(&providersCfg)
