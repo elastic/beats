@@ -29,6 +29,7 @@ https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache H
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
 https://github.com/MelonSmasher/browserbeat[browserbeat]:: Reads and ships browser history (Chrome, Firefox, & Safari) to an Elastic output.
 https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consumer lag for Burrow V1.0.0(API V3).
+https://github.com/toravir/cborbeat[cborbeat]:: Reads from cbor encoded files (specifically log files). More: https://cbor.io[CBOR Encoding] https://github.com/toravir/csd[Decoder]
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
