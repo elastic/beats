@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/providers/linux"
 

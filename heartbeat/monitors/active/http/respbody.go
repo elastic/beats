@@ -24,8 +24,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/docker/go-units"
-
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common"
 )

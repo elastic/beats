@@ -25,7 +25,7 @@ import (
 	"hash"
 	"strings"
 
-	"github.com/cespare/xxhash/v2"
+	"github.com/cespare/xxhash"
 )
 
 type hashMethod func() hash.Hash

@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/go-txfile"
 )
 
 func init() {

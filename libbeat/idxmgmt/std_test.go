@@ -367,10 +367,10 @@ func TestIndexManager_Setup(t *testing.T) {
 	}{
 		"template default ilm default": {
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
-				"overwrite":                     "true",
-				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test",
+				"overwrite":                               "true",
+				"name":                                    "test-9.9.9",
+				"pattern":                                 "test-9.9.9-*",
+				"settings.index.lifecycle.name":           "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 			alias:  "test-9.9.9",
@@ -382,10 +382,10 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.ilm.policy_name":    "policy-keep",
 			},
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
-				"overwrite":                     "true",
-				"name":                          "mocktest",
-				"pattern":                       "mocktest-*",
-				"settings.index.lifecycle.name": "policy-keep",
+				"overwrite":                               "true",
+				"name":                                    "mocktest",
+				"pattern":                                 "mocktest-*",
+				"settings.index.lifecycle.name":           "policy-keep",
 				"settings.index.lifecycle.rollover_alias": "mocktest",
 			}),
 			alias:  "mocktest",
@@ -454,9 +454,9 @@ func TestIndexManager_Setup(t *testing.T) {
 		"template default ilm loadMode disabled": {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
-				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test",
+				"name":                                    "test-9.9.9",
+				"pattern":                                 "test-9.9.9-*",
+				"settings.index.lifecycle.name":           "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 		},

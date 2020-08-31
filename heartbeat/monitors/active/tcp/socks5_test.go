@@ -25,12 +25,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/armon/go-socks5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 )

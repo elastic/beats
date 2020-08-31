@@ -12,7 +12,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/dustin/go-humanize"
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
 	"golang.org/x/net/bpf"

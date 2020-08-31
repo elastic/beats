@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"

@@ -5,8 +5,6 @@
 package composed
 
 import (
-	"github.com/hashicorp/go-multierror"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 

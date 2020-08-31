@@ -110,7 +110,7 @@ func (input *kafkaInput) runConsumerGroup(
 		outlet:  input.outlet,
 		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
 		expandEventListFromField: input.config.ExpandEventListFromField,
-		log:                      input.log,
+		log: input.log,
 	}
 
 	input.saramaWaitGroup.Add(1)

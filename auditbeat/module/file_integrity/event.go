@@ -34,7 +34,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash/v2"
+	"github.com/cespare/xxhash"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"

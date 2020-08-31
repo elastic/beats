@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
 

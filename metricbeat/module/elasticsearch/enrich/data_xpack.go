@@ -49,10 +49,10 @@ func indexExecutingPolicies(r mb.ReporterV2, enrichData response, esInfo elastic
 	for _, stat := range enrichData.ExecutingPolicies {
 		event := mb.Event{}
 		event.RootFields = common.MapStr{
-			"cluster_uuid":                  esInfo.ClusterID,
-			"timestamp":                     now,
-			"interval_ms":                   intervalMS,
-			"type":                          "enrich_executing_policy_stats",
+			"cluster_uuid": esInfo.ClusterID,
+			"timestamp":    now,
+			"interval_ms":  intervalMS,
+			"type":         "enrich_executing_policy_stats",
 			"enrich_executing_policy_stats": stat,
 		}
 		event.Index = indexName
@@ -64,10 +64,10 @@ func indexCoordinatorStats(r mb.ReporterV2, enrichData response, esInfo elastics
 	for _, stat := range enrichData.CoordinatorStats {
 		event := mb.Event{}
 		event.RootFields = common.MapStr{
-			"cluster_uuid":             esInfo.ClusterID,
-			"timestamp":                now,
-			"interval_ms":              intervalMS,
-			"type":                     "enrich_coordinator_stats",
+			"cluster_uuid": esInfo.ClusterID,
+			"timestamp":    now,
+			"interval_ms":  intervalMS,
+			"type":         "enrich_coordinator_stats",
 			"enrich_coordinator_stats": stat,
 		}
 		event.Index = indexName

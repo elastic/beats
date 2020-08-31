@@ -27,8 +27,6 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/hashicorp/go-multierror"
-
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

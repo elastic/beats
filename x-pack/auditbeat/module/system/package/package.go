@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash/v2"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"

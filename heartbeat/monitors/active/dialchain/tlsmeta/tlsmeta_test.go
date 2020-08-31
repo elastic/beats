@@ -26,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/require"

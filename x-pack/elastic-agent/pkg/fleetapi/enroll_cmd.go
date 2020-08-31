@@ -12,8 +12,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )

@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
-	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
@@ -550,7 +549,7 @@ func TestNoHeaders(t *testing.T) {
 	defer server.Close()
 
 	configSrc := map[string]interface{}{
-		"urls":                     server.URL,
+		"urls": server.URL,
 		"response.include_headers": false,
 	}
 
