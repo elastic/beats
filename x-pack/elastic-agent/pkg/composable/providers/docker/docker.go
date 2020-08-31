@@ -36,8 +36,8 @@ type dynamicProvider struct {
 func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	watcher, err := docker.NewWatcher(c.logger, c.config.Host, c.config.TLS, false)
 	if err != nil {
-		// warn only; return nil (do nothing)
-		c.logger.Warnf("Failed starting docker provider: %s", err)
+		// info only; return nil (do nothing)
+		c.logger.Infof("Docker provider skipped, unable to connect: %s", err)
 		return nil
 	}
 	startListener := watcher.ListenStart()
@@ -46,8 +46,8 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	stopTrigger := make(chan *dockerContainerData)
 
 	if err := watcher.Start(); err != nil {
-		// warn only; return nil (do nothing)
-		c.logger.Warnf("Failed starting docker provider: %s", err)
+		// info only; return nil (do nothing)
+		c.logger.Infof("Docker provider skipped, unable to connect: %s", err)
 		return nil
 	}
 
