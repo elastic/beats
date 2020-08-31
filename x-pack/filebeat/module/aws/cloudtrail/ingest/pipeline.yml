@@ -468,12 +468,6 @@ processors:
           type:
             - user
             - info
-        ListGroupsForUser:
-          category:
-            - iam
-          type:
-            - user
-            - info
         ListGroupPolicies:
           category:
             - iam
