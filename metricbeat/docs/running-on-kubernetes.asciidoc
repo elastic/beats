@@ -208,6 +208,6 @@ Metrics should start flowing to Elasticsearch.
 In some cases, users might want to monitor really big Kubernetes clusters. In such cases,
 the Pod that will be collecting cluster level metrics might face performance issues due to
 resources limitations. In this case users might consider avoid using leader election configuration
-for the Daemonset and instead deploy a singleton Metribceat instance using a
-https://github.com/elastic/beats/blob/7.9/deploy/kubernetes/metricbeat/metricbeat-deployment.yaml[Deployment] with the
-proper https://github.com/elastic/beats/blob/7.9/deploy/kubernetes/metricbeat/metricbeat-deployment-configmap.yaml[configuration].
+for the Daemonset and instead deploy a singleton Metribceat instance using a Deployment with the
+proper configuration.
+
