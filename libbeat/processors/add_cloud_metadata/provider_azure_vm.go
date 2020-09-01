@@ -46,7 +46,7 @@ var azureVMMetadataFetcher = provider{
 			return out
 		}
 
-		fetcher, err := newMetadataFetcher(config, "az", azHeaders, metadataHost, azSchema, azMetadataURI)
+		fetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azSchema, azMetadataURI)
 		return fetcher, err
 	},
 }

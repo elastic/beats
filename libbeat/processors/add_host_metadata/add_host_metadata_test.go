@@ -357,6 +357,16 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 }
 
 func TestSkipAddingHostMetadata(t *testing.T) {
+	hostIDMap := map[string]string{}
+	hostIDMap["id"] = hostID
+
+	hostNameMap := map[string]string{}
+	hostNameMap["name"] = hostName
+
+	hostIDNameMap := map[string]string{}
+	hostIDNameMap["id"] = hostID
+	hostIDNameMap["name"] = hostName
+
 	cases := []struct {
 		title        string
 		event        beat.Event
@@ -400,6 +410,42 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 			"event without host field",
 			beat.Event{
 				Fields: common.MapStr{},
+			},
+			false,
+		},
+		{
+			"event with field type map[string]string hostID",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": hostIDMap,
+				},
+			},
+			true,
+		},
+		{
+			"event with field type map[string]string host name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": hostNameMap,
+				},
+			},
+			false,
+		},
+		{
+			"event with field type map[string]string host ID and name",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": hostIDNameMap,
+				},
+			},
+			true,
+		},
+		{
+			"event with field type string",
+			beat.Event{
+				Fields: common.MapStr{
+					"host": "string",
+				},
 			},
 			false,
 		},
