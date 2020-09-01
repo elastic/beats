@@ -35,7 +35,7 @@ It is compatible with a subset of applications under the https://developers.goog
 [float]
 === Configure the module
 
-In order for filebeat to ingest data from the Google Reports API you must:
+In order for Filebeat to ingest data from the Google Reports API you must:
 
 - Have an *administrator account*.
 - https://support.google.com/gsuitemigrate/answer/9222993?hl=en[Set up a ServiceAccount] using the administrator account.
