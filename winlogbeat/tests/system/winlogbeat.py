@@ -11,8 +11,6 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 
 PROVIDER = "WinlogbeatTestPython"
