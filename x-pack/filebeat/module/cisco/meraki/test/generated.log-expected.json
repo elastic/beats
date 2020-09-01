@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2016-01-29T06:09:59.000Z",
         "destination.ip": [
             "10.193.124.51"
         ],
@@ -16,8 +17,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.193.124.51",
-            "10.15.44.253"
+            "10.15.44.253",
+            "10.193.124.51"
         ],
         "rsa.internal.event_desc": "olaborissecurity_event tur",
         "rsa.internal.messageid": "security_event",
@@ -28,6 +29,7 @@
         "rsa.misc.event_type": "security_event",
         "rsa.misc.node": "nto_",
         "rsa.misc.sensor": "nto_",
+        "rsa.time.event_time": "2016-01-29T06:09:59.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.15.44.253"
@@ -41,6 +43,7 @@
         "url.original": "https://example.org/odoco/ria.jpg?ritin=uredolor#tatemac"
     },
     {
+        "@timestamp": "2016-02-12T13:12:33.000Z",
         "destination.mac": "01:00:5e:0f:87:e3",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -54,8 +57,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.102.218.31",
-            "10.15.16.212"
+            "10.15.16.212",
+            "10.102.218.31"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -63,6 +66,7 @@
         "rsa.misc.sensor": "vol_",
         "rsa.network.dns_a_record": "aqu",
         "rsa.network.mask": "ameaqu",
+        "rsa.time.event_time": "2016-02-12T13:12:33.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.102.218.31"
@@ -74,6 +78,7 @@
         ]
     },
     {
+        "@timestamp": "2016-02-26T20:15:08.000Z",
         "event.action": "ceroinBC flows src=10.179.60.216 dst=10.69.53.104 protocol=udp pattern: 0 reprehe",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -92,6 +97,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "minim_",
         "rsa.misc.sensor": "minim_",
+        "rsa.time.event_time": "2016-02-26T20:15:08.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -99,6 +105,7 @@
         ]
     },
     {
+        "@timestamp": "2016-03-12T03:17:42.000Z",
         "destination.ip": [
             "10.112.46.169"
         ],
@@ -125,6 +132,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "taliquip_",
         "rsa.misc.sensor": "taliquip_",
+        "rsa.time.event_time": "2016-03-12T03:17:42.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.155.236.240"
@@ -136,6 +144,7 @@
         ]
     },
     {
+        "@timestamp": "2016-03-26T10:20:16.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -155,6 +164,7 @@
         "rsa.misc.node": "uidexea",
         "rsa.misc.sensor": "uidexea",
         "rsa.network.eth_host": "01:00:5e:a3:d9:ac",
+        "rsa.time.event_time": "2016-03-26T10:20:16.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.14.107.140"
@@ -165,6 +175,7 @@
         ]
     },
     {
+        "@timestamp": "2016-04-09T17:22:51.000Z",
         "destination.ip": [
             "10.108.180.105"
         ],
@@ -188,6 +199,7 @@
         "rsa.misc.category": "ari",
         "rsa.misc.node": "urerep",
         "rsa.misc.sensor": "urerep",
+        "rsa.time.event_time": "2016-04-09T17:22:51.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -196,6 +208,7 @@
         "url.original": "https://api.example.org/liqu/lorem.gif?ueipsaqu=uidolore#niamqu"
     },
     {
+        "@timestamp": "2016-04-24T00:25:25.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -215,6 +228,7 @@
         "rsa.misc.node": "riat",
         "rsa.misc.sensor": "riat",
         "rsa.network.eth_host": "01:00:5e:3f:49:e4",
+        "rsa.time.event_time": "2016-04-24T00:25:25.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.149.88.198"
@@ -225,6 +239,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-08T07:27:59.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -241,6 +256,7 @@
         "rsa.misc.node": "animi",
         "rsa.misc.sensor": "animi",
         "rsa.network.eth_host": "01:00:5e:e3:10:34",
+        "rsa.time.event_time": "2016-05-08T07:27:59.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -248,6 +264,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-22T14:30:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -267,6 +284,7 @@
         "rsa.misc.node": "ite",
         "rsa.misc.sensor": "ite",
         "rsa.network.eth_host": "01:00:5e:9f:b6:a6",
+        "rsa.time.event_time": "2016-05-22T14:30:33.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.243.206.225"
@@ -277,6 +295,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-05T21:33:08.000Z",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -297,6 +316,7 @@
         "rsa.misc.event_type": "ids-alerts",
         "rsa.misc.node": "tatno_ ids-alerts taliqu",
         "rsa.misc.sensor": "tatno_ ids-alerts taliqu",
+        "rsa.time.event_time": "2016-06-05T21:33:08.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.131.82.116"
@@ -308,6 +328,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-20T04:35:42.000Z",
         "destination.ip": [
             "10.134.0.141"
         ],
@@ -336,6 +357,7 @@
         "rsa.misc.event_type": "security_event",
         "rsa.misc.node": "ehenderi_",
         "rsa.misc.sensor": "ehenderi_",
+        "rsa.time.event_time": "2016-06-20T04:35:42.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.210.213.18"
@@ -349,6 +371,7 @@
         "url.original": "https://www5.example.net/sun/essecill.html?saute=vel#quu"
     },
     {
+        "@timestamp": "2016-07-04T11:38:16.000Z",
         "destination.ip": [
             "10.74.237.180"
         ],
@@ -366,8 +389,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.74.237.180",
-            "10.163.72.17"
+            "10.163.72.17",
+            "10.74.237.180"
         ],
         "rsa.internal.event_desc": "remipsum security_event liq",
         "rsa.internal.messageid": "security_event",
@@ -375,6 +398,7 @@
         "rsa.misc.node": "oremagna_",
         "rsa.misc.policy_name": "nsequu",
         "rsa.misc.sensor": "oremagna_",
+        "rsa.time.event_time": "2016-07-04T11:38:16.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.163.72.17"
@@ -386,6 +410,7 @@
         ]
     },
     {
+        "@timestamp": "2016-07-18T18:40:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -405,6 +430,7 @@
         "rsa.misc.node": "Nemoeni",
         "rsa.misc.sensor": "Nemoeni",
         "rsa.network.eth_host": "01:00:5e:e2:67:d2",
+        "rsa.time.event_time": "2016-07-18T18:40:50.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.72.31.26"
@@ -415,6 +441,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-02T01:43:25.000Z",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -435,6 +462,7 @@
         "rsa.misc.event_type": "ids-alerts",
         "rsa.misc.node": "mqui",
         "rsa.misc.sensor": "mqui",
+        "rsa.time.event_time": "2016-08-02T01:43:25.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.70.95.74"
@@ -446,6 +474,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-16T08:45:59.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -465,6 +494,7 @@
         "rsa.misc.node": "sumquiad",
         "rsa.misc.sensor": "sumquiad",
         "rsa.network.eth_host": "01:00:5e:9c:d2:4a",
+        "rsa.time.event_time": "2016-08-16T08:45:59.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.17.21.125"
@@ -475,6 +505,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-30T15:48:33.000Z",
         "destination.mac": "01:00:5e:46:17:35",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -488,8 +519,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.85.10.165",
-            "10.53.150.119"
+            "10.53.150.119",
+            "10.85.10.165"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -497,6 +528,7 @@
         "rsa.misc.sensor": "nsec",
         "rsa.network.dns_a_record": "tisetq",
         "rsa.network.mask": "uiineavo",
+        "rsa.time.event_time": "2016-08-30T15:48:33.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.85.10.165"
@@ -508,6 +540,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-13T22:51:07.000Z",
         "destination.ip": [
             "10.187.77.245"
         ],
@@ -532,6 +565,7 @@
         "rsa.misc.node": "iscinge",
         "rsa.misc.policy_name": "iadese",
         "rsa.misc.sensor": "iscinge",
+        "rsa.time.event_time": "2016-09-13T22:51:07.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.88.231.224"
@@ -542,6 +576,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-28T05:53:42.000Z",
         "destination.ip": [
             "10.186.58.115"
         ],
@@ -565,6 +600,7 @@
         "rsa.misc.category": "aqu",
         "rsa.misc.node": "tat",
         "rsa.misc.sensor": "tat",
+        "rsa.time.event_time": "2016-09-28T05:53:42.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -573,6 +609,7 @@
         "url.original": "https://internal.example.com/quae/maccusa.htm?rQuisau=idex#xerci"
     },
     {
+        "@timestamp": "2016-10-12T12:56:16.000Z",
         "destination.mac": "01:00:5e:87:e1:a0",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -595,6 +632,7 @@
         "rsa.misc.sensor": "untmolli_",
         "rsa.network.dns_a_record": "samvolu",
         "rsa.network.mask": "uovolup",
+        "rsa.time.event_time": "2016-10-12T12:56:16.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.219.84.37"
@@ -606,6 +644,7 @@
         ]
     },
     {
+        "@timestamp": "2016-10-26T19:58:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -625,6 +664,7 @@
         "rsa.misc.node": "evita",
         "rsa.misc.sensor": "evita",
         "rsa.network.eth_host": "01:00:5e:ec:f8:cc",
+        "rsa.time.event_time": "2016-10-26T19:58:50.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.3.134.237"
@@ -635,6 +675,7 @@
         ]
     },
     {
+        "@timestamp": "2016-11-10T03:01:24.000Z",
         "destination.ip": [
             "10.63.194.87"
         ],
@@ -662,6 +703,7 @@
         "rsa.misc.node": "uscipit",
         "rsa.misc.sensor": "uscipit",
         "rsa.time.duration_time": 48.123,
+        "rsa.time.event_time": "2016-11-10T03:01:24.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.182.178.217"
@@ -673,6 +715,7 @@
         "url.original": "https://internal.example.net/ris/uamqu.txt?liqui=quioffi#uptate"
     },
     {
+        "@timestamp": "2016-11-24T10:03:59.000Z",
         "destination.ip": [
             "10.163.154.210"
         ],
@@ -689,8 +732,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.163.154.210",
-            "10.153.0.77"
+            "10.153.0.77",
+            "10.163.154.210"
         ],
         "rsa.counters.dclass_r1": "utlabor",
         "rsa.internal.messageid": "events",
@@ -700,6 +743,7 @@
         "rsa.misc.node": "fde",
         "rsa.misc.sensor": "fde",
         "rsa.time.duration_time": 71.798,
+        "rsa.time.event_time": "2016-11-24T10:03:59.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.153.0.77"
@@ -711,6 +755,7 @@
         "url.original": "https://mail.example.com/icabo/itatio.jpg?eleum=sintoc#volupt"
     },
     {
+        "@timestamp": "2016-12-08T17:06:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -730,6 +775,7 @@
         "rsa.misc.node": "ciati",
         "rsa.misc.sensor": "ciati",
         "rsa.network.eth_host": "01:00:5e:b9:6b:a8",
+        "rsa.time.event_time": "2016-12-08T17:06:33.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.73.69.176"
@@ -740,6 +786,7 @@
         ]
     },
     {
+        "@timestamp": "2016-12-23T00:09:07.000Z",
         "event.action": "ese flows allow src=10.145.248.111 dst=10.57.6.252 mac=01:00:5e:94:6a:cf protocol=udp",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -758,6 +805,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "ommodico_",
         "rsa.misc.sensor": "ommodico_",
+        "rsa.time.event_time": "2016-12-23T00:09:07.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -765,6 +813,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-06T07:11:41.000Z",
         "destination.ip": [
             "10.12.182.70"
         ],
@@ -782,8 +831,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.31.77.157",
-            "10.12.182.70"
+            "10.12.182.70",
+            "10.31.77.157"
         ],
         "rsa.internal.event_desc": "uiac security_event epte",
         "rsa.internal.messageid": "security_event",
@@ -791,6 +840,7 @@
         "rsa.misc.node": "uamest_",
         "rsa.misc.policy_name": "tev",
         "rsa.misc.sensor": "uamest_",
+        "rsa.time.event_time": "2017-01-06T07:11:41.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.31.77.157"
@@ -802,6 +852,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-20T14:14:16.000Z",
         "event.action": "cancel",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -820,6 +871,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "inibusB",
         "rsa.misc.sensor": "inibusB",
+        "rsa.time.event_time": "2017-01-20T14:14:16.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -827,6 +879,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-03T21:16:50.000Z",
         "destination.ip": [
             "10.135.217.12"
         ],
@@ -853,6 +906,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "pid_",
         "rsa.misc.sensor": "pid_",
+        "rsa.time.event_time": "2017-02-03T21:16:50.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.93.68.231"
@@ -864,6 +918,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-18T04:19:24.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -880,6 +935,7 @@
         "rsa.misc.node": "esciuntN_",
         "rsa.misc.sensor": "esciuntN_",
         "rsa.network.eth_host": "01:00:5e:8b:99:98",
+        "rsa.time.event_time": "2017-02-18T04:19:24.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -887,6 +943,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-04T11:21:59.000Z",
         "destination.ip": [
             "10.66.89.5"
         ],
@@ -913,6 +970,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "ncidi_",
         "rsa.misc.sensor": "ncidi_",
+        "rsa.time.event_time": "2017-03-04T11:21:59.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.247.30.212"
@@ -924,6 +982,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-18T18:24:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -939,6 +998,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "madminim",
         "rsa.misc.sensor": "madminim",
+        "rsa.time.event_time": "2017-03-18T18:24:33.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -946,6 +1006,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-02T01:27:07.000Z",
         "destination.ip": [
             "10.173.136.186"
         ],
@@ -973,6 +1034,7 @@
         "rsa.misc.node": "iduntu",
         "rsa.misc.policy_name": "naal",
         "rsa.misc.sensor": "iduntu",
+        "rsa.time.event_time": "2017-04-02T01:27:07.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.221.102.245"
@@ -983,6 +1045,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-16T08:29:41.000Z",
         "destination.ip": [
             "10.54.37.86"
         ],
@@ -1009,6 +1072,7 @@
         "rsa.misc.node": "uscipitl_ ids-alerts ritatise",
         "rsa.misc.policy_name": "entorev",
         "rsa.misc.sensor": "uscipitl_ ids-alerts ritatise",
+        "rsa.time.event_time": "2017-04-16T08:29:41.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.58.64.108"
@@ -1019,6 +1083,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-30T15:32:16.000Z",
         "destination.ip": [
             "10.163.93.20"
         ],
@@ -1035,8 +1100,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.147.76.202",
-            "10.163.93.20"
+            "10.163.93.20",
+            "10.147.76.202"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -1045,6 +1110,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "uunturm_",
         "rsa.misc.sensor": "uunturm_",
+        "rsa.time.event_time": "2017-04-30T15:32:16.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.147.76.202"
@@ -1056,6 +1122,7 @@
         ]
     },
     {
+        "@timestamp": "2017-05-14T22:34:50.000Z",
         "destination.ip": [
             "10.183.44.198"
         ],
@@ -1075,8 +1142,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.183.44.198",
-            "10.0.200.27"
+            "10.0.200.27",
+            "10.183.44.198"
         ],
         "rsa.internal.event_desc": "uradi security_event tot",
         "rsa.internal.messageid": "security_event",
@@ -1084,6 +1151,7 @@
         "rsa.misc.node": "uptatema_",
         "rsa.misc.policy_name": "asiarc",
         "rsa.misc.sensor": "uptatema_",
+        "rsa.time.event_time": "2017-05-14T22:34:50.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.0.200.27"
@@ -1095,6 +1163,7 @@
         ]
     },
     {
+        "@timestamp": "2017-05-29T05:37:24.000Z",
         "destination.mac": "01:00:5e:06:12:98",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1108,8 +1177,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.28.144.180",
-            "10.148.124.84"
+            "10.148.124.84",
+            "10.28.144.180"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -1117,6 +1186,7 @@
         "rsa.misc.sensor": "icabo_",
         "rsa.network.dns_a_record": "temporin",
         "rsa.network.mask": "ritin",
+        "rsa.time.event_time": "2017-05-29T05:37:24.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.148.124.84"
@@ -1128,6 +1198,7 @@
         ]
     },
     {
+        "@timestamp": "2017-06-12T12:39:58.000Z",
         "destination.ip": [
             "10.98.194.212"
         ],
@@ -1144,8 +1215,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.204.230.166",
-            "10.98.194.212"
+            "10.98.194.212",
+            "10.204.230.166"
         ],
         "rsa.counters.dclass_r1": "enimadmi",
         "rsa.internal.messageid": "events",
@@ -1155,6 +1226,7 @@
         "rsa.misc.node": "remips",
         "rsa.misc.sensor": "remips",
         "rsa.time.duration_time": 165.611,
+        "rsa.time.event_time": "2017-06-12T12:39:58.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.204.230.166"
@@ -1166,6 +1238,7 @@
         "url.original": "https://example.net/ites/isetq.gif?nisiut=tur#avolupt"
     },
     {
+        "@timestamp": "2017-06-26T19:42:33.000Z",
         "destination.ip": [
             "10.197.13.39"
         ],
@@ -1188,6 +1261,7 @@
         "rsa.misc.category": "borisnis",
         "rsa.misc.node": "admi",
         "rsa.misc.sensor": "admi",
+        "rsa.time.event_time": "2017-06-26T19:42:33.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1196,6 +1270,7 @@
         "url.original": "https://www.example.org/ueipsa/tae.html?eriti=atcupi#corpori"
     },
     {
+        "@timestamp": "2017-07-11T02:45:07.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1212,6 +1287,7 @@
         "rsa.misc.node": "eratvol",
         "rsa.misc.sensor": "eratvol",
         "rsa.network.eth_host": "01:00:5e:fd:84:bb",
+        "rsa.time.event_time": "2017-07-11T02:45:07.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1219,6 +1295,7 @@
         ]
     },
     {
+        "@timestamp": "2017-07-25T09:47:41.000Z",
         "destination.ip": [
             "10.150.245.88"
         ],
@@ -1243,6 +1320,7 @@
         "rsa.misc.node": "nimid",
         "rsa.misc.policy_name": "orisn",
         "rsa.misc.sensor": "nimid",
+        "rsa.time.event_time": "2017-07-25T09:47:41.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.242.77.170"
@@ -1253,6 +1331,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-08T16:50:15.000Z",
         "destination.ip": [
             "10.180.195.43"
         ],
@@ -1278,6 +1357,7 @@
         "rsa.misc.node": "isc_ ids-alerts volupt",
         "rsa.misc.policy_name": "tenatuse",
         "rsa.misc.sensor": "isc_ ids-alerts volupt",
+        "rsa.time.event_time": "2017-08-08T16:50:15.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.247.139.239"
@@ -1289,6 +1369,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-22T23:52:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1305,6 +1386,7 @@
         "rsa.misc.node": "consequa",
         "rsa.misc.sensor": "consequa",
         "rsa.network.eth_host": "01:00:5e:50:48:c4",
+        "rsa.time.event_time": "2017-08-22T23:52:50.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1312,6 +1394,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-06T06:55:24.000Z",
         "destination.ip": [
             "10.147.15.213"
         ],
@@ -1328,14 +1411,15 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.94.6.140",
-            "10.147.15.213"
+            "10.147.15.213",
+            "10.94.6.140"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
         "rsa.misc.node": "uov_ ids-alerts isn",
         "rsa.misc.policy_name": "uptat",
         "rsa.misc.sensor": "uov_ ids-alerts isn",
+        "rsa.time.event_time": "2017-09-06T06:55:24.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.94.6.140"
@@ -1346,6 +1430,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-20T13:57:58.000Z",
         "destination.ip": [
             "10.111.157.56"
         ],
@@ -1372,6 +1457,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "mve_",
         "rsa.misc.sensor": "mve_",
+        "rsa.time.event_time": "2017-09-20T13:57:58.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.230.6.127"
@@ -1383,6 +1469,7 @@
         ]
     },
     {
+        "@timestamp": "2017-10-04T21:00:32.000Z",
         "destination.ip": [
             "10.193.219.34"
         ],
@@ -1399,8 +1486,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.179.40.170",
-            "10.193.219.34"
+            "10.193.219.34",
+            "10.179.40.170"
         ],
         "rsa.counters.dclass_r1": "emip",
         "rsa.internal.messageid": "events",
@@ -1410,6 +1497,7 @@
         "rsa.misc.node": "veniamq",
         "rsa.misc.sensor": "veniamq",
         "rsa.time.duration_time": 85.513,
+        "rsa.time.event_time": "2017-10-04T21:00:32.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.179.40.170"
@@ -1421,6 +1509,7 @@
         "url.original": "https://www.example.net/irured/illumqui.txt?tionula=ritqu#ecatcupi"
     },
     {
+        "@timestamp": "2017-10-19T04:03:07.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1440,6 +1529,7 @@
         "rsa.misc.node": "oremquel",
         "rsa.misc.sensor": "oremquel",
         "rsa.network.eth_host": "01:00:5e:ee:e8:77",
+        "rsa.time.event_time": "2017-10-19T04:03:07.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.255.199.16"
@@ -1450,6 +1540,7 @@
         ]
     },
     {
+        "@timestamp": "2017-11-02T11:05:41.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1469,6 +1560,7 @@
         "rsa.misc.node": "llam",
         "rsa.misc.sensor": "llam",
         "rsa.network.eth_host": "01:00:5e:f1:21:bd",
+        "rsa.time.event_time": "2017-11-02T11:05:41.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.94.88.5"
@@ -1479,6 +1571,7 @@
         ]
     },
     {
+        "@timestamp": "2017-11-16T18:08:15.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1494,6 +1587,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "quaeab_",
         "rsa.misc.sensor": "quaeab_",
+        "rsa.time.event_time": "2017-11-16T18:08:15.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1501,6 +1595,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-01T01:10:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1516,6 +1611,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "liquid",
         "rsa.misc.sensor": "liquid",
+        "rsa.time.event_time": "2017-12-01T01:10:49.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1523,6 +1619,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-15T08:13:24.000Z",
         "destination.ip": [
             "10.124.63.4"
         ],
@@ -1550,6 +1647,7 @@
         "rsa.misc.node": "ser",
         "rsa.misc.policy_name": "pta",
         "rsa.misc.sensor": "ser",
+        "rsa.time.event_time": "2017-12-15T08:13:24.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.90.99.245"
@@ -1560,6 +1658,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-29T15:15:58.000Z",
         "destination.ip": [
             "10.249.7.146"
         ],
@@ -1582,6 +1681,7 @@
         "rsa.misc.category": "laudan",
         "rsa.misc.node": "moe",
         "rsa.misc.sensor": "moe",
+        "rsa.time.event_time": "2017-12-29T15:15:58.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1590,6 +1690,7 @@
         "url.original": "https://mail.example.net/uat/lupta.html?uptassit=ncidi#tlabori"
     },
     {
+        "@timestamp": "2018-01-12T22:18:32.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1605,6 +1706,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "edquia",
         "rsa.misc.sensor": "edquia",
+        "rsa.time.event_time": "2018-01-12T22:18:32.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1612,6 +1714,7 @@
         ]
     },
     {
+        "@timestamp": "2018-01-27T05:21:06.000Z",
         "destination.ip": [
             "10.81.234.34"
         ],
@@ -1630,8 +1733,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.81.234.34",
-            "10.196.96.162"
+            "10.196.96.162",
+            "10.81.234.34"
         ],
         "rsa.internal.event_desc": "Utenima security_event iqua",
         "rsa.internal.messageid": "security_event",
@@ -1639,6 +1742,7 @@
         "rsa.misc.node": "tobeatae_",
         "rsa.misc.policy_name": "equuntur",
         "rsa.misc.sensor": "tobeatae_",
+        "rsa.time.event_time": "2018-01-27T05:21:06.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.196.96.162"
@@ -1649,6 +1753,7 @@
         ]
     },
     {
+        "@timestamp": "2018-02-10T12:23:41.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1664,6 +1769,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "henderi",
         "rsa.misc.sensor": "henderi",
+        "rsa.time.event_time": "2018-02-10T12:23:41.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1671,6 +1777,7 @@
         ]
     },
     {
+        "@timestamp": "2018-02-24T19:26:15.000Z",
         "destination.mac": "01:00:5e:7c:01:ab",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1685,8 +1792,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.78.199.43",
-            "10.40.101.224"
+            "10.40.101.224",
+            "10.78.199.43"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -1697,6 +1804,7 @@
         ],
         "rsa.network.dns_a_record": "ilmole",
         "rsa.network.mask": "ehender",
+        "rsa.time.event_time": "2018-02-24T19:26:15.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.40.101.224"
@@ -1708,6 +1816,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-11T02:28:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1727,6 +1836,7 @@
         "rsa.misc.node": "isund",
         "rsa.misc.sensor": "isund",
         "rsa.network.eth_host": "01:00:5e:5f:c1:3e",
+        "rsa.time.event_time": "2018-03-11T02:28:49.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.244.29.119"
@@ -1737,6 +1847,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-25T09:31:24.000Z",
         "destination.ip": [
             "10.39.172.93"
         ],
@@ -1753,8 +1864,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.83.131.245",
-            "10.39.172.93"
+            "10.39.172.93",
+            "10.83.131.245"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -1763,6 +1874,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "gna_",
         "rsa.misc.sensor": "gna_",
+        "rsa.time.event_time": "2018-03-25T09:31:24.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.83.131.245"
@@ -1774,6 +1886,7 @@
         ]
     },
     {
+        "@timestamp": "2018-04-08T16:33:58.000Z",
         "destination.mac": "01:00:5e:7e:cd:15",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1787,8 +1900,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.201.168.116",
-            "10.86.188.179"
+            "10.86.188.179",
+            "10.201.168.116"
         ],
         "rsa.internal.messageid": "events",
         "rsa.misc.event_source": "appliance",
@@ -1796,6 +1909,7 @@
         "rsa.misc.sensor": "sciveli_",
         "rsa.network.dns_a_record": "laborum",
         "rsa.network.mask": "umiure",
+        "rsa.time.event_time": "2018-04-08T16:33:58.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.86.188.179"
@@ -1807,6 +1921,7 @@
         ]
     },
     {
+        "@timestamp": "2018-04-22T23:36:32.000Z",
         "destination.ip": [
             "10.122.204.151"
         ],
@@ -1823,8 +1938,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.148.211.222",
-            "10.122.204.151"
+            "10.122.204.151",
+            "10.148.211.222"
         ],
         "rsa.internal.event_desc": "umexercisecurity_event duntut",
         "rsa.internal.messageid": "security_event",
@@ -1835,6 +1950,7 @@
         "rsa.misc.event_type": "security_event",
         "rsa.misc.node": "acom_",
         "rsa.misc.sensor": "acom_",
+        "rsa.time.event_time": "2018-04-22T23:36:32.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.148.211.222"
@@ -1848,6 +1964,7 @@
         "url.original": "https://mail.example.com/prehend/eufug.htm?eufug=est#civelits"
     },
     {
+        "@timestamp": "2018-05-07T06:39:06.000Z",
         "event.action": "luptatem flows accept",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1866,6 +1983,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "stquidol_",
         "rsa.misc.sensor": "stquidol_",
+        "rsa.time.event_time": "2018-05-07T06:39:06.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -1873,6 +1991,7 @@
         ]
     },
     {
+        "@timestamp": "2018-05-21T13:41:41.000Z",
         "destination.ip": [
             "10.120.4.9"
         ],
@@ -1897,6 +2016,7 @@
         "rsa.misc.node": "upt",
         "rsa.misc.policy_name": "teni",
         "rsa.misc.sensor": "upt",
+        "rsa.time.event_time": "2018-05-21T13:41:41.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.97.46.16"
@@ -1907,6 +2027,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-04T20:44:15.000Z",
         "destination.ip": [
             "10.165.173.162"
         ],
@@ -1931,6 +2052,7 @@
         "rsa.misc.node": "litseddo_ ids-alerts oremqu",
         "rsa.misc.policy_name": "lestia",
         "rsa.misc.sensor": "litseddo_ ids-alerts oremqu",
+        "rsa.time.event_time": "2018-06-04T20:44:15.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.171.206.139"
@@ -1941,6 +2063,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-19T03:46:49.000Z",
         "destination.mac": "01:00:5e:f2:d3:12",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1967,6 +2090,7 @@
         ],
         "rsa.network.dns_a_record": "orem",
         "rsa.network.mask": "oinBCSed",
+        "rsa.time.event_time": "2018-06-19T03:46:49.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.150.163.151"
@@ -1978,6 +2102,7 @@
         ]
     },
     {
+        "@timestamp": "2018-07-03T10:49:23.000Z",
         "destination.ip": [
             "10.54.44.231"
         ],
@@ -1995,14 +2120,15 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.52.202.158",
-            "10.54.44.231"
+            "10.54.44.231",
+            "10.52.202.158"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
         "rsa.misc.node": "elillum_ ids-alerts tco",
         "rsa.misc.policy_name": "Ute",
         "rsa.misc.sensor": "elillum_ ids-alerts tco",
+        "rsa.time.event_time": "2018-07-03T10:49:23.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.52.202.158"
@@ -2014,6 +2140,7 @@
         ]
     },
     {
+        "@timestamp": "2018-07-17T17:51:58.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2033,6 +2160,7 @@
         "rsa.misc.node": "olorsi_",
         "rsa.misc.sensor": "olorsi_",
         "rsa.network.eth_host": "01:00:5e:f0:a9:cd",
+        "rsa.time.event_time": "2018-07-17T17:51:58.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.101.183.86"
@@ -2043,6 +2171,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-01T00:54:32.000Z",
         "event.action": "orem flows src=10.71.22.225 dst=10.4.76.100 protocol=ggp pattern: allow serrorsi",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2061,6 +2190,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "atcupid_",
         "rsa.misc.sensor": "atcupid_",
+        "rsa.time.event_time": "2018-08-01T00:54:32.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2068,6 +2198,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-15T07:57:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2087,6 +2218,7 @@
         "rsa.misc.node": "siar",
         "rsa.misc.sensor": "siar",
         "rsa.network.eth_host": "01:00:5e:45:aa:51",
+        "rsa.time.event_time": "2018-08-15T07:57:06.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.83.130.95"
@@ -2097,6 +2229,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-29T14:59:40.000Z",
         "destination.ip": [
             "10.103.49.129"
         ],
@@ -2124,6 +2257,7 @@
         "rsa.misc.node": "nofdeFi",
         "rsa.misc.sensor": "nofdeFi",
         "rsa.time.duration_time": 91.439,
+        "rsa.time.event_time": "2018-08-29T14:59:40.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.2.110.73"
@@ -2135,6 +2269,7 @@
         "url.original": "https://www.example.net/doconse/eni.html?mSec=smoditem#tatisetq"
     },
     {
+        "@timestamp": "2018-09-12T22:02:15.000Z",
         "destination.ip": [
             "10.132.176.96"
         ],
@@ -2151,8 +2286,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.158.61.228",
-            "10.132.176.96"
+            "10.132.176.96",
+            "10.158.61.228"
         ],
         "rsa.counters.dclass_r1": "eserun",
         "rsa.internal.messageid": "events",
@@ -2162,6 +2297,7 @@
         "rsa.misc.node": "amni",
         "rsa.misc.sensor": "amni",
         "rsa.time.duration_time": 59.289,
+        "rsa.time.event_time": "2018-09-12T22:02:15.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.158.61.228"
@@ -2173,6 +2309,7 @@
         "url.original": "https://www.example.com/seq/moll.htm?sunt=dquianon#urExc"
     },
     {
+        "@timestamp": "2018-09-27T05:04:49.000Z",
         "destination.mac": "01:00:5e:69:92:4a",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -2199,6 +2336,7 @@
         ],
         "rsa.network.dns_a_record": "orissus",
         "rsa.network.mask": "amnihil",
+        "rsa.time.event_time": "2018-09-27T05:04:49.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.105.136.146"
@@ -2210,6 +2348,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-11T12:07:23.000Z",
         "destination.ip": [
             "10.123.62.215"
         ],
@@ -2234,6 +2373,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "quiavolu",
         "rsa.misc.sensor": "quiavolu",
+        "rsa.time.event_time": "2018-10-11T12:07:23.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.245.199.23"
@@ -2244,6 +2384,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-25T19:09:57.000Z",
         "event.action": "cancel src=10.239.105.121 dst=10.70.7.23 mac=01:00:5e:8e:82:f0 protocol=ipv6",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2262,6 +2403,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "deri",
         "rsa.misc.sensor": "deri",
+        "rsa.time.event_time": "2018-10-25T19:09:57.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2269,6 +2411,7 @@
         ]
     },
     {
+        "@timestamp": "2018-11-09T02:12:32.000Z",
         "destination.ip": [
             "10.16.230.121"
         ],
@@ -2285,8 +2428,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.196.176.243",
-            "10.16.230.121"
+            "10.16.230.121",
+            "10.196.176.243"
         ],
         "rsa.counters.dclass_r1": "velites",
         "rsa.internal.messageid": "events",
@@ -2296,6 +2439,7 @@
         "rsa.misc.node": "midest",
         "rsa.misc.sensor": "midest",
         "rsa.time.duration_time": 116.294,
+        "rsa.time.event_time": "2018-11-09T02:12:32.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.196.176.243"
@@ -2307,6 +2451,7 @@
         "url.original": "https://www.example.net/sectetur/edquian.html?turQuis=taevi#uames"
     },
     {
+        "@timestamp": "2018-11-23T09:15:06.000Z",
         "destination.ip": [
             "10.34.62.190"
         ],
@@ -2335,6 +2480,7 @@
         "rsa.misc.node": "gna",
         "rsa.misc.policy_name": "eve",
         "rsa.misc.sensor": "gna",
+        "rsa.time.event_time": "2018-11-23T09:15:06.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.246.152.72"
@@ -2346,6 +2492,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-07T16:17:40.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2362,6 +2509,7 @@
         "rsa.misc.node": "ulamcola",
         "rsa.misc.sensor": "ulamcola",
         "rsa.network.eth_host": "01:00:5e:67:fc:cb",
+        "rsa.time.event_time": "2018-12-07T16:17:40.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2369,6 +2517,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-21T23:20:14.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2385,6 +2534,7 @@
         "rsa.misc.node": "usanti_",
         "rsa.misc.sensor": "usanti_",
         "rsa.network.eth_host": "01:00:5e:7d:de:f7",
+        "rsa.time.event_time": "2018-12-21T23:20:14.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2392,6 +2542,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-05T06:22:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2408,6 +2559,7 @@
         "rsa.misc.node": "consequu_",
         "rsa.misc.sensor": "consequu_",
         "rsa.network.eth_host": "01:00:5e:6b:96:f2",
+        "rsa.time.event_time": "2019-01-05T06:22:49.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2415,6 +2567,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-19T13:25:23.000Z",
         "destination.ip": [
             "10.121.9.5"
         ],
@@ -2439,6 +2592,7 @@
         "rsa.misc.node": "emUtenim",
         "rsa.misc.policy_name": "uptas",
         "rsa.misc.sensor": "emUtenim",
+        "rsa.time.event_time": "2019-01-19T13:25:23.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.244.32.189"
@@ -2449,6 +2603,7 @@
         ]
     },
     {
+        "@timestamp": "2019-02-02T20:27:57.000Z",
         "destination.ip": [
             "10.41.124.15"
         ],
@@ -2471,6 +2626,7 @@
         "rsa.misc.category": "auto",
         "rsa.misc.node": "quameius_",
         "rsa.misc.sensor": "quameius_",
+        "rsa.time.event_time": "2019-02-02T20:27:57.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2479,6 +2635,7 @@
         "url.original": "https://www.example.com/totamrem/aliqu.htm?sBonorum=moenimi#lor"
     },
     {
+        "@timestamp": "2019-02-17T03:30:32.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2495,6 +2652,7 @@
         "rsa.misc.node": "eseosq",
         "rsa.misc.sensor": "eseosq",
         "rsa.network.eth_host": "01:00:5e:c3:77:27",
+        "rsa.time.event_time": "2019-02-17T03:30:32.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2502,6 +2660,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-03T10:33:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2521,6 +2680,7 @@
         "rsa.misc.node": "dit",
         "rsa.misc.sensor": "dit",
         "rsa.network.eth_host": "01:00:5e:ed:ed:79",
+        "rsa.time.event_time": "2019-03-03T10:33:06.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.43.235.230"
@@ -2531,6 +2691,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-17T17:35:40.000Z",
         "destination.ip": [
             "10.103.91.159"
         ],
@@ -2557,6 +2718,7 @@
         "rsa.misc.node": "lorese_ ids-alerts ctobeat",
         "rsa.misc.policy_name": "ntut",
         "rsa.misc.sensor": "lorese_ ids-alerts ctobeat",
+        "rsa.time.event_time": "2019-03-17T17:35:40.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.199.19.205"
@@ -2569,6 +2731,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-01T00:38:14.000Z",
         "destination.ip": [
             "10.65.0.157"
         ],
@@ -2597,6 +2760,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "tas",
         "rsa.misc.sensor": "tas",
+        "rsa.time.event_time": "2019-04-01T00:38:14.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.17.111.91"
@@ -2607,6 +2771,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-15T07:40:49.000Z",
         "event.action": "cancel",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2625,6 +2790,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "serro",
         "rsa.misc.sensor": "serro",
+        "rsa.time.event_time": "2019-04-15T07:40:49.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2632,6 +2798,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-29T14:43:23.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2651,6 +2818,7 @@
         "rsa.misc.node": "leumiur",
         "rsa.misc.sensor": "leumiur",
         "rsa.network.eth_host": "01:00:5e:4d:c0:dd",
+        "rsa.time.event_time": "2019-04-29T14:43:23.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.20.130.88"
@@ -2661,6 +2829,7 @@
         ]
     },
     {
+        "@timestamp": "2019-05-13T21:45:57.000Z",
         "destination.ip": [
             "10.140.242.86"
         ],
@@ -2685,6 +2854,7 @@
         "rsa.misc.node": "tasnu_ ids-alerts tionev",
         "rsa.misc.policy_name": "temporin",
         "rsa.misc.sensor": "tasnu_ ids-alerts tionev",
+        "rsa.time.event_time": "2019-05-13T21:45:57.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.177.64.152"
@@ -2695,6 +2865,7 @@
         ]
     },
     {
+        "@timestamp": "2019-05-28T04:48:31.000Z",
         "destination.ip": [
             "10.51.121.223"
         ],
@@ -2722,6 +2893,7 @@
         "rsa.misc.node": "ora_",
         "rsa.misc.policy_name": "stenat",
         "rsa.misc.sensor": "ora_",
+        "rsa.time.event_time": "2019-05-28T04:48:31.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.199.103.185"
@@ -2734,6 +2906,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-11T11:51:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2753,6 +2926,7 @@
         "rsa.misc.node": "ssuscipi",
         "rsa.misc.sensor": "ssuscipi",
         "rsa.network.eth_host": "01:00:5e:21:c2:55",
+        "rsa.time.event_time": "2019-06-11T11:51:06.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.126.242.58"
@@ -2763,6 +2937,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-25T18:53:40.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2779,6 +2954,7 @@
         "rsa.misc.node": "ionevo",
         "rsa.misc.sensor": "ionevo",
         "rsa.network.eth_host": "01:00:5e:8a:1a:f9",
+        "rsa.time.event_time": "2019-06-25T18:53:40.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2786,6 +2962,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-10T01:56:14.000Z",
         "destination.ip": [
             "10.113.152.241"
         ],
@@ -2802,8 +2979,8 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.121.37.244",
-            "10.113.152.241"
+            "10.113.152.241",
+            "10.121.37.244"
         ],
         "rsa.internal.messageid": "flows",
         "rsa.misc.action": [
@@ -2812,6 +2989,7 @@
         "rsa.misc.event_source": "appliance",
         "rsa.misc.node": "aerat_",
         "rsa.misc.sensor": "aerat_",
+        "rsa.time.event_time": "2019-07-10T01:56:14.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.121.37.244"
@@ -2823,6 +3001,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-24T08:58:48.000Z",
         "destination.ip": [
             "10.254.96.130"
         ],
@@ -2850,6 +3029,7 @@
         "rsa.misc.node": "roinBCSe",
         "rsa.misc.sensor": "roinBCSe",
         "rsa.time.duration_time": 39.622,
+        "rsa.time.event_time": "2019-07-24T08:58:48.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.247.118.132"
@@ -2861,6 +3041,7 @@
         "url.original": "https://www5.example.org/eturadi/umS.txt?mSecti=henderi#taevitae"
     },
     {
+        "@timestamp": "2019-08-07T16:01:23.000Z",
         "destination.ip": [
             "10.200.98.243"
         ],
@@ -2888,6 +3069,7 @@
         "rsa.misc.node": "emeumfu",
         "rsa.misc.sensor": "emeumfu",
         "rsa.time.duration_time": 18.963,
+        "rsa.time.event_time": "2019-08-07T16:01:23.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.101.13.122"
@@ -2899,6 +3081,7 @@
         "url.original": "https://internal.example.org/fdeFi/ratv.htm?sequatu=tiumtot#tate"
     },
     {
+        "@timestamp": "2019-08-21T23:03:57.000Z",
         "destination.ip": [
             "10.247.205.185"
         ],
@@ -2922,6 +3105,7 @@
         "rsa.misc.category": "lorem",
         "rsa.misc.node": "orissusc",
         "rsa.misc.sensor": "orissusc",
+        "rsa.time.event_time": "2019-08-21T23:03:57.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2930,6 +3114,7 @@
         "url.original": "https://www5.example.net/uov/pariat.htm?litsed=lumd#tiaec"
     },
     {
+        "@timestamp": "2019-09-05T06:06:31.000Z",
         "destination.ip": [
             "10.147.165.30"
         ],
@@ -2957,6 +3142,7 @@
         "rsa.misc.node": "mipsumqu_ ids-alerts ccusa",
         "rsa.misc.policy_name": "idents",
         "rsa.misc.sensor": "mipsumqu_ ids-alerts ccusa",
+        "rsa.time.event_time": "2019-09-05T06:06:31.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.195.90.73"
@@ -2968,6 +3154,7 @@
         ]
     },
     {
+        "@timestamp": "2019-09-19T13:09:05.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2983,6 +3170,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "ueporr",
         "rsa.misc.sensor": "ueporr",
+        "rsa.time.event_time": "2019-09-19T13:09:05.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -2990,6 +3178,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-03T20:11:40.000Z",
         "destination.ip": [
             "10.162.202.14"
         ],
@@ -3008,14 +3197,15 @@
         "observer.type": "Wireless",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.137.166.97",
-            "10.162.202.14"
+            "10.162.202.14",
+            "10.137.166.97"
         ],
         "rsa.internal.messageid": "ids-alerts",
         "rsa.misc.event_type": "ids-alerts",
         "rsa.misc.node": "iat",
         "rsa.misc.policy_name": "ipsaqua",
         "rsa.misc.sensor": "iat",
+        "rsa.time.event_time": "2019-10-03T20:11:40.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.137.166.97"
@@ -3026,6 +3216,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-18T03:14:14.000Z",
         "destination.ip": [
             "10.227.135.142"
         ],
@@ -3048,6 +3239,7 @@
         "rsa.misc.category": "adeserun",
         "rsa.misc.node": "rautod",
         "rsa.misc.sensor": "rautod",
+        "rsa.time.event_time": "2019-10-18T03:14:14.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -3056,6 +3248,7 @@
         "url.original": "https://www5.example.com/illoinve/etcon.htm?nevolup=erspici#itinvolu"
     },
     {
+        "@timestamp": "2019-11-01T10:16:48.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3075,6 +3268,7 @@
         "rsa.misc.node": "umqui",
         "rsa.misc.sensor": "umqui",
         "rsa.network.eth_host": "01:00:5e:37:9c:af",
+        "rsa.time.event_time": "2019-11-01T10:16:48.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.199.29.19"
@@ -3085,6 +3279,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-15T17:19:22.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3101,6 +3296,7 @@
         "rsa.misc.node": "teiru",
         "rsa.misc.sensor": "teiru",
         "rsa.network.eth_host": "01:00:5e:b8:06:92",
+        "rsa.time.event_time": "2019-11-15T17:19:22.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",
@@ -3108,6 +3304,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-30T00:21:57.000Z",
         "destination.ip": [
             "10.75.122.111"
         ],
@@ -3135,6 +3332,7 @@
         "rsa.misc.node": "iusmod_",
         "rsa.misc.sensor": "iusmod_",
         "rsa.time.duration_time": 10.574,
+        "rsa.time.event_time": "2019-11-30T00:21:57.000Z",
         "service.type": "cisco",
         "source.ip": [
             "10.85.59.172"
@@ -3146,6 +3344,7 @@
         "url.original": "https://example.com/qui/itse.gif?orsitame=tasn#exeaco"
     },
     {
+        "@timestamp": "2019-12-14T07:24:31.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3161,6 +3360,7 @@
         "rsa.internal.messageid": "events",
         "rsa.misc.node": "aute",
         "rsa.misc.sensor": "aute",
+        "rsa.time.event_time": "2019-12-14T07:24:31.000Z",
         "service.type": "cisco",
         "tags": [
             "cisco.meraki",

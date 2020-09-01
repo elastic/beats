@@ -633,9 +633,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.175.83.138",
             "10.7.164.113",
-            "10.207.125.114"
+            "10.207.125.114",
+            "10.175.83.138"
         ],
         "related.user": [
             "remip"
@@ -717,8 +717,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.139.207.36",
-            "10.217.91.49"
+            "10.217.91.49",
+            "10.139.207.36"
         ],
         "related.user": [
             "lumqui"
@@ -1003,8 +1003,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.185.64.46",
-            "10.209.205.25"
+            "10.209.205.25",
+            "10.185.64.46"
         ],
         "related.user": [
             "iduntu"
@@ -1092,8 +1092,8 @@
         "observer.vendor": "Symantec",
         "observer.version": "1.7457",
         "related.ip": [
-            "10.202.55.203",
-            "10.35.89.51"
+            "10.35.89.51",
+            "10.202.55.203"
         ],
         "related.user": [
             "Quis"
@@ -1264,8 +1264,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.247.21.74",
-            "10.87.92.95"
+            "10.87.92.95",
+            "10.247.21.74"
         ],
         "related.user": [
             "Sedutper"
@@ -1727,8 +1727,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.92.93.236",
-            "10.66.203.117"
+            "10.66.203.117",
+            "10.92.93.236"
         ],
         "related.user": [
             "uisa"
@@ -2875,8 +2875,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.ip": [
-            "10.29.149.77",
-            "10.56.95.160"
+            "10.56.95.160",
+            "10.29.149.77"
         ],
         "related.user": [
             "rema"

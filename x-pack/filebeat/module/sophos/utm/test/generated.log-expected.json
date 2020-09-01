@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2016-01-29T08:09:59.000Z",
         "event.code": "smtpd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -13,6 +14,7 @@
         "process.pid": 905,
         "rsa.internal.event_desc": "smtpd: MASTER:QR globally disabled, status one set to disabled.",
         "rsa.internal.messageid": "smtpd",
+        "rsa.time.event_time": "2016-01-29T08:09:59.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -20,6 +22,7 @@
         ]
     },
     {
+        "@timestamp": "2016-02-12T15:12:33.000Z",
         "destination.address": "ercit2385.internal.home",
         "destination.ip": [
             "10.47.202.102"
@@ -49,12 +52,12 @@
         "observer.version": "1.5102",
         "process.pid": 5716,
         "related.ip": [
-            "10.57.170.140",
-            "10.47.202.102"
+            "10.47.202.102",
+            "10.57.170.140"
         ],
         "related.user": [
-            "sunt",
             "dexeac",
+            "sunt",
             "icistatuscode=giatquov"
         ],
         "rsa.db.index": "run",
@@ -64,8 +67,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "ugiatnu",
-            "block"
+            "block",
+            "ugiatnu"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -84,6 +87,7 @@
         "rsa.network.dinterface": "enp0s7084",
         "rsa.network.host_dst": "ercit2385.internal.home",
         "rsa.network.sinterface": "enp0s7281",
+        "rsa.time.event_time": "2016-02-12T15:12:33.000Z",
         "rsa.web.web_cookie": "quirat",
         "service.name": "tlabo",
         "service.type": "sophos",
@@ -100,6 +104,7 @@
         "user.name": "sunt"
     },
     {
+        "@timestamp": "2016-02-26T22:15:08.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -122,6 +127,7 @@
             "eirure7587.internal.localhost"
         ],
         "rsa.network.gateway": "sitame",
+        "rsa.time.event_time": "2016-02-26T22:15:08.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -129,6 +135,7 @@
         ]
     },
     {
+        "@timestamp": "2016-03-12T05:17:42.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -147,8 +154,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "itquiin",
-            "eaq"
+            "eaq",
+            "itquiin"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -162,6 +169,7 @@
         "rsa.network.alias_host": [
             "data4478.api.lan"
         ],
+        "rsa.time.event_time": "2016-03-12T05:17:42.000Z",
         "service.name": "wri",
         "service.type": "sophos",
         "source.ip": [
@@ -174,6 +182,7 @@
         "user.name": "itquiin"
     },
     {
+        "@timestamp": "2016-03-26T12:20:16.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -195,6 +204,7 @@
         "rsa.network.alias_host": [
             "ctetura3009.www5.corp"
         ],
+        "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -202,6 +212,7 @@
         ]
     },
     {
+        "@timestamp": "2016-04-09T19:22:51.000Z",
         "event.code": "smtpd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -215,6 +226,7 @@
         "process.pid": 1411,
         "rsa.internal.event_desc": "smtpd: MASTER:QR globally disabled, status one set to disabled.",
         "rsa.internal.messageid": "smtpd",
+        "rsa.time.event_time": "2016-04-09T19:22:51.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -222,6 +234,7 @@
         ]
     },
     {
+        "@timestamp": "2016-04-24T02:25:25.000Z",
         "event.code": "httpproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -236,6 +249,7 @@
         "rsa.db.index": "paquioff",
         "rsa.internal.event_desc": "httpproxy:disk_cache_zap related message.",
         "rsa.internal.messageid": "httpproxy",
+        "rsa.time.event_time": "2016-04-24T02:25:25.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -243,6 +257,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-08T09:27:59.000Z",
         "destination.ip": [
             "10.18.13.211"
         ],
@@ -271,6 +286,7 @@
             "ptasnu6684.mail.lan"
         ],
         "rsa.network.network_service": "ofdeFini",
+        "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -278,6 +294,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-22T16:30:33.000Z",
         "event.code": "barnyard",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -294,6 +311,7 @@
         "rsa.network.alias_host": [
             "ssecillu7166.internal.lan"
         ],
+        "rsa.time.event_time": "2016-05-22T16:30:33.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -301,6 +319,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-05T23:33:08.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -320,6 +339,7 @@
         "rsa.network.alias_host": [
             "ore5643.api.lan"
         ],
+        "rsa.time.event_time": "2016-06-05T23:33:08.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -327,6 +347,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-20T06:35:42.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -349,6 +370,7 @@
         "rsa.network.alias_host": [
             "ciun39.localdomain"
         ],
+        "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -356,6 +378,7 @@
         ]
     },
     {
+        "@timestamp": "2016-07-04T13:38:16.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -376,6 +399,7 @@
         "rsa.network.alias_host": [
             "atatnon6064.www.invalid"
         ],
+        "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -383,6 +407,7 @@
         ]
     },
     {
+        "@timestamp": "2016-07-18T20:40:50.000Z",
         "event.code": "aua",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -406,6 +431,7 @@
         "rsa.network.alias_host": [
             "gitse2463.www5.invalid"
         ],
+        "rsa.time.event_time": "2016-07-18T20:40:50.000Z",
         "service.name": "col",
         "service.type": "sophos",
         "tags": [
@@ -415,6 +441,7 @@
         "user.name": "agnaaliq"
     },
     {
+        "@timestamp": "2016-08-02T03:43:25.000Z",
         "event.code": "httpproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -428,6 +455,7 @@
         "process.pid": 2078,
         "rsa.internal.event_desc": "httpproxy:decrypt failed.",
         "rsa.internal.messageid": "httpproxy",
+        "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -435,6 +463,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-16T10:45:59.000Z",
         "event.code": "frox",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -454,6 +483,7 @@
         "rsa.network.alias_host": [
             "oriosam6277.mail.localdomain"
         ],
+        "rsa.time.event_time": "2016-08-16T10:45:59.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.169.5.162"
@@ -465,6 +495,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-30T17:48:33.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -485,6 +516,7 @@
         "rsa.network.alias_host": [
             "ptate3830.internal.localhost"
         ],
+        "rsa.time.event_time": "2016-08-30T17:48:33.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -492,6 +524,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-14T00:51:07.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -514,6 +547,7 @@
         "rsa.network.alias_host": [
             "nvo6105.invalid"
         ],
+        "rsa.time.event_time": "2016-09-14T00:51:07.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -521,6 +555,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-28T07:53:42.000Z",
         "event.code": "afcd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -534,6 +569,7 @@
         "process.pid": 2492,
         "rsa.internal.event_desc": "afcd: IM/P2P Classifier configuration reloaded successfully.",
         "rsa.internal.messageid": "afcd",
+        "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -541,6 +577,7 @@
         ]
     },
     {
+        "@timestamp": "2016-10-12T14:56:16.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -574,6 +611,7 @@
         "rsa.network.alias_host": [
             "edic2758.api.domain"
         ],
+        "rsa.time.event_time": "2016-10-12T14:56:16.000Z",
         "service.name": "lica",
         "service.type": "sophos",
         "source.ip": [
@@ -586,6 +624,7 @@
         "user.name": "scipit"
     },
     {
+        "@timestamp": "2016-10-26T21:58:50.000Z",
         "event.code": "aua",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -606,6 +645,7 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.severity": "high",
+        "rsa.time.event_time": "2016-10-26T21:58:50.000Z",
         "service.name": "aeabillo",
         "service.type": "sophos",
         "tags": [
@@ -615,6 +655,7 @@
         "user.name": "eruntmo"
     },
     {
+        "@timestamp": "2016-11-10T05:01:24.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -631,6 +672,7 @@
         ],
         "rsa.internal.event_desc": "sshd:Server listening; restarting.",
         "rsa.internal.messageid": "sshd",
+        "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.59.215.207"
@@ -642,6 +684,7 @@
         ]
     },
     {
+        "@timestamp": "2016-11-24T12:03:59.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -664,6 +707,7 @@
         "rsa.network.alias_host": [
             "ectobeat3157.mail.local"
         ],
+        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -671,6 +715,7 @@
         ]
     },
     {
+        "@timestamp": "2016-12-08T19:06:33.000Z",
         "destination.ip": [
             "10.144.21.112"
         ],
@@ -699,6 +744,7 @@
         "rsa.network.alias_host": [
             "ident2323.internal.corp"
         ],
+        "rsa.time.event_time": "2016-12-08T19:06:33.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -706,6 +752,7 @@
         ]
     },
     {
+        "@timestamp": "2016-12-23T02:09:07.000Z",
         "event.code": "httpproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -722,6 +769,7 @@
         "rsa.network.alias_host": [
             "ttenb4581.www.host"
         ],
+        "rsa.time.event_time": "2016-12-23T02:09:07.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -729,6 +777,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-06T09:11:41.000Z",
         "event.code": "frox",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -748,6 +797,7 @@
         "rsa.network.alias_host": [
             "lapari5763.api.invalid"
         ],
+        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.103.2.48"
@@ -759,6 +809,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-20T16:14:16.000Z",
         "destination.ip": [
             "10.52.190.18"
         ],
@@ -800,6 +851,7 @@
         "rsa.network.dinterface": "lo272",
         "rsa.network.network_service": "onemul",
         "rsa.network.sinterface": "lo6086",
+        "rsa.time.event_time": "2017-01-20T16:14:16.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.161.51.135"
@@ -812,6 +864,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-03T23:16:50.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -834,6 +887,7 @@
         "rsa.network.alias_host": [
             "sam1795.invalid"
         ],
+        "rsa.time.event_time": "2017-02-03T23:16:50.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -841,6 +895,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-18T06:19:24.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -859,8 +914,8 @@
             "10.232.108.32"
         ],
         "related.user": [
-            "llum",
-            "rsp"
+            "rsp",
+            "llum"
         ],
         "rsa.identity.logon_type": "ntut",
         "rsa.internal.event_desc": "ittenb",
@@ -871,6 +926,7 @@
         "rsa.misc.obj_type": "ende",
         "rsa.misc.severity": "high",
         "rsa.misc.version": "1.5240",
+        "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.name": "ugits",
         "service.type": "sophos",
         "source.ip": [
@@ -883,6 +939,7 @@
         "user.name": "llum"
     },
     {
+        "@timestamp": "2017-03-04T13:21:59.000Z",
         "destination.address": "Duis583.api.local",
         "destination.ip": [
             "10.17.51.153"
@@ -912,12 +969,12 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.5146",
         "related.ip": [
-            "10.89.41.97",
-            "10.17.51.153"
+            "10.17.51.153",
+            "10.89.41.97"
         ],
         "related.user": [
-            "tcustatuscode=eumiu",
             "tio",
+            "tcustatuscode=eumiu",
             "pteurs"
         ],
         "rsa.db.index": "eavolupt",
@@ -950,6 +1007,7 @@
         "rsa.network.dinterface": "lo6683",
         "rsa.network.host_dst": "Duis583.api.local",
         "rsa.network.sinterface": "lo1543",
+        "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
         "rsa.web.web_cookie": "aperiame",
         "service.name": "etcons",
         "service.type": "sophos",
@@ -966,6 +1024,7 @@
         "user.name": "tio"
     },
     {
+        "@timestamp": "2017-03-18T20:24:33.000Z",
         "event.code": "aua",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -989,6 +1048,7 @@
         "rsa.network.alias_host": [
             "xeaco7887.www.localdomain"
         ],
+        "rsa.time.event_time": "2017-03-18T20:24:33.000Z",
         "service.name": "dminimve",
         "service.type": "sophos",
         "tags": [
@@ -998,6 +1058,7 @@
         "user.name": "uptate"
     },
     {
+        "@timestamp": "2017-04-02T03:27:07.000Z",
         "destination.address": "iscivel3512.invalid",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -1013,6 +1074,7 @@
         "rsa.internal.messageid": "reverseproxy",
         "rsa.misc.operation_id": "eriti",
         "rsa.network.host_dst": "iscivel3512.invalid",
+        "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1021,6 +1083,7 @@
         "url.path": "atcupi"
     },
     {
+        "@timestamp": "2017-04-16T10:29:41.000Z",
         "event.code": "sockd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1036,6 +1099,7 @@
         "rsa.internal.event_desc": "sockd:dante/server running.",
         "rsa.internal.messageid": "sockd",
         "rsa.misc.version": "1.202",
+        "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1043,6 +1107,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-30T17:32:16.000Z",
         "event.code": "afcd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1059,6 +1124,7 @@
         "rsa.network.alias_host": [
             "dolor5799.home"
         ],
+        "rsa.time.event_time": "2017-04-30T17:32:16.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1066,6 +1132,7 @@
         ]
     },
     {
+        "@timestamp": "2017-05-15T00:34:50.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1088,6 +1155,7 @@
             "oreseosq1859.api.lan"
         ],
         "rsa.network.gateway": "uiinea",
+        "rsa.time.event_time": "2017-05-15T00:34:50.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1096,6 +1164,7 @@
         "url.original": "https://www5.example.com/dantium/ors.htm?sinto=edi#eumiure"
     },
     {
+        "@timestamp": "2017-05-29T07:37:24.000Z",
         "event.code": "confd-sync",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1111,6 +1180,7 @@
         "rsa.internal.event_desc": "luptatem",
         "rsa.internal.messageid": "confd-sync",
         "rsa.misc.severity": "very-high",
+        "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.name": "oNemoeni",
         "service.type": "sophos",
         "tags": [
@@ -1119,6 +1189,7 @@
         ]
     },
     {
+        "@timestamp": "2017-06-12T14:39:58.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1138,6 +1209,7 @@
         "rsa.network.alias_host": [
             "autodit272.www.localhost"
         ],
+        "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1145,6 +1217,7 @@
         ]
     },
     {
+        "@timestamp": "2017-06-26T21:42:33.000Z",
         "destination.ip": [
             "10.148.21.7"
         ],
@@ -1174,6 +1247,7 @@
         ],
         "rsa.network.gateway": "ipsu",
         "rsa.network.network_service": "siarch",
+        "rsa.time.event_time": "2017-06-26T21:42:33.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1181,6 +1255,7 @@
         ]
     },
     {
+        "@timestamp": "2017-07-11T04:45:07.000Z",
         "destination.address": "ntore4333.api.invalid",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -1201,6 +1276,7 @@
             "reprehe5661.www.lan"
         ],
         "rsa.network.host_dst": "ntore4333.api.invalid",
+        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1209,6 +1285,7 @@
         "url.path": "sitv"
     },
     {
+        "@timestamp": "2017-07-25T11:47:41.000Z",
         "event.code": "exim",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1230,6 +1307,7 @@
         "rsa.network.alias_host": [
             "sequatD163.internal.example"
         ],
+        "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.151.206.38"
@@ -1241,6 +1319,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-08T18:50:15.000Z",
         "event.code": "pluto",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1260,6 +1339,7 @@
         "rsa.network.alias_host": [
             "elillu5777.www5.lan"
         ],
+        "rsa.time.event_time": "2017-08-08T18:50:15.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.230.4.70"
@@ -1270,6 +1350,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-23T01:52:50.000Z",
         "event.code": "xl2tpd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1287,6 +1368,7 @@
         "rsa.network.alias_host": [
             "ecatcup3022.mail.invalid"
         ],
+        "rsa.time.event_time": "2017-08-23T01:52:50.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1294,6 +1376,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-06T08:55:24.000Z",
         "event.code": "ipsec_starter",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1310,6 +1393,7 @@
         "rsa.network.alias_host": [
             "qui7797.www.host"
         ],
+        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1317,6 +1401,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-20T15:57:58.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1339,6 +1424,7 @@
             "nofdeFin2037.mail.example"
         ],
         "rsa.network.gateway": "tiumdol",
+        "rsa.time.event_time": "2017-09-20T15:57:58.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1346,6 +1432,7 @@
         ]
     },
     {
+        "@timestamp": "2017-10-04T23:00:32.000Z",
         "event.code": "sockd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1361,6 +1448,7 @@
         "rsa.internal.event_desc": "sockd:dante/server running.",
         "rsa.internal.messageid": "sockd",
         "rsa.misc.version": "1.3714",
+        "rsa.time.event_time": "2017-10-04T23:00:32.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1368,6 +1456,7 @@
         ]
     },
     {
+        "@timestamp": "2017-10-19T06:03:07.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1390,6 +1479,7 @@
             "eFinib2403.api.example"
         ],
         "rsa.network.gateway": "quatD",
+        "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1397,6 +1487,7 @@
         ]
     },
     {
+        "@timestamp": "2017-11-02T13:05:41.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1415,8 +1506,8 @@
             "10.244.96.61"
         ],
         "related.user": [
-            "itsedqui",
-            "iumt"
+            "iumt",
+            "itsedqui"
         ],
         "rsa.identity.logon_type": "psamvolu",
         "rsa.internal.event_desc": "orroqui",
@@ -1427,6 +1518,7 @@
         "rsa.misc.obj_type": "Exce",
         "rsa.misc.severity": "high",
         "rsa.misc.version": "1.2707",
+        "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.name": "omnisist",
         "service.type": "sophos",
         "source.ip": [
@@ -1439,6 +1531,7 @@
         "user.name": "itsedqui"
     },
     {
+        "@timestamp": "2017-11-16T20:08:15.000Z",
         "event.action": "reloading",
         "event.code": "named",
         "event.dataset": "sophos.utm",
@@ -1457,6 +1550,7 @@
         ],
         "rsa.misc.disposition": "iono",
         "rsa.misc.obj_type": "eddoei",
+        "rsa.time.event_time": "2017-11-16T20:08:15.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1464,6 +1558,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-01T03:10:49.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1487,6 +1582,7 @@
             "obeatae2042.www.domain"
         ],
         "rsa.network.gateway": "quaUteni",
+        "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1494,6 +1590,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-15T10:13:24.000Z",
         "event.code": "pop3proxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1510,6 +1607,7 @@
         "rsa.network.alias_host": [
             "aerat1267.www5.example"
         ],
+        "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1517,6 +1615,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-29T17:15:58.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1538,6 +1637,7 @@
             "writt2238.internal.localdomain"
         ],
         "rsa.network.gateway": "scingeli",
+        "rsa.time.event_time": "2017-12-29T17:15:58.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1545,6 +1645,7 @@
         ]
     },
     {
+        "@timestamp": "2018-01-13T00:18:32.000Z",
         "destination.domain": "uatD",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -1567,6 +1668,7 @@
             "siutaliq4937.api.lan"
         ],
         "rsa.network.network_service": "dquiac",
+        "rsa.time.event_time": "2018-01-13T00:18:32.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1574,6 +1676,7 @@
         ]
     },
     {
+        "@timestamp": "2018-01-27T07:21:06.000Z",
         "event.action": "accept",
         "event.code": "URID",
         "event.dataset": "sophos.utm",
@@ -1591,6 +1694,7 @@
             "accept"
         ],
         "rsa.misc.disposition": "ametco",
+        "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1598,6 +1702,7 @@
         ]
     },
     {
+        "@timestamp": "2018-02-10T14:23:41.000Z",
         "destination.address": "tenbyCi4371.www5.localdomain",
         "destination.ip": [
             "10.98.126.206"
@@ -1631,9 +1736,9 @@
             "10.214.167.164"
         ],
         "related.user": [
-            "isnostru",
             "hen",
-            "amremapstatuscode=dolorsit"
+            "amremapstatuscode=dolorsit",
+            "isnostru"
         ],
         "rsa.db.index": "spernatu",
         "rsa.identity.logon_type": "untutl",
@@ -1662,6 +1767,7 @@
         "rsa.network.dinterface": "eth965",
         "rsa.network.host_dst": "tenbyCi4371.www5.localdomain",
         "rsa.network.sinterface": "lo1255",
+        "rsa.time.event_time": "2018-02-10T14:23:41.000Z",
         "rsa.web.web_cookie": "tion",
         "service.name": "animi",
         "service.type": "sophos",
@@ -1678,6 +1784,7 @@
         "user.name": "hen"
     },
     {
+        "@timestamp": "2018-02-24T21:26:15.000Z",
         "destination.ip": [
             "10.32.236.117"
         ],
@@ -1698,8 +1805,8 @@
         "observer.vendor": "Sophos",
         "process.pid": 6722,
         "related.ip": [
-            "10.203.157.250",
-            "10.32.236.117"
+            "10.32.236.117",
+            "10.203.157.250"
         ],
         "rsa.internal.event_desc": "Packet",
         "rsa.internal.messageid": "ulogd",
@@ -1716,6 +1823,7 @@
         "rsa.network.dinterface": "eth6357",
         "rsa.network.network_service": "lapa",
         "rsa.network.sinterface": "lo7088",
+        "rsa.time.event_time": "2018-02-24T21:26:15.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.203.157.250"
@@ -1728,6 +1836,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-11T04:28:49.000Z",
         "destination.ip": [
             "10.231.77.26"
         ],
@@ -1755,6 +1864,7 @@
         "rsa.network.alias_host": [
             "ectob5542.www5.corp"
         ],
+        "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
         "rsa.time.process_time": "volup",
         "service.type": "sophos",
         "tags": [
@@ -1763,6 +1873,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-25T11:31:24.000Z",
         "destination.address": "tenima5715.api.example",
         "destination.ip": [
             "10.92.93.236"
@@ -1792,14 +1903,14 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.2707",
         "related.ip": [
-            "10.92.93.236",
-            "10.2.24.156"
+            "10.2.24.156",
+            "10.92.93.236"
         ],
         "related.user": [
             "ulpaq",
-            "Sedutper",
             "ntoccae",
-            "dolorsistatuscode=acc"
+            "dolorsistatuscode=acc",
+            "Sedutper"
         ],
         "rsa.db.index": "snisiut",
         "rsa.identity.logon_type": "umdol",
@@ -1832,6 +1943,7 @@
         "rsa.network.host_dst": "tenima5715.api.example",
         "rsa.network.network_port": 7174,
         "rsa.network.sinterface": "lo3680",
+        "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
         "rsa.web.web_cookie": "amr",
         "service.name": "siu",
         "service.type": "sophos",
@@ -1849,6 +1961,7 @@
         "user.name": "Sedutper"
     },
     {
+        "@timestamp": "2018-04-08T18:33:58.000Z",
         "destination.address": "mni4032.lan",
         "destination.ip": [
             "10.202.65.2"
@@ -1882,9 +1995,9 @@
             "10.202.65.2"
         ],
         "related.user": [
-            "atatno",
             "tasu",
-            "iscivelistatuscode=urve"
+            "iscivelistatuscode=urve",
+            "atatno"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -1913,6 +2026,7 @@
         "rsa.network.dinterface": "lo2179",
         "rsa.network.host_dst": "mni4032.lan",
         "rsa.network.sinterface": "enp0s566",
+        "rsa.time.event_time": "2018-04-08T18:33:58.000Z",
         "rsa.web.web_cookie": "queporr",
         "service.name": "adeseru",
         "service.type": "sophos",
@@ -1929,6 +2043,7 @@
         "user.name": "atatno"
     },
     {
+        "@timestamp": "2018-04-23T01:36:32.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1951,6 +2066,7 @@
         "rsa.network.alias_host": [
             "iscing6960.api.invalid"
         ],
+        "rsa.time.event_time": "2018-04-23T01:36:32.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -1958,6 +2074,7 @@
         ]
     },
     {
+        "@timestamp": "2018-05-07T08:39:06.000Z",
         "destination.address": "olupta3647.host",
         "event.code": "httpd",
         "event.dataset": "sophos.utm",
@@ -1984,6 +2101,7 @@
         "rsa.misc.version": "1.6420",
         "rsa.network.gateway": "iconseq",
         "rsa.network.host_dst": "olupta3647.host",
+        "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
         "rule.name": "nidolo",
         "service.type": "sophos",
         "tags": [
@@ -1993,6 +2111,7 @@
         "url.path": "uaUteni"
     },
     {
+        "@timestamp": "2018-05-21T15:41:41.000Z",
         "event.code": "named",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2013,6 +2132,7 @@
         "rsa.network.alias_host": [
             "iavolu7814.www5.localhost"
         ],
+        "rsa.time.event_time": "2018-05-21T15:41:41.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.194.12.83"
@@ -2023,6 +2143,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-04T22:44:15.000Z",
         "destination.address": "obea2960.mail.corp",
         "destination.ip": [
             "10.45.12.53"
@@ -2087,6 +2208,7 @@
         "rsa.network.dinterface": "lo2114",
         "rsa.network.host_dst": "obea2960.mail.corp",
         "rsa.network.sinterface": "enp0s3792",
+        "rsa.time.event_time": "2018-06-04T22:44:15.000Z",
         "rsa.web.web_cookie": "etdo",
         "service.name": "mavenia",
         "service.type": "sophos",
@@ -2103,6 +2225,7 @@
         "user.name": "eturadip"
     },
     {
+        "@timestamp": "2018-06-19T05:46:49.000Z",
         "event.code": "frox",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2119,6 +2242,7 @@
         ],
         "rsa.internal.event_desc": "frox:FTP Proxy listening on port.",
         "rsa.internal.messageid": "frox",
+        "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.99.134.49"
@@ -2130,6 +2254,7 @@
         ]
     },
     {
+        "@timestamp": "2018-07-03T12:49:23.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2152,6 +2277,7 @@
             "olli5982.www.test"
         ],
         "rsa.network.gateway": "raut",
+        "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2160,6 +2286,7 @@
         "url.path": "ectetu"
     },
     {
+        "@timestamp": "2018-07-17T19:51:58.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2180,6 +2307,7 @@
             "nsecte3644.internal.test"
         ],
         "rsa.network.gateway": "uptate",
+        "rsa.time.event_time": "2018-07-17T19:51:58.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2187,6 +2315,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-01T02:54:32.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2205,8 +2334,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "antium",
-            "etconsec"
+            "etconsec",
+            "antium"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2217,6 +2346,7 @@
         "rsa.misc.obj_type": "ione",
         "rsa.misc.severity": "very-high",
         "rsa.misc.version": "1.7852",
+        "rsa.time.event_time": "2018-08-01T02:54:32.000Z",
         "service.name": "aliqu",
         "service.type": "sophos",
         "source.ip": [
@@ -2229,6 +2359,7 @@
         "user.name": "antium"
     },
     {
+        "@timestamp": "2018-08-15T09:57:06.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2245,6 +2376,7 @@
         "rsa.network.alias_host": [
             "econseq7119.www.home"
         ],
+        "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2252,6 +2384,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-29T16:59:40.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2274,6 +2407,7 @@
             "ant2543.www5.lan"
         ],
         "rsa.network.gateway": "sed",
+        "rsa.time.event_time": "2018-08-29T16:59:40.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2281,6 +2415,7 @@
         ]
     },
     {
+        "@timestamp": "2018-09-13T00:02:15.000Z",
         "event.action": "accept",
         "event.code": "pluto",
         "event.dataset": "sophos.utm",
@@ -2299,6 +2434,7 @@
         "rsa.misc.action": [
             "accept"
         ],
+        "rsa.time.event_time": "2018-09-13T00:02:15.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2306,6 +2442,7 @@
         ]
     },
     {
+        "@timestamp": "2018-09-27T07:04:49.000Z",
         "destination.address": "nisiuta4810.api.test",
         "destination.ip": [
             "10.85.200.58"
@@ -2339,10 +2476,10 @@
             "10.85.200.58"
         ],
         "related.user": [
-            "rExce",
-            "Loremi",
             "reetd",
-            "inimastatuscode=emipsum"
+            "inimastatuscode=emipsum",
+            "Loremi",
+            "rExce"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -2351,8 +2488,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "odte",
-            "cancel"
+            "cancel",
+            "odte"
         ],
         "rsa.misc.comments": "emquia",
         "rsa.misc.content_type": "sauteir",
@@ -2372,6 +2509,7 @@
         "rsa.network.host_dst": "nisiuta4810.api.test",
         "rsa.network.network_port": 2294,
         "rsa.network.sinterface": "eth65",
+        "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
         "rsa.web.web_cookie": "esse",
         "service.name": "atu",
         "service.type": "sophos",
@@ -2389,6 +2527,7 @@
         "user.name": "reetd"
     },
     {
+        "@timestamp": "2018-10-11T14:07:23.000Z",
         "destination.ip": [
             "10.115.166.48"
         ],
@@ -2409,8 +2548,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sophos",
         "related.ip": [
-            "10.133.45.45",
-            "10.115.166.48"
+            "10.115.166.48",
+            "10.133.45.45"
         ],
         "rsa.internal.event_desc": "Authentication",
         "rsa.internal.messageid": "ulogd",
@@ -2430,6 +2569,7 @@
         "rsa.network.dinterface": "enp0s1164",
         "rsa.network.network_service": "ips",
         "rsa.network.sinterface": "eth2679",
+        "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.133.45.45"
@@ -2442,6 +2582,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-25T21:09:57.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2458,6 +2599,7 @@
         "rsa.network.alias_host": [
             "tiumt5462.mail.localhost"
         ],
+        "rsa.time.event_time": "2018-10-25T21:09:57.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2465,6 +2607,7 @@
         ]
     },
     {
+        "@timestamp": "2018-11-09T04:12:32.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2484,6 +2627,7 @@
         "rsa.network.alias_host": [
             "vol1450.internal.host"
         ],
+        "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.71.184.162"
@@ -2495,6 +2639,7 @@
         ]
     },
     {
+        "@timestamp": "2018-11-23T11:15:06.000Z",
         "event.code": "ipsec_starter",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2508,6 +2653,7 @@
         "process.pid": 178,
         "rsa.internal.event_desc": "ipsec_starter: IP address or index of physical interface changed.",
         "rsa.internal.messageid": "ipsec_starter",
+        "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2515,6 +2661,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-07T18:17:40.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2537,6 +2684,7 @@
         "rsa.network.alias_host": [
             "rporissu573.api.test"
         ],
+        "rsa.time.event_time": "2018-12-07T18:17:40.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2544,6 +2692,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-22T01:20:14.000Z",
         "event.action": "allow",
         "event.code": "URID",
         "event.dataset": "sophos.utm",
@@ -2564,6 +2713,7 @@
         "rsa.network.alias_host": [
             "nostru774.corp"
         ],
+        "rsa.time.event_time": "2018-12-22T01:20:14.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2571,6 +2721,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-05T08:22:49.000Z",
         "event.code": "ipsec_starter",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2584,6 +2735,7 @@
         "process.pid": 6226,
         "rsa.internal.event_desc": "ipsec_starter: IP address or index of physical interface changed.",
         "rsa.internal.messageid": "ipsec_starter",
+        "rsa.time.event_time": "2019-01-05T08:22:49.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2591,6 +2743,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-19T15:25:23.000Z",
         "destination.address": "lorsita2216.www5.example",
         "event.code": "httpd",
         "event.dataset": "sophos.utm",
@@ -2617,6 +2770,7 @@
         "rsa.misc.version": "1.7102",
         "rsa.network.gateway": "rehender",
         "rsa.network.host_dst": "lorsita2216.www5.example",
+        "rsa.time.event_time": "2019-01-19T15:25:23.000Z",
         "rule.name": "uat",
         "service.type": "sophos",
         "tags": [
@@ -2626,6 +2780,7 @@
         "url.path": "turvelil"
     },
     {
+        "@timestamp": "2019-02-02T22:27:57.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2647,6 +2802,7 @@
             "sum2208.host"
         ],
         "rsa.network.gateway": "ritinvol",
+        "rsa.time.event_time": "2019-02-02T22:27:57.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2654,6 +2810,7 @@
         ]
     },
     {
+        "@timestamp": "2019-02-17T05:30:32.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2675,6 +2832,7 @@
             "ore6843.local"
         ],
         "rsa.network.gateway": "taev",
+        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2682,6 +2840,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-03T12:33:06.000Z",
         "destination.ip": [
             "10.177.35.133"
         ],
@@ -2711,6 +2870,7 @@
         ],
         "rsa.network.gateway": "uunturma",
         "rsa.network.network_service": "cons",
+        "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2718,6 +2878,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-17T19:35:40.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2739,6 +2900,7 @@
             "corpo6737.example"
         ],
         "rsa.network.gateway": "raincidu",
+        "rsa.time.event_time": "2019-03-17T19:35:40.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2746,6 +2908,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-01T02:38:14.000Z",
         "event.code": "pop3proxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2759,6 +2922,7 @@
         "process.pid": 6854,
         "rsa.internal.event_desc": "pop3proxy:Master started.",
         "rsa.internal.messageid": "pop3proxy",
+        "rsa.time.event_time": "2019-04-01T02:38:14.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2766,6 +2930,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-15T09:40:49.000Z",
         "event.code": "pop3proxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2782,6 +2947,7 @@
         "rsa.network.alias_host": [
             "eratvol314.www.home"
         ],
+        "rsa.time.event_time": "2019-04-15T09:40:49.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2789,6 +2955,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-29T16:43:23.000Z",
         "destination.address": "seosquir715.local",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -2817,6 +2984,7 @@
         ],
         "rsa.network.gateway": "nrepr",
         "rsa.network.host_dst": "seosquir715.local",
+        "rsa.time.event_time": "2019-04-29T16:43:23.000Z",
         "rule.name": "uipex",
         "service.type": "sophos",
         "tags": [
@@ -2826,6 +2994,7 @@
         "url.path": "ercitati"
     },
     {
+        "@timestamp": "2019-05-13T23:45:57.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2847,6 +3016,7 @@
             "ulapari2656.local"
         ],
         "rsa.network.gateway": "nvol",
+        "rsa.time.event_time": "2019-05-13T23:45:57.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2854,6 +3024,7 @@
         ]
     },
     {
+        "@timestamp": "2019-05-28T06:48:31.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2872,6 +3043,7 @@
         "rsa.misc.event_log": "iscinge",
         "rsa.misc.severity": "very-high",
         "rsa.network.gateway": "tnonpro",
+        "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2879,6 +3051,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-11T13:51:06.000Z",
         "event.action": "cancel",
         "event.code": "URID",
         "event.dataset": "sophos.utm",
@@ -2896,6 +3069,7 @@
             "cancel"
         ],
         "rsa.misc.disposition": "onemul",
+        "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2903,6 +3077,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-25T20:53:40.000Z",
         "event.action": "ips",
         "event.code": "pluto",
         "event.dataset": "sophos.utm",
@@ -2920,6 +3095,7 @@
         ],
         "rsa.internal.messageid": "pluto",
         "rsa.misc.event_type": "ips",
+        "rsa.time.event_time": "2019-06-25T20:53:40.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.165.217.56"
@@ -2930,6 +3106,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-10T03:56:14.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2950,6 +3127,7 @@
         "rsa.network.alias_host": [
             "stla2856.host"
         ],
+        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2957,6 +3135,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-24T10:58:48.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2979,6 +3158,7 @@
         "rsa.network.alias_host": [
             "peri6748.www5.domain"
         ],
+        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -2986,6 +3166,7 @@
         ]
     },
     {
+        "@timestamp": "2019-08-07T18:01:23.000Z",
         "event.action": "accept",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -3011,6 +3192,7 @@
         "rsa.network.alias_host": [
             "tnon5442.internal.test"
         ],
+        "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -3018,6 +3200,7 @@
         ]
     },
     {
+        "@timestamp": "2019-08-22T01:03:57.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3040,6 +3223,7 @@
             "ariatu2606.www.host"
         ],
         "rsa.network.gateway": "its",
+        "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -3047,6 +3231,7 @@
         ]
     },
     {
+        "@timestamp": "2019-09-05T08:06:31.000Z",
         "destination.ip": [
             "10.248.62.55"
         ],
@@ -3088,6 +3273,7 @@
         "rsa.network.dinterface": "lo3422",
         "rsa.network.network_service": "orsit",
         "rsa.network.sinterface": "lo4665",
+        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.96.243.231"
@@ -3100,6 +3286,7 @@
         ]
     },
     {
+        "@timestamp": "2019-09-19T15:09:05.000Z",
         "destination.ip": [
             "10.132.101.158"
         ],
@@ -3127,6 +3314,7 @@
         "rsa.network.alias_host": [
             "rita600.www5.localdomain"
         ],
+        "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "rsa.time.process_time": "cipitlab",
         "service.type": "sophos",
         "tags": [
@@ -3135,6 +3323,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-03T22:11:40.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3148,6 +3337,7 @@
         "process.pid": 2014,
         "rsa.internal.event_desc": "sshd: Did not receive identification string.",
         "rsa.internal.messageid": "sshd",
+        "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -3155,6 +3345,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-18T05:14:14.000Z",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3180,6 +3371,7 @@
             "admini1122.www.local"
         ],
         "rsa.network.gateway": "vol",
+        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "sophos",
         "source.ip": [
             "10.96.193.132"
@@ -3191,6 +3383,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-01T12:16:48.000Z",
         "event.code": "confd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3209,8 +3402,8 @@
             "10.96.200.83"
         ],
         "related.user": [
-            "lapariat",
-            "acommod"
+            "acommod",
+            "lapariat"
         ],
         "rsa.identity.logon_type": "remeumf",
         "rsa.internal.event_desc": "dol",
@@ -3221,6 +3414,7 @@
         "rsa.misc.obj_type": "olorem",
         "rsa.misc.severity": "low",
         "rsa.misc.version": "1.7416",
+        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.name": "quamni",
         "service.type": "sophos",
         "source.ip": [
@@ -3233,6 +3427,7 @@
         "user.name": "acommod"
     },
     {
+        "@timestamp": "2019-11-15T19:19:22.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3249,6 +3444,7 @@
         "rsa.network.alias_host": [
             "emvel4391.localhost"
         ],
+        "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
@@ -3256,6 +3452,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-30T02:21:57.000Z",
         "event.code": "confd-sync",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3271,6 +3468,7 @@
         "rsa.internal.event_desc": "ico",
         "rsa.internal.messageid": "confd-sync",
         "rsa.misc.severity": "high",
+        "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "service.name": "rnatu",
         "service.type": "sophos",
         "tags": [
@@ -3279,6 +3477,7 @@
         ]
     },
     {
+        "@timestamp": "2019-12-14T09:24:31.000Z",
         "event.code": "sshd",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3295,6 +3494,7 @@
         "rsa.network.alias_host": [
             "untinc5531.www5.test"
         ],
+        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "sophos",
         "tags": [
             "sophos.utm",
