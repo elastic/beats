@@ -5,7 +5,7 @@
 // +build integration
 // +build azure
 
-package container_registry
+package compute_vm
 
 import (
 	"testing"
