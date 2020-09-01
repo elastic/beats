@@ -72,7 +72,7 @@ processors:
         kind: event
         category:
           - network
-        kind:
+        type:
           - connection
           - protocol
 {{ if .community_id }}

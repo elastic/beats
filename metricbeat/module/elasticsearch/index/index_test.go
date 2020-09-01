@@ -33,7 +33,7 @@ func TestGetServiceURI(t *testing.T) {
 		expectedPath string
 	}{
 		"bulk_stats_unavailable": {
-			esVersion:    common.MustNewVersion("7.7.0"),
+			esVersion:    common.MustNewVersion("7.9.0"),
 			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
