@@ -149,7 +149,7 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `compute`, `loadbalancing`, `pubsub`, `metrics` and
+Currently, we have `billing`, `compute`, `loadbalancing`, `pubsub`, `metrics` and
 `storage` metricset in `googlecloud` module.
 
 [float]

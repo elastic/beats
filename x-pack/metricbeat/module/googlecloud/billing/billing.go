@@ -50,9 +50,31 @@ type config struct {
 	ProjectID           string `config:"project_id" validate:"required"`
 	CredentialsFilePath string `config:"credentials_file_path" validate:"required"`
 	DatasetID           string `config:"dataset_id" validate:"required"`
-	TablePattern        string `config:"table_pattern" validate:"required"`
+	TablePattern        string `config:"table_pattern"`
 	CostType            string `config:"cost_type"`
 	period              time.Duration
+}
+
+// Validate checks for deprecated config options
+func (c config) Validate() error {
+	if c.CostType != "" {
+		// cost_type can only be regular, tax, adjustment, or rounding error
+		costTypes := []string{"regular", "tax", "adjustment", "rounding error"}
+		if stringInSlice(c.CostType, costTypes) {
+			return nil
+		}
+		return fmt.Errorf("given cost_type %s is not in supported list %s", c.CostType, costTypes)
+	}
+	return nil
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -88,21 +110,26 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 
 	defer client.Close()
 
-	var events []mb.Event
+	// default table_pattern for query is "gcp_billing_export_v1"
+	if m.config.TablePattern == "" {
+		m.logger.Warn("table_pattern is not set in config, \"gcp_billing_export_v1\" will be used by default.")
+		m.config.TablePattern = "gcp_billing_export_v1"
+	}
+
+	// default cost_type for query is "regular"
+	if m.config.CostType == "" {
+		m.logger.Warn("cost_type is not set in config, \"regular\" will be used by default.")
+		m.config.CostType = "regular"
+	}
+
 	tableMetas, err := getTables(ctx, client, m.config.DatasetID, m.config.TablePattern)
 	if err != nil {
 		return fmt.Errorf("getTables failed: %w", err)
 	}
 
-	// default cost_type for query is "regular"
-	costType := m.config.CostType
-	if costType == "" {
-		m.logger.Warn("cost_type is not set in config, \"regular\" will be used by default.")
-		costType = "regular"
-	}
-
+	var events []mb.Event
 	for _, tableMeta := range tableMetas {
-		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, costType)
+		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, m.config.CostType)
 		if err != nil {
 			return fmt.Errorf("queryBigQuery failed: %w", err)
 		}
@@ -239,17 +266,18 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 
 func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 	event := mb.Event{}
-	event.MetricSetFields = common.MapStr{}
-	event.RootFields = common.MapStr{}
+	event.MetricSetFields = common.MapStr{
+		"invoice_month": rowItems[0],
+		"project_id":rowItems[1],
+		"cost_type": rowItems[2],
+		"total": rowItems[3],
+	}
 
-	event.RootFields.Put("cloud.provider", "googlecloud")
-	event.RootFields.Put("cloud.account.id", accountID)
-	event.RootFields.Put("cloud.account.name", accountID)
-
-	event.MetricSetFields.Put("invoice_month", rowItems[0])
-	event.MetricSetFields.Put("project_id", rowItems[1])
-	event.MetricSetFields.Put("cost_type", rowItems[2])
-	event.MetricSetFields.Put("total", rowItems[3])
+	event.RootFields = common.MapStr{
+		"cloud.provider": "googlecloud",
+		"cloud.account.id": accountID,
+		"cloud.account.name": accountID,
+	}
 
 	// create eventID for each current_date + invoice_month + project_id + cost_type
 	currentDate := getCurrentDate()
