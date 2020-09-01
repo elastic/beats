@@ -28,7 +28,10 @@ handling cluster wide monitoring.
 This instance is used to retrieve metrics that are unique for the whole
 cluster, such as Kubernetes events or
 https://github.com/kubernetes/kube-state-metrics[kube-state-metrics].
-You canfind more information about leader election configuration options at <<configuration-autodiscover>>.
+You can find more information about leader election configuration options at <<configuration-autodiscover>>.
+
+Note: If you are upgrading from older versions of these manifests please make sure that there are no redundant parts
+as left-overs from previous versions. Deployment specification and its ConfigMaps might be the case.
 
 Everything is deployed under the `kube-system` namespace by default. To change
 the namespace, modify the manifest file.
@@ -202,7 +205,7 @@ Metrics should start flowing to Elasticsearch.
 [float]
 ==== Deploying Metricbeat to collect cluster level metrics for big clusters
 
-In some cases, users might want to monitor really bog Kubernetes clusters. In such cases,
+In some cases, users might want to monitor really big Kubernetes clusters. In such cases,
 the Pod that will be collecting cluster level metrics might face performance issues due to
 resources limitations. In this case users might consider avoid using leader election configuration
 for the Daemonset and instead deploy a singleton Metribceat instance using a
