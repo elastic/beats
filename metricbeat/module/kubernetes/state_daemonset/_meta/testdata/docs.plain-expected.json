@@ -1,0 +1,56 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.daemonset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "daemonset": {
+                "name": "kube-proxy",
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "ready": 1,
+                    "unavailable": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_daemonset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.daemonset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "daemonset": {
+                "name": "kindnet",
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "ready": 1,
+                    "unavailable": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_daemonset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]
