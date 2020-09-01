@@ -28,7 +28,7 @@ services:
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-7.7.0}
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.9.0}
     depends_on:
       - elasticsearch
     ports:
