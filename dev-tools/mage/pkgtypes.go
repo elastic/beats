@@ -925,7 +925,6 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 	return filepath.Walk(link, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
-				fmt.Println("M", path)
 				return nil
 			}
 
