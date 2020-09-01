@@ -18,7 +18,10 @@
 package template
 
 import (
+	"fmt"
+
 	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -123,11 +126,20 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...u
 	if err != nil {
 		logp.Err("Error building config: %v", err)
 	}
+
 	opts := []ucfg.Option{
 		ucfg.PathSep("."),
 		ucfg.Env(vars),
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
+
+		// Catch-all resolve function to log fields not resolved in any other way.
+		ucfg.Resolve(func(name string) (string, parse.Config, error) {
+			// Logging here the whole name of the field because it is not included in
+			// the error reported by Unpack.
+			logp.Debug("autodiscover", "Configuration includes a field not available in event: %s", name)
+			return "", parse.Config{}, fmt.Errorf("unavailable field %s", name)
+		}),
 	}
 	opts = append(opts, options...)
 
@@ -139,9 +151,9 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...u
 		}
 		// Unpack config to process any vars in the template:
 		var unpacked map[string]interface{}
-		c.Unpack(&unpacked, opts...)
+		err = c.Unpack(&unpacked, opts...)
 		if err != nil {
-			logp.Err("Error unpacking config: %v", err)
+			logp.Debug("autodiscover", "Configuration template cannot be resolved: %v", err)
 			continue
 		}
 		// Repack again:

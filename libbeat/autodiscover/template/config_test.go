@@ -28,9 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigsMapping(t *testing.T) {
+	logp.TestingSetup()
+
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"correct": "config",
 	})
@@ -110,6 +113,17 @@ func TestConfigsMapping(t *testing.T) {
 				"port": 8080,
 			},
 			expected: []*common.Config{configPorts},
+		},
+		// Missing variable, config is not generated
+		{
+			mapping: `
+- config:
+  - module: something
+    hosts: ["${not.exists.host}"]`,
+			event: bus.Event{
+				"host": "1.2.3.4",
+			},
+			expected: nil,
 		},
 	}
 
