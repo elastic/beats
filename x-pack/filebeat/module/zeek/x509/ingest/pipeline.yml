@@ -21,21 +21,45 @@ processors:
       field: file.x509.signature_algorithm
       value: '{{zeek.x509.certificate.signature_algorithm}}'
       ignore_empty_value: true
+  - script:
+      lang: painless
+      params:
+        "md2WithRSAEncryption": MD2-RSA
+        "md5WithRSAEncryption": MD5-RSA
+        "sha-1WithRSAEncryption": SHA1-RSA
+        "sha256WithRSAEncryption": SHA256-RSA
+        "sha384WithRSAEncryption": SHA384-RSA
+        "sha512WithRSAEncryption": SHA512-RSA
+        "dsaWithSha1": DSA-SHA1
+        "dsaWithSha256": DSA-SHA256
+        "ecdsa-with-SHA1": ECDSA-SHA1
+        "ecdsa-with-SHA256": ECDSA-SHA256
+        "ecdsa-with-SHA384": ECDSA-SHA384
+        "ecdsa-with-SHA512": ECDSA-SHA512
+        "id-Ed25519": Ed25519
+      source: |
+        String algo = params.get(ctx.file.x509.signature_algorithm);
+        if (algo != null) {
+          ctx.file.x509.signature_algorithm = algo;
+        }
+      if: ctx?.file?.x509?.signature_algorithm != null
   - set:
       field: file.x509.public_key_algorithm
       value: '{{zeek.x509.certificate.key.algorithm}}'
       ignore_empty_value: true
-  - set:
-      field: file.x509.public_key_size
-      value: '{{zeek.x509.certificate.key.length}}'
-      ignore_empty_value: true
+  - convert:
+      field: zeek.x509.certificate.key.length
+      target_field: file.x509.public_key_size
+      type: long
+      ignore_missing: true
   - dot_expander:
       field: certificate.exponent
       path: zeek.x509
-  - set:
-      field: file.x509.public_key_exponent
-      value: '{{zeek.x509.certificate.exponent}}'
-      ignore_empty_value: true
+  - convert:
+      field: zeek.x509.certificate.exponent
+      target_field: file.x509.public_key_exponent
+      type: long
+      ignore_missing: true
   - dot_expander:
       field: certificate.serial
       path: zeek.x509
