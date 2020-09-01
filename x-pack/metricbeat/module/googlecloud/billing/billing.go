@@ -47,12 +47,12 @@ type MetricSet struct {
 }
 
 type config struct {
-	ProjectID           string `config:"project_id" validate:"required"`
-	CredentialsFilePath string `config:"credentials_file_path" validate:"required"`
-	DatasetID           string `config:"dataset_id" validate:"required"`
-	TablePattern        string `config:"table_pattern"`
-	CostType            string `config:"cost_type"`
-	period              time.Duration
+	Period              time.Duration `config:"period" validate:"required"`
+	ProjectID           string        `config:"project_id" validate:"required"`
+	CredentialsFilePath string        `config:"credentials_file_path" validate:"required"`
+	DatasetID           string        `config:"dataset_id" validate:"required"`
+	TablePattern        string        `config:"table_pattern"`
+	CostType            string        `config:"cost_type"`
 }
 
 // Validate checks for deprecated config options
@@ -64,6 +64,10 @@ func (c config) Validate() error {
 			return nil
 		}
 		return fmt.Errorf("given cost_type %s is not in supported list %s", c.CostType, costTypes)
+	}
+
+	if c.Period.Hours() < 24 {
+		return fmt.Errorf("collection period for billing metricset %s cannot be less than 24 hours", c.Period)
 	}
 	return nil
 }
@@ -268,14 +272,14 @@ func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 	event := mb.Event{}
 	event.MetricSetFields = common.MapStr{
 		"invoice_month": rowItems[0],
-		"project_id":rowItems[1],
-		"cost_type": rowItems[2],
-		"total": rowItems[3],
+		"project_id":    rowItems[1],
+		"cost_type":     rowItems[2],
+		"total":         rowItems[3],
 	}
 
 	event.RootFields = common.MapStr{
-		"cloud.provider": "googlecloud",
-		"cloud.account.id": accountID,
+		"cloud.provider":     "googlecloud",
+		"cloud.account.id":   accountID,
 		"cloud.account.name": accountID,
 	}
 
