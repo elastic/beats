@@ -230,17 +230,30 @@ def withMacOSEnv(Closure body){
 
 def publishPackages(baseDir){
   def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
-  if (env.CHANGE_ID?.trim()) {
+  if (isPR()) {
     bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
   }
-
-  googleStorageUpload(bucket: "${bucketUri}",
+  def beatsFolderName = getBeatsName(baseDir)
+  googleStorageUpload(bucket: "${bucketUri}/${beatsFolderName}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",
     sharedPublicly: true,
     showInline: true
   )
+}
+
+/**
+* There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
+* therefore the storage bucket in GCP should follow the same folder structure.
+* This is required by https://github.com/elastic/beats-tester
+*/
+def getBeatsName(baseDir) {
+  def beatsFolderName = baseDir
+  if (baseDir.split('/')) {
+    beatsFolderName = baseDir.split('')[1]
+  }
+  return beatsFolderName
 }
 
 def withBeatsEnv(Closure body) {
