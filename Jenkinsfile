@@ -62,7 +62,7 @@ pipeline {
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
-    string(name: 'PYTEST_ADDOPTS', defaultValue: '--reruns 3 --reruns-delay 15', description: 'Aditional options to pass to pyTest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.')
+    string(name: 'PYTEST_ADDOPTS', defaultValue: '--reruns 3 --reruns-delay 15', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.')
   }
   stages {
     /**
