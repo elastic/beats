@@ -1,10 +1,8 @@
+import metricbeat
 import os
 import sys
 import unittest
 from parameterized import parameterized
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 @unittest.skip("See https://github.com/elastic/beats/issues/14660")
