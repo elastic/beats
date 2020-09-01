@@ -5,7 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-kubernetes-state_storageclass]]
 === Kubernetes state_storageclass metricset
 
-experimental[]
+beta[]
 
 include::../../../module/kubernetes/state_storageclass/_meta/docs.asciidoc[]
 

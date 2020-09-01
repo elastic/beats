@@ -2,7 +2,7 @@
   type: group
   description: >
     Kubernetes DaemonSet metrics
-  release: experimental
+  release: beta
   fields:
     - name: name
       type: keyword
