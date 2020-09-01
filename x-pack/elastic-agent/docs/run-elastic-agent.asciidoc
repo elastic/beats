@@ -23,8 +23,8 @@ To enroll an {agent} to {fleet}:
 . Stop {agent}, if it's already running.
 
 . In {ingest-manager}, click **Settings** and change the defaults, if necessary.
-For self-managed installations, set the URLs for {es} and {kib}, then save
-your changes.
+For self-managed installations, set the URLs for {es} and {kib}, including
+the http ports, then save your changes.
 +
 [role="screenshot"]
 image::images/kibana-ingest-manager-settings.png[{ingest-manager} settings]
