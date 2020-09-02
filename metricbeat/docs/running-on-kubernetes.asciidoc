@@ -31,7 +31,7 @@ https://github.com/kubernetes/kube-state-metrics[kube-state-metrics].
 You can find more information about leader election configuration options at <<configuration-autodiscover>>.
 
 Note: If you are upgrading from older versions, please make sure there are no redundant parts
-as left-overs from previous versions. Deployment specification and its ConfigMaps might be the case.
+as left-overs from the old manifests. Deployment specification and its ConfigMaps might be the case.
 
 Everything is deployed under the `kube-system` namespace by default. To change
 the namespace, modify the manifest file.
