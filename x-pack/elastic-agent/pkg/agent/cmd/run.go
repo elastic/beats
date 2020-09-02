@@ -40,7 +40,7 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 
 func run(flags *globalFlags, streams *cli.IOStreams) error {
 	pathConfigFile := flags.Config()
-	rawConfig, err := application.LoadConfig(pathConfigFile)
+	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),

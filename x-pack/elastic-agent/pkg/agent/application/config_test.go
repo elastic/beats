@@ -49,7 +49,7 @@ func TestLoadConfig(t *testing.T) {
 	cfgPath := filepath.Join(tmp, "config.yml")
 	dumpToYAML(t, cfgPath, contents)
 
-	cfg, err := LoadConfig(cfgPath)
+	cfg, err := LoadConfigFromFile(cfgPath)
 	require.NoError(t, err)
 
 	cfgData, err := cfg.ToMapStr()

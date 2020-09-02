@@ -61,7 +61,7 @@ func (c *IntrospectConfigCmd) introspectConfig() error {
 }
 
 func loadConfig(configPath string) (*config.Config, error) {
-	rawConfig, err := LoadConfig(configPath)
+	rawConfig, err := LoadConfigFromFile(configPath)
 	if err != nil {
 		return nil, err
 	}

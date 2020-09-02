@@ -34,11 +34,11 @@ func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*conf
 	return cfg, nil
 }
 
-// LoadConfig loads the Agent configuration.
+// LoadConfigFromFile loads the Agent configuration from a file.
 //
 // This must be used to load the Agent configuration, so that variables defined in the inputs are not
 // parsed by go-ucfg. Variables from the inputs should be parsed by the transpiler.
-func LoadConfig(path string) (*config.Config, error) {
+func LoadConfigFromFile(path string) (*config.Config, error) {
 	in, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -47,6 +47,14 @@ func LoadConfig(path string) (*config.Config, error) {
 	if err := yaml.Unmarshal(in, &m); err != nil {
 		return nil, err
 	}
+	return LoadConfig(m)
+}
+
+// LoadConfig loads the Agent configuration from a map.
+//
+// This must be used to load the Agent configuration, so that variables defined in the inputs are not
+// parsed by go-ucfg. Variables from the inputs should be parsed by the transpiler.
+func LoadConfig(m map[string]interface{}) (*config.Config, error) {
 	inputs, ok := m["inputs"]
 	if ok {
 		// remove the inputs
