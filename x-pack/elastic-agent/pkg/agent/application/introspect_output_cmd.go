@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -230,7 +232,7 @@ func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
 }
 
 func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
-	err := w.controller.Run(ctx, func(vars []composable.Vars) {
+	err := w.controller.Run(ctx, func(vars []transpiler.Vars) {
 		cb(vars)
 		w.done <- true
 	})

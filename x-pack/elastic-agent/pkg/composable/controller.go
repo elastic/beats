@@ -8,15 +8,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"reflect"
 	"sort"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
+
+// VarsCallback is callback called when the current vars state changes.
+type VarsCallback func([]transpiler.Vars)
 
 // Controller manages the state of the providers current context.
 type Controller interface {
@@ -79,7 +84,7 @@ func New(c *config.Config) (Controller, error) {
 		}
 		dynamicProviders[name] = &dynamicProviderState{
 			provider: provider,
-			mappings: map[string]Vars{},
+			mappings: map[string]transpiler.Vars{},
 		}
 	}
 
@@ -142,12 +147,12 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 			}
 
 			// build the vars list of mappings
-			vars := make([]Vars, 1)
+			vars := make([]transpiler.Vars, 1)
 			mapping := map[string]interface{}{}
 			for name, state := range c.contextProviders {
 				mapping[name] = state.Current()
 			}
-			vars[0] = Vars{
+			vars[0] = transpiler.Vars{
 				Mapping: mapping,
 			}
 
@@ -156,7 +161,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				for _, mappings := range state.Mappings() {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.Mapping
-					vars = append(vars, Vars{
+					vars = append(vars, transpiler.Vars{
 						Mapping:       local,
 						ProcessorsKey: name,
 						Processors:    mappings.Processors,
@@ -213,7 +218,7 @@ type dynamicProviderState struct {
 
 	provider DynamicProvider
 	lock     sync.RWMutex
-	mappings map[string]Vars
+	mappings map[string]transpiler.Vars
 	signal   chan bool
 }
 
@@ -236,7 +241,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interfa
 		// same mapping; no need to update and signal
 		return nil
 	}
-	c.mappings[id] = Vars{
+	c.mappings[id] = transpiler.Vars{
 		Mapping:    mapping,
 		Processors: processors,
 	}
@@ -257,11 +262,11 @@ func (c *dynamicProviderState) Remove(id string) {
 }
 
 // Mappings returns the current mappings.
-func (c *dynamicProviderState) Mappings() []Vars {
+func (c *dynamicProviderState) Mappings() []transpiler.Vars {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	mappings := make([]Vars, 0)
+	mappings := make([]transpiler.Vars, 0)
 	ids := make([]string, 0)
 	for name := range c.mappings {
 		ids = append(ids, name)

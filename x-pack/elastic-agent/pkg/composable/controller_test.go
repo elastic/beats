@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
@@ -78,8 +80,8 @@ func TestController(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	wg.Add(1)
-	var setVars []composable.Vars
-	err = c.Run(ctx, func(vars []composable.Vars) {
+	var setVars []transpiler.Vars
+	err = c.Run(ctx, func(vars []transpiler.Vars) {
 		setVars = vars
 		wg.Done()
 	})

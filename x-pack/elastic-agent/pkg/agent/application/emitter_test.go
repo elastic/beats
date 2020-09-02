@@ -12,20 +12,19 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
 func TestRenderInputs(t *testing.T) {
 	testcases := map[string]struct {
 		input     transpiler.Node
 		expected  transpiler.Node
-		varsArray []composable.Vars
+		varsArray []transpiler.Vars
 		err       bool
 	}{
 		"inputs not list": {
 			input: transpiler.NewKey("inputs", transpiler.NewStrVal("not list")),
 			err:   true,
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{},
 				},
@@ -34,11 +33,11 @@ func TestRenderInputs(t *testing.T) {
 		"bad variable error": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name|'missing ending quote}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name|'missing ending quote}")),
 				}),
 			})),
 			err: true,
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -51,7 +50,7 @@ func TestRenderInputs(t *testing.T) {
 		"basic single var": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name}")),
 				}),
 			})),
 			expected: transpiler.NewList([]transpiler.Node{
@@ -59,7 +58,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -72,10 +71,10 @@ func TestRenderInputs(t *testing.T) {
 		"duplicate result is removed": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name}")),
 				}),
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.diff}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.diff}")),
 				}),
 			})),
 			expected: transpiler.NewList([]transpiler.Node{
@@ -83,7 +82,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -97,13 +96,13 @@ func TestRenderInputs(t *testing.T) {
 		"missing var removes input": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name}")),
 				}),
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.missing|var1.diff}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.missing|var1.diff}")),
 				}),
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.removed}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.removed}")),
 				}),
 			})),
 			expected: transpiler.NewList([]transpiler.Node{
@@ -111,7 +110,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -125,11 +124,11 @@ func TestRenderInputs(t *testing.T) {
 		"duplicate var result but unique input not removed": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name}")),
 					transpiler.NewKey("unique", transpiler.NewStrVal("0")),
 				}),
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.diff}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.diff}")),
 					transpiler.NewKey("unique", transpiler.NewStrVal("1")),
 				}),
 			})),
@@ -143,7 +142,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("unique", transpiler.NewStrVal("1")),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -157,10 +156,10 @@ func TestRenderInputs(t *testing.T) {
 		"duplicates across vars array handled": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.name}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.name}")),
 				}),
 				transpiler.NewDict([]transpiler.Node{
-					transpiler.NewKey("key", transpiler.NewStrVal("{{var1.diff}}")),
+					transpiler.NewKey("key", transpiler.NewStrVal("${var1.diff}")),
 				}),
 			})),
 			expected: transpiler.NewList([]transpiler.Node{
@@ -177,7 +176,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value4")),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -227,7 +226,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
 						transpiler.NewDict([]transpiler.Node{
 							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
-								transpiler.NewStrVal("/var/log/{{var1.name}}.log"),
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
 							})),
 						}),
 					})),
@@ -275,7 +274,7 @@ func TestRenderInputs(t *testing.T) {
 					})),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{
@@ -327,7 +326,7 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
 						transpiler.NewDict([]transpiler.Node{
 							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
-								transpiler.NewStrVal("/var/log/{{var1.name}}.log"),
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
 							})),
 						}),
 					})),
@@ -375,7 +374,7 @@ func TestRenderInputs(t *testing.T) {
 					})),
 				}),
 			}),
-			varsArray: []composable.Vars{
+			varsArray: []transpiler.Vars{
 				{
 					Mapping: map[string]interface{}{
 						"var1": map[string]interface{}{

@@ -45,7 +45,7 @@ type emitterController struct {
 	lock   sync.RWMutex
 	config *config.Config
 	ast    *transpiler.AST
-	vars   []composable.Vars
+	vars   []transpiler.Vars
 }
 
 func (e *emitterController) Update(c *config.Config) error {
@@ -72,7 +72,7 @@ func (e *emitterController) Update(c *config.Config) error {
 	ast := rawAst.Clone()
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		renderedInputs, err := renderInputs(inputs, []composable.Vars{
+		renderedInputs, err := renderInputs(inputs, []transpiler.Vars{
 			{
 				Mapping: map[string]interface{}{},
 			},
@@ -108,7 +108,7 @@ func (e *emitterController) Update(c *config.Config) error {
 	return e.update()
 }
 
-func (e *emitterController) Set(vars []composable.Vars) {
+func (e *emitterController) Set(vars []transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
@@ -176,13 +176,13 @@ func emitter(ctx context.Context, log *logger.Logger, controller composable.Cont
 		router:      router,
 		modifiers:   modifiers,
 		reloadables: reloadables,
-		vars: []composable.Vars{
+		vars: []transpiler.Vars{
 			{
 				Mapping: map[string]interface{}{},
 			},
 		},
 	}
-	err := controller.Run(ctx, func(vars []composable.Vars) {
+	err := controller.Run(ctx, func(vars []transpiler.Vars) {
 		ctrl.Set(vars)
 	})
 	if err != nil {
@@ -202,7 +202,7 @@ func readfiles(files []string, emitter emitterFunc) error {
 	return emitter(c)
 }
 
-func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpiler.Node, error) {
+func renderInputs(inputs transpiler.Node, varsArray []transpiler.Vars) (transpiler.Node, error) {
 	l, ok := inputs.Value().(*transpiler.List)
 	if !ok {
 		return nil, fmt.Errorf("inputs must be an array")
@@ -215,8 +215,8 @@ func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpil
 			if !ok {
 				continue
 			}
-			err := dict.Apply(vars)
-			if err == composable.ErrNoMatch {
+			n, err := dict.Apply(vars)
+			if err == transpiler.ErrNoMatch {
 				// has a variable that didn't exist, so we ignore it
 				continue
 			}
@@ -224,6 +224,7 @@ func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpil
 				// another error that needs to be reported
 				return nil, err
 			}
+			dict = n.(*transpiler.Dict)
 			dict = promoteProcessors(dict)
 			hash := string(dict.Hash())
 			_, exists := nodesMap[hash]
@@ -237,43 +238,13 @@ func renderInputs(inputs transpiler.Node, varsArray []composable.Vars) (transpil
 }
 
 func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
-	found := findProcessors(dict)
-	if found == nil {
+	p := dict.Processors()
+	if p == nil {
 		return dict
 	}
 	ast, _ := transpiler.NewAST(map[string]interface{}{
-		"processors": found,
+		"processors": p,
 	})
 	node, _ := transpiler.Lookup(ast, "processors")
 	return transpiler.NewDict(append(dict.Value().([]transpiler.Node), node))
-}
-
-func findProcessors(node transpiler.Node) []map[string]interface{} {
-	switch t := node.(type) {
-	case *transpiler.Dict, *transpiler.List:
-		val := t.Value()
-		if val != nil {
-			for _, key := range t.Value().([]transpiler.Node) {
-				if found := findProcessors(key); found != nil {
-					return found
-				}
-			}
-		}
-	case *transpiler.Key:
-		val := t.Value()
-		if val != nil {
-			if found := findProcessors(t.Value().(transpiler.Node)); found != nil {
-				return found
-			}
-		}
-	case *transpiler.StrVal:
-		if t != nil {
-			if found := t.Processors(); found != nil {
-				return found
-			}
-		}
-	default:
-		return nil
-	}
-	return nil
 }
