@@ -203,7 +203,7 @@ Metrics should start flowing to Elasticsearch.
 
 
 [float]
-==== Deploying Metricbeat to collect cluster level metrics for big clusters
+==== Deploying Metricbeat to collect cluster-level metrics in large clusters
 
 In some cases, users might want to monitor really big Kubernetes clusters. In such cases,
 the Pod that will be collecting cluster level metrics might face performance issues due to
