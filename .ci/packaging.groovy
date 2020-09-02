@@ -249,9 +249,10 @@ def publishPackages(baseDir){
 * This is required by https://github.com/elastic/beats-tester
 */
 def getBeatsName(baseDir) {
-  def beatsFolderName = baseDir
-  if (baseDir.split('/')) {
-    beatsFolderName = baseDir.split('')[1]
+  def PATH_SEPARATOR_QUOTED = '\\/'
+  def beatsFolderName = baseDir.replaceAll(PATH_SEPARATOR_QUOTED, '')
+  if (baseDir.split(PATH_SEPARATOR_QUOTED).length > 1) {
+    beatsFolderName = baseDir.split(PATH_SEPARATOR_QUOTED)[1]
   }
   return beatsFolderName
 }
