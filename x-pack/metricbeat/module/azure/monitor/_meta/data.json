@@ -1,15 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
-        "metrics": {
-            "data_usage": {
-                "total": 0
-            },
-            "document_count": {
-                "total": 0
-            },
-            "document_quota": {
-                "total": 53687091200
+        "monitor": {
+            "metrics": {
+                "data_usage": {
+                    "total": 131072
+                },
+                "document_count": {
+                    "total": 2
+                },
+                "document_quota": {
+                    "total": 107374182400
+                }
             }
         },
         "namespace": "Microsoft.DocumentDb/databaseAccounts",
@@ -20,12 +22,12 @@
             },
             "type": "Microsoft.DocumentDb/databaseAccounts"
         },
-        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "subscription_id": "70bd6e77-4b1e-4835-8896-db77b8eef364",
         "timegrain": "PT5M"
     },
     "cloud": {
         "instance": {
-            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "id": "/subscriptions/70bd6e77-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
             "name": "obsaccount"
         },
         "provider": "azure",
@@ -35,6 +37,10 @@
         "dataset": "azure.monitor",
         "duration": 115000,
         "module": "azure"
+    },
+    "host": {
+        "id": "/subscriptions/70bd6e77-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+        "name": "obsaccount"
     },
     "metricset": {
         "name": "monitor",
