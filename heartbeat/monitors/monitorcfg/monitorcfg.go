@@ -38,8 +38,17 @@ type JobConfig struct {
 type AgentInput struct {
 	Id      string           `config:"id"`
 	Name    string           `config:"name"`
-	Meta    *common.Config   `config:"meta"`
+	Meta    *AgentMeta   `config:"meta"`
 	Streams []*common.Config `config:"streams" validate:"required"`
+}
+
+type AgentMeta struct {
+	Pkg *AgentPackage `config:package`
+}
+
+type AgentPackage struct {
+	Name string `config:name`
+	Version string `config:version`
 }
 
 // ToStandardConfig transforms this AgentInput into something compatible with
