@@ -12,6 +12,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
+- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
+- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
+- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
+- Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
+- Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
+- Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
+- Make error message about locked data path actionable. {pull}18667[18667]
+- Ensure dynamic template names are unique for the same field. {pull}18849[18849]
+- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
+- Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
+- Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
 
 *Auditbeat*
 
@@ -54,6 +65,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
+- Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 
 *Auditbeat*
 
