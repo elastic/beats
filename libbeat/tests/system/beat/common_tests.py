@@ -21,8 +21,9 @@ class TestExportsMixin:
         if len(extra) != 0:
             args += extra
         exit_code = self.run_beat(extra_args=args, logging_args=[])
-        assert exit_code == 0
         output = self.get_log()
+        if exit_code != 0:
+            raise Exception("export command returned with an error: {}".format(output))
         trailer = "\nPASS\n"
         pos = output.rfind(trailer)
         if pos == -1:
