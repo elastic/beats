@@ -302,6 +302,80 @@ func TestModifySetProcessor(t *testing.T) {
 			},
 			isErrExpected: false,
 		},
+		{
+			name:      "existing if",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+							"if":                 "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+							"if":    "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ignore_empty_value is false",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": false,
+							"if":                 "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+							"if":    "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "no value",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"ignore_empty_value": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
 	}
 
 	for _, test := range cases {
@@ -313,7 +387,7 @@ func TestModifySetProcessor(t *testing.T) {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, test.expected, test.content)
+				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
 	}

@@ -261,21 +261,31 @@ func modifySetProcessor(esVersion common.Version, pipelineID string, content map
 			continue
 		}
 		if options, ok := processor["set"].(map[string]interface{}); ok {
-			iev, ok := options["ignore_empty_value"].(bool)
-			if !ok || !iev {
+			_, ok := options["ignore_empty_value"].(bool)
+			if !ok {
+				// don't have ignore_empty_value nothing to do
+				continue
+			}
+
+			logp.Debug("modules", "In pipeline %q removing unsupported 'ignore_empty_value' in set processor", pipelineID)
+			delete(options, "ignore_empty_value")
+
+			_, ok = options["if"].(string)
+			if ok {
+				// assume if check is sufficient
 				continue
 			}
 			val, ok := options["value"].(string)
 			if !ok {
 				continue
 			}
-			newIf := strings.ReplaceAll(val, "{", "")
-			newIf = strings.ReplaceAll(newIf, "}", "")
-			newIf = strings.TrimSpace(newIf)
+
+			newIf := strings.TrimLeft(val, "{ ")
+			newIf = strings.TrimRight(newIf, "} ")
 			newIf = strings.ReplaceAll(newIf, ".", "?.")
 			newIf = "ctx?." + newIf + " != null"
-			logp.Debug("modules", "in pipeline %s replacing unsupported 'ignore_empty_value' with if %s in set processor", pipelineID, newIf)
-			delete(options, "ignore_empty_value")
+
+			logp.Debug("modules", "In pipeline %q adding if %s to replace 'ignore_empty_value' in set processor", pipelineID, newIf)
 			options["if"] = newIf
 		}
 	}
