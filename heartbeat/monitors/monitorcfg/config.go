@@ -1,28 +1,36 @@
 package monitorcfg
 
 import (
+	"fmt"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type AgentInput struct {
 	Id string `config:"id"`
 	Name string `config:"name"`
-	Meta AgentMeta `config:"meta"`
+	Meta *common.Config `config:"meta"`
 	Streams []*common.Config `config:"streams" validate:"required"`
 }
 
-type AgentMeta struct {
-	Pkg AgentPackage `config:"package"`
-}
+func (ai AgentInput) ToStandardConfig() (*common.Config, error) {
+	// We expect there to be exactly one stream here, and for that config,
+	// to map to a single 'regular' config.
+	// to
+	if len(ai.Streams) != 1 {
+		return nil, fmt.Errorf("received agent config with len(streams)==%d", len(ai.Streams))
+	}
+	config := ai.Streams[0]
 
-type AgentPackage struct {
-	Name string `config:"name"`
-	Version string `config:"version"`
-}
+	// We overwrite the ID of monitor with the input ID since this comes
+	// centrally from Kibana and should have greater precedence due to it
+	// being part of a persistent store in ES that better tracks the life
+	// of a config object than a text file
+	if ai.Id != "" {
+		err := config.SetString("id", 0, ai.Id)
+		if err != nil {
+			return nil, fmt.Errorf("could not override stream ID with agent ID: %w", err)
+		}
+	}
 
-func normalizeConfig(config *common.Config) *common.Config {
-	logp.Warn("NORMALIZE CONFIG %s", config)
-	return config
+	return config, nil
 }
-

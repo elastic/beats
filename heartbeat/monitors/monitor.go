@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
-	"io/ioutil"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -121,26 +120,17 @@ func newMonitorUnsafe(
 	allowWatches bool,
 	format int,
 ) (*Monitor, error) {
-	logp.Warn("AAAAH")
-	logp.Warn("AAAAH CHECKIT")
 	if format == FORMAT_AGENT_INPUT {
-		agentConfig := monitorcfg.AgentInput{}
-		err := config.Unpack(&agentConfig)
+		ai := monitorcfg.AgentInput{}
+		err := config.Unpack(&ai)
 		if err != nil {
 			return nil, err
 		}
-		logp.Warn("AAAH RAW IS %s", common.DebugString(config, false))
-		ioutil.WriteFile("testout", []byte(common.DebugString(config, false)), 0644)
-		logp.Warn("AAAH CONFIG FROM AGENT!!! %w\n %#v", err, agentConfig)
-		ioutil.WriteFile("testparse", []byte(fmt.Sprintf("%#v", agentConfig)), 0644)
-		ioutil.WriteFile("testerr", []byte(fmt.Sprintf("%s", err)), 0644)
 
-		if len(agentConfig.Streams) != 1 {
-			return nil, fmt.Errorf("received agent config with len(streams)==%d", len(agentConfig.Streams))
+		config, err = ai.ToStandardConfig()
+		if err != nil {
+			return nil, err
 		}
-		config = agentConfig.Streams[0]
-		config.SetString("id", 0, agentConfig.Id)
-		ioutil.WriteFile("testfinal", []byte(common.DebugString(config, false)), 0644)
 	}
 
 	// Extract just the Id, Type, and Enabled fields from the config
