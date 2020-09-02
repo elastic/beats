@@ -21,6 +21,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
+	"io/ioutil"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -71,8 +73,8 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
-	m, err := newMonitor(config, registrar, nil, nil, allowWatches)
+func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool, format int) error {
+	m, err := newMonitor(config, registrar, nil, nil, allowWatches, format)
 	if m != nil {
 		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	}
@@ -100,8 +102,9 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
+	format int,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches, format)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -116,7 +119,30 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
+	format int,
 ) (*Monitor, error) {
+	logp.Warn("AAAAH")
+	logp.Warn("AAAAH CHECKIT")
+	if format == FORMAT_AGENT_INPUT {
+		agentConfig := monitorcfg.AgentInput{}
+		err := config.Unpack(&agentConfig)
+		if err != nil {
+			return nil, err
+		}
+		logp.Warn("AAAH RAW IS %s", common.DebugString(config, false))
+		ioutil.WriteFile("testout", []byte(common.DebugString(config, false)), 0644)
+		logp.Warn("AAAH CONFIG FROM AGENT!!! %w\n %#v", err, agentConfig)
+		ioutil.WriteFile("testparse", []byte(fmt.Sprintf("%#v", agentConfig)), 0644)
+		ioutil.WriteFile("testerr", []byte(fmt.Sprintf("%s", err)), 0644)
+
+		if len(agentConfig.Streams) != 1 {
+			return nil, fmt.Errorf("received agent config with len(streams)==%d", len(agentConfig.Streams))
+		}
+		config = agentConfig.Streams[0]
+		config.SetString("id", 0, agentConfig.Id)
+		ioutil.WriteFile("testfinal", []byte(common.DebugString(config, false)), 0644)
+	}
+
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have
