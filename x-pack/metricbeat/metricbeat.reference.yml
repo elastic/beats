@@ -556,6 +556,16 @@ metricbeat.modules:
         - "instance/cpu/utilization"
         - "instance/uptime"
 
+- module: googlecloud
+  metricsets:
+    - billing
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"
+  cost_type: "regular"
+
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
   metricsets: ["server"]
