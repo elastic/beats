@@ -34,6 +34,12 @@
         "network.bytes": 148,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Outside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.233.123.123"
@@ -77,6 +83,12 @@
         "log.offset": 200,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -119,6 +131,11 @@
         "log.offset": 381,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -164,6 +181,12 @@
         "log.offset": 545,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -202,6 +225,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 734,
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -242,6 +269,11 @@
         "log.offset": 853,
         "network.iana_number": 58,
         "network.transport": "ipv6-icmp",
+        "observer.egress.interface.name": "ISP1",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "fe80::1ff:fe23:4567:890a"
         ],
@@ -287,6 +319,11 @@
         "log.offset": 989,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Inside",
+        "observer.ingress.interface.name": "identity",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.255.0.206",
             "10.12.31.51"
@@ -299,5 +336,212 @@
             "cisco-asa",
             "forwarded"
         ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106100",
+        "cisco.asa.rule_name": "incoming",
+        "cisco.asa.source_interface": "dmz2",
+        "destination.address": "127.3.4.5",
+        "destination.ip": "127.3.4.5",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106100: access-list incoming permitted udp dmz2/127.2.3.4(56575) -> inside/127.3.4.5(53) hit-cnt 1 first hit [0x93d0e533, 0x578ef52f]",
+        "event.outcome": "allow",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1171,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "dmz2",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "127.2.3.4",
+            "127.3.4.5"
+        ],
+        "service.type": "cisco",
+        "source.address": "127.2.3.4",
+        "source.ip": "127.2.3.4",
+        "source.port": 56575,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106100",
+        "cisco.asa.rule_name": "incoming",
+        "cisco.asa.source_interface": "dmz2",
+        "destination.address": "127.3.4.5",
+        "destination.ip": "127.3.4.5",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106100: access-list incoming permitted udp dmz2/127.2.3.4(56575)(LOCAL\\\\username) -> inside/127.3.4.5(53) hit-cnt 1 first hit [0x93d0e533, 0x578ef52f]",
+        "event.outcome": "allow",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1334,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "dmz2",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "127.2.3.4",
+            "127.3.4.5"
+        ],
+        "service.type": "cisco",
+        "source.address": "127.2.3.4",
+        "source.ip": "127.2.3.4",
+        "source.port": 56575,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106102",
+        "cisco.asa.rule_name": "dev_inward_client",
+        "cisco.asa.source_interface": "outside",
+        "cisco.asa.suffix": "session",
+        "destination.address": "10.223.223.40",
+        "destination.ip": "10.223.223.40",
+        "destination.port": 53,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106102,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-session-3-106102: access-list dev_inward_client permitted udp for user redacted outside/10.123.123.20(49721) -> inside/10.223.223.40(53) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]",
+        "event.outcome": "allow",
+        "event.severity": 3,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 1514,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.123.20",
+            "10.223.223.40"
+        ],
+        "related.user": [
+            "redacted"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.123.123.20",
+        "source.ip": "10.123.123.20",
+        "source.port": 49721,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "redacted"
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "106103",
+        "cisco.asa.rule_name": "filter",
+        "cisco.asa.source_interface": "inside",
+        "destination.address": "1.2.33.40",
+        "destination.geo.continent_name": "Asia",
+        "destination.geo.country_iso_code": "CN",
+        "destination.geo.location.lat": 23.1167,
+        "destination.geo.location.lon": 113.25,
+        "destination.geo.region_iso_code": "CN-GD",
+        "destination.geo.region_name": "Guangdong",
+        "destination.ip": "1.2.33.40",
+        "destination.port": 8080,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106103,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-1-106103: access-list filter denied icmp for user joe inside/10.1.2.3(64321) -> outside/1.2.33.40(8080) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]",
+        "event.outcome": "deny",
+        "event.severity": 1,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "alert",
+        "log.offset": 1723,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.2.3",
+            "1.2.33.40"
+        ],
+        "related.user": [
+            "joe"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.1.2.3",
+        "source.ip": "10.1.2.3",
+        "source.port": 64321,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "joe"
     }
 ]

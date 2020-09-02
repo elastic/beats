@@ -1,0 +1,36 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-apm"
+        },
+        "instance": {
+            "id": "8867356942891823986",
+            "name": "apm-ui-dev"
+        },
+        "provider": "googlecloud"
+    },
+    "cloud.availability_zone": "europe-west4-a",
+    "event": {
+        "dataset": "googlecloud.metrics",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "labels": {},
+        "metrics": {
+            "instance": {
+                "uptime": {
+                    "value": 60
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "metrics",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

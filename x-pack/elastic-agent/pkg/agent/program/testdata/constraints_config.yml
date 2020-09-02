@@ -24,17 +24,13 @@ inputs:
   - type: apache/metrics
     constraints:
       - "validate_version(%{[agent.version]}, '1.0.0 - 7.0.0')"
-    dataset.namespace: testing
+    data_stream.namespace: testing
     streams:
       - enabled: true
         metricset: info
 
-settings.monitoring:
+agent.monitoring:
   use_output: monitoring
 
-management:
-  host: "localhost"
-  mode: "local"
-
-config:
+agent:
   reload: 123

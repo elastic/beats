@@ -385,8 +385,8 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat", "endpoint"},
-			expected: 3,
+			programs: []string{"filebeat", "heartbeat", "metricbeat", "endpoint"},
+			expected: 4,
 		},
 		"constraints_config": {
 			programs: []string{"filebeat"},
@@ -400,10 +400,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
-		// "monitor_config": {
-		// 	programs: []string{"heartbeat"},
-		// 	expected: 1,
-		// },
+		"synthetics_config": {
+			programs: []string{"heartbeat"},
+			expected: 1,
+		},
 		"enabled_true": {
 			programs: []string{"filebeat"},
 			expected: 1,
@@ -430,7 +430,7 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
-	l, _ := logger.New()
+	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))

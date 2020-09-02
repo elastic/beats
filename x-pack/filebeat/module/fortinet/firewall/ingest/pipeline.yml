@@ -1,5 +1,8 @@
 description: Pipeline for parsing fortinet firewall logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
@@ -69,13 +72,26 @@ processors:
     formats:
     - UNIX_MS
     timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null"
+    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    timezone: "{{fortinet.firewall.tz}}"
+    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX_MS
-    if: "ctx.fortinet?.firewall?.tz == null"
+    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+- date:
+    field: fortinet.firewall.eventtime
+    target_field: event.start
+    formats:
+    - UNIX
+    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - rename:
     field: fortinet.firewall.devname
     target_field: observer.name

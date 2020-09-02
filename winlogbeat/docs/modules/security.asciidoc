@@ -2,8 +2,6 @@
 [role="xpack"]
 == Security Module
 
-beta[]
-
 The security module processes event log records from the Security log.
 
 The module has transformations for the following event IDs:

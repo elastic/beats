@@ -49,6 +49,10 @@ func NewConfigFrom(from interface{}) (*Config, error) {
 	}
 
 	if in, ok := from.(io.Reader); ok {
+		if closer, ok := from.(io.Closer); ok {
+			defer closer.Close()
+		}
+
 		content, err := ioutil.ReadAll(in)
 		if err != nil {
 			return nil, err
@@ -96,6 +100,22 @@ func (c *Config) ToMapStr() (map[string]interface{}, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+// Enabled return the configured enabled value or true by default.
+func (c *Config) Enabled() bool {
+	testEnabled := struct {
+		Enabled bool `config:"enabled"`
+	}{true}
+
+	if c == nil {
+		return false
+	}
+	if err := c.Unpack(&testEnabled); err != nil {
+		// if unpacking fails, expect 'enabled' being set to default value
+		return true
+	}
+	return testEnabled.Enabled
 }
 
 // LoadFile take a path and load the file and return a new configuration.

@@ -1,13 +1,13 @@
+revision: 5
 name: Endpoint Host
 fleet:
   agent:
     id: fleet-agent-id
-  api:
-    access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-    kibana:
-      protocol: https
-      host: localhost:5601
-      timeout: 30s
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  kibana:
+    protocol: https
+    host: localhost:5601
+    timeout: 30s
 
 outputs:
   default:
@@ -20,12 +20,13 @@ outputs:
 
 inputs:
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22

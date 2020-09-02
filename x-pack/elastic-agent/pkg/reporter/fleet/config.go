@@ -4,15 +4,15 @@
 
 package fleet
 
-// ManagementConfig is a configuration describing fleet connected parts
-type ManagementConfig struct {
+// Config is a configuration describing fleet connected parts
+type Config struct {
 	Threshold               int `yaml:"threshold" config:"threshold" validate:"min=1"`
 	ReportingCheckFrequency int `yaml:"check_frequency_sec" config:"check_frequency_sec" validate:"min=1"`
 }
 
-// DefaultFleetManagementConfig initiates FleetManagementConfig with default values
-func DefaultFleetManagementConfig() *ManagementConfig {
-	return &ManagementConfig{
+// DefaultConfig initiates FleetManagementConfig with default values
+func DefaultConfig() *Config {
+	return &Config{
 		Threshold:               10000,
 		ReportingCheckFrequency: 30,
 	}

@@ -55,7 +55,7 @@ func mustLoad(t *testing.T, yamlStr string) *Config {
 
 func TestEmptyTlsConfig(t *testing.T) {
 	cfg, err := load("")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, cfg, &Config{})
 }
@@ -73,20 +73,20 @@ func TestLoadWithEmptyValues(t *testing.T) {
     supported_protocols:
   `)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, cfg, &Config{})
 }
 
 func TestNoLoadNilConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
 
 func TestNoLoadDisabledConfig(t *testing.T) {
 	enabled := false
 	cfg, err := LoadTLSConfig(&Config{Enabled: &enabled})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, cfg)
 }
 
@@ -172,9 +172,13 @@ func TestApplyWithConfig(t *testing.T) {
 func TestServerConfigDefaults(t *testing.T) {
 	t.Run("when CA is not explicitly set", func(t *testing.T) {
 		var c ServerConfig
-		config := common.MustNewConfigFrom([]byte(``))
+		config := common.MustNewConfigFrom(`
+certificate: mycert.pem
+key: mykey.pem
+`)
 		err := config.Unpack(&c)
 		require.NoError(t, err)
+		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
@@ -196,10 +200,13 @@ func TestServerConfigDefaults(t *testing.T) {
 
 		yamlStr := `
     certificate_authorities: [ca_test.pem]
+    certificate: mycert.pem
+    key: mykey.pem
 `
 		var c ServerConfig
 		config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
 		err = config.Unpack(&c)
+		c.Certificate = CertificateConfig{} // prevent reading non-existent files
 		require.NoError(t, err)
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)

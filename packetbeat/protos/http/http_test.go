@@ -767,7 +767,7 @@ func TestHttpParser_requestURIWithSpace(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	path, params, err := http.extractParameters(msg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "/test", path)
 	assert.Equal(t, string(msg.requestURI), "http://localhost:8080/test?password=two secret")
 	assert.False(t, strings.Contains(params, "two secret"))
@@ -802,7 +802,7 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	path, params, err := http.extractParameters(msg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "/test", path)
 	assert.False(t, strings.Contains(params, "secret"))
 }
@@ -829,7 +829,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	assert.True(t, complete)
 
 	path, params, err := http.extractParameters(msg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "/users/login", path)
 	assert.True(t, strings.Contains(params, "username=ME"))
 	assert.False(t, strings.Contains(params, "secret"))

@@ -1,6 +1,7 @@
 - name: activitylogs
   type: group
   release: beta
+  default_field: false
   description: >
     Fields for Azure activity logs.
   fields:
@@ -86,6 +87,10 @@
       type: keyword
       description: >
         Operation name
+    - name: result_type
+      type: keyword
+      description: >
+        Result type
     - name: result_signature
       type: keyword
       description: >
@@ -94,6 +99,10 @@
       type: keyword
       description: >
         Category
+    - name: event_category
+      type: keyword
+      description: >
+        Event Category
     - name: properties
       type: group
       description: >

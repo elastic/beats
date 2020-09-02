@@ -27,6 +27,9 @@ func (b *Monitor) Cleanup(string, string) error {
 	return nil
 }
 
+// Close closes the monitor.
+func (b *Monitor) Close() {}
+
 // Prepare executes steps in order for monitoring to work correctly
 func (b *Monitor) Prepare(string, string, int, int) error {
 	return nil

@@ -11,8 +11,11 @@ it. Hints tell {beatname_uc} how to get metrics for the given container. This is
 [float]
 ===== `co.elastic.metrics/hosts`
 
-Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
-values from the autodiscover event, ie: `${data.host}:80`.
+Hosts setting to use with the given module. Hosts can include `${data.host}`, `${data.port}`,
+`${data.ports.<port_name>}` values from the autodiscover event, ie: `${data.host}:80`.
+For Kuberentes autodiscover events users can leverage port names as well,
+like `http://${data.host}:${data.ports.prometheus}/metrics`.
+In the last one we refer to the container port with name `prometheus`.
 
 [float]
 ===== `co.elastic.metrics/metricsets`
@@ -190,5 +193,5 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
-The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
-of the Docker container every 1 minute.
+The above labels would allow {beatname_uc} to run the nginx module and poll port `80`
+of the Docker container every 10 seconds.

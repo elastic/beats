@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -92,16 +93,18 @@ func NewInput(
 
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKEvents: func(privates []interface{}) {
-			for _, priv := range privates {
-				if msg, ok := priv.(*pubsub.Message); ok {
-					msg.Ack()
-					in.ackedCount.Inc()
-				} else {
-					in.log.Error("Failed ACKing pub/sub event")
+		ACKHandler: acker.ConnectionOnly(
+			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+				for _, priv := range privates {
+					if msg, ok := priv.(*pubsub.Message); ok {
+						msg.Ack()
+						in.ackedCount.Inc()
+					} else {
+						in.log.Error("Failed ACKing pub/sub event")
+					}
 				}
-			}
-		},
+			}),
+		),
 	})
 	if err != nil {
 		return nil, err

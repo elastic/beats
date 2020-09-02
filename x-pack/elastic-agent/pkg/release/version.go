@@ -7,6 +7,7 @@ package release
 import (
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -66,4 +67,38 @@ func PGP() (bool, []byte) {
 	})
 
 	return isEmptyAllowed, pgpBytes
+}
+
+// VersionInfo is structure used by `version --yaml`.
+type VersionInfo struct {
+	Version   string    `yaml:"version"`
+	Commit    string    `yaml:"commit"`
+	BuildTime time.Time `yaml:"build_time"`
+	Snapshot  bool      `yaml:"snapshot"`
+}
+
+// Info returns current version information.
+func Info() VersionInfo {
+	return VersionInfo{
+		Version:   Version(),
+		Commit:    Commit(),
+		BuildTime: BuildTime(),
+		Snapshot:  Snapshot(),
+	}
+}
+
+// String returns the string format for the version information.
+func (v *VersionInfo) String() string {
+	var sb strings.Builder
+
+	sb.WriteString(v.Version)
+	if v.Snapshot {
+		sb.WriteString("-SNAPSHOT")
+	}
+	sb.WriteString(" (build: ")
+	sb.WriteString(v.Commit)
+	sb.WriteString(" at ")
+	sb.WriteString(v.BuildTime.Format("2006-01-02 15:04:05 -0700 MST"))
+	sb.WriteString(")")
+	return sb.String()
 }

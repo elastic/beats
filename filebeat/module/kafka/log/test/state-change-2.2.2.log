@@ -1,0 +1,23 @@
+[2020-04-23 00:28:21,796] [WARN ] [kafka-request-handler-7] [state.change.logger] - [Broker id=1] Ignoring LeaderAndIsr request from controller 1 with correlation id 1 epoch 27 for partition xxx.xxx.inventory.test.1-0-2 since its associated leader epoch 5 is not higher than the current leader epoch 5 
+[2020-01-20 01:32:00,705] [ERROR] [controller-event-thread] [state.change.logger] - [Controller id=1 epoch=25] Controller 1 epoch 25 failed to change state for partition xxx.xxx.na.och.aud.1-0-2 from OfflinePartition to OnlinePartition
+kafka.common.StateChangeFailedException: Failed to elect leader for partition xxx.xxx.na.och.aud.1-0-2 under strategy OfflinePartitionLeaderElectionStrategy
+    at kafka.controller.PartitionStateMachine.$anonfun$doElectLeaderForPartitions$9(PartitionStateMachine.scala:390)
+    at scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)
+    at scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)
+    at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)
+    at kafka.controller.PartitionStateMachine.doElectLeaderForPartitions(PartitionStateMachine.scala:388)
+    at kafka.controller.PartitionStateMachine.electLeaderForPartitions(PartitionStateMachine.scala:315)
+    at kafka.controller.PartitionStateMachine.doHandleStateChanges(PartitionStateMachine.scala:225)
+    at kafka.controller.PartitionStateMachine.handleStateChanges(PartitionStateMachine.scala:141)
+    at kafka.controller.PartitionStateMachine.triggerOnlinePartitionStateChange(PartitionStateMachine.scala:123)
+    at kafka.controller.PartitionStateMachine.triggerOnlinePartitionStateChange(PartitionStateMachine.scala:109)
+    at kafka.controller.PartitionStateMachine.startup(PartitionStateMachine.scala:66)
+    at kafka.controller.KafkaController.onControllerFailover(KafkaController.scala:266)
+    at kafka.controller.KafkaController.kafka$controller$KafkaController$$elect(KafkaController.scala:1271)
+    at kafka.controller.KafkaController$Startup$.process(KafkaController.scala:1184)
+    at kafka.controller.ControllerEventManager$ControllerEventThread.$anonfun$doWork$1(ControllerEventManager.scala:94)
+    at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+    at kafka.metrics.KafkaTimer.time(KafkaTimer.scala:31)
+    at kafka.controller.ControllerEventManager$ControllerEventThread.doWork(ControllerEventManager.scala:94)
+    at kafka.utils.ShutdownableThread.run(ShutdownableThread.scala:82)
+

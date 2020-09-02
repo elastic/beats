@@ -1,9 +1,9 @@
 [
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -18,9 +18,9 @@
     },
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -32,9 +32,9 @@
     },
     {
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "input.type": "log",
         "log.offset": 1176,

@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+        "azure" : {
+        "app_insights" : {
+            "metrics" : {
+                "requests_failed" : {
+                    "sum" : 182
+                },
+                "request_name" : "GET /favicon.ico"
+            },
+            "start_date" : "2020-07-12T10:52:11.831Z",
+            "end_date" : "2020-07-12T12:52:11.831Z",
+            "application_id" : "42cb59a9-d5be-400b-a5c4-69b0a0026ac6"
+        }
+    },
+    "cloud": {
+        "provider": "azure"
+    },
+    "event": {
+        "dataset": "azure.app_insights",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "app_insights",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}
