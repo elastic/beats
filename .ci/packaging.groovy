@@ -252,7 +252,7 @@ def publishPackages(baseDir){
 * baseDir=name1/name2/name3-> return name2
 */
 def getBeatsName(baseDir) {
-  return basedir.replace('x-pack/', '')
+  return baseDir.replace('x-pack/', '')
 }
 
 def withBeatsEnv(Closure body) {
