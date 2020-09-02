@@ -39,6 +39,11 @@ pipeline {
         beforeAgent true
         anyOf {
           triggeredBy cause: "IssueCommentCause"
+          // Trigger the build if a PR changed this file.
+          allOf {
+            changeRequest
+            changeset '.ci/packaging.groovy'
+          }
           expression {
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
