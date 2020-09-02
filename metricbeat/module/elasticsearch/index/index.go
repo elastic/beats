@@ -133,9 +133,8 @@ func getServicePath(esVersion common.Version) (string, error) {
 		ew := u.Query().Get(expandWildcardsParam)
 		if !strings.HasSuffix(ew, hiddenSuffix) {
 			ew += hiddenSuffix
+			u.Query().Set(expandWildcardsParam, ew)
 		}
-
-		u.Query().Set(expandWildcardsParam, ew)
 	}
 
 	return u.String(), nil
