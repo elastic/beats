@@ -23,7 +23,7 @@ instances are used to retrieve most metrics from the host, such as system
 metrics, Docker stats, and metrics from all the services running on top of
 Kubernetes.
 
-In addition one Pod of the Daemonset will hold a leader lock each time which makes it responsible for
+In addition, one of the Pods in the DaemonSet will constantly hold a _leader lock_ which makes it responsible for
 handling cluster wide monitoring.
 This instance is used to retrieve metrics that are unique for the whole
 cluster, such as Kubernetes events or
@@ -210,4 +210,3 @@ the Pod that will be collecting cluster level metrics might face performance iss
 resources limitations. In this case users might consider avoid using leader election configuration
 for the Daemonset and instead deploy a singleton Metribceat instance using a Deployment with the
 proper configuration.
-
