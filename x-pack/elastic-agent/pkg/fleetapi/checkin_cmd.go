@@ -49,7 +49,6 @@ func (e *CheckinRequest) Validate() error {
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
 	Actions Actions `json:"actions"`
-	Success bool    `json:"success"`
 }
 
 // Validate validates the response send from the server.
