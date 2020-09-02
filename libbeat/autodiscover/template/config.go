@@ -130,11 +130,10 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...u
 	opts := []ucfg.Option{
 		// Catch-all resolve function to log fields not resolved in any other way,
 		// it needs to be the first resolver added, so it is executed the last one.
+		// Being the last one, its returned error will be the one returned by `Unpack`,
+		// this is important to give better feedback in case of failure.
 		ucfg.Resolve(func(name string) (string, parse.Config, error) {
-			// Logging here the whole name of the field because it is not included in
-			// the error reported by Unpack.
-			logp.Debug("autodiscover", "Configuration includes a field not available in event or environment: %s", name)
-			return "", parse.Config{}, fmt.Errorf("unavailable field %s", name)
+			return "", parse.Config{}, fmt.Errorf("field '%s' not available in event or environment", name)
 		}),
 
 		ucfg.PathSep("."),
