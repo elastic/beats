@@ -1,6 +1,5 @@
 {
   "action": "checkin",
-  "success": true,
   "actions": [
     {
       "type": "CONFIG_CHANGE",
