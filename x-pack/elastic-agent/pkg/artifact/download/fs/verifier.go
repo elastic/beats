@@ -67,9 +67,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		return isMatch, err
 	}
 
-	// TODO: package in asc singature files
-	// return v.verifyAsc(filename, fullPath)
-	return true, nil
+	return v.verifyAsc(filename, fullPath)
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
