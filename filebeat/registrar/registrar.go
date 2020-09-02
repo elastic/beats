@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 )
 
 type Registrar struct {
@@ -300,7 +301,7 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 	return states, nil
 }
 
-func writeStates(store *statestore.Store, states []file.State) error {
+func writeStates(store backend.Store, states []file.State) error {
 	for i := range states {
 		key := fileStatePrefix + states[i].Id
 		if err := store.Set(key, states[i]); err != nil {

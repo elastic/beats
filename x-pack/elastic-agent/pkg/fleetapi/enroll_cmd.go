@@ -112,7 +112,6 @@ func (e *EnrollRequest) Validate() error {
 // Example:
 // {
 //   "action": "created",
-//   "success": true,
 //   "item": {
 //     "id": "a4937110-e53e-11e9-934f-47a8e38a522c",
 //     "active": true,
@@ -126,9 +125,8 @@ func (e *EnrollRequest) Validate() error {
 //   }
 // }
 type EnrollResponse struct {
-	Action  string             `json:"action"`
-	Success bool               `json:"success"`
-	Item    EnrollItemResponse `json:"item"`
+	Action string             `json:"action"`
+	Item   EnrollItemResponse `json:"item"`
 }
 
 // EnrollItemResponse item response.

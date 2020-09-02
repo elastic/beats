@@ -2,9 +2,6 @@ import os
 import re
 import sys
 import yaml
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
-
 from beat.beat import TestCase
 from beat.tags import tag
 from parameterized import parameterized_class
