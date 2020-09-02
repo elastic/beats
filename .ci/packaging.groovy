@@ -86,6 +86,22 @@ pipeline {
                   'x-pack/winlogbeat'
                 )
               }
+              axis {
+                name 'PLATFORMS'
+                values (
+                  '+all',
+                  'linux/amd64',
+                  'linux/386',
+                  'linux/arm64',
+                  'linux/armv7',
+                  'linux/ppc64le',
+                  'linux/mips64',
+                  'linux/s390x',
+                  'windows/amd64',
+                  'windows/386',
+                  'darwin/amd64'
+                )
+              }
             }
             stages {
               stage('Package Linux'){
@@ -99,19 +115,6 @@ pipeline {
                 }
                 environment {
                   HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'linux/amd64',
-                    'linux/386',
-                    'linux/arm64',
-                    'linux/armv7',
-                    'linux/ppc64le',
-                    'linux/mips64',
-                    'linux/s390x',
-                    'windows/amd64',
-                    'windows/386',
-                    (params.macos ? '' : 'darwin/amd64'),
-                  ].join(' ')
                 }
                 steps {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
@@ -127,15 +130,11 @@ pipeline {
                 when {
                   beforeAgent true
                   expression {
-                    return params.macos
+                    return params.macos && (env.PLATFORMS.equals('+all') || env.PLATFORMS.equals('darwin/amd64'))
                   }
                 }
                 environment {
                   HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'darwin/amd64',
-                  ].join(' ')
                 }
                 steps {
                   withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
