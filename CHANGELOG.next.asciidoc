@@ -165,6 +165,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
+- Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
+- Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
 
 *Auditbeat*
 
@@ -251,6 +253,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
+- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
+- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
+- Update documentation in the azure module filebeat. {pull}20815[20815]
 
 *Heartbeat*
 
@@ -398,6 +403,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
+- Added support for more message types for Cisco ASA and FTD. {pull}20565[20565]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 
 *Auditbeat*
@@ -542,6 +548,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 - Convert httpjson to v2 input {pull}20226[20226]
+- Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 
 *Heartbeat*
 
@@ -654,8 +661,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 - Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add state_daemonset metricset for Kubernetes Metricbeat module {pull}20649[20649]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
+- Request prometheus endpoints to be gzipped by default {pull}20766[20766]
 
 *Packetbeat*
 
@@ -668,6 +677,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
+- Add support for parallelization factor for kinesis. {pull}20727[20727]
 
 *Winlogbeat*
 
