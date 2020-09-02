@@ -347,7 +347,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.check_kill_and_wait()
 
-        assert self.has_registry(data_path=self.working_dir+"/datapath")
+        assert self.has_registry(data_path=self.working_dir + "/datapath")
 
     def test_rotating_file_inode(self):
         """
@@ -770,7 +770,8 @@ class Test(BaseTest):
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
-    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin", 'flaky test https://github.com/elastic/beats/issues/8102')
+    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin",
+                     'flaky test https://github.com/elastic/beats/issues/8102')
     def test_clean_inactive(self):
         """
         Checks that states are properly removed after clean_inactive
@@ -930,8 +931,8 @@ class Test(BaseTest):
             ignore_older="2000ms",
         )
 
-        init_files = ["test"+str(i)+".log" for i in range(3)]
-        restart_files = ["test"+str(i+3)+".log" for i in range(1)]
+        init_files = ["test" + str(i) + ".log" for i in range(3)]
+        restart_files = ["test" + str(i + 3) + ".log" for i in range(1)]
 
         for name in init_files:
             self.input_logs.write(name, "Hello World\n")

@@ -96,7 +96,7 @@ clean: mage
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -a -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 	# check if vendor folder does not exists
 	[ ! -d vendor ]
@@ -134,7 +134,7 @@ misspell:
 fmt: add-headers python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
-	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
+	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 -a --in-place --max-line-length 120 {} \;
 
 ## lint : TBD.
 .PHONY: lint
@@ -167,7 +167,7 @@ notice:
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==2.4.4
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 

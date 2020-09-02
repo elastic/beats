@@ -107,7 +107,7 @@ func PythonAutopep8() error {
 	}
 
 	args := append(
-		[]string{"--in-place", "--max-line-length", "120"},
+		[]string{"-a", "--in-place", "--max-line-length", "120"},
 		pyFiles...,
 	)
 
