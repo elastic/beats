@@ -447,7 +447,7 @@ func NewUIntVal(val uint64) *UIntVal {
 	return NewUIntValWithProcessors(val, nil)
 }
 
-// NewUIntVal creates a new uint value node with provided value with processors attached.
+// NewUIntValWithProcessors creates a new uint value node with provided value with processors attached.
 func NewUIntValWithProcessors(val uint64, processors Processors) *UIntVal {
 	return &UIntVal{val, processors}
 }
@@ -499,7 +499,7 @@ func NewFloatVal(val float64) *FloatVal {
 	return NewFloatValWithProcessors(val, nil)
 }
 
-// NewFloatVal creates a new float value node with provided value with processors attached.
+// NewFloatValWithProcessors creates a new float value node with provided value with processors attached.
 func NewFloatValWithProcessors(val float64, processors Processors) *FloatVal {
 	return &FloatVal{val, processors}
 }
@@ -550,7 +550,7 @@ func NewBoolVal(val bool) *BoolVal {
 	return NewBoolValWithProcessors(val, nil)
 }
 
-// NewBoolVal creates a new bool value node with provided value with processors attached.
+// NewBoolValWithProcessors creates a new bool value node with provided value with processors attached.
 func NewBoolValWithProcessors(val bool, processors Processors) *BoolVal {
 	return &BoolVal{val, processors}
 }
