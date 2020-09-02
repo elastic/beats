@@ -64,7 +64,7 @@ func TestLazyAcker(t *testing.T) {
 			assert.EqualValues(t, 1, len(cr.Events))
 		}
 
-		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+		resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 		return resp, nil
 	})
 
