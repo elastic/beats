@@ -72,7 +72,7 @@ var (
 
 	//ExpandWildcardsHiddenAvailableVersion is the version since when the "expand_wildcards" query parameter to
 	// the Indices Stats API can accept "hidden" as a value.
-	ExpandWildcardsHiddenAvailableVersion = common.MustNewVersion("7.9.0")
+	ExpandWildcardsHiddenAvailableVersion = common.MustNewVersion("7.7.0")
 
 	// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 	clusterIDCache = map[string]string{}
