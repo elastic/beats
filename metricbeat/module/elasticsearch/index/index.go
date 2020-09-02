@@ -19,7 +19,6 @@ package index
 
 import (
 	"net/url"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -124,17 +123,13 @@ func getServicePath(esVersion common.Version) (string, error) {
 	}
 
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		if !strings.HasSuffix(u.Path, bulkSuffix) {
-			u.Path += bulkSuffix
-		}
+		u.Path += bulkSuffix
 	}
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
 		ew := u.Query().Get(expandWildcardsParam)
-		if !strings.HasSuffix(ew, hiddenSuffix) {
-			ew += hiddenSuffix
-			u.Query().Set(expandWildcardsParam, ew)
-		}
+		ew += hiddenSuffix
+		u.Query().Set(expandWildcardsParam, ew)
 	}
 
 	return u.String(), nil
