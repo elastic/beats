@@ -43,6 +43,13 @@ func TestConfigsMapping(t *testing.T) {
 		"hosts":   [1]string{"1.2.3.4:8080"},
 	})
 
+	const envValue = "valuefromenv"
+	configFromEnv, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct": envValue,
+	})
+
+	os.Setenv("CONFIGS_MAPPING_TESTENV", envValue)
+
 	tests := []struct {
 		mapping  string
 		event    bus.Event
@@ -81,6 +88,16 @@ func TestConfigsMapping(t *testing.T) {
 				"foo": 3,
 			},
 			expected: []*common.Config{config},
+		},
+		// No condition, value from environment
+		{
+			mapping: `
+- config:
+    - correct: ${CONFIGS_MAPPING_TESTENV}`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{configFromEnv},
 		},
 		// Match config and replace data.host and data.ports.<name> properly
 		{
