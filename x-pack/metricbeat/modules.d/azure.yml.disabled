@@ -3,13 +3,19 @@
 
 - module: azure
   metricsets:
-    - compute_vm_scaleset
+  - monitor
   enabled: true
   period: 300s
-
-  refresh_list_interval: 120s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 600s
   resources:
-    - resource_group: "obs-infrastructure"
+#  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+#    metrics:
+#    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+#      namespace: "Microsoft.DocumentDb/databaseAccounts"
 
 #- module: azure
 #  metricsets:
