@@ -38,6 +38,7 @@ const (
 	defaultInstanceField  = "instance"
 	defaultObjectField    = "object"
 	replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
+	collectFailedMsg      = "failed collecting counter values"
 )
 
 // Reader will contain the config options
@@ -152,7 +153,13 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := re.query.CollectData(); err != nil {
-		return nil, errors.Wrap(err, "failed querying counter values")
+		// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
+		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
+		if err == pdh.PDH_NO_COUNTERS {
+			re.log.Warnf("%s %v", collectFailedMsg, err)
+		} else {
+			return nil, errors.Wrap(err, collectFailedMsg)
+		}
 	}
 
 	// Get the values.

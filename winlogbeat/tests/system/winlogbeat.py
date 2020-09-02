@@ -11,8 +11,6 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 
 PROVIDER = "WinlogbeatTestPython"
@@ -111,7 +109,7 @@ class WriteReadTest(BaseTest):
 
     def read_registry(self, requireBookmark=False):
         f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "r")
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.FullLoader)
         self.assertIn("update_time", data)
         self.assertIn("event_logs", data)
 

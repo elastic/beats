@@ -179,7 +179,6 @@ processors:
         - {from: source.address, to: source.ip, type: ip}
         - {from: destination.address, to: destination.ip, type: ip}
         - {from: zeek.session_id, to: event.id}
-        - {from: '@timestamp', to: event.created}
         - {from: zeek.dns.trans_id, to: dns.id}
         - {from: zeek.dns.query, to: dns.question.name}
         - {from: zeek.dns.qtype_name, to: dns.question.type}
@@ -197,18 +196,12 @@ processors:
 {{ if .community_id }}
   - community_id:
 {{ end }}
-  - timestamp:
-      ignore_missing: true
-      field: zeek.dns.ts
-      layouts:
-        - UNIX
   - drop_fields:
       ignore_missing: true
       fields:
         - zeek.dns.Z
         - zeek.dns.auth
         - zeek.dns.addl
-        - zeek.dns.ts
   - add_fields:
       target: ''
       fields:
