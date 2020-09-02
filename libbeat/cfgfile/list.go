@@ -95,7 +95,6 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			if _, ok := err.(*common.ErrInputNotFinished); ok {
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
-				return nil
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
