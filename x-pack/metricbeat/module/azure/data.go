@@ -84,7 +84,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 				event, metricList = createEvent(timestamp, defaultMetric, groupTimeValues)
 			}
 			if metricset == nativeMetricset {
-				event.ModuleFields.Put(fmt.Sprintf("%s.metrics", nativeMetricset), metricList)
+				event.ModuleFields.Put("metrics", metricList)
 			} else {
 				for key, metric := range metricList {
 					event.MetricSetFields.Put(key, metric)
