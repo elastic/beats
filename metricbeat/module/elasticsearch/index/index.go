@@ -19,6 +19,7 @@ package index
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -37,9 +38,9 @@ func init() {
 }
 
 const (
-	statsMetrics         = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	expandWildcardsParam = "expand_wildcards"
-	statsPath            = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcardsParam + "=open"
+	statsMetrics    = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	expandWildcards = "expand_wildcards=open"
+	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
 
 	bulkSuffix   = ",bulk"
 	hiddenSuffix = ",hidden"
@@ -127,9 +128,7 @@ func getServicePath(esVersion common.Version) (string, error) {
 	}
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
-		ew := u.Query().Get(expandWildcardsParam)
-		ew += hiddenSuffix
-		u.Query().Set(expandWildcardsParam, ew)
+		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
 	}
 
 	return u.String(), nil

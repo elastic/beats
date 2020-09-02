@@ -27,18 +27,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetServiceURI(t *testing.T) {
+func TestGetServiceURIExpectedPath(t *testing.T) {
+	path770 := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	path800 := strings.Replace(path770, statsMetrics, statsMetrics+bulkSuffix, 1)
+
 	tests := map[string]struct {
 		esVersion    *common.Version
 		expectedPath string
 	}{
 		"bulk_stats_unavailable": {
-			esVersion:    common.MustNewVersion("7.9.0"),
+			esVersion:    common.MustNewVersion("7.6.0"),
 			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
 			esVersion:    common.MustNewVersion("8.0.0"),
-			expectedPath: strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1),
+			expectedPath: path800,
+		},
+		"expand_wildcards_hidden_unavailable": {
+			esVersion:    common.MustNewVersion("7.6.0"),
+			expectedPath: statsPath,
+		},
+		"expand_wildcards_hidden_available": {
+			esVersion:    common.MustNewVersion("7.7.0"),
+			expectedPath: path770,
 		},
 	}
 
