@@ -139,8 +139,8 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...u
 
 		ucfg.PathSep("."),
 		ucfg.Env(vars),
-		ucfg.VarExp,
 		ucfg.ResolveEnv,
+		ucfg.VarExp,
 	}
 	opts = append(opts, options...)
 
