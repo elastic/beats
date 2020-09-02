@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	FORMAT_STANDALONE = iota
+	FORMAT_AGENTLESS = iota
 	FORMAT_AGENT_INPUT
 )
 
@@ -40,7 +40,7 @@ type RunnerFactory struct {
 	info         beat.Info
 	sched        *scheduler.Scheduler
 	allowWatches bool
-	format int
+	format       int
 }
 
 type publishSettings struct {
