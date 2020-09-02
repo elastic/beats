@@ -39,7 +39,11 @@ func init() {
 
 const (
 	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices&expand_wildcards=open,hidden"
+	expandWildcardsParam = "expand_wildcards"
+	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices&"+expandWildcardsParam+"=open"
+
+	bulkSuffix = ",bulk"
+ hiddenSuffix = ",hidden"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -120,12 +124,18 @@ func getServicePath(esVersion common.Version) (string, error) {
 	}
 
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		if strings.HasSuffix(u.Path, ",bulk") {
-			// Bulk stats already being requested so don't change service URI
-			return currPath, nil
+		if !strings.HasSuffix(u.Path, bulkSuffix) {
+			u.Path += bulkSuffix
+		}
+	}
+
+	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
+		ew := u.Query().Get(expandWildcardsParam)
+		if !strings.HasSuffix(ew, hiddenSuffix) {
+			ew += hiddenSuffix
 		}
 
-		u.Path += ",bulk"
+		u.Query().Set(expandWildcardsParam, ew)
 	}
 
 	return u.String(), nil

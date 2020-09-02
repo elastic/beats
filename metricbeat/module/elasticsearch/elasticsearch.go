@@ -60,17 +60,23 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
+var (
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
-var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
 // BulkStatsAvailableVersion is the version since when bulk indexing stats are available
-var BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
+BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
+
+//ExpandWildcardsHiddenAvailableVersion is the version since when the "expand_wildcards" query parameter to
+// the Indices Stats API can accept "hidden" as a value.
+ ExpandWildcardsHiddenAvailableVersion = common.MustNewVersion("7.9.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
-var clusterIDCache = map[string]string{}
+clusterIDCache = map[string]string{}
+)
 
 // ModuleName is the name of this module.
 const ModuleName = "elasticsearch"
