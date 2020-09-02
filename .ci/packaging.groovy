@@ -247,6 +247,9 @@ def publishPackages(baseDir){
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
 * therefore the storage bucket in GCP should follow the same folder structure.
 * This is required by https://github.com/elastic/beats-tester
+* e.g.
+* baseDir=name -> return name
+* baseDir=name1/name2/name3-> return name2
 */
 def getBeatsName(baseDir) {
   return basedir.replace('x-pack/', '')
