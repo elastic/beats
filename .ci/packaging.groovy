@@ -41,7 +41,7 @@ pipeline {
           triggeredBy cause: "IssueCommentCause"
           // Trigger the build if a PR changed this file.
           allOf {
-            changeRequest
+            changeRequest()
             changeset '.ci/packaging.groovy'
           }
           expression {
