@@ -205,7 +205,7 @@ Metrics should start flowing to Elasticsearch.
 [float]
 ==== Deploying Metricbeat to collect cluster-level metrics in large clusters
 
-In some cases, users might want to monitor really big Kubernetes clusters. In such cases,
+The size and the number of nodes in a Kubernetes cluster can be fairly large at times, and in such cases
 the Pod that will be collecting cluster level metrics might face performance issues due to
 resources limitations. In this case users might consider avoid using leader election configuration
 for the Daemonset and instead deploy a singleton Metribceat instance using a Deployment with the
