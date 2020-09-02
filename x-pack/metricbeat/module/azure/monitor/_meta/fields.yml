@@ -3,5 +3,6 @@
   release: ga
   description: >
     monitor
+  fields:
 
 
