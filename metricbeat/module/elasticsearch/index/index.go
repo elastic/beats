@@ -38,12 +38,12 @@ func init() {
 }
 
 const (
-	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	statsMetrics         = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
 	expandWildcardsParam = "expand_wildcards"
-	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices&"+expandWildcardsParam+"=open"
+	statsPath            = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcardsParam + "=open"
 
-	bulkSuffix = ",bulk"
- hiddenSuffix = ",hidden"
+	bulkSuffix   = ",bulk"
+	hiddenSuffix = ",hidden"
 )
 
 // MetricSet type defines all fields of the MetricSet
