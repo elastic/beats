@@ -24,6 +24,7 @@ func ListSuite(suiteFile string) (out *CmdOut, err error) {
 }
 
 func RunSuite(suiteFile string, journeyName string) (out *CmdOut, err error) {
+	logp.Warn("RUNNING JOURNEY %s", journeyName)
 	cmd := exec.Command(
 		"node",
 		suiteFile,
