@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
+- Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
 
 *Auditbeat*
 
@@ -167,6 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
+- Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 
 *Auditbeat*
 
@@ -548,6 +550,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Return error when log harvester tries to open a named pipe. {issue}18682[18682] {pull}20450[20450]
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 - Convert httpjson to v2 input {pull}20226[20226]
+- Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 
 *Heartbeat*
 
@@ -660,10 +663,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.instance.name into aws ec2 metricset. {pull}20077[20077]
 - Add host inventory metrics into aws ec2 metricset. {pull}20171[20171]
 - Add `scope` setting for elasticsearch module, allowing it to monitor an Elasticsearch cluster behind a load-balancing proxy. {issue}18539[18539] {pull}18547[18547]
+- Add state_daemonset metricset for Kubernetes Metricbeat module {pull}20649[20649]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
 - Add latency config parameter into aws module. {pull}20875[20875]
+- Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 
 *Packetbeat*
 
