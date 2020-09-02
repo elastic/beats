@@ -216,7 +216,7 @@ func (m *Monitor) configHash() (uint64, error) {
 }
 
 func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
-	mtConf := jobConfig{}
+	mtConf := monitorcfg.JobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}

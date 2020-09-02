@@ -20,9 +20,21 @@ package monitorcfg
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// JobConfig represents fields needed to execute a single job.
+type JobConfig struct {
+	Name     string             `config:"pluginName"`
+	Type     string             `config:"type"`
+	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+}
+
+// AgentInput represents the base config used when using the agent.
+// We expect there to be exactly one stream here, and for that config,
+// to map to a single 'regular' config.
 type AgentInput struct {
 	Id      string           `config:"id"`
 	Name    string           `config:"name"`
@@ -30,10 +42,9 @@ type AgentInput struct {
 	Streams []*common.Config `config:"streams" validate:"required"`
 }
 
+// ToStandardConfig transforms this AgentInput into something compatible with
+// a JobConfig and whatever more specific monitor type it becomes later.
 func (ai AgentInput) ToStandardConfig() (*common.Config, error) {
-	// We expect there to be exactly one stream here, and for that config,
-	// to map to a single 'regular' config.
-	// to
 	if len(ai.Streams) != 1 {
 		return nil, fmt.Errorf("received agent config with len(streams)==%d", len(ai.Streams))
 	}
