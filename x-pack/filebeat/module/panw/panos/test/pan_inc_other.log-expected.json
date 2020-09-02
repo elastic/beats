@@ -730,6 +730,8 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",

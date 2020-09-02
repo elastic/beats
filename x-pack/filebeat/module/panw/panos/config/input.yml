@@ -51,6 +51,8 @@ processors:
       omit_empty: true
       fail_on_error: false
       mappings:
+        panw.panos.type: 3
+        panw.panos.sub_type: 4
         client.ip: 7
         source.ip: 7
         source.address: 7
@@ -113,6 +115,8 @@ processors:
       overwrite_keys: true
       fail_on_error: false
       mappings:
+        panw.panos.type: 3
+        panw.panos.sub_type: 4
         client.ip: 7
         source.ip: 7
         source.address: 7
