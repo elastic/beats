@@ -15,25 +15,31 @@ outputs:
     password: changeme
 
 inputs:
-  - id: cd8256b0-e86a-11ea-9199-e12923f35450
-    name: synthetics-1
-    type: synthetics/http
+  - type: system/metrics
+
+    # The only two requirement are that it has only characters allowed in an Elasticsearch index name
+    # Index names must meet the following criteria:
+    #   Lowercase only
+    #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+    #   Cannot start with -, _, +
+    #   Cannot be . or ..
+    data_stream.namespace: default
     use_output: default
-    meta:
-      package:
-        name: synthetics
-        version: 0.1.3
-    data_stream:
-      namespace: default
     streams:
-      - id: synthetics/http-synthetics.monitor
-        name: fwae
-        type: http
-        data_stream:
-          dataset: synthetics.monitor
-          type: logs
-        urls: feaw
-        schedule: 10s
+      - metricset: cpu
+        # The only two requirement are that it has only characters allowed in an Elasticsearch index name
+        # Index names must meet the following criteria:
+        #   Lowercase only
+        #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
+        #   Cannot start with -, _, +
+        #   Cannot be . or ..
+        data_stream.dataset: system.cpu
+      - metricset: memory
+        data_stream.dataset: system.memory
+      - metricset: network
+        data_stream.dataset: system.network
+      - metricset: filesystem
+        data_stream.dataset: system.filesystem
 
 # agent.monitoring:
 #   # enabled turns on monitoring of running processes
