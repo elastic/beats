@@ -114,21 +114,19 @@ func (m *MetricSet) updateServicePath(esVersion common.Version) error {
 
 func getServicePath(esVersion common.Version) (string, error) {
 	currPath := statsPath
-	if esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		// Can't request bulk stats so don't change service URI
-		return currPath, nil
-	}
-
 	u, err := url.Parse(currPath)
 	if err != nil {
 		return "", err
 	}
 
-	if strings.HasSuffix(u.Path, ",bulk") {
-		// Bulk stats already being requested so don't change service URI
-		return currPath, nil
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		if strings.HasSuffix(u.Path, ",bulk") {
+			// Bulk stats already being requested so don't change service URI
+			return currPath, nil
+		}
+
+		u.Path += ",bulk"
 	}
 
-	u.Path += ",bulk"
 	return u.String(), nil
 }
