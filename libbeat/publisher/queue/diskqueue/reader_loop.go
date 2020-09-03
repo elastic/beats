@@ -81,7 +81,19 @@ func (rl *readerLoop) processRequest(request readRequest) readResponse {
 
 	targetLength := int64(request.endOffset - request.startOffset)
 	for {
-		frame, err := nextFrame(handle)
+		remainingLength := targetLength - byteCount
+		/*if byteCount+frame.bytesOnDisk > targetLength {
+			// Something is wrong, read requests must end on a segment boundary.
+			return readResponse{
+				frameCount: frameCount,
+				byteCount:  byteCount,
+			}
+		}*/
+
+		// Try to read the next, clipping to the length we were told to read.
+		// If the next frame extends past this boundary, nextFrame will return
+		// an error.
+		frame, err := nextFrame(handle, remainingLength)
 		if frame != nil {
 			// We've read the frame, try sending it to the output channel.
 			select {
@@ -127,7 +139,7 @@ func (rl *readerLoop) processRequest(request readRequest) readResponse {
 	}
 }
 
-func nextFrame(handle *os.File) (*readFrame, error) {
+func nextFrame(handle *os.File, maxLength int64) (*readFrame, error) {
 	return nil, nil
 }
 

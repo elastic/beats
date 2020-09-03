@@ -174,7 +174,7 @@ func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
 	return file, nil
 }
 
-func readSegmentHeader(in *os.File) (*segmentHeader, error) {
+func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	header := segmentHeader{}
 	if header.version != 0 {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)

@@ -79,6 +79,10 @@ type writeFrame struct {
 type readFrame struct {
 	event publisher.Event
 	id    frameID
+
+	// How much space this frame occupied on disk (before deserialization),
+	// including the frame header / footer.
+	bytesOnDisk int64
 }
 
 func (cl *coreLoop) run() {

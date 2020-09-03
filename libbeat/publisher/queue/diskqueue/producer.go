@@ -83,6 +83,7 @@ func (producer *diskQueueProducer) publish(
 		// The request has been sent, and we are now guaranteed to get a result on
 		// the response channel, so we must read from it immediately to avoid
 		// blocking the core loop.
+		// TODO: this should be unblocked by a call to Cancel
 		return <-request.responseChan
 	case <-producer.queue.done:
 		return false
