@@ -29,6 +29,7 @@ data:
                   metricsets:
                     - state_node
                     - state_deployment
+                    - state_daemonset
                     - state_replicaset
                     - state_pod
                     - state_container
