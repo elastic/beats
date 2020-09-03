@@ -19,7 +19,6 @@ package stdfields
 
 import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"time"
 
 	"github.com/pkg/errors"
@@ -44,10 +43,7 @@ type StdMonitorFields struct {
 }
 
 func ConfigToStdMonitorFields(config *common.Config, ap *monitorcfg.AgentPackage) (StdMonitorFields, error) {
-	logp.Warn("AAAH CTSF %v", common.DebugString(config, true))
 	mpi := StdMonitorFields{Enabled: true, AgentPackage: ap}
-
-	logp.Warn("AAAH PKG %#v || %v", mpi.AgentPackage, ap)
 
 	if err := config.Unpack(&mpi); err != nil {
 		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
