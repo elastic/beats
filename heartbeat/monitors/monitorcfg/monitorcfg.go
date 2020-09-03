@@ -20,8 +20,8 @@ package monitorcfg
 import (
 	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // JobConfig represents fields needed to execute a single job.
@@ -38,7 +38,21 @@ type AgentInput struct {
 	Id      string           `config:"id"`
 	Name    string           `config:"name"`
 	Meta    *AgentMeta   	 `config:"meta"`
+	DataStream *DataStream `config:"data_stream"`
 	Streams []*common.Config `config:"streams" validate:"required"`
+	// A regular heartbeat config, suitable for passing to monitor plugin constructor
+	// This is set by the UnpackAgentInput constructor
+	StandardConfig *common.Config
+}
+
+type DataStream struct {
+	Namespace string `config:"namespace"`
+	Dataset string `config:"dataset"`
+	Type string `config:"type"`
+}
+
+func (ds *DataStream) IndexName() string {
+	return fmt.Sprintf("%s-%s-%s", ds.Type, ds.Dataset, ds.Namespace)
 }
 
 type AgentMeta struct {
@@ -50,24 +64,42 @@ type AgentPackage struct {
 	Version string `config:"version"`
 }
 
-// ToStandardConfig transforms this AgentInput into something compatible with
-// a JobConfig and whatever more specific monitor type it becomes later.
-func (ai AgentInput) ToStandardConfig() (*common.Config, error) {
-	if len(ai.Streams) != 1 {
-		return nil, fmt.Errorf("received agent config with len(streams)==%d", len(ai.Streams))
+func UnpackAgentInput(config *common.Config) (ai AgentInput, err error) {
+	err = config.Unpack(&ai)
+	if err != nil {
+		return AgentInput{}, err
 	}
-	config := ai.Streams[0]
+
+	if len(ai.Streams) != 1 {
+		return AgentInput{}, fmt.Errorf("received agent config with len(streams)==%d", len(ai.Streams))
+	}
+	stdConfig := ai.Streams[0]
+
+	// Unpack the single stream's DataStream over the outer DataStream to yield one DataStream with
+	// dataset, type and namespace
+	dsCfg, err := stdConfig.Child("data_stream", -1)
+	if err != nil {
+		return AgentInput{}, fmt.Errorf("could access child data_stream: %w", err)
+	}
+	ds := ai.DataStream
+	err = dsCfg.Unpack(&ds)
+	if err != nil {
+		logp.Warn("AAAH ERROR2")
+		return AgentInput{}, fmt.Errorf("could not unpack child data_stream: %w", err)
+	}
 
 	// We overwrite the ID of monitor with the input ID since this comes
 	// centrally from Kibana and should have greater precedence due to it
 	// being part of a persistent store in ES that better tracks the life
 	// of a config object than a text file
 	if ai.Id != "" {
-		err := config.Merge(common.MapStr{"id": ai.Id})
+		err := stdConfig.Merge(common.MapStr{"id": ai.Id, "index": ds.IndexName()})
 		if err != nil {
-			return nil, fmt.Errorf("could not override stream ID with agent ID: %w", err)
+			return AgentInput{}, fmt.Errorf("could not override stream ID with agent ID: %w", err)
 		}
 	}
 
-	return config, nil
+	ai.StandardConfig = stdConfig
+
+	return
 }

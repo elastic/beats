@@ -119,20 +119,8 @@ func newMonitorUnsafe(
 	allowWatches bool,
 	format int,
 ) (*Monitor, error) {
+	// TODO: Delete this maybe? We'll figure out where this data goes
 	var agentPkg *monitorcfg.AgentPackage
-	if format == FORMAT_AGENT_INPUT {
-		ai := monitorcfg.AgentInput{}
-		err := config.Unpack(&ai)
-		if err != nil {
-			return nil, err
-		}
-
-		config, err = ai.ToStandardConfig()
-		if err != nil {
-			return nil, err
-		}
-		agentPkg = ai.Meta.Pkg
-	}
 
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
