@@ -63,6 +63,9 @@ func TestGetServiceURIExpectedPath(t *testing.T) {
 }
 
 func TestGetServiceURIMultipleCalls(t *testing.T) {
+	path := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	path = strings.Replace(path, statsMetrics, statsMetrics+bulkSuffix, 1)
+
 	err := quick.Check(func(r uint) bool {
 		numCalls := 2 + (r % 10) // between 2 and 11
 
@@ -75,7 +78,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 			}
 		}
 
-		return err == nil && uri == strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1)
+		return err == nil && uri == path
 	}, nil)
 	require.NoError(t, err)
 }
