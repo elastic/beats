@@ -19,7 +19,6 @@ package monitorcfg
 
 import (
 	"fmt"
-
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -64,7 +63,7 @@ func (ai AgentInput) ToStandardConfig() (*common.Config, error) {
 	// being part of a persistent store in ES that better tracks the life
 	// of a config object than a text file
 	if ai.Id != "" {
-		err := config.SetString("id", 0, ai.Id)
+		err := config.Merge(common.MapStr{"id": ai.Id})
 		if err != nil {
 			return nil, fmt.Errorf("could not override stream ID with agent ID: %w", err)
 		}
