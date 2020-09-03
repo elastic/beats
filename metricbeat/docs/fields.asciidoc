@@ -27747,6 +27747,67 @@ type: long
 --
 
 [float]
+=== daemonset
+
+Kubernetes DaemonSet metrics
+
+
+
+*`kubernetes.daemonset.name`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== replicas
+
+Kubernetes DaemonSet replica metrics
+
+
+
+*`kubernetes.daemonset.replicas.available`*::
++
+--
+The number of available replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.desired`*::
++
+--
+The desired number of replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.ready`*::
++
+--
+The number of ready replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.unavailable`*::
++
+--
+The number of unavailable replicas per DaemonSet
+
+
+type: long
+
+--
+
+[float]
 === deployment
 
 kubernetes deployment metrics
