@@ -14,14 +14,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-func newIntrospectCommandWithArgs(flags *globalFlags, s []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectCommandWithArgs(flags *globalFlags, s []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "inspect",
 		Short: "Shows configuration of the agent",
 		Long:  "Shows current configuration of the agent",
 		Args:  cobra.ExactArgs(0),
 		Run: func(c *cobra.Command, args []string) {
-			command, err := application.NewIntrospectConfigCmd(flags.Config())
+			command, err := application.NewInspectConfigCmd(flags.Config())
 			if err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
@@ -34,12 +34,12 @@ func newIntrospectCommandWithArgs(flags *globalFlags, s []string, streams *cli.I
 		},
 	}
 
-	cmd.AddCommand(newIntrospectOutputCommandWithArgs(flags, s, streams))
+	cmd.AddCommand(newInspectOutputCommandWithArgs(flags, s, streams))
 
 	return cmd
 }
 
-func newIntrospectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newInspectOutputCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "output",
 		Short: "Displays configuration generated for output",
@@ -49,7 +49,7 @@ func newIntrospectOutputCommandWithArgs(flags *globalFlags, _ []string, streams 
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
 
-			command, err := application.NewIntrospectOutputCmd(flags.Config(), outName, program)
+			command, err := application.NewInspectOutputCmd(flags.Config(), outName, program)
 			if err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
@@ -62,8 +62,8 @@ func newIntrospectOutputCommandWithArgs(flags *globalFlags, _ []string, streams 
 		},
 	}
 
-	cmd.Flags().StringP("output", "o", "", "name of the output to be introspected")
-	cmd.Flags().StringP("program", "p", "", "type of program to introspect, needs to be combined with output. e.g filebeat")
+	cmd.Flags().StringP("output", "o", "", "name of the output to be inspected")
+	cmd.Flags().StringP("program", "p", "", "type of program to inspect, needs to be combined with output. e.g filebeat")
 
 	return cmd
 }

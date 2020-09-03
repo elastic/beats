@@ -16,16 +16,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 )
 
-// IntrospectOutputCmd is an introspect subcommand that shows configurations of the agent.
-type IntrospectOutputCmd struct {
+// InspectOutputCmd is an inspect subcommand that shows configurations of the agent.
+type InspectOutputCmd struct {
 	cfgPath string
 	output  string
 	program string
 }
 
-// NewIntrospectOutputCmd creates a new introspect command.
-func NewIntrospectOutputCmd(configPath, output, program string) (*IntrospectOutputCmd, error) {
-	return &IntrospectOutputCmd{
+// NewInspectOutputCmd creates a new inspect command.
+func NewInspectOutputCmd(configPath, output, program string) (*InspectOutputCmd, error) {
+	return &InspectOutputCmd{
 		cfgPath: configPath,
 		output:  output,
 		program: program,
@@ -33,15 +33,15 @@ func NewIntrospectOutputCmd(configPath, output, program string) (*IntrospectOutp
 }
 
 // Execute tries to enroll the agent into Fleet.
-func (c *IntrospectOutputCmd) Execute() error {
+func (c *InspectOutputCmd) Execute() error {
 	if c.output == "" {
-		return c.introspectOutputs()
+		return c.inspectOutputs()
 	}
 
-	return c.introspectOutput()
+	return c.inspectOutput()
 }
 
-func (c *IntrospectOutputCmd) introspectOutputs() error {
+func (c *InspectOutputCmd) inspectOutputs() error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func listOutputsFromMap(log *logger.Logger, cfg map[string]interface{}) error {
 	return listOutputsFromConfig(log, c)
 }
 
-func (c *IntrospectOutputCmd) introspectOutput() error {
+func (c *InspectOutputCmd) inspectOutput() error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		}
 
 		if !programFound {
-			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs",
+			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent inspect output` to find available outputs",
 				programName,
 				output)
 		}
@@ -157,7 +157,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		return nil
 	}
 
-	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs", output)
+	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent inspect output` to find available outputs", output)
 
 }
 

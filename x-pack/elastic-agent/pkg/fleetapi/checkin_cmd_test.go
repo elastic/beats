@@ -79,8 +79,7 @@ func TestCheckin(t *testing.T) {
 					}]
 				}
 			}
-		}],
-		"success": true
+		}]
 	}
 	`
 			mux := http.NewServeMux()
@@ -98,7 +97,6 @@ func TestCheckin(t *testing.T) {
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 
 			require.Equal(t, 1, len(r.Actions))
 
@@ -142,8 +140,7 @@ func TestCheckin(t *testing.T) {
 	            "type": "WHAT_TO_DO_WITH_IT",
 	            "id": "id2"
 	        }
-	    ],
-	    "success": true
+	    ]
 	}
 	`
 			mux := http.NewServeMux()
@@ -161,7 +158,6 @@ func TestCheckin(t *testing.T) {
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 
 			require.Equal(t, 2, len(r.Actions))
 
@@ -178,12 +174,7 @@ func TestCheckin(t *testing.T) {
 
 	t.Run("When we receive no action", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
-			raw := `
-	{
-	  "actions": [],
-		"success": true
-	}
-	`
+			raw := `{ "actions": [] }`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -199,7 +190,6 @@ func TestCheckin(t *testing.T) {
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 
 			require.Equal(t, 0, len(r.Actions))
 		},
@@ -207,12 +197,7 @@ func TestCheckin(t *testing.T) {
 
 	t.Run("Meta are sent", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
-			raw := `
-{
-  "actions": [],
-	"success": true
-}
-`
+			raw := `{"actions": []}`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -239,7 +224,6 @@ func TestCheckin(t *testing.T) {
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 
 			require.Equal(t, 0, len(r.Actions))
 		},
@@ -247,12 +231,7 @@ func TestCheckin(t *testing.T) {
 
 	t.Run("No meta are sent when not provided", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
-			raw := `
-	{
-	  "actions": [],
-		"success": true
-	}
-	`
+			raw := `{"actions": []}`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -279,7 +258,6 @@ func TestCheckin(t *testing.T) {
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 
 			require.Equal(t, 0, len(r.Actions))
 		},

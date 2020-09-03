@@ -18,9 +18,7 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 	credentialsFilePath, okCredentialsFilePath := os.LookupEnv("GCP_CREDENTIALS_FILE_PATH")
 
 	config := map[string]interface{}{}
-	if !okRegion || region == "" {
-		t.Fatal("$GCP_REGION not set or set to empty")
-	} else if !okProjectID || projectID == "" {
+	if !okProjectID || projectID == "" {
 		t.Fatal("$GCP_PROJECT_ID not set or set to empty")
 	} else if !okCredentialsFilePath || credentialsFilePath == "" {
 		t.Fatal("$GCP_CREDENTIALS_FILE_PATH not set or set to empty")
@@ -31,7 +29,10 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 			"metricsets":            []string{metricSetName},
 			"project_id":            projectID,
 			"credentials_file_path": credentialsFilePath,
-			"region":                region,
+		}
+
+		if okRegion {
+			config["region"] = region
 		}
 
 		if metricSetName == "metrics" {
