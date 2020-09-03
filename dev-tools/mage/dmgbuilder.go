@@ -110,7 +110,7 @@ func (b *dmgBuilder) buildBeatPkg() error {
 	// Copy files into the packaging root and set their mode.
 	for _, f := range b.Files {
 		if f.Symlink {
-			// not supported, handlink symlink in post/pre install scripts
+			// not supported, handling symlink in post/pre install scripts
 			continue
 		}
 
