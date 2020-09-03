@@ -64,7 +64,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(run)
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newIntrospectCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
 
 	// windows special hidden sub-command (only added on windows)
 	reexec := newReExecWindowsCommand(flags, args, streams)

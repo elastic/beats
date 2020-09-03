@@ -17,25 +17,25 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-// IntrospectConfigCmd is an introspect subcommand that shows configurations of the agent.
-type IntrospectConfigCmd struct {
+// InspectConfigCmd is an inspect subcommand that shows configurations of the agent.
+type InspectConfigCmd struct {
 	cfgPath string
 }
 
-// NewIntrospectConfigCmd creates a new introspect command.
-func NewIntrospectConfigCmd(configPath string,
-) (*IntrospectConfigCmd, error) {
-	return &IntrospectConfigCmd{
+// NewInspectConfigCmd creates a new inspect command.
+func NewInspectConfigCmd(configPath string,
+) (*InspectConfigCmd, error) {
+	return &InspectConfigCmd{
 		cfgPath: configPath,
 	}, nil
 }
 
-// Execute introspects agent configuration.
-func (c *IntrospectConfigCmd) Execute() error {
-	return c.introspectConfig()
+// Execute inspects agent configuration.
+func (c *InspectConfigCmd) Execute() error {
+	return c.inspectConfig()
 }
 
-func (c *IntrospectConfigCmd) introspectConfig() error {
+func (c *InspectConfigCmd) inspectConfig() error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
