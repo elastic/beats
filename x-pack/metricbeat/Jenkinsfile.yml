@@ -22,7 +22,6 @@ stages:
             parameters:
                 - "awsCloudTests"
                 - "allCloudTests"
-            disabled: true     ## See https://github.com/elastic/beats/issues/20951
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
