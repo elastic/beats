@@ -61,10 +61,8 @@ class Test(BaseTest):
         logfile_abs_path = os.path.abspath(testfile_path)
         record = self.get_registry_entry_by_path(logfile_abs_path)
 
-        self.assertDictContainsSubset({
-            "source": logfile_abs_path,
-            "offset": iterations * line_len,
-        }, record)
+        self.assertEqual(logfile_abs_path, record.get('source'))
+        self.assertEqual(iterations * line_len, record.get('offset'))
         self.assertTrue("FileStateOS" in record)
         self.assertTrue("meta" not in record)
         file_state_os = record["FileStateOS"]
@@ -82,10 +80,8 @@ class Test(BaseTest):
             self.assertTrue("device" in file_state_os)
         else:
             stat = os.stat(logfile_abs_path)
-            self.assertDictContainsSubset({
-                "inode": stat.st_ino,
-                "device": stat.st_dev,
-            }, file_state_os)
+            self.assertEqual(stat.st_ino, file_state_os.get('inode'))
+            self.assertEqual(stat.st_dev, file_state_os.get('device'))
 
     def test_registrar_files(self):
         """
@@ -1319,10 +1315,8 @@ class Test(BaseTest):
         logfile_abs_path = os.path.abspath(testfile_path1)
         record = self.get_registry_entry_by_path(logfile_abs_path)
 
-        self.assertDictContainsSubset({
-            "source": logfile_abs_path,
-            "offset": iterations * (len("hello world") + len(os.linesep)),
-        }, record)
+        self.assertEqual(logfile_abs_path, record.get('source'))
+        self.assertEqual(iterations * (len("hello world") + len(os.linesep)), record.get('offset'))
         self.assertTrue("FileStateOS" in record)
         file_state_os = record["FileStateOS"]
 
@@ -1339,10 +1333,8 @@ class Test(BaseTest):
             self.assertTrue("device" in file_state_os)
         else:
             stat = os.stat(logfile_abs_path)
-            self.assertDictContainsSubset({
-                "inode": stat.st_ino,
-                "device": stat.st_dev,
-            }, file_state_os)
+            self.assertEqual(stat.st_ino, file_state_os.get('inode'))
+            self.assertEqual(stat.st_dev, file_state_os.get('device'))
 
     def test_registrar_meta(self):
         """

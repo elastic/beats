@@ -130,14 +130,15 @@ class WriteReadTest(BaseTest):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
         assert "winlog.record_id" in evt
-        self.assertDictContainsSubset({
+        expected = {
             "winlog.event_id": eventID,
             "event.code": eventID,
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,
             "winlog.api": self.api,
-        }, evt)
+        }
+        assert expected.items() <= evt.items()
 
         if msg is None:
             assert "message" not in evt
