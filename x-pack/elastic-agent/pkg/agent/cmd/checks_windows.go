@@ -29,6 +29,8 @@ import (
 func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		if sn := paths.ServiceName(); sn != "" {
+			// replacing with correct service name so we
+			// can talk to service manager.
 			if !filepath.IsAbs(os.Args[0]) {
 				os.Args[0] = sn
 			}
