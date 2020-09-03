@@ -89,17 +89,16 @@ pipeline {
               axis {
                 name 'PLATFORMS'
                 values (
-                  '+all',
-                  'linux/amd64',
-                  'linux/386',
-                  'linux/arm64',
-                  'linux/armv7',
-                  'linux/ppc64le',
-                  'linux/mips64',
-                  'linux/s390x',
-                  'windows/amd64',
-                  'windows/386',
-                  'darwin/amd64'
+                  '+all linux/amd64',
+                  '+all linux/386',
+                  '+all linux/arm64',
+                  '+all linux/armv7',
+                  '+all linux/ppc64le',
+                  '+all linux/mips64',
+                  '+all linux/s390x',
+                  '+all windows/amd64',
+                  '+all windows/386',
+                  '+all darwin/amd64'
                 )
               }
             }
@@ -130,7 +129,7 @@ pipeline {
                 when {
                   beforeAgent true
                   expression {
-                    return params.macos && (env.PLATFORMS.equals('+all') || env.PLATFORMS.equals('darwin/amd64'))
+                    return params.macos && env.PLATFORMS.equals('+all darwin/amd64')
                   }
                 }
                 environment {
