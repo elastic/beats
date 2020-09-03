@@ -185,6 +185,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
+- [Autodiscover] Handle input-not-finished errors in config reload. {pull}20915[20915]
 - Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 
 *Auditbeat*
