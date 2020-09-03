@@ -158,16 +158,16 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-scheduler,scheduler>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
-|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>   
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_service,state_service>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_service,state_service>>   
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
-|<<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,KVM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
