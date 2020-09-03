@@ -43,8 +43,7 @@ func TestEnroll(t *testing.T) {
 				require.Equal(t, "linux", req.Metadata.Local.OS.Name)
 
 				response := &EnrollResponse{
-					Action:  "created",
-					Success: true,
+					Action: "created",
 					Item: EnrollItemResponse{
 						ID:                   "a4937110-e53e-11e9-934f-47a8e38a522c",
 						Active:               true,
@@ -87,7 +86,6 @@ func TestEnroll(t *testing.T) {
 
 			require.Equal(t, "my-access-api-key", resp.Item.AccessAPIKey)
 			require.Equal(t, "created", resp.Action)
-			require.True(t, resp.Success)
 		},
 	))
 
