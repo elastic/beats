@@ -5,12 +5,16 @@
 package application
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
@@ -173,8 +177,17 @@ func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[
 func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][]program.Program, error) {
 	monitor := noop.NewMonitor()
 	router := &inmemRouter{}
-	emit := emitter(
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	composableCtrl, err := composable.New(cfg)
+	if err != nil {
+		return nil, err
+	}
+	composableWaiter := newWaitForCompose(composableCtrl)
+	emit, err := emitter(
+		ctx,
 		log,
+		composableWaiter,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -182,10 +195,14 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := emit(cfg); err != nil {
 		return nil, err
 	}
+	composableWaiter.Wait()
 	return router.programs, nil
 }
 
@@ -200,4 +217,28 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 
 func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+}
+
+type waitForCompose struct {
+	controller composable.Controller
+	done       chan bool
+}
+
+func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
+	return &waitForCompose{
+		controller: wrapped,
+		done:       make(chan bool),
+	}
+}
+
+func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
+	err := w.controller.Run(ctx, func(vars []transpiler.Vars) {
+		cb(vars)
+		w.done <- true
+	})
+	return err
+}
+
+func (w *waitForCompose) Wait() {
+	<-w.done
 }

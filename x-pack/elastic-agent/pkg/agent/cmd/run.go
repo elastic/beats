@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -41,7 +40,7 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 
 func run(flags *globalFlags, streams *cli.IOStreams) error {
 	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
