@@ -134,39 +134,13 @@ def generateStages(Map args = [:]) {
   if (fileExists(fileName)) {
     def content = readYaml(file: fileName)
     // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
-    if (beatsWhen(project: projectName, content: content?.when, changeset: changeset, changesetFunction: this.&getProjectDependencies)) {
-      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: this.&runCommand)
+    if (beatsWhen(project: projectName, content: content?.when, changeset: changeset, changesetFunction: new GetProjectDependencies(steps: this))) {
+      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: new RunCommand(steps: this))
     }
   } else {
     log(level: 'WARN', text: "${fileName} file does not exist. Please review the top-level Jenkinsfile.yml")
   }
   return mapParallelStages
-}
-
-/**
-* This method is the one used for running the parallel stages, therefore
-* its arguments are passed by the beatsStages step.
-*
-*  What parameters/arguments are supported:
-*    - label -> the worker labels
-*    - project -> the name of the project that should match with the folder name.
-*    - content -> the specific stage data in the <project>/Jenkinsfile.yml
-*    - context -> the name of the stage, normally <project>-<stage>(-<platform>)?
-*/
-def runCommand(Map args = [:]) {
-  def withModule = args.content.get('withModule', false)
-  if(args?.content?.containsKey('make')) {
-    target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
-  }
-  if(args?.content?.containsKey('mage')) {
-    target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
-  }
-  if(args?.content?.containsKey('k8sTest')) {
-    k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
-  }
-  if(args?.content?.containsKey('cloud')) {
-    cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
-  }
 }
 
 def cloud(Map args = [:]) {
@@ -491,6 +465,16 @@ def startCloudTestEnv(Map args = [:]) {
 }
 
 /**
+* Run terraform in the given directory
+*/
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+/**
 * Tear down the terraform environments, by looking for all terraform states in directory 
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
@@ -520,33 +504,10 @@ def terraformInit(String directory) {
 }
 
 /**
-* Run terraform in the given directory
-*/
-def terraformApply(String directory) {
-  terraformInit(directory)
-  dir(directory) {
-    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
-  }
-}
-
-/**
 * Replace the slashes in the directory in case there are nested folders.
 */
 def normalise(String directory) {
   return directory.replaceAll("[\\W]|_",'-')
-}
-
-/**
-* This method fetchs the dependencies of a Go module for such it transforms them in a
-* regex pattern.
-*/
-def getProjectDependencies(Map args = [:]) {
-  def output = ""
-  withEnv(["HOME=${env.WORKSPACE}"]) {
-    output = sh(label: 'Get vendor dependency patterns', returnStdout: true,
-                script: ".ci/scripts/get-vendor-dependencies.sh ${args.project}")
-  }
-  return output?.split('\n').collect{ item -> item as String }
 }
 
 /**
@@ -617,5 +578,54 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
   } else {
     return false
+  }
+}
+
+/**
+* This class is the one used for running the parallel stages, therefore
+* its arguments are passed by the beatsStages step.
+*
+*  What parameters/arguments are supported:
+*    - label -> the worker labels
+*    - project -> the name of the project that should match with the folder name.
+*    - content -> the specific stage data in the <project>/Jenkinsfile.yml
+*    - context -> the name of the stage, normally <project>-<stage>(-<platform>)?
+*/
+class RunCommand extends co.elastic.beats.BeatsFunction {
+  public RunCommand(Map args = [:]){
+    super(args)
+  }
+  public run(Map args = [:]){
+    def withModule = args.content.get('withModule', false)
+    if(args?.content?.containsKey('make')) {
+      steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+    }
+    if(args?.content?.containsKey('mage')) {
+      steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+    }
+    if(args?.content?.containsKey('k8sTest')) {
+      steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
+    }
+    if(args?.content?.containsKey('cloud')) {
+      steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+    }
+  }
+}
+
+/**
+* This class retrieves the dependencies of a Go module for such it transforms them in a
+* regex pattern.
+*/
+class GetProjectDependencies extends co.elastic.beats.BeatsFunction {
+  public GetProjectDependencies(Map args = [:]){
+    super(args)
+  }
+  public run(Map args = [:]){
+    def output = ""
+    steps.withEnv(["HOME=${steps.env.WORKSPACE}"]) {
+      output = steps.sh(label: 'Get vendor dependency patterns', returnStdout: true,
+                        script: ".ci/scripts/get-vendor-dependencies.sh ${args.project}")
+    }
+    return output?.split('\n').collect{ item -> item as String }
   }
 }
