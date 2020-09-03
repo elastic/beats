@@ -210,6 +210,7 @@ metricbeat.modules:
   enabled: true
   metricsets:
     - state_node
+    - state_daemonset
     - state_deployment
     - state_replicaset
     - state_statefulset
@@ -303,6 +304,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>
 
+* <<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>
+
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
@@ -344,6 +347,8 @@ include::kubernetes/scheduler.asciidoc[]
 include::kubernetes/state_container.asciidoc[]
 
 include::kubernetes/state_cronjob.asciidoc[]
+
+include::kubernetes/state_daemonset.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
 
