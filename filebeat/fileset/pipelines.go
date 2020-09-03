@@ -127,6 +127,11 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
 	}
 
+	err = modifySetProcessor(esClient.GetVersion(), pipelineID, content)
+	if err != nil {
+		return fmt.Errorf("failed to modify set processor in pipeline: %v", err)
+	}
+
 	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return interpretError(err, body)
@@ -231,4 +236,58 @@ func interpretError(initialErr error, body []byte) error {
 	}
 
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
+}
+
+// modifySetProcessor replaces ignore_empty_value option with an if statement
+// so ES less than 7.9 will still work
+func modifySetProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	flagVersion := common.MustNewVersion("7.9.0")
+	if !esVersion.LessThan(flagVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	for _, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["set"].(map[string]interface{}); ok {
+			_, ok := options["ignore_empty_value"].(bool)
+			if !ok {
+				// don't have ignore_empty_value nothing to do
+				continue
+			}
+
+			logp.Debug("modules", "In pipeline %q removing unsupported 'ignore_empty_value' in set processor", pipelineID)
+			delete(options, "ignore_empty_value")
+
+			_, ok = options["if"].(string)
+			if ok {
+				// assume if check is sufficient
+				continue
+			}
+			val, ok := options["value"].(string)
+			if !ok {
+				continue
+			}
+
+			newIf := strings.TrimLeft(val, "{ ")
+			newIf = strings.TrimRight(newIf, "} ")
+			newIf = strings.ReplaceAll(newIf, ".", "?.")
+			newIf = "ctx?." + newIf + " != null"
+
+			logp.Debug("modules", "In pipeline %q adding if %s to replace 'ignore_empty_value' in set processor", pipelineID, newIf)
+			options["if"] = newIf
+		}
+	}
+	return nil
 }

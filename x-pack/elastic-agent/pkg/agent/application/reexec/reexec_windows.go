@@ -28,12 +28,13 @@ import (
 //   current process just exits.
 //
 // * Sub-process - As a sub-process a new child is spawned and the current process just exits.
-func reexec(log *logger.Logger, executable string) error {
+func reexec(log *logger.Logger, executable string, argOverrides ...string) error {
 	svc, status, err := getService()
 	if err == nil {
 		// running as a service; spawn re-exec windows sub-process
 		log.Infof("Running as Windows service %s; triggering service restart", svc.Name)
 		args := []string{filepath.Base(executable), "reexec_windows", svc.Name, strconv.Itoa(int(status.ProcessId))}
+		args = append(args, argOverrides...)
 		cmd := exec.Cmd{
 			Path:   executable,
 			Args:   args,
@@ -51,6 +52,7 @@ func reexec(log *logger.Logger, executable string) error {
 		log.Infof("Running as Windows process; spawning new child process")
 		args := []string{filepath.Base(executable)}
 		args = append(args, os.Args[1:]...)
+		args = append(args, argOverrides...)
 		cmd := exec.Cmd{
 			Path:   executable,
 			Args:   args,
