@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
-- Removed experimental modules `citrix`, `kaspersky`, `rapid7` and `tenable`. {pull}20706[20706]
 
 *Heartbeat*
 
@@ -46,14 +45,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
-- Update replicaset group to apps/v1 {pull}15854[15854]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
 - Fix `setup.dashboards.index` setting not working. {pull}17749[17749]
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
-- Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
-- Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
 
 *Auditbeat*
 
@@ -73,13 +69,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed `cloudfoundry.access` to have the correct `cloudfoundry.app.id` contents. {pull}17847[17847]
 - Fixing `ingress_controller.` fields to be of type keyword instead of text. {issue}17834[17834]
 - Fixed typo in log message. {pull}17897[17897]
-- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
-- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
-- Update documentation in the azure module filebeat. {pull}20815[20815]
 
 *Heartbeat*
 
-- Stop rescheduling tasks of stopped monitors. {pull}20570[20570]
 
 *Journalbeat*
 
@@ -103,21 +95,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
-- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
-- Add required option for `metrics` in app_insights. {pull}20406[20406]
-- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
-- Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
-- Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
-- Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
-- Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
 
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
-- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[20564]
 
 *Functionbeat*
 
@@ -132,7 +115,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
-- Added support for more message types for Cisco ASA and FTD. {pull}20565[20565]
 
 *Auditbeat*
 
