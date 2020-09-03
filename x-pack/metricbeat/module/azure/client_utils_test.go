@@ -60,7 +60,7 @@ func TestMetricExists(t *testing.T) {
 
 func TestMatchMetrics(t *testing.T) {
 	prev := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -69,7 +69,7 @@ func TestMatchMetrics(t *testing.T) {
 		TimeGrain:    "1PM",
 	}
 	current := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -79,7 +79,7 @@ func TestMatchMetrics(t *testing.T) {
 	}
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
-	current.Resource.Id = "id1"
+	current.ResourceId = "id1"
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
