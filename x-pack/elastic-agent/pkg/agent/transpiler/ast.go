@@ -200,6 +200,11 @@ func (k *Key) Find(key string) (Node, bool) {
 	}
 }
 
+// Name returns the name for the key.
+func (k *Key) Name() string {
+	return k.name
+}
+
 // Value returns the raw value.
 func (k *Key) Value() interface{} {
 	return k.value

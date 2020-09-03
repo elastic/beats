@@ -242,9 +242,39 @@ func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
 	if p == nil {
 		return dict
 	}
+	current, ok := dict.Find("processors")
+	currentList, isList := current.Value().(*transpiler.List)
+	if !isList {
+		return dict
+	}
 	ast, _ := transpiler.NewAST(map[string]interface{}{
 		"processors": p,
 	})
-	node, _ := transpiler.Lookup(ast, "processors")
-	return transpiler.NewDict(append(dict.Value().([]transpiler.Node), node))
+	procs, _ := transpiler.Lookup(ast, "processors")
+	nodes := nodesFromList(procs.Value().(*transpiler.List))
+	if ok {
+		nodes = append(nodes, nodesFromList(currentList)...)
+	}
+	dictNodes := dict.Value().([]transpiler.Node)
+	set := false
+	for i, node := range dictNodes {
+		switch n := node.(type) {
+		case *transpiler.Key:
+			if n.Name() == "processors" {
+				dictNodes[i] = transpiler.NewKey("processors", transpiler.NewList(nodes))
+				set = true
+			}
+		}
+		if set {
+			break
+		}
+	}
+	if !set {
+		dictNodes = append(dictNodes, transpiler.NewKey("processors", transpiler.NewList(nodes)))
+	}
+	return transpiler.NewDict(dictNodes)
+}
+
+func nodesFromList(list *transpiler.List) []transpiler.Node {
+	return list.Value().([]transpiler.Node)
 }

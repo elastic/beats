@@ -319,6 +319,88 @@ func TestRenderInputs(t *testing.T) {
 				},
 			},
 		},
+		"inputs with processors": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
+							})),
+						}),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value2.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
+							})),
+						}),
+					})),
+				}),
+			}),
+			varsArray: []transpiler.Vars{
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value1",
+						},
+					},
+				},
+				{
+					Mapping: map[string]interface{}{
+						"var1": map[string]interface{}{
+							"name": "value2",
+						},
+					},
+				},
+			},
+		},
 		"vars with processors": {
 			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
 				transpiler.NewDict([]transpiler.Node{
@@ -327,6 +409,16 @@ func TestRenderInputs(t *testing.T) {
 						transpiler.NewDict([]transpiler.Node{
 							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
 								transpiler.NewStrVal("/var/log/${var1.name}.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
 							})),
 						}),
 					})),
@@ -351,6 +443,14 @@ func TestRenderInputs(t *testing.T) {
 								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
 							})),
 						}),
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
+							})),
+						}),
 					})),
 				}),
 				transpiler.NewDict([]transpiler.Node{
@@ -369,6 +469,14 @@ func TestRenderInputs(t *testing.T) {
 									transpiler.NewKey("custom", transpiler.NewStrVal("value2")),
 								})),
 								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("user", transpiler.NewStrVal("user1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("user")),
 							})),
 						}),
 					})),
