@@ -89,7 +89,7 @@ func (v *Vars) Replace(value string) (Node, error) {
 	return NewStrValWithProcessors(result+value[lastIndex:], processors), nil
 }
 
-// validBrackets returns true when all starting {{ have a matching ending }}.
+// validBrackets returns true when all starting {$ have a matching ending }.
 func validBrackets(s string, matchIdxs [][]int) bool {
 	result := ""
 	lastIndex := 0

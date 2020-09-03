@@ -220,23 +220,31 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 		Processors:    processers,
 	}
 
-	//res, err := vars.Replace("${testing.key1}")
-	//require.NoError(t, err)
-	//assert.Equal(t, NewStrVal("data1"), res)
+	res, err := vars.Replace("${testing.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrVal("data1"), res)
 
-	//res, err = vars.Replace("${dynamic.key1}")
-	//require.NoError(t, err)
-	//assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
+	res, err = vars.Replace("${dynamic.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
 
-	//res, err = vars.Replace("${other.key1|dynamic.key1}")
-	//require.NoError(t, err)
-	//assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
+	res, err = vars.Replace("${other.key1|dynamic.key1}")
+	require.NoError(t, err)
+	assert.Equal(t, NewStrValWithProcessors("dynamic1", processers), res)
 
-	res, err := vars.Replace("${dynamic.list}")
+	res, err = vars.Replace("${dynamic.list}")
 	require.NoError(t, err)
 	assert.Equal(t, processers, res.Processors())
 	assert.Equal(t, NewListWithProcessors([]Node{
 		NewStrVal("array1"),
 		NewStrVal("array2"),
+	}, processers), res)
+
+	res, err = vars.Replace("${dynamic.dict}")
+	require.NoError(t, err)
+	assert.Equal(t, processers, res.Processors())
+	assert.Equal(t, NewDictWithProcessors([]Node{
+		NewKey("key1", NewStrVal("value1")),
+		NewKey("key2", NewStrVal("value2")),
 	}, processers), res)
 }

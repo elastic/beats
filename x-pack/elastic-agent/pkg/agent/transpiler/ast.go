@@ -78,7 +78,12 @@ type Dict struct {
 
 // NewDict creates a new dict with provided nodes.
 func NewDict(nodes []Node) *Dict {
-	return &Dict{nodes, nil}
+	return NewDictWithProcessors(nodes, nil)
+}
+
+// NewDictWithProcessors creates a new dict with provided nodes and attached processors.
+func NewDictWithProcessors(nodes []Node, processors Processors) *Dict {
+	return &Dict{nodes, processors}
 }
 
 // Find takes a string which is a key and try to find the elements in the associated K/V.

@@ -43,7 +43,7 @@ func New(c *config.Config) (Controller, error) {
 	if err != nil {
 		return nil, err
 	}
-	l.Info("EXPERIMENTAL - Dynamic Inputs are currently experimental and should not be used in production")
+	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
 	if c != nil {
