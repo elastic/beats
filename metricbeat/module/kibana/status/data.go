@@ -48,7 +48,7 @@ var (
 				"disconnects": c.Int("disconnects"),
 			}),
 			"concurrent_connections": c.Int("concurrent_connections"),
-		}),
+		}, c.DictOptional),
 	}
 )
 
