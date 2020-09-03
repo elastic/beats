@@ -144,7 +144,7 @@ class WriteReadTest(BaseTest):
             assert "message" not in evt
         else:
             self.assertEqual(evt["message"], msg)
-            self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
+            self.assertEqual(msg, evt.get("winlog.event_data.param1"))
 
         if sid is None:
             self.assertEqual(evt["winlog.user.identifier"], self.get_sid_string())
@@ -158,7 +158,7 @@ class WriteReadTest(BaseTest):
             assert "winlog.user.type" not in evt
 
         if extra is not None:
-            self.assertDictContainsSubset(extra, evt)
+            assert extra.items() <= evt.items()
 
 
 def host_name(fqdn):
