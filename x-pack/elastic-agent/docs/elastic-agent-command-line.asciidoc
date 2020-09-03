@@ -150,11 +150,11 @@ accepts additional flags:
 +
 --
 `--output <string>`::
-The name of the output to introspect.
+The name of the output to inspect.
 
 `--program <string>`::
-The type of program to introspect. For example, `filebeat`. This option must be
-combined with `--output`. 
+The type of program to inspect. For example, `filebeat`. This option must be
+combined with `--output`.
 --
 
 `--help`::

@@ -99,7 +99,6 @@ func (m *mockStreamStore) Shutdown() {}
 const fleetResponse = `
 {
 	"action": "checkin",
-	"success": true,
 	"actions": [{
 		"agent_id": "17e93530-7f42-11ea-9330-71e968b29fa4",
 		"type": "CONFIG_CHANGE",
