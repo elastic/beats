@@ -23,6 +23,7 @@ package diskqueue
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"hash/crc32"
 	"time"
 
@@ -67,16 +68,17 @@ type entry struct {
 	Fields    common.MapStr
 }
 
-func newEncoder(checksumType ChecksumType) (*frameEncoder, error) {
+func newFrameEncoder(checksumType ChecksumType) *frameEncoder {
 	e := &frameEncoder{checksumType: checksumType}
 	e.reset()
-	return e, nil
+	return e
 }
 
 func (e *frameEncoder) reset() {
 	e.folder = nil
 
 	visitor := json.NewVisitor(&e.buf)
+	fmt.Printf("Creating folder\n")
 	folder, err := gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),
@@ -94,6 +96,7 @@ func (e *frameEncoder) encode(event *publisher.Event) ([]byte, error) {
 	e.buf.Reset()
 
 	var flags uint8
+	// TODO: handle guaranteed send?
 	/*if (event.Flags & publisher.GuaranteedSend) == publisher.GuaranteedSend {
 		flags = flagGuaranteed
 	}*/

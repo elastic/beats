@@ -101,8 +101,8 @@ type diskQueue struct {
 	deleterLoop *deleterLoop
 
 	// The API channels used by diskQueueProducer to send write / cancel calls.
-	writeRequestChan  chan *writeRequest
-	cancelRequestChan chan *cancelRequest
+	producerWriteRequestChan  chan *producerWriteRequest
+	producerCancelRequestChan chan *producerCancelRequest
 
 	// When a consumer ack increments ackedUpTo, the consumer sends
 	// its new value to this channel. The core loop then decides whether to
@@ -120,6 +120,7 @@ type diskQueue struct {
 
 	// A map of all acked indices that are above ackedUpTo (and thus
 	// can't yet be acknowledged as a continuous block).
+	// TODO: do this better.
 	acked map[frameID]bool
 
 	// Wait group for shutdown of the goroutines associated with this queue:
@@ -207,6 +208,9 @@ func queueFactory(
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
 func NewQueue(settings Settings) (queue.Queue, error) {
+	settings.Logger.Debugf(
+		"Initializing disk queue at path %v", settings.directoryPath())
+
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
 	if err != nil {
@@ -231,13 +235,73 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		return nil, err
 	}
 
-	return &diskQueue{
-		settings: settings,
+	// We wait for four goroutines: core loop, reader loop, writer loop,
+	// deleter loop.
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(4)
+
+	// The helper loops all have an input channel with buffer size 1, to ensure
+	// that the core loop can never block when sending a request (the core
+	// loop never sends a request until receiving the response from the
+	// previous one, so there is never more than one outstanding request for
+	// any helper loop).
+
+	readerLoop := &readerLoop{
+		requestChan:  make(chan readRequest, 1),
+		responseChan: make(chan readResponse),
+		output:       make(chan *readFrame, 20), // TODO: customize this buffer size
+	}
+	go func() {
+		readerLoop.run()
+		waitGroup.Done()
+	}()
+
+	writerLoop := &writerLoop{
+		logger:        settings.Logger,
+		input:         make(chan *writeRequest, 1),
+		writeResponse: make(chan struct{}),
+	}
+	go func() {
+		writerLoop.run()
+		waitGroup.Done()
+	}()
+
+	deleterLoop := &deleterLoop{
+		queueSettings: &settings,
+		input:         make(chan *deleteRequest),
+		response:      make(chan *deleteResponse),
+	}
+	go func() {
+		deleterLoop.run()
+		waitGroup.Done()
+	}()
+
+	queue := &diskQueue{
+		settings:  settings,
+		stateFile: stateFile,
 		segments: &diskQueueSegments{
 			reading: initialSegments,
 		},
-		done: make(chan struct{}),
-	}, nil
+		readerLoop:  readerLoop,
+		writerLoop:  writerLoop,
+		deleterLoop: deleterLoop,
+		waitGroup:   &waitGroup,
+		done:        make(chan struct{}),
+	}
+
+	// The core loop is created last because it's the only one that needs
+	// to refer back to the queue. (TODO: just merge the core loop fields
+	// and logic into the queue itself.)
+	queue.coreLoop = &coreLoop{
+		queue:          queue,
+		nextReadOffset: 0, // TODO: initialize this if we're opening an existing queue
+	}
+	go func() {
+		queue.coreLoop.run()
+		waitGroup.Done()
+	}()
+
+	return queue, nil
 }
 
 //
@@ -285,8 +349,9 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return &diskQueueProducer{
-		queue:  dq,
-		config: cfg,
+		queue:   dq,
+		config:  cfg,
+		encoder: newFrameEncoder(dq.settings.ChecksumType),
 	}
 }
 

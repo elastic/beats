@@ -29,18 +29,18 @@ type diskQueueProducer struct {
 	// The configuration this producer was created with.
 	config queue.ProducerConfig
 
-	encoder frameEncoder
+	encoder *frameEncoder
 }
 
 // A request sent from a producer to the core loop to add a frame to the queue.
-type writeRequest struct {
+type producerWriteRequest struct {
 	frame        *writeFrame
 	shouldBlock  bool
 	responseChan chan bool
 }
 
 // A request to the core loop to cancel the specified producer.
-type cancelRequest struct {
+type producerCancelRequest struct {
 	producer *diskQueueProducer
 	// If producer.config.DropOnCancel is true, then the core loop will respond
 	// on responseChan with the number of dropped events.
@@ -69,17 +69,18 @@ func (producer *diskQueueProducer) publish(
 			"Couldn't serialize incoming event: %v", err)
 		return false
 	}
-	request := &writeRequest{
+	request := &producerWriteRequest{
 		frame: &writeFrame{
 			event:      event,
 			serialized: serialized,
+			producer:   producer,
 		},
 		shouldBlock:  shouldBlock,
 		responseChan: make(chan bool),
 	}
 
 	select {
-	case producer.queue.writeRequestChan <- request:
+	case producer.queue.producerWriteRequestChan <- request:
 		// The request has been sent, and we are now guaranteed to get a result on
 		// the response channel, so we must read from it immediately to avoid
 		// blocking the core loop.

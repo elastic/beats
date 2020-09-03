@@ -17,7 +17,9 @@
 
 package diskqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
+import (
+	"github.com/elastic/beats/v7/libbeat/publisher"
+)
 
 type coreLoop struct {
 	// The queue that created this coreLoop. The core loop is the only one of
@@ -49,12 +51,12 @@ type coreLoop struct {
 	nextReadOffset segmentOffset
 
 	// pendingWrites is a list of all write requests that have been accepted
-	// by the queue and are waiting to be written to disk.
-	pendingWrites []*writeRequest
+	// by the queue and are waiting to be sent to the writer loop.
+	pendingWrites []*producerWriteRequest
 
 	// blockedWrites is a list of all write requests that are waiting for
 	// free space in the queue.
-	blockedWrites []*writeRequest
+	blockedWrites []*producerWriteRequest
 
 	// This value represents the oldest frame ID for a segment that has not
 	// yet been moved to the acked list. It is used to detect when the oldest
@@ -73,6 +75,16 @@ type writeFrame struct {
 	// The event, serialized for writing to disk and wrapped in a frame
 	// header / footer.
 	serialized []byte
+
+	// The producer that created this frame. This is included in the
+	// frame structure itself because we may need the producer and / or
+	// its config at any time up until it has been completely written:
+	// - While the core loop is tracking frames to send to the writer,
+	//   it may receive a Cancel request, which requires us to know
+	//   the producer / config each frame came from.
+	// - After the writer loop has finished writing the frame to disk,
+	//   it needs to call the ACK function specified in ProducerConfig.
+	producer *diskQueueProducer
 }
 
 // A frame that has been read from disk
@@ -94,10 +106,10 @@ func (cl *coreLoop) run() {
 	for {
 		select {
 		// Endpoints used by the public API
-		case writeRequest := <-dq.writeRequestChan:
-			cl.handleProducerWriteRequest(writeRequest)
+		case producerWriteRequest := <-dq.producerWriteRequestChan:
+			cl.handleProducerWriteRequest(producerWriteRequest)
 
-		case cancelRequest := <-dq.cancelRequestChan:
+		case cancelRequest := <-dq.producerCancelRequestChan:
 			cl.handleProducerCancelRequest(cancelRequest)
 
 		case ackedUpTo := <-dq.consumerAckChan:
@@ -108,7 +120,7 @@ func (cl *coreLoop) run() {
 			return
 
 		// Writer loop handling
-		case <-dq.writerLoop.finishedWriting:
+		case <-dq.writerLoop.writeResponse:
 			// Reset the writing flag and check if there's another frame waiting
 			// to be written.
 			cl.writing = false
@@ -125,7 +137,7 @@ func (cl *coreLoop) run() {
 	}
 }
 
-func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
+func (cl *coreLoop) handleProducerWriteRequest(request *producerWriteRequest) {
 	if len(cl.blockedWrites) > 0 {
 		// If other requests are still waiting for space, then there
 		// definitely isn't enough for this one.
@@ -168,7 +180,7 @@ func (cl *coreLoop) handleProducerWriteRequest(request *writeRequest) {
 	}
 }
 
-func (cl *coreLoop) handleProducerCancelRequest(request *cancelRequest) {
+func (cl *coreLoop) handleProducerCancelRequest(request *producerCancelRequest) {
 }
 
 // Returns the active read segment, or nil if there is none.
@@ -269,7 +281,7 @@ func (cl *coreLoop) handleShutdown() {
 
 	close(cl.queue.writerLoop.input)
 	if cl.writing {
-		<-cl.queue.writerLoop.finishedWriting
+		<-cl.queue.writerLoop.writeResponse
 		cl.queue.segments.writing.writer.Close()
 	}
 
@@ -327,7 +339,7 @@ func (cl *coreLoop) maybeWritePending() {
 		dq.segments.nextID++
 	}
 
-	cl.queue.writerLoop.input <- &writeBlock{
+	cl.queue.writerLoop.input <- &writeRequest{
 		request: cl.pendingWrites[0],
 		segment: segment,
 	}

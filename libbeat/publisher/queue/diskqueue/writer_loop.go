@@ -23,11 +23,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+type frameWriteRequest struct {
+	// The frame to be written to disk.
+	frame *writeFrame
+
+	// The segment to which this frame should be written.
+	segment *queueSegment
+}
+
 // One block for the writer loop consists of a write request and the
 // segment it should be written to.
-type writeBlock struct {
-	request *writeRequest
-	segment *queueSegment
+type writeRequest struct {
+	frames []frameWriteRequest
 }
 
 type writerLoop struct {
@@ -36,13 +43,13 @@ type writerLoop struct {
 	// The writer loop listens on the input channel for write blocks, and
 	// writes them to disk immediately (all queue capacity checking etc. is
 	// done by the core loop before sending it to the writer).
-	input chan *writeBlock
+	input chan *writeRequest
 
 	// The writer loop sends to this channel when it has finished writing a
 	// frame, to signal the core loop that it is ready for the next one. To
 	// ensure that the core loop doesn't block, the writer loop always reads
-	// from input immediately after sending to finishedWriting.
-	finishedWriting chan struct{}
+	// from input immediately after sending to writeResponse.
+	writeResponse chan struct{}
 }
 
 func (wl *writerLoop) run() {
@@ -53,12 +60,12 @@ func (wl *writerLoop) run() {
 			return
 		}
 		wl.processRequest(block)
-		wl.finishedWriting <- struct{}{}
+		wl.writeResponse <- struct{}{}
 	}
 }
 
 // Write the block data to disk.
-func (wl *writerLoop) processRequest(block *writeBlock) {
+func (wl *writerLoop) processRequest(block *writeRequest) {
 	//writer, err := block.segment.getWriter()
 }
 
