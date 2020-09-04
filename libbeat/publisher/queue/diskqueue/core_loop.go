@@ -46,9 +46,17 @@ type coreLoop struct {
 	// nextReadOffset is the segment offset to start reading at during
 	// the next read request. This offset always refers to the first read
 	// segment: either segments.reading[0], if that list is nonempty, or
-	// segments.writing (if all segments have been read except the one
+	// segments.writing[0] (if all segments have been read except the one
 	// currently being written).
 	nextReadOffset segmentOffset
+
+	// nextWriteOffset is the segment offset at which the next new frame
+	// should be written. This offset always refers to the last entry of
+	// segments.writing. This is distinct from the endOffset field
+	// within a segment: endOffset tracks how much data _has_ been
+	// written to disk, while nextWriteOffset also includes all pending
+	// frames that are scheduled to be written to disk.
+	nextWriteOffset segmentOffset
 
 	// pendingWrites is a list of all write requests that have been accepted
 	// by the queue and are waiting to be sent to the writer loop.
@@ -105,7 +113,7 @@ func (cl *coreLoop) run() {
 
 	for {
 		select {
-		// Endpoints used by the public API
+		// Endpoints used by the producer / consumer API implementation.
 		case producerWriteRequest := <-dq.producerWriteRequestChan:
 			cl.handleProducerWriteRequest(producerWriteRequest)
 
@@ -120,7 +128,7 @@ func (cl *coreLoop) run() {
 			return
 
 		// Writer loop handling
-		case <-dq.writerLoop.writeResponse:
+		case <-dq.writerLoop.responseChan:
 			// Reset the writing flag and check if there's another frame waiting
 			// to be written.
 			cl.writing = false
@@ -188,31 +196,38 @@ func (segments *diskQueueSegments) readingSegment() *queueSegment {
 	if len(segments.reading) > 0 {
 		return segments.reading[0]
 	}
-	return segments.writing
+	if len(segments.writing) > 0 {
+		return segments.writing[0]
+	}
+	return nil
 }
 
 func (cl *coreLoop) handleReadResponse(response readResponse) {
 	cl.reading = false
 	segments := cl.queue.segments
-	segment := segments.readingSegment()
-	segment.framesRead += response.frameCount
-	newOffset := cl.nextReadOffset + segmentOffset(response.byteCount)
 
-	// A (non-writing) segment is finished if we have read all the data, or
-	// the read response reports an error.
-	segmentFinished :=
-		segment != segments.writing &&
-			(newOffset >= segment.endOffset || response.err != nil)
-	if segmentFinished {
-		// Move to the acking list and reset the read offset.
-		segments.reading = segments.reading[1:]
-		segments.acking = append(segments.acking, segment)
-		cl.nextReadOffset = 0
+	// Advance the read offset based on what was just completed.
+	cl.nextReadOffset += segmentOffset(response.byteCount)
+
+	var segment *queueSegment
+	if len(segments.reading) > 0 {
+		// A segment is finished if we have read all the data, or
+		// the read response reports an error.
+		// Segments in the reading list have been completely written,
+		// so we can rely on their endOffset field to determine the
+		// size of the data.
+		segment = segments.reading[0]
+		if cl.nextReadOffset >= segment.endOffset || response.err != nil {
+			segments.reading = segments.reading[1:]
+			segments.acking = append(segments.acking, segment)
+			cl.nextReadOffset = 0
+		}
 	} else {
-		// We aren't done reading this segment; next time we'll start from
-		// the end of this read response.
-		cl.nextReadOffset = newOffset
+		// A segment in the writing list can't be finished writing,
+		// so we don't check the endOffset.
+		segment = segments.writing[0]
 	}
+	segment.framesRead += response.frameCount
 
 	// If there is more data to read, start a new read request.
 	cl.maybeReadPending()
@@ -279,10 +294,10 @@ func (cl *coreLoop) handleShutdown() {
 		cl.handleReadResponse(response)
 	}
 
-	close(cl.queue.writerLoop.input)
+	close(cl.queue.writerLoop.requestChan)
 	if cl.writing {
-		<-cl.queue.writerLoop.writeResponse
-		cl.queue.segments.writing.writer.Close()
+		<-cl.queue.writerLoop.responseChan
+		//cl.queue.segments.writing.writer.Close()
 	}
 
 	close(cl.queue.deleterLoop.input)
@@ -309,39 +324,42 @@ func (cl *coreLoop) maybeWritePending() {
 		// Nothing to do right now
 		return
 	}
-	// We are now definitely going to handle the next request, so
-	// remove it from pendingWrites.
-	request := cl.pendingWrites[0]
-	cl.pendingWrites = cl.pendingWrites[1:]
+	// We are now definitely going to handle the queued requests, so
+	// remove them from pendingWrites.
+	requests := cl.pendingWrites
+	cl.pendingWrites = nil
 
-	// We have a frame to write, but we need to decide which segment
-	// it should go in.
-	segment := dq.segments.writing
-
-	// If the new frame exceeds the maximum segment size, close the current
-	// writing segment.
-	frameLen := segmentOffset(len(request.frame.serialized))
-	newEndOffset := segment.endOffset + frameLen
-	if segment != nil && newEndOffset > dq.settings.maxSegmentOffset() {
-		segment.writer.Close()
-		segment.writer = nil
-		dq.segments.reading = append(dq.segments.reading, segment)
-		segment = nil
+	// We have frames to write, but we need to decide which segments
+	// they should go in and assemble them into frameWriteRequests
+	// for the writer loop. Start with the most recent writing segment
+	// if there is one.
+	var segment *queueSegment
+	if len(dq.segments.writing) > 0 {
+		segment = dq.segments.writing[len(dq.segments.writing)-1]
 	}
-
-	// If there is no active writing segment need to create a new segment.
-	if segment == nil {
-		segment = &queueSegment{
-			id:            dq.segments.nextID,
-			queueSettings: &dq.settings,
+	var frameRequests []frameWriteRequest
+	for _, request := range requests {
+		frameLen := segmentOffset(len(request.frame.serialized))
+		// If segment is nil, or the new segment exceeds its bounds,
+		// we need to create a new writing segment.
+		if segment == nil ||
+			cl.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
+			segment = &queueSegment{
+				id:            dq.segments.nextID,
+				queueSettings: &dq.settings,
+			}
+			dq.segments.writing = append(dq.segments.writing, segment)
+			dq.segments.nextID++
+			cl.nextWriteOffset = frameLen
 		}
-		dq.segments.writing = segment
-		dq.segments.nextID++
+		frameRequests = append(frameRequests, frameWriteRequest{
+			frame:   request.frame,
+			segment: segment,
+		})
 	}
 
-	cl.queue.writerLoop.input <- &writeRequest{
-		request: cl.pendingWrites[0],
-		segment: segment,
+	cl.queue.writerLoop.requestChan <- writeRequest{
+		frames: frameRequests,
 	}
 	cl.writing = true
 }

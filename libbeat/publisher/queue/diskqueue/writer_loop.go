@@ -37,36 +37,47 @@ type writeRequest struct {
 	frames []frameWriteRequest
 }
 
+// A writeResponse reports the list of segments that have been
+// completely written and can be moved to segments.reading.
+// A segment is determined to have been completely written
+// (and is then closed by the writer loop) when a frameWriteRequest
+// targets a different segment than the previous ones.
+type writeResponse struct {
+	completedSegments []*queueSegment
+}
+
 type writerLoop struct {
 	logger *logp.Logger
 
-	// The writer loop listens on the input channel for write blocks, and
+	// The writer loop listens on requestChan for write blocks, and
 	// writes them to disk immediately (all queue capacity checking etc. is
 	// done by the core loop before sending it to the writer).
-	input chan *writeRequest
+	requestChan chan writeRequest
 
-	// The writer loop sends to this channel when it has finished writing a
-	// frame, to signal the core loop that it is ready for the next one. To
-	// ensure that the core loop doesn't block, the writer loop always reads
-	// from input immediately after sending to writeResponse.
-	writeResponse chan struct{}
+	// The writer loop sends to responseChan when it has finished handling a
+	// request, to signal the core loop that it is ready for the next one.
+	responseChan chan writeResponse
 }
 
 func (wl *writerLoop) run() {
 	for {
-		block, ok := <-wl.input
+		block, ok := <-wl.requestChan
 		if !ok {
 			// The input channel is closed, we are done
 			return
 		}
-		wl.processRequest(block)
-		wl.writeResponse <- struct{}{}
+		completedSegments := wl.processRequest(block)
+		wl.responseChan <- writeResponse{
+			completedSegments: completedSegments,
+		}
 	}
 }
 
-// Write the block data to disk.
-func (wl *writerLoop) processRequest(block *writeRequest) {
+// Write the given data to disk, returns the list of segments that were
+// completed in the process.
+func (wl *writerLoop) processRequest(request writeRequest) []*queueSegment {
 	//writer, err := block.segment.getWriter()
+	return nil
 }
 
 // frameForContent wraps the given content buffer in a

@@ -70,12 +70,6 @@ type queueSegment struct {
 	//
 	// Used to count how many frames still need to be acknowledged by consumers.
 	framesRead int64
-
-	// If this segment is being written or read, then reader / writer
-	// contain the respective file handles. To get a valid reader / writer for
-	// a segment that may not yet be open, call getReader / getWriter instead.
-	reader *os.File
-	writer *os.File
 }
 
 type segmentHeader struct {
@@ -156,21 +150,21 @@ func (segment *queueSegment) getReader() (*os.File, error) {
 
 // Should only be called from the writer loop.
 func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
-	if segment.writer != nil {
-		return segment.writer, nil
-	}
 	path := segment.queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(
+			"Couldn't open segment %d: %w", segment.id, err)
 	}
-	segment.writer = file
 	header := &segmentHeader{
 		version:      0,
 		checksumType: segment.queueSettings.ChecksumType,
 	}
 	err = writeSegmentHeader(file, header)
-	// TODO: write header
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Couldn't write to new segment %d: %w", segment.id, err)
+	}
 	return file, nil
 }
 
@@ -191,8 +185,8 @@ func writeSegmentHeader(out io.Writer, header *segmentHeader) error {
 // should only be called from the core loop.
 func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	total := uint64(0)
-	if segments.writing != nil {
-		total += segments.writing.sizeOnDisk()
+	for _, segment := range segments.writing {
+		total += segment.sizeOnDisk()
 	}
 	for _, segment := range segments.reading {
 		total += segment.sizeOnDisk()

@@ -149,8 +149,15 @@ type pendingFrameData struct {
 
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
-	// The segment that is currently being written.
-	writing *queueSegment
+	// The segments that are currently being written. The writer loop
+	// writes these segments in order. When a segment has been
+	// completely written, the writer loop notifies the core loop
+	// in a writeResponse, and it is moved to the reading list.
+	// If the reading list is empty, the reader loop may read from
+	// a segment that is still being written, but it will always
+	// be writing[0], since later entries have generally not been
+	// created yet.
+	writing []*queueSegment
 
 	// A list of the segments that have been completely written but have
 	// not yet been completely processed by the reader loop, sorted by increasing
@@ -257,9 +264,9 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	}()
 
 	writerLoop := &writerLoop{
-		logger:        settings.Logger,
-		input:         make(chan *writeRequest, 1),
-		writeResponse: make(chan struct{}),
+		logger:       settings.Logger,
+		requestChan:  make(chan writeRequest, 1),
+		responseChan: make(chan writeResponse),
 	}
 	go func() {
 		writerLoop.run()
