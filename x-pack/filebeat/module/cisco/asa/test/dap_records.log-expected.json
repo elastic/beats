@@ -24,6 +24,9 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "1.2.3.4"
         ],

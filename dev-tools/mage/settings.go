@@ -85,12 +85,14 @@ var (
 		"beat_doc_branch":   BeatDocBranch,
 		"beat_version":      BeatQualifiedVersion,
 		"commit":            CommitHash,
+		"commit_short":      CommitHashShort,
 		"date":              BuildDate,
 		"elastic_beats_dir": ElasticBeatsDir,
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
 		"title":             strings.Title,
 		"tolower":           strings.ToLower,
+		"contains":          strings.Contains,
 	}
 )
 
@@ -236,6 +238,15 @@ func CommitHash() (string, error) {
 		commitHash, err = sh.Output("git", "rev-parse", "HEAD")
 	})
 	return commitHash, err
+}
+
+// CommitHashShort returns the short length git commit hash.
+func CommitHashShort() (string, error) {
+	shortHash, err := CommitHash()
+	if len(shortHash) > 6 {
+		shortHash = shortHash[:6]
+	}
+	return shortHash, err
 }
 
 var (
