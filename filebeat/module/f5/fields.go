@@ -32,5 +32,5 @@ func init() {
 // AssetF5 returns asset data.
 // This is the base64 encoded gzipped contents of module/f5.
 func AssetF5() string {
-	return "eJzEkz1uwzAMhXef4iF7liJZNPQGBXqDQoiYVIgcqiKNRrcvnKQN0xr9GWp5MGDy4b3PErnEnqrDdu2l7wCNmshhcfpedEAg2ZSYNfLB4b4DcNbigcOQqAO2kVIQd2otcfA9Xe3GR2smh13hIV8qE563NtZKqiTerVd3qyeVj+4nk8dEXgg+BFs3ajr6Po9/ZpSXmlGdUZWO+h2Gz3kWjj3VVy7hC0qcJ97EvCdnLtruCnJh5Q2ndgSFXgaSeY7ALgwm9uNK1ZM+czCNv2L9FuynwRxKbHc3MbTLHt8tp9LLjeM/578FAAD//xhqxrE="
+	return "eJzEkz1uwzAMhXef4iF7liJZNPQGBXqDQojoVIgcqiKNRrcvnKQN0wb9GWp5MGDy4b3PErnEjqpDv/YydIBGTeSwOH4vOiCQbErMGnnvcN8BOGnxwGFM1AF9pBTEHVtL7P1AF7vp0ZrJYVt4zOfKDc9rG2slVRJv16u71ZPKR/eTyWMiLwQfgq0bNR38kKc/M8pzzahOqEoH/Q7D5zwLx47qK5fwBSXOE29i3pMzF213Bbmw8oZTO4JCLyPJPEdgFwY39uNCNZA+czCNv2L9FuynwezH1PByYmiXPb1bjqWXK8d/zn8LAAD//w87xxQ="
 }

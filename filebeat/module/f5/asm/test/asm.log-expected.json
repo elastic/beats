@@ -1,7 +1,7 @@
 [
     {
-        "@timestamp": "2020-09-04T10:32:50.068Z",
-        "destination.ip": "2.170.237.22",
+        "@timestamp": "2020-09-04T10:50:15.633Z",
+        "destination.ip": "10.10.0.1",
         "destination.port": "443",
         "event.category": "network",
         "event.dataset": "f5.asm",
@@ -19,7 +19,7 @@
         "network.protocol": "HTTPS",
         "observer.type": "firewall",
         "observer.vendor": "F5 Networks",
-        "rule.name": "/Common/live-nmiv-asm-policy",
+        "rule.name": "/Common/my-asm-policy",
         "service.type": "f5",
         "source.ip": "7.8.24.87",
         "source.port": "52620",

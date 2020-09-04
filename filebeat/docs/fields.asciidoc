@@ -47607,7 +47607,7 @@ example: Please add example
 
 --
 
-*`f5asm.uri`*::
+*`f5asm.full`*::
 +
 --
 Please add description
