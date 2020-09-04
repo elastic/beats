@@ -130,15 +130,12 @@ func (cl *coreLoop) run() {
 			return
 
 		// Writer loop handling
-		case <-dq.writerLoop.responseChan:
-			// Reset the writing flag and check if there's another frame waiting
-			// to be written.
-			cl.writing = false
-			cl.maybeWritePending()
+		case writerLoopResponse := <-dq.writerLoop.responseChan:
+			cl.handleWriterLoopResponse(writerLoopResponse)
 
 		// Reader loop handling
-		case readResponse := <-dq.readerLoop.responseChan:
-			cl.handleReadResponse(readResponse)
+		case readerLoopResponse := <-dq.readerLoop.responseChan:
+			cl.handleReaderLoopResponse(readerLoopResponse)
 
 		// Deleter loop handling
 		case deleteResponse := <-dq.deleterLoop.response:
@@ -215,18 +212,29 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 func (cl *coreLoop) handleProducerCancelRequest(request producerCancelRequest) {
 }
 
-// Returns the active read segment, or nil if there is none.
-func (segments *diskQueueSegments) readingSegment() *queueSegment {
-	if len(segments.reading) > 0 {
-		return segments.reading[0]
+func (cl *coreLoop) handleWriterLoopResponse(response writerLoopResponse) {
+	cl.writing = false
+
+	for _, metadata := range response.segments {
+		// Update the segments with their new size and, if the writer
+		// closed them, move them to the reading list.
+		// TODO: i don't like this. It is redundant, and in brittle ways:
+		// segments are always written and closed in strict order, and the
+		// core loop knows what that order is, but we let the writer loop
+		// report them as independent parameters and then depend on those
+		// instead? It works for the moment but needs to be fixed soon.
+		metadata.segment.endOffset += segmentOffset(metadata.bytesWritten)
+		if metadata.closed {
+			cl.queue.segments.writing = cl.queue.segments.writing[1:]
+			cl.queue.segments.reading =
+				append(cl.queue.segments.reading, metadata.segment)
+		}
 	}
-	if len(segments.writing) > 0 {
-		return segments.writing[0]
-	}
-	return nil
+
+	cl.maybeWritePending()
 }
 
-func (cl *coreLoop) handleReadResponse(response readerLoopResponse) {
+func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 	cl.reading = false
 	segments := cl.queue.segments
 
@@ -315,7 +323,7 @@ func (cl *coreLoop) handleShutdown() {
 	close(cl.queue.readerLoop.requestChan)
 	if cl.reading {
 		response := <-cl.queue.readerLoop.responseChan
-		cl.handleReadResponse(response)
+		cl.handleReaderLoopResponse(response)
 	}
 
 	close(cl.queue.writerLoop.requestChan)
@@ -355,6 +363,17 @@ func (cl *coreLoop) maybeWritePending() {
 		frames: requests,
 	}
 	cl.writing = true
+}
+
+// Returns the active read segment, or nil if there is none.
+func (segments *diskQueueSegments) readingSegment() *queueSegment {
+	if len(segments.reading) > 0 {
+		return segments.reading[0]
+	}
+	if len(segments.writing) > 0 {
+		return segments.writing[0]
+	}
+	return nil
 }
 
 // If the reading list is nonempty, and there are no outstanding read

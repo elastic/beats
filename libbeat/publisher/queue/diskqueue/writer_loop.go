@@ -40,13 +40,23 @@ type writerLoopRequest struct {
 	frames []segmentedFrame
 }
 
+// writerSegmentMetadata returns the actions taken by the writer loop
+// on a single segment: the number of bytes written, and whether or
+// not the segment was closed while handling the request (which signals
+// to the core loop that the segment can be moved to segments.reading).
+type writerSegmentMetadata struct {
+	segment      *queueSegment
+	bytesWritten int64
+	closed       bool
+}
+
 // A writerLoopResponse reports the list of segments that have been
 // completely written and can be moved to segments.reading.
 // A segment is determined to have been completely written
 // (and is then closed by the writer loop) when a frameWriteRequest
 // targets a different segment than the previous ones.
 type writerLoopResponse struct {
-	completedSegments []*queueSegment
+	segments []writerSegmentMetadata
 }
 
 type writerLoop struct {
@@ -78,27 +88,31 @@ func (wl *writerLoop) run() {
 			// The input channel is closed, we are done
 			return
 		}
-		completedSegments := wl.processRequest(block)
-		wl.responseChan <- writerLoopResponse{
-			completedSegments: completedSegments,
-		}
+		segments := wl.processRequest(block)
+		wl.responseChan <- writerLoopResponse{segments: segments}
 	}
 }
 
 // Write the given data to disk, returns the list of segments that were
 // completed in the process.
-func (wl *writerLoop) processRequest(request writerLoopRequest) []*queueSegment {
-	var completedSegments []*queueSegment
+func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentMetadata {
+	var segments []writerSegmentMetadata
+	bytesWritten := int64(0) // Bytes written to the current segment.
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
 		// file handle and possibly clean up the old one.
 		if wl.currentSegment != frameRequest.segment {
 			wl.logger.Debugf("")
 			if wl.outputFile != nil {
-				completedSegments = append(completedSegments, wl.currentSegment)
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// TODO: try to sync?
+				segments = append(segments, writerSegmentMetadata{
+					segment:      wl.currentSegment,
+					bytesWritten: bytesWritten,
+					closed:       true,
+				})
+				bytesWritten = 0
 			}
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriter()
@@ -111,14 +125,21 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []*queueSegment 
 
 		// We have the data and a file to write it to. We are now committed
 		// to writing this block unless the queue is closed in the meantime.
-		_, err := wl.outputFile.Write(frameRequest.frame.serialized)
+		n, err := wl.outputFile.Write(frameRequest.frame.serialized)
+		bytesWritten += int64(n)
 		// TODO: retry forever if there is an error or n isn't the right
 		// length.
 		if err != nil {
 			wl.logger.Errorf("Couldn't write pending data to disk: %w", err)
 		}
 	}
-	return completedSegments
+	if bytesWritten > 0 {
+		segments = append(segments, writerSegmentMetadata{
+			segment:      wl.currentSegment,
+			bytesWritten: bytesWritten,
+		})
+	}
+	return segments
 }
 
 // frameForContent wraps the given content buffer in a
