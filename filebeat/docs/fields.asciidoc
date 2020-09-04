@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-aws>>
 * <<exported-fields-awscloudwatch>>
 * <<exported-fields-azure>>
+* <<exported-fields-azure-eventhub>>
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-bluecoat>>
@@ -3277,6 +3278,65 @@ type: keyword
 --
 Status
 
+
+type: keyword
+
+--
+
+[[exported-fields-azure-eventhub]]
+== azure-eventhub fields
+
+Fields regarding the Azure event hub information.
+
+
+
+[float]
+=== azure-eventhub
+
+Fields regarding the Azure event hub information.
+
+
+
+*`azure-eventhub.offset`*::
++
+--
+The position of an event within a partition.
+
+type: long
+
+--
+
+*`azure-eventhub.sequence_number`*::
++
+--
+The logical sequence number of the event within the partition stream of the event hub.
+
+type: long
+
+--
+
+*`azure-eventhub.enqueued_time`*::
++
+--
+The date and time, in UTC, of when the event was enqueued in the event hub partition.
+
+type: date
+
+--
+
+*`azure-eventhub.eventhub`*::
++
+--
+The name of the event hub instance.
+
+type: keyword
+
+--
+
+*`azure-eventhub.consumer_group`*::
++
+--
+The view (state, position, or offset) of an entire event hub.
 
 type: keyword
 
@@ -77476,7 +77536,7 @@ type: keyword
 --
 
 
-*`azure.eventhub`*::
+*`azure-eventhub.eventhub`*::
 +
 --
 Name of the eventhub.
@@ -77486,7 +77546,7 @@ type: keyword
 
 --
 
-*`azure.offset`*::
+*`azure-eventhub.offset`*::
 +
 --
 The offset.
@@ -77496,7 +77556,7 @@ type: long
 
 --
 
-*`azure.enqueued_time`*::
+*`azure-eventhub.enqueued_time`*::
 +
 --
 The enqueued time.
@@ -77506,7 +77566,7 @@ type: date
 
 --
 
-*`azure.partition_id`*::
+*`azure-eventhub.partition_id`*::
 +
 --
 The partition id.
@@ -77516,7 +77576,7 @@ type: long
 
 --
 
-*`azure.consumer_group`*::
+*`azure-eventhub.consumer_group`*::
 +
 --
 The consumer group.
@@ -77526,7 +77586,7 @@ type: keyword
 
 --
 
-*`azure.sequence_number`*::
+*`azure-eventhub.sequence_number`*::
 +
 --
 The sequence number.
