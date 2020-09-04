@@ -555,6 +555,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert httpjson to v2 input {pull}20226[20226]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
+- Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 
 *Heartbeat*
 
