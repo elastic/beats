@@ -20,7 +20,6 @@ package diskqueue
 import (
 	"encoding/binary"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"sort"
@@ -167,18 +166,24 @@ func (segment *queueSegment) getWriter() (*os.File, error) {
 	return file, nil
 }
 
-func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
-	header := segmentHeader{}
+func readSegmentHeader(in *os.File) (*segmentHeader, error) {
+	header := &segmentHeader{}
+	err := binary.Read(in, binary.LittleEndian, &header.version)
+	if err != nil {
+		return nil, err
+	}
 	if header.version != 0 {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
 	}
-	panic("TODO: not implemented")
-	//return nil, nil
+	err = binary.Read(in, binary.LittleEndian, &header.checksumType)
+	if err != nil {
+		return nil, err
+	}
+	return header, nil
 }
 
 func writeSegmentHeader(out *os.File, header *segmentHeader) error {
 	err := binary.Write(out, binary.LittleEndian, header.version)
-	fmt.Printf("binary.Write result: %v\n", err)
 	if err == nil {
 		err = binary.Write(out, binary.LittleEndian, uint32(header.checksumType))
 	}

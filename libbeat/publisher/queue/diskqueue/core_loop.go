@@ -138,16 +138,13 @@ func (cl *coreLoop) run() {
 			cl.handleReaderLoopResponse(readerLoopResponse)
 
 		// Deleter loop handling
-		case deleteResponse := <-dq.deleterLoop.response:
-			cl.handleDeleteResponse(deleteResponse)
+		case deleterLoopResponse := <-dq.deleterLoop.responseChan:
+			cl.handleDeleterLoopResponse(deleterLoopResponse)
 		}
 	}
 }
 
 func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
-	cl.queue.logger.Debugf(
-		"Core loop received producer write request (%d bytes)",
-		len(request.frame.serialized))
 	if len(cl.blockedProducers) > 0 {
 		// If other requests are still waiting for space, then there
 		// definitely isn't enough for this one.
@@ -231,6 +228,9 @@ func (cl *coreLoop) handleWriterLoopResponse(response writerLoopResponse) {
 		}
 	}
 
+	// New data is available, so we also check if we should send a new
+	// read request.
+	cl.maybeReadPending()
 	cl.maybeWritePending()
 }
 
@@ -265,7 +265,7 @@ func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 	cl.maybeReadPending()
 }
 
-func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
+func (cl *coreLoop) handleDeleterLoopResponse(response deleterLoopResponse) {
 	dq := cl.queue
 	cl.deleting = false
 	if len(response.deleted) > 0 {
@@ -285,6 +285,10 @@ func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
 	}
 	// If there are still files to delete, send the next request.
 	cl.maybeDeleteAcked()
+
+	// If there are blocked producers waiting for more queue space, this
+	// deletion might have unblocked them.
+	cl.maybeUnblockProducers()
 }
 
 func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
@@ -332,9 +336,9 @@ func (cl *coreLoop) handleShutdown() {
 		//cl.queue.segments.writing.writer.Close()
 	}
 
-	close(cl.queue.deleterLoop.input)
+	close(cl.queue.deleterLoop.requestChan)
 	if cl.deleting {
-		response := <-cl.queue.deleterLoop.response
+		response := <-cl.queue.deleterLoop.responseChan
 		// We can't retry any more if deletion failed, but we still check the
 		// response so we can log any errors.
 		if len(response.errors) > 0 {
@@ -401,9 +405,13 @@ func (cl *coreLoop) maybeReadPending() {
 // requests, send one.
 func (cl *coreLoop) maybeDeleteAcked() {
 	if !cl.deleting && len(cl.queue.segments.acked) > 0 {
-		cl.queue.deleterLoop.input <- &deleteRequest{segments: cl.queue.segments.acked}
+		cl.queue.deleterLoop.requestChan <- deleterLoopRequest{segments: cl.queue.segments.acked}
 		cl.deleting = true
 	}
+}
+
+func (cl *coreLoop) maybeUnblockProducers() {
+	// TODO: implement me
 }
 
 // enqueueProducerFrame determines which segment an incoming frame should be

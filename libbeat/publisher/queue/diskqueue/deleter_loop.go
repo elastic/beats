@@ -26,24 +26,23 @@ type deleterLoop struct {
 	// The settings for the queue that created this loop.
 	queueSettings *Settings
 
-	// When one or more segments are ready to delete, they are sent to the
-	// deleter loop input as a deleteRequest. At most one deleteRequest may be
-	// outstanding at any time.
-	input chan *deleteRequest
+	// When one or more segments are ready to delete, they are sent to
+	// requestChan. At most one deleteRequest may be outstanding at any time.
+	requestChan chan deleterLoopRequest
 
-	// When a deleteRequest has been completely processed, the resulting
-	// deleteResponse is sent on the response channel. If at least one deletion
-	// was successful, the response is sent immediately. Otherwise, the deleter
-	// loop delays for queueSettings.RetryWriteInterval before returning, so
-	// that delays don't have to be handled by the core loop.
-	response chan *deleteResponse
+	// When a request has been completely processed, a response is sent on
+	// responseChan. If at least one deletion was successful, the response
+	// is sent immediately. Otherwise, the deleter loop delays for
+	// queueSettings.RetryWriteInterval before returning, so timed retries
+	// don't have to be handled by the core loop.
+	responseChan chan deleterLoopResponse
 }
 
-type deleteRequest struct {
+type deleterLoopRequest struct {
 	segments []*queueSegment
 }
 
-type deleteResponse struct {
+type deleterLoopResponse struct {
 	// The queue segments that were successfully deleted.
 	deleted map[*queueSegment]bool
 
@@ -53,7 +52,7 @@ type deleteResponse struct {
 
 func (dl *deleterLoop) run() {
 	for {
-		request, ok := <-dl.input
+		request, ok := <-dl.requestChan
 		if !ok {
 			// The channel has been closed, time to shut down.
 			return
@@ -71,7 +70,7 @@ func (dl *deleterLoop) run() {
 				deleted[segment] = true
 			}
 		}
-		dl.response <- &deleteResponse{
+		dl.responseChan <- deleterLoopResponse{
 			deleted: deleted,
 			errors:  errorList,
 		}

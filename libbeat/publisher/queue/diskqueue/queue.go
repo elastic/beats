@@ -273,8 +273,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 	deleterLoop := &deleterLoop{
 		queueSettings: &settings,
-		input:         make(chan *deleteRequest),
-		response:      make(chan *deleteResponse),
+		requestChan:   make(chan deleterLoopRequest),
+		responseChan:  make(chan deleterLoopResponse),
 	}
 	go func() {
 		deleterLoop.run()
