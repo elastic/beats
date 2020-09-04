@@ -32,6 +32,8 @@ func compareEQ(left, right operand) (bool, error) {
 		return false, nil
 	case int:
 		switch rv := right.(type) {
+		case *null:
+			return false, nil
 		case int:
 			return v == rv, nil
 		case float64:
@@ -47,6 +49,8 @@ func compareEQ(left, right operand) (bool, error) {
 		}
 	case float64:
 		switch rv := right.(type) {
+		case *null:
+			return false, nil
 		case int:
 			return v == float64(rv), nil
 		case float64:
@@ -131,6 +135,8 @@ func compareNEQ(left, right operand) (bool, error) {
 		return true, nil
 	case int:
 		switch rv := right.(type) {
+		case *null:
+			return true, nil
 		case int:
 			return v != rv, nil
 		case float64:
@@ -146,6 +152,8 @@ func compareNEQ(left, right operand) (bool, error) {
 		}
 	case float64:
 		switch rv := right.(type) {
+		case *null:
+			return true, nil
 		case int:
 			return v != float64(rv), nil
 		case float64:
@@ -160,7 +168,7 @@ func compareNEQ(left, right operand) (bool, error) {
 	case string:
 		rV, ok := right.(string)
 		if !ok {
-			return false, nil
+			return true, nil
 		}
 		if rV == v {
 			return false, nil
@@ -362,11 +370,33 @@ func compareGTE(left, right operand) (bool, error) {
 type logical func(left, right operand) (bool, error)
 
 func logicalAND(left, right operand) (bool, error) {
-	return left.(bool) && right.(bool), nil
+	switch l := left.(type) {
+	case bool:
+		switch r := right.(type) {
+		case bool:
+			return l && r, nil
+		}
+	}
+	return false, fmt.Errorf(
+		"and: incompatible type to and both operands must be booleans, left=%T, right=%T",
+		left,
+		right,
+	)
 }
 
 func logicalOR(left, right operand) (bool, error) {
-	return left.(bool) == true || right.(bool), nil
+	switch l := left.(type) {
+	case bool:
+		switch r := right.(type) {
+		case bool:
+			return l || r, nil
+		}
+	}
+	return false, fmt.Errorf(
+		"and: incompatible type to and both operands must be booleans, left=%T, right=%T",
+		left,
+		right,
+	)
 }
 
 func keys(v map[string]interface{}) []string {
