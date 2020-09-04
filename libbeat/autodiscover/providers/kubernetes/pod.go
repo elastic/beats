@@ -341,8 +341,12 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name),
-			metadata.WithFields("container.image", c.Image))
+		meta := p.metagen.Generate(
+			pod,
+			metadata.WithFields("container.name", c.Name),
+			metadata.WithFields("container.image", c.Image),
+			metadata.WithFields("container.id", cid),
+		)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
