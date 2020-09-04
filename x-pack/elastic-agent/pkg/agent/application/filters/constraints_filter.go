@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -24,7 +24,7 @@ const (
 
 var (
 	boolexpVarStore    *constraintVarStore
-	boolexpMethodsRegs *boolexp.MethodsReg
+	boolexpMethodsRegs *eql.MethodsReg
 )
 
 // ConstraintFilter filters ast based on included constraints.
@@ -147,20 +147,20 @@ func datasourceIdentifier(datasourceNode transpiler.Node) string {
 }
 
 func evaluateConstraint(constraint string) (bool, error) {
-	store, regs, err := boolexpMachinery()
+	_, regs, err := boolexpMachinery()
 	if err != nil {
 		return false, err
 	}
 
-	return boolexp.Eval(constraint, regs, store)
+	return eql.Eval(constraint, regs)
 }
 
-func boolexpMachinery() (*constraintVarStore, *boolexp.MethodsReg, error) {
+func boolexpMachinery() (*constraintVarStore, *eql.MethodsReg, error) {
 	if boolexpMethodsRegs != nil && boolexpVarStore != nil {
 		return boolexpVarStore, boolexpMethodsRegs, nil
 	}
 
-	regs := boolexp.NewMethodsReg()
+	regs := eql.NewMethodsReg()
 	if err := regs.Register(validateVersionFuncName, regValidateVersion); err != nil {
 		return nil, nil, err
 	}

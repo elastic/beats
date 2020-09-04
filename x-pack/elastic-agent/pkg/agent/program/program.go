@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 )
 
 // Program represents a program that must be started or must run.
@@ -78,12 +78,12 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 			return nil, ErrMissingWhen
 		}
 
-		expression, err := boolexp.New(spec.When, methodsEnv(specificAST))
+		expression, err := eql.New(spec.When, methodsEnv(specificAST))
 		if err != nil {
 			return nil, err
 		}
 
-		ok, err := expression.Eval(&varStoreAST{ast: specificAST})
+		ok, err := expression.Eval()
 		if err != nil {
 			return nil, err
 		}

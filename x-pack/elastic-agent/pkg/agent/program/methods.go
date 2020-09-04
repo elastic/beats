@@ -8,23 +8,21 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 )
 
 type env struct {
 	ast  *transpiler.AST
-	vars boolexp.VarStore
 }
 
 type envFunc = func(*env, []interface{}) (interface{}, error)
 
-func methodsEnv(ast *transpiler.AST) *boolexp.MethodsReg {
+func methodsEnv(ast *transpiler.AST) *eql.MethodsReg {
 	env := &env{
 		ast:  ast,
-		vars: &varStoreAST{ast: ast},
 	}
 
-	var methods = boolexp.NewMethodsReg()
+	var methods = eql.NewMethodsReg()
 	methods.MustRegister("HasItems", withEnv(env, hasItems))
 	methods.MustRegister("HasNamespace", withEnv(env, hasNamespace))
 	methods.MustRegister("HasAny", withEnv(env, hasAny))
@@ -41,7 +39,7 @@ func hasItems(_ *env, args []interface{}) (interface{}, error) {
 		return false, fmt.Errorf("expecting 1 argument received %d", len(args))
 	}
 
-	if args[0] == boolexp.Null {
+	if args[0] == eql.Null {
 		return false, nil
 	}
 
@@ -138,7 +136,7 @@ func hasAny(env *env, args []interface{}) (interface{}, error) {
 	return false, nil
 }
 
-func withEnv(env *env, method envFunc) boolexp.CallFunc {
+func withEnv(env *env, method envFunc) eql.CallFunc {
 	return func(args []interface{}) (interface{}, error) {
 		return method(env, args)
 	}

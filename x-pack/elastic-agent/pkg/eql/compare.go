@@ -2,9 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package boolexp
+package eql
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type operand interface{}
 
@@ -58,6 +61,42 @@ func compareEQ(left, right operand) (bool, error) {
 			return true, nil
 		}
 		return false, nil
+	case []interface{}:
+		rV, ok := right.([]interface{})
+		if !ok {
+			return false, nil
+		}
+		if len(v) != len(rV) {
+			return false, nil
+		}
+		for i := range v {
+			b, err := compareEQ(v[i], rV[i])
+			if err != nil {
+				return false, err
+			}
+			if !b {
+				return false, nil
+			}
+		}
+		return true, nil
+	case map[string]interface{}:
+		rV, ok := right.(map[string]interface{})
+		if !ok {
+			return false, nil
+		}
+		if !keysEqual(v, rV) {
+			return false, nil
+		}
+		for i := range v {
+			b, err := compareEQ(v[i], rV[i])
+			if err != nil {
+				return false, err
+			}
+			if !b {
+				return false, nil
+			}
+		}
+		return true, nil
 	default:
 		return false, fmt.Errorf(
 			"compare: ==, incompatible type to compare, left=%T, right=%T",
@@ -115,6 +154,42 @@ func compareNEQ(left, right operand) (bool, error) {
 			return false, nil
 		}
 		return true, nil
+	case []interface{}:
+		rV, ok := right.([]interface{})
+		if !ok {
+			return true, nil
+		}
+		if len(v) != len(rV) {
+			return true, nil
+		}
+		for i := range v {
+			b, err := compareNEQ(v[i], rV[i])
+			if err != nil {
+				return false, err
+			}
+			if b {
+				return true, nil
+			}
+		}
+		return false, nil
+	case map[string]interface{}:
+		rV, ok := right.(map[string]interface{})
+		if !ok {
+			return true, nil
+		}
+		if !keysEqual(v, rV) {
+			return true, nil
+		}
+		for i := range v {
+			b, err := compareNEQ(v[i], rV[i])
+			if err != nil {
+				return false, err
+			}
+			if b {
+				return true, nil
+			}
+		}
+		return false, nil
 	default:
 		return false, fmt.Errorf(
 			"compare: !=, incompatible type to compare, left=%T, right=%T",
@@ -280,4 +355,29 @@ func logicalAND(left, right operand) (bool, error) {
 
 func logicalOR(left, right operand) (bool, error) {
 	return left.(bool) == true || right.(bool), nil
+}
+
+func keys(v map[string]interface{}) []string {
+	ks := make([]string, len(v))
+	i := 0
+	for k := range v {
+		ks[i] = k
+		i++
+	}
+	sort.Strings(ks)
+	return ks
+}
+
+func keysEqual(v1, v2 map[string]interface{}) bool {
+	ks1 := keys(v1)
+	ks2 := keys(v2)
+	if len(ks1) != len(ks2) {
+		return false
+	}
+	for i, v := range ks1 {
+		if v != ks2[i] {
+			return false
+		}
+	}
+	return true
 }
