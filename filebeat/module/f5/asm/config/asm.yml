@@ -33,9 +33,8 @@ exclude_files: [".gz$"]
 
 fields:
   observer:
-    vendor: "F5"
+    vendor: "F5 Networks"
     product: "Big-IP"
-    type: "ASM"
 
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
@@ -44,4 +43,4 @@ processors:
 - add_fields:
     target: ''
     fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

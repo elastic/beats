@@ -1,18 +1,61 @@
-description: Pipeline for parsing checkpoint firewall logs
+description: Pipeline for parsing F5 ASM web application firewall logs
+
+on_failure:
+- 
+  set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+
 processors:
+-
+  set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - 
   grok:
     field: message
     patterns:
-    - '%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-)
-    +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
-    +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
-    +\[%{GREEDYDATA:syslog5424_content}\]$'
+    - '^<%{NONNEGINT:syslog5424_ver}>+(?:%{SYSLOGTIMESTAMP:syslog5424_ts}|-) +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{WORD:syslog5424_app}):%{GREEDYDATA:syslog5424_content}$'
 -
   grok:
     field: syslog5424_content
     patterns:
-    - 'ASM:%{DATA:asm_version}###%{DATA}###%{DATA}###%{DATA:source_port}###%{DATA:destination_ip}###%{DATA:destination_port}###%{DATA:protocol}###%{DATA:method}###%{DATA:uri}###%{DATA:source_ip}###%{DATA:event_result}###%{DATA:support_id}###%{DATA}###${DATA:policy-name}############${DATA:request}###${DATA:reason}###'
+    - '^"%{IP:source.ip}"###"%{DATA:client.country}"###"%{DATA}"###"%{DATA:source.port}"###"%{IP:destination.ip}"###"%{DATA:destination.port}"###"%{DATA:network.protocol}"###"%{WORD:http.request.method}"###"%{DATA:uri}"###"%{IP:source.ip}"###"%{WORD:result}"###"%{DATA:event.id}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:rule.name}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:request}"###"%{DATA:event.reason}"###""$'
+-
+  set:
+    field: event.module
+    value: 'f5'
+-
+  set:
+    field: event.kind
+    value: '{{syslog5424_app}}'
+-
+  set:
+    field: event.category
+    value: network
+-
+  set:
+    field: observer.vendor
+    value: F5 Networks
+-
+  set:
+    field: observer.type
+    value: firewall
+-
+  set:
+    field: event.outcome
+    value: success
+    if: '[''passed'',''alerted''].contains(ctx.result)'
+-
+  set:
+    field: event.outcome
+    value: failure
+    if: '[''blocked''].contains(ctx.result)'
+-
+  set:
+    field: event.outcome
+    value: unknown
+    if: ctx.event?.outcome == null
 -
   remove:
     ignore_missing: true
@@ -27,25 +70,6 @@ processors:
     - syslog5424_ver
     - message
     - host
--
-  set:
-    field: '@timestamp'
-    value: '{{syslog5424_ts}}'
--
-  set:
-    field: event.module
-    value: F5
--
-  set:
-    field: event.category
-    value: network
--
-  set:
-    field: observer.vendor
-    value: F5 Networks
--
-  set:
-    field: observer.type
-    value: firewall
--
-  
+    - request
+    - client.country
+    - result

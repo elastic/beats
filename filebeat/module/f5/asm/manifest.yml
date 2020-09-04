@@ -20,5 +20,7 @@ var:
 - name: pipeline
   default: ""
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+- ingest/pipeline.yml
+
 input: config/asm.yml

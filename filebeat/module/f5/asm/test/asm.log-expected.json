@@ -1,6 +1,21 @@
 [
     {
-        "@timestamp": "Aug 24 15:32:06"
-        
+        "@timestamp": "Aug 24 15:32:06",
+        "event.module": "f5",
+        "event.kind": "ASM",
+        "event.category": "network",
+        "observer.vendor": "F5 Networks",
+        "observer.type": "firewall",
+        "client.address": "xxx",
+        "client.ip": "xxx",
+        "client.port": "52620",
+        "destination.ip": "2.170.237.22",
+        "destination.port": "443",
+        "network.protocol": "https",
+        "http.request.method": "GET",
+        "event.outcome": "success",
+        "event.id": "10064012564865874907",
+        "rule.name": "/Common/live-nmiv-asm-policy",
+        "event.reason": "Logging rate limit reached"
     }
 ]
