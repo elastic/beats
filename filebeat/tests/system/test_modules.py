@@ -246,6 +246,7 @@ def clean_keys(obj):
         "netscout.sightline",
         "proofpoint.emailsecurity",
         "redis.log",
+        "snort.log",
         "symantec.endpointprotection",
         "system.auth",
         "system.syslog",
