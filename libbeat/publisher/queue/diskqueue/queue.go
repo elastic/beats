@@ -34,9 +34,6 @@ import (
 // Settings contains the configuration fields to create a new disk queue
 // or open an existing one.
 type Settings struct {
-	// The destination for log messages related to the disk queue.
-	Logger *logp.Logger
-
 	// The path on disk of the queue's containing directory, which will be
 	// created if it doesn't exist. Within the directory, the queue's state
 	// is stored in state.dat and each segment's data is stored in
@@ -56,7 +53,7 @@ type Settings struct {
 
 	// A listener that receives ACKs when events are written to the queue's
 	// disk buffer.
-	WriteToDiskACKListener queue.ACKListener
+	//producerACKListener queue.ACKListener
 
 	ChecksumType ChecksumType
 }
@@ -87,6 +84,7 @@ type diskQueueOutput struct {
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
 type diskQueue struct {
+	logger   *logp.Logger
 	settings Settings
 
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
@@ -203,19 +201,14 @@ func queueFactory(
 	if err != nil {
 		return nil, err
 	}
-	settings.Logger = logger
-	// For now, incoming messages are acked when they are written to disk
-	// (rather than transmitted to the output, as with the memory queue). This
-	// can produce unexpected behavior in some contexts and we might want to
-	// make it configurable later.
-	settings.WriteToDiskACKListener = ackListener
-	return NewQueue(settings)
+	//settings.producerAckListener = ackListener
+	return NewQueue(logger, settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(settings Settings) (queue.Queue, error) {
-	settings.Logger.Debugf(
+func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
+	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
 
 	// Create the given directory path if it doesn't exist.
@@ -264,7 +257,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	}()
 
 	writerLoop := &writerLoop{
-		logger:       settings.Logger,
+		logger:       logger,
 		requestChan:  make(chan writeRequest, 1),
 		responseChan: make(chan writeResponse),
 	}
@@ -284,6 +277,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	}()
 
 	queue := &diskQueue{
+		logger:    logger,
 		settings:  settings,
 		stateFile: stateFile,
 		segments: &diskQueueSegments{

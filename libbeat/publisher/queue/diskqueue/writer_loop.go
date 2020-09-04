@@ -110,7 +110,7 @@ func (wl *writerLoop) processRequest(request writeRequest) []*queueSegment {
 		// TODO: retry forever if there is an error or n isn't the right
 		// length.
 		if err != nil {
-			wl.logger.Errorf("Couldn't write pending data to output file: %w", err)
+			wl.logger.Errorf("Couldn't write pending data to disk: %w", err)
 		}
 	}
 	return completedSegments

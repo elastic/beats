@@ -248,7 +248,7 @@ func (cl *coreLoop) handleDeleteResponse(response *deleteResponse) {
 		dq.segments.acked = newAckedSegments
 	}
 	if len(response.errors) > 0 {
-		dq.settings.Logger.Errorw("Couldn't delete old segment files",
+		dq.logger.Errorw("Couldn't delete old segment files",
 			"errors", response.errors)
 	}
 	// If there are still files to delete, send the next request.
@@ -306,7 +306,7 @@ func (cl *coreLoop) handleShutdown() {
 		// We can't retry any more if deletion failed, but we still check the
 		// response so we can log any errors.
 		if len(response.errors) > 0 {
-			cl.queue.settings.Logger.Errorw("Couldn't delete old segment files",
+			cl.queue.logger.Errorw("Couldn't delete old segment files",
 				"errors", response.errors)
 		}
 	}
