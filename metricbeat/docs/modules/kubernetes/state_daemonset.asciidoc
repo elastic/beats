@@ -5,8 +5,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-kubernetes-state_daemonset]]
 === Kubernetes state_daemonset metricset
 
-experimental[]
-
 include::../../../module/kubernetes/state_daemonset/_meta/docs.asciidoc[]
 
 
