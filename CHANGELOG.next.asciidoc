@@ -631,6 +631,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
+- Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 
 *Heartbeat*
 
