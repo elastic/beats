@@ -750,6 +750,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
+- Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 
 *Packetbeat*

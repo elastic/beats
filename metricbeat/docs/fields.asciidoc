@@ -19867,6 +19867,48 @@ type: object
 --
 
 [float]
+=== billing
+
+Google Cloud Billing metrics
+
+
+*`googlecloud.billing.cost_type`*::
++
+--
+Cost types include regular, tax, adjustment, and rounding_error.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.invoice_month`*::
++
+--
+Billing report month.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.project_id`*::
++
+--
+Project ID of the billing report belongs to.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.total`*::
++
+--
+Total billing amount.
+
+type: float
+
+--
+
+[float]
 === compute
 
 Google Cloud Compute metrics
