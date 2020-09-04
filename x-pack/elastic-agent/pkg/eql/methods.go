@@ -13,23 +13,26 @@ var methods = map[string]callFunc{
 	// array
 	"arrayContains": arrayContains,
 
+	// dict
+	"hasKey": hasKey,
+
 	// length:
 	"length": length,
 
 	// math
-	"add": add,
+	"add":      add,
 	"subtract": subtract,
 	"multiply": multiply,
-	"divide": divide,
-	"modulo": modulo,
+	"divide":   divide,
+	"modulo":   modulo,
 
 	// str
-	"concat": concat,
-	"endsWith": endsWith,
-	"indexOf": indexOf,
-	"match": match,
-	"number": number,
-	"startsWith": startsWith,
-	"string": str,
+	"concat":         concat,
+	"endsWith":       endsWith,
+	"indexOf":        indexOf,
+	"match":          match,
+	"number":         number,
+	"startsWith":     startsWith,
+	"string":         str,
 	"stringContains": stringContains,
 }

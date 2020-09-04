@@ -203,14 +203,25 @@ func TestEql(t *testing.T) {
 		{expression: "arrayContains([true, 1, 3.5, 'str'], 'str')", result: true},
 		{expression: "arrayContains([true, 1, 3.5, 'str'], 'str2')", result: false},
 		{expression: "arrayContains([true, 1, 3.5, 'str'], 'str2', 3.5)", result: true},
+		{expression: "arrayContains(${null.data}, 'str2', 3.5)", result: false},
 		{expression: "arrayContains(${data.array}, 'array5', 'array2')", result: true},
 		{expression: "arrayContains('not array', 'str2')", err: true},
+
+		// methods dict
+		{expression: "hasKey({key1: 'val1', key2: 'val2'}, 'key2')", result: true},
+		{expression: "hasKey({key1: 'val1', key2: 'val2'}, 'other', 'key1')", result: true},
+		{expression: "hasKey({key1: 'val1', key2: 'val2'}, 'missing', 'still')", result: false},
+		{expression: "hasKey(${data.dict}, 'key3', 'still')", result: true},
+		{expression: "hasKey(${null}, 'key3', 'still')", result: false},
+		{expression: "hasKey(${data.dict})", err: true},
+		{expression: "hasKey(${data.array}, 'not present')", err: true},
 
 		// methods length
 		{expression: "length('hello') == 5", result: true},
 		{expression: "length([true, 1, 3.5, 'str']) == 4", result: true},
 		{expression: "length({key: 'data', other: '2'}) == 2", result: true},
 		{expression: "length(${data.dict}) == 3", result: true},
+		{expression: "length(${null}) == 0", result: true},
 		{expression: "length(4) == 2", err: true},
 		{expression: "length('hello', 'too many args') == 2", err: true},
 
@@ -290,8 +301,8 @@ func TestEql(t *testing.T) {
 	store := &testVarStore{
 		vars: map[string]interface{}{
 			"env.HOSTNAME": "my-hostname",
-			"host.name": "host-name",
-			"data.array": []interface{}{"array1", "array2", "array3"},
+			"host.name":    "host-name",
+			"data.array":   []interface{}{"array1", "array2", "array3"},
 			"data.dict": map[string]interface{}{
 				"key1": "dict1",
 				"key2": "dict2",

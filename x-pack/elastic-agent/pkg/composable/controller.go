@@ -21,7 +21,7 @@ import (
 )
 
 // VarsCallback is callback called when the current vars state changes.
-type VarsCallback func([]transpiler.Vars)
+type VarsCallback func([]*transpiler.Vars)
 
 // Controller manages the state of the providers current context.
 type Controller interface {
@@ -84,7 +84,7 @@ func New(c *config.Config) (Controller, error) {
 		}
 		dynamicProviders[name] = &dynamicProviderState{
 			provider: provider,
-			mappings: map[string]transpiler.Vars{},
+			mappings: map[string]dynamicProviderMapping{},
 		}
 	}
 
@@ -147,25 +147,22 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 			}
 
 			// build the vars list of mappings
-			vars := make([]transpiler.Vars, 1)
+			vars := make([]*transpiler.Vars, 1)
 			mapping := map[string]interface{}{}
 			for name, state := range c.contextProviders {
 				mapping[name] = state.Current()
 			}
-			vars[0] = transpiler.Vars{
-				Mapping: mapping,
-			}
+			// this is ensured not to error, by how the mappings states are verified
+			vars[0], _ = transpiler.NewVars(mapping)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
 				for _, mappings := range state.Mappings() {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
-					local[name] = mappings.Mapping
-					vars = append(vars, transpiler.Vars{
-						Mapping:       local,
-						ProcessorsKey: name,
-						Processors:    mappings.Processors,
-					})
+					local[name] = mappings.mapping
+					// this is ensured not to error, by how the mappings states are verified
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors)
+					vars = append(vars, v)
 				}
 			}
 
@@ -193,6 +190,11 @@ func (c *contextProviderState) Set(mapping map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+	// ensure creating vars will not error
+	_, err = transpiler.NewVars(mapping)
+	if err != nil {
+		return err
+	}
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -213,12 +215,17 @@ func (c *contextProviderState) Current() map[string]interface{} {
 	return c.mapping
 }
 
+type dynamicProviderMapping struct {
+	mapping    map[string]interface{}
+	processors transpiler.Processors
+}
+
 type dynamicProviderState struct {
 	context.Context
 
 	provider DynamicProvider
 	lock     sync.RWMutex
-	mappings map[string]transpiler.Vars
+	mappings map[string]dynamicProviderMapping
 	signal   chan bool
 }
 
@@ -233,17 +240,22 @@ func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interfa
 	if err != nil {
 		return err
 	}
+	// ensure creating vars will not error
+	_, err = transpiler.NewVars(mapping)
+	if err != nil {
+		return err
+	}
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	curr, ok := c.mappings[id]
-	if ok && reflect.DeepEqual(curr.Mapping, mapping) && reflect.DeepEqual(curr.Processors, processors) {
+	if ok && reflect.DeepEqual(curr.mapping, mapping) && reflect.DeepEqual(curr.processors, processors) {
 		// same mapping; no need to update and signal
 		return nil
 	}
-	c.mappings[id] = transpiler.Vars{
-		Mapping:    mapping,
-		Processors: processors,
+	c.mappings[id] = dynamicProviderMapping{
+		mapping:    mapping,
+		processors: processors,
 	}
 	c.signal <- true
 	return nil
@@ -262,11 +274,11 @@ func (c *dynamicProviderState) Remove(id string) {
 }
 
 // Mappings returns the current mappings.
-func (c *dynamicProviderState) Mappings() []transpiler.Vars {
+func (c *dynamicProviderState) Mappings() []dynamicProviderMapping {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	mappings := make([]transpiler.Vars, 0)
+	mappings := make([]dynamicProviderMapping, 0)
 	ids := make([]string, 0)
 	for name := range c.mappings {
 		ids = append(ids, name)

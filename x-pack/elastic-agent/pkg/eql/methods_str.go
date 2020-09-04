@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package eql
 
 import (
@@ -70,7 +74,7 @@ func match(args []interface{}) (interface{}, error) {
 				return true, nil
 			}
 		default:
-			return nil, fmt.Errorf("match: argument %d must be a string; recieved %T", i + 1, reg)
+			return nil, fmt.Errorf("match: argument %d must be a string; recieved %T", i+1, reg)
 		}
 	}
 	return false, nil
@@ -140,6 +144,8 @@ func stringContains(args []interface{}) (interface{}, error) {
 
 func toString(arg interface{}) string {
 	switch a := arg.(type) {
+	case *null:
+		return "null"
 	case string:
 		return a
 	case int:

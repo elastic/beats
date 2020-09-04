@@ -48,7 +48,8 @@ constant
 ;
 
 variable
-: VNAME
+: NAME
+| VNAME
 | constant
 ;
 

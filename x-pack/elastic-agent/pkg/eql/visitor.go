@@ -26,8 +26,8 @@ var Null = &null{}
 
 type expVisitor struct {
 	antlr.ParseTreeVisitor
-	err        error
-	vars       VarStore
+	err  error
+	vars VarStore
 }
 
 func (v *expVisitor) Visit(tree antlr.ParseTree) interface{} {
@@ -275,8 +275,13 @@ func (v *expVisitor) VisitVariable(ctx *parser.VariableContext) interface{} {
 		return nil
 	}
 
-	variable := ctx.VNAME().GetText()
-	val, ok := v.vars.Lookup(variable)
+	var name string
+	if ctx.NAME() != nil {
+		name = ctx.NAME().GetText()
+	} else if ctx.VNAME() != nil {
+		name = ctx.VNAME().GetText()
+	}
+	val, ok := v.vars.Lookup(name)
 	if !ok {
 		return Null
 	}
@@ -390,7 +395,7 @@ func toFloat(ctx parserContext) (float64, error) {
 }
 
 type dictKey struct {
-	key string
+	key   string
 	value interface{}
 }
 

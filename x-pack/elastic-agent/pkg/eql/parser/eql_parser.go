@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 // Code generated from Eql.g4 by ANTLR 4.7.1. DO NOT EDIT.
 
 package parser // Eql
@@ -16,71 +20,71 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 35, 143,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 35, 144,
 	4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7,
 	4, 8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 3, 2, 3, 2, 3, 2, 3,
-	3, 3, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 5, 4, 33, 10, 4, 3, 5, 3, 5, 5,
-	5, 37, 10, 5, 3, 6, 3, 6, 3, 6, 7, 6, 42, 10, 6, 12, 6, 14, 6, 45, 11,
-	6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3,
-	7, 3, 7, 3, 7, 3, 7, 5, 7, 62, 10, 7, 3, 7, 3, 7, 3, 7, 5, 7, 67, 10, 7,
-	3, 7, 3, 7, 3, 7, 5, 7, 72, 10, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 78, 10,
-	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3,
-	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3,
-	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 110, 10, 7, 12, 7, 14, 7,
-	113, 11, 7, 3, 8, 3, 8, 3, 8, 7, 8, 118, 10, 8, 12, 8, 14, 8, 121, 11,
-	8, 3, 9, 3, 9, 3, 9, 7, 9, 126, 10, 9, 12, 9, 14, 9, 129, 11, 9, 3, 10,
-	3, 10, 3, 10, 3, 10, 3, 11, 3, 11, 3, 11, 7, 11, 138, 10, 11, 12, 11, 14,
-	11, 141, 11, 11, 3, 11, 2, 3, 12, 12, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20,
+	3, 3, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 5, 4, 33, 10, 4, 3, 5, 3, 5, 3,
+	5, 5, 5, 38, 10, 5, 3, 6, 3, 6, 3, 6, 7, 6, 43, 10, 6, 12, 6, 14, 6, 46,
+	11, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7,
+	3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 63, 10, 7, 3, 7, 3, 7, 3, 7, 5, 7, 68, 10,
+	7, 3, 7, 3, 7, 3, 7, 5, 7, 73, 10, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 79,
+	10, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7,
+	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7,
+	3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 111, 10, 7, 12, 7, 14,
+	7, 114, 11, 7, 3, 8, 3, 8, 3, 8, 7, 8, 119, 10, 8, 12, 8, 14, 8, 122, 11,
+	8, 3, 9, 3, 9, 3, 9, 7, 9, 127, 10, 9, 12, 9, 14, 9, 130, 11, 9, 3, 10,
+	3, 10, 3, 10, 3, 10, 3, 11, 3, 11, 3, 11, 7, 11, 139, 10, 11, 12, 11, 14,
+	11, 142, 11, 11, 3, 11, 2, 3, 12, 12, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20,
 	2, 7, 3, 2, 19, 20, 3, 2, 27, 28, 3, 2, 14, 16, 3, 2, 12, 13, 4, 2, 25,
-	25, 27, 28, 2, 163, 2, 22, 3, 2, 2, 2, 4, 25, 3, 2, 2, 2, 6, 32, 3, 2,
-	2, 2, 8, 36, 3, 2, 2, 2, 10, 38, 3, 2, 2, 2, 12, 77, 3, 2, 2, 2, 14, 114,
-	3, 2, 2, 2, 16, 122, 3, 2, 2, 2, 18, 130, 3, 2, 2, 2, 20, 134, 3, 2, 2,
+	25, 27, 28, 2, 165, 2, 22, 3, 2, 2, 2, 4, 25, 3, 2, 2, 2, 6, 32, 3, 2,
+	2, 2, 8, 37, 3, 2, 2, 2, 10, 39, 3, 2, 2, 2, 12, 78, 3, 2, 2, 2, 14, 115,
+	3, 2, 2, 2, 16, 123, 3, 2, 2, 2, 18, 131, 3, 2, 2, 2, 20, 135, 3, 2, 2,
 	2, 22, 23, 5, 12, 7, 2, 23, 24, 7, 2, 2, 3, 24, 3, 3, 2, 2, 2, 25, 26,
 	9, 2, 2, 2, 26, 5, 3, 2, 2, 2, 27, 33, 7, 27, 2, 2, 28, 33, 7, 28, 2, 2,
 	29, 33, 7, 21, 2, 2, 30, 33, 7, 22, 2, 2, 31, 33, 5, 4, 3, 2, 32, 27, 3,
 	2, 2, 2, 32, 28, 3, 2, 2, 2, 32, 29, 3, 2, 2, 2, 32, 30, 3, 2, 2, 2, 32,
-	31, 3, 2, 2, 2, 33, 7, 3, 2, 2, 2, 34, 37, 7, 26, 2, 2, 35, 37, 5, 6, 4,
-	2, 36, 34, 3, 2, 2, 2, 36, 35, 3, 2, 2, 2, 37, 9, 3, 2, 2, 2, 38, 43, 5,
-	8, 5, 2, 39, 40, 7, 3, 2, 2, 40, 42, 5, 8, 5, 2, 41, 39, 3, 2, 2, 2, 42,
-	45, 3, 2, 2, 2, 43, 41, 3, 2, 2, 2, 43, 44, 3, 2, 2, 2, 44, 11, 3, 2, 2,
-	2, 45, 43, 3, 2, 2, 2, 46, 47, 8, 7, 1, 2, 47, 48, 7, 29, 2, 2, 48, 49,
-	5, 12, 7, 2, 49, 50, 7, 30, 2, 2, 50, 78, 3, 2, 2, 2, 51, 52, 7, 24, 2,
-	2, 52, 78, 5, 12, 7, 19, 53, 78, 5, 4, 3, 2, 54, 55, 7, 35, 2, 2, 55, 56,
-	5, 10, 6, 2, 56, 57, 7, 34, 2, 2, 57, 78, 3, 2, 2, 2, 58, 59, 7, 25, 2,
-	2, 59, 61, 7, 29, 2, 2, 60, 62, 5, 14, 8, 2, 61, 60, 3, 2, 2, 2, 61, 62,
-	3, 2, 2, 2, 62, 63, 3, 2, 2, 2, 63, 78, 7, 30, 2, 2, 64, 66, 7, 31, 2,
-	2, 65, 67, 5, 16, 9, 2, 66, 65, 3, 2, 2, 2, 66, 67, 3, 2, 2, 2, 67, 68,
-	3, 2, 2, 2, 68, 78, 7, 32, 2, 2, 69, 71, 7, 33, 2, 2, 70, 72, 5, 20, 11,
-	2, 71, 70, 3, 2, 2, 2, 71, 72, 3, 2, 2, 2, 72, 73, 3, 2, 2, 2, 73, 78,
-	7, 34, 2, 2, 74, 78, 9, 3, 2, 2, 75, 78, 7, 21, 2, 2, 76, 78, 7, 22, 2,
-	2, 77, 46, 3, 2, 2, 2, 77, 51, 3, 2, 2, 2, 77, 53, 3, 2, 2, 2, 77, 54,
-	3, 2, 2, 2, 77, 58, 3, 2, 2, 2, 77, 64, 3, 2, 2, 2, 77, 69, 3, 2, 2, 2,
-	77, 74, 3, 2, 2, 2, 77, 75, 3, 2, 2, 2, 77, 76, 3, 2, 2, 2, 78, 111, 3,
-	2, 2, 2, 79, 80, 12, 21, 2, 2, 80, 81, 9, 4, 2, 2, 81, 110, 5, 12, 7, 22,
-	82, 83, 12, 20, 2, 2, 83, 84, 9, 5, 2, 2, 84, 110, 5, 12, 7, 21, 85, 86,
-	12, 18, 2, 2, 86, 87, 7, 6, 2, 2, 87, 110, 5, 12, 7, 19, 88, 89, 12, 17,
-	2, 2, 89, 90, 7, 7, 2, 2, 90, 110, 5, 12, 7, 18, 91, 92, 12, 16, 2, 2,
-	92, 93, 7, 11, 2, 2, 93, 110, 5, 12, 7, 17, 94, 95, 12, 15, 2, 2, 95, 96,
-	7, 10, 2, 2, 96, 110, 5, 12, 7, 16, 97, 98, 12, 14, 2, 2, 98, 99, 7, 9,
-	2, 2, 99, 110, 5, 12, 7, 15, 100, 101, 12, 13, 2, 2, 101, 102, 7, 8, 2,
-	2, 102, 110, 5, 12, 7, 14, 103, 104, 12, 12, 2, 2, 104, 105, 7, 17, 2,
-	2, 105, 110, 5, 12, 7, 13, 106, 107, 12, 11, 2, 2, 107, 108, 7, 18, 2,
-	2, 108, 110, 5, 12, 7, 12, 109, 79, 3, 2, 2, 2, 109, 82, 3, 2, 2, 2, 109,
-	85, 3, 2, 2, 2, 109, 88, 3, 2, 2, 2, 109, 91, 3, 2, 2, 2, 109, 94, 3, 2,
-	2, 2, 109, 97, 3, 2, 2, 2, 109, 100, 3, 2, 2, 2, 109, 103, 3, 2, 2, 2,
-	109, 106, 3, 2, 2, 2, 110, 113, 3, 2, 2, 2, 111, 109, 3, 2, 2, 2, 111,
-	112, 3, 2, 2, 2, 112, 13, 3, 2, 2, 2, 113, 111, 3, 2, 2, 2, 114, 119, 5,
-	12, 7, 2, 115, 116, 7, 4, 2, 2, 116, 118, 5, 12, 7, 2, 117, 115, 3, 2,
-	2, 2, 118, 121, 3, 2, 2, 2, 119, 117, 3, 2, 2, 2, 119, 120, 3, 2, 2, 2,
-	120, 15, 3, 2, 2, 2, 121, 119, 3, 2, 2, 2, 122, 127, 5, 6, 4, 2, 123, 124,
-	7, 4, 2, 2, 124, 126, 5, 6, 4, 2, 125, 123, 3, 2, 2, 2, 126, 129, 3, 2,
-	2, 2, 127, 125, 3, 2, 2, 2, 127, 128, 3, 2, 2, 2, 128, 17, 3, 2, 2, 2,
-	129, 127, 3, 2, 2, 2, 130, 131, 9, 6, 2, 2, 131, 132, 7, 5, 2, 2, 132,
-	133, 5, 6, 4, 2, 133, 19, 3, 2, 2, 2, 134, 139, 5, 18, 10, 2, 135, 136,
-	7, 4, 2, 2, 136, 138, 5, 18, 10, 2, 137, 135, 3, 2, 2, 2, 138, 141, 3,
-	2, 2, 2, 139, 137, 3, 2, 2, 2, 139, 140, 3, 2, 2, 2, 140, 21, 3, 2, 2,
-	2, 141, 139, 3, 2, 2, 2, 14, 32, 36, 43, 61, 66, 71, 77, 109, 111, 119,
-	127, 139,
+	31, 3, 2, 2, 2, 33, 7, 3, 2, 2, 2, 34, 38, 7, 25, 2, 2, 35, 38, 7, 26,
+	2, 2, 36, 38, 5, 6, 4, 2, 37, 34, 3, 2, 2, 2, 37, 35, 3, 2, 2, 2, 37, 36,
+	3, 2, 2, 2, 38, 9, 3, 2, 2, 2, 39, 44, 5, 8, 5, 2, 40, 41, 7, 3, 2, 2,
+	41, 43, 5, 8, 5, 2, 42, 40, 3, 2, 2, 2, 43, 46, 3, 2, 2, 2, 44, 42, 3,
+	2, 2, 2, 44, 45, 3, 2, 2, 2, 45, 11, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 47,
+	48, 8, 7, 1, 2, 48, 49, 7, 29, 2, 2, 49, 50, 5, 12, 7, 2, 50, 51, 7, 30,
+	2, 2, 51, 79, 3, 2, 2, 2, 52, 53, 7, 24, 2, 2, 53, 79, 5, 12, 7, 19, 54,
+	79, 5, 4, 3, 2, 55, 56, 7, 35, 2, 2, 56, 57, 5, 10, 6, 2, 57, 58, 7, 34,
+	2, 2, 58, 79, 3, 2, 2, 2, 59, 60, 7, 25, 2, 2, 60, 62, 7, 29, 2, 2, 61,
+	63, 5, 14, 8, 2, 62, 61, 3, 2, 2, 2, 62, 63, 3, 2, 2, 2, 63, 64, 3, 2,
+	2, 2, 64, 79, 7, 30, 2, 2, 65, 67, 7, 31, 2, 2, 66, 68, 5, 16, 9, 2, 67,
+	66, 3, 2, 2, 2, 67, 68, 3, 2, 2, 2, 68, 69, 3, 2, 2, 2, 69, 79, 7, 32,
+	2, 2, 70, 72, 7, 33, 2, 2, 71, 73, 5, 20, 11, 2, 72, 71, 3, 2, 2, 2, 72,
+	73, 3, 2, 2, 2, 73, 74, 3, 2, 2, 2, 74, 79, 7, 34, 2, 2, 75, 79, 9, 3,
+	2, 2, 76, 79, 7, 21, 2, 2, 77, 79, 7, 22, 2, 2, 78, 47, 3, 2, 2, 2, 78,
+	52, 3, 2, 2, 2, 78, 54, 3, 2, 2, 2, 78, 55, 3, 2, 2, 2, 78, 59, 3, 2, 2,
+	2, 78, 65, 3, 2, 2, 2, 78, 70, 3, 2, 2, 2, 78, 75, 3, 2, 2, 2, 78, 76,
+	3, 2, 2, 2, 78, 77, 3, 2, 2, 2, 79, 112, 3, 2, 2, 2, 80, 81, 12, 21, 2,
+	2, 81, 82, 9, 4, 2, 2, 82, 111, 5, 12, 7, 22, 83, 84, 12, 20, 2, 2, 84,
+	85, 9, 5, 2, 2, 85, 111, 5, 12, 7, 21, 86, 87, 12, 18, 2, 2, 87, 88, 7,
+	6, 2, 2, 88, 111, 5, 12, 7, 19, 89, 90, 12, 17, 2, 2, 90, 91, 7, 7, 2,
+	2, 91, 111, 5, 12, 7, 18, 92, 93, 12, 16, 2, 2, 93, 94, 7, 11, 2, 2, 94,
+	111, 5, 12, 7, 17, 95, 96, 12, 15, 2, 2, 96, 97, 7, 10, 2, 2, 97, 111,
+	5, 12, 7, 16, 98, 99, 12, 14, 2, 2, 99, 100, 7, 9, 2, 2, 100, 111, 5, 12,
+	7, 15, 101, 102, 12, 13, 2, 2, 102, 103, 7, 8, 2, 2, 103, 111, 5, 12, 7,
+	14, 104, 105, 12, 12, 2, 2, 105, 106, 7, 17, 2, 2, 106, 111, 5, 12, 7,
+	13, 107, 108, 12, 11, 2, 2, 108, 109, 7, 18, 2, 2, 109, 111, 5, 12, 7,
+	12, 110, 80, 3, 2, 2, 2, 110, 83, 3, 2, 2, 2, 110, 86, 3, 2, 2, 2, 110,
+	89, 3, 2, 2, 2, 110, 92, 3, 2, 2, 2, 110, 95, 3, 2, 2, 2, 110, 98, 3, 2,
+	2, 2, 110, 101, 3, 2, 2, 2, 110, 104, 3, 2, 2, 2, 110, 107, 3, 2, 2, 2,
+	111, 114, 3, 2, 2, 2, 112, 110, 3, 2, 2, 2, 112, 113, 3, 2, 2, 2, 113,
+	13, 3, 2, 2, 2, 114, 112, 3, 2, 2, 2, 115, 120, 5, 12, 7, 2, 116, 117,
+	7, 4, 2, 2, 117, 119, 5, 12, 7, 2, 118, 116, 3, 2, 2, 2, 119, 122, 3, 2,
+	2, 2, 120, 118, 3, 2, 2, 2, 120, 121, 3, 2, 2, 2, 121, 15, 3, 2, 2, 2,
+	122, 120, 3, 2, 2, 2, 123, 128, 5, 6, 4, 2, 124, 125, 7, 4, 2, 2, 125,
+	127, 5, 6, 4, 2, 126, 124, 3, 2, 2, 2, 127, 130, 3, 2, 2, 2, 128, 126,
+	3, 2, 2, 2, 128, 129, 3, 2, 2, 2, 129, 17, 3, 2, 2, 2, 130, 128, 3, 2,
+	2, 2, 131, 132, 9, 6, 2, 2, 132, 133, 7, 5, 2, 2, 133, 134, 5, 6, 4, 2,
+	134, 19, 3, 2, 2, 2, 135, 140, 5, 18, 10, 2, 136, 137, 7, 4, 2, 2, 137,
+	139, 5, 18, 10, 2, 138, 136, 3, 2, 2, 2, 139, 142, 3, 2, 2, 2, 140, 138,
+	3, 2, 2, 2, 140, 141, 3, 2, 2, 2, 141, 21, 3, 2, 2, 2, 142, 140, 3, 2,
+	2, 2, 14, 32, 37, 44, 62, 67, 72, 78, 110, 112, 120, 128, 140,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
@@ -605,6 +609,10 @@ func NewVariableContext(parser antlr.Parser, parent antlr.ParserRuleContext, inv
 
 func (s *VariableContext) GetParser() antlr.Parser { return s.parser }
 
+func (s *VariableContext) NAME() antlr.TerminalNode {
+	return s.GetToken(EqlParserNAME, 0)
+}
+
 func (s *VariableContext) VNAME() antlr.TerminalNode {
 	return s.GetToken(EqlParserVNAME, 0)
 }
@@ -669,21 +677,28 @@ func (p *EqlParser) Variable() (localctx IVariableContext) {
 		}
 	}()
 
-	p.SetState(34)
+	p.SetState(35)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case EqlParserVNAME:
+	case EqlParserNAME:
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(32)
+			p.Match(EqlParserNAME)
+		}
+
+	case EqlParserVNAME:
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(33)
 			p.Match(EqlParserVNAME)
 		}
 
 	case EqlParserTRUE, EqlParserFALSE, EqlParserFLOAT, EqlParserNUMBER, EqlParserSTEXT, EqlParserDTEXT:
-		p.EnterOuterAlt(localctx, 2)
+		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(33)
+			p.SetState(34)
 			p.Constant()
 		}
 
@@ -808,24 +823,24 @@ func (p *EqlParser) VariableExp() (localctx IVariableExpContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(36)
+		p.SetState(37)
 		p.Variable()
 	}
-	p.SetState(41)
+	p.SetState(42)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == EqlParserT__0 {
 		{
-			p.SetState(37)
+			p.SetState(38)
 			p.Match(EqlParserT__0)
 		}
 		{
-			p.SetState(38)
+			p.SetState(39)
 			p.Variable()
 		}
 
-		p.SetState(43)
+		p.SetState(44)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
@@ -2232,7 +2247,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(75)
+	p.SetState(76)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
@@ -2242,15 +2257,15 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		_prevctx = localctx
 
 		{
-			p.SetState(45)
+			p.SetState(46)
 			p.Match(EqlParserLPAR)
 		}
 		{
-			p.SetState(46)
+			p.SetState(47)
 			p.exp(0)
 		}
 		{
-			p.SetState(47)
+			p.SetState(48)
 			p.Match(EqlParserRPAR)
 		}
 
@@ -2259,11 +2274,11 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(49)
+			p.SetState(50)
 			p.Match(EqlParserNOT)
 		}
 		{
-			p.SetState(50)
+			p.SetState(51)
 			p.exp(17)
 		}
 
@@ -2272,7 +2287,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(51)
+			p.SetState(52)
 			p.Boolean()
 		}
 
@@ -2281,15 +2296,15 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(52)
+			p.SetState(53)
 			p.Match(EqlParserBEGIN_VARIABLE)
 		}
 		{
-			p.SetState(53)
+			p.SetState(54)
 			p.VariableExp()
 		}
 		{
-			p.SetState(54)
+			p.SetState(55)
 			p.Match(EqlParserRDICT)
 		}
 
@@ -2298,26 +2313,26 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(56)
+			p.SetState(57)
 			p.Match(EqlParserNAME)
 		}
 		{
-			p.SetState(57)
+			p.SetState(58)
 			p.Match(EqlParserLPAR)
 		}
-		p.SetState(59)
+		p.SetState(60)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if ((_la-17)&-(0x1f+1)) == 0 && ((1<<uint((_la-17)))&((1<<(EqlParserTRUE-17))|(1<<(EqlParserFALSE-17))|(1<<(EqlParserFLOAT-17))|(1<<(EqlParserNUMBER-17))|(1<<(EqlParserNOT-17))|(1<<(EqlParserNAME-17))|(1<<(EqlParserSTEXT-17))|(1<<(EqlParserDTEXT-17))|(1<<(EqlParserLPAR-17))|(1<<(EqlParserLARR-17))|(1<<(EqlParserLDICT-17))|(1<<(EqlParserBEGIN_VARIABLE-17)))) != 0 {
 			{
-				p.SetState(58)
+				p.SetState(59)
 				p.Arguments()
 			}
 
 		}
 		{
-			p.SetState(61)
+			p.SetState(62)
 			p.Match(EqlParserRPAR)
 		}
 
@@ -2326,22 +2341,22 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(62)
+			p.SetState(63)
 			p.Match(EqlParserLARR)
 		}
-		p.SetState(64)
+		p.SetState(65)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<EqlParserTRUE)|(1<<EqlParserFALSE)|(1<<EqlParserFLOAT)|(1<<EqlParserNUMBER)|(1<<EqlParserSTEXT)|(1<<EqlParserDTEXT))) != 0 {
 			{
-				p.SetState(63)
+				p.SetState(64)
 				p.Array()
 			}
 
 		}
 		{
-			p.SetState(66)
+			p.SetState(67)
 			p.Match(EqlParserRARR)
 		}
 
@@ -2350,22 +2365,22 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(67)
+			p.SetState(68)
 			p.Match(EqlParserLDICT)
 		}
-		p.SetState(69)
+		p.SetState(70)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<EqlParserNAME)|(1<<EqlParserSTEXT)|(1<<EqlParserDTEXT))) != 0 {
 			{
-				p.SetState(68)
+				p.SetState(69)
 				p.Dict()
 			}
 
 		}
 		{
-			p.SetState(71)
+			p.SetState(72)
 			p.Match(EqlParserRDICT)
 		}
 
@@ -2374,7 +2389,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(72)
+			p.SetState(73)
 			_la = p.GetTokenStream().LA(1)
 
 			if !(_la == EqlParserSTEXT || _la == EqlParserDTEXT) {
@@ -2390,7 +2405,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(73)
+			p.SetState(74)
 			p.Match(EqlParserFLOAT)
 		}
 
@@ -2399,7 +2414,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(74)
+			p.SetState(75)
 			p.Match(EqlParserNUMBER)
 		}
 
@@ -2407,7 +2422,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(109)
+	p.SetState(110)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 8, p.GetParserRuleContext())
 
@@ -2417,7 +2432,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(107)
+			p.SetState(108)
 			p.GetErrorHandler().Sync(p)
 			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 7, p.GetParserRuleContext()) {
 			case 1:
@@ -2425,13 +2440,13 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticMulDivModContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(77)
+				p.SetState(78)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 19)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 19)", ""))
 				}
 				{
-					p.SetState(78)
+					p.SetState(79)
 					_la = p.GetTokenStream().LA(1)
 
 					if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<EqlParserMUL)|(1<<EqlParserDIV)|(1<<EqlParserMOD))) != 0) {
@@ -2442,7 +2457,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 					}
 				}
 				{
-					p.SetState(79)
+					p.SetState(80)
 
 					var _x = p.exp(20)
 
@@ -2454,13 +2469,13 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticAddSubContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(80)
+				p.SetState(81)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 18)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 18)", ""))
 				}
 				{
-					p.SetState(81)
+					p.SetState(82)
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == EqlParserADD || _la == EqlParserSUB) {
@@ -2471,7 +2486,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 					}
 				}
 				{
-					p.SetState(82)
+					p.SetState(83)
 
 					var _x = p.exp(19)
 
@@ -2483,17 +2498,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticEQContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(83)
+				p.SetState(84)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 16)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 16)", ""))
 				}
 				{
-					p.SetState(84)
+					p.SetState(85)
 					p.Match(EqlParserEQ)
 				}
 				{
-					p.SetState(85)
+					p.SetState(86)
 
 					var _x = p.exp(17)
 
@@ -2505,17 +2520,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticNEQContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(86)
+				p.SetState(87)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 15)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 15)", ""))
 				}
 				{
-					p.SetState(87)
+					p.SetState(88)
 					p.Match(EqlParserNEQ)
 				}
 				{
-					p.SetState(88)
+					p.SetState(89)
 
 					var _x = p.exp(16)
 
@@ -2527,17 +2542,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticLTEContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(89)
+				p.SetState(90)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 14)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 14)", ""))
 				}
 				{
-					p.SetState(90)
+					p.SetState(91)
 					p.Match(EqlParserLTE)
 				}
 				{
-					p.SetState(91)
+					p.SetState(92)
 
 					var _x = p.exp(15)
 
@@ -2549,17 +2564,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticGTEContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(92)
+				p.SetState(93)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 13)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 13)", ""))
 				}
 				{
-					p.SetState(93)
+					p.SetState(94)
 					p.Match(EqlParserGTE)
 				}
 				{
-					p.SetState(94)
+					p.SetState(95)
 
 					var _x = p.exp(14)
 
@@ -2571,17 +2586,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticLTContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(95)
+				p.SetState(96)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 12)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 12)", ""))
 				}
 				{
-					p.SetState(96)
+					p.SetState(97)
 					p.Match(EqlParserLT)
 				}
 				{
-					p.SetState(97)
+					p.SetState(98)
 
 					var _x = p.exp(13)
 
@@ -2593,17 +2608,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpArithmeticGTContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(98)
+				p.SetState(99)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 11)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 11)", ""))
 				}
 				{
-					p.SetState(99)
+					p.SetState(100)
 					p.Match(EqlParserGT)
 				}
 				{
-					p.SetState(100)
+					p.SetState(101)
 
 					var _x = p.exp(12)
 
@@ -2615,17 +2630,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpLogicalAndContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(101)
+				p.SetState(102)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 10)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 10)", ""))
 				}
 				{
-					p.SetState(102)
+					p.SetState(103)
 					p.Match(EqlParserAND)
 				}
 				{
-					p.SetState(103)
+					p.SetState(104)
 
 					var _x = p.exp(11)
 
@@ -2637,17 +2652,17 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 				localctx.(*ExpLogicalORContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, EqlParserRULE_exp)
-				p.SetState(104)
+				p.SetState(105)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
 				}
 				{
-					p.SetState(105)
+					p.SetState(106)
 					p.Match(EqlParserOR)
 				}
 				{
-					p.SetState(106)
+					p.SetState(107)
 
 					var _x = p.exp(10)
 
@@ -2657,7 +2672,7 @@ func (p *EqlParser) exp(_p int) (localctx IExpContext) {
 			}
 
 		}
-		p.SetState(111)
+		p.SetState(112)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 8, p.GetParserRuleContext())
 	}
@@ -2779,24 +2794,24 @@ func (p *EqlParser) Arguments() (localctx IArgumentsContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(112)
+		p.SetState(113)
 		p.exp(0)
 	}
-	p.SetState(117)
+	p.SetState(118)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == EqlParserT__1 {
 		{
-			p.SetState(113)
+			p.SetState(114)
 			p.Match(EqlParserT__1)
 		}
 		{
-			p.SetState(114)
+			p.SetState(115)
 			p.exp(0)
 		}
 
-		p.SetState(119)
+		p.SetState(120)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
@@ -2918,24 +2933,24 @@ func (p *EqlParser) Array() (localctx IArrayContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(120)
+		p.SetState(121)
 		p.Constant()
 	}
-	p.SetState(125)
+	p.SetState(126)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == EqlParserT__1 {
 		{
-			p.SetState(121)
+			p.SetState(122)
 			p.Match(EqlParserT__1)
 		}
 		{
-			p.SetState(122)
+			p.SetState(123)
 			p.Constant()
 		}
 
-		p.SetState(127)
+		p.SetState(128)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
@@ -3056,7 +3071,7 @@ func (p *EqlParser) Key() (localctx IKeyContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(128)
+		p.SetState(129)
 		_la = p.GetTokenStream().LA(1)
 
 		if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<EqlParserNAME)|(1<<EqlParserSTEXT)|(1<<EqlParserDTEXT))) != 0) {
@@ -3067,11 +3082,11 @@ func (p *EqlParser) Key() (localctx IKeyContext) {
 		}
 	}
 	{
-		p.SetState(129)
+		p.SetState(130)
 		p.Match(EqlParserT__2)
 	}
 	{
-		p.SetState(130)
+		p.SetState(131)
 		p.Constant()
 	}
 
@@ -3192,24 +3207,24 @@ func (p *EqlParser) Dict() (localctx IDictContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(132)
+		p.SetState(133)
 		p.Key()
 	}
-	p.SetState(137)
+	p.SetState(138)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	for _la == EqlParserT__1 {
 		{
-			p.SetState(133)
+			p.SetState(134)
 			p.Match(EqlParserT__1)
 		}
 		{
-			p.SetState(134)
+			p.SetState(135)
 			p.Key()
 		}
 
-		p.SetState(139)
+		p.SetState(140)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
