@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
+- Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
 
 *Auditbeat*
 
@@ -167,6 +168,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
+- [Autodiscover] Handle input-not-finished errors in config reload. {pull}20915[20915]
+- Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 
 *Auditbeat*
 
@@ -256,6 +259,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
 - Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
 - Update documentation in the azure module filebeat. {pull}20815[20815]
+- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 
 *Heartbeat*
 
@@ -335,6 +339,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 - Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
+- The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 
 *Packetbeat*
 
@@ -549,6 +554,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 - Convert httpjson to v2 input {pull}20226[20226]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
+- Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
 
 *Heartbeat*
 
@@ -665,6 +671,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
+- Release all kubernetes `state` metricsets as GA {pull}20901[20901]
+- Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 
 *Packetbeat*
 
