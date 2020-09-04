@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"bytes"
+	"os"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -57,6 +58,14 @@ type writerLoop struct {
 	// The writer loop sends to responseChan when it has finished handling a
 	// request, to signal the core loop that it is ready for the next one.
 	responseChan chan writeResponse
+
+	// The most recent segment that has been written to, if there is one.
+	// This segment
+	currentSegment *queueSegment
+
+	// The file handle corresponding to currentSegment. When currentSegment
+	// changes, this handle is closed and a new one is created.
+	outputFile *os.File
 }
 
 func (wl *writerLoop) run() {
@@ -76,8 +85,35 @@ func (wl *writerLoop) run() {
 // Write the given data to disk, returns the list of segments that were
 // completed in the process.
 func (wl *writerLoop) processRequest(request writeRequest) []*queueSegment {
-	//writer, err := block.segment.getWriter()
-	return nil
+	var completedSegments []*queueSegment
+	for _, frameRequest := range request.frames {
+		// If the new segment doesn't match the last one, we need to open a new
+		// file handle and possibly clean up the old one.
+		if wl.currentSegment != frameRequest.segment {
+			if wl.outputFile != nil {
+				completedSegments = append(completedSegments, wl.currentSegment)
+				wl.outputFile.Close()
+				wl.outputFile = nil
+				// TODO: try to sync?
+			}
+			wl.currentSegment = frameRequest.segment
+			file, err := wl.currentSegment.getWriter()
+			if err != nil {
+				// TODO: retry, etc
+			}
+			wl.outputFile = file
+		}
+
+		// We have the data and a file to write it to. We are now committed
+		// to writing this block unless the queue is closed in the meantime.
+		_, err := wl.outputFile.Write(frameRequest.frame.serialized)
+		// TODO: retry forever if there is an error or n isn't the right
+		// length.
+		if err != nil {
+			wl.logger.Errorf("Couldn't write pending data to output file: %w", err)
+		}
+	}
+	return completedSegments
 }
 
 // frameForContent wraps the given content buffer in a

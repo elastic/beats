@@ -149,7 +149,7 @@ func (segment *queueSegment) getReader() (*os.File, error) {
 }
 
 // Should only be called from the writer loop.
-func (segment *queueSegment) getWriter() (io.WriteCloser, error) {
+func (segment *queueSegment) getWriter() (*os.File, error) {
 	path := segment.queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
