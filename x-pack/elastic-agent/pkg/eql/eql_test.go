@@ -61,6 +61,9 @@ func TestEql(t *testing.T) {
 		{expression: "true == false", result: false},
 		{expression: "false == false", result: true},
 		{expression: "true == false", result: false},
+		{expression: "${missing} == ${missing}", result: true},
+		{expression: "${missing} == false", result: false},
+		{expression: "false == ${missing}", result: false},
 
 		// not equal
 		{expression: "'hello' != 'hello'", result: false},
@@ -76,6 +79,9 @@ func TestEql(t *testing.T) {
 		{expression: "true != false", result: true},
 		{expression: "false != false", result: false},
 		{expression: "true != false", result: true},
+		{expression: "${missing} != ${missing}", result: false},
+		{expression: "${missing} != false", result: true},
+		{expression: "false != ${missing}", result: true},
 
 		// gt
 		{expression: "1 > 5", result: false},

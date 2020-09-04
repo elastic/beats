@@ -15,6 +15,12 @@ type compare func(left, right operand) (bool, error)
 
 func compareEQ(left, right operand) (bool, error) {
 	switch v := left.(type) {
+	case *null:
+		_, ok := right.(*null)
+		if ok {
+			return true, nil
+		}
+		return false, nil
 	case bool:
 		rV, ok := right.(bool)
 		if !ok {
@@ -108,10 +114,16 @@ func compareEQ(left, right operand) (bool, error) {
 
 func compareNEQ(left, right operand) (bool, error) {
 	switch v := left.(type) {
+	case *null:
+		_, ok := right.(*null)
+		if ok {
+			return false, nil
+		}
+		return true, nil
 	case bool:
 		rV, ok := right.(bool)
 		if !ok {
-			return false, nil
+			return true, nil
 		}
 		if rV == v {
 			return false, nil

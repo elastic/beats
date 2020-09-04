@@ -189,6 +189,10 @@ func renderInputs(inputs transpiler.Node, varsArray []*transpiler.Vars) (transpi
 				// another error that needs to be reported
 				return nil, err
 			}
+			if n == nil {
+				// condition removed it
+				continue
+			}
 			dict = n.(*transpiler.Dict)
 			dict = promoteProcessors(dict)
 			hash := string(dict.Hash())
