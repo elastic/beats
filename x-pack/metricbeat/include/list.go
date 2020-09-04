@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/coredns"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/coredns/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/ibmmq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"

@@ -1,10 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
@@ -68,6 +65,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
 
+@unittest.skip("Flaky test: https://github.com/elastic/beats/issues/20967")
 class TestRemoteWrite(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['prometheus-host-network']

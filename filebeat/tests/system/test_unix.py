@@ -1,14 +1,16 @@
-from filebeat import BaseTest
 import os
+import platform
 import socket
 import tempfile
 import unittest
+from filebeat import BaseTest
 
 # AF_UNIX support in python isn't available until
 # Python 3.9, see https://bugs.python.org/issue33408
 
 
 @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
+@unittest.skipIf(platform.system() == 'Darwin', 'Flaky test: https://github.com/elastic/beats/issues/20941')
 class Test(BaseTest):
     """
     Test filebeat UNIX input
