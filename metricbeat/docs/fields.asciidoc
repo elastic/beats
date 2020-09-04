@@ -19813,6 +19813,48 @@ type: object
 --
 
 [float]
+=== billing
+
+Google Cloud Billing metrics
+
+
+*`googlecloud.billing.cost_type`*::
++
+--
+Cost types include regular, tax, adjustment, and rounding_error.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.invoice_month`*::
++
+--
+Billing report month.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.project_id`*::
++
+--
+Project ID of the billing report belongs to.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.total`*::
++
+--
+Total billing amount.
+
+type: float
+
+--
+
+[float]
 === compute
 
 Google Cloud Compute metrics
@@ -27715,6 +27757,67 @@ type: double
 +
 --
 Deadline seconds after schedule for considering failed
+
+type: long
+
+--
+
+[float]
+=== daemonset
+
+Kubernetes DaemonSet metrics
+
+
+
+*`kubernetes.daemonset.name`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== replicas
+
+Kubernetes DaemonSet replica metrics
+
+
+
+*`kubernetes.daemonset.replicas.available`*::
++
+--
+The number of available replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.desired`*::
++
+--
+The desired number of replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.ready`*::
++
+--
+The number of ready replicas per DaemonSet
+
+
+type: long
+
+--
+
+*`kubernetes.daemonset.replicas.unavailable`*::
++
+--
+The number of unavailable replicas per DaemonSet
+
 
 type: long
 

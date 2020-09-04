@@ -1,9 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 @metricbeat.parameterized_with_supported_versions
