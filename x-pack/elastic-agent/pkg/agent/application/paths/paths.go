@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
@@ -19,26 +20,18 @@ var (
 	dataPath    string
 	logsPath    string
 	serviceName string
+
+	overridesLoader sync.Once
 )
 
 func init() {
 	initialHome := initialHome()
 
-	var homePathVar, configPathVar, dataPathVar, logsPathVar string
-
 	fs := flag.CommandLine
-	fs.StringVar(&homePathVar, "path.home", initialHome, "Agent root path")
-	fs.StringVar(&configPathVar, "path.config", initialHome, "Config path is the directory Agent looks for its config file")
-	fs.StringVar(&dataPathVar, "path.data", filepath.Join(initialHome, "data"), "Data path contains Agent managed binaries")
-	fs.StringVar(&logsPathVar, "path.logs", initialHome, "Logs path contains Agent log output")
-
-	// avoid rewriting initialized values by flagSet later
-	homePath = homePathVar
-	configPath = configPathVar
-	dataPath = dataPathVar
-	logsPath = logsPathVar
-
-	getOverrides()
+	fs.StringVar(&homePath, "path.home", initialHome, "Agent root path")
+	fs.StringVar(&configPath, "path.config", initialHome, "Config path is the directory Agent looks for its config file")
+	fs.StringVar(&dataPath, "path.data", filepath.Join(initialHome, "data"), "Data path contains Agent managed binaries")
+	fs.StringVar(&logsPath, "path.logs", initialHome, "Logs path contains Agent log output")
 }
 
 // UpdatePaths update paths based on changes in paths file.
@@ -78,27 +71,34 @@ func getOverrides() {
 
 // ServiceName return predefined service name if defined by initial call.
 func ServiceName() string {
+	// needs to do this at this place because otherwise it will
+	// get overwritten by flags behavior.
+	overridesLoader.Do(getOverrides)
 	return serviceName
 }
 
 // Home returns a directory where binary lives
 // Executable is not supported on nacl.
 func Home() string {
+	overridesLoader.Do(getOverrides)
 	return homePath
 }
 
 // Config returns a directory where configuration file lives
 func Config() string {
+	overridesLoader.Do(getOverrides)
 	return configPath
 }
 
 // Data returns the data directory for Agent
 func Data() string {
+	overridesLoader.Do(getOverrides)
 	return dataPath
 }
 
 // Logs returns a the log directory for Agent
 func Logs() string {
+	overridesLoader.Do(getOverrides)
 	return logsPath
 }
 
