@@ -1,21 +1,32 @@
 [
     {
-        "@timestamp": "Aug 24 15:32:06",
-        "event.module": "f5",
-        "event.kind": "ASM",
-        "event.category": "network",
-        "observer.vendor": "F5 Networks",
-        "observer.type": "firewall",
-        "client.address": "xxx",
-        "client.ip": "xxx",
-        "client.port": "52620",
+        "@timestamp": "2020-09-04T10:32:50.068Z",
         "destination.ip": "2.170.237.22",
         "destination.port": "443",
-        "network.protocol": "https",
-        "http.request.method": "GET",
-        "event.outcome": "success",
+        "event.category": "network",
+        "event.dataset": "f5.asm",
         "event.id": "10064012564865874907",
+        "event.kind": "ASM",
+        "event.module": "f5",
+        "event.outcome": "success",
+        "event.reason": "Logging rate limit reached",
+        "fields.observer.product": "Big-IP",
+        "fields.observer.vendor": "F5 Networks",
+        "fileset.name": "asm",
+        "http.request.method": "GET",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.protocol": "HTTPS",
+        "observer.type": "firewall",
+        "observer.vendor": "F5 Networks",
         "rule.name": "/Common/live-nmiv-asm-policy",
-        "event.reason": "Logging rate limit reached"
+        "service.type": "f5",
+        "source.ip": "7.8.24.87",
+        "source.port": "52620",
+        "tags": [
+            "checkpoint-firewall",
+            "forwarded"
+        ],
+        "url.full": "/javascript-6.1.6/resize.js"
     }
 ]

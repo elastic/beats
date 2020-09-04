@@ -20,7 +20,7 @@ processors:
   grok:
     field: syslog5424_content
     patterns:
-    - '^"%{IP:source.ip}"###"%{DATA:client.country}"###"%{DATA}"###"%{DATA:source.port}"###"%{IP:destination.ip}"###"%{DATA:destination.port}"###"%{DATA:network.protocol}"###"%{WORD:http.request.method}"###"%{DATA:uri}"###"%{IP:source.ip}"###"%{WORD:result}"###"%{DATA:event.id}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:rule.name}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:request}"###"%{DATA:event.reason}"###""$'
+    - '^"%{IP:source.ip}"###"%{DATA:client.country}"###"%{DATA}"###"%{DATA:source.port}"###"%{IP:destination.ip}"###"%{DATA:destination.port}"###"%{DATA:network.protocol}"###"%{WORD:http.request.method}"###"%{DATA:url.full}"###"%{IP:source.ip}"###"%{WORD:result}"###"%{DATA:event.id}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:rule.name}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:request}"###"%{DATA:event.reason}"###""$'
 -
   set:
     field: event.module
@@ -68,6 +68,7 @@ processors:
     - syslog5424_pri
     - syslog5424_proc
     - syslog5424_ver
+    - syslog5424_ts
     - message
     - host
     - request

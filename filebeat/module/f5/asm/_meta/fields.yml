@@ -1,0 +1,45 @@
+- name: syslog5424_ts
+  description: Please add description
+  example: Please add example
+  type: text
+- name: syslog5424_app
+  description: Please add description
+  example: Please add example
+  type: keyword
+- name: ip
+  description: Please add description
+  example: Please add example
+  type: ip
+- name: port
+  description: Please add description
+  example: Please add example
+  type: text
+- name: protocol
+  description: Please add description
+  example: Please add example
+  type: text
+- name: request
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: method
+    description: Please add description
+    example: Please add example
+    type: keyword
+- name: full
+  description: Please add description
+  example: Please add example
+  type: text
+- name: id
+  description: Please add description
+  example: Please add example
+  type: text
+- name: name
+  description: Please add description
+  example: Please add example
+  type: text
+- name: reason
+  description: Please add description
+  example: Please add example
+  type: text

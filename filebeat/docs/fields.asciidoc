@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-f5>>
+* <<exported-fields-f5asm>>
 * <<exported-fields-fortinet>>
 * <<exported-fields-googlecloud>>
 * <<exported-fields-gsuite>>
@@ -47518,6 +47519,135 @@ type: keyword
 This key captures values or decorators used within a registry entry
 
 type: keyword
+
+--
+
+[[exported-fields-f5asm]]
+== f5asm fields
+
+f5asm Module
+
+
+
+[float]
+=== f5asm
+
+
+
+
+*`f5asm.syslog5424_ts`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`f5asm.syslog5424_app`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`f5asm.ip`*::
++
+--
+Please add description
+
+type: ip
+
+example: Please add example
+
+--
+
+*`f5asm.port`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`f5asm.protocol`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+[float]
+=== request
+
+Please add description
+
+
+*`f5asm.request.method`*::
++
+--
+Please add description
+
+type: keyword
+
+example: Please add example
+
+--
+
+*`f5asm.uri`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`f5asm.id`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`f5asm.name`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`f5asm.reason`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
 
 --
 

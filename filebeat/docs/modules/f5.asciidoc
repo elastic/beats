@@ -3,72 +3,52 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-f5]]
-[role="xpack"]
+:modulename: f5asm
+:has-dashboards: true
 
-:modulename: f5
-:has-dashboards: false
+== f5asm module
 
-== F5 module
+This is the f5asm module.
 
-experimental[]
-
-This is a module for receiving Big-IP Access Policy Manager logs over Syslog or a file.
+include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
 
+[float]
+=== Compatibility
+
+TODO: document with what versions of the software is this tested
+
 include::../include/configuring-intro.asciidoc[]
 
-:fileset_ex: bigipapm
+TODO: provide an example configuration
+
+:fileset_ex: {fileset}
 
 include::../include/config-option-intro.asciidoc[]
 
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
 [float]
-==== `bigipapm` fileset settings
+==== `{fileset}` log fileset settings
 
-experimental[]
+include::../include/var-paths.asciidoc[]
 
-NOTE: This was converted from RSA NetWitness log parser XML "bigipapm" device revision 113.
+[float]
+=== Example dashboard
 
-*`var.input`*::
+This module comes with a sample dashboard. For example:
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
-
-*`var.syslog_host`*::
-
-The address to listen to UDP or TCP based syslog traffic.
-Defaults to `localhost`.
-Set to `0.0.0.0` to bind to all available interfaces.
-
-*`var.syslog_port`*::
-
-The port to listen for syslog traffic. Defaults to `9504`
-
-NOTE: Ports below 1024 require Filebeat to run as root.
-
-*`var.tz_offset`*::
-
-By default, datetimes in the logs will be interpreted as relative to
-the timezone configured in the host where {beatname_uc} is running. If ingesting
-logs from a host on a different timezone, use this field to set the timezone
-offset so that datetimes are correctly parsed. Valid values are in the form
-±HH:mm, for example, `-07:00` for `UTC-7`.
-
-*`var.rsa_fields`*::
-
-Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
-
-*`var.keep_raw_fields`*::
-
-Flag to control the addition of the raw parser fields to the event. This fields
-will be found under `rsa.raw`. The default is false.
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
 
 :has-dashboards!:
 
 :fileset_ex!:
 
 :modulename!:
-
 
 
 [float]
