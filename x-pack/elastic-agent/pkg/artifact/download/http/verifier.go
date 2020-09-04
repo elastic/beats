@@ -148,7 +148,10 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 	}
 
 	ascBytes, err := v.getPublicAsc(ascURI)
-	if err != nil {
+	if err != nil && v.allowEmptyPgp {
+		// asc not available but we allow empty for dev use-case
+		return true, nil
+	} else if err != nil {
 		return false, errors.New(err, fmt.Sprintf("fetching asc file from %s", ascURI), errors.TypeNetwork, errors.M(errors.MetaKeyURI, ascURI))
 	}
 

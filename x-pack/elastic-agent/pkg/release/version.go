@@ -5,10 +5,8 @@
 package release
 
 import (
-	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	libbeatVersion "github.com/elastic/beats/v7/libbeat/version"
@@ -16,12 +14,6 @@ import (
 
 // snapshot is a flag marking build as a snapshot.
 var snapshot = ""
-
-// escPgp is escaped content of pgp bytes
-var escPgp string
-
-// pgp bytes is a packed in public gpg key
-var pgpBytes []byte
 
 // allowEmptyPgp is used as a debug flag and allows working
 // without valid pgp
@@ -46,27 +38,6 @@ func Version() string {
 func Snapshot() bool {
 	val, err := strconv.ParseBool(snapshot)
 	return err == nil && val
-}
-
-// PGP return pgpbytes and a flag describing whether or not no pgp is valid.
-func PGP() (bool, []byte) {
-	var pgpLoader sync.Once
-	isEmptyAllowed := allowEmptyPgp == "true"
-
-	pgpLoader.Do(func() {
-		// initial sanity build check
-		if len(escPgp) == 0 && !isEmptyAllowed {
-			panic("GPG key is not present but required")
-		}
-
-		if len(escPgp) > 0 {
-			if unescaped, err := url.PathUnescape(escPgp); err == nil {
-				pgpBytes = []byte(unescaped)
-			}
-		}
-	})
-
-	return isEmptyAllowed, pgpBytes
 }
 
 // VersionInfo is structure used by `version --yaml`.

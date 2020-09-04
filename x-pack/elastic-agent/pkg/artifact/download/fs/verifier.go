@@ -120,7 +120,10 @@ func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 	}
 
 	ascBytes, err := v.getPublicAsc(filename)
-	if err != nil {
+	if err != nil && v.allowEmptyPgp {
+		// asc not available but we allow empty for dev use-case
+		return true, nil
+	} else if err != nil {
 		return false, err
 	}
 

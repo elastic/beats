@@ -44,7 +44,6 @@ type Config struct {
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
 	homePath := paths.Home()
-	dataPath := paths.Data()
 	return &Config{
 		SourceURI:       "https://artifacts.elastic.co/downloads/",
 		TargetDirectory: filepath.Join(homePath, "downloads"),

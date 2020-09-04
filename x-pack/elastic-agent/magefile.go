@@ -10,9 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -350,7 +347,7 @@ func commitID() string {
 
 // Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(Config, BuildSpec, BuildPGP, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -375,12 +372,22 @@ func ControlProto() error {
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
-	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/elastic-agent/pkg/agent/program/supported.go
 	goF := filepath.Join("dev-tools", "cmd", "buildspec", "buildspec.go")
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
 	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
+}
+
+func BuildPGP() error {
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildpgp/build_pgp.go --in x-pack/agent/spec/GPG-KEY-elasticsearch --out x-pack/elastic-agent/pkg/release/pgp.go
+	goF := filepath.Join("dev-tools", "cmd", "buildpgp", "build_pgp.go")
+	in := "GPG-KEY-elasticsearch"
+	out := filepath.Join("pkg", "release", "pgp.go")
+
+	fmt.Printf(">> BuildPGP from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -625,21 +632,10 @@ func buildVars() map[string]string {
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
 
-	fetchPgp := true
 	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
 		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
 			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
-			fetchPgp = false
 		}
-	}
-	fmt.Println("fetching pgp", fetchPgp)
-
-	if fetchPgp {
-		pgp, err := loadPGPFromWeb()
-		if err != nil {
-			panic(err)
-		}
-		vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.escPgp"] = string(pgp)
 	}
 
 	return vars
@@ -649,24 +645,4 @@ func injectBuildVars(m map[string]string) {
 	for k, v := range buildVars() {
 		m[k] = v
 	}
-}
-
-func loadPGPFromWeb() (string, error) {
-	const publicKeyURI = "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
-
-	resp, err := http.Get(publicKeyURI)
-	if err != nil {
-		return "", fmt.Errorf("failed loading public key: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("call to '%s' returned unsuccessful status code: %d", publicKeyURI, resp.StatusCode)
-	}
-
-	rawPgp, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	return url.PathEscape(string(rawPgp)), nil
 }
