@@ -37,6 +37,16 @@ func (c *userConfig) Validate() error {
 	return nil
 }
 
+// DefaultSettings returns a Settings object with reasonable default values
+// for all important fields.
+func DefaultSettings() Settings {
+	return Settings{
+		ChecksumType:   ChecksumTypeCRC32,
+		MaxSegmentSize: 100 * (1 << 20), // 100MB
+		MaxBufferSize:  (1 << 30),       // 1GB
+	}
+}
+
 // SettingsForUserConfig returns a Settings struct initialized with the
 // end-user-configurable settings in the given config tree.
 func SettingsForUserConfig(config *common.Config) (Settings, error) {
@@ -44,9 +54,7 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 	if err := config.Unpack(&userConfig); err != nil {
 		return Settings{}, err
 	}
-	settings := Settings{
-		ChecksumType: ChecksumTypeCRC32,
-	}
+	settings := DefaultSettings()
 	settings.Path = userConfig.Path
 
 	return Settings{}, nil

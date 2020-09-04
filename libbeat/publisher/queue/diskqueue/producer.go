@@ -63,22 +63,20 @@ func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
 func (producer *diskQueueProducer) publish(
 	event publisher.Event, shouldBlock bool,
 ) bool {
-	producer.queue.logger.Debugf(
-		"diskQueueProducer.publish(%v, %v)", event, shouldBlock)
 	serialized, err := producer.encoder.encode(&event)
 	if err != nil {
 		producer.queue.logger.Errorf(
 			"Couldn't serialize incoming event: %v", err)
 		return false
 	}
-	request := &producerWriteRequest{
+	request := producerWriteRequest{
 		frame: &writeFrame{
 			event:      event,
 			serialized: serialized,
 			producer:   producer,
 		},
 		shouldBlock:  shouldBlock,
-		responseChan: make(chan bool),
+		responseChan: make(chan bool, 1),
 	}
 
 	select {
@@ -87,7 +85,8 @@ func (producer *diskQueueProducer) publish(
 		// the response channel, so we must read from it immediately to avoid
 		// blocking the core loop.
 		// TODO: this should be unblocked by a call to Cancel
-		return <-request.responseChan
+		response := <-request.responseChan
+		return response
 	case <-producer.queue.done:
 		return false
 	}

@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -151,10 +152,9 @@ func (segment *queueSegment) getReader() (*os.File, error) {
 // Should only be called from the writer loop.
 func (segment *queueSegment) getWriter() (*os.File, error) {
 	path := segment.queueSettings.segmentPath(segment.id)
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0600)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
-		return nil, fmt.Errorf(
-			"Couldn't open segment %d: %w", segment.id, err)
+		return nil, err
 	}
 	header := &segmentHeader{
 		version:      0,
@@ -162,8 +162,7 @@ func (segment *queueSegment) getWriter() (*os.File, error) {
 	}
 	err = writeSegmentHeader(file, header)
 	if err != nil {
-		return nil, fmt.Errorf(
-			"Couldn't write to new segment %d: %w", segment.id, err)
+		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
 	}
 	return file, nil
 }
@@ -177,8 +176,13 @@ func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	//return nil, nil
 }
 
-func writeSegmentHeader(out io.Writer, header *segmentHeader) error {
-	panic("TODO: not implemented")
+func writeSegmentHeader(out *os.File, header *segmentHeader) error {
+	err := binary.Write(out, binary.LittleEndian, header.version)
+	fmt.Printf("binary.Write result: %v\n", err)
+	if err == nil {
+		err = binary.Write(out, binary.LittleEndian, uint32(header.checksumType))
+	}
+	return err
 }
 
 // The number of bytes occupied by all the queue's segment files. This

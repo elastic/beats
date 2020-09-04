@@ -19,13 +19,13 @@ package diskqueue
 
 import "os"
 
-type readRequest struct {
+type readerLoopRequest struct {
 	segment     *queueSegment
 	startOffset segmentOffset
 	endOffset   segmentOffset
 }
 
-type readResponse struct {
+type readerLoopResponse struct {
 	// The number of frames successfully read from the requested segment file.
 	frameCount int64
 
@@ -43,8 +43,8 @@ type readerLoop struct {
 	// sends the result to finishedReading. If there is more than one block
 	// available for reading, the core loop will wait until it gets a
 	// finishedReadingMessage before it
-	requestChan  chan readRequest
-	responseChan chan readResponse
+	requestChan  chan readerLoopRequest
+	responseChan chan readerLoopResponse
 
 	// Frames that have been read from disk are sent to this channel.
 	// Unlike most of the queue's API channels, this one is buffered to allow
@@ -65,18 +65,18 @@ func (rl *readerLoop) run() {
 	}
 }
 
-func (rl *readerLoop) processRequest(request readRequest) readResponse {
+func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
 	frameCount := int64(0)
 	byteCount := int64(0)
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader()
 	if err != nil {
-		return readResponse{err: err}
+		return readerLoopResponse{err: err}
 	}
 	_, err = handle.Seek(segmentHeaderSize+int64(request.startOffset), 0)
 	if err != nil {
-		return readResponse{err: err}
+		return readerLoopResponse{err: err}
 	}
 
 	targetLength := int64(request.endOffset - request.startOffset)
@@ -105,7 +105,7 @@ func (rl *readerLoop) processRequest(request readRequest) readResponse {
 				// Since we haven't sent a finishedReading message yet, we can only
 				// reach this case when the nextReadBlock channel is closed, indicating
 				// queue shutdown. In this case we immediately return.
-				return readResponse{
+				return readerLoopResponse{
 					frameCount: frameCount,
 					byteCount:  byteCount,
 					err:        nil,
@@ -118,7 +118,7 @@ func (rl *readerLoop) processRequest(request readRequest) readResponse {
 		// - there are no more frames to read, or
 		// - we have reached the end of the requested region
 		if err != nil || frame == nil || byteCount >= targetLength {
-			return readResponse{
+			return readerLoopResponse{
 				frameCount: frameCount,
 				byteCount:  byteCount,
 				err:        err,
@@ -130,7 +130,7 @@ func (rl *readerLoop) processRequest(request readRequest) readResponse {
 		// again separately before we move on to the next data frame.
 		select {
 		case <-rl.requestChan:
-			return readResponse{
+			return readerLoopResponse{
 				frameCount: frameCount,
 				err:        nil,
 			}

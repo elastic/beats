@@ -51,10 +51,6 @@ type Settings struct {
 	// to a single segment file before creating a new one.
 	MaxSegmentSize uint64
 
-	// A listener that receives ACKs when events are written to the queue's
-	// disk buffer.
-	//producerACKListener queue.ACKListener
-
 	ChecksumType ChecksumType
 }
 
@@ -93,14 +89,15 @@ type diskQueue struct {
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
 
+	// The queue's helper loops, each of which is run in its own goroutine.
 	coreLoop    *coreLoop
 	readerLoop  *readerLoop
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
 
 	// The API channels used by diskQueueProducer to send write / cancel calls.
-	producerWriteRequestChan  chan *producerWriteRequest
-	producerCancelRequestChan chan *producerCancelRequest
+	producerWriteRequestChan  chan producerWriteRequest
+	producerCancelRequestChan chan producerCancelRequest
 
 	// When a consumer ack increments ackedUpTo, the consumer sends
 	// its new value to this channel. The core loop then decides whether to
@@ -211,6 +208,14 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
 
+	if settings.MaxBufferSize > 0 &&
+		settings.MaxBufferSize < settings.MaxSegmentSize*2 {
+		return nil, fmt.Errorf(
+			"Disk queue buffer size (%v) must be at least "+
+				"twice the segment size (%v)",
+			settings.MaxBufferSize, settings.MaxSegmentSize)
+	}
+
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
 	if err != nil {
@@ -247,8 +252,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	// any helper loop).
 
 	readerLoop := &readerLoop{
-		requestChan:  make(chan readRequest, 1),
-		responseChan: make(chan readResponse),
+		requestChan:  make(chan readerLoopRequest, 1),
+		responseChan: make(chan readerLoopResponse),
 		output:       make(chan *readFrame, 20), // TODO: customize this buffer size
 	}
 	go func() {
@@ -258,8 +263,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 	writerLoop := &writerLoop{
 		logger:       logger,
-		requestChan:  make(chan writeRequest, 1),
-		responseChan: make(chan writeResponse),
+		requestChan:  make(chan writerLoopRequest, 1),
+		responseChan: make(chan writerLoopResponse),
 	}
 	go func() {
 		writerLoop.run()
@@ -277,17 +282,27 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}()
 
 	queue := &diskQueue{
-		logger:    logger,
-		settings:  settings,
+		logger:   logger,
+		settings: settings,
+
 		stateFile: stateFile,
 		segments: &diskQueueSegments{
 			reading: initialSegments,
 		},
+
 		readerLoop:  readerLoop,
 		writerLoop:  writerLoop,
 		deleterLoop: deleterLoop,
-		waitGroup:   &waitGroup,
-		done:        make(chan struct{}),
+
+		// TODO: customize this channel buffer size
+		producerWriteRequestChan:  make(chan producerWriteRequest, 10),
+		producerCancelRequestChan: make(chan producerCancelRequest),
+
+		consumerAckChan: make(chan frameID),
+		acked:           make(map[frameID]bool),
+
+		waitGroup: &waitGroup,
+		done:      make(chan struct{}),
 	}
 
 	// The core loop is created last because it's the only one that needs

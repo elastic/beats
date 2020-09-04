@@ -24,7 +24,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type frameWriteRequest struct {
+// A segmentedFrame is a data frame waiting to be written to disk along with
+// the containing segment it has been assigned to.
+type segmentedFrame struct {
 	// The frame to be written to disk.
 	frame *writeFrame
 
@@ -34,16 +36,16 @@ type frameWriteRequest struct {
 
 // One block for the writer loop consists of a write request and the
 // segment it should be written to.
-type writeRequest struct {
-	frames []frameWriteRequest
+type writerLoopRequest struct {
+	frames []segmentedFrame
 }
 
-// A writeResponse reports the list of segments that have been
+// A writerLoopResponse reports the list of segments that have been
 // completely written and can be moved to segments.reading.
 // A segment is determined to have been completely written
 // (and is then closed by the writer loop) when a frameWriteRequest
 // targets a different segment than the previous ones.
-type writeResponse struct {
+type writerLoopResponse struct {
 	completedSegments []*queueSegment
 }
 
@@ -53,11 +55,11 @@ type writerLoop struct {
 	// The writer loop listens on requestChan for write blocks, and
 	// writes them to disk immediately (all queue capacity checking etc. is
 	// done by the core loop before sending it to the writer).
-	requestChan chan writeRequest
+	requestChan chan writerLoopRequest
 
 	// The writer loop sends to responseChan when it has finished handling a
 	// request, to signal the core loop that it is ready for the next one.
-	responseChan chan writeResponse
+	responseChan chan writerLoopResponse
 
 	// The most recent segment that has been written to, if there is one.
 	// This segment
@@ -69,6 +71,7 @@ type writerLoop struct {
 }
 
 func (wl *writerLoop) run() {
+	wl.logger.Debug("Writer loop starting up...")
 	for {
 		block, ok := <-wl.requestChan
 		if !ok {
@@ -76,7 +79,7 @@ func (wl *writerLoop) run() {
 			return
 		}
 		completedSegments := wl.processRequest(block)
-		wl.responseChan <- writeResponse{
+		wl.responseChan <- writerLoopResponse{
 			completedSegments: completedSegments,
 		}
 	}
@@ -84,12 +87,13 @@ func (wl *writerLoop) run() {
 
 // Write the given data to disk, returns the list of segments that were
 // completed in the process.
-func (wl *writerLoop) processRequest(request writeRequest) []*queueSegment {
+func (wl *writerLoop) processRequest(request writerLoopRequest) []*queueSegment {
 	var completedSegments []*queueSegment
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
 		// file handle and possibly clean up the old one.
 		if wl.currentSegment != frameRequest.segment {
+			wl.logger.Debugf("")
 			if wl.outputFile != nil {
 				completedSegments = append(completedSegments, wl.currentSegment)
 				wl.outputFile.Close()
@@ -99,6 +103,7 @@ func (wl *writerLoop) processRequest(request writeRequest) []*queueSegment {
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriter()
 			if err != nil {
+				wl.logger.Errorf("Couldn't open new segment file: %w", err)
 				// TODO: retry, etc
 			}
 			wl.outputFile = file

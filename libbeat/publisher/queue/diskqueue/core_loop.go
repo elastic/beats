@@ -58,13 +58,13 @@ type coreLoop struct {
 	// frames that are scheduled to be written to disk.
 	nextWriteOffset segmentOffset
 
-	// pendingWrites is a list of all write requests that have been accepted
-	// by the queue and are waiting to be sent to the writer loop.
-	pendingWrites []*producerWriteRequest
+	// pendingFrames is a list of all incoming data frames that have been
+	// accepted by the queue and are waiting to be sent to the writer loop.
+	pendingFrames []segmentedFrame
 
-	// blockedWrites is a list of all write requests that are waiting for
-	// free space in the queue.
-	blockedWrites []*producerWriteRequest
+	// blockedProducers is a list of all producer write requests that are
+	// waiting for free space in the queue.
+	blockedProducers []producerWriteRequest
 
 	// This value represents the oldest frame ID for a segment that has not
 	// yet been moved to the acked list. It is used to detect when the oldest
@@ -72,7 +72,8 @@ type coreLoop struct {
 	oldestFrameID frameID
 }
 
-// A frame waiting to be written to disk
+// A data frame created through the producer API and waiting to be
+// written to disk.
 type writeFrame struct {
 	// The original event provided by the client to diskQueueProducer.
 	// We keep this as well as the serialized form until we are done
@@ -106,6 +107,7 @@ type readFrame struct {
 }
 
 func (cl *coreLoop) run() {
+	cl.queue.logger.Debug("Core loop starting up...")
 	dq := cl.queue
 
 	// Wake up the reader loop if there are segments available to read.
@@ -145,50 +147,72 @@ func (cl *coreLoop) run() {
 	}
 }
 
-func (cl *coreLoop) handleProducerWriteRequest(request *producerWriteRequest) {
-	if len(cl.blockedWrites) > 0 {
+func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
+	cl.queue.logger.Debugf(
+		"Core loop received producer write request (%d bytes)",
+		len(request.frame.serialized))
+	if len(cl.blockedProducers) > 0 {
 		// If other requests are still waiting for space, then there
 		// definitely isn't enough for this one.
 		if request.shouldBlock {
-			cl.blockedWrites = append(cl.blockedWrites, request)
+			// Blocked writes don't get a response until there is enough free
+			// space and they are moved to pendingWrites.
+			cl.blockedProducers = append(cl.blockedProducers, request)
 		} else {
 			// If the request is non-blocking, send immediate failure and discard it.
 			request.responseChan <- false
 		}
 		return
 	}
+
+	// Pathological case checking: make sure the incoming frame isn't bigger
+	// than an entire segment all by itself (as long as it isn't, it is
+	// guaranteed to eventually enter the queue assuming no disk errors).
+	frameSize := uint64(len(request.frame.serialized))
+	if cl.queue.settings.MaxSegmentSize < frameSize {
+		cl.queue.logger.Warnf(
+			"Rejecting event with size %v because the maximum segment size is %v",
+			frameSize, cl.queue.settings.MaxSegmentSize)
+		request.responseChan <- false
+		return
+	}
+
 	// We will accept this request if there is enough capacity left in
 	// the queue (after accounting for the pending writes that were
 	// already accepted).
 	pendingBytes := uint64(0)
-	for _, request := range cl.pendingWrites {
+	for _, request := range cl.pendingFrames {
 		pendingBytes += uint64(len(request.frame.serialized))
 	}
 	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
-	frameSize := uint64(len(request.frame.serialized))
-	if currentSize+frameSize > cl.queue.settings.MaxBufferSize {
+	cl.queue.logger.Debugf(
+		"currentSize: %v  frameSize: %v  MaxBufferSize: %v",
+		currentSize, frameSize, cl.queue.settings.MaxBufferSize)
+	if cl.queue.settings.MaxBufferSize > 0 &&
+		currentSize+frameSize > cl.queue.settings.MaxBufferSize {
 		// The queue is too full. Either add the request to blockedWrites,
 		// or send an immediate reject.
 		if request.shouldBlock {
-			cl.blockedWrites = append(cl.blockedWrites, request)
+			cl.blockedProducers = append(cl.blockedProducers, request)
 		} else {
 			request.responseChan <- false
 		}
 	} else {
 		// There is enough space for the new frame! Add it to the
-		// pending list and dispatch it to the writer loop if no other
-		// writes are outstanding.
+		// pending list and report success, then dispatch it to the
+		// writer loop if no other requests are outstanding.
 		// Right now we accept any request if there is enough space for it
 		// on disk. High-throughput inputs may produce events faster than
 		// they can be written to disk, so it would make sense to
 		// additionally bound the amount of data in pendingWrites to some
 		// configurable limit to avoid out-of-memory errors.
-		cl.pendingWrites = append(cl.pendingWrites, request)
+		cl.enqueueProducerFrame(request.frame)
+		request.responseChan <- true
 		cl.maybeWritePending()
 	}
 }
 
-func (cl *coreLoop) handleProducerCancelRequest(request *producerCancelRequest) {
+func (cl *coreLoop) handleProducerCancelRequest(request producerCancelRequest) {
 }
 
 // Returns the active read segment, or nil if there is none.
@@ -202,7 +226,7 @@ func (segments *diskQueueSegments) readingSegment() *queueSegment {
 	return nil
 }
 
-func (cl *coreLoop) handleReadResponse(response readResponse) {
+func (cl *coreLoop) handleReadResponse(response readerLoopResponse) {
 	cl.reading = false
 	segments := cl.queue.segments
 
@@ -317,49 +341,18 @@ func (cl *coreLoop) handleShutdown() {
 }
 
 // If the pendingWrites list is nonempty, and there are no outstanding
-// requests to the writer loop, send the next frame.
+// requests to the writer loop, send the next batch of frames.
 func (cl *coreLoop) maybeWritePending() {
-	dq := cl.queue
-	if cl.writing || len(cl.pendingWrites) == 0 {
+	if cl.writing || len(cl.pendingFrames) == 0 {
 		// Nothing to do right now
 		return
 	}
-	// We are now definitely going to handle the queued requests, so
-	// remove them from pendingWrites.
-	requests := cl.pendingWrites
-	cl.pendingWrites = nil
+	// Remove everything from pendingWrites and forward it to the writer loop.
+	requests := cl.pendingFrames
+	cl.pendingFrames = nil
 
-	// We have frames to write, but we need to decide which segments
-	// they should go in and assemble them into frameWriteRequests
-	// for the writer loop. Start with the most recent writing segment
-	// if there is one.
-	var segment *queueSegment
-	if len(dq.segments.writing) > 0 {
-		segment = dq.segments.writing[len(dq.segments.writing)-1]
-	}
-	var frameRequests []frameWriteRequest
-	for _, request := range requests {
-		frameLen := segmentOffset(len(request.frame.serialized))
-		// If segment is nil, or the new segment exceeds its bounds,
-		// we need to create a new writing segment.
-		if segment == nil ||
-			cl.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
-			segment = &queueSegment{
-				id:            dq.segments.nextID,
-				queueSettings: &dq.settings,
-			}
-			dq.segments.writing = append(dq.segments.writing, segment)
-			dq.segments.nextID++
-			cl.nextWriteOffset = frameLen
-		}
-		frameRequests = append(frameRequests, frameWriteRequest{
-			frame:   request.frame,
-			segment: segment,
-		})
-	}
-
-	cl.queue.writerLoop.requestChan <- writeRequest{
-		frames: frameRequests,
+	cl.queue.writerLoop.requestChan <- writerLoopRequest{
+		frames: requests,
 	}
 	cl.writing = true
 }
@@ -376,7 +369,7 @@ func (cl *coreLoop) maybeReadPending() {
 		// Nothing to read
 		return
 	}
-	request := readRequest{
+	request := readerLoopRequest{
 		segment:     segment,
 		startOffset: cl.nextReadOffset,
 		endOffset:   segment.endOffset,
@@ -392,4 +385,35 @@ func (cl *coreLoop) maybeDeleteAcked() {
 		cl.queue.deleterLoop.input <- &deleteRequest{segments: cl.queue.segments.acked}
 		cl.deleting = true
 	}
+}
+
+// enqueueProducerFrame determines which segment an incoming frame should be
+// written to and adds the result to pendingWrites.
+func (cl *coreLoop) enqueueProducerFrame(frame *writeFrame) {
+	dq := cl.queue
+
+	// Start with the most recent writing segment if there is one.
+	var segment *queueSegment
+	if len(dq.segments.writing) > 0 {
+		segment = dq.segments.writing[len(dq.segments.writing)-1]
+	}
+	frameLen := segmentOffset(len(frame.serialized))
+	// If segment is nil, or the new segment exceeds its bounds,
+	// we need to create a new writing segment.
+	if segment == nil ||
+		cl.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
+		segment = &queueSegment{
+			id:            dq.segments.nextID,
+			queueSettings: &dq.settings,
+		}
+		dq.segments.writing = append(dq.segments.writing, segment)
+		dq.segments.nextID++
+		cl.nextWriteOffset = 0
+	}
+
+	cl.nextWriteOffset += frameLen
+	cl.pendingFrames = append(cl.pendingFrames, segmentedFrame{
+		frame:   frame,
+		segment: segment,
+	})
 }
