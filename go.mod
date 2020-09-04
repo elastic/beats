@@ -21,7 +21,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.2.0
 	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
-	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
+	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
@@ -54,7 +54,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.4.0
-	github.com/dop251/goja v0.0.0-00010101000000-000000000000
+	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
@@ -74,7 +74,7 @@ require (
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.10.6-0.20200715000138-f115143bb233
 	github.com/fatih/color v1.5.0
-	github.com/fsnotify/fsevents v0.0.0-00010101000000-000000000000
+	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/garyburd/redigo v1.0.1-0.20160525165706-b8dc90050f24
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
