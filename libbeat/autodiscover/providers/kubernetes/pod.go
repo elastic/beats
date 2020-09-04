@@ -334,23 +334,17 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
-
-		cmeta := common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
-		}
+		
 		meta := p.metagen.Generate(
 			pod,
 			metadata.WithFields("container.name", c.Name),
 			metadata.WithFields("container.image", c.Image),
 			metadata.WithFields("container.id", cid),
+			metadata.WithFields("container.runtime", runtimes[c.Name]),
 		)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
 		kubemeta["annotations"] = annotations
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
