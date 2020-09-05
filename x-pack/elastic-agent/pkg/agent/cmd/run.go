@@ -127,12 +127,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			}
 		}
 		if breakout {
+			if !reexecing {
+				logger.Info("Shutting down Elastic Agent and sending last events...")
+			}
 			break
 		}
 	}
 
 	err = app.Stop()
 	if !reexecing {
+		logger.Info("Shutting down completed.")
 		return err
 	}
 	rex.ShutdownComplete()
