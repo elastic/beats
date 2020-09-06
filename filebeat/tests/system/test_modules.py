@@ -218,13 +218,6 @@ class Test(BaseTest):
 
             assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
-def file_contains(filepath, string):
-    with open(filepath, 'r') as file:
-        for line in file:
-            if string in line:
-                return True, line
-    return False, None
-
 
 def clean_keys(obj):
     # These keys are host dependent
@@ -310,6 +303,14 @@ def clean_keys(obj):
 def delete_key(obj, key):
     if key in obj:
         del obj[key]
+
+
+def file_contains(filepath, string):
+    with open(filepath, 'r') as file:
+        for line in file:
+            if string in line:
+                return True, line
+    return False, None
 
 
 def pretty_json(obj):
