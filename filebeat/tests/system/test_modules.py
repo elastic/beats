@@ -150,8 +150,10 @@ class Test(BaseTest):
                              bufsize=0).wait()
             output.close()
 
+        # List of errors to check in filebeat output logs
+        errors = ["Error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
-        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), "ERROR")
+        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
         assert contains_error is False, "Error found in log:{}".format(error_line)
 
         # Ensure file is actually closed to ensure large amount of file handlers is not spawning
@@ -305,11 +307,12 @@ def delete_key(obj, key):
         del obj[key]
 
 
-def file_contains(filepath, string):
+def file_contains(filepath, strings):
     with open(filepath, 'r') as file:
         for line in file:
-            if string in line:
-                return True, line
+            for string in strings:
+                if string in line:
+                    return True, line
     return False, None
 
 
