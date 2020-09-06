@@ -1,6 +1,7 @@
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
 import os
+import sys
 import unittest
 import glob
 import subprocess
@@ -131,22 +132,31 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
 
         output_path = os.path.join(self.working_dir)
-        output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
+        # Runs inside a with loop to ensure file is closed afterwards
+        with open(os.path.join(output_path, "output.log"), "ab") as output:
+            output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
-        # Use a fixed timezone so results don't vary depending on the environment
-        # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
-        # this can happen because UTC uses to be the default timezone in date parsers when no other
-        # timezone is specified.
-        local_env = os.environ.copy()
-        local_env["TZ"] = 'Etc/GMT+2'
+            # Use a fixed timezone so results don't vary depending on the environment
+            # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
+            # this can happen because UTC uses to be the default timezone in date parsers when no other
+            # timezone is specified.
+            local_env = os.environ.copy()
+            local_env["TZ"] = 'Etc/GMT+2'
 
-        subprocess.Popen(cmd,
-                         env=local_env,
-                         stdin=None,
-                         stdout=output,
-                         stderr=subprocess.STDOUT,
-                         bufsize=0).wait()
+            subprocess.Popen(cmd,
+                             env=local_env,
+                             stdin=None,
+                             stdout=output,
+                             stderr=subprocess.STDOUT,
+                             bufsize=0).wait()
+            output.close()
+
+        # Checks if the output of filebeat includes errors
+        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), "ERROR")
+        assert contains_error is False, "Error found in log:{}".format(error_line)
+
+        # Ensure file is actually closed to ensure large amount of file handlers is not spawning
+        assert output.closed is True
 
         # Make sure index exists
         self.wait_until(lambda: self.es.indices.exists(self.index_name))
@@ -208,6 +218,13 @@ class Test(BaseTest):
             d = DeepDiff(ev, obj, ignore_order=True)
 
             assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
+
+def file_contains(filepath, string):
+    with open(filepath, 'r') as file:
+        for line in file:
+            if string in line:
+                return True, line
+    return False, None
 
 
 def clean_keys(obj):
