@@ -1,7 +1,6 @@
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
 import os
-import sys
 import unittest
 import glob
 import subprocess
