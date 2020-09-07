@@ -295,12 +295,8 @@ processors:
     ignore_missing: true
 - rename:
     field: fortinet.firewall.scertcname
-    target_field: tls.server.server_name
+    target_field: tls.server.x509.subject.common_name
     ignore_missing: true
-- set:
-    field: tls.server.x509.subject.common_name
-    value: "{{tls.server.server_name}}"
-    ignore_empty_value: true
 - rename:
     field: fortinet.firewall.scertissuer
     target_field: tls.server.issuer

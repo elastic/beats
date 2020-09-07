@@ -260,6 +260,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
 - Update documentation in the azure module filebeat. {pull}20815[20815]
 - Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
+- Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 
 *Heartbeat*
 

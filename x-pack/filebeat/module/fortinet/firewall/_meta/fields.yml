@@ -1,6 +1,3 @@
-- name: tls.server.server_name
-  type: keyword
-
 - name: fortinet
   type: group
   description: >

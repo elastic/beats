@@ -289,7 +289,6 @@
             "fortinet-firewall",
             "forwarded"
         ],
-        "tls.server.server_name": "test.elastic.co",
         "tls.server.x509.subject.common_name": "test.elastic.co",
         "url.domain": "elastic.co",
         "url.path": "/"
@@ -364,7 +363,6 @@
             "fortinet-firewall",
             "forwarded"
         ],
-        "tls.server.server_name": "test.elastic.co",
         "tls.server.x509.subject.common_name": "test.elastic.co",
         "url.domain": "elastic.co",
         "url.path": "/"
@@ -1937,7 +1935,6 @@
             "forwarded"
         ],
         "tls.server.issuer": "DigiCert SHA2 High Assurance Server CA",
-        "tls.server.server_name": "*.dailymotion.com",
         "tls.server.x509.issuer.common_name": "DigiCert SHA2 High Assurance Server CA",
         "tls.server.x509.subject.common_name": "*.dailymotion.com",
         "url.domain": "www.dailymotion.com",

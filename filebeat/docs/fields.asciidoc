@@ -52955,13 +52955,6 @@ type: keyword
 
 --
 
-*`tls.server.server_name`*::
-+
---
-type: keyword
-
---
-
 [float]
 === fortinet
 
