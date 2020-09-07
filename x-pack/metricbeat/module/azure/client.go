@@ -185,9 +185,10 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []insights.MetricDef
 	return clientMetrics
 }
 
-func (client *Client) GetResourceForData(resId string) Resource {
+// GetResourceForData will retrieve resource details for the selected metric configuration
+func (client *Client) GetResourceForData(resourceId string) Resource {
 	for i, res := range client.Resources {
-		if res.Id == resId {
+		if res.Id == resourceId {
 			var vmSize string
 			var vmId string
 			if client.Config.AddCloudMetadata && res.Vm == (VmResource{}) {
