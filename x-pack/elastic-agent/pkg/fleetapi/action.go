@@ -83,6 +83,33 @@ func (a *ActionConfigChange) ID() string {
 	return a.ActionID
 }
 
+// ActionUpgrade is a request for agent to unhook from fleet.
+type ActionUpgrade struct {
+	ActionID   string
+	ActionType string
+	Version    string `json:"Version"`
+	SourceURI  string `json:"SourceURI"`
+}
+
+func (a *ActionUpgrade) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionUpgrade) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionUpgrade) ID() string {
+	return a.ActionID
+}
+
 // ActionUnenroll is a request for agent to unhook from fleet.
 type ActionUnenroll struct {
 	ActionID   string
@@ -147,6 +174,16 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 			action = &ActionUnenroll{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
+			}
+		case "UPGRADE_ACTION":
+			action = &ActionUnenroll{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode UPGRADE_ACTION action",
+					errors.TypeConfig)
 			}
 		default:
 			action = &ActionUnknown{
