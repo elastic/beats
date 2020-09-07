@@ -4520,6 +4520,16 @@ type: object
 
 --
 
+*`azure.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
 [float]
 === app_insights
 
@@ -4749,17 +4759,6 @@ type: object
 
 monitor
 
-
-
-*`azure.monitor.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
 
 *`azure.storage.*.*`*::
 +
@@ -19809,6 +19808,48 @@ Metrics that returned from Google Cloud API query.
 
 
 type: object
+
+--
+
+[float]
+=== billing
+
+Google Cloud Billing metrics
+
+
+*`googlecloud.billing.cost_type`*::
++
+--
+Cost types include regular, tax, adjustment, and rounding_error.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.invoice_month`*::
++
+--
+Billing report month.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.project_id`*::
++
+--
+Project ID of the billing report belongs to.
+
+type: keyword
+
+--
+
+*`googlecloud.billing.total`*::
++
+--
+Total billing amount.
+
+type: float
 
 --
 

@@ -21,13 +21,42 @@ func TestContextProvider(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
+	processors1 := []map[string]interface{}{
+		{
+			"add_fields": map[string]interface{}{
+				"fields": map[string]interface{}{
+					"add": "value1",
+				},
+				"to": "dynamic",
+			},
+		},
+	}
 	mapping2 := map[string]interface{}{
 		"key1": "value12",
 		"key2": "value22",
 	}
-	mapping := []map[string]interface{}{mapping1, mapping2}
+	processors2 := []map[string]interface{}{
+		{
+			"add_fields": map[string]interface{}{
+				"fields": map[string]interface{}{
+					"add": "value12",
+				},
+				"to": "dynamic",
+			},
+		},
+	}
+	mapping := []map[string]interface{}{
+		{
+			"vars":       mapping1,
+			"processors": processors1,
+		},
+		{
+			"vars":       mapping2,
+			"processors": processors2,
+		},
+	}
 	cfg, err := config.NewConfigFrom(map[string]interface{}{
-		"vars": mapping,
+		"items": mapping,
 	})
 	require.NoError(t, err)
 	builder, _ := composable.Providers.GetDynamicProvider("local_dynamic")
@@ -41,8 +70,10 @@ func TestContextProvider(t *testing.T) {
 	curr1, ok1 := comm.Current("0")
 	assert.True(t, ok1)
 	assert.Equal(t, mapping1, curr1.Mapping)
+	assert.Equal(t, processors1, curr1.Processors)
 
 	curr2, ok2 := comm.Current("1")
 	assert.True(t, ok2)
 	assert.Equal(t, mapping2, curr2.Mapping)
+	assert.Equal(t, processors2, curr2.Processors)
 }
