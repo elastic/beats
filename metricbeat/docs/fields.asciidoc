@@ -25177,20 +25177,36 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+type: alias
 
-
-type: keyword
+alias to: container.name
 
 --
 
 *`kubernetes.container.image`*::
 +
 --
-Kubernetes container image
+type: alias
 
+alias to: container.image.name
 
-type: keyword
+--
+
+*`kubernetes.container.id`*::
++
+--
+type: alias
+
+alias to: container.id
+
+--
+
+*`kubernetes.container.runtime`*::
++
+--
+type: alias
+
+alias to: container.runtime
 
 --
 

@@ -58,31 +58,21 @@
             Kubernetes statefulset name
 
         - name: container.name
-          type: keyword
-          description: >
-            Kubernetes container name
+          type: alias
+          path: container.name
+          migration: true
 
         - name: container.image
-          type: keyword
-          description: >
-            Kubernetes container image
-
-        - name: container.name
-          type: keyword
-          description: >
-            Kubernetes container name
-
-        - name: container.image
-          type: keyword
-          description: >
-            Kubernetes container image
+          type: alias
+          path: container.image.name
+          migration: true
 
         - name: container.id
-          type: keyword
-          description: >
-            Kubernetes container id
+          type: alias
+          path: container.id
+          migration: true
 
         - name: container.runtime
-          type: keyword
-          description: >
-            Kubernetes container runtime
+          type: alias
+          path: container.runtime
+          migration: true
