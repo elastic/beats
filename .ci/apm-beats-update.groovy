@@ -53,6 +53,7 @@ pipeline {
         Checkout the code and stash it, to use it on other stages.
         */
         stage('Checkout') {
+          options { skipDefaultCheckout() }
           steps {
             deleteDir()
             gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
