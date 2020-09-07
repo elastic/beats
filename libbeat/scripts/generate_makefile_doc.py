@@ -63,11 +63,11 @@ def parse_line(line, regexp, categories, categories_set):
         try:
             name = matches.group("varname")
             is_variable = True
-        except:
+        except BaseException:
             pass
         try:
             default = matches.group("default").strip()
-        except:
+        except BaseException:
             default = ""
 
         if not name:
