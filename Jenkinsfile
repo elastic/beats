@@ -1127,6 +1127,7 @@ def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -1140,6 +1141,7 @@ def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",
