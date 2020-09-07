@@ -47,8 +47,10 @@ Below you will see an example configuration file, that sets the default hostname
     var.syslog_port: 9005
     var.default_host_name: firewall.localgroup.local
     var.known_devices:
-       "1234567890123457": "a.host.local"
-       "1234234590678557": "b.host.local"
+      - serial_number: "1234567890123457"
+        hostname: "a.host.local"
+      - serial_number: "1234234590678557"
+        hostname: "b.host.local"
 ----
 
 include::../include/var-paths.asciidoc[]
