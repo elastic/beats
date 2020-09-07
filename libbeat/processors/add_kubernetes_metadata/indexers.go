@@ -183,7 +183,7 @@ func NewContainerIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, er
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var m []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := kubernetes.ContainerID(status)
+		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
 		if cID == "" {
 			continue
 		}
@@ -194,6 +194,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 				metadata.WithFields("container.name", status.Name),
 				metadata.WithFields("container.image", status.Image),
 				metadata.WithFields("container.id", cID),
+				metadata.WithFields("container.runtime", runtime),
 			),
 		})
 	}

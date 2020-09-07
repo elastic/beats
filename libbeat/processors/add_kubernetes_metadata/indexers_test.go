@@ -211,16 +211,18 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 
 	expected["container"] = common.MapStr{
-		"name":  container,
-		"image": containerImage,
-		"id":    "abcde",
+		"name":    container,
+		"image":   containerImage,
+		"id":      "abcde",
+		"runtime": "docker",
 	}
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	expected["container"] = common.MapStr{
-		"name":  initContainer,
-		"image": initContainerImage,
-		"id":    "fghij",
+		"name":    initContainer,
+		"image":   initContainerImage,
+		"id":      "fghij",
+		"runtime": "docker",
 	}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
