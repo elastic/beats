@@ -324,7 +324,7 @@ processors:
       target_field: tls.server.not_before
       formats:
         - ISO8601
-      if: ctx.tls?.server?.not_before != null
+      if: ctx.suricata?.eve?.tls?.notbefore != null
   - set:
       field: file.x509.not_after
       value: '{{tls.server.not_after}}'

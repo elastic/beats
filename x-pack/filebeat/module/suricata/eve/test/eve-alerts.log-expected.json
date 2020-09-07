@@ -1557,6 +1557,7 @@
         "file.x509.issuer.country": "US",
         "file.x509.issuer.organization": "Google Inc",
         "file.x509.not_after": "2024-07-16T14:52:35.000Z",
+        "file.x509.not_before": "2019-07-17T14:52:35.000Z",
         "file.x509.serial_number": "001122334455667788",
         "file.x509.subject.common_name": "*.google.com",
         "file.x509.subject.country": "US",
@@ -1604,6 +1605,7 @@
         "tls.server.issuer": "C=US, O=Google Inc, CN=Google Internet Authority G2",
         "tls.server.ja3s": "0993626a07ad09e1ce91293be7aa5721",
         "tls.server.not_after": "2024-07-16T14:52:35.000Z",
+        "tls.server.not_before": "2019-07-17T14:52:35.000Z",
         "tls.server.subject": "C=US, ST=California, L=Mountain View, O=Google Inc, CN=*.google.com",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
@@ -1636,6 +1638,7 @@
         "file.x509.issuer.organizational_unit": "Unknown",
         "file.x509.issuer.state_or_province": "Unknown",
         "file.x509.not_after": "2026-06-25T17:36:29.000Z",
+        "file.x509.not_before": "2016-06-27T17:36:29.000Z",
         "file.x509.serial_number": "72A92C51",
         "file.x509.subject.common_name": "Unknown",
         "file.x509.subject.country": "Unknown",
@@ -1696,6 +1699,7 @@
         "tls.server.issuer": "C=Unknown, ST=Unknown, L=Unknown, O=Unknown, OU=Unknown, CN=Unknown",
         "tls.server.ja3s": "391231ba5675e42807b9e1f457b2614e",
         "tls.server.not_after": "2026-06-25T17:36:29.000Z",
+        "tls.server.not_before": "2016-06-27T17:36:29.000Z",
         "tls.server.subject": "C=Unknown, ST=Unknown, L=Unknown, O=Unknown, OU=Unknown, CN=Unknown",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
