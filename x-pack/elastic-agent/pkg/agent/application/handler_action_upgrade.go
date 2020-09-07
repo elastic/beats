@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -15,6 +16,7 @@ import (
 // After running Upgrade agent should download its own version specified by action
 // from repository specified by fleet.
 type handlerUpgrade struct {
+	settings    *artifact.Config
 	log         *logger.Logger
 	emitter     emitterFunc
 	dispatcher  programsDispatcher

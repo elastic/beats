@@ -209,6 +209,7 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
 		&handlerUpgrade{
+			settings:    cfg.Settings.DownloadConfig,
 			log:         log,
 			emitter:     emit,
 			dispatcher:  router,
