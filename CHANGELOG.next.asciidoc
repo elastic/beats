@@ -296,6 +296,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for new `service_name` option to all monitors. {pull}19932[19932].
 - Stop rescheduling tasks of stopped monitors. {pull}20570[20570]
 
+*Heartbeat*
+
+
 *Journalbeat*
 
 
@@ -377,6 +380,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
 - Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
 - Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
+- Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 - Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 
@@ -391,6 +395,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
 - Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
 - Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
+- Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 
 *Functionbeat*
 
@@ -466,7 +471,6 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 - Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
-- Added support for more message types for Cisco ASA and FTD. {pull}20565[20565]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 
 *Auditbeat*
