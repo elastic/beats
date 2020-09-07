@@ -189,8 +189,12 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 		}
 		m = append(m, MetadataIndex{
 			Index: cID,
-			Data: c.metaGen.Generate(pod, metadata.WithFields("container.name", status.Name),
-				metadata.WithFields("container.image", status.Image)),
+			Data: c.metaGen.Generate(
+				pod,
+				metadata.WithFields("container.name", status.Name),
+				metadata.WithFields("container.image", status.Image),
+				metadata.WithFields("container.id", cID),
+			),
 		})
 	}
 

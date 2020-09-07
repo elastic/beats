@@ -334,7 +334,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
-		
+
 		meta := p.metagen.Generate(
 			pod,
 			metadata.WithFields("container.name", c.Name),

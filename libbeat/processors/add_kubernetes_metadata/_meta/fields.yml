@@ -66,3 +66,23 @@
           type: keyword
           description: >
             Kubernetes container image
+
+        - name: container.name
+          type: keyword
+          description: >
+            Kubernetes container name
+
+        - name: container.image
+          type: keyword
+          description: >
+            Kubernetes container image
+
+        - name: container.id
+          type: keyword
+          description: >
+            Kubernetes container id
+
+        - name: container.runtime
+          type: keyword
+          description: >
+            Kubernetes container runtime
