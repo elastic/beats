@@ -379,7 +379,7 @@ func TestConfigurableStartStop(t *testing.T) {
 }
 
 func TestConfigurableService(t *testing.T) {
-	t.SkipNow("flaky see https://github.com/elastic/beats/issues/20836")
+	t.Skipf("flaky see https://github.com/elastic/beats/issues/20836")
 
 	p := getProgram("serviceable", "1.0")
 
