@@ -339,9 +339,15 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			pod,
 			metadata.WithFields("container.name", c.Name),
 			metadata.WithFields("container.image", c.Image),
-			metadata.WithFields("container.id", cid),
-			metadata.WithFields("container.runtime", runtimes[c.Name]),
 		)
+
+		cmeta := common.MapStr{
+			"id":   cid,
+			"image": common.MapStr{
+				"name": c.Image,
+			},
+			"runtime": runtimes[c.Name],
+		}
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
@@ -362,6 +368,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container": cmeta,
 				},
 			}
 			events = append(events, event)
@@ -378,6 +385,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container": cmeta,
 				},
 			}
 			events = append(events, event)
