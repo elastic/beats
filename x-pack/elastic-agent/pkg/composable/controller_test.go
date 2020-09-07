@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
@@ -34,12 +36,36 @@ func TestController(t *testing.T) {
 				},
 			},
 			"local_dynamic": map[string]interface{}{
-				"vars": []map[string]interface{}{
+				"items": []map[string]interface{}{
 					{
-						"key1": "value1",
+						"vars": map[string]interface{}{
+							"key1": "value1",
+						},
+						"processors": []map[string]interface{}{
+							{
+								"add_fields": map[string]interface{}{
+									"fields": map[string]interface{}{
+										"add": "value1",
+									},
+									"to": "dynamic",
+								},
+							},
+						},
 					},
 					{
-						"key1": "value2",
+						"vars": map[string]interface{}{
+							"key1": "value2",
+						},
+						"processors": []map[string]interface{}{
+							{
+								"add_fields": map[string]interface{}{
+									"fields": map[string]interface{}{
+										"add": "value2",
+									},
+									"to": "dynamic",
+								},
+							},
+						},
 					},
 				},
 			},
@@ -54,8 +80,8 @@ func TestController(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	wg.Add(1)
-	var setVars []composable.Vars
-	err = c.Run(ctx, func(vars []composable.Vars) {
+	var setVars []transpiler.Vars
+	err = c.Run(ctx, func(vars []transpiler.Vars) {
 		setVars = vars
 		wg.Done()
 	})
@@ -76,10 +102,10 @@ func TestController(t *testing.T) {
 	localMap = setVars[1].Mapping["local_dynamic"].(map[string]interface{})
 	assert.Equal(t, "value1", localMap["key1"])
 	assert.Equal(t, "local_dynamic", setVars[1].ProcessorsKey)
-	assert.Nil(t, setVars[1].Processors)
+	assert.Len(t, setVars[1].Processors, 1)
 
 	localMap = setVars[2].Mapping["local_dynamic"].(map[string]interface{})
 	assert.Equal(t, "value2", localMap["key1"])
 	assert.Equal(t, "local_dynamic", setVars[2].ProcessorsKey)
-	assert.Nil(t, setVars[2].Processors)
+	assert.Len(t, setVars[2].Processors, 1)
 }
