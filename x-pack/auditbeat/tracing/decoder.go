@@ -20,7 +20,8 @@ import (
 // as the kernel tracing subsystem won't let us dump more than that anyway.
 const maxRawCopySize = 2048
 
-// Decoder decodes raw events into an usable type.
+// Decoder interface decodes a raw event's data into an usable type. The type
+// returned depends on the specific Decoder implementation.
 type Decoder interface {
 	// Decode takes a raw message and its metadata and returns a representation
 	// in a decoder-dependent type.
@@ -31,8 +32,8 @@ type mapDecoder []Field
 
 // NewMapDecoder creates a new decoder that will parse raw tracing events
 // into a map[string]interface{}. This decoder will decode all the fields
-// described in the format.
-// The map keys are the field names as given in the format.
+// described by the probe format file.
+// The map keys are the field names.
 // The map values are fixed-size integers for integer fields:
 // uint8, uint16, uint32, uint64, and for signed fields, their signed counterpart.
 // For string fields, the value is a string.

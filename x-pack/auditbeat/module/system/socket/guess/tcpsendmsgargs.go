@@ -10,8 +10,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // Guess the position of size parameter in tcp_sendmsg.
@@ -35,7 +35,7 @@ type tcpSendMsgArgCountGuess struct {
 }
 
 type guessTCPSendMsg struct {
-	ctx     Context
+	ctx     kprobes.GuessContext
 	cs      inetClientServer
 	written int
 }
@@ -61,21 +61,21 @@ func (g *guessTCPSendMsg) Requires() []string {
 }
 
 // Probes returns a kprobe on tcp_sendmsg that fetches args 3 and 4.
-func (g *guessTCPSendMsg) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessTCPSendMsg) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "tcp_sendmsg_argcount_guess",
 				Address:   "tcp_sendmsg",
 				Fetchargs: "c={{.P3}} d={{.P4}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgArgCountGuess) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpSendMsgArgCountGuess) }),
 		},
 	}, nil
 }
 
 // Prepare creates a TCP client-server.
-func (g *guessTCPSendMsg) Prepare(ctx Context) error {
+func (g *guessTCPSendMsg) Prepare(ctx kprobes.GuessContext) error {
 	g.ctx = ctx
 	return g.cs.SetupTCP()
 }

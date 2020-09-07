@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -40,7 +41,7 @@ func init() {
 }
 
 type guessInet6CskXmit struct {
-	ctx                    Context
+	ctx                    kprobes.GuessContext
 	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
@@ -70,15 +71,15 @@ func (g *guessInet6CskXmit) Requires() []string {
 }
 
 // Condition allows this probe to run only when IPv6 is enabled.
-func (g *guessInet6CskXmit) Condition(ctx Context) (bool, error) {
+func (g *guessInet6CskXmit) Condition(ctx kprobes.GuessContext) (bool, error) {
 	return isIPv6Enabled(ctx.Vars)
 }
 
 // Probes returns 2 probes:
 //   - kretprobe on inet_csk_accept, which returns a struct sock*
 //   - kprobe on inet6_csk_xmit, returning 1st argument as pointer and dump.
-func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessInet6CskXmit) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
@@ -86,22 +87,22 @@ func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
 				Address:   "inet_csk_accept",
 				Fetchargs: "sock={{.RET}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
 		},
 		{
 			Probe: tracing.Probe{
 				Name:      "inet6_csk_xmit_guess",
 				Address:   "inet6_csk_xmit",
-				Fetchargs: "arg={{.P1}} dump=" + helper.MakeMemoryDump("{{.P1}}", 0, skbuffDumpSize),
+				Fetchargs: "arg={{.P1}} dump=" + kprobes.MakeMemoryDump("{{.P1}}", 0, skbuffDumpSize),
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
 		},
 	}, nil
 }
 
 // Prepare setups an IPv6 TCP client/server where the server is listening
 // and the client is connecting to it.
-func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
+func (g *guessInet6CskXmit) Prepare(ctx kprobes.GuessContext) (err error) {
 	g.ctx = ctx
 	g.acceptedFd = -1
 	g.loopback, err = helper.NewIPv6Loopback()

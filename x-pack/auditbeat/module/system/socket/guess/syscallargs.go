@@ -12,8 +12,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -46,7 +46,7 @@ type syscallGuess struct {
 }
 
 type guessSyscallArgs struct {
-	ctx      Context
+	ctx      kprobes.GuessContext
 	expected [2]uintptr
 }
 
@@ -78,21 +78,21 @@ func (g *guessSyscallArgs) Requires() []string {
 
 // Probes sets a probe on gettimeofday syscall, and returns its first and
 // second argument according to both calling conventions.
-func (g *guessSyscallArgs) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessSyscallArgs) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "syscall_args_guess",
 				Address:   "{{.SYS_GETTIMEOFDAY}}",
 				Fetchargs: "p1reg={{._SYS_P1}} p2reg={{._SYS_P2}} p1pt=+0x70({{._SYS_P1}}) p2pt=+0x68({{(._SYS_P1)}})",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(syscallGuess) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(syscallGuess) }),
 		},
 	}, nil
 }
 
 // Prepare is a no-op.
-func (g *guessSyscallArgs) Prepare(ctx Context) error {
+func (g *guessSyscallArgs) Prepare(ctx kprobes.GuessContext) error {
 	g.ctx = ctx
 	return nil
 }

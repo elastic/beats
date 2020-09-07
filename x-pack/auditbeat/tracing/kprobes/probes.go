@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package helper
+package kprobes
 
 import (
 	"bytes"
@@ -21,6 +21,12 @@ type ProbeDef struct {
 	Probe   tracing.Probe
 	Decoder func(desc tracing.ProbeFormat) (tracing.Decoder, error)
 }
+
+// ProbeTransform transforms a probe before its installed.
+type ProbeTransform func(ProbeDef) ProbeDef
+
+// ProbeCondition is a function that allows to filter probes.
+type ProbeCondition func(probe tracing.Probe) bool
 
 // ApplyTemplate returns a new probe definition after expanding all templates.
 func (pdef ProbeDef) ApplyTemplate(vars common.MapStr) ProbeDef {

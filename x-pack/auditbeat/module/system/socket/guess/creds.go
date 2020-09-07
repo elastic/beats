@@ -14,8 +14,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -57,7 +57,7 @@ func init() {
 }
 
 type guessStructCreds struct {
-	ctx Context
+	ctx kprobes.GuessContext
 }
 
 // Name of this guess.
@@ -84,14 +84,14 @@ func (g *guessStructCreds) Requires() []string {
 
 // Probes returns a kretprobe on prepare_creds that dumps the first bytes
 // pointed to by the return value, which is a struct cred.
-func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessStructCreds) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_struct_creds",
 				Address:   "prepare_creds",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
+				Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -99,7 +99,7 @@ func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessStructCreds) Prepare(ctx Context) error {
+func (g *guessStructCreds) Prepare(ctx kprobes.GuessContext) error {
 	return nil
 }
 

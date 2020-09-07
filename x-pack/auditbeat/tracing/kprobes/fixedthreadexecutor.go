@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package helper
+package kprobes
 
 import (
 	"runtime"

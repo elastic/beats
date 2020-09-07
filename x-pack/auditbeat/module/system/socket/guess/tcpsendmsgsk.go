@@ -12,8 +12,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // Guess how to get a struct sock* from tcp_sendmsg parameters. It can be:
@@ -40,7 +40,7 @@ type tcpSendMsgSockGuess struct {
 }
 
 type guessTcpSendmsgSock struct {
-	ctx     Context
+	ctx     kprobes.GuessContext
 	cs      inetClientServer
 	written int
 }
@@ -69,21 +69,21 @@ func (g *guessTcpSendmsgSock) Requires() []string {
 
 // Probes sets a kprobe on tcp_sendmsg and fetches all the possible argument
 // combinations to account for all the known signatures of the function.
-func (g *guessTcpSendmsgSock) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessTcpSendmsgSock) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "tcp_sendmsg_sock_guess",
 				Address:   "tcp_sendmsg",
 				Fetchargs: "p1=+{{.INET_SOCK_RADDR}}({{.P1}}):u32 p2=+{{.INET_SOCK_RADDR}}({{.P2}}):u32 indirect=+{{.INET_SOCK_RADDR}}(+{{.SOCKET_SOCK}}({{.P2}})):u32",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgSockGuess) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpSendMsgSockGuess) }),
 		},
 	}, nil
 }
 
 // Prepare creates a TCP client-server.
-func (g *guessTcpSendmsgSock) Prepare(ctx Context) error {
+func (g *guessTcpSendmsgSock) Prepare(ctx kprobes.GuessContext) error {
 	g.ctx = ctx
 	return g.cs.SetupTCP()
 }

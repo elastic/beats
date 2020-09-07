@@ -6,20 +6,24 @@
 
 package guess
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
+)
 
 // Registry serves as a registration point for guesses.
 var Registry = Register{
-	guesses: make(map[string]Guesser),
+	guesses: make(map[string]kprobes.Guesser),
 }
 
 // Register stores the registered guesses.
 type Register struct {
-	guesses map[string]Guesser
+	guesses map[string]kprobes.Guesser
 }
 
 // AddGuess registers a new guess.
-func (r *Register) AddGuess(guess Guesser) error {
+func (r *Register) AddGuess(guess kprobes.Guesser) error {
 	if _, found := r.guesses[guess.Name()]; found {
 		return fmt.Errorf("guess %s is duplicated", guess.Name())
 	}
@@ -28,7 +32,7 @@ func (r *Register) AddGuess(guess Guesser) error {
 }
 
 // GetList returns a list of registered guesses.
-func (r *Register) GetList() (list []Guesser) {
+func (r *Register) GetList() (list []kprobes.Guesser) {
 	for _, guess := range r.guesses {
 		list = append(list, guess)
 	}

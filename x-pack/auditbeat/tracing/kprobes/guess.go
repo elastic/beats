@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package guess
+package kprobes
 
 import (
 	"fmt"
@@ -13,14 +13,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
-// Context shared with guesses.
-type Context struct {
+// GuessContext shared with guesses.
+type GuessContext struct {
 	// Log is a logger so that guesses can log.
-	Log helper.Logger
+	Log Logger
 	// Vars is the current set of template variables.
 	Vars common.MapStr
 	// Timeout is the maximum time allowed to wait for a guess to complete.
@@ -33,7 +32,7 @@ type Guesser interface {
 	// Name returned the name of this guess.
 	Name() string
 	// Probes returns one or more probes to install.
-	Probes() ([]helper.ProbeDef, error)
+	Probes() ([]ProbeDef, error)
 	// Provides must return the list of variables that this guess will provide.
 	Provides() []string
 	// Requires must return the list of variables that this guess requires to
@@ -41,7 +40,7 @@ type Guesser interface {
 	Requires() []string
 	// Prepare performs initializations. Events won't be captured for actions
 	// performed during preparation. It runs in the same OS thread than Trigger.
-	Prepare(ctx Context) error
+	Prepare(ctx GuessContext) error
 	// Trigger performs the actions necessary to generate events of interest
 	// to this guess.
 	Trigger() error
@@ -79,22 +78,22 @@ type ConditionalGuesser interface {
 	// Condition returns if this guess has to be run.
 	// When false, it must set all its Provides() to dummy values to ensure that
 	// dependent guesses are run.
-	Condition(ctx Context) (bool, error)
+	Condition(ctx GuessContext) (bool, error)
 }
 
-// Guess is a helper function to easily determine memory layouts of kernel
+// guess is a helper function to easily determine memory layouts of kernel
 // structs and similar tasks. It installs the guesser's Probe, starts a perf
 // channel and executes the Trigger function. Each record received through the
 // channel is passed to the Extract function. Terminates once Extract succeeds
 // or the timeout expires.
-func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func (e *Engine) guess(guesser Guesser, ctx GuessContext) (result common.MapStr, err error) {
 	switch v := guesser.(type) {
 	case RepeatGuesser:
-		result, err = guessMultiple(v, installer, ctx)
+		result, err = e.guessMultiple(v, ctx)
 	case EventualGuesser:
-		result, err = guessEventually(v, installer, ctx)
+		result, err = e.guessEventually(v, ctx)
 	default:
-		result, err = guessOnce(guesser, installer, ctx)
+		result, err = e.guessOnce(guesser, ctx)
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "%s failed", guesser.Name())
@@ -102,10 +101,10 @@ func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (resul
 	return result, nil
 }
 
-func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func (e *Engine) guessMultiple(guess RepeatGuesser, ctx GuessContext) (result common.MapStr, err error) {
 	var results []common.MapStr
 	for idx := 1; idx <= guess.NumRepeats(); idx++ {
-		r, err := guessOnce(guess, installer, ctx)
+		r, err := e.guessOnce(guess, ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -115,11 +114,11 @@ func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Con
 	return guess.Reduce(results)
 }
 
-func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func (e *Engine) guessEventually(guess EventualGuesser, ctx GuessContext) (result common.MapStr, err error) {
 	limit := guess.MaxRepeats()
 	for i := 0; i < limit; i++ {
 		ctx.Log.Debugf(" --- %s run #%d", guess.Name(), i)
-		if result, err = guessOnce(guess, installer, ctx); err != nil {
+		if result, err = e.guessOnce(guess, ctx); err != nil {
 			return nil, err
 		}
 		if len(result) != 0 {
@@ -129,7 +128,7 @@ func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx
 	return nil, fmt.Errorf("guess %s didn't succeed after %d tries", guess.Name(), limit)
 }
 
-func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func (e *Engine) guessOnce(guesser Guesser, ctx GuessContext) (result common.MapStr, err error) {
 	if err := guesser.Prepare(ctx); err != nil {
 		return nil, errors.Wrap(err, "prepare failed")
 	}
@@ -145,9 +144,9 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 	decoders := make([]tracing.Decoder, 0, len(probes))
 	formats := make([]tracing.ProbeFormat, 0, len(probes))
-	defer installer.UninstallInstalled()
+	defer e.uninstallProbes()
 	for _, pdesc := range probes {
-		format, decoder, err := installer.Install(pdesc)
+		format, decoder, err := e.installProbe(pdesc)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to add kprobe '%s'", pdesc.Probe.String())
 		}
@@ -165,7 +164,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	// thread even if the result of an execution is not consumed because be
 	// timeout.
 	const executorQueueSize = 1
-	thread := helper.NewFixedThreadExecutor(executorQueueSize)
+	thread := NewFixedThreadExecutor(executorQueueSize)
 	defer thread.Close()
 
 	perfchan, err := tracing.NewPerfChannel(
@@ -252,8 +251,7 @@ func containsAll(requirements []string, dict common.MapStr) bool {
 
 // GuessAll will run all the registered guesses, taking care of doing so in an
 // order so that a probe dependencies are available before it runs.
-func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
-	list := Registry.GetList()
+func (e *Engine) guessAll(list []Guesser, ctx GuessContext) (err error) {
 	start := time.Now()
 	ctx.Log.Infof("Running %d guesses ...", len(list))
 	// This simple O(N^2) topological sort is enough for the small
@@ -275,7 +273,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 				next = append(next, guesser)
 				continue
 			}
-			result, err := Guess(guesser, installer, ctx)
+			result, err := e.guess(guesser, ctx)
 			if err != nil {
 				return err
 			}
@@ -304,16 +302,4 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 	}
 	ctx.Log.Infof("Guessing done after %v", time.Since(start))
 	return nil
-}
-
-func isIPv6Enabled(vars common.MapStr) (bool, error) {
-	iface, err := vars.GetValue("HAS_IPV6")
-	if err != nil {
-		return false, err
-	}
-	hasIPv6, ok := iface.(bool)
-	if !ok {
-		return false, errors.New("HAS_IPV6 is not a bool")
-	}
-	return hasIPv6, nil
 }

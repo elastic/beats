@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -36,7 +37,7 @@ func init() {
 }
 
 type guessSockaddrIn6 struct {
-	ctx                    Context
+	ctx                    kprobes.GuessContext
 	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
@@ -65,19 +66,19 @@ func (g *guessSockaddrIn6) Requires() []string {
 }
 
 // Condition allows this probe to run only when IPv6 is enabled.
-func (g *guessSockaddrIn6) Condition(ctx Context) (bool, error) {
+func (g *guessSockaddrIn6) Condition(ctx kprobes.GuessContext) (bool, error) {
 	return isIPv6Enabled(ctx.Vars)
 }
 
 // Probes returns a probe on tcp_v6_connect, dumping its second argument,
 // a struct sockaddr* (struct sockaddr_in6* for AF_INET6).
-func (g *guessSockaddrIn6) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessSockaddrIn6) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "sockaddr_in6_guess",
 				Address:   "tcp_v6_connect",
-				Fetchargs: helper.MakeMemoryDump("{{.P2}}", 0, 64),
+				Fetchargs: kprobes.MakeMemoryDump("{{.P2}}", 0, 64),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -85,7 +86,7 @@ func (g *guessSockaddrIn6) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessSockaddrIn6) Prepare(ctx Context) (err error) {
+func (g *guessSockaddrIn6) Prepare(ctx kprobes.GuessContext) (err error) {
 	g.ctx = ctx
 	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {

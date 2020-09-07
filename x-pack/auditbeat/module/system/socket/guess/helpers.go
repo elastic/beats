@@ -200,3 +200,15 @@ func (cs *inetClientServer) Cleanup() error {
 	unix.Close(cs.client)
 	return nil
 }
+
+func isIPv6Enabled(vars common.MapStr) (bool, error) {
+	iface, err := vars.GetValue("HAS_IPV6")
+	if err != nil {
+		return false, err
+	}
+	hasIPv6, ok := iface.(bool)
+	if !ok {
+		return false, errors.New("HAS_IPV6 is not a bool")
+	}
+	return hasIPv6, nil
+}

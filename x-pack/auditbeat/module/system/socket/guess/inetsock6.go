@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -109,7 +110,7 @@ func init() {
 }
 
 type guessInetSockIPv6 struct {
-	ctx                    Context
+	ctx                    kprobes.GuessContext
 	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
@@ -143,7 +144,7 @@ func (g *guessInetSockIPv6) Requires() []string {
 }
 
 // Condition allows this probe to run only when IPv6 is enabled.
-func (g *guessInetSockIPv6) Condition(ctx Context) (bool, error) {
+func (g *guessInetSockIPv6) Condition(ctx kprobes.GuessContext) (bool, error) {
 	runs, err := isIPv6Enabled(ctx.Vars)
 	if err != nil {
 		return false, err
@@ -178,13 +179,13 @@ func (d *decoderWrapper) Decode(raw []byte, meta tracing.Metadata) (event interf
 // Probes returns a kretprobe in inet_csk_accept that dumps the memory pointed
 // to by the return value (an inet_sock*) and a kretprobe that dumps various
 // candidates for the ipv6_pinfo struct.
-func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
-	probes = append(probes, helper.ProbeDef{
+func (g *guessInetSockIPv6) Probes() (probes []kprobes.ProbeDef, err error) {
+	probes = append(probes, kprobes.ProbeDef{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
 			Name:      "inet_sock_ipv6_guess",
 			Address:   "inet_csk_accept",
-			Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, inetSockDumpSize),
+			Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, inetSockDumpSize),
 		},
 		Decoder: tracing.NewDumpDecoder,
 	})
@@ -204,7 +205,7 @@ func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
 		// dumps the rcv_saddr field of struct ipv6_pinfo
 		fetch = append(fetch, fmt.Sprintf("+16(+%d({{.RET}})):u64 +24(+%d({{.RET}})):u64", off, off))
 	}
-	probes = append(probes, helper.ProbeDef{
+	probes = append(probes, kprobes.ProbeDef{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
 			Name:      "inet_sock_ipv6_guess2",
@@ -225,7 +226,7 @@ func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
 // Unlike with IPv4, it's not possible to bind to a random IP in the IPv6
 // loopback as it is ::1/128 by default. Thus it's necessary to add temporary
 // random addresses in the fd00::/8 reserved network to the loopback device.
-func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
+func (g *guessInetSockIPv6) Prepare(ctx kprobes.GuessContext) (err error) {
 	g.ctx = ctx
 	g.offsets, err = getListField(g.ctx.Vars, "INET_SOCK_RADDR_LIST")
 	if err != nil {

@@ -11,8 +11,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -51,7 +51,7 @@ func init() {
 }
 
 type guessInetSockFamily struct {
-	ctx     Context
+	ctx     kprobes.GuessContext
 	family  int
 	limit   int
 	canIPv6 bool
@@ -81,13 +81,13 @@ func (g *guessInetSockFamily) Requires() []string {
 // Probes returns a kprobe on inet_release which has a struct socket* as
 // single argument. Returns a dump of the (struct socket*)->sk field, which is
 // a struct inet_sock* for INET/INET6.
-func (g *guessInetSockFamily) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessInetSockFamily) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "inet_sock_af_guess",
 				Address:   "inet_release",
-				Fetchargs: helper.MakeMemoryDump("+{{.SOCKET_SOCK}}({{.P1}})", 0, inetSockAfDumpSize),
+				Fetchargs: kprobes.MakeMemoryDump("+{{.SOCKET_SOCK}}({{.P1}})", 0, inetSockAfDumpSize),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -95,7 +95,7 @@ func (g *guessInetSockFamily) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessInetSockFamily) Prepare(ctx Context) error {
+func (g *guessInetSockFamily) Prepare(ctx kprobes.GuessContext) error {
 	g.ctx = ctx
 	var ok bool
 	// limit is used as a reference point within struct sock_common to know where

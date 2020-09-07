@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -57,7 +58,7 @@ func init() {
 }
 
 type guessSkBuffLen struct {
-	ctx     Context
+	ctx     kprobes.GuessContext
 	cs      inetClientServer
 	written int
 }
@@ -85,13 +86,13 @@ func (g *guessSkBuffLen) Requires() []string {
 
 // Probes returns a probe on ip_local_out, which is called to output an IPv4
 // packet.
-func (g *guessSkBuffLen) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessSkBuffLen) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "ip_local_out_len_guess",
 				Address:   "{{.IP_LOCAL_OUT}}",
-				Fetchargs: helper.MakeMemoryDump("{{.IP_LOCAL_OUT_SK_BUFF}}", 0, skbuffDumpSize),
+				Fetchargs: kprobes.MakeMemoryDump("{{.IP_LOCAL_OUT_SK_BUFF}}", 0, skbuffDumpSize),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -99,7 +100,7 @@ func (g *guessSkBuffLen) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare creates a connected TCP client-server.
-func (g *guessSkBuffLen) Prepare(ctx Context) error {
+func (g *guessSkBuffLen) Prepare(ctx kprobes.GuessContext) error {
 	g.ctx = ctx
 	return g.cs.SetupTCP()
 }
@@ -232,7 +233,7 @@ func (g *guessSkBuffLen) Reduce(results []common.MapStr) (result common.MapStr, 
 */
 
 type guessSkBuffProto struct {
-	ctx                    Context
+	ctx                    kprobes.GuessContext
 	doIPv6                 bool
 	hasIPv6                bool
 	cs                     inetClientServer
@@ -249,14 +250,14 @@ func (g *guessSkBuffProto) Name() string {
 
 // Probes returns a kretprobe in __skb_recv_datagram that dumps the memory
 // pointed to by the return value (a struct sk_buff*).
-func (g *guessSkBuffProto) Probes() ([]helper.ProbeDef, error) {
-	return []helper.ProbeDef{
+func (g *guessSkBuffProto) Probes() ([]kprobes.ProbeDef, error) {
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_datagram",
 				Address:   "{{.RECV_UDP_DATAGRAM}}",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, 1024),
+				Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, 1024),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -276,7 +277,7 @@ func (g *guessSkBuffProto) Requires() []string {
 }
 
 // Prepare sets up either two UDP sockets, using either IPv4 or IPv6.
-func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
+func (g *guessSkBuffProto) Prepare(ctx kprobes.GuessContext) (err error) {
 	g.ctx = ctx
 	g.hasIPv6, err = isIPv6Enabled(ctx.Vars)
 	if err != nil {
@@ -496,7 +497,7 @@ const (
 */
 
 type guessSkBuffDataPtr struct {
-	ctx Context
+	ctx kprobes.GuessContext
 	cs  inetClientServer
 	// offset of proto (already discovered)
 	protoOffset int
@@ -521,24 +522,24 @@ func (g *guessSkBuffDataPtr) Name() string {
 
 // Probes return two probes at the same function. One will output a *dataDump
 // the other one a []byte with the sk_buff.
-func (g *guessSkBuffDataPtr) Probes() ([]helper.ProbeDef, error) {
+func (g *guessSkBuffDataPtr) Probes() ([]kprobes.ProbeDef, error) {
 	address := fmt.Sprintf("+%d(%s)", g.dumpOffset, g.ctx.Vars["RET"])
-	return []helper.ProbeDef{
+	return []kprobes.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_dgrm_data",
 				Address:   "{{.RECV_UDP_DATAGRAM}}",
-				Fetchargs: fmt.Sprintf("ptr=%s data=%s", address, helper.MakeMemoryDump(address, 0, dataDumpBytes)),
+				Fetchargs: fmt.Sprintf("ptr=%s data=%s", address, kprobes.MakeMemoryDump(address, 0, dataDumpBytes)),
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(dataDump) }),
+			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(dataDump) }),
 		},
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_dgrm_skbuff",
 				Address:   "{{.RECV_UDP_DATAGRAM}}",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, skbuffDumpSize),
+				Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, skbuffDumpSize),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -561,7 +562,7 @@ func (g *guessSkBuffDataPtr) Requires() []string {
 
 // Prepare initializes the guess. The first time it sets protoOffset/dumpOffset
 // and payload. When called again it increments the dumpOffset.
-func (g *guessSkBuffDataPtr) Prepare(ctx Context) (err error) {
+func (g *guessSkBuffDataPtr) Prepare(ctx kprobes.GuessContext) (err error) {
 	g.ctx = ctx
 	// start looking for the pointer at the next uintptr aligned offset after
 	// protocol field.
