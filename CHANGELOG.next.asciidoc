@@ -255,6 +255,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
+- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
+- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
+- Update documentation in the azure module filebeat. {pull}20815[20815]
+- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 
 *Heartbeat*
 
@@ -329,6 +333,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s scheduler compatibility issue. {pull}19699[19699]
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
+- Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
+- Update fields.yml in the azure module, missing metrics field. {pull}20918[20918]
+- The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 
 *Packetbeat*
 
@@ -541,6 +548,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert httpjson to v2 input {pull}20226[20226]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
+- Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 
 *Heartbeat*
 
@@ -657,6 +665,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
+- Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 
 *Packetbeat*
