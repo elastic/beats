@@ -2,7 +2,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'master' }
+  agent none
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
@@ -31,7 +31,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
