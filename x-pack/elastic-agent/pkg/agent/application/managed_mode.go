@@ -207,6 +207,17 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionUpgrade{},
+		&handlerUpgrade{
+			log:         log,
+			emitter:     emit,
+			dispatcher:  router,
+			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
+			actionStore: actionStore,
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)
