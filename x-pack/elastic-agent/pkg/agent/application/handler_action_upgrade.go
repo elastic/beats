@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,6 +28,7 @@ import (
 const (
 	agentName         = "elastic-agent"
 	hashLen           = 6
+	agentCommitFile   = ".elastic-agent.active.commit"
 	agentArtifactName = "beats/" + agentName
 )
 
@@ -159,17 +161,22 @@ func unpack(r io.Reader) (string, error) {
 			return "", errors.New("tar contained invalid filename: %q", f.Name, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
 		}
 
+		//get hash
+		if f.Name == agentCommitFile {
+			hashBytes, err := ioutil.ReadAll(tr)
+			if err != nil || len(hashBytes) < hashLen {
+				return "", err
+			}
+
+			hash = string(hashBytes[:hashLen])
+		}
+
 		// skip everything outside data/
 		if !strings.HasPrefix(f.Name, "data/") {
 			continue
 		}
 
-		name := strings.TrimPrefix(f.Name, "data/")
-		if match, _ := filepath.Match("elastic-agent-??????/*", name); match {
-			hash = (name[:hashEnd])[hashStart:]
-		}
-
-		rel := filepath.FromSlash(name)
+		rel := filepath.FromSlash(strings.TrimPrefix(f.Name, "data/"))
 		abs := filepath.Join(paths.Data(), rel)
 
 		// find the root dir
