@@ -1,5 +1,8 @@
 description: Pipeline for normalizing envoyproxy logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - pipeline:
     if: ctx.message.charAt(0) != (char)("{")
     name: '{< IngestPipeline "pipeline-plaintext" >}'
@@ -11,6 +14,7 @@ processors:
 - set:
     field: event.created
     value: '{{@timestamp}}'
+    ignore_empty_value: true
 - append:
     field: related.ip
     value: "{{source.ip}}"
@@ -36,7 +40,7 @@ processors:
 - set:
     field: '@timestamp'
     value: '{{timestamp}}'
-    if: ctx.timestamp != null
+    ignore_empty_value: true
 - remove:
     field:
     - timestamp

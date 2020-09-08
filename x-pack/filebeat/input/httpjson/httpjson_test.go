@@ -6,543 +6,427 @@ package httpjson
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
-	"strconv"
-	"sync"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
-var (
-	once sync.Once
-	url  string
-)
-
-func testSetup(t *testing.T) {
-	t.Helper()
-	once.Do(func() {
-		logp.TestingSetup()
-	})
-}
-
-func createServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
-	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			req, err := ioutil.ReadAll(r.Body)
-			defer r.Body.Close()
-			if err != nil {
-				log.Fatalln(err)
-			}
-			var m interface{}
-			err = json.Unmarshal(req, &m)
-			w.Header().Set("Content-Type", "application/json")
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-			} else {
-				w.WriteHeader(http.StatusOK)
-				w.Write(req)
-			}
-		} else {
-			message := map[string]interface{}{
-				"hello": "world",
-				"embedded": map[string]string{
-					"hello": "world",
-				},
-			}
-			b, _ := json.Marshal(message)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			w.Write(b)
-		}
-	}))
-}
-
-func createCustomServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
-	var isRetry bool
-	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		if !isRetry {
-			w.Header().Set("X-Rate-Limit-Limit", "0")
-			w.Header().Set("X-Rate-Limit-Remaining", "0")
-			w.Header().Set("X-Rate-Limit-Reset", strconv.FormatInt(time.Now().Unix(), 10))
-			w.WriteHeader(http.StatusTooManyRequests)
-			w.Write([]byte{})
-			isRetry = true
-		} else {
-			message := map[string]interface{}{
-				"hello": "world",
-				"embedded": map[string]string{
-					"hello": "world",
-				},
-			}
-			b, _ := json.Marshal(message)
-			w.WriteHeader(http.StatusOK)
-			w.Write(b)
-		}
-	}))
-}
-
-func createCustomServerWithArrayResponse(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
-	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		message := map[string]interface{}{
-			"hello": []map[string]string{
-				{"foo": "bar"},
-				{"bar": "foo"},
+func TestHTTPJSONInput(t *testing.T) {
+	testCases := []struct {
+		name        string
+		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig  map[string]interface{}
+		handler     http.HandlerFunc
+		expected    []string
+	}{
+		{
+			name:        "Test simple GET request",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method": "GET",
+				"interval":    0,
 			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name:        "Test simple HTTPS GET request",
+			setupServer: newTestServer(httptest.NewTLSServer),
+			baseConfig: map[string]interface{}{
+				"http_method":           "GET",
+				"interval":              0,
+				"ssl.verification_mode": "none",
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name:        "Test request honors rate limit",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":          "GET",
+				"interval":             0,
+				"rate_limit.limit":     "X-Rate-Limit-Limit",
+				"rate_limit.remaining": "X-Rate-Limit-Remaining",
+				"rate_limit.reset":     "X-Rate-Limit-Reset",
+			},
+			handler:  rateLimitHandler(),
+			expected: []string{`{"hello":"world"}`},
+		},
+		{
+			name:        "Test request retries when failed",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method": "GET",
+				"interval":    0,
+			},
+			handler:  retryHandler(),
+			expected: []string{`{"hello":"world"}`},
+		},
+		{
+			name:        "Test POST request with body",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method": "POST",
+				"interval":    0,
+				"http_request_body": map[string]interface{}{
+					"test": "abc",
+				},
+			},
+			handler:  defaultHandler("POST", `{"test":"abc"}`),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name:        "Test repeated POST requests",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method": "POST",
+				"interval":    "100ms",
+			},
+			handler: defaultHandler("POST", ""),
+			expected: []string{
+				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
+				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
+			},
+		},
+		{
+			name:        "Test json objects array",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":        "GET",
+				"interval":           0,
+				"json_objects_array": "hello",
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
+		},
+		{
+			name:        "Test split events by",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":     "GET",
+				"interval":        0,
+				"split_events_by": "hello",
+			},
+			handler: defaultHandler("GET", ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
+			},
+		},
+		{
+			name:        "Test split events by with array",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":        "GET",
+				"interval":           0,
+				"split_events_by":    "space",
+				"json_objects_array": "hello",
+			},
+			handler: defaultHandler("GET", ""),
+			expected: []string{
+				`{"world":"moon"}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name:        "Test split events by not found",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":     "GET",
+				"interval":        0,
+				"split_events_by": "unknwown",
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test date cursor",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				server := httptest.NewServer(h)
+				config["url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"http_method":                  "GET",
+				"interval":                     "100ms",
+				"date_cursor.field":            "@timestamp",
+				"date_cursor.url_field":        "$filter",
+				"date_cursor.value_template":   "alertCreationTime ge {{.}}",
+				"date_cursor.initial_interval": "10m",
+				"date_cursor.date_format":      "2006-01-02T15:04:05Z",
+			},
+			handler: dateCursorHandler(),
+			expected: []string{
+				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+			},
+		},
+		{
+			name:        "Test pagination",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"http_method":          "GET",
+				"interval":             0,
+				"pagination.id_field":  "nextPageToken",
+				"pagination.url_field": "page",
+				"json_objects_array":   "items",
+			},
+			handler:  paginationHandler(),
+			expected: []string{`{"foo":"bar"}`, `{"foo":"bar"}`},
+		},
+		{
+			name: "Test oauth2",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				server := httptest.NewServer(h)
+				config["url"] = server.URL
+				config["oauth2.token_url"] = server.URL + "/token"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"http_method":          "POST",
+				"interval":             "0",
+				"oauth2.client.id":     "a_client_id",
+				"oauth2.client.secret": "a_client_secret",
+				"oauth2.endpoint_params": map[string]interface{}{
+					"param1": "v1",
+				},
+				"oauth2.scopes": []string{"scope1", "scope2"},
+			},
+			handler:  oauth2Handler,
+			expected: []string{`{"hello": "world"}`},
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setupServer(t, tc.handler, tc.baseConfig)
+
+			cfg := common.MustNewConfigFrom(tc.baseConfig)
+
+			input, err := configure(cfg)
+
+			assert.NoError(t, err)
+			assert.Equal(t, "httpjson", input.Name())
+			assert.NoError(t, input.Test(v2.TestContext{}))
+
+			pub := beattest.NewChanClient(len(tc.expected))
+			t.Cleanup(func() { _ = pub.Close() })
+
+			ctx, cancel := newV2Context()
+			t.Cleanup(cancel)
+
+			var g errgroup.Group
+			g.Go(func() error { return input.Run(ctx, pub) })
+
+			timeout := time.NewTimer(5 * time.Second)
+			t.Cleanup(func() { _ = timeout.Stop() })
+
+			var receivedCount int
+		wait:
+			for {
+				select {
+				case <-timeout.C:
+					t.Errorf("timed out waiting for %d events", len(tc.expected))
+					return
+				case got := <-pub.Channel:
+					val, err := got.Fields.GetValue("message")
+					assert.NoError(t, err)
+					assert.JSONEq(t, tc.expected[receivedCount], val.(string))
+					receivedCount += 1
+					if receivedCount == len(tc.expected) {
+						cancel()
+						break wait
+					}
+				}
+			}
+			assert.NoError(t, g.Wait())
+		})
+	}
+}
+
+func newTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server := newServer(h)
+		config["url"] = server.URL
+		t.Cleanup(server.Close)
+	}
+}
+
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("httpjson_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
+}
+
+func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+		switch {
+		case r.Method != expectedMethod:
+			w.WriteHeader(http.StatusBadRequest)
+			msg = fmt.Sprintf(`{"error":"expected method was %q"}`, expectedMethod)
+		case expectedBody != "":
+			body, _ := ioutil.ReadAll(r.Body)
+			r.Body.Close()
+			if expectedBody != string(body) {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected body was %q"}`, expectedBody)
+			}
 		}
-		b, _ := json.Marshal(message)
-		w.WriteHeader(http.StatusOK)
-		w.Write(b)
-	}))
-}
 
-func runTest(t *testing.T, isTLS bool, testRateLimitRetry bool, testArrayResponse bool, m map[string]interface{}, run func(input *HttpjsonInput, out *stubOutleter, t *testing.T)) {
-	testSetup(t)
-	// Create an http test server according to whether TLS is used
-	var newServer = httptest.NewServer
-	if isTLS {
-		newServer = httptest.NewTLSServer
-	}
-	ts := createServer(newServer)
-	if testRateLimitRetry {
-		ts = createCustomServer(newServer)
-	}
-	if testArrayResponse {
-		ts = createCustomServerWithArrayResponse(newServer)
-	}
-	defer ts.Close()
-	m["url"] = ts.URL
-	cfg := common.MustNewConfigFrom(m)
-	// Simulate input.Context from Filebeat input runner.
-	inputCtx := newInputContext()
-	defer close(inputCtx.Done)
-
-	// Stub outlet for receiving events generated by the input.
-	eventOutlet := newStubOutlet()
-	defer eventOutlet.Close()
-
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
-		return eventOutlet, nil
-	})
-
-	in, err := NewInput(cfg, connector, inputCtx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	input := in.(*HttpjsonInput)
-	defer input.Stop()
-
-	run(input, eventOutlet, t)
-}
-
-func newInputContext() input.Context {
-	return input.Context{
-		Done: make(chan struct{}),
+		_, _ = w.Write([]byte(msg))
 	}
 }
 
-type stubOutleter struct {
-	sync.Mutex
-	cond   *sync.Cond
-	done   bool
-	Events []beat.Event
-}
-
-func newStubOutlet() *stubOutleter {
-	o := &stubOutleter{}
-	o.cond = sync.NewCond(o)
-	return o
-}
-
-func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
-	o.Lock()
-	defer o.Unlock()
-
-	for len(o.Events) < numEvents && !o.done {
-		o.cond.Wait()
-	}
-
-	size := numEvents
-	if size >= len(o.Events) {
-		size = len(o.Events)
-	}
-
-	out := make([]beat.Event, size)
-	copy(out, o.Events)
-	return out, len(out) == numEvents
-}
-
-func (o *stubOutleter) Close() error {
-	o.Lock()
-	defer o.Unlock()
-	o.done = true
-	return nil
-}
-
-func (o *stubOutleter) Done() <-chan struct{} { return nil }
-
-func (o *stubOutleter) OnEvent(event beat.Event) bool {
-	o.Lock()
-	defer o.Unlock()
-	o.Events = append(o.Events, event)
-	o.cond.Broadcast()
-	return !o.done
-}
-
-// --- Test Cases
-
-func TestConfigValidationCase1(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":       "GET",
-		"http_request_body": map[string]interface{}{"test": "abc"},
-		"no_http_body":      true,
-		"url":               "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase2(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase3(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"req_field": "abc"},
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase4(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "req_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase5(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "id_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase6(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase7(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "DELETE",
-		"no_http_body": true,
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
-	}
-}
-
-func TestGetNextLinkFromHeader(t *testing.T) {
-	header := make(http.Header)
-	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs>; rel=\"self\"")
-	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1>; rel=\"next\"")
-	re, _ := regexp.Compile("<([^>]+)>; *rel=\"next\"(?:,|$)")
-	url, err := getNextLinkFromHeader(header, "Link", re)
-	if url != "https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1" {
-		t.Fatal("Failed to test getNextLinkFromHeader. URL " + url + " is not expected")
-	}
-	if err != nil {
-		t.Fatal("Failed to test getNextLinkFromHeader with error:", err)
-	}
-}
-
-func TestCreateRequestInfoFromBody(t *testing.T) {
-	m := map[string]interface{}{
-		"id": 100,
-	}
-	extraBodyContent := common.MapStr{"extra_body": "abc"}
-	ri, err := createRequestInfoFromBody(common.MapStr(m), "id", "pagination_id", extraBodyContent, "https://test-123", &RequestInfo{
-		URL:        "",
-		ContentMap: common.MapStr{},
-		Headers:    common.MapStr{},
-	})
-	if ri.URL != "https://test-123" {
-		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
-	}
-	p, err := ri.ContentMap.GetValue("pagination_id")
-	if err != nil {
-		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
-	}
-	switch pt := p.(type) {
-	case int:
-		if pt != 100 {
-			t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %d should be 100.", pt)
+func rateLimitHandler() http.HandlerFunc {
+	var isRetry bool
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		if isRetry {
+			_, _ = w.Write([]byte(`{"hello":"world"}`))
+			return
 		}
+		w.Header().Set("X-Rate-Limit-Limit", "0")
+		w.Header().Set("X-Rate-Limit-Remaining", "0")
+		w.Header().Set("X-Rate-Limit-Reset", fmt.Sprint(time.Now().Unix()))
+		w.WriteHeader(http.StatusTooManyRequests)
+		isRetry = true
+		_, _ = w.Write([]byte(`{"error":"too many requests"}`))
+	}
+}
+
+func retryHandler() http.HandlerFunc {
+	count := 0
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		if count == 2 {
+			_, _ = w.Write([]byte(`{"hello":"world"}`))
+			return
+		}
+		w.WriteHeader(rand.Intn(100) + 500)
+		count += 1
+	}
+}
+
+func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	_ = r.ParseForm()
+	switch {
+	case r.Method != "POST":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
+	case r.FormValue("grant_type") != "client_credentials":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong grant_type"}`))
+	case r.FormValue("client_id") != "a_client_id":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong client_id"}`))
+	case r.FormValue("client_secret") != "a_client_secret":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong client_secret"}`))
+	case r.FormValue("scope") != "scope1 scope2":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong scope"}`))
+	case r.FormValue("param1") != "v1":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong param1"}`))
 	default:
-		t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %T should be int.", pt)
+		_, _ = w.Write([]byte(`{"token_type": "Bearer", "expires_in": "60", "access_token": "abcd"}`))
 	}
-	b, err := ri.ContentMap.GetValue("extra_body")
-	if err != nil {
-		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
+}
+
+func oauth2Handler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/token" {
+		oauth2TokenHandler(w, r)
+		return
 	}
-	switch bt := b.(type) {
-	case string:
-		if bt != "abc" {
-			t.Fatalf("Failed to test createRequestInfoFromBody. extra_body value %s does not match \"abc\".", bt)
-		}
+
+	w.Header().Set("content-type", "application/json")
+	switch {
+	case r.Method != "POST":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
+	case r.Header.Get("Authorization") != "Bearer abcd":
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(`{"error":"wrong bearer"}`))
 	default:
-		t.Fatalf("Failed to test createRequestInfoFromBody. extra_body type %T should be string.", bt)
+		_, _ = w.Write([]byte(`{"hello":"world"}`))
 	}
 }
 
-// Test getRateLimit function with a remaining quota, expect to receive 0, nil.
-func TestGetRateLimitCase1(t *testing.T) {
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "120")
-	header.Add("X-Rate-Limit-Remaining", "118")
-	header.Add("X-Rate-Limit-Reset", "1581658643")
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
-	}
-	epoch, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch != 0 {
-		t.Fatal("Failed to test getRateLimit.")
+func dateCursorHandler() http.HandlerFunc {
+	var count int
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		switch count {
+		case 0:
+			if r.URL.Query().Get("$filter") != "alertCreationTime ge 2002-10-02T14:50:00Z" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong initial cursor value"`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`))
+		case 1:
+			if r.URL.Query().Get("$filter") != "alertCreationTime ge 2002-10-02T15:00:00Z" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong cursor value"`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`))
+		case 2:
+			if r.URL.Query().Get("$filter") != "alertCreationTime ge 2002-10-02T15:00:01Z" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong cursor value"`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`))
+		}
+		count += 1
 	}
 }
 
-// Test getRateLimit function with a past time, expect to receive 0, nil.
-func TestGetRateLimitCase2(t *testing.T) {
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "10")
-	header.Add("X-Rate-Limit-Remaining", "0")
-	header.Add("X-Rate-Limit-Reset", "1581658643")
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
+func paginationHandler() http.HandlerFunc {
+	var count int
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		switch count {
+		case 0:
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"bar"}]}`))
+		case 1:
+			if r.URL.Query().Get("page") != "bar" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","items":[{"foo":"bar"}]}`))
+		}
+		count += 1
 	}
-	epoch, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch != 0 {
-		t.Fatal("Failed to test getRateLimit.")
-	}
-}
-
-// Test getRateLimit function with a time yet to come, expect to receive <reset-value>, nil.
-func TestGetRateLimitCase3(t *testing.T) {
-	epoch := time.Now().Unix() + 100
-	header := make(http.Header)
-	header.Add("X-Rate-Limit-Limit", "10")
-	header.Add("X-Rate-Limit-Remaining", "0")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(epoch, 10))
-	rateLimit := &RateLimit{
-		Limit:     "X-Rate-Limit-Limit",
-		Reset:     "X-Rate-Limit-Reset",
-		Remaining: "X-Rate-Limit-Remaining",
-	}
-	epoch2, err := getRateLimit(header, rateLimit)
-	if err != nil || epoch2 != epoch {
-		t.Fatal("Failed to test getRateLimit.")
-	}
-}
-
-func TestGET(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"interval":    0,
-	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(1)
-		if !ok {
-			t.Fatalf("Expected 1 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestGetHTTPS(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":           "GET",
-		"interval":              0,
-		"ssl.verification_mode": "none",
-	}
-	runTest(t, true, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(1)
-		if !ok {
-			t.Fatalf("Expected 1 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestRateLimitRetry(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"interval":    0,
-	}
-	runTest(t, false, true, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(1)
-		if !ok {
-			t.Fatalf("Expected 1 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestArrayResponse(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":        "GET",
-		"json_objects_array": "hello",
-		"interval":           0,
-	}
-	runTest(t, false, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(2)
-		if !ok {
-			t.Fatalf("Expected 2 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestPOST(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":       "POST",
-		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
-		"interval":          0,
-	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(1)
-		if !ok {
-			t.Fatalf("Expected 1 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestRepeatedPOST(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":       "POST",
-		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
-		"interval":          10 ^ 9,
-	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(3)
-		if !ok {
-			t.Fatalf("Expected 3 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestRunStop(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"interval":    0,
-	}
-	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		input.Run()
-		input.Stop()
-		input.Run()
-		input.Stop()
-	})
 }

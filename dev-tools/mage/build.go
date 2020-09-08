@@ -118,16 +118,6 @@ func Build(params BuildArgs) error {
 	}
 	env["CGO_ENABLED"] = cgoEnabled
 
-	if UseVendor {
-		var goFlags string
-		goFlags, ok := env["GOFLAGS"]
-		if !ok {
-			env["GOFLAGS"] = "-mod=vendor"
-		} else {
-			env["GOFLAGS"] = strings.Join([]string{goFlags, "-mod=vendor"}, " ")
-		}
-	}
-
 	// Spec
 	args := []string{
 		"build",

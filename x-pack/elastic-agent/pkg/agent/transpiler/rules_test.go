@@ -24,76 +24,66 @@ func TestRules(t *testing.T) {
 	}{
 		"fix streams": {
 			givenYAML: `
-datasources:
+inputs:
   - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
   - name: Specified dataset
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified with empty strings
-    namespace: ""
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: ""
+    type: file
+    data_stream.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: ""
 `,
 			expectedYAML: `
-datasources:
+inputs:
   - name: All default
-    namespace: default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
-          dataset: generic
+    type: file
+    data_stream.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: generic
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: generic
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: generic
   - name: Specified dataset
-    namespace: default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    data_stream.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified with empty strings
-    namespace: default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: generic
+    type: file
+    data_stream.namespace: default
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: generic
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -104,77 +94,69 @@ datasources:
 
 		"inject index": {
 			givenYAML: `
-datasources:
+inputs:
   - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+
   - name: Specified dataset
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
   - name: All specified with empty strings
-    namespace: ""
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: ""
+    type: file
+    data_stream.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: ""
 `,
 			expectedYAML: `
-datasources:
+inputs:
   - name: All default
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/error.log
-          index: mytype-generic-default
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        index: mytype-generic-default
   - name: Specified namespace
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          index: mytype-generic-nsns
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        index: mytype-generic-nsns
+
   - name: Specified dataset
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
-          index: mytype-dsds-default
+    type: file
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
+        index: mytype-dsds-default
   - name: All specified
-    namespace: nsns
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: dsds
-          index: mytype-dsds-nsns
+    type: file
+    data_stream.namespace: nsns
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: dsds
+        index: mytype-dsds-nsns
   - name: All specified with empty strings
-    namespace: ""
-    inputs:
-    - type: file
-      streams:
-        - paths: /var/log/mysql/access.log
-          dataset: ""
-          index: mytype-generic-default
+    type: file
+    data_stream.namespace: ""
+    streams:
+      - paths: /var/log/mysql/error.log
+        data_stream.dataset: ""
+        index: mytype-generic-default
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -277,6 +259,34 @@ output:
 			rule: &RuleList{
 				Rules: []Rule{
 					Rename("donoexist", "what"),
+				},
+			},
+		},
+		"select into": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					SelectInto("level_one.level_two", "level_one.key1", "level_one.key2"),
 				},
 			},
 		},
@@ -619,8 +629,8 @@ logs:
 				require.NoError(t, err)
 			}
 
-			if !assert.True(t, cmp.Equal(v.Content, m)) {
-				diff := cmp.Diff(v.Content, m)
+			if !assert.True(t, cmp.Equal(m, v.Content)) {
+				diff := cmp.Diff(m, v.Content)
 				if diff != "" {
 					t.Errorf("mismatch (-want +got):\n%s", diff)
 				}
@@ -660,6 +670,7 @@ func TestSerialization(t *testing.T) {
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
+		SelectInto("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -720,6 +731,11 @@ func TestSerialization(t *testing.T) {
     - b
     on_conflict: insert_before
 - fix_stream: {}
+- select_into:
+    selectors:
+    - s1
+    - s2
+    path: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

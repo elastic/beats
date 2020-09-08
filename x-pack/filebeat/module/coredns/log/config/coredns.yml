@@ -3,7 +3,8 @@ paths:
 {{ range $i, $path := .paths }}
   - {{$path}}
 {{ end }}
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - add_fields:
       target: ''

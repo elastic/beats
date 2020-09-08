@@ -45,6 +45,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 	for _, rule := range r.Rules {
 		var name string
 		switch rule.(type) {
+		case *SelectIntoRule:
+			name = "select_into"
 		case *CopyRule:
 			name = "copy"
 		case *CopyToListRule:
@@ -124,6 +126,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 		var r Rule
 		switch name {
+		case "select_into":
+			r = &SelectIntoRule{}
 		case "copy":
 			r = &CopyRule{}
 		case "copy_to_list":
@@ -168,6 +172,40 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	r.Rules = rules
 	return nil
+}
+
+// SelectIntoRule inserts selected paths into a new Dict node.
+type SelectIntoRule struct {
+	Selectors []Selector
+	Path      string
+}
+
+// Apply applies select into rule.
+func (r *SelectIntoRule) Apply(ast *AST) error {
+	target := &Dict{}
+
+	for _, selector := range r.Selectors {
+		lookupNode, ok := Lookup(ast.Clone(), selector)
+		if !ok {
+			continue
+		}
+
+		target.value = append(target.value, lookupNode.Clone())
+	}
+
+	if len(target.value) > 0 {
+		return Insert(ast, target, r.Path)
+	}
+
+	return nil
+}
+
+// SelectInto creates a SelectIntoRule
+func SelectInto(path string, selectors ...Selector) *SelectIntoRule {
+	return &SelectIntoRule{
+		Selectors: selectors,
+		Path:      path,
+	}
 }
 
 // RemoveKeyRule removes key from a dict.
@@ -263,7 +301,8 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 
 	targetList, ok := targetListNode.Value().(*List)
 	if !ok {
-		return errors.New("target node is not a list")
+		// not a list; skip
+		return nil
 	}
 
 	for _, listItem := range targetList.value {
@@ -355,22 +394,22 @@ type FixStreamRule struct {
 
 // Apply stream fixes.
 func (r *FixStreamRule) Apply(ast *AST) error {
-	const defaultNamespace = "default"
 	const defaultDataset = "generic"
+	const defaultNamespace = "default"
 
-	datasourcesNode, found := Lookup(ast, "datasources")
+	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
 	}
 
-	datasourcesList, ok := datasourcesNode.Value().(*List)
+	inputsNodeList, ok := inputsNode.Value().(*List)
 	if !ok {
 		return nil
 	}
 
-	for _, datasourceNode := range datasourcesList.value {
-		nsNode, found := datasourceNode.Find("namespace")
-		if found {
+	for _, inputNode := range inputsNodeList.value {
+		// fix this only if in compact form
+		if nsNode, found := inputNode.Find("data_stream.namespace"); found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
 				if newNamespace := nsKey.value.String(); newNamespace == "" {
@@ -378,55 +417,90 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				}
 			}
 		} else {
-			datasourceMap, ok := datasourceNode.(*Dict)
-			if !ok {
-				continue
+			dsNode, found := inputNode.Find("data_stream")
+			if found {
+				// got a datastream
+				datastreamMap, ok := dsNode.Value().(*Dict)
+				if ok {
+					nsNode, found := datastreamMap.Find("namespace")
+					if found {
+						nsKey, ok := nsNode.(*Key)
+						if ok {
+							if newNamespace := nsKey.value.String(); newNamespace == "" {
+								nsKey.value = &StrVal{value: defaultNamespace}
+							}
+						}
+					} else {
+						inputMap, ok := inputNode.(*Dict)
+						if ok {
+							inputMap.value = append(inputMap.value, &Key{
+								name:  "data_stream.namespace",
+								value: &StrVal{value: defaultNamespace},
+							})
+						}
+					}
+				}
+			} else {
+				inputMap, ok := inputNode.(*Dict)
+				if ok {
+					inputMap.value = append(inputMap.value, &Key{
+						name:  "data_stream.namespace",
+						value: &StrVal{value: defaultNamespace},
+					})
+				}
 			}
-			datasourceMap.value = append(datasourceMap.value, &Key{
-				name:  "namespace",
-				value: &StrVal{value: defaultNamespace},
-			})
 		}
 
-		// get input
-		inputNode, found := datasourceNode.Find("inputs")
-		if !found {
-			continue
-		}
-
-		inputsList, ok := inputNode.Value().(*List)
+		streamsNode, ok := inputNode.Find("streams")
 		if !ok {
 			continue
 		}
 
-		for _, inputNode := range inputsList.value {
-			streamsNode, ok := inputNode.Find("streams")
+		streamsList, ok := streamsNode.Value().(*List)
+		if !ok {
+			continue
+		}
+
+		for _, streamNode := range streamsList.value {
+			streamMap, ok := streamNode.(*Dict)
 			if !ok {
 				continue
 			}
 
-			streamsList, ok := streamsNode.Value().(*List)
-			if !ok {
-				continue
-			}
-
-			for _, streamNode := range streamsList.value {
-				streamMap, ok := streamNode.(*Dict)
-				if !ok {
-					continue
+			// fix this only if in compact form
+			if dsNameNode, found := streamMap.Find("data_stream.dataset"); found {
+				dsKey, ok := dsNameNode.(*Key)
+				if ok {
+					if newDataset := dsKey.value.String(); newDataset == "" {
+						dsKey.value = &StrVal{value: defaultDataset}
+					}
 				}
+			} else {
 
-				dsNode, found := streamNode.Find("dataset")
+				datastreamNode, found := streamMap.Find("data_stream")
 				if found {
-					dsKey, ok := dsNode.(*Key)
-					if ok {
-						if newDataset := dsKey.value.String(); newDataset == "" {
-							dsKey.value = &StrVal{value: defaultDataset}
+					datastreamMap, ok := datastreamNode.Value().(*Dict)
+					if !ok {
+						continue
+					}
+
+					dsNameNode, found := datastreamMap.Find("dataset")
+					if found {
+						dsKey, ok := dsNameNode.(*Key)
+						if ok {
+							if newDataset := dsKey.value.String(); newDataset == "" {
+								dsKey.value = &StrVal{value: defaultDataset}
+							}
 						}
+					} else {
+						streamMap.value = append(streamMap.value, &Key{
+							name:  "data_stream.dataset",
+							value: &StrVal{value: defaultDataset},
+						})
 					}
 				} else {
 					streamMap.value = append(streamMap.value, &Key{
-						name:  "dataset",
+						name:  "data_stream.dataset",
 						value: &StrVal{value: defaultDataset},
 					})
 				}
@@ -443,87 +517,51 @@ func FixStream() *FixStreamRule {
 }
 
 // InjectIndexRule injects index to each input.
-// Index is in form {type}-{namespace}-{dataset-type}
+// Index is in form {type}-{namespace}-{dataset}
 // type: is provided to the rule.
 // namespace: is collected from streams[n].namespace. If not found used 'default'.
-// dataset-type: is collected from streams[n].dataset.type. If not found used 'generic'.
+// dataset: is collected from streams[n].data_stream.dataset. If not found used 'generic'.
 type InjectIndexRule struct {
 	Type string
 }
 
 // Apply injects index into input.
 func (r *InjectIndexRule) Apply(ast *AST) error {
-	const defaultNamespace = "default"
-	const defaultDataset = "generic"
-
-	datasourcesNode, found := Lookup(ast, "datasources")
+	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
 	}
 
-	datasourcesList, ok := datasourcesNode.Value().(*List)
+	inputsList, ok := inputsNode.Value().(*List)
 	if !ok {
 		return nil
 	}
 
-	for _, datasourceNode := range datasourcesList.value {
-		namespace := defaultNamespace
-		nsNode, found := datasourceNode.Find("namespace")
-		if found {
-			nsKey, ok := nsNode.(*Key)
-			if ok {
-				if newNamespace := nsKey.value.String(); newNamespace != "" {
-					namespace = newNamespace
-				}
-			}
-		}
+	for _, inputNode := range inputsList.value {
+		namespace := datastreamNamespaceFromInputNode(inputNode)
+		datastreamType := datastreamTypeFromInputNode(inputNode, r.Type)
 
-		// get input
-		inputNode, found := datasourceNode.Find("inputs")
-		if !found {
-			continue
-		}
-
-		inputsList, ok := inputNode.Value().(*List)
+		streamsNode, ok := inputNode.Find("streams")
 		if !ok {
 			continue
 		}
 
-		for _, inputNode := range inputsList.value {
-			streamsNode, ok := inputNode.Find("streams")
+		streamsList, ok := streamsNode.Value().(*List)
+		if !ok {
+			continue
+		}
+
+		for _, streamNode := range streamsList.value {
+			streamMap, ok := streamNode.(*Dict)
 			if !ok {
 				continue
 			}
 
-			streamsList, ok := streamsNode.Value().(*List)
-			if !ok {
-				continue
-			}
-
-			for _, streamNode := range streamsList.value {
-				streamMap, ok := streamNode.(*Dict)
-				if !ok {
-					continue
-				}
-
-				dataset := defaultDataset
-
-				dsNode, found := streamNode.Find("dataset")
-				if found {
-					dsKey, ok := dsNode.(*Key)
-					if ok {
-						if newDataset := dsKey.value.String(); newDataset != "" {
-							dataset = newDataset
-						}
-					}
-
-				}
-
-				streamMap.value = append(streamMap.value, &Key{
-					name:  "index",
-					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
-				})
-			}
+			dataset := datasetNameFromStreamNode(streamNode)
+			streamMap.value = append(streamMap.value, &Key{
+				name:  "index",
+				value: &StrVal{value: fmt.Sprintf("%s-%s-%s", datastreamType, dataset, namespace)},
+			})
 		}
 	}
 
@@ -546,112 +584,73 @@ type InjectStreamProcessorRule struct {
 
 // Apply injects processor into input.
 func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
-	const defaultNamespace = "default"
-	const defaultDataset = "generic"
-
-	datasourcesNode, found := Lookup(ast, "datasources")
+	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
 	}
 
-	datasourcesList, ok := datasourcesNode.Value().(*List)
+	inputsList, ok := inputsNode.Value().(*List)
 	if !ok {
 		return nil
 	}
 
-	for _, datasourceNode := range datasourcesList.value {
-		namespace := defaultNamespace
-		nsNode, found := datasourceNode.Find("namespace")
-		if found {
-			nsKey, ok := nsNode.(*Key)
-			if ok {
-				if newNamespace := nsKey.value.String(); newNamespace != "" {
-					namespace = newNamespace
-				}
-			}
-		}
+	for _, inputNode := range inputsList.value {
+		namespace := datastreamNamespaceFromInputNode(inputNode)
+		datastreamType := datastreamTypeFromInputNode(inputNode, r.Type)
 
-		// get input
-		inputNode, found := datasourceNode.Find("inputs")
-		if !found {
-			continue
-		}
-
-		inputsList, ok := inputNode.Value().(*List)
+		streamsNode, ok := inputNode.Find("streams")
 		if !ok {
 			continue
 		}
 
-		for _, inputNode := range inputsList.value {
-			streamsNode, ok := inputNode.Find("streams")
+		streamsList, ok := streamsNode.Value().(*List)
+		if !ok {
+			continue
+		}
+
+		for _, streamNode := range streamsList.value {
+			streamMap, ok := streamNode.(*Dict)
 			if !ok {
 				continue
 			}
 
-			streamsList, ok := streamsNode.Value().(*List)
+			dataset := datasetNameFromStreamNode(streamNode)
+
+			// get processors node
+			processorsNode, found := streamNode.Find("processors")
+			if !found {
+				processorsNode = &Key{
+					name:  "processors",
+					value: &List{value: make([]Node, 0)},
+				}
+
+				streamMap.value = append(streamMap.value, processorsNode)
+			}
+
+			processorsList, ok := processorsNode.Value().(*List)
 			if !ok {
-				continue
+				return errors.New("InjectStreamProcessorRule: processors is not a list")
 			}
 
-			for _, streamNode := range streamsList.value {
-				streamMap, ok := streamNode.(*Dict)
-				if !ok {
-					continue
-				}
+			// datastream
+			processorMap := &Dict{value: make([]Node, 0)}
+			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "data_stream"}})
+			processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+				&Key{name: "type", value: &StrVal{value: datastreamType}},
+				&Key{name: "namespace", value: &StrVal{value: namespace}},
+				&Key{name: "dataset", value: &StrVal{value: dataset}},
+			}}})
+			addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
 
-				dataset := defaultDataset
-
-				dsNode, found := streamNode.Find("dataset")
-				if found {
-					dsKey, ok := dsNode.(*Key)
-					if ok {
-						if newDataset := dsKey.value.String(); newDataset != "" {
-							dataset = newDataset
-						}
-					}
-				}
-
-				// get processors node
-				processorsNode, found := streamNode.Find("processors")
-				if !found {
-					processorsNode = &Key{
-						name:  "processors",
-						value: &List{value: make([]Node, 0)},
-					}
-
-					streamMap.value = append(streamMap.value, processorsNode)
-				}
-
-				processorsList, ok := processorsNode.Value().(*List)
-				if !ok {
-					return errors.New("InjectStreamProcessorRule: processors is not a list")
-				}
-
-				processorMap := &Dict{value: make([]Node, 0)}
-				processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "dataset"}})
-				processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
-					&Key{name: "type", value: &StrVal{value: r.Type}},
-					&Key{name: "namespace", value: &StrVal{value: namespace}},
-					&Key{name: "name", value: &StrVal{value: dataset}},
-				}}})
-
-				addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
-				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
-
-				// add this for backwards compatibility remove later
-				streamProcessorMap := &Dict{value: make([]Node, 0)}
-				streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "target", value: &StrVal{value: "stream"}})
-				streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
-					&Key{name: "type", value: &StrVal{value: r.Type}},
-					&Key{name: "namespace", value: &StrVal{value: namespace}},
-					&Key{name: "dataset", value: &StrVal{value: dataset}},
-				}}})
-
-				streamAddFieldsMap := &Dict{value: []Node{&Key{"add_fields", streamProcessorMap}}}
-
-				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, streamAddFieldsMap)
-				// end of backward compatibility section
-			}
+			// event
+			processorMap = &Dict{value: make([]Node, 0)}
+			processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "event"}})
+			processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+				&Key{name: "dataset", value: &StrVal{value: dataset}},
+			}}})
+			addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+			processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
 		}
 	}
 
@@ -930,14 +929,32 @@ func (r *MapRule) Apply(ast *AST) error {
 		)
 	}
 
-	l, ok := n.Value().(*List)
-	if !ok {
-		return fmt.Errorf(
-			"cannot iterate over node, invalid type expected 'List' received '%T'",
-			node,
-		)
+	switch t := n.Value().(type) {
+	case *List:
+		return mapList(r, t)
+	case *Dict:
+		return mapDict(r, t)
+	case *Key:
+		switch t := n.Value().(type) {
+		case *List:
+			return mapList(r, t)
+		case *Dict:
+			return mapDict(r, t)
+		default:
+			return fmt.Errorf(
+				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
+				node,
+			)
+		}
 	}
 
+	return fmt.Errorf(
+		"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
+		node,
+	)
+}
+
+func mapList(r *MapRule, l *List) error {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
@@ -950,6 +967,18 @@ func (r *MapRule) Apply(ast *AST) error {
 			values[idx] = newAST.root
 		}
 	}
+	return nil
+}
+
+func mapDict(r *MapRule, l *Dict) error {
+	newAST := &AST{root: l}
+	for _, rule := range r.Rules {
+		err := rule.Apply(newAST)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1170,7 +1199,7 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 
 		newAST, ok := Lookup(newRoot, r.Key)
 		if !ok {
-			newNodes = append(newNodes, item)
+			// doesn't have key so its filtered out
 			continue
 		}
 
@@ -1181,7 +1210,7 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 		}
 
 		if n.name != r.Key {
-			newNodes = append(newNodes, item)
+			// doesn't match so its filtered out
 			continue
 		}
 
@@ -1211,4 +1240,95 @@ func keys(m map[string]interface{}) []string {
 		keys = append(keys, k)
 	}
 	return keys
+}
+
+func datastreamNamespaceFromInputNode(inputNode Node) string {
+	const defaultNamespace = "default"
+
+	if namespaceNode, found := inputNode.Find("data_stream.namespace"); found {
+		nsKey, ok := namespaceNode.(*Key)
+		if ok {
+			if newNamespace := nsKey.value.String(); newNamespace != "" {
+				return newNamespace
+			}
+		}
+	}
+
+	dsNode, found := inputNode.Find("data_stream")
+	if found {
+		dsMapNode, ok := dsNode.Value().(*Dict)
+		if ok {
+			nsNode, found := dsMapNode.Find("namespace")
+			if found {
+				nsKey, ok := nsNode.(*Key)
+				if ok {
+					if newNamespace := nsKey.value.String(); newNamespace != "" {
+						return newNamespace
+					}
+				}
+			}
+		}
+	}
+
+	return defaultNamespace
+}
+
+func datastreamTypeFromInputNode(inputNode Node, defaultType string) string {
+	if dsTypeNode, found := inputNode.Find("data_stream.type"); found {
+		dsTypeKey, ok := dsTypeNode.(*Key)
+		if ok {
+			if newDatastreamType := dsTypeKey.value.String(); newDatastreamType != "" {
+				return newDatastreamType
+			}
+		}
+	}
+
+	dsNode, found := inputNode.Find("data_stream")
+	if found {
+		dsMapNode, ok := dsNode.Value().(*Dict)
+		if ok {
+			typeNode, found := dsMapNode.Find("type")
+			if found {
+				typeKey, ok := typeNode.(*Key)
+				if ok {
+					if newDatastreamType := typeKey.value.String(); newDatastreamType != "" {
+						return newDatastreamType
+					}
+				}
+			}
+		}
+	}
+
+	return defaultType
+}
+
+func datasetNameFromStreamNode(streamNode Node) string {
+	const defaultDataset = "generic"
+
+	if dsNameNode, found := streamNode.Find("data_stream.dataset"); found {
+		dsNameKey, ok := dsNameNode.(*Key)
+		if ok {
+			if newDatasetName := dsNameKey.value.String(); newDatasetName != "" {
+				return newDatasetName
+			}
+		}
+	}
+
+	dsNode, found := streamNode.Find("data_stream")
+	if found {
+		dsMapNode, ok := dsNode.Value().(*Dict)
+		if ok {
+			dsNameNode, found := dsMapNode.Find("dataset")
+			if found {
+				dsKey, ok := dsNameNode.(*Key)
+				if ok {
+					if newDataset := dsKey.value.String(); newDataset != "" {
+						return newDataset
+					}
+				}
+			}
+		}
+	}
+
+	return defaultDataset
 }

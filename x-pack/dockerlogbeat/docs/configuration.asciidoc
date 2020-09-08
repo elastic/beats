@@ -49,10 +49,6 @@ format is `"username:password"`.
 [[es-output-options]]
 === {es} output options
 
-// TODO: Add the following settings. Syntax is a little different so we might
-// need to add deameon examples that show how to specify these settings:
-// `output.elasticsearch.indices
-// `output.elasticsearch.pipelines`
 
 [options="header"]
 |=====
@@ -79,6 +75,11 @@ value that specifies the index to write events to when you're using daily
 indices. For example: +"dockerlogs-%{+yyyy.MM.dd}"+. 
 
 3+|*Advanced:*
+
+|`name`
+|`testbeat`
+| A custom value that will be inserted into the document as `agent.name`.
+If not set, it will be the hostname of Docker host.
 
 |`backoff_init`
 |`1s`
@@ -117,3 +118,72 @@ for more information about the environment variables.
 
 
 |=====
+
+
+[float]
+[[local-log-opts]]
+=== Configuring the local log
+This plugin fully supports `docker logs`, and it maintains a local copy of logs that can be read without a connection to Elasticsearch. The plugin mounts the `/var/lib/docker` directory on the host to write logs to `/var/log/containers` on the host. If you want to change the log location on the host, you must change the mount inside the plugin:
+
+1. Disable the plugin:
++
+["source","sh",subs="attributes"] 
+----
+docker plugin disable elastic/{log-driver-alias}:{version}
+----
+
+2. Set the bindmount directory:
++
+["source","sh",subs="attributes"]
+----
+docker plugin set elastic/{log-driver-alias}:{version} LOG_DIR.source=NEW_LOG_LOCATION
+----
++
+
+3. Enable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin enable elastic/{log-driver-alias}:{version}
+----
+
+
+The local log also supports the `max-file`, `max-size` and `compress` options that are https://docs.docker.com/config/containers/logging/json-file/#options[a part of the Docker default file logger]. For example:
+
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt endpoint="myhost:9200" \
+           --log-opt user="myusername" \
+           --log-opt password="mypassword" \
+           --log-opt max-file=10 \
+           --log-opt max-size=5M \
+           --log-opt compress=true \
+           -it debian:jessie /bin/bash
+----
+
+
+In situations where logs can't be easily managed, for example, you can also configure the plugin to remove log files when a container is stopped. This will prevent you from reading logs on a stopped container, but it will rotate logs without user intervention. To enable removal of logs for stopped containers, you must change the `DESTROY_LOGS_ON_STOP` environment variable: 
+
+1. Disable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin disable elastic/{log-driver-alias}:{version}
+----
+
+2. Enable log removal:
++
+["source","sh",subs="attributes"]
+----
+docker plugin set elastic/{log-driver-alias}:{version} DESTROY_LOGS_ON_STOP=true
+----
++
+
+3. Enable the plugin:
++
+["source","sh",subs="attributes"]
+----
+docker plugin enable elastic/{log-driver-alias}:{version}
+----
+

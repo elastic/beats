@@ -21,8 +21,8 @@ type Config struct {
 	// Architecture: target architecture [32, 64]
 	Architecture string `json:"-" config:",ignore"`
 
-	// BeatsSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/beats/
-	BeatsSourceURI string `json:"sourceURI" config:"sourceURI"`
+	// SourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/
+	SourceURI string `json:"sourceURI" config:"sourceURI"`
 
 	// TargetDirectory: path to the directory containing downloaded packages
 	TargetDirectory string `json:"targetDirectory" config:"target_directory"`
@@ -47,13 +47,14 @@ type Config struct {
 
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
+	homePath := paths.Home()
 	dataPath := paths.Data()
 	return &Config{
-		BeatsSourceURI:  "https://artifacts.elastic.co/downloads/beats/",
-		TargetDirectory: filepath.Join(dataPath, "downloads"),
+		SourceURI:       "https://artifacts.elastic.co/downloads/",
+		TargetDirectory: filepath.Join(homePath, "downloads"),
 		Timeout:         30 * time.Second,
 		PgpFile:         filepath.Join(dataPath, "elastic.pgp"),
-		InstallPath:     filepath.Join(dataPath, "install"),
+		InstallPath:     filepath.Join(homePath, "install"),
 	}
 }
 

@@ -27,6 +27,7 @@ func methodsEnv(ast *transpiler.AST) *boolexp.MethodsReg {
 	var methods = boolexp.NewMethodsReg()
 	methods.MustRegister("HasItems", withEnv(env, hasItems))
 	methods.MustRegister("HasNamespace", withEnv(env, hasNamespace))
+	methods.MustRegister("HasAny", withEnv(env, hasAny))
 	return methods
 }
 
@@ -110,6 +111,31 @@ func hasNamespace(env *env, args []interface{}) (interface{}, error) {
 	}
 
 	return true, nil
+}
+
+// hasAny the methods take a list of possible keys where at least one of those keys must exist.
+func hasAny(env *env, args []interface{}) (interface{}, error) {
+	if len(args) < 1 {
+		return false, fmt.Errorf("expecting at least 1 argument received %d", len(args))
+	}
+
+	possibleKeys := make([]string, 0, len(args))
+
+	for _, v := range args {
+		sk, ok := v.(string)
+		if !ok {
+			return false, fmt.Errorf("invalid key %+v", v)
+		}
+		possibleKeys = append(possibleKeys, sk)
+	}
+
+	for _, key := range possibleKeys {
+		_, ok := transpiler.Lookup(env.ast, transpiler.Selector(key))
+		if ok {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func withEnv(env *env, method envFunc) boolexp.CallFunc {

@@ -68,8 +68,12 @@ override to change the default options.
 | BEAT_PATH_OPTS | Other paths | +-path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}+
 |=======================================
 
+NOTE: You can use `BEAT_LOG_OPTS` to set debug selectors for logging. However,
+to configure logging behavior, set the logging options described in
+<<configuration-logging,Configure logging>>.
+
 To override these variables, create a drop-in unit file in the
-+/etc/systemd/system/{beatname_pkg}.service.d+ directory.
++/etc/systemd/system/{beatname_pkg}.service.d+ directory.  
 
 For example a file with the following content placed in
 +/etc/systemd/system/{beatname_pkg}.service.d/debug.conf+

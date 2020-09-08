@@ -18,6 +18,7 @@ import (
 
 	"golang.org/x/crypto/openpgp"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
@@ -53,7 +54,14 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 
 	fullPath := filepath.Join(v.config.TargetDirectory, filename)
 
-	return v.verifyHash(filename, fullPath)
+	isMatch, err := v.verifyHash(filename, fullPath)
+	if !isMatch || err != nil {
+		// remove bits so they can be redownloaded
+		os.Remove(fullPath)
+		os.Remove(fullPath + ".sha512")
+	}
+
+	return isMatch, err
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -137,7 +145,7 @@ func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 
 func (v *Verifier) getPublicAsc(filename string) ([]byte, error) {
 	ascFile := fmt.Sprintf("%s%s", filename, ascSuffix)
-	fullPath := filepath.Join(defaultDropSubdir, ascFile)
+	fullPath := filepath.Join(paths.Home(), "downloads", ascFile)
 
 	b, err := ioutil.ReadFile(fullPath)
 	if err != nil {

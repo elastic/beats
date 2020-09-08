@@ -4,13 +4,15 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.x509"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"

@@ -7,7 +7,7 @@ PYTHON_ENV?=$(BUILD_DIR)/python-env
 PYTHON_EXE?=python3
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
-FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
+FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
 REVIEWDOG=reviewdog
@@ -18,7 +18,7 @@ XPACK_SUFFIX=x-pack/
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
 # of artifacts). This will be removed once we complete the transition.
-PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/metricbeat x-pack/winlogbeat
+PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/winlogbeat
 # PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
@@ -96,8 +96,10 @@ clean: mage
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	# check if vendor folder does not exists
+	[ ! -d vendor ]
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
@@ -148,15 +150,24 @@ docs:
 
 ## notice : Generates the NOTICE file.
 .PHONY: notice
-notice: python-env
+notice:
 	@echo "Generating NOTICE"
-	@${PYTHON_ENV_EXE} dev-tools/generate_notice.py .
+	go mod tidy
+	go mod download
+	go list -m -json all | go run go.elastic.co/go-licence-detector \
+		-includeIndirect \
+		-rules dev-tools/notice/rules.json \
+		-overrides dev-tools/notice/overrides.json \
+		-noticeTemplate dev-tools/notice/NOTICE.txt.tmpl \
+		-noticeOut NOTICE.txt \
+		-depsOut ""
+
 
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==2.4.4
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 

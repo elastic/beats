@@ -49,7 +49,6 @@ func (e *CheckinRequest) Validate() error {
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
 	Actions Actions `json:"actions"`
-	Success bool    `json:"success"`
 }
 
 // Validate validates the response send from the server.
@@ -112,7 +111,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
-	fmt.Println(string(rs))
+
 	if err := checkinResponse.Validate(); err != nil {
 		return nil, err
 	}

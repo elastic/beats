@@ -28,6 +28,9 @@ shared:
       /usr/share/{{.BeatName}}/LICENSE.txt:
         source: '{{ repo.RootDir }}/LICENSE.txt'
         mode: 0644
+      /usr/share/{{.BeatName}}/NOTICE.txt:
+        source: '{{ repo.RootDir }}/NOTICE.txt'
+        mode: 0644
       /usr/share/{{.BeatName}}/README.md:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
         mode: 0644
@@ -42,49 +45,90 @@ shared:
         source: 'elastic-agent.yml'
         mode: 0600
         config: true
+      /etc/{{.BeatName}}/.elastic-agent.active.commit:
+        content: >
+          {{ commit }}
+        mode: 0644
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
         source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
         mode: 0755
       /usr/bin/{{.BeatName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl'
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/elastic-agent.sh.tmpl'
         mode: 0755
       /lib/systemd/system/{{.BeatServiceName}}.service:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/elastic-agent.unit.tmpl'
         mode: 0644
       /etc/init.d/{{.BeatServiceName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
         mode: 0755
-      /etc/{{.BeatName}}/data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+
 
 
   # MacOS pkg spec for community beats.
   - &macos_agent_pkg_spec
     <<: *common
     extra_vars:
-      # OS X 10.11 Mountain Lion is the oldest supported by Go 1.13.
-      # https://golang.org/doc/go1.13#ports
+      # OS X 10.11 El Capitan is the oldest supported by Go 1.14.
+      # https://golang.org/doc/go1.14#ports
       min_supported_osx_version: 10.11
       identifier: 'co.{{.BeatVendor | tolower}}.beats.{{.BeatName}}'
       install_path: /Library/Application Support
     pre_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/preinstall.tmpl'
-    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/postinstall.tmpl'
+    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/postinstall.elastic-agent.tmpl'
     files:
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
         mode: 0755
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
         source: '{{ repo.RootDir }}/LICENSE.txt'
+        mode: 0644
+      /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/NOTICE.txt:
+        source: '{{ repo.RootDir }}/NOTICE.txt'
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/README.md:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
@@ -103,25 +147,70 @@ shared:
         source: 'elastic-agent.yml'
         mode: 0600
         config: true
-      /etc/{{.BeatName}}/data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      /etc/{{.BeatName}}/.elastic-agent.active.commit:
+        content: >
+          {{ commit }}
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
         mode: 0644
-      /etc/{{.BeatName}}/data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
   - &agent_binary_files
     '{{.BeatName}}{{.BinaryExt}}':
       source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
       mode: 0755
+    'data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}':
+      source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
     LICENSE.txt:
       source: '{{ repo.RootDir }}/LICENSE.txt'
+      mode: 0644
+    NOTICE.txt:
+      source: '{{ repo.RootDir }}/NOTICE.txt'
       mode: 0644
     README.md:
       template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
@@ -137,25 +226,58 @@ shared:
       source: 'elastic-agent.yml'
       mode: 0600
       config: true
+    '.elastic-agent.active.commit':
+      content: >
+        {{ commit }}
+      mode: 0644
 
   # Binary package spec (tar.gz for linux/darwin) for community beats.
   - &agent_binary_spec
     <<: *common
     files:
       <<: *agent_binary_files
-      'data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
-      'data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
         mode: 0644
-      <<: *agent_binary_files
-      'data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
-      'data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
   # Binary package spec (zip for windows) for community beats.
   - &agent_windows_binary_spec
@@ -168,23 +290,56 @@ shared:
       uninstall-service-{{.BeatName}}.ps1:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
         mode: 0755
-      'data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
-      'data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
         mode: 0644
-      'data/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
-      'data/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
 
   - &agent_docker_spec
     <<: *agent_binary_spec
     extra_vars:
       from: 'centos:7'
+      buildFrom: 'centos:7'
+      dockerfile: 'Dockerfile.elastic-agent.tmpl'
+      docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: 'root'
       linux_capabilities: ''
     files:
@@ -192,6 +347,10 @@ shared:
         source: 'elastic-agent.docker.yml'
         mode: 0600
         config: true
+      '.elastic-agent.active.commit':
+        content: >
+          {{ commit }}
+        mode: 0644
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -338,6 +497,7 @@ shared:
     <<: *binary_spec
     extra_vars:
       from: 'centos:7'
+      buildFrom: 'centos:7'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
@@ -345,6 +505,11 @@ shared:
         source: '{{.BeatName}}.docker.yml'
         mode: 0600
         config: true
+
+  - &docker_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi8'
+      from: 'registry.access.redhat.com/ubi8/ubi-minimal'
 
   - &elastic_docker_spec
     extra_vars:
@@ -515,6 +680,14 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
   # Elastic Beat with Elastic License and binary taken the current directory.
   elastic_beat_xpack_reduced:
     ###
@@ -599,6 +772,17 @@ specs:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
   # Elastic Beat with Elastic License and binary taken from the x-pack dir.
   elastic_beat_agent_binaries:
     ###
@@ -620,7 +804,9 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
+            symlink: true
+            mode: 0755
 
     - os: darwin
       types: [dmg]
@@ -630,7 +816,8 @@ specs:
         files:
           /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
             mode: 0755
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
+            symlink: true
 
     - os: linux
       types: [tgz]
@@ -639,7 +826,9 @@ specs:
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+            source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
+            symlink: true
+            mode: 0755
 
     - os: linux
       types: [deb, rpm]
@@ -648,12 +837,25 @@ specs:
         <<: *elastic_license_for_deb_rpm
         files:
           /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            source: /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
+            symlink: true
+            mode: 0755
+
+    - os: linux
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
       types: [docker]
       spec:
         <<: *agent_docker_spec
+        <<: *docker_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:

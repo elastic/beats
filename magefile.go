@@ -135,7 +135,6 @@ func CheckLicenseHeaders() error {
 			licenser.Exclude("x-pack"),
 			licenser.Exclude("generator/_templates/beat/{beat}"),
 			licenser.Exclude("generator/_templates/metricbeat/{beat}"),
-			licenser.Exclude("generator/_templates/beat/{beat}"),
 		),
 		licenser(
 			licenser.Check(),
@@ -148,9 +147,4 @@ func CheckLicenseHeaders() error {
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
 	return devtools.DumpVariables()
-}
-
-// Vendor moves dependencies to the repo using go modules.
-func Vendor() error {
-	return devtools.Vendor()
 }

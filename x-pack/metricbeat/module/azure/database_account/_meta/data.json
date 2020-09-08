@@ -1,40 +1,38 @@
 {
-    "@timestamp" : "2020-02-25T08:53:00.000Z",
-    "cloud" : {
-        "provider" : "azure",
-        "region" : "westeurope"
-    },
-    "event" : {
-        "module" : "azure",
-        "duration" : 4877063600,
-        "dataset" : "azure.database_account"
-    },
-    "metricset" : {
-        "name" : "database_account",
-        "period" : 300000
-    },
-    "azure" : {
-        "timegrain" : "PT5M",
-        "dimensions" : {
-            "database_name" : "testdb"
-        },
-        "database_account" : {
-            "provisioned_throughput" : {
-                "max" : 400
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "database_account": {
+            "service_availability": {
+                "avg": 100
             }
         },
-        "resource" : {
-            "group" : "obs-test",
-            "tags" : {
-                "defaultExperience" : "Core (SQL)"
+        "namespace": "Microsoft.DocumentDb/databaseAccounts",
+        "resource": {
+            "group": "obs-infrastructure",
+            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "name": "obsaccount",
+            "tags": {
+                "defaultExperience": "Core (SQL)"
             },
-            "name" : "obsaccount",
-            "type" : "Microsoft.DocumentDb/databaseAccounts"
+            "type": "Microsoft.DocumentDb/databaseAccounts"
         },
-        "subscription_id" : "123456-qwer-1234-5678-12345678",
-        "namespace" : "Microsoft.DocumentDb/databaseAccounts"
+        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
+        "timegrain": "PT1H"
     },
-    "service" : {
-        "type" : "azure"
+    "cloud": {
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.database_account",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "database_account",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
     }
 }

@@ -4,13 +4,15 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.actions"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
@@ -78,6 +80,7 @@ processors:
 
   - drop_fields:
       fields: ["zeek.notice.remote_location", "zeek.notice.f"]
+      ignore_missing: true
   - convert:
       fields:
         - {from: "zeek.session_id", to: "event.id"}

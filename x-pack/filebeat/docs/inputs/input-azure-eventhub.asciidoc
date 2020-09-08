@@ -6,7 +6,7 @@
 === Azure eventhub input
 
 ++++
-<titleabbrev>Azure eventhub</titleabbrev>
+<titleabbrev>Azure Event Hub</titleabbrev>
 ++++
 
 Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub.

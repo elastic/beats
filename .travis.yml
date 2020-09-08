@@ -38,41 +38,55 @@ jobs:
     # Filebeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat || travis_terminate 0
-      env: TARGETS="-C filebeat testsuite"
+      env:
+        - PROJECT=filebeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
+      env:
+        - PROJECT=filebeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/filebeat filebeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/filebeat testsuite"
+      env:
+        - PROJECT=x-pack/filebeat
+        - MAGE='build test'
       go: $(GO_VERSION)
       stage: test
 
     # Heartbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat || travis_terminate 0
-      env: TARGETS="-C heartbeat testsuite"
+      env:
+        - PROJECT=heartbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
+      env:
+        - PROJECT=heartbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Auditbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat || travis_terminate 0
-      env: TARGETS="-C auditbeat testsuite"
+      env:
+        - PROJECT=auditbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
+      env:
+        - PROJECT=auditbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -82,14 +96,27 @@ jobs:
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/auditbeat auditbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/auditbeat testsuite"
+      env:
+        - PROJECT=x-pack/auditbeat
+        - MAGE='build test'
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/auditbeat auditbeat libbeat || travis_terminate 0
+      env:
+        - PROJECT=x-pack/auditbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Libbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh libbeat || travis_terminate 0
-      env: TARGETS="-C libbeat testsuite"
+      env:
+        - PROJECT=libbeat
+        - MAGE='build test'
+        # The libbeat tests are so verbose that they exceed the maximum allowed log length of Travis CI.
+        - MAGEFILE_VERBOSE=false
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -104,35 +131,44 @@ jobs:
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/libbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/libbeat testsuite"
+      env:
+        - PROJECT=x-pack/libbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Metricbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C metricbeat unit-tests"
+      env:
+        - PROJECT=metricbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      install: 
+      install:
         - .ci/scripts/install-kind.sh
         - .ci/scripts/install-kubectl.sh
       env:
-        - TARGETS="-C metricbeat integration-tests"
         - K8S_VERSION=v1.17.2
         - KIND_VERSION=v0.7.0
+        - PROJECT=metricbeat
+        - MAGE='goIntegTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C metricbeat system-tests"
+      env:
+        - PROJECT=metricbeat
+        - MAGE='pythonIntegTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C metricbeat testsuite"
+      env:
+        - PROJECT=metricbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -142,29 +178,39 @@ jobs:
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/metricbeat unit-tests"
+      env:
+        - PROJECT=x-pack/metricbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/metricbeat integration-tests"
+      env:
+        - PROJECT=x-pack/metricbeat
+        - MAGE='goIntegTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/metricbeat system-tests"
+      env:
+        - PROJECT=x-pack/metricbeat
+        - MAGE='pythonIntegTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/metricbeat testsuite"
+      env:
+        - PROJECT=x-pack/metricbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Packetbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh packetbeat libbeat || travis_terminate 0
-      env: TARGETS="-C packetbeat testsuite"
+      env:
+        - PROJECT=packetbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
 
@@ -178,43 +224,57 @@ jobs:
     # Functionbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/functionbeat testsuite"
+      env:
+        - PROJECT=x-pack/functionbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
+      env:
+        - PROJECT=x-pack/functionbeat
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/functionbeat test-gcp-functions"
+      env:
+        - PROJECT=x-pack/functionbeat
+        - MAGE='testGCPFunctions'
       go: 1.13.1
       stage: test
 
     # Docker Log Driver
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/dockerlogbeat libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/dockerlogbeat testsuite"
+      env:
+        - PROJECT=x-pack/dockerlogbeat
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Journalbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh journalbeat libbeat || travis_terminate 0
-      env: TARGETS="-C journalbeat testsuite"
+      env:
+        - PROJECT=journalbeat
+        - MAGE='build goUnitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Agent
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/elastic-agent testsuite"
+      env:
+        - PROJECT=x-pack/elastic-agent
+        - MAGE='build test'
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite"
+      env:
+        - PROJECT=x-pack/elastic-agent
+        - MAGE='build unitTest'
       go: $TRAVIS_GO_VERSION
       stage: test
 
@@ -318,13 +378,21 @@ before_script:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
+  - make mage
 
 script:
   # Replacement for travis_wait which doesn't print output in real time.
   # Default Travis timeout is 10min, so this workaround prints timestamps every 9min to reset the counter.
   # Using seconds (540s = 9min) instead of minutes for shell compatibility reasons.
   - while sleep 540; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
-  - make $TARGETS
+  - if [[ -n "$MAGE" ]]; then
+        echo ">> mage $MAGE from $PROJECT";
+        cd "$PROJECT";
+        mage $MAGE;
+      else
+        echo ">> make $TARGETS";
+        make $TARGETS;
+      fi
   - kill %1
 
 notifications:
@@ -334,12 +402,3 @@ notifications:
     on_pull_requests: false
     rooms:
       secure: "e25J5puEA31dOooTI4T+K+zrTs8XeWIGq2cgmiPt9u/g7eqWeQj1UJnVsr8GOu1RPDyuJZJHXqfrvuOYJTdHzXbwjD0JTbwwVVZMkkZW2SWZHG46HCXPiucjWXEr3hXJKBJDDpIx6VxrN7r17dejv1biQ8QuEFZfiB1H8kbH/ho="
-
-after_success:
-  # Copy full.cov to coverage.txt because codecov.io requires this file
-  - test -f auditbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f auditbeat/build/coverage/full.cov
-  - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
-  - test -f heartbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f heartbeat/build/coverage/full.cov
-  - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
-  - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov
-  - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov

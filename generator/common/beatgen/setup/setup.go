@@ -35,7 +35,11 @@ func InitModule() error {
 		return errors.Wrap(err, "error initializing a module for the Beat")
 	}
 
-	return copyReplacedModules()
+	err = copyReplacedModules()
+	if err != nil {
+		return errors.Wrap(err, "error adding replaced modules to go.mod")
+	}
+	return gotool.Mod.Tidy()
 }
 
 func copyReplacedModules() error {

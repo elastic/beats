@@ -11,6 +11,7 @@ import time
 import yaml
 import hashlib
 import re
+import glob
 from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
@@ -108,12 +109,12 @@ class Proc(object):
         try:
             self.proc.terminate()
             self.proc.kill()
-        except:
+        except BaseException:
             pass
         # Ensure the output is closed.
         try:
             self.output.close()
-        except:
+        except BaseException:
             pass
 
 
@@ -133,14 +134,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
-        template_paths = [
-            self.beat_path,
-            os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-        ]
         if not hasattr(self, 'template_paths'):
-            self.template_paths = template_paths
-        else:
-            self.template_paths.append(template_paths)
+            self.template_paths = [
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ]
 
         # Create build path
         build_dir = self.beat_path + "/build"
@@ -182,7 +180,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc = self.start_beat(cmd=cmd, config=config, output=output,
                                logging_args=logging_args,
                                extra_args=extra_args, env=env)
-        if exit_code != None:
+        if exit_code is not None:
             return proc.check_wait(exit_code)
 
         return proc.wait()
@@ -278,7 +276,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 try:
                     jsons.append(self.flatten_object(json.loads(
                         line, object_pairs_hook=self.json_raise_on_duplicates), []))
-                except:
+                except BaseException:
                     print("Fail to load the json {}".format(line))
                     raise
 
@@ -344,7 +342,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 os.unlink(self.build_path + "last_run")
             os.symlink(self.build_path + "run/{}".format(self.id()),
                        self.build_path + "last_run")
-        except:
+        except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
@@ -411,7 +409,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         Returns the number of appearances of the given string in the log file
         """
-        is_regexp = type(msg) == REGEXP_TYPE
+        is_regexp = isinstance(msg, REGEXP_TYPE)
 
         counter = 0
         if ignore_case:
@@ -486,6 +484,21 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 return len([1 for line in f]) == lines
         except IOError:
             return False
+
+    def output_is_empty(self, output_file=None):
+        """
+        Returns true if the output is empty.
+        """
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
+                return len([1 for line in f]) == 0
+        except IOError:
+            return True
 
     def output_has_message(self, message, output_file=None):
         """
@@ -570,7 +583,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     aliases.extend(subaliases)
                 else:
                     fields.append(newName)
-                    if field.get("type") in ["object", "geo_point"]:
+                    if field.get("type") in ["object", "geo_point", "flattened"]:
                         dictfields.append(newName)
 
                 if field.get("type") == "object" and field.get("object_type") == "histogram":
@@ -722,3 +735,33 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc.wait()
 
         return self.get_log_lines(logfile="version")[0].split()[2]
+
+    def assert_explicit_ecs_version_set(self, module, fileset):
+        """
+        Assert that the module explicitly sets the ECS version field.
+        """
+        def get_config_paths(modules_path, module, fileset):
+            pathname = os.path.abspath(modules_path +
+                                       "/" +
+                                       module +
+                                       "/" +
+                                       fileset +
+                                       "/" +
+                                       "config/*.yml")
+            return glob.glob(pathname)
+
+        def is_ecs_version_set(path):
+            # parsing the yml file would be better but go templates in
+            # the file make that difficult
+            with open(path) as fhandle:
+                for line in fhandle:
+                    if re.search(r"ecs\.version", line):
+                        return True
+            return False
+
+        errors = []
+        for cfg_path in get_config_paths(self.modules_path, module, fileset):
+            if not is_ecs_version_set(cfg_path):
+                errors.append("{}".format(cfg_path))
+        if len(errors) > 0:
+            raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))

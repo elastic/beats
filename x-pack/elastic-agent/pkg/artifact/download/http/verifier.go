@@ -66,7 +66,14 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		return false, errors.New(err, "retrieving package path")
 	}
 
-	return v.verifyHash(filename, fullPath)
+	isMatch, err := v.verifyHash(filename, fullPath)
+	if !isMatch || err != nil {
+		// remove bits so they can be redownloaded
+		os.Remove(fullPath)
+		os.Remove(fullPath + ".sha512")
+	}
+
+	return isMatch, err
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -166,7 +173,7 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 }
 
 func (v *Verifier) composeURI(programName, filename string) (string, error) {
-	upstream := v.config.BeatsSourceURI
+	upstream := v.config.SourceURI
 	if !strings.HasPrefix(upstream, "http") && !strings.HasPrefix(upstream, "file") && !strings.HasPrefix(upstream, "/") {
 		// always default to https
 		upstream = fmt.Sprintf("https://%s", upstream)
@@ -178,7 +185,7 @@ func (v *Verifier) composeURI(programName, filename string) (string, error) {
 		return "", errors.New(err, "invalid upstream URI", errors.TypeNetwork, errors.M(errors.MetaKeyURI, upstream))
 	}
 
-	uri.Path = path.Join(uri.Path, programName, filename+ascSuffix)
+	uri.Path = path.Join(uri.Path, "beats", programName, filename+ascSuffix)
 	return uri.String(), nil
 }
 

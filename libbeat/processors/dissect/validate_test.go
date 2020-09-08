@@ -32,7 +32,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "when we find reference field for all indirect field",
 			p: &parser{
-				fields:          []field{newIndirectField(1, "hello", 0), newNormalField(0, "hola", 1, 0, false)},
+				fields:          []field{newIndirectField(1, "hello", "", 0), newNormalField(0, "hola", "", 1, 0, false)},
 				referenceFields: []field{newPointerField(2, "hello", 0)},
 			},
 			expectError: false,
@@ -40,7 +40,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "when we cannot find all the reference field for all indirect field",
 			p: &parser{
-				fields:          []field{newIndirectField(1, "hello", 0), newNormalField(0, "hola", 1, 0, false)},
+				fields:          []field{newIndirectField(1, "hello", "", 0), newNormalField(0, "hola", "", 1, 0, false)},
 				referenceFields: []field{newPointerField(2, "okhello", 0)},
 			},
 			expectError: true,

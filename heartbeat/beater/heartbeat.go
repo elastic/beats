@@ -72,7 +72,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(scheduler, false),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler, false),
 	}
 	return bt, nil
 }
@@ -86,7 +86,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.ConfigManager.Enabled() {
+	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 
@@ -123,10 +123,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
-	factory := monitors.NewFactory(bt.scheduler, true)
+	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg, nil)
+		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
 			return errors.Wrap(err, "could not create monitor")
 		}
@@ -139,6 +139,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.

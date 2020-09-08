@@ -143,46 +143,58 @@ The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 [float]
 ==== `verification_mode`
 
-This option controls whether the client verifies server certificates and host
-names. Valid values are `none` and `full`. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only.
+Controls the verification of certificates. Valid values are:
 
-The default is `full`.
+ * `full`, which verifies that the provided certificate is signed by a trusted
+authority (CA) and also verifies that the server's hostname (or IP address)
+matches the names identified within the certificate.
+ * `certificate`, which verifies that the provided certificate is signed by a
+trusted authority (CA), but does not perform any hostname verification.
+ * `none`, which performs _no verification_ of the server's certificate. This
+mode disables many of the security benefits of SSL/TLS and should only be used
+after very careful consideration. It is primarily intended as a temporary
+diagnostic mechanism when attempting to resolve TLS errors; its use in
+production environments is strongly discouraged.
+
+The default value is `full`.
 
 [float]
 ==== `cipher_suites`
 
 The list of cipher suites to use. The first entry has the highest priority.
-If this option is omitted, the Go crypto library's default
-suites are used (recommended). Note that TLS 1.3 cipher suites are not
+If this option is omitted, the Go crypto library's https://golang.org/pkg/crypto/tls/[default suites]
+are used (recommended). Note that TLS 1.3 cipher suites are not
 individually configurable in Go, so they are not included in this list.
 
+// tag::cipher_suites[]
 The following cipher suites are available:
 
-* ECDHE-ECDSA-AES-128-CBC-SHA
-* ECDHE-ECDSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-CHACHA20-POLY1305 (TLS 1.2 only)
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES-256-CBC-SHA
-* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-RSA-CHACHA20-POLY1205 (TLS 1.2 only)
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* RSA-AES-256-CBC-SHA
-* RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+[options="header"]
+|===
+| Cypher | Notes
+| ECDHE-ECDSA-AES-128-CBC-SHA |
+| ECDHE-ECDSA-AES-128-CBC-SHA256 | TLS 1.2 only. Disabled by default.
+| ECDHE-ECDSA-AES-128-GCM-SHA256 | TLS 1.2 only.
+| ECDHE-ECDSA-AES-256-CBC-SHA |
+| ECDHE-ECDSA-AES-256-GCM-SHA384 | TLS 1.2 only.
+| ECDHE-ECDSA-CHACHA20-POLY1305 | TLS 1.2 only.
+| ECDHE-ECDSA-RC4-128-SHA | Disabled by default. RC4 not recommended.
+| ECDHE-RSA-3DES-CBC3-SHA |
+| ECDHE-RSA-AES-128-CBC-SHA |
+| ECDHE-RSA-AES-128-CBC-SHA256 | TLS 1.2 only. Disabled by default.
+| ECDHE-RSA-AES-128-GCM-SHA256 | TLS 1.2 only.
+| ECDHE-RSA-AES-256-CBC-SHA |
+| ECDHE-RSA-AES-256-GCM-SHA384 | TLS 1.2 only.
+| ECDHE-RSA-CHACHA20-POLY1205 | TLS 1.2 only.
+| ECDHE-RSA-RC4-128-SHA | Disabled by default. RC4 not recommended.
+| RSA-3DES-CBC3-SHA |
+| RSA-AES-128-CBC-SHA |
+| RSA-AES-128-CBC-SHA256 | TLS 1.2 only. Disabled by default.
+| RSA-AES-128-GCM-SHA256 | TLS 1.2 only.
+| RSA-AES-256-CBC-SHA |
+| RSA-AES-256-GCM-SHA384 | TLS 1.2 only.
+| RSA-RC4-128-SHA | Disabled by default. RC4 not recommended.
+|===
 
 Here is a list of acronyms used in defining the cipher suites:
 
@@ -212,6 +224,7 @@ Here is a list of acronyms used in defining the cipher suites:
 
 * SHA, SHA256, SHA384:
   Cipher suites using SHA-1, SHA-256 or SHA-384.
+// end::cipher_suites[]
 
 [float]
 ==== `curve_types`

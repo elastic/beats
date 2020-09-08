@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing ActiveMQ audit logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       pattern_definitions:
@@ -13,9 +16,9 @@ processors:
       field: event.kind
       value: event
   - set:
-      if: "ctx?.activemq?.user != null"
       field: user.name
       value: "{{activemq.user}}"
+      ignore_empty_value: true
   - script:
       if: "ctx?.log?.level != null"
       lang: painless

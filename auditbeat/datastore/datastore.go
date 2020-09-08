@@ -22,7 +22,7 @@ import (
 	"os"
 	"sync"
 
-	bolt "github.com/coreos/bbolt"
+	bolt "go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/libbeat/paths"
 )

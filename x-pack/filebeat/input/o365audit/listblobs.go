@@ -20,20 +20,20 @@ import (
 
 // listBlob is a poll.Transaction that handles the content/"blobs" list.
 type listBlob struct {
-	cursor             cursor
+	cursor             checkpoint
 	startTime, endTime time.Time
 	delay              time.Duration
 	env                apiEnvironment
 }
 
-// ListBlob creates a new poll.Transaction that lists content starting from
+// makeListBlob creates a new poll.Transaction that lists content starting from
 // the given cursor position.
-func ListBlob(cursor cursor, env apiEnvironment) listBlob {
+func makeListBlob(cursor checkpoint, env apiEnvironment) listBlob {
 	l := listBlob{
 		cursor: cursor,
 		env:    env,
 	}
-	return l.adjustTimes(cursor.timestamp)
+	return l.adjustTimes(cursor.Timestamp)
 }
 
 // WithStartTime allows to alter the startTime of a listBlob. This is necessary
@@ -57,8 +57,8 @@ func (l listBlob) adjustTimes(since time.Time) listBlob {
 	var delay time.Duration
 	if to.After(now) {
 		since = now.Add(-l.env.Config.MaxQuerySize)
-		if since.Before(l.cursor.timestamp) {
-			since = l.cursor.timestamp
+		if since.Before(l.cursor.Timestamp) {
+			since = l.cursor.Timestamp
 		}
 		to = now
 		delay = l.env.Config.PollInterval
@@ -84,11 +84,11 @@ func (l listBlob) RequestDecorators() []autorest.PrepareDecorator {
 	return []autorest.PrepareDecorator{
 		autorest.WithBaseURL(l.env.Config.Resource),
 		autorest.WithPath("api/v1.0"),
-		autorest.WithPath(l.cursor.tenantID),
+		autorest.WithPath(l.env.TenantID),
 		autorest.WithPath("activity/feed/subscriptions/content"),
 		autorest.WithQueryParameters(
 			map[string]interface{}{
-				"contentType": l.cursor.contentType,
+				"contentType": l.env.ContentType,
 				"startTime":   l.startTime.Format(apiDateFormat),
 				"endTime":     l.endTime.Format(apiDateFormat),
 			}),
@@ -130,7 +130,7 @@ func (l listBlob) OnResponse(response *http.Response) (actions []poll.Action) {
 			actions = append(actions, poll.Fetch(
 				ContentBlob(entry.URI, l.cursor, l.env).
 					WithID(entry.ID).
-					WithSkipLines(l.cursor.line)))
+					WithSkipLines(l.cursor.Line)))
 		} else {
 			l.env.Logger.Debugf("- skip blob date:%v id:%s", entry.Created.UTC(), entry.ID)
 		}
@@ -293,5 +293,5 @@ func getServerTimeDelta(response *http.Response) time.Duration {
 	if err != nil {
 		return 0
 	}
-	return serverDate.Sub(time.Now())
+	return time.Until(serverDate)
 }

@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-stan-stats]]
+[role="xpack"]
 === Stan stats metricset
 
 include::../../../../x-pack/metricbeat/module/stan/stats/_meta/docs.asciidoc[]

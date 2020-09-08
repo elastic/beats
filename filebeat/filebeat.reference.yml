@@ -437,6 +437,10 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
@@ -530,6 +534,15 @@ filebeat.inputs:
   # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
   # Default is 5s.
   #multiline.timeout: 5s
+
+  # To aggregate constant number of lines into a single event use the count mode of multiline.
+  #multiline.type: count
+
+  # The number of lines to aggregate into a single event.
+  #multiline.count_lines: 3
+
+  # Do not add new line character when concatenating lines.
+  #multiline.skip_newline: false
 
   # Setting tail_files to true means filebeat starts reading new files at the end
   # instead of the beginning. If this is used in combination with log rotation
@@ -1202,10 +1215,18 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -1318,20 +1339,27 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -1341,7 +1369,7 @@ output.elasticsearch:
   # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
@@ -1504,30 +1532,37 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Optional SSL configuration options. SSL is off by default.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
@@ -1539,6 +1574,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -1647,41 +1688,55 @@ output.elasticsearch:
   # occurs on the proxy server.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
 
 # -------------------------------- File Output ---------------------------------
 #output.file:
@@ -1918,20 +1973,31 @@ setup.kibana:
   # Optional Kibana space ID.
   #space.id: ""
 
-  # Use SSL settings for HTTPS. Default is true.
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
+
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -1949,6 +2015,17 @@ setup.kibana:
 
   # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
+
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
 
 # ================================== Logging ===================================
 
@@ -2100,17 +2177,24 @@ logging.files:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -2132,6 +2216,12 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -2194,6 +2284,41 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the filebeat.
+#instrumentation:
+    # Set to true to enable instrumentation of filebeat.
+    #enabled: false
+
+    # Environment in which filebeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+    # Enable profiling of the server, recording profile samples as events.
+    #
+    # This feature is experimental.
+    #profiling:
+        #cpu:
+            # Set to true to enable CPU profiling.
+            #enabled: false
+            #interval: 60s
+            #duration: 10s
+        #heap:
+            # Set to true to enable heap profiling.
+            #enabled: false
+            #interval: 60s
 
 # ================================= Migration ==================================
 

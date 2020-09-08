@@ -1,8 +1,11 @@
 description: Pipeline for normalizing Zeek dnp3.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.dnp3.ts
     formats:
@@ -20,6 +23,14 @@ processors:
 - lowercase:
     field: event.action
     ignore_missing: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
 - geoip:
     field: destination.ip
     target_field: destination.geo

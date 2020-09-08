@@ -1,4 +1,4 @@
-  
+
 ---
 
 ##### GLOBAL METADATA
@@ -16,5 +16,4 @@
     publishers:
       - email:
           recipients: infra-root+build@elastic.co
-    periodic-folder-trigger: 1w
     prune-dead-branches: true

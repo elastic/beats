@@ -8,5 +8,5 @@ import "context"
 
 // Downloader is an interface allowing download of an artifact
 type Downloader interface {
-	Download(ctx context.Context, programName, version string) (string, error)
+	Download(ctx context.Context, programName, artifactName, version string) (string, error)
 }

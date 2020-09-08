@@ -37,9 +37,7 @@ include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::./gettingstarted.asciidoc[]
-
-include::{libbeat-dir}/repositories.asciidoc[]
+include::./getting-started.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -66,3 +64,5 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+
+include::{libbeat-dir}/shared/redirects.asciidoc[]

@@ -86,6 +86,7 @@ func TestReadService(t *testing.T) {
 					assert.Equal(t, w.ProcessId, s["pid"],
 						"PID of service %v does not match", w.DisplayName)
 				}
+				assert.NotEmpty(t, s["start_type"])
 				// For some services DisplayName and Name are the same. It seems to be a bug from the wmi query.
 				if w.DisplayName != w.Name {
 					assert.Equal(t, w.DisplayName, s["display_name"],

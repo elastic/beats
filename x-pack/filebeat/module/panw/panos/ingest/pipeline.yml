@@ -1,5 +1,8 @@
 description: "Pipeline for Palo Alto Networks PAN-OS Logs"
 processors:
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
 
 # keep message as log.original.
  - rename:
@@ -197,8 +200,6 @@ processors:
        - intrusion_detection
        - network
      if: 'ctx?._temp_?.message_type == "THREAT"'
- - drop:
-     if: 'ctx?.event?.category == null'
  - append:
      field: event.type
      value: allowed
@@ -293,7 +294,7 @@ processors:
      if: 'ctx?._temp_?.message_subtype == "vulnerability"'
  - set:
      field: event.action
-     value: wildfire_veredict
+     value: wildfire_verdict
      if: 'ctx?._temp_?.message_subtype == "wildfire"'
  - set:
      field: event.action
@@ -444,7 +445,7 @@ processors:
  - set:
      field: rule.name
      value: "{{panw.panos.ruleset}}"
-     if: "ctx?.panw?.panos?.ruleset != null"
+     ignore_empty_value: true
 
  - append:
      field: related.user

@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -84,16 +85,19 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
 		go runner.Stop()
+		moduleStops.Add(1)
 	}
 
 	// Start new runners
 	for hash, config := range startList {
-		// Pass a copy of the config to the factory, this way if the factory modifies it,
-		// that doesn't affect the hash of the original one.
-		c, _ := common.NewConfigFrom(config.Config)
-		runner, err := r.factory.Create(r.pipeline, c, config.Meta)
+		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			r.logger.Errorf("Error creating runner from config: %s", err)
+			if _, ok := err.(*common.ErrInputNotFinished); ok {
+				// error is related to state, we should not log at error level
+				r.logger.Debugf("Error creating runner from config: %s", err)
+			} else {
+				r.logger.Errorf("Error creating runner from config: %s", err)
+			}
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
 			continue
 		}
@@ -101,7 +105,14 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
 		runner.Start()
+		moduleStarts.Add(1)
 	}
+
+	// NOTE: This metric tracks the number of modules in the list. The true
+	// number of modules in the running state may differ because modules can
+	// stop on their own (i.e. on errors) and also when this stops a module
+	// above it is done asynchronously.
+	moduleRunning.Set(int64(len(r.runners)))
 
 	return errs.Err()
 }
@@ -156,4 +167,11 @@ func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 		list[k] = v
 	}
 	return list
+}
+
+func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, config *reload.ConfigWithMeta) (Runner, error) {
+	// Pass a copy of the config to the factory, this way if the factory modifies it,
+	// that doesn't affect the hash of the original one.
+	c, _ := common.NewConfigFrom(config.Config)
+	return factory.Create(pipetool.WithDynamicFields(pipeline, config.Meta), c)
 }

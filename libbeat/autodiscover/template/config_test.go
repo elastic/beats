@@ -28,12 +28,27 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigsMapping(t *testing.T) {
+	logp.TestingSetup()
+
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"correct": "config",
 	})
+
+	configPorts, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct": "config",
+		"hosts":   [1]string{"1.2.3.4:8080"},
+	})
+
+	const envValue = "valuefromenv"
+	configFromEnv, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct": envValue,
+	})
+
+	os.Setenv("CONFIGS_MAPPING_TESTENV", envValue)
 
 	tests := []struct {
 		mapping  string
@@ -73,6 +88,59 @@ func TestConfigsMapping(t *testing.T) {
 				"foo": 3,
 			},
 			expected: []*common.Config{config},
+		},
+		// No condition, value from environment
+		{
+			mapping: `
+- config:
+    - correct: ${CONFIGS_MAPPING_TESTENV}`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{configFromEnv},
+		},
+		// Match config and replace data.host and data.ports.<name> properly
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    hosts: ["${data.host}:${data.ports.web}"]`,
+			event: bus.Event{
+				"foo":  3,
+				"host": "1.2.3.4",
+				"ports": common.MapStr{
+					"web": 8080,
+				},
+			},
+			expected: []*common.Config{configPorts},
+		},
+		// Match config and replace data.host and data.port properly
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    hosts: ["${data.host}:${data.port}"]`,
+			event: bus.Event{
+				"foo":  3,
+				"host": "1.2.3.4",
+				"port": 8080,
+			},
+			expected: []*common.Config{configPorts},
+		},
+		// Missing variable, config is not generated
+		{
+			mapping: `
+- config:
+  - module: something
+    hosts: ["${not.exists.host}"]`,
+			event: bus.Event{
+				"host": "1.2.3.4",
+			},
+			expected: nil,
 		},
 	}
 

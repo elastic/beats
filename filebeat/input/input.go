@@ -60,7 +60,6 @@ func New(
 	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
-	dynFields *common.MapStrPointer,
 ) (*Runner, error) {
 	input := &Runner{
 		config:   defaultConfig,
@@ -82,11 +81,10 @@ func New(
 	}
 
 	context := Context{
-		States:        states,
-		Done:          input.done,
-		BeatDone:      input.beatDone,
-		DynamicFields: dynFields,
-		Meta:          nil,
+		States:   states,
+		Done:     input.done,
+		BeatDone: input.beatDone,
+		Meta:     nil,
 	}
 	var ipt Input
 	ipt, err = f(conf, connector, context)

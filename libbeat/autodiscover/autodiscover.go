@@ -83,7 +83,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := Registry.BuildProvider(bus, providerCfg, keystore)
+		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
@@ -206,7 +206,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config '%s', won't start runner", common.DebugString(config, true))))
+			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+				"Auto discover config check failed for config '%s', won't start runner",
+				common.DebugString(config, true))))
 			continue
 		}
 

@@ -109,14 +109,15 @@ spec:
           path: /etc
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: auditbeat-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: auditbeat-daemonset-modules
       - name: data
         hostPath:
+          # When auditbeat runs as non-root user, this directory needs to be writable by group (g+w).
           path: /var/lib/auditbeat-data
           type: DirectoryOrCreate
       - name: run-containerd
