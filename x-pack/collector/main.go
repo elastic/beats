@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/beatsout"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/pb"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/registries"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/cfgload"
@@ -199,7 +198,7 @@ func (app *app) configure(flags flagsConfig) error {
 	app.pipelines, err = pipeline.NewController(
 		app.log, app.info,
 		app.inputsRegistry,
-		beatsout.NewOutputFactory(app.info),
+		outputPlugins(app.info),
 		app.Settings.Pipeline,
 	)
 	if err != nil {

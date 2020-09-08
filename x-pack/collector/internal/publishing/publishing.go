@@ -4,15 +4,38 @@ package publishing
 //go:generate godocdown -plain=false -output Readme.md
 
 import (
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 // OutputFactory configures an output.
 type OutputFactory interface {
 	ConfigureOutput(*logp.Logger, *common.Config) (Output, error)
+}
+
+type Plugin struct {
+	// Name of the output type.
+	Name string
+
+	// Configure the output stability. If the stability is not 'Stable' a message
+	// is logged when the output type is configured.
+	Stability feature.Stability
+
+	// Deprecated marks the plugin as deprecated. If set a deprecation message is logged if
+	// an output is configured.
+	Deprecated bool
+
+	// Info contains a short description of the output type.
+	Info string
+
+	// Doc contains an optional longer description.
+	Doc string
+
+	Configure func(*logp.Logger, *common.Config) (Output, error)
 }
 
 // Output represents an configured, but inactive output. The output instance

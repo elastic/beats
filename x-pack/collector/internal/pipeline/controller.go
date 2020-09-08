@@ -24,7 +24,7 @@ type Controller struct {
 	info beat.Info
 
 	inputLoader   *inputLoader
-	outputFactory publishing.OutputFactory
+	outputFactory *publishing.Loader
 
 	// processing config updates Cell[map[string]*pipelineState]
 	shouldState *cell.Cell
@@ -36,10 +36,14 @@ func NewController(
 	log *logp.Logger,
 	info beat.Info,
 	inputsRegistry v2.Registry,
-	outputFactory publishing.OutputFactory,
+	outputs []publishing.Plugin,
 	settings Settings,
 ) (*Controller, error) {
 	inputLoader := newInputLoader(log, inputsRegistry)
+	outputFactory, err := publishing.NewLoader(outputs)
+	if err != nil {
+		return nil, err
+	}
 
 	state, err := makePipelineStates(log, inputLoader, outputFactory, settings)
 	if err != nil {
@@ -176,7 +180,7 @@ func (pm *Controller) UpdateConfig(settings Settings) error {
 	return nil
 }
 
-func makePipelineStates(log *logp.Logger, loader *inputLoader, outFactory publishing.OutputFactory, settings Settings) (map[string]*pipelineState, error) {
+func makePipelineStates(log *logp.Logger, loader *inputLoader, outFactory *publishing.Loader, settings Settings) (map[string]*pipelineState, error) {
 	// TODO: we might find quite a few errors here. Maybe better collect errors
 	// such that per input/output errors can be better associated with the
 	// configuration in Integration Manager or standalone Agent.

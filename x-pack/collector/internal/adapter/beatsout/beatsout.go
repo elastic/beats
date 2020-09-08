@@ -24,7 +24,8 @@ import (
 )
 
 type beatsOutputFactory struct {
-	info beat.Info
+	info       beat.Info
+	outputType string
 }
 
 type beatsOutput struct {
@@ -65,22 +66,18 @@ var errEventDropped = errors.New("event dropped")
 // When creating an output we create a complete libbeat publisher pipeline
 // including queue, ack handling and actual libbeat outputs for publishing the
 // events. The pipeline is wrapped, such that is satifies the publishing.Output interface.
-func NewOutputFactory(info beat.Info) publishing.OutputFactory {
-	return &beatsOutputFactory{info: info}
+func NewOutputFactory(info beat.Info, outputType string) publishing.OutputFactory {
+	if outputs.FindFactory(outputType) == nil {
+		panic(fmt.Errorf("output type '%v' does not exist", outputType))
+	}
+
+	return &beatsOutputFactory{info: info, outputType: outputType}
 }
 
 func (f *beatsOutputFactory) ConfigureOutput(_ *logp.Logger, cfg *common.Config) (publishing.Output, error) {
 	var pipeConfig beatpipe.Config
 	if err := cfg.Unpack(&pipeConfig); err != nil {
 		return nil, err
-	}
-
-	typeInfo := struct{ Type string }{}
-	if err := cfg.Unpack(&typeInfo); err != nil {
-		return nil, err
-	}
-	if outputs.FindFactory(typeInfo.Type) == nil {
-		return nil, fmt.Errorf("unknown output type %v", typeInfo.Type)
 	}
 
 	// XXX: A little overkill to init all index management, but makes output setup easier for now
@@ -99,7 +96,7 @@ func (f *beatsOutputFactory) ConfigureOutput(_ *logp.Logger, cfg *common.Config)
 	return &beatsOutput{
 		info:            f.info,
 		pipeConfig:      pipeConfig,
-		outputType:      typeInfo.Type,
+		outputType:      f.outputType,
 		indexManagement: indexManagement,
 		cfg:             cfg,
 	}, nil
