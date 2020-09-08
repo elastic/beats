@@ -16,73 +16,169 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+var segmentNames = []string{"request_name", "request_urlHost", "operation_name"}
+
+type MetricValue struct {
+	SegmentName map[string]string
+	Value       map[string]interface{}
+	Segments    []MetricValue
+	Interval    string
+	Start       *date.Time
+	End         *date.Time
+}
+
+func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue {
+	var mapped []MetricValue
+	for _, item := range *metricValues.Value {
+		metricValue := MetricValue{
+			Start: item.Body.Value.Start,
+			End:   item.Body.Value.End,
+		}
+		metricValue.Interval = fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)
+		if item.Body != nil && item.Body.Value != nil {
+			if item.Body.Value.AdditionalProperties != nil {
+				metrics := getAdditionalPropMetric(item.Body.Value.AdditionalProperties)
+				for key, metric := range metrics {
+					if isSegment(key) {
+						metricValue.SegmentName[key] = metric.(string)
+					} else {
+						metricValue.Value[key] = metric
+					}
+				}
+			}
+			if item.Body.Value.Segments != nil {
+				for _, segment := range *item.Body.Value.Segments {
+					metVal := mapSegment(segment, metricValue.SegmentName)
+					metricValue.Segments = append(metricValue.Segments, metVal)
+				}
+			}
+			mapped = append(mapped, metricValue)
+		}
+
+	}
+	return mapped
+}
+
+func mapSegment(segment insights.MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
+	metricValue := MetricValue{Value: map[string]interface{}{}, SegmentName: map[string]string{}}
+	if segment.AdditionalProperties != nil {
+		metrics := getAdditionalPropMetric(segment.AdditionalProperties)
+		for key, metric := range metrics {
+			if isSegment(key) {
+				metricValue.SegmentName[key] = metric.(string)
+			} else {
+				metricValue.Value[key] = metric
+			}
+		}
+	}
+	if len(parentSeg) > 0 {
+		for key, val := range parentSeg {
+			metricValue.SegmentName[key] = val
+		}
+	}
+	if segment.Segments != nil {
+		for _, segment := range *segment.Segments {
+			metVal := mapSegment(segment, metricValue.SegmentName)
+			metricValue.Segments = append(metricValue.Segments, metVal)
+		}
+	}
+
+	return metricValue
+}
+
+func isSegment(metric string) bool {
+	for _, seg := range segmentNames {
+		if metric == seg {
+			return true
+		}
+	}
+	return false
+}
+
 func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string) []mb.Event {
 	var events []mb.Event
 	if metricValues.Value == nil {
 		return events
 	}
-	groupedAddProp := make(map[string][]insights.MetricsResultInfo)
-	for _, item := range *metricValues.Value {
-		if item.Body != nil && item.Body.Value != nil {
-			if item.Body.Value.AdditionalProperties != nil {
-				groupedAddProp[fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)] =
-					append(groupedAddProp[fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)], *item.Body.Value)
-			} else if item.Body.Value.Segments != nil {
-				for _, segment := range *item.Body.Value.Segments {
-					event, ok := createSegmentEvent(*item.Body.Value.Start, *item.Body.Value.End, segment, applicationId)
-					if ok {
-						events = append(events, event)
-					}
-				}
-			}
+	groupedAddProp := make(map[string][]MetricValue)
+	mValues := mapMetricValues(metricValues)
+
+	var segValues []MetricValue
+	for _, mv := range mValues {
+		if len(mv.Segments) == 0 {
+			groupedAddProp[mv.Interval] = append(groupedAddProp[mv.Interval], mv)
+		} else {
+			segValues = append(segValues, mv)
 		}
 	}
-	if len(groupedAddProp) > 0 {
-		for _, val := range groupedAddProp {
-			event, ok := createEvent(val, applicationId)
-			if ok {
-				events = append(events, event)
+
+	for _, val := range groupedAddProp {
+		event := createNoSegEvent(val, applicationId)
+		if len(event.MetricSetFields) > 0 {
+			events = append(events, event)
+		}
+	}
+	for _, val := range segValues {
+		for _, seg := range val.Segments {
+			lastSeg := getValue(seg)
+			for _, ls := range lastSeg {
+				events = append(events, createSegEvent(val, ls, applicationId))
 			}
 		}
 	}
 	return events
 }
 
-func createSegmentEvent(start date.Time, end date.Time, segment insights.MetricsSegmentInfo, applicationId string) (mb.Event, bool) {
-	metricList := common.MapStr{}
-	metrics := getMetric(segment.AdditionalProperties)
-	if len(metrics) == 0 {
-		return mb.Event{}, false
+func getValue(metric MetricValue) []MetricValue {
+	var values []MetricValue
+	if metric.Segments == nil {
+		return []MetricValue{metric}
 	}
-	for key, metric := range metrics {
+	for _, met := range metric.Segments {
+		values = append(values, getValue(met)...)
+	}
+	return values
+}
+
+func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, applicationId string) mb.Event {
+	metricList := common.MapStr{}
+	for key, metric := range metricValue.Value {
 		metricList.Put(key, metric)
 	}
+	if len(metricList) == 0 {
+		return mb.Event{}
+	}
 	event := mb.Event{
+		ModuleFields: common.MapStr{},
 		MetricSetFields: common.MapStr{
-			"start_date":     start,
-			"end_date":       end,
+			"start_date":     parentMetricValue.Start,
+			"end_date":       parentMetricValue.End,
 			"application_id": applicationId,
 		},
-		Timestamp: end.Time,
+		Timestamp: parentMetricValue.End.Time,
 	}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.MetricSetFields.Put("metrics", metricList)
-	return event, true
+	if len(parentMetricValue.SegmentName) > 0 {
+		event.ModuleFields.Put("dimensions", parentMetricValue.SegmentName)
+	}
+	if len(metricValue.SegmentName) > 0 {
+		event.ModuleFields.Put("dimensions", metricValue.SegmentName)
+	}
+	return event
 }
 
-func createEvent(values []insights.MetricsResultInfo, applicationId string) (mb.Event, bool) {
+func createNoSegEvent(values []MetricValue, applicationId string) mb.Event {
 	metricList := common.MapStr{}
 	for _, value := range values {
-		metrics := getMetric(value.AdditionalProperties)
-		for key, metric := range metrics {
+		for key, metric := range value.Value {
 			metricList.Put(key, metric)
 		}
 	}
 	if len(metricList) == 0 {
-		return mb.Event{}, false
+		return mb.Event{}
 	}
-
 	event := mb.Event{
 		MetricSetFields: common.MapStr{
 			"start_date":     values[0].Start,
@@ -94,10 +190,10 @@ func createEvent(values []insights.MetricsResultInfo, applicationId string) (mb.
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.MetricSetFields.Put("metrics", metricList)
-	return event, true
+	return event
 }
 
-func getMetric(addProp map[string]interface{}) map[string]interface{} {
+func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interface{} {
 	metricNames := make(map[string]interface{})
 	for key, val := range addProp {
 		switch val.(type) {

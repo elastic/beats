@@ -9,7 +9,7 @@ input:
         aggregation: ["sum"]
         interval: "P5M"
       - id: ["users/count", "sessions/count", "users/authenticated"]
-        segment: "request/name"
+        segment: ["request/urlHost", "request/name"]
         aggregation: ["unique"]
         interval: "P5M"
       - id: ["browserTimings/networkDuration", "browserTimings/sendDuration", "browserTimings/receiveDuration", "browserTimings/processingDuration", "browserTimings/totalDuration"]
@@ -22,7 +22,6 @@ input:
         aggregation: ["sum"]
         interval: "P5M"
       - id: ["performanceCounters/memoryAvailableBytes", "performanceCounters/processCpuPercentageTotal", "performanceCounters/processCpuPercentage", "performanceCounters/processIOBytesPerSecond",
-      "performanceCounters/processPrivateBytes", "performanceCounters/processorCpuPercentage"]
+             "performanceCounters/processPrivateBytes", "performanceCounters/processorCpuPercentage"]
         aggregation: ["avg"]
         interval: "P5M"
-
