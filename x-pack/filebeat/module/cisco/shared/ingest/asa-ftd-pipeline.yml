@@ -319,7 +319,7 @@ processors:
   - set:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "event.outcome"
-      value: allow
+      value: success
   - dissect:
       if: "ctx._temp_.cisco.message_id == '304002'"
       field: "message"
@@ -591,19 +591,20 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '713120'"
       field: "message"
-      pattern: "%{event.reason} (msgid=%{event.id})"
+      pattern: "Group = %{}, IP = %{source.address}, %{event.reason} (msgid=%{event.id})"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '713202'"
       field: "message"
-      pattern: "IP = %{IP:source.address}, %{event.reason}. %{} packet."
+      pattern: "IP = %{source.address}, %{event.reason}. %{} packet."
   - dissect:
       if: "ctx._temp_.cisco.message_id == '750003'"
       field: "message"
       pattern: "Local:%{source.address}:%{source.port} Remote:%{destination.address}:%{destination.port} Username:%{user.name} %{event.reason} ERROR:%{+event.reason}"
-  - dissect:
+  - grok:
       if: '["713905", "713904", "713906", "713902", "713901"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
-      pattern: "%{event.reason}"
+      patterns:
+      - "^(Group = %{IP}, )?(IP = %{IP:source.address}, )?%{GREEDYDATA:event.reason}$"
    # Handle ecs action outcome protocol
   - set:
       if: '["434002", "434004"].contains(ctx._temp_.cisco.message_id)'
@@ -1276,6 +1277,10 @@ processors:
   - set:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "permitted"'
+      value: success
+  - set:
+      field: "event.outcome"
+      if: 'ctx.event?.outcome == "allow"'
       value: success
   - set:
       field: "event.outcome"

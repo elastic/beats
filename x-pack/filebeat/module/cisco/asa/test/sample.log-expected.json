@@ -17,7 +17,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -67,7 +67,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -118,7 +118,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-session-5-106100: access-list acl_in permitted tcp inside/10.1.2.16(2241) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -168,7 +168,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -220,7 +220,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list inside permitted udp inside/172.29.2.3(1065) -> outside/192.0.2.57(53) hit-cnt 144 300-second interval [0xe982c7a4, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -305,7 +305,7 @@
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.asa.connection_id": "89743274",
         "cisco.asa.destination_interface": "outside",
-        "cisco.asa.mapped_destination_ip": "10.123.3.42",
+        "cisco.asa.mapped_destination_host": "10.123.3.42.130",
         "cisco.asa.mapped_destination_port": 12834,
         "cisco.asa.mapped_source_ip": "192.0.2.43",
         "cisco.asa.mapped_source_port": 443,
@@ -829,7 +829,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.0.66/12981 to 10.1.2.60/53 due to DNS Query",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -879,7 +879,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2006) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -929,7 +929,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49734) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -979,7 +979,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49735) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1029,7 +1029,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49736) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1079,7 +1079,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49737) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1129,7 +1129,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49738) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1179,7 +1179,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49746) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1229,7 +1229,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2007) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1279,7 +1279,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.13(43013) -> dmz/192.168.33.31(25) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1329,7 +1329,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2008) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1377,7 +1377,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106006: Deny inbound UDP from 192.0.2.66/137 to 10.1.2.42/137 on interface inside",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1424,7 +1424,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.2.66/12981 to 10.1.5.60/53 due to DNS Query",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1474,7 +1474,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2009) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1524,7 +1524,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49776) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1574,7 +1574,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2010) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1624,7 +1624,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2011) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1674,7 +1674,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2012) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1724,7 +1724,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1774,7 +1774,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1824,7 +1824,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.46(49840) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1874,7 +1874,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -1925,7 +1925,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2029,7 +2029,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2080,7 +2080,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2397,18 +2397,20 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "tcp",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "info",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7459,
-        "network.transport": "(no",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -2443,18 +2445,20 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "tcp",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "info",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 7601,
-        "network.transport": "(no",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -2491,7 +2495,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group \"dmz\" [0x123a465e, 0x8c20f21]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2754,7 +2758,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2799,7 +2803,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2844,7 +2848,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2889,7 +2893,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2934,7 +2938,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2979,7 +2983,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3024,7 +3028,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3069,7 +3073,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3117,7 +3121,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.95/24069 dst inside:10.32.112.125/25 by access-group \"PERMIT_IN\" [0x0, 0x0]\"",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3166,7 +3170,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3213,7 +3217,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3266,7 +3270,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-338002: Dynamic Filter permitted black listed TCP traffic from inside:10.1.1.45/6798 (192.88.99.1/7890) to outside:192.88.99.129/80 (192.88.99.129/80), destination 192.88.99.129 resolved from dynamic list: bad.example.com",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3381,7 +3385,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-338008: Dynamic Filter dropped blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3428,7 +3432,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3470,7 +3474,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3513,7 +3517,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [

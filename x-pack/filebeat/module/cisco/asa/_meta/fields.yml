@@ -1,3 +1,8 @@
+- name: event.reason
+  type: text
+  description: >
+    Reason why this event happened, according to the source.
+  
 - name: cisco.asa
   type: group
   description: >

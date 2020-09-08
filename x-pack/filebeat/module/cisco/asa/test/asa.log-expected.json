@@ -4492,7 +4492,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4546,7 +4546,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4600,7 +4600,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4654,7 +4654,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4708,7 +4708,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4762,7 +4762,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4816,7 +4816,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4870,7 +4870,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4924,7 +4924,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4978,7 +4978,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5032,7 +5032,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5086,7 +5086,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -5140,7 +5140,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:100.66.19.254/80 dst inside:172.31.98.44/8277 by access-group \"inbound\" [0x0, 0x0]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
