@@ -352,6 +352,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
 		kubemeta["annotations"] = annotations
+		kubemeta["container"] = cmeta	
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
 		}
