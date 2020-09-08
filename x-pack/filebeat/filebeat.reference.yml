@@ -473,27 +473,6 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#---------------------------- Citrix XenApp Module ----------------------------
-- module: citrix
-  virtualapps:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9507
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
@@ -917,27 +896,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------- Kaspersky Anti-Virus Module -------------------------
-- module: kaspersky
-  av:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9514
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
   # All logs
@@ -1270,27 +1228,6 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#---------------------------- Rapid7 NeXpose Module ----------------------------
-- module: rapid7
-  nexpose:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9517
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
   # Main logs
@@ -1360,8 +1297,10 @@ filebeat.modules:
 
     # known firewalls
     #var.known_devices:
-    #   "device1_serialnumber": "a.host.local"
-    #   "device2_serialnumber": "b.host.local"
+      #- serial_number: "1234567890123457"
+      #  hostname: "a.host.local"
+      #- serial_number: "1234234590678557"
+      #  hostname: "b.host.local"
 
 
 #-------------------------------- Squid Module --------------------------------
@@ -1394,27 +1333,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-#------------------- Tenable Network Security Nessus Module -------------------
-- module: tenable
-  nessus_security:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9516
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat

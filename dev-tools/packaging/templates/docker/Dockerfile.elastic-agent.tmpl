@@ -2,11 +2,38 @@
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
 {{- $repoInfo := repo }}
 
+# Prepare home in a different stage to avoid creating additional layers on
+# the final image because of permission changes.
+FROM {{ .buildFrom }} AS home
+
+COPY beat {{ $beatHome }}
+
+RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \
+    chown -R root:root {{ $beatHome }} && \
+    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    rm {{ $beatBinary }} && \
+    ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
+    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
+{{- if .linux_capabilities }}
+    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
+{{- end }}
+{{- range $i, $modulesd := .ModulesDirs }}
+    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+{{- end }}
+    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs
+
 FROM {{ .from }}
 
+{{- if contains .from "ubi-minimal" }}
+RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && \
+    chmod +x /usr/local/bin/jq
+{{- else }}
 # Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
 RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y && yum install --setopt=tsflags=nodocs -y epel-release &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 RUN for iter in {1..10}; do yum update -y && yum install -y jq &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+{{- end }}
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \
@@ -18,33 +45,37 @@ LABEL \
   org.label-schema.url="{{ .BeatURL }}" \
   org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   org.label-schema.vcs-ref="{{ commit }}" \
+  io.k8s.description="{{ .BeatDescription }}" \
+  io.k8s.display-name="{{ .BeatName | title }} image" \
+  org.opencontainers.image.created="{{ date }}" \
+  org.opencontainers.image.licenses="{{ .License }}" \
+  org.opencontainers.image.title="{{ .BeatName | title }}" \
+  org.opencontainers.image.vendor="{{ .BeatVendor }}" \
+  name="{{ .BeatName }}" \
+  maintainer="infra@elastic.co" \
+  vendor="{{ .BeatVendor }}" \
+  version="{{ beat_version }}" \
+  release="1" \
+  url="{{ .BeatURL }}" \
+  summary="{{ .BeatName }}" \
   license="{{ .License }}" \
   description="{{ .BeatDescription }}"
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
 
-COPY beat {{ $beatHome }}
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
-RUN groupadd --gid 1000 {{ .BeatName }}
+COPY --from=home {{ $beatHome }} {{ $beatHome }}
 
-RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
-    chown -R root:{{ .BeatName }} {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
-{{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
-{{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+RUN mkdir /licenses
+COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
+COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
 {{- if ne .user "root" }}
-RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
+RUN groupadd --gid 1000 {{ .BeatName }}
+RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}
 
