@@ -51,7 +51,7 @@ func TestAsyncStructuredEvent(t *testing.T) {
 }
 
 func makeAsyncTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.Pipelining = 3
 	client, err := newAsyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)

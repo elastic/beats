@@ -80,6 +80,10 @@ func (f *beatsOutputFactory) ConfigureOutput(_ *logp.Logger, cfg *common.Config)
 		return nil, err
 	}
 
+	return NewPipelineOutput(f.info, pipeConfig, f.outputType, cfg), nil
+}
+
+func NewPipelineOutput(info beat.Info, pipelineSettings beatpipe.Config, outputType string, outputConfig *common.Config) publishing.Output {
 	// XXX: A little overkill to init all index management, but makes output setup easier for now
 	indexManagementConfig := common.MustNewConfigFrom(map[string]interface{}{
 		"setup.ilm.enabled":      false,
@@ -87,19 +91,19 @@ func (f *beatsOutputFactory) ConfigureOutput(_ *logp.Logger, cfg *common.Config)
 		"output.something":       map[string]interface{}{},
 	})
 
-	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, f.info, indexManagementConfig)
+	indexManagement, err := idxmgmt.MakeDefaultSupport(nil)(nil, info, indexManagementConfig)
 	if err != nil {
 		// the config is hard coded, if we panic here, we've messed up
 		panic(err)
 	}
 
 	return &beatsOutput{
-		info:            f.info,
-		pipeConfig:      pipeConfig,
-		outputType:      f.outputType,
+		info:            info,
+		pipeConfig:      pipelineSettings,
+		outputType:      outputType,
 		indexManagement: indexManagement,
-		cfg:             cfg,
-	}, nil
+		cfg:             outputConfig,
+	}
 }
 
 func (f *beatsOutput) Open(_ unison.Canceler, log *logp.Logger, acks publishing.ACKCallback) (publishing.Publisher, error) {

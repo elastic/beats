@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/x-pack/collector/elastic/logstash/lsout"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/beatsout"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/publishing"
 	"github.com/elastic/beats/v7/x-pack/collector/os/console/consoleout"
@@ -22,7 +23,7 @@ func outputPlugins(info beat.Info) []publishing.Plugin {
 		consoleout.Plugin(info),
 		beatsOutput("file"),
 		beatsOutput("elasticsearch"),
-		beatsOutput("logstash"),
+		lsout.Plugin(info),
 		beatsOutput("kafka"),
 		beatsOutput("redis"),
 	}

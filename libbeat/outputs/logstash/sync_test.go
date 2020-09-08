@@ -64,7 +64,7 @@ func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 }
 
 func makeTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig()
+	config := DefaultConfig()
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
 	client, err := newSyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)

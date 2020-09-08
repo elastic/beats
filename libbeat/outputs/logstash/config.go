@@ -50,7 +50,7 @@ type Backoff struct {
 	Max  time.Duration
 }
 
-func defaultConfig() Config {
+func DefaultConfig() Config {
 	return Config{
 		LoadBalance:      false,
 		Pipelining:       2,
@@ -69,7 +69,7 @@ func defaultConfig() Config {
 }
 
 func readConfig(cfg *common.Config, info beat.Info) (*Config, error) {
-	c := defaultConfig()
+	c := DefaultConfig()
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
 	if err != nil {
