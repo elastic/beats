@@ -29,7 +29,7 @@ type diskQueueProducer struct {
 	// The configuration this producer was created with.
 	config queue.ProducerConfig
 
-	encoder *frameEncoder
+	encoder *eventEncoder
 }
 
 // A request sent from a producer to the core loop to add a frame to the queue.

@@ -34,26 +34,13 @@ import (
 	"github.com/elastic/go-structform/json"
 )
 
-// ChecksumType specifies what checksum algorithm the queue should use to
-// verify its data frames.
-type ChecksumType int
-
-// ChecksumTypeNone: Don't compute or verify checksums.
-// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
-//   "hash/crc32" package.
-const (
-	ChecksumTypeNone = iota
-
-	ChecksumTypeCRC32
-)
-
-type frameEncoder struct {
+type eventEncoder struct {
 	buf          bytes.Buffer
 	folder       *gotype.Iterator
 	checksumType ChecksumType
 }
 
-type decoder struct {
+type eventDecoder struct {
 	buf []byte
 
 	parser   *json.Parser
@@ -67,13 +54,13 @@ type entry struct {
 	Fields    common.MapStr
 }
 
-func newFrameEncoder(checksumType ChecksumType) *frameEncoder {
-	e := &frameEncoder{checksumType: checksumType}
+func newFrameEncoder() *eventEncoder {
+	e := &eventEncoder{}
 	e.reset()
 	return e
 }
 
-func (e *frameEncoder) reset() {
+func (e *eventEncoder) reset() {
 	e.folder = nil
 
 	visitor := json.NewVisitor(&e.buf)
@@ -90,7 +77,7 @@ func (e *frameEncoder) reset() {
 	e.folder = folder
 }
 
-func (e *frameEncoder) encode(event *publisher.Event) ([]byte, error) {
+func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
 	e.buf.Reset()
 
 	var flags uint8
@@ -113,13 +100,13 @@ func (e *frameEncoder) encode(event *publisher.Event) ([]byte, error) {
 	return e.buf.Bytes(), nil
 }
 
-func newDecoder() *decoder {
-	d := &decoder{}
+func newDecoder() *eventDecoder {
+	d := &eventDecoder{}
 	d.reset()
 	return d
 }
 
-func (d *decoder) reset() {
+func (d *eventDecoder) reset() {
 	unfolder, err := gotype.NewUnfolder(nil)
 	if err != nil {
 		panic(err) // can not happen
@@ -130,7 +117,7 @@ func (d *decoder) reset() {
 }
 
 // Buffer prepares the read buffer to hold the next event of n bytes.
-func (d *decoder) Buffer(n int) []byte {
+func (d *eventDecoder) Buffer(n int) []byte {
 	if cap(d.buf) > n {
 		d.buf = d.buf[:n]
 	} else {
@@ -139,7 +126,7 @@ func (d *decoder) Buffer(n int) []byte {
 	return d.buf
 }
 
-func (d *decoder) Decode() (publisher.Event, error) {
+func (d *eventDecoder) Decode() (publisher.Event, error) {
 	var (
 		to       entry
 		err      error

@@ -17,10 +17,6 @@
 
 package diskqueue
 
-import (
-	"github.com/elastic/beats/v7/libbeat/publisher"
-)
-
 type coreLoop struct {
 	// The queue that created this coreLoop. The core loop is the only one of
 	// the main goroutines for the queue that has a pointer to the queue and
@@ -70,40 +66,6 @@ type coreLoop struct {
 	// yet been moved to the acked list. It is used to detect when the oldest
 	// outstanding segment has been fully acknowledged by the consumer.
 	oldestFrameID frameID
-}
-
-// A data frame created through the producer API and waiting to be
-// written to disk.
-type writeFrame struct {
-	// The original event provided by the client to diskQueueProducer.
-	// We keep this as well as the serialized form until we are done
-	// writing, because we may need to send this value back to the producer
-	// callback if it is cancelled.
-	event publisher.Event
-
-	// The event, serialized for writing to disk and wrapped in a frame
-	// header / footer.
-	serialized []byte
-
-	// The producer that created this frame. This is included in the
-	// frame structure itself because we may need the producer and / or
-	// its config at any time up until it has been completely written:
-	// - While the core loop is tracking frames to send to the writer,
-	//   it may receive a Cancel request, which requires us to know
-	//   the producer / config each frame came from.
-	// - After the writer loop has finished writing the frame to disk,
-	//   it needs to call the ACK function specified in ProducerConfig.
-	producer *diskQueueProducer
-}
-
-// A frame that has been read from disk
-type readFrame struct {
-	event publisher.Event
-	id    frameID
-
-	// How much space this frame occupied on disk (before deserialization),
-	// including the frame header / footer.
-	bytesOnDisk int64
 }
 
 func (cl *coreLoop) run() {

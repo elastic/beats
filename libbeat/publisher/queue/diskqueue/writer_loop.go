@@ -121,7 +121,7 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriter(wl.settings)
 			if err != nil {
-				wl.logger.Errorf("Couldn't open new segment file: %w", err)
+				wl.logger.Errorf("Couldn't open new segment file: %v", err)
 				// TODO: retry, etc
 			}
 			wl.outputFile = file

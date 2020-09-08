@@ -27,6 +27,43 @@ import (
 	"strings"
 )
 
+// diskQueueSegments encapsulates segment-related queue metadata.
+type diskQueueSegments struct {
+	// The segments that are currently being written. The writer loop
+	// writes these segments in order. When a segment has been
+	// completely written, the writer loop notifies the core loop
+	// in a writeResponse, and it is moved to the reading list.
+	// If the reading list is empty, the reader loop may read from
+	// a segment that is still being written, but it will always
+	// be writing[0], since later entries have generally not been
+	// created yet.
+	writing []*queueSegment
+
+	// A list of the segments that have been completely written but have
+	// not yet been completely processed by the reader loop, sorted by increasing
+	// segment ID. Segments are always read in order. When a segment has
+	// been read completely, it is removed from the front of this list and
+	// appended to read.
+	reading []*queueSegment
+
+	// A list of the segments that have been read but have not yet been
+	// completely acknowledged, sorted by increasing segment ID. When the
+	// first entry of this list is completely acknowledged, it is removed
+	// from this list and added to acked.
+	acking []*queueSegment
+
+	// A list of the segments that have been completely processed and are
+	// ready to be deleted. The writer loop always tries to delete segments
+	// in this list before writing new data. When a segment is successfully
+	// deleted, it is removed from this list and the queue's
+	// segmentDeletedCond is signalled.
+	acked []*queueSegment
+
+	// The next sequential unused segment ID. This is what will be assigned
+	// to the next queueSegment we create.
+	nextID segmentID
+}
+
 // Every data frame read from the queue is assigned a unique sequential
 // integer, which is used to keep track of which frames have been
 // acknowledged.
@@ -42,15 +79,6 @@ type segmentOffset uint64
 type queueSegment struct {
 	// A segment id is globally unique within its originating queue.
 	id segmentID
-
-	// The settings for the queue that created this segment. Used for locating
-	// the queue file on disk and determining its checksum behavior.
-	//queueSettings *Settings
-
-	// Whether the file for this segment exists on disk yet. If it does
-	// not, then calling getWriter() will create it and return a writer
-	// positioned at the start of the data region.
-	created bool
 
 	// The byte offset of the end of the segment's data region. This is
 	// updated when the segment is written to, and should always correspond
@@ -77,10 +105,23 @@ type segmentHeader struct {
 	checksumType ChecksumType
 }
 
-// Each data frame has a 32-bit length and a 32-bit checksum
-// in the header, and a duplicate 32-bit length in the footer.
-const frameHeaderSize = 8
-const frameFooterSize = 4
+// ChecksumType specifies what checksum algorithm the queue should use to
+// verify its data frames.
+type ChecksumType uint32
+
+// ChecksumTypeNone: Don't compute or verify checksums.
+// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
+//   "hash/crc32" package.
+const (
+	ChecksumTypeNone = iota
+
+	ChecksumTypeCRC32
+)
+
+// Each data frame has a 32-bit length in the header, and a 32-bit checksum
+// and a duplicate 32-bit length in the footer.
+const frameHeaderSize = 4
+const frameFooterSize = 8
 const frameMetadataSize = frameHeaderSize + frameFooterSize
 
 // Each segment header has a 32-bit version and a 32-bit checksum type.
@@ -117,7 +158,6 @@ func scanExistingSegments(path string) ([]*queueSegment, error) {
 				segments = append(segments,
 					&queueSegment{
 						id:        segmentID(id),
-						created:   true,
 						endOffset: segmentOffset(file.Size() - segmentHeaderSize),
 					})
 			}
@@ -135,18 +175,24 @@ func (segment *queueSegment) sizeOnDisk() uint64 {
 func (segment *queueSegment) getReader(
 	queueSettings *Settings,
 ) (*os.File, error) {
+	fmt.Printf("\033[94mgetReader(%v)\033[0m\n", segment.id)
+
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
+		fmt.Printf("\033[94mfailed: %v\033[0m\n", err)
 		return nil, fmt.Errorf(
 			"Couldn't open segment %d: %w", segment.id, err)
 	}
 	header, err := readSegmentHeader(file)
 	if err != nil {
+		fmt.Printf("\033[94mfailed (header): %v\033[0m\n", err)
+		file.Close()
 		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
 	}
 	segment.header = header
 
+	fmt.Printf("\033[94msuccess\033[0m\n")
 	return file, nil
 }
 
@@ -154,9 +200,11 @@ func (segment *queueSegment) getReader(
 func (segment *queueSegment) getWriter(
 	queueSettings *Settings,
 ) (*os.File, error) {
+	fmt.Printf("\033[0;32mgetWriter(%v)\033[0m\n", segment.id)
 	path := queueSettings.segmentPath(segment.id)
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
+		fmt.Printf("\033[0;32mfailed\033[0m\n")
 		return nil, err
 	}
 	header := &segmentHeader{
@@ -165,8 +213,11 @@ func (segment *queueSegment) getWriter(
 	}
 	err = writeSegmentHeader(file, header)
 	if err != nil {
+		fmt.Printf("\033[0;32mfailed (header)\033[0m\n")
 		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
 	}
+	fmt.Printf("\033[0;32msuccess\033[0m\n")
+
 	return file, nil
 }
 
@@ -179,10 +230,12 @@ func readSegmentHeader(in *os.File) (*segmentHeader, error) {
 	if header.version != 0 {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
 	}
-	err = binary.Read(in, binary.LittleEndian, &header.checksumType)
+	var rawChecksumType uint32
+	err = binary.Read(in, binary.LittleEndian, &rawChecksumType)
 	if err != nil {
 		return nil, err
 	}
+	header.checksumType = ChecksumType(rawChecksumType)
 	return header, nil
 }
 
