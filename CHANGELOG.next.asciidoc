@@ -334,6 +334,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add F5 ASM filebeat module {issue}20800[20800] {pull}19560[19560]
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
