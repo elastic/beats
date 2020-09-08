@@ -23,12 +23,9 @@ const (
 // After running Upgrade agent should download its own version specified by action
 // from repository specified by fleet.
 type handlerUpgrade struct {
-	settings    *artifact.Config
-	log         *logger.Logger
-	emitter     emitterFunc
-	dispatcher  programsDispatcher
-	closers     []context.CancelFunc
-	actionStore *actionStore
+	settings *artifact.Config
+	log      *logger.Logger
+	closers  []context.CancelFunc
 }
 
 func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker) error {
@@ -38,20 +35,29 @@ func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker)
 		return fmt.Errorf("invalid type, expected ActionUpgrade and received %T", a)
 	}
 
-	// download artifact
-	_, err := h.downloadArtifact(ctx, action)
+	archivePath, err := h.downloadArtifact(ctx, action)
 	if err != nil {
 		return err
 	}
 
-	// TODO: unpack correctly, skip root (symlink, config...) unpack data/*
-	// TODO: change symlink
-	// TODO: mark update happened so we can handle grace period
-	// TODO: reexec
-	return nil
+	newHash, err := h.untar(ctx, action, archivePath)
+	if err != nil {
+		return err
+	}
+
+	if err := h.changeSymlink(ctx, action, newHash); err != nil {
+		return err
+	}
+
+	if err := h.markUpgrade(ctx, action); err != nil {
+		return err
+	}
+
+	return h.reexec(ctx, action)
 }
 
 func (h *handlerUpgrade) downloadArtifact(ctx context.Context, action *fleetapi.ActionUpgrade) (string, error) {
+	// do not update source config
 	settings := *h.settings
 	if action.SourceURI != "" {
 		settings.SourceURI = action.SourceURI
@@ -77,4 +83,24 @@ func (h *handlerUpgrade) downloadArtifact(ctx context.Context, action *fleetapi.
 	}
 
 	return path, nil
+}
+
+// untar unpacks archive correctly, skips root (symlink, config...) unpacks data/*
+func (h *handlerUpgrade) untar(ctx context.Context, action *fleetapi.ActionUpgrade, archivePath string) (string, error) {
+	return "", errors.New("not yet implemented")
+}
+
+// changeSymlink changes root symlink so it points to updated version
+func (h *handlerUpgrade) changeSymlink(ctx context.Context, action *fleetapi.ActionUpgrade, newHash string) error {
+	return errors.New("not yet implemented")
+}
+
+// markUpgrade marks update happened so we can handle grace period
+func (h *handlerUpgrade) markUpgrade(ctx context.Context, action *fleetapi.ActionUpgrade) error {
+	return errors.New("not yet implemented")
+}
+
+// reexec restarts agent so new version is run
+func (h *handlerUpgrade) reexec(ctx context.Context, action *fleetapi.ActionUpgrade) error {
+	return errors.New("not yet implemented")
 }

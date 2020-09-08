@@ -209,12 +209,9 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
 		&handlerUpgrade{
-			settings:    cfg.Settings.DownloadConfig,
-			log:         log,
-			emitter:     emit,
-			dispatcher:  router,
-			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
-			actionStore: actionStore,
+			settings: cfg.Settings.DownloadConfig,
+			log:      log,
+			closers:  []context.CancelFunc{managedApplication.cancelCtxFn},
 		},
 	)
 
