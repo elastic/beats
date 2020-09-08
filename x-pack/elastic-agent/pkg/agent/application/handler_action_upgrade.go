@@ -145,9 +145,6 @@ func unpack(r io.Reader) (string, error) {
 	var rootDir string
 	var hash string
 
-	hashEnd := len(agentName) + hashLen + 1
-	hashStart := len(agentName) + 1
-
 	for {
 		f, err := tr.Next()
 		if err == io.EOF {
