@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"strings"
 	"time"
@@ -404,13 +405,13 @@ func bulkCollectPublishFails(
 				stats.tooMany++
 			} else {
 				// hard failure, don't collect
-				log.Warnf("Cannot index event %#v (status=%v): %s", data[i], status, msg)
+				log.Warn("Cannot index event",zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg))
 				stats.nonIndexable++
 				continue
 			}
 		}
 
-		log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		log.Debug("Bulk item insert failed",zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg))
 		stats.fails++
 		failed = append(failed, data[i])
 	}
