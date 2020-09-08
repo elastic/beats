@@ -66,6 +66,11 @@ type readerLoop struct {
 	// The helper object to deserialize binary blobs from the queue into
 	// publisher.Event objects that can be returned in a readFrame.
 	decoder *eventDecoder
+
+	// The id that will be assigned to the next successfully-read frame.
+	// Always starts from 0; this is just to track which frames have been
+	// acknowledged, and doesn't need any consistency between runs.
+	nextFrameID frameID
 }
 
 func (rl *readerLoop) run() {
@@ -111,9 +116,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		// Try to read the next frame, clipping to the given bound.
 		// If the next frame extends past this boundary, nextFrame will return
 		// an error.
-		frame, err := nextFrame(
-			handle, remainingLength, rl.decoder,
-			request.segment.header.checksumType)
+		frame, err := rl.nextFrame(handle, remainingLength)
 		if frame != nil {
 			// We've read the frame, try sending it to the output channel.
 			select {
@@ -160,11 +163,8 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 	}
 }
 
-func nextFrame(
-	handle *os.File,
-	maxLength int64,
-	decoder *eventDecoder,
-	checksumType ChecksumType,
+func (rl *readerLoop) nextFrame(
+	handle *os.File, maxLength int64,
 ) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
@@ -196,7 +196,7 @@ func nextFrame(
 
 	// Read the actual frame data
 	dataLength := frameLength - frameMetadataSize
-	bytes := decoder.Buffer(int(dataLength))
+	bytes := rl.decoder.Buffer(int(dataLength))
 	//bytes := make([]byte, dataLength)
 	_, err = reader.Read(bytes)
 	if err != nil {
@@ -226,7 +226,7 @@ func nextFrame(
 			frameLength, duplicateLength)
 	}
 
-	event, err := decoder.Decode()
+	event, err := rl.decoder.Decode()
 	if err != nil {
 		// TODO: Unlike errors in the segment or frame metadata, this is entirely
 		// a problem in the event [de]serialization which may be isolated.
@@ -239,8 +239,10 @@ func nextFrame(
 
 	frame := &readFrame{
 		event:       event,
+		id:          rl.nextFrameID,
 		bytesOnDisk: int64(frameLength),
 	}
+	rl.nextFrameID++
 
 	return frame, nil
 }
