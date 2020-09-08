@@ -295,7 +295,7 @@ class Test(metricbeat.BaseTest):
         # Enable xpack trial
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Trial already enabled. Error: {}".format(e))
 
@@ -307,7 +307,7 @@ class Test(metricbeat.BaseTest):
 
         try:
             self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
-        except:
+        except BaseException:
             e = sys.exc_info()[0]
             print("Basic license already enabled. Error: {}".format(e))
 
