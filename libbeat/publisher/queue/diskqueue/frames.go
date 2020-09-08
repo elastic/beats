@@ -66,3 +66,7 @@ type readFrame struct {
 const frameHeaderSize = 4
 const frameFooterSize = 8
 const frameMetadataSize = frameHeaderSize + frameFooterSize
+
+func (frame writeFrame) sizeOnDisk() uint64 {
+	return uint64(len(frame.serialized) + frameMetadataSize)
+}

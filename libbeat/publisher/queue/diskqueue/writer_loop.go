@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"bytes"
+	"encoding/binary"
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -129,6 +130,9 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 
 		// We have the data and a file to write it to. We are now committed
 		// to writing this block unless the queue is closed in the meantime.
+		frameSize := uint32(frameRequest.frame.sizeOnDisk())
+		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
+		bytesWritten += 4
 		n, err := wl.outputFile.Write(frameRequest.frame.serialized)
 		bytesWritten += int64(n)
 		// TODO: retry forever if there is an error or n isn't the right
@@ -136,6 +140,11 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 		if err != nil {
 			wl.logger.Errorf("Couldn't write pending data to disk: %w", err)
 		}
+		// empty crc
+		binary.Write(wl.outputFile, binary.LittleEndian, uint32(0))
+		// duplicate length
+		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
+		bytesWritten += 8
 	}
 	if bytesWritten > 0 {
 		segments = append(segments, writerSegmentMetadata{

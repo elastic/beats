@@ -124,7 +124,7 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 	// Pathological case checking: make sure the incoming frame isn't bigger
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
-	frameSize := uint64(len(request.frame.serialized))
+	frameSize := request.frame.sizeOnDisk()
 	if cl.queue.settings.MaxSegmentSize < frameSize {
 		cl.queue.logger.Warnf(
 			"Rejecting event with size %v because the maximum segment size is %v",
@@ -138,7 +138,7 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 	// already accepted).
 	pendingBytes := uint64(0)
 	for _, request := range cl.pendingFrames {
-		pendingBytes += uint64(len(request.frame.serialized))
+		pendingBytes += request.frame.sizeOnDisk()
 	}
 	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
 	// cl.queue.logger.Debugf(
@@ -386,7 +386,7 @@ func (cl *coreLoop) enqueueProducerFrame(frame *writeFrame) {
 	if len(dq.segments.writing) > 0 {
 		segment = dq.segments.writing[len(dq.segments.writing)-1]
 	}
-	frameLen := segmentOffset(len(frame.serialized))
+	frameLen := segmentOffset(frame.sizeOnDisk())
 	// If segment is nil, or the new segment exceeds its bounds,
 	// we need to create a new writing segment.
 	if segment == nil ||

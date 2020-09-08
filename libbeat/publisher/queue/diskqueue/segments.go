@@ -64,13 +64,6 @@ type diskQueueSegments struct {
 	nextID segmentID
 }
 
-// Every data frame read from the queue is assigned a unique sequential
-// integer, which is used to keep track of which frames have been
-// acknowledged.
-// This id is not stable between restarts; the value 0 is always assigned
-// to the oldest remaining frame on startup.
-type frameID uint64
-
 // segmentOffset is a byte index into the segment's data region.
 // An offset of 0 means the first byte after the segment file header.
 type segmentOffset uint64
@@ -117,12 +110,6 @@ const (
 
 	ChecksumTypeCRC32
 )
-
-// Each data frame has a 32-bit length in the header, and a 32-bit checksum
-// and a duplicate 32-bit length in the footer.
-const frameHeaderSize = 4
-const frameFooterSize = 8
-const frameMetadataSize = frameHeaderSize + frameFooterSize
 
 // Each segment header has a 32-bit version and a 32-bit checksum type.
 const segmentHeaderSize = 8
