@@ -446,15 +446,15 @@ func TestEmitEvent(t *testing.T) {
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
 							"namespace": "default",
-							 "pod": common.MapStr{
+							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 							}, "node": common.MapStr{
 								"name": "node",
 							},
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
 						},
 						"container": common.MapStr{
@@ -571,15 +571,15 @@ func TestEmitEvent(t *testing.T) {
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
 							"namespace": "default",
-							 "pod": common.MapStr{
+							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 							}, "node": common.MapStr{
 								"name": "node",
 							},
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
 						},
 						"container": common.MapStr{
@@ -623,8 +623,8 @@ func TestEmitEvent(t *testing.T) {
 								"name": "node",
 							},
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
 						},
 						"container": common.MapStr{
@@ -787,15 +787,15 @@ func TestEmitEvent(t *testing.T) {
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
 							"namespace": "default",
-							 "pod": common.MapStr{
+							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 							}, "node": common.MapStr{
 								"name": "node",
 							},
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
 						},
 						"container": common.MapStr{
@@ -896,10 +896,10 @@ func TestEmitEvent(t *testing.T) {
 						"kubernetes": common.MapStr{
 							"namespace": "default",
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
-							 "pod": common.MapStr{
+							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 							}, "node": common.MapStr{
@@ -1004,8 +1004,8 @@ func TestEmitEvent(t *testing.T) {
 						"kubernetes": common.MapStr{
 							"namespace": "default",
 							"container": common.MapStr{
-								"name":    "filebeat",
-								"image":   "elastic/filebeat:6.3.0",
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
 							},
 							"pod": common.MapStr{
 								"name": "filebeat",
