@@ -30,7 +30,7 @@ processors:
     field: fortinet.firewall.remip
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.destination?.ip == null"  
+    if: "ctx.destination?.ip == null"
 - convert:
     field: fortinet.firewall.dst_port
     target_field: destination.port
@@ -295,16 +295,24 @@ processors:
     ignore_missing: true
 - rename:
     field: fortinet.firewall.scertcname
-    target_field: tls.client.server_name
+    target_field: tls.server.x509.subject.common_name
     ignore_missing: true
 - rename:
     field: fortinet.firewall.scertissuer
     target_field: tls.server.issuer
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.common_name
+    value: "{{tls.server.issuer}}"
+    ignore_empty_value: true
 - rename:
     field: fortinet.firewall.ccertissuer
     target_field: tls.client.issuer
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.common_name
+    value: "{{tls.client.issuer}}"
+    ignore_empty_value: true
 - rename:
     field: fortinet.firewall.sender
     target_field: tls.server.issuer
