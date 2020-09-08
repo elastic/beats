@@ -376,7 +376,8 @@ func TestIpPortIndexer(t *testing.T) {
 		},
 
 		Status: v1.PodStatus{
-			PodIP: ip,
+			PodIP:             ip,
+			ContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
 		},
 	}
 
@@ -418,6 +419,13 @@ func TestIpPortIndexer(t *testing.T) {
 			},
 		},
 	}
+	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
+		{
+			Name:        container,
+			Image:       containerImage,
+			ContainerID: "docker://foobar",
+		},
+	}
 
 	nodeName := "testnode"
 	pod.Spec.NodeName = nodeName
@@ -433,6 +441,6 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
-	expected["container"] = common.MapStr{"name": container, "image": containerImage}
+	expected["container"] = common.MapStr{"name": container, "image": containerImage, "id": "foobar", "runtime": "docker"}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }

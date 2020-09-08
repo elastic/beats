@@ -239,14 +239,29 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 		Data:  h.metaGen.Generate(pod),
 	})
 
+	cIDs := make(map[string]string)
+	runtimes := make(map[string]string)
+	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
+		if cID == "" {
+			continue
+		}
+		cIDs[status.Name] = cID
+		runtimes[status.Name] = runtime
+	}
+
 	for _, container := range pod.Spec.Containers {
 		for _, port := range container.Ports {
 			if port.ContainerPort != 0 {
 
 				m = append(m, MetadataIndex{
 					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
-					Data: h.metaGen.Generate(pod, metadata.WithFields("container.name", container.Name),
-						metadata.WithFields("container.image", container.Image)),
+					Data: h.metaGen.Generate(
+						pod, metadata.WithFields("container.name", container.Name),
+						metadata.WithFields("container.image", container.Image),
+						metadata.WithFields("container.id", cIDs[container.Name]),
+						metadata.WithFields("container.runtime", runtimes[container.Name]),
+					),
 				})
 			}
 		}
