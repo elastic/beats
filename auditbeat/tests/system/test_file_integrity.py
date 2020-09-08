@@ -31,7 +31,7 @@ def file_events(objs, path, expected):
     evts = set()
     for obj in objs:
         if 'file.path' in obj and 'event.action' in obj and obj['file.path'].lower() == path.lower():
-            if type(obj['event.action']) == list:
+            if isinstance(obj['event.action'], list):
                 evts = evts.union(set(obj['event.action']))
             else:
                 evts.add(obj['event.action'])

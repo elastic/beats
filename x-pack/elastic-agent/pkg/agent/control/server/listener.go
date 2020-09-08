@@ -23,7 +23,7 @@ func createListener(log *logger.Logger) (net.Listener, error) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		err = os.Remove(path)
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			log.Errorf("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
 		}
 	}

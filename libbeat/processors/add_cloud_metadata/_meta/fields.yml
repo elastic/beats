@@ -3,11 +3,6 @@
   description: >
     Metadata from cloud providers added by the add_cloud_metadata processor.
   fields:
-
-    - name: cloud.project.id
-      example: project-x
-      description: >
-        Name of the project in Google Cloud.
     
     - name: cloud.image.id
       example: ami-abcd1234

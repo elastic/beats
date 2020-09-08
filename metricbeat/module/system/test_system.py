@@ -1,12 +1,10 @@
+import getpass
+import metricbeat
+import os
 import re
 import six
 import sys
 import unittest
-import getpass
-import os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
@@ -535,7 +533,7 @@ class Test(metricbeat.BaseTest):
             assert isinstance(udp["all"]["count"], int)
 
     def check_username(self, observed, expected=None):
-        if expected == None:
+        if expected is None:
             expected = getpass.getuser()
 
         if os.name == 'nt':

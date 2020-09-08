@@ -55,7 +55,8 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	ecs := common.MapStr{
 		ECSCloud: common.MapStr{
 			ECSCloudAccount: common.MapStr{
-				ECSCloudAccountID: accountID,
+				ECSCloudAccountID:   accountID,
+				ECSCloudAccountName: accountID,
 			},
 			ECSCloudProvider: "googlecloud",
 		},
