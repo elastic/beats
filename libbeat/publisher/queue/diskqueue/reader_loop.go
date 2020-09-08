@@ -62,6 +62,10 @@ type readerLoop struct {
 	// the reader to read ahead and cache pending frames before a consumer
 	// explicitly requests them.
 	output chan *readFrame
+
+	// The helper object to deserialize binary blobs from the queue into
+	// publisher.Event objects that can be returned in a readFrame.
+	decoder *eventDecoder
 }
 
 func (rl *readerLoop) run() {
@@ -103,19 +107,13 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 	targetLength := int64(request.endOffset - request.startOffset)
 	for {
 		remainingLength := targetLength - byteCount
-		/*if byteCount+frame.bytesOnDisk > targetLength {
-			// Something is wrong, read requests must end on a segment boundary.
-			return readResponse{
-				frameCount: frameCount,
-				byteCount:  byteCount,
-			}
-		}*/
 
-		// Try to read the next, clipping to the length we were told to read.
+		// Try to read the next frame, clipping to the given bound.
 		// If the next frame extends past this boundary, nextFrame will return
 		// an error.
 		frame, err := nextFrame(
-			handle, remainingLength, request.segment.header.checksumType)
+			handle, remainingLength, rl.decoder,
+			request.segment.header.checksumType)
 		if frame != nil {
 			// We've read the frame, try sending it to the output channel.
 			select {
@@ -163,7 +161,10 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 }
 
 func nextFrame(
-	handle *os.File, maxLength int64, checksumType ChecksumType,
+	handle *os.File,
+	maxLength int64,
+	decoder *eventDecoder,
+	checksumType ChecksumType,
 ) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
@@ -195,7 +196,8 @@ func nextFrame(
 
 	// Read the actual frame data
 	dataLength := frameLength - frameMetadataSize
-	bytes := make([]byte, dataLength)
+	bytes := decoder.Buffer(int(dataLength))
+	//bytes := make([]byte, dataLength)
 	_, err = reader.Read(bytes)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read data frame: %w", err)
@@ -224,8 +226,19 @@ func nextFrame(
 			frameLength, duplicateLength)
 	}
 
-	// TODO: deserialize
+	event, err := decoder.Decode()
+	if err != nil {
+		// TODO: Unlike errors in the segment or frame metadata, this is entirely
+		// a problem in the event [de]serialization which may be isolated.
+		// Rather than pass this error back to the read request, which discards
+		// the rest of the segment, we should just log the error and advance to
+		// the next frame, which is likely still valid.
+		return nil, err
+	}
+	fmt.Printf("Decoded event from frame: %v\n", event)
+
 	frame := &readFrame{
+		event:       event,
 		bytesOnDisk: int64(frameLength),
 	}
 

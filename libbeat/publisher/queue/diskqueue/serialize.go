@@ -22,8 +22,6 @@ package diskqueue
 
 import (
 	"bytes"
-	"encoding/binary"
-	"hash/crc32"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -54,7 +52,7 @@ type entry struct {
 	Fields    common.MapStr
 }
 
-func newFrameEncoder() *eventEncoder {
+func newEventEncoder() *eventEncoder {
 	e := &eventEncoder{}
 	e.reset()
 	return e
@@ -100,7 +98,7 @@ func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
 	return e.buf.Bytes(), nil
 }
 
-func newDecoder() *eventDecoder {
+func newEventDecoder() *eventDecoder {
 	d := &eventDecoder{}
 	d.reset()
 	return d
@@ -128,15 +126,14 @@ func (d *eventDecoder) Buffer(n int) []byte {
 
 func (d *eventDecoder) Decode() (publisher.Event, error) {
 	var (
-		to       entry
-		err      error
-		contents = d.buf[1:]
+		to  entry
+		err error
 	)
 
 	d.unfolder.SetTarget(&to)
 	defer d.unfolder.Reset()
 
-	err = d.parser.Parse(contents)
+	err = d.parser.Parse(d.buf)
 
 	if err != nil {
 		d.reset() // reset parser just in case
@@ -144,6 +141,7 @@ func (d *eventDecoder) Decode() (publisher.Event, error) {
 	}
 
 	var flags publisher.EventFlags
+	// TODO: handle guaranteed send?
 	/*if (to.Flags & flagGuaranteed) != 0 {
 		flags |= publisher.GuaranteedSend
 	}*/
@@ -156,19 +154,4 @@ func (d *eventDecoder) Decode() (publisher.Event, error) {
 			Meta:      to.Meta,
 		},
 	}, nil
-}
-
-func computeChecksum(data []byte, checksumType ChecksumType) uint32 {
-	switch checksumType {
-	case ChecksumTypeNone:
-		return 0
-	case ChecksumTypeCRC32:
-		hash := crc32.NewIEEE()
-		frameLength := uint32(len(data) + frameMetadataSize)
-		binary.Write(hash, binary.LittleEndian, &frameLength)
-		hash.Write(data)
-		return hash.Sum32()
-	default:
-		panic("segmentReader: invalid checksum type")
-	}
 }

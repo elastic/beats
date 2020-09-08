@@ -187,6 +187,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		requestChan:  make(chan readerLoopRequest, 1),
 		responseChan: make(chan readerLoopResponse),
 		output:       make(chan *readFrame, 20), // TODO: customize this buffer size
+		decoder:      newEventDecoder(),
 	}
 	go func() {
 		readerLoop.run()
@@ -314,7 +315,7 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newFrameEncoder(),
+		encoder: newEventEncoder(),
 	}
 }
 

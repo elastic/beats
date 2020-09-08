@@ -98,19 +98,6 @@ type segmentHeader struct {
 	checksumType ChecksumType
 }
 
-// ChecksumType specifies what checksum algorithm the queue should use to
-// verify its data frames.
-type ChecksumType uint32
-
-// ChecksumTypeNone: Don't compute or verify checksums.
-// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
-//   "hash/crc32" package.
-const (
-	ChecksumTypeNone = iota
-
-	ChecksumTypeCRC32
-)
-
 // Each segment header has a 32-bit version and a 32-bit checksum type.
 const segmentHeaderSize = 8
 
