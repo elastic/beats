@@ -342,7 +342,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		)
 
 		cmeta := common.MapStr{
-			"id":   cid,
+			"id": cid,
 			"image": common.MapStr{
 				"name": c.Image,
 			},
@@ -352,7 +352,12 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
 		kubemeta["annotations"] = annotations
-		kubemeta["container"] = cmeta	
+		kubemeta["container"] = common.MapStr{
+			"id":      cid,
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
+		}
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
 		}
@@ -369,7 +374,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
-					"container": cmeta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)
@@ -386,7 +391,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
-					"container": cmeta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)
