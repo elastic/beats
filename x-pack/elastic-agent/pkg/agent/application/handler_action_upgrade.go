@@ -6,6 +6,7 @@ package application
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"compress/gzip"
 	"context"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -23,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -52,7 +55,7 @@ func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker)
 		return err
 	}
 
-	newHash, err := h.untar(ctx, action, archivePath)
+	newHash, err := h.unpack(ctx, action, archivePath)
 	if err != nil {
 		return err
 	}
@@ -102,16 +105,16 @@ func (h *handlerUpgrade) downloadArtifact(ctx context.Context, action *fleetapi.
 }
 
 // untar unpacks archive correctly, skips root (symlink, config...) unpacks data/*
-func (h *handlerUpgrade) untar(ctx context.Context, action *fleetapi.ActionUpgrade, archivePath string) (string, error) {
-	f, err := os.Open(archivePath)
-	if err != nil {
-		return "", errors.New(fmt.Sprintf("artifact for 'elastic-agent' version '%s' could not be found at '%s'", action.Version, archivePath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, archivePath))
-	}
-	defer f.Close()
-
+func (h *handlerUpgrade) unpack(ctx context.Context, action *fleetapi.ActionUpgrade, archivePath string) (string, error) {
 	// unpack must occur in directory that holds the installation directory
 	// or the extraction will be double nested
-	hash, err := unpack(f)
+	var hash string
+	var err error
+	if runtime.GOOS == "windows" {
+		hash, err = unzip(action, archivePath)
+	} else {
+		hash, err = untar(action, archivePath)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -134,7 +137,97 @@ func (h *handlerUpgrade) reexec(ctx context.Context, action *fleetapi.ActionUpgr
 	return errors.New("not yet implemented")
 }
 
-func unpack(r io.Reader) (string, error) {
+func unzip(action *fleetapi.ActionUpgrade, archivePath string) (string, error) {
+	var hash, rootDir string
+	r, err := zip.OpenReader(archivePath)
+	if err != nil {
+		return "", err
+	}
+	defer r.Close()
+
+	unpackFile := func(f *zip.File) (err error) {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if cerr := rc.Close(); cerr != nil {
+				err = multierror.Append(err, cerr)
+			}
+		}()
+
+		//get hash
+		if f.Name == agentCommitFile {
+			hashBytes, err := ioutil.ReadAll(rc)
+			if err != nil || len(hashBytes) < hashLen {
+				return err
+			}
+
+			hash = string(hashBytes[:hashLen])
+			return nil
+		}
+
+		// skip everything outside data/
+		if !strings.HasPrefix(f.Name, "data/") {
+			return nil
+		}
+
+		path := filepath.Join(paths.Data(), strings.TrimPrefix(f.Name, "data/"))
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(path), f.Mode())
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if cerr := f.Close(); cerr != nil {
+					err = multierror.Append(err, cerr)
+				}
+			}()
+
+			if _, err = io.Copy(f, rc); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range r.File {
+		// TODO: verify if needed
+		if rootDir == "" && filepath.Base(f.Name) == filepath.Dir(f.Name) {
+			return f.Name, nil
+		}
+		if currentDir := filepath.Dir(f.Name); rootDir == "" || len(currentDir) < len(rootDir) {
+			rootDir = currentDir
+		}
+		// EOT
+
+		if err := unpackFile(f); err != nil {
+			return "", err
+		}
+	}
+
+	// if root directory is not the same as desired directory rename
+	// e.g contains `-windows-` or  `-SNAPSHOT-`
+	if dataPath := paths.Data(); rootDir != dataPath {
+		if err := os.Rename(rootDir, dataPath); err != nil {
+			return "", errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
+		}
+	}
+
+	return hash, nil
+
+}
+
+func untar(action *fleetapi.ActionUpgrade, archivePath string) (string, error) {
+	r, err := os.Open(archivePath)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("artifact for 'elastic-agent' version '%s' could not be found at '%s'", action.Version, archivePath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, archivePath))
+	}
+	defer r.Close()
 
 	zr, err := gzip.NewReader(r)
 	if err != nil {
@@ -166,6 +259,7 @@ func unpack(r io.Reader) (string, error) {
 			}
 
 			hash = string(hashBytes[:hashLen])
+			continue
 		}
 
 		// skip everything outside data/
