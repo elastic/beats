@@ -85,6 +85,12 @@ func runCmd(cmd *exec.Cmd, stdinStr *string) (out *CmdOut, err error) {
 	stderrLines, _ := decodePipe(stderr)
 
 	if err = cmd.Wait(); err != nil {
+		for _, line := range stdoutLines {
+			logp.Warn("stdout: %s", line)
+		}
+		for _, line := range stderrLines {
+			logp.Warn("stderr: %s", line)
+		}
 		return nil, fmt.Errorf("error running cmd: %w", err)
 	}
 
