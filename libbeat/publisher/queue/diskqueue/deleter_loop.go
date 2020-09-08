@@ -24,7 +24,7 @@ import (
 
 type deleterLoop struct {
 	// The settings for the queue that created this loop.
-	queueSettings *Settings
+	settings *Settings
 
 	// When one or more segments are ready to delete, they are sent to
 	// requestChan. At most one deleteRequest may be outstanding at any time.
@@ -60,7 +60,7 @@ func (dl *deleterLoop) run() {
 		deleted := make(map[*queueSegment]bool, len(request.segments))
 		errorList := []error{}
 		for _, segment := range request.segments {
-			path := dl.queueSettings.segmentPath(segment.id)
+			path := dl.settings.segmentPath(segment.id)
 			err := os.Remove(path)
 			// We ignore errors caused by the file not existing: this shouldn't
 			// happen, but it is still safe to report it as successfully removed.

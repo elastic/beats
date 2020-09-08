@@ -45,7 +45,7 @@ type queueSegment struct {
 
 	// The settings for the queue that created this segment. Used for locating
 	// the queue file on disk and determining its checksum behavior.
-	queueSettings *Settings
+	//queueSettings *Settings
 
 	// Whether the file for this segment exists on disk yet. If it does
 	// not, then calling getWriter() will create it and return a writer
@@ -91,7 +91,7 @@ type bySegmentID []*queueSegment
 
 func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s bySegmentID) Less(i, j int) bool { return s[i].endOffset < s[j].endOffset }
+func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
@@ -132,8 +132,10 @@ func (segment *queueSegment) sizeOnDisk() uint64 {
 }
 
 // Should only be called from the reader loop.
-func (segment *queueSegment) getReader() (*os.File, error) {
-	path := segment.queueSettings.segmentPath(segment.id)
+func (segment *queueSegment) getReader(
+	queueSettings *Settings,
+) (*os.File, error) {
+	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -149,15 +151,17 @@ func (segment *queueSegment) getReader() (*os.File, error) {
 }
 
 // Should only be called from the writer loop.
-func (segment *queueSegment) getWriter() (*os.File, error) {
-	path := segment.queueSettings.segmentPath(segment.id)
+func (segment *queueSegment) getWriter(
+	queueSettings *Settings,
+) (*os.File, error) {
+	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
 	header := &segmentHeader{
 		version:      0,
-		checksumType: segment.queueSettings.ChecksumType,
+		checksumType: queueSettings.ChecksumType,
 	}
 	err = writeSegmentHeader(file, header)
 	if err != nil {

@@ -60,6 +60,10 @@ type writerLoopResponse struct {
 }
 
 type writerLoop struct {
+	// The settings for the queue that created this loop.
+	settings *Settings
+
+	// The logger for the writer loop, assigned when the queue creates it.
 	logger *logp.Logger
 
 	// The writer loop listens on requestChan for write blocks, and
@@ -115,7 +119,7 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 				bytesWritten = 0
 			}
 			wl.currentSegment = frameRequest.segment
-			file, err := wl.currentSegment.getWriter()
+			file, err := wl.currentSegment.getWriter(wl.settings)
 			if err != nil {
 				wl.logger.Errorf("Couldn't open new segment file: %w", err)
 				// TODO: retry, etc

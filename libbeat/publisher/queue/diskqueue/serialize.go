@@ -23,7 +23,6 @@ package diskqueue
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"hash/crc32"
 	"time"
 
@@ -78,7 +77,6 @@ func (e *frameEncoder) reset() {
 	e.folder = nil
 
 	visitor := json.NewVisitor(&e.buf)
-	fmt.Printf("Creating folder\n")
 	folder, err := gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),

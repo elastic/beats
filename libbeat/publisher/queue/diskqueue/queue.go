@@ -235,11 +235,6 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	initialSegments, err := scanExistingSegments(settings.directoryPath())
-	if err != nil {
-		return nil, err
-	}
-
 	// We wait for four goroutines: core loop, reader loop, writer loop,
 	// deleter loop.
 	var waitGroup sync.WaitGroup
@@ -252,6 +247,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	// any helper loop).
 
 	readerLoop := &readerLoop{
+		settings: &settings,
+
 		requestChan:  make(chan readerLoopRequest, 1),
 		responseChan: make(chan readerLoopResponse),
 		output:       make(chan *readFrame, 20), // TODO: customize this buffer size
@@ -262,7 +259,9 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}()
 
 	writerLoop := &writerLoop{
-		logger:       logger,
+		logger:   logger,
+		settings: &settings,
+
 		requestChan:  make(chan writerLoopRequest, 1),
 		responseChan: make(chan writerLoopResponse),
 	}
@@ -272,14 +271,26 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}()
 
 	deleterLoop := &deleterLoop{
-		queueSettings: &settings,
-		requestChan:   make(chan deleterLoopRequest),
-		responseChan:  make(chan deleterLoopResponse),
+		settings: &settings,
+
+		requestChan:  make(chan deleterLoopRequest),
+		responseChan: make(chan deleterLoopResponse),
 	}
 	go func() {
 		deleterLoop.run()
 		waitGroup.Done()
 	}()
+
+	// Index any existing data segments to be placed in segments.reading.
+	initialSegments, err := scanExistingSegments(settings.directoryPath())
+	if err != nil {
+		return nil, err
+	}
+	var nextSegmentID segmentID
+	if len(initialSegments) > 0 {
+		lastID := initialSegments[len(initialSegments)-1].id
+		nextSegmentID = lastID + 1
+	}
 
 	queue := &diskQueue{
 		logger:   logger,
@@ -288,6 +299,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		stateFile: stateFile,
 		segments: &diskQueueSegments{
 			reading: initialSegments,
+			nextID:  nextSegmentID,
 		},
 
 		readerLoop:  readerLoop,

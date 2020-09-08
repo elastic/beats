@@ -38,6 +38,9 @@ type readerLoopResponse struct {
 }
 
 type readerLoop struct {
+	// The settings for the queue that created this loop.
+	settings *Settings
+
 	// When there is a block available for reading, it will be sent to
 	// requestChan. When the reader loop has finished processing it, it
 	// sends the result to finishedReading. If there is more than one block
@@ -70,7 +73,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 	byteCount := int64(0)
 
 	// Open the file and seek to the starting position.
-	handle, err := request.segment.getReader()
+	handle, err := request.segment.getReader(rl.settings)
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}

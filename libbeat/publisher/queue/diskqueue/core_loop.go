@@ -179,9 +179,9 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 		pendingBytes += uint64(len(request.frame.serialized))
 	}
 	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
-	cl.queue.logger.Debugf(
-		"currentSize: %v  frameSize: %v  MaxBufferSize: %v",
-		currentSize, frameSize, cl.queue.settings.MaxBufferSize)
+	// cl.queue.logger.Debugf(
+	// 	"currentSize: %v  frameSize: %v  MaxBufferSize: %v",
+	// 	currentSize, frameSize, cl.queue.settings.MaxBufferSize)
 	if cl.queue.settings.MaxBufferSize > 0 &&
 		currentSize+frameSize > cl.queue.settings.MaxBufferSize {
 		// The queue is too full. Either add the request to blockedWrites,
@@ -429,10 +429,7 @@ func (cl *coreLoop) enqueueProducerFrame(frame *writeFrame) {
 	// we need to create a new writing segment.
 	if segment == nil ||
 		cl.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
-		segment = &queueSegment{
-			id:            dq.segments.nextID,
-			queueSettings: &dq.settings,
-		}
+		segment = &queueSegment{id: dq.segments.nextID}
 		dq.segments.writing = append(dq.segments.writing, segment)
 		dq.segments.nextID++
 		cl.nextWriteOffset = 0
