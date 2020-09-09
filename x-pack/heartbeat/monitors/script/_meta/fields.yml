@@ -7,9 +7,7 @@
       description: >
         Script related fields.
       fields:
-        - name: stderr
-          type: text
-        - name: stdout
+        - name: lines
           type: text
         - name: journey
           type: object

@@ -52,8 +52,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 
 		eventext.MergeEventFields(event, common.MapStr{
 			"script": common.MapStr{
-				"stdout": cmdRes.Stdout,
-				"stderr": cmdRes.Stderr,
+				"lines": cmdRes.Lines,
 			},
 		})
 

@@ -6,10 +6,10 @@ package synthexec
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"os/exec"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -56,109 +56,75 @@ func RunScript(script string) (out *CmdOut, err error) {
 	return runCmd(cmd, &script)
 }
 
-func runCmd(cmd *exec.Cmd, stdinStr *string) (out *CmdOut, err error) {
+func runCmd(cmd *exec.Cmd, stdinStr *string) (*CmdOut, error) {
 	logp.Info("Running command: %s", cmd.String())
 
-	stdout, err := cmd.StdoutPipe()
+	if stdinStr	!= nil {
+		cmd.Stdin = strings.NewReader(*stdinStr)
+	}
+
+	outBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("could not attach stdout: %w", err)
+		return nil, err
 	}
 
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, fmt.Errorf("could not attach stderr: %w", err)
-	}
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return nil, fmt.Errorf("could not attach stdin: %w", err)
-	}
-
-	if err = cmd.Start(); err != nil {
-		return nil, fmt.Errorf("Could not start cmd: %w", err)
-	}
-
-	if stdinStr != nil {
-		_, err = stdin.Write([]byte(*stdinStr))
-	}
-	if err != nil {
-		return nil, fmt.Errorf("could not write to script stdin: %w", err)
-	}
-	stdin.Close()
-
-	stdoutLines, result := decodePipe(stdout)
-	stderrLines, _ := decodePipe(stderr)
-
-	if err = cmd.Wait(); err != nil {
-		for _, line := range stdoutLines {
-			logp.Warn("stdout: %s", line)
+	out := &CmdOut{}
+	scanner := bufio.NewScanner(bytes.NewReader(outBytes))
+	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
+	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			logp.Warn("GOT SCAN ERR %w", scanner.Err())
+			return nil, scanner.Err()
 		}
-		for _, line := range stderrLines {
-			logp.Warn("stderr: %s", line)
+
+		var result *Result
+		if out.Result == nil {
+			result = decodeResult(scanner.Bytes())
+			out.Result = result
 		}
-		return nil, fmt.Errorf("error running cmd: %w", err)
+		if result != nil {
+			logp.Warn("GOT RESULT %s", result)
+		}
+		if result == nil {
+			logp.Warn("GOT LINE '%s'", scanner.Text())
+			out.Lines = append(out.Lines, scanner.Text())
+		}
 	}
 
-	return &CmdOut{
-		Result: result,
-		Stdout: stdoutLines,
-		Stderr: stderrLines,
-	}, nil
+	return out, err
 }
 
-func decodePipe(pipe io.ReadCloser) (lines []string, result *Result) {
-	pipeBio := bufio.NewReader(pipe)
-	for {
-		line, err := pipeBio.ReadBytes([]byte("\n")[0])
-
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			logp.Warn("error reading line: %w", err)
-		}
-
-		res, ok := decodeResults(line)
-		if ok { // append the rich results if that's what this line is
-			result = res
-		} else { // otherwise just append
-			lines = append(lines, string(line))
-		}
-	}
-
-	return
-}
-
-func decodeResults(line []byte) (res *Result, ok bool) {
+// decodeResult attempts to decode the given line to our result type, returns nil if invalid.
+func decodeResult(line []byte) (*Result) {
 	// We need to yield both a map[string]interface{} version of "Journeys" to pass through to ES
 	// and a richer version that has accessible fields. Let's do both
 	var rawRes = &RawResult{}
-	res = &Result{}
+	res := &Result{}
 
 	err := json.Unmarshal(line, rawRes)
 	// This must just be a plain line
 	if err != nil {
-		return
+		return nil
 	}
 
 	err = json.Unmarshal(line, res)
 	if err != nil {
 		logp.Warn("Raw result decoded successfully, but richer one did not: %s", line)
-		return
+		return nil
 	}
 
 	res.Raw = rawRes
-	ok = true
 	for idx, j := range res.Journeys {
 		j.Raw = rawRes.Journeys[idx]
 	}
 
-	return
+	return res
 }
 
 type CmdOut struct {
 	Result *Result
-	Stdout []string
-	Stderr []string
+	Lines []string
 }
 
 type Result struct {
