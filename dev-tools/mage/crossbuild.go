@@ -173,7 +173,7 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 // values for Docker. It has the benefit of speeding up the build because the
 // mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
-	return sh.Run("mage", "-f", "-goos=linux", "-goarch=amd64",
+	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch=amd64",
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-amd64")))
 }
 
@@ -255,9 +255,6 @@ func (b GolangCrossBuilder) Build() error {
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
-	if UseVendor {
-		args = append(args, "--env", "GOFLAGS=-mod=vendor")
-	}
 	if CrossBuildMountModcache {
 		// Mount $GOPATH/pkg/mod into the container, read-only.
 		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
@@ -266,6 +263,7 @@ func (b GolangCrossBuilder) Build() error {
 
 	args = append(args,
 		"--rm",
+		"--env", "GOFLAGS=-mod=readonly",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),

@@ -10,8 +10,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -59,9 +61,13 @@ func newLocal(
 	pathConfigFile string,
 	rawConfig *config.Config,
 ) (*Local, error) {
-	var err error
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	if log == nil {
-		log, err = logger.NewFromConfig("", rawConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -71,12 +77,7 @@ func newLocal(
 		return nil, err
 	}
 
-	c := localConfigDefault()
-	if err := rawConfig.Unpack(c); err != nil {
-		return nil, errors.New(err, "initialize local mode")
-	}
-
-	logR := logreporter.NewReporter(log, c.Management.Reporting)
+	logR := logreporter.NewReporter(log)
 
 	localApplication := &Local{
 		log:       log,
@@ -84,34 +85,52 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
-	localApplication.srv, err = server.NewFromConfig(log, rawConfig, &operation.ApplicationStatusHandler{})
+	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}
 
 	reporter := reporting.NewReporter(localApplication.bgContext, log, localApplication.agentInfo, logR)
 
-	monitor, err := monitoring.NewMonitor(rawConfig)
+	monitor, err := monitoring.NewMonitor(cfg.Settings)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, rawConfig, localApplication.srv, reporter, monitor))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, cfg.Settings, localApplication.srv, reporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 	localApplication.router = router
 
-	discover := discoverer(pathConfigFile, c.Management.Path)
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
+	composableCtrl, err := composable.New(rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
+	discover := discoverer(pathConfigFile, cfg.Settings.Path)
+	emit, err := emitter(
+		localApplication.bgContext,
+		log,
+		composableCtrl,
+		router,
+		&configModifiers{
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{filters.StreamChecker},
+		},
+		monitor,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	var cfgSource source
-	if !c.Management.Reload.Enabled {
+	if !cfg.Settings.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
 		cfgSource = newOnce(log, discover, emit)
 	} else {
-		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Management.Reload.Period)
-		cfgSource = newPeriodic(log, c.Management.Reload.Period, discover, emit)
+		log.Debugf("Reloading of configuration is on, frequency is set to %s", cfg.Settings.Reload.Period)
+		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, emit)
 	}
 
 	localApplication.source = cfgSource

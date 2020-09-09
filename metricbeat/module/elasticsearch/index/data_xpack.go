@@ -49,6 +49,7 @@ type Index struct {
 	Index   string     `json:"index"`
 	Created int64      `json:"created"`
 	Status  string     `json:"status"`
+	Hidden  bool       `json:"hidden"`
 	Shards  shardStats `json:"shards"`
 }
 
@@ -141,10 +142,20 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
+	indicesSettings, err := elasticsearch.GetIndicesSettings(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
+	}
+
 	var errs multierror.Errors
 	for name, idx := range indicesStats.Indices {
 		event := mb.Event{}
 		idx.Index = name
+
+		settings, exists := indicesSettings[name]
+		if exists {
+			idx.Hidden = settings.Hidden
+		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {

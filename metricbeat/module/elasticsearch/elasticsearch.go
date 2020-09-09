@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -59,17 +60,23 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
-// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+var (
+	// CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
+	CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
-// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
-var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+	// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
+	EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
-// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
-var BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
+	// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
+	BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
 
-// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
-var clusterIDCache = map[string]string{}
+	//ExpandWildcardsHiddenAvailableVersion is the version since when the "expand_wildcards" query parameter to
+	// the Indices Stats API can accept "hidden" as a value.
+	ExpandWildcardsHiddenAvailableVersion = common.MustNewVersion("7.7.0")
+
+	// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
+	clusterIDCache = map[string]string{}
+)
 
 // ModuleName is the name of this module.
 const ModuleName = "elasticsearch"
@@ -359,6 +366,61 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	return xpack, err
 }
 
+type boolStr bool
+
+func (b *boolStr) UnmarshalJSON(raw []byte) error {
+	var bs string
+	err := json.Unmarshal(raw, &bs)
+	if err != nil {
+		return err
+	}
+
+	bv, err := strconv.ParseBool(bs)
+	if err != nil {
+		return err
+	}
+
+	*b = boolStr(bv)
+	return nil
+}
+
+type IndexSettings struct {
+	Hidden bool
+}
+
+// GetIndicesSettings returns a map of index names to their settings.
+// Note that as of now it is optimized to fetch only the "hidden" index setting to keep the memory
+// footprint of this function call as low as possible.
+func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSettings, error) {
+	content, err := fetchPath(http, resetURI, "*/_settings", "filter_path=*.settings.index.hidden&expand_wildcards=all")
+
+	if err != nil {
+		return nil, errors.Wrap(err, "could not fetch indices settings")
+	}
+
+	var resp map[string]struct {
+		Settings struct {
+			Index struct {
+				Hidden boolStr `json:"hidden"`
+			} `json:"index"`
+		} `json:"settings"`
+	}
+
+	err = json.Unmarshal(content, &resp)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse indices settings response")
+	}
+
+	ret := make(map[string]IndexSettings, len(resp))
+	for index, settings := range resp {
+		ret[index] = IndexSettings{
+			Hidden: bool(settings.Settings.Index.Hidden),
+		}
+	}
+
+	return ret, nil
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
@@ -378,6 +440,28 @@ func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error)
 	}
 
 	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
+}
+
+// GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
+func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
+	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
+	if err != nil {
+		return "", err
+	}
+
+	var response struct {
+		Nodes map[string]interface{} `json:"nodes"`
+	}
+
+	if err := json.Unmarshal(content, &response); err != nil {
+		return "", err
+	}
+
+	for nodeID, _ := range response.Nodes {
+		return nodeID, nil
+	}
+
+	return "", errors.New("could not determine master node ID")
 }
 
 // PassThruField copies the field at the given path from the given source data object into

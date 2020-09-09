@@ -17,10 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -382,15 +380,12 @@ func TestConfiguration(t *testing.T) {
 	testcases := map[string]struct {
 		programs []string
 		expected int
+		empty    bool
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat", "endpoint"},
-			expected: 3,
-		},
-		"constraints_config": {
-			programs: []string{"filebeat"},
-			expected: 1,
+			programs: []string{"filebeat", "heartbeat", "metricbeat", "endpoint"},
+			expected: 4,
 		},
 		// "audit_config": {
 		// 	programs: []string{"auditbeat"},
@@ -400,10 +395,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
-		// "monitor_config": {
-		// 	programs: []string{"heartbeat"},
-		// 	expected: 1,
-		// },
+		"synthetics_config": {
+			programs: []string{"heartbeat"},
+			expected: 1,
+		},
 		"enabled_true": {
 			programs: []string{"filebeat"},
 			expected: 1,
@@ -416,7 +411,7 @@ func TestConfiguration(t *testing.T) {
 			expected: 1,
 		},
 		"enabled_output_false": {
-			expected: 0,
+			empty: true,
 		},
 		"endpoint_basic": {
 			programs: []string{"endpoint"},
@@ -430,7 +425,6 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
-	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -443,14 +437,16 @@ func TestConfiguration(t *testing.T) {
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
 
-			filters.ConstraintFilter(l, ast)
-
 			programs, err := Programs(ast)
 			if test.err {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
+			if test.empty {
+				require.Equal(t, 0, len(programs))
+				return
+			}
 
 			require.Equal(t, 1, len(programs))
 

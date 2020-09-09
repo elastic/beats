@@ -7,6 +7,7 @@ package azureeventhub
 import (
 	"errors"
 	"fmt"
+	"unicode"
 )
 
 type azureInputConfig struct {
@@ -36,6 +37,32 @@ func (conf *azureInputConfig) Validate() error {
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
+
+	}
+	err := storageContainerValidate(conf.SAContainer)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func storageContainerValidate(name string) error {
+	runes := []rune(name)
+	length := len(runes)
+	if length < 3 {
+		return fmt.Errorf("storage_account_container (%s) must be 3 or more characters", name)
+	}
+	if length > 63 {
+		return fmt.Errorf("storage_account_container (%s) must be less than 63 characters", name)
+	}
+	if !unicode.IsLower(runes[0]) && !unicode.IsNumber(runes[0]) {
+		return fmt.Errorf("storage_account_container (%s) must start with a lowercase letter or number", name)
+	}
+	for i := 0; i < length; i++ {
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && !('-' == runes[i]) {
+			return fmt.Errorf("rune %d of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
+		}
 	}
 	return nil
 }

@@ -2,6 +2,7 @@
   type: group
   description: >
     Fields for Azure sign-in logs.
+  default_field: false
   fields:
     - name: operation_name
       type: keyword
@@ -23,10 +24,18 @@
       type: keyword
       description: >
         Result description
+    - name: result_type
+      type: keyword
+      description: >
+        Result type
     - name: identity
       type: keyword
       description: >
         Identity
+    - name: category
+      type: keyword
+      description: >
+        Category
     - name: properties
       type: group
       description: >

@@ -11,9 +11,7 @@
         "event.id": "Cmz4Cb4qCw1hGqYw1c",
         "event.kind": "event",
         "event.module": "zeek",
-        "event.outcome": [
-            "success"
-        ],
+        "event.outcome": "success",
         "event.type": [
             "connection",
             "protocol"

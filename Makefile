@@ -18,7 +18,7 @@ XPACK_SUFFIX=x-pack/
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
 # of artifacts). This will be removed once we complete the transition.
-PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/metricbeat x-pack/winlogbeat
+PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/winlogbeat
 # PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
@@ -98,6 +98,8 @@ check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	# check if vendor folder does not exists
+	[ ! -d vendor ]
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
@@ -165,7 +167,7 @@ notice:
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==2.4.4
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 

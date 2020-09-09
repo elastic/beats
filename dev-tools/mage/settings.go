@@ -60,7 +60,6 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
-	UseVendor    = false
 
 	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
@@ -86,12 +85,14 @@ var (
 		"beat_doc_branch":   BeatDocBranch,
 		"beat_version":      BeatQualifiedVersion,
 		"commit":            CommitHash,
+		"commit_short":      CommitHashShort,
 		"date":              BuildDate,
 		"elastic_beats_dir": ElasticBeatsDir,
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
 		"title":             strings.Title,
 		"tolower":           strings.ToLower,
+		"contains":          strings.Contains,
 	}
 )
 
@@ -109,10 +110,6 @@ func init() {
 	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
-	}
-	UseVendor, err = strconv.ParseBool(EnvOr("USE_VENDOR", "false"))
-	if err != nil {
-		panic(errors.Wrap(err, "failed to parse USE_VENDOR env value"))
 	}
 
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
@@ -243,6 +240,15 @@ func CommitHash() (string, error) {
 	return commitHash, err
 }
 
+// CommitHashShort returns the short length git commit hash.
+func CommitHashShort() (string, error) {
+	shortHash, err := CommitHash()
+	if len(shortHash) > 6 {
+		shortHash = shortHash[:6]
+	}
+	return shortHash, err
+}
+
 var (
 	elasticBeatsDirValue string
 	elasticBeatsDirErr   error
@@ -286,7 +292,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-	return listModuleDir(elasticBeatsModulePath)
+	return gotool.ListModuleCacheDir(elasticBeatsModulePath)
 }
 
 var (

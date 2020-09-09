@@ -1,0 +1,2976 @@
+[
+    {
+        "@timestamp": "2016-01-29T08:09:59.000Z",
+        "event.code": "11030",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4257-11030: 11030,1/29/16,6:09:59,oremi,10.124.22.221,ciade5699.domain,umq,ntium,psaq,cer",
+        "fileset.name": "dhcp",
+        "host.hostname": "ciade5699.domain",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.124.22.221"
+        ],
+        "rsa.internal.event_desc": "oremi",
+        "rsa.internal.messageid": "11030",
+        "rsa.time.event_time": "2016-01-29T08:09:59.000Z",
+        "service.type": "microsoft",
+        "source.address": "ciade5699.domain",
+        "source.ip": [
+            "10.124.22.221"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-02-12T03:12:33.000Z",
+        "event.code": "11015",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-363-11015: 11015,2/12/16,1:12:33,nci,10.103.162.55,orev6153.internal.domain,deF,sist,nnumqu,iatnu",
+        "fileset.name": "dhcp",
+        "host.hostname": "orev6153.internal.domain",
+        "input.type": "log",
+        "log.offset": 98,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.103.162.55"
+        ],
+        "rsa.internal.event_desc": "nci",
+        "rsa.internal.messageid": "11015",
+        "rsa.time.event_time": "2016-02-12T03:12:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "orev6153.internal.domain",
+        "source.ip": [
+            "10.103.162.55"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-02-26T10:15:08.000Z",
+        "event.code": "11008",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5738-11008: 11008,2/26/16,8:15:08,ccaecat,10.58.0.245,uatDuis2964.test,veri,rsita,siutaliq,exercit",
+        "fileset.name": "dhcp",
+        "host.hostname": "uatDuis2964.test",
+        "input.type": "log",
+        "log.offset": 204,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.58.0.245"
+        ],
+        "rsa.internal.event_desc": "ccaecat",
+        "rsa.internal.messageid": "11008",
+        "rsa.time.event_time": "2016-02-26T10:15:08.000Z",
+        "service.type": "microsoft",
+        "source.address": "uatDuis2964.test",
+        "source.ip": [
+            "10.58.0.245"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-03-12T05:17:42.000Z",
+        "event.code": "11011",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1579-11011: 11011,3/12/16,3:17:42,natura,10.163.217.10,untNequ5075.www5.domain,erep,iutal,dexe,urerep",
+        "fileset.name": "dhcp",
+        "host.hostname": "untNequ5075.www5.domain",
+        "input.type": "log",
+        "log.offset": 311,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.163.217.10"
+        ],
+        "rsa.internal.event_desc": "natura",
+        "rsa.internal.messageid": "11011",
+        "rsa.investigations.ec_activity": "Stop",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2016-03-12T05:17:42.000Z",
+        "service.type": "microsoft",
+        "source.address": "untNequ5075.www5.domain",
+        "source.ip": [
+            "10.163.217.10"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-03-26T12:20:16.000Z",
+        "event.code": "11003",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5393-11003: 11003,3/26/16,10:20:16,temsequ,10.111.27.193,idexea3181.www.local,tvol,moll,tatione,inB",
+        "fileset.name": "dhcp",
+        "host.hostname": "idexea3181.www.local",
+        "input.type": "log",
+        "log.offset": 421,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.111.27.193"
+        ],
+        "rsa.internal.event_desc": "temsequ",
+        "rsa.internal.messageid": "11003",
+        "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
+        "service.type": "microsoft",
+        "source.address": "idexea3181.www.local",
+        "source.ip": [
+            "10.111.27.193"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-04-09T07:22:51.000Z",
+        "event.code": "11018",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6103-11018: 11018,4/9/16,5:22:51,lapariat,10.97.38.141,etM953.api.domain,xercitat,lpa,entsu,dun",
+        "fileset.name": "dhcp",
+        "host.hostname": "etM953.api.domain",
+        "input.type": "log",
+        "log.offset": 529,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.97.38.141"
+        ],
+        "rsa.internal.event_desc": "lapariat",
+        "rsa.internal.messageid": "11018",
+        "rsa.time.event_time": "2016-04-09T07:22:51.000Z",
+        "service.type": "microsoft",
+        "source.address": "etM953.api.domain",
+        "source.ip": [
+            "10.97.38.141"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-04-24T14:25:25.000Z",
+        "event.code": "11019",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5524-11019: 11019,4/24/16,12:25:25,moenimi,10.17.21.125,inv5716.mail.invalid,sequatur,uidolo,lumquido,nihi",
+        "fileset.name": "dhcp",
+        "host.hostname": "inv5716.mail.invalid",
+        "input.type": "log",
+        "log.offset": 633,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.17.21.125"
+        ],
+        "rsa.internal.event_desc": "moenimi",
+        "rsa.internal.messageid": "11019",
+        "rsa.time.event_time": "2016-04-24T14:25:25.000Z",
+        "service.type": "microsoft",
+        "source.address": "inv5716.mail.invalid",
+        "source.ip": [
+            "10.17.21.125"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-05-08T09:27:59.000Z",
+        "event.code": "11021",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5841-11021: 11021,5/8/16,7:27:59,nofdeF,10.73.69.75,uines6355.internal.localdomain,estqu,inibusBo,tat,tion",
+        "fileset.name": "dhcp",
+        "host.hostname": "uines6355.internal.localdomain",
+        "input.type": "log",
+        "log.offset": 748,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.73.69.75"
+        ],
+        "rsa.internal.event_desc": "nofdeF",
+        "rsa.internal.messageid": "11021",
+        "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
+        "service.type": "microsoft",
+        "source.address": "uines6355.internal.localdomain",
+        "source.ip": [
+            "10.73.69.75"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-05-22T04:30:33.000Z",
+        "event.code": "11020",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1559-11020: 11020,5/22/16,2:30:33,deFinibu,10.45.25.68,rehender4535.www5.test,hil,atquovo,suntinc,xeac",
+        "fileset.name": "dhcp",
+        "host.hostname": "rehender4535.www5.test",
+        "input.type": "log",
+        "log.offset": 863,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.45.25.68"
+        ],
+        "rsa.internal.event_desc": "deFinibu",
+        "rsa.internal.messageid": "11020",
+        "rsa.time.event_time": "2016-05-22T04:30:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "rehender4535.www5.test",
+        "source.ip": [
+            "10.45.25.68"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-06-05T11:33:08.000Z",
+        "event.code": "11006",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7427-11006: 11006,6/5/16,9:33:08,psaquae,10.68.93.6,mporain2624.www.localhost,iunt,temveleu,colabo,eme",
+        "fileset.name": "dhcp",
+        "host.hostname": "mporain2624.www.localhost",
+        "input.type": "log",
+        "log.offset": 974,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.68.93.6"
+        ],
+        "rsa.internal.event_desc": "psaquae",
+        "rsa.internal.messageid": "11006",
+        "rsa.time.event_time": "2016-06-05T11:33:08.000Z",
+        "service.type": "microsoft",
+        "source.address": "mporain2624.www.localhost",
+        "source.ip": [
+            "10.68.93.6"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-06-20T06:35:42.000Z",
+        "event.code": "11003",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3458-11003: 11003,6/20/16,4:35:42,idex,10.192.110.182,tutla2716.www.domain,inesci,serror,aliqu,olupta",
+        "fileset.name": "dhcp",
+        "host.hostname": "tutla2716.www.domain",
+        "input.type": "log",
+        "log.offset": 1085,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.192.110.182"
+        ],
+        "rsa.internal.event_desc": "idex",
+        "rsa.internal.messageid": "11003",
+        "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
+        "service.type": "microsoft",
+        "source.address": "tutla2716.www.domain",
+        "source.ip": [
+            "10.192.110.182"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-07-04T13:38:16.000Z",
+        "event.code": "11012",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6972-11012: 11012,7/4/16,11:38:16,ittenbyC,10.148.153.201,conseq557.mail.lan,aaliquaU,ntor,lpaqui,sitame",
+        "fileset.name": "dhcp",
+        "host.hostname": "conseq557.mail.lan",
+        "input.type": "log",
+        "log.offset": 1195,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.148.153.201"
+        ],
+        "rsa.internal.event_desc": "ittenbyC",
+        "rsa.internal.messageid": "11012",
+        "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
+        "service.type": "microsoft",
+        "source.address": "conseq557.mail.lan",
+        "source.ip": [
+            "10.148.153.201"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-07-18T08:40:50.000Z",
+        "event.code": "11019",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4977-11019: 11019,7/18/16,6:40:50,que,10.213.147.241,etconse7424.internal.lan,lit,asun,estia,eaq",
+        "fileset.name": "dhcp",
+        "host.hostname": "etconse7424.internal.lan",
+        "input.type": "log",
+        "log.offset": 1308,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.213.147.241"
+        ],
+        "rsa.internal.event_desc": "que",
+        "rsa.internal.messageid": "11019",
+        "rsa.time.event_time": "2016-07-18T08:40:50.000Z",
+        "service.type": "microsoft",
+        "source.address": "etconse7424.internal.lan",
+        "source.ip": [
+            "10.213.147.241"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-08-02T03:43:25.000Z",
+        "event.code": "11010",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1180-11010: 11010,8/2/16,1:43:25,serunt,10.183.233.5,tMalor7410.www.localhost,eaq,amest,corp,modtemp",
+        "fileset.name": "dhcp",
+        "host.hostname": "tMalor7410.www.localhost",
+        "input.type": "log",
+        "log.offset": 1413,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.183.233.5"
+        ],
+        "rsa.internal.event_desc": "serunt",
+        "rsa.internal.messageid": "11010",
+        "rsa.investigations.ec_activity": "Start",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
+        "service.type": "microsoft",
+        "source.address": "tMalor7410.www.localhost",
+        "source.ip": [
+            "10.183.233.5"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-08-16T10:45:59.000Z",
+        "event.code": "11013",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2628-11013: 11013,8/16/16,8:45:59,tNequepo,10.52.186.29,equat2243.www5.localdomain,ione,ihilmole,eriamea,amre",
+        "fileset.name": "dhcp",
+        "host.hostname": "equat2243.www5.localdomain",
+        "input.type": "log",
+        "log.offset": 1522,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.52.186.29"
+        ],
+        "rsa.internal.event_desc": "tNequepo",
+        "rsa.internal.messageid": "11013",
+        "rsa.time.event_time": "2016-08-16T10:45:59.000Z",
+        "service.type": "microsoft",
+        "source.address": "equat2243.www5.localdomain",
+        "source.ip": [
+            "10.52.186.29"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-08-30T05:48:33.000Z",
+        "event.code": "11004",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5037-11004: 11004,8/30/16,3:48:33,uela,10.194.114.58,ectio2175.www.localhost,ihilmo,radi,gel,lorsitam",
+        "fileset.name": "dhcp",
+        "host.hostname": "ectio2175.www.localhost",
+        "input.type": "log",
+        "log.offset": 1640,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.194.114.58"
+        ],
+        "rsa.internal.event_desc": "uela",
+        "rsa.internal.messageid": "11004",
+        "rsa.time.event_time": "2016-08-30T05:48:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "ectio2175.www.localhost",
+        "source.ip": [
+            "10.194.114.58"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-09-13T12:51:07.000Z",
+        "event.code": "1103",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6385-1103: 1103,9/13/16,10:51:07,ris,10.212.42.224,liqui6106.internal.home,amvolu,eturadi,uamei,quisno",
+        "fileset.name": "dhcp",
+        "host.hostname": "liqui6106.internal.home",
+        "input.type": "log",
+        "log.offset": 1750,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.212.42.224"
+        ],
+        "rsa.internal.event_desc": "ris",
+        "rsa.internal.messageid": "1103",
+        "rsa.time.event_time": "2016-09-13T12:51:07.000Z",
+        "service.type": "microsoft",
+        "source.address": "liqui6106.internal.home",
+        "source.ip": [
+            "10.212.42.224"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-09-28T07:53:42.000Z",
+        "event.code": "11011",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1747-11011: 11011,9/28/16,5:53:42,aliquam,10.244.144.198,eratv6205.internal.lan,reme,acommod,uaUteni,udantium",
+        "fileset.name": "dhcp",
+        "host.hostname": "eratv6205.internal.lan",
+        "input.type": "log",
+        "log.offset": 1861,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.244.144.198"
+        ],
+        "rsa.internal.event_desc": "aliquam",
+        "rsa.internal.messageid": "11011",
+        "rsa.investigations.ec_activity": "Stop",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
+        "service.type": "microsoft",
+        "source.address": "eratv6205.internal.lan",
+        "source.ip": [
+            "10.244.144.198"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-10-12T14:56:16.000Z",
+        "event.code": "11020",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4949-11020: 11020,10/12/16,12:56:16,derit,10.90.86.89,piscin6866.internal.host,uptatema,intocc,liqu,eporr",
+        "fileset.name": "dhcp",
+        "host.hostname": "piscin6866.internal.host",
+        "input.type": "log",
+        "log.offset": 1979,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.90.86.89"
+        ],
+        "rsa.internal.event_desc": "derit",
+        "rsa.internal.messageid": "11020",
+        "rsa.time.event_time": "2016-10-12T14:56:16.000Z",
+        "service.type": "microsoft",
+        "source.address": "piscin6866.internal.host",
+        "source.ip": [
+            "10.90.86.89"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-10-26T09:58:50.000Z",
+        "event.code": "11010",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4824-11010: 11010,10/26/16,7:58:50,volupt,10.158.237.92,riosamn7650.api.test,rcitati,eni,ionevo,ugiatnu",
+        "fileset.name": "dhcp",
+        "host.hostname": "riosamn7650.api.test",
+        "input.type": "log",
+        "log.offset": 2093,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.158.237.92"
+        ],
+        "rsa.internal.event_desc": "volupt",
+        "rsa.internal.messageid": "11010",
+        "rsa.investigations.ec_activity": "Start",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2016-10-26T09:58:50.000Z",
+        "service.type": "microsoft",
+        "source.address": "riosamn7650.api.test",
+        "source.ip": [
+            "10.158.237.92"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-11-10T05:01:24.000Z",
+        "event.code": "11023",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1842-11023: 11023,11/10/16,3:01:24,epte,10.20.147.134,aper5651.test,roi,niamqui,orem,sno",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "aper5651.test",
+        "input.type": "log",
+        "log.offset": 2205,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.20.147.134"
+        ],
+        "rsa.internal.event_desc": "epte",
+        "rsa.internal.messageid": "11023",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "aper5651.test",
+        "source.ip": [
+            "10.20.147.134"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-11-24T12:03:59.000Z",
+        "event.code": "11007",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5263-11007: 11007,11/24/16,10:03:59,saute,10.213.145.202,inventor6088.www.invalid,quamni,iatisu,sec,cons",
+        "fileset.name": "dhcp",
+        "host.hostname": "inventor6088.www.invalid",
+        "input.type": "log",
+        "log.offset": 2302,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.213.145.202"
+        ],
+        "rsa.internal.event_desc": "saute",
+        "rsa.internal.messageid": "11007",
+        "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
+        "service.type": "microsoft",
+        "source.address": "inventor6088.www.invalid",
+        "source.ip": [
+            "10.213.145.202"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-12-08T07:06:33.000Z",
+        "event.code": "11003",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4410-11003: 11003,12/8/16,5:06:33,itinvol,10.76.10.73,cipitlab6201.www5.example,ios,evolu,ersp,tquov",
+        "fileset.name": "dhcp",
+        "host.hostname": "cipitlab6201.www5.example",
+        "input.type": "log",
+        "log.offset": 2415,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.76.10.73"
+        ],
+        "rsa.internal.event_desc": "itinvol",
+        "rsa.internal.messageid": "11003",
+        "rsa.time.event_time": "2016-12-08T07:06:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "cipitlab6201.www5.example",
+        "source.ip": [
+            "10.76.10.73"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-12-23T14:09:07.000Z",
+        "event.code": "ID",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3253-ID: ID,12/23/16,12:09:07,roid,10.226.199.190,Nemoenim2039.api.localhost,01:00:5e:f6:ba:65",
+        "fileset.name": "dhcp",
+        "host.hostname": "Nemoenim2039.api.localhost",
+        "input.type": "log",
+        "log.offset": 2524,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.226.199.190"
+        ],
+        "rsa.internal.event_desc": "roid",
+        "rsa.internal.messageid": "ID",
+        "rsa.time.event_time": "2016-12-23T14:09:07.000Z",
+        "service.type": "microsoft",
+        "source.address": "Nemoenim2039.api.localhost",
+        "source.ip": [
+            "10.226.199.190"
+        ],
+        "source.mac": "01:00:5e:f6:ba:65",
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-06T09:11:41.000Z",
+        "event.code": "11000",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1394-11000: 11000,1/6/17,7:11:41,itessequ,10.20.129.206,iquipe2458.api.host,modtemp,quovol,nve,remag",
+        "fileset.name": "dhcp",
+        "host.hostname": "iquipe2458.api.host",
+        "input.type": "log",
+        "log.offset": 2627,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.20.129.206"
+        ],
+        "rsa.internal.event_desc": "itessequ",
+        "rsa.internal.messageid": "11000",
+        "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "iquipe2458.api.host",
+        "source.ip": [
+            "10.20.129.206"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-20T04:14:16.000Z",
+        "event.code": "11007",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2516-11007: 11007,1/20/17,2:14:16,oremeu,10.22.110.210,intoc1426.mail.lan,eeufugia,evit,runtm,molli",
+        "fileset.name": "dhcp",
+        "host.hostname": "intoc1426.mail.lan",
+        "input.type": "log",
+        "log.offset": 2736,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.22.110.210"
+        ],
+        "rsa.internal.event_desc": "oremeu",
+        "rsa.internal.messageid": "11007",
+        "rsa.time.event_time": "2017-01-20T04:14:16.000Z",
+        "service.type": "microsoft",
+        "source.address": "intoc1426.mail.lan",
+        "source.ip": [
+            "10.22.110.210"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-02-03T11:16:50.000Z",
+        "event.code": "11006",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-543-11006: 11006,2/3/17,9:16:50,eturadi,10.218.87.174,rsitvolu3751.mail.lan,olor,ineavo,pexe,niamqui",
+        "fileset.name": "dhcp",
+        "host.hostname": "rsitvolu3751.mail.lan",
+        "input.type": "log",
+        "log.offset": 2844,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.218.87.174"
+        ],
+        "rsa.internal.event_desc": "eturadi",
+        "rsa.internal.messageid": "11006",
+        "rsa.time.event_time": "2017-02-03T11:16:50.000Z",
+        "service.type": "microsoft",
+        "source.address": "rsitvolu3751.mail.lan",
+        "source.ip": [
+            "10.218.87.174"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-02-18T06:19:24.000Z",
+        "event.code": "11014",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6846-11014: 11014,2/18/17,4:19:24,adeser,10.140.113.244,tqu4367.www5.localhost,quam,quid,fugiat,atisun",
+        "fileset.name": "dhcp",
+        "host.hostname": "tqu4367.www5.localhost",
+        "input.type": "log",
+        "log.offset": 2953,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.140.113.244"
+        ],
+        "rsa.internal.event_desc": "adeser",
+        "rsa.internal.messageid": "11014",
+        "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "tqu4367.www5.localhost",
+        "source.ip": [
+            "10.140.113.244"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-03-04T13:21:59.000Z",
+        "event.code": "1103",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7741-1103: 1103,3/4/17,11:21:59,dmin,10.159.181.29,inci5738.www5.invalid,rnatur,ofdeFin,essequam,acommo",
+        "fileset.name": "dhcp",
+        "host.hostname": "inci5738.www5.invalid",
+        "input.type": "log",
+        "log.offset": 3064,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.159.181.29"
+        ],
+        "rsa.internal.event_desc": "dmin",
+        "rsa.internal.messageid": "1103",
+        "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
+        "service.type": "microsoft",
+        "source.address": "inci5738.www5.invalid",
+        "source.ip": [
+            "10.159.181.29"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-03-18T08:24:33.000Z",
+        "event.code": "11005",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-18-11005: 11005,3/18/17,6:24:33,cusant,10.178.173.128,itecto1300.internal.corp,tut,ercita,ciadeser,emquia",
+        "fileset.name": "dhcp",
+        "host.hostname": "itecto1300.internal.corp",
+        "input.type": "log",
+        "log.offset": 3176,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.178.173.128"
+        ],
+        "rsa.internal.event_desc": "cusant",
+        "rsa.internal.messageid": "11005",
+        "rsa.time.event_time": "2017-03-18T08:24:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "itecto1300.internal.corp",
+        "source.ip": [
+            "10.178.173.128"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-04-02T03:27:07.000Z",
+        "event.code": "11015",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6789-11015: 11015,4/2/17,1:27:07,uia,10.217.38.30,siut1579.www.domain,eFi,mexe,its,ender",
+        "fileset.name": "dhcp",
+        "host.hostname": "siut1579.www.domain",
+        "input.type": "log",
+        "log.offset": 3290,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.217.38.30"
+        ],
+        "rsa.internal.event_desc": "uia",
+        "rsa.internal.messageid": "11015",
+        "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
+        "service.type": "microsoft",
+        "source.address": "siut1579.www.domain",
+        "source.ip": [
+            "10.217.38.30"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-04-16T10:29:41.000Z",
+        "event.code": "11014",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1540-11014: 11014,4/16/17,8:29:41,edic,10.178.49.161,ame6223.www5.localhost,meius,billo,labo,oNemoeni",
+        "fileset.name": "dhcp",
+        "host.hostname": "ame6223.www5.localhost",
+        "input.type": "log",
+        "log.offset": 3387,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.178.49.161"
+        ],
+        "rsa.internal.event_desc": "edic",
+        "rsa.internal.messageid": "11014",
+        "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "ame6223.www5.localhost",
+        "source.ip": [
+            "10.178.49.161"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-04-30T05:32:16.000Z",
+        "event.code": "11025",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5663-11025: 11025,4/30/17,3:32:16,ano,10.175.103.215,aturve1647.mail.localhost,uunturm,temUte,sit,olab",
+        "fileset.name": "dhcp",
+        "host.hostname": "aturve1647.mail.localhost",
+        "input.type": "log",
+        "log.offset": 3497,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.175.103.215"
+        ],
+        "rsa.internal.event_desc": "ano",
+        "rsa.internal.messageid": "11025",
+        "rsa.time.event_time": "2017-04-30T05:32:16.000Z",
+        "service.type": "microsoft",
+        "source.address": "aturve1647.mail.localhost",
+        "source.ip": [
+            "10.175.103.215"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-05-14T12:34:50.000Z",
+        "event.code": "11011",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5224-11011: 11011,5/14/17,10:34:50,liqua,10.192.21.74,aco6894.mail.home,emUteni,rum,gnaaliqu,teirured",
+        "fileset.name": "dhcp",
+        "host.hostname": "aco6894.mail.home",
+        "input.type": "log",
+        "log.offset": 3608,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.192.21.74"
+        ],
+        "rsa.internal.event_desc": "liqua",
+        "rsa.internal.messageid": "11011",
+        "rsa.investigations.ec_activity": "Stop",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2017-05-14T12:34:50.000Z",
+        "service.type": "microsoft",
+        "source.address": "aco6894.mail.home",
+        "source.ip": [
+            "10.192.21.74"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-05-29T07:37:24.000Z",
+        "event.code": "11019",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5608-11019: 11019,5/29/17,5:37:24,bor,10.142.25.100,tetu2485.internal.invalid,nby,mve,osqui,sequat",
+        "fileset.name": "dhcp",
+        "host.hostname": "tetu2485.internal.invalid",
+        "input.type": "log",
+        "log.offset": 3718,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.142.25.100"
+        ],
+        "rsa.internal.event_desc": "bor",
+        "rsa.internal.messageid": "11019",
+        "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "tetu2485.internal.invalid",
+        "source.ip": [
+            "10.142.25.100"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-06-12T14:39:58.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3051-1098: 1098,6/12/17,12:39:58,ven,10.162.114.217,doloreme60.www5.localhost,evitaed,inimveni,dex,lor",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "doloreme60.www5.localhost",
+        "input.type": "log",
+        "log.offset": 3825,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.162.114.217"
+        ],
+        "rsa.internal.event_desc": "ven",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
+        "service.type": "microsoft",
+        "source.address": "doloreme60.www5.localhost",
+        "source.ip": [
+            "10.162.114.217"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-06-26T09:42:33.000Z",
+        "event.code": "11001",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6444-11001: 11001,6/26/17,7:42:33,mex,10.0.132.176,luptat7214.domain,lillum,remips,uisaute,imide",
+        "fileset.name": "dhcp",
+        "host.hostname": "luptat7214.domain",
+        "input.type": "log",
+        "log.offset": 3936,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.0.132.176"
+        ],
+        "rsa.internal.event_desc": "mex",
+        "rsa.internal.messageid": "11001",
+        "rsa.time.event_time": "2017-06-26T09:42:33.000Z",
+        "service.type": "microsoft",
+        "source.address": "luptat7214.domain",
+        "source.ip": [
+            "10.0.132.176"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-07-11T04:45:07.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5524-1098: 1098,7/11/17,2:45:07,lupta,10.22.187.69,amcor5091.internal.corp,nbyCi,tevel,usc,rem",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "amcor5091.internal.corp",
+        "input.type": "log",
+        "log.offset": 4041,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.22.187.69"
+        ],
+        "rsa.internal.event_desc": "lupta",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
+        "service.type": "microsoft",
+        "source.address": "amcor5091.internal.corp",
+        "source.ip": [
+            "10.22.187.69"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-07-25T11:47:41.000Z",
+        "event.code": "11019",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1978-11019: 11019,7/25/17,9:47:41,atisund,10.2.128.234,ncidid5410.internal.domain,velite,teturad,perspici,itation",
+        "fileset.name": "dhcp",
+        "host.hostname": "ncidid5410.internal.domain",
+        "input.type": "log",
+        "log.offset": 4144,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.2.128.234"
+        ],
+        "rsa.internal.event_desc": "atisund",
+        "rsa.internal.messageid": "11019",
+        "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "ncidid5410.internal.domain",
+        "source.ip": [
+            "10.2.128.234"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-08-08T06:50:15.000Z",
+        "event.code": "11024",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5469-11024: 11024,8/8/17,4:50:15,porincid,10.223.160.140,nofd988.api.example,ilmol,eri,quunt,olori",
+        "event.outcome": "success",
+        "fileset.name": "dhcp",
+        "host.hostname": "nofd988.api.example",
+        "input.type": "log",
+        "log.offset": 4266,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.223.160.140"
+        ],
+        "rsa.internal.event_desc": "porincid",
+        "rsa.internal.messageid": "11024",
+        "rsa.investigations.ec_outcome": "Success",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2017-08-08T06:50:15.000Z",
+        "service.type": "microsoft",
+        "source.address": "nofd988.api.example",
+        "source.ip": [
+            "10.223.160.140"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-08-22T13:52:50.000Z",
+        "event.code": "11004",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2-11004: 11004,8/22/17,11:52:50,elit,10.137.14.180,borisnis6159.www5.localdomain,inven,eufugi,accusant,onse",
+        "fileset.name": "dhcp",
+        "host.hostname": "borisnis6159.www5.localdomain",
+        "input.type": "log",
+        "log.offset": 4373,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.137.14.180"
+        ],
+        "rsa.internal.event_desc": "elit",
+        "rsa.internal.messageid": "11004",
+        "rsa.time.event_time": "2017-08-22T13:52:50.000Z",
+        "service.type": "microsoft",
+        "source.address": "borisnis6159.www5.localdomain",
+        "source.ip": [
+            "10.137.14.180"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-09-06T08:55:24.000Z",
+        "event.code": "11025",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4924-11025: 11025,9/6/17,6:55:24,periam,10.192.182.230,dminima4348.mail.home,tame,naaliq,nte,ulpa",
+        "fileset.name": "dhcp",
+        "host.hostname": "dminima4348.mail.home",
+        "input.type": "log",
+        "log.offset": 4489,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.192.182.230"
+        ],
+        "rsa.internal.event_desc": "periam",
+        "rsa.internal.messageid": "11025",
+        "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "dminima4348.mail.home",
+        "source.ip": [
+            "10.192.182.230"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-09-20T03:57:58.000Z",
+        "event.code": "11023",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3023-11023: 11023,9/20/17,1:57:58,atise,10.95.241.28,oluptas6981.www5.localhost,lor,Sedut,yCiceroi,quunt",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "oluptas6981.www5.localhost",
+        "input.type": "log",
+        "log.offset": 4595,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.95.241.28"
+        ],
+        "rsa.internal.event_desc": "atise",
+        "rsa.internal.messageid": "11023",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2017-09-20T03:57:58.000Z",
+        "service.type": "microsoft",
+        "source.address": "oluptas6981.www5.localhost",
+        "source.ip": [
+            "10.95.241.28"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-10-04T11:00:32.000Z",
+        "event.code": "11011",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3896-11011: 11011,10/4/17,9:00:32,isn,10.74.240.121,equ4808.www.localhost,siuta,urmagn,dquia,temporin",
+        "fileset.name": "dhcp",
+        "host.hostname": "equ4808.www.localhost",
+        "input.type": "log",
+        "log.offset": 4708,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.74.240.121"
+        ],
+        "rsa.internal.event_desc": "isn",
+        "rsa.internal.messageid": "11011",
+        "rsa.investigations.ec_activity": "Stop",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2017-10-04T11:00:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "equ4808.www.localhost",
+        "source.ip": [
+            "10.74.240.121"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-10-19T06:03:07.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6160-1098: 1098,10/19/17,4:03:07,obeataev,10.139.127.232,nsec923.internal.local,agnaaliq,tlaboree,norumet,dtempo",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "nsec923.internal.local",
+        "input.type": "log",
+        "log.offset": 4818,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.139.127.232"
+        ],
+        "rsa.internal.event_desc": "obeataev",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
+        "service.type": "microsoft",
+        "source.address": "nsec923.internal.local",
+        "source.ip": [
+            "10.139.127.232"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-11-02T13:05:41.000Z",
+        "event.code": "11009",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4862-11009: 11009,11/2/17,11:05:41,iumtot,10.170.6.54,emoe4059.api.localdomain,ehende,eaqueip,eum,lamc",
+        "fileset.name": "dhcp",
+        "host.hostname": "emoe4059.api.localdomain",
+        "input.type": "log",
+        "log.offset": 4939,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.170.6.54"
+        ],
+        "rsa.internal.event_desc": "iumtot",
+        "rsa.internal.messageid": "11009",
+        "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "emoe4059.api.localdomain",
+        "source.ip": [
+            "10.170.6.54"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-11-16T08:08:15.000Z",
+        "event.code": "11007",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1664-11007: 11007,11/16/17,6:08:15,sciun,10.46.115.216,equun6662.home,uia,iciad,lorem,nsequunt",
+        "fileset.name": "dhcp",
+        "host.hostname": "equun6662.home",
+        "input.type": "log",
+        "log.offset": 5050,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.46.115.216"
+        ],
+        "rsa.internal.event_desc": "sciun",
+        "rsa.internal.messageid": "11007",
+        "rsa.time.event_time": "2017-11-16T08:08:15.000Z",
+        "service.type": "microsoft",
+        "source.address": "equun6662.home",
+        "source.ip": [
+            "10.46.115.216"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-12-01T03:10:49.000Z",
+        "event.code": "11017",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6603-11017: 11017,12/1/17,1:10:49,gnaa,10.226.5.189,dtempori5735.www5.local,dexerc,strumex,eprehend,asnu",
+        "fileset.name": "dhcp",
+        "host.hostname": "dtempori5735.www5.local",
+        "input.type": "log",
+        "log.offset": 5153,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.226.5.189"
+        ],
+        "rsa.internal.event_desc": "gnaa",
+        "rsa.internal.messageid": "11017",
+        "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "dtempori5735.www5.local",
+        "source.ip": [
+            "10.226.5.189"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-12-15T10:13:24.000Z",
+        "event.code": "11030",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1313-11030: 11030,12/15/17,8:13:24,derit,10.0.20.5,cupi7581.internal.local,dunt,litsedq,nderiti,ntNe",
+        "fileset.name": "dhcp",
+        "host.hostname": "cupi7581.internal.local",
+        "input.type": "log",
+        "log.offset": 5266,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.0.20.5"
+        ],
+        "rsa.internal.event_desc": "derit",
+        "rsa.internal.messageid": "11030",
+        "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "cupi7581.internal.local",
+        "source.ip": [
+            "10.0.20.5"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-12-29T05:15:58.000Z",
+        "event.code": "11023",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4024-11023: 11023,12/29/17,3:15:58,olorema,10.180.101.232,quasiar5281.mail.invalid,emip,inBC,mol,tur",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "quasiar5281.mail.invalid",
+        "input.type": "log",
+        "log.offset": 5375,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.180.101.232"
+        ],
+        "rsa.internal.event_desc": "olorema",
+        "rsa.internal.messageid": "11023",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2017-12-29T05:15:58.000Z",
+        "service.type": "microsoft",
+        "source.address": "quasiar5281.mail.invalid",
+        "source.ip": [
+            "10.180.101.232"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-01-12T12:18:32.000Z",
+        "event.code": "11018",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-754-11018: 11018,1/12/18,10:18:32,irured,10.141.158.225,tionula1586.host,idolor,ratvolu,nreprehe,onse",
+        "fileset.name": "dhcp",
+        "host.hostname": "tionula1586.host",
+        "input.type": "log",
+        "log.offset": 5484,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.141.158.225"
+        ],
+        "rsa.internal.event_desc": "irured",
+        "rsa.internal.messageid": "11018",
+        "rsa.time.event_time": "2018-01-12T12:18:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "tionula1586.host",
+        "source.ip": [
+            "10.141.158.225"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-01-27T07:21:06.000Z",
+        "event.code": "11013",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3617-11013: 11013,1/27/18,5:21:06,tatnon,10.94.88.5,ore5643.api.lan,metco,acom,ceroinB,nim",
+        "fileset.name": "dhcp",
+        "host.hostname": "ore5643.api.lan",
+        "input.type": "log",
+        "log.offset": 5594,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.94.88.5"
+        ],
+        "rsa.internal.event_desc": "tatnon",
+        "rsa.internal.messageid": "11013",
+        "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "ore5643.api.lan",
+        "source.ip": [
+            "10.94.88.5"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-02-10T14:23:41.000Z",
+        "event.code": "11024",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4248-11024: 11024,2/10/18,12:23:41,aspe,10.155.18.139,ciun39.localdomain,iatqu,inBCSedu,erspi,rorsit",
+        "event.outcome": "success",
+        "fileset.name": "dhcp",
+        "host.hostname": "ciun39.localdomain",
+        "input.type": "log",
+        "log.offset": 5693,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.155.18.139"
+        ],
+        "rsa.internal.event_desc": "aspe",
+        "rsa.internal.messageid": "11024",
+        "rsa.investigations.ec_outcome": "Success",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2018-02-10T14:23:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "ciun39.localdomain",
+        "source.ip": [
+            "10.155.18.139"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-02-24T09:26:15.000Z",
+        "event.code": "11013",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5976-11013: 11013,2/24/18,7:26:15,undeomni,10.85.48.117,iutali7297.www.domain,Finibus,radi,xeacom,des",
+        "fileset.name": "dhcp",
+        "host.hostname": "iutali7297.www.domain",
+        "input.type": "log",
+        "log.offset": 5802,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.85.48.117"
+        ],
+        "rsa.internal.event_desc": "undeomni",
+        "rsa.internal.messageid": "11013",
+        "rsa.time.event_time": "2018-02-24T09:26:15.000Z",
+        "service.type": "microsoft",
+        "source.address": "iutali7297.www.domain",
+        "source.ip": [
+            "10.85.48.117"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-03-11T04:28:49.000Z",
+        "event.code": "11003",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-77-11003: 11003,3/11/18,2:28:49,eprehend,10.224.146.6,docon5398.mail.host,uptate,lloinven,econs,lmolesti",
+        "fileset.name": "dhcp",
+        "host.hostname": "docon5398.mail.host",
+        "input.type": "log",
+        "log.offset": 5912,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.224.146.6"
+        ],
+        "rsa.internal.event_desc": "eprehend",
+        "rsa.internal.messageid": "11003",
+        "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "docon5398.mail.host",
+        "source.ip": [
+            "10.224.146.6"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-03-25T11:31:24.000Z",
+        "event.code": "11007",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2519-11007: 11007,3/25/18,9:31:24,doeiu,10.182.152.242,destlabo7803.mail.localhost,ecillum,isci,dolor,tiumto",
+        "fileset.name": "dhcp",
+        "host.hostname": "destlabo7803.mail.localhost",
+        "input.type": "log",
+        "log.offset": 6025,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.182.152.242"
+        ],
+        "rsa.internal.event_desc": "doeiu",
+        "rsa.internal.messageid": "11007",
+        "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
+        "service.type": "microsoft",
+        "source.address": "destlabo7803.mail.localhost",
+        "source.ip": [
+            "10.182.152.242"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-04-08T06:33:58.000Z",
+        "event.code": "11000",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6515-11000: 11000,4/8/18,4:33:58,quin,10.225.157.110,fugits1163.host,vol,admi,onnu,olorema",
+        "fileset.name": "dhcp",
+        "host.hostname": "fugits1163.host",
+        "input.type": "log",
+        "log.offset": 6142,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.225.157.110"
+        ],
+        "rsa.internal.event_desc": "quin",
+        "rsa.internal.messageid": "11000",
+        "rsa.time.event_time": "2018-04-08T06:33:58.000Z",
+        "service.type": "microsoft",
+        "source.address": "fugits1163.host",
+        "source.ip": [
+            "10.225.157.110"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-04-22T13:36:32.000Z",
+        "event.code": "11005",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4357-11005: 11005,4/22/18,11:36:32,tcupida,10.236.185.102,adol170.internal.example,niam,pernat,rerepre,nculpaq",
+        "fileset.name": "dhcp",
+        "host.hostname": "adol170.internal.example",
+        "input.type": "log",
+        "log.offset": 6241,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.236.185.102"
+        ],
+        "rsa.internal.event_desc": "tcupida",
+        "rsa.internal.messageid": "11005",
+        "rsa.time.event_time": "2018-04-22T13:36:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "adol170.internal.example",
+        "source.ip": [
+            "10.236.185.102"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-05-07T08:39:06.000Z",
+        "event.code": "11010",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2577-11010: 11010,5/7/18,6:39:06,billoinv,10.146.72.62,red5516.localhost,agnaaliq,est,mquisno,aev",
+        "fileset.name": "dhcp",
+        "host.hostname": "red5516.localhost",
+        "input.type": "log",
+        "log.offset": 6360,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.146.72.62"
+        ],
+        "rsa.internal.event_desc": "billoinv",
+        "rsa.internal.messageid": "11010",
+        "rsa.investigations.ec_activity": "Start",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "red5516.localhost",
+        "source.ip": [
+            "10.146.72.62"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-05-21T03:41:41.000Z",
+        "event.code": "1103",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5343-1103: 1103,5/21/18,1:41:41,lapar,10.221.7.206,qui3176.internal.example,mexerc,meaque,uid,equaturv",
+        "fileset.name": "dhcp",
+        "host.hostname": "qui3176.internal.example",
+        "input.type": "log",
+        "log.offset": 6466,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.221.7.206"
+        ],
+        "rsa.internal.event_desc": "lapar",
+        "rsa.internal.messageid": "1103",
+        "rsa.time.event_time": "2018-05-21T03:41:41.000Z",
+        "service.type": "microsoft",
+        "source.address": "qui3176.internal.example",
+        "source.ip": [
+            "10.221.7.206"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-06-04T10:44:15.000Z",
+        "event.code": "1103",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-653-1103: 1103,6/4/18,8:44:15,maccusa,10.196.35.130,luptat2979.internal.local,uradi,velitsed,magnaali,mwrit",
+        "fileset.name": "dhcp",
+        "host.hostname": "luptat2979.internal.local",
+        "input.type": "log",
+        "log.offset": 6577,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.196.35.130"
+        ],
+        "rsa.internal.event_desc": "maccusa",
+        "rsa.internal.messageid": "1103",
+        "rsa.time.event_time": "2018-06-04T10:44:15.000Z",
+        "service.type": "microsoft",
+        "source.address": "luptat2979.internal.local",
+        "source.ip": [
+            "10.196.35.130"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-06-19T05:46:49.000Z",
+        "event.code": "11014",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6378-11014: 11014,6/19/18,3:46:49,equatDu,10.182.219.241,prehe1037.api.example,eiusmod,itation,veleum,piciatis",
+        "fileset.name": "dhcp",
+        "host.hostname": "prehe1037.api.example",
+        "input.type": "log",
+        "log.offset": 6693,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.182.219.241"
+        ],
+        "rsa.internal.event_desc": "equatDu",
+        "rsa.internal.messageid": "11014",
+        "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "prehe1037.api.example",
+        "source.ip": [
+            "10.182.219.241"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-07-03T12:49:23.000Z",
+        "event.code": "11021",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7616-11021: 11021,7/3/18,10:49:23,tanimid,10.101.163.40,abor1370.www.domain,remips,illoi,reetdolo,rationev",
+        "fileset.name": "dhcp",
+        "host.hostname": "abor1370.www.domain",
+        "input.type": "log",
+        "log.offset": 6812,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.101.163.40"
+        ],
+        "rsa.internal.event_desc": "tanimid",
+        "rsa.internal.messageid": "11021",
+        "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
+        "service.type": "microsoft",
+        "source.address": "abor1370.www.domain",
+        "source.ip": [
+            "10.101.163.40"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-07-17T07:51:58.000Z",
+        "event.code": "11003",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3147-11003: 11003,7/17/18,5:51:58,oremi,10.141.39.190,atDuis5759.internal.test,rumwri,velill,ore,tation",
+        "fileset.name": "dhcp",
+        "host.hostname": "atDuis5759.internal.test",
+        "input.type": "log",
+        "log.offset": 6927,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.141.39.190"
+        ],
+        "rsa.internal.event_desc": "oremi",
+        "rsa.internal.messageid": "11003",
+        "rsa.time.event_time": "2018-07-17T07:51:58.000Z",
+        "service.type": "microsoft",
+        "source.address": "atDuis5759.internal.test",
+        "source.ip": [
+            "10.141.39.190"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-08-01T14:54:32.000Z",
+        "event.code": "11009",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7360-11009: 11009,8/1/18,12:54:32,tperspic,10.41.89.217,ict2699.internal.localhost,riosamni,icta,luptate,llamc",
+        "fileset.name": "dhcp",
+        "host.hostname": "ict2699.internal.localhost",
+        "input.type": "log",
+        "log.offset": 7039,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.41.89.217"
+        ],
+        "rsa.internal.event_desc": "tperspic",
+        "rsa.internal.messageid": "11009",
+        "rsa.time.event_time": "2018-08-01T14:54:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "ict2699.internal.localhost",
+        "source.ip": [
+            "10.41.89.217"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-08-15T09:57:06.000Z",
+        "event.code": "11007",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2454-11007: 11007,8/15/18,7:57:06,tesseci,10.86.44.130,cive2292.api.local,nisiuta,stiaecon,dol,sumquiad",
+        "fileset.name": "dhcp",
+        "host.hostname": "cive2292.api.local",
+        "input.type": "log",
+        "log.offset": 7158,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.86.44.130"
+        ],
+        "rsa.internal.event_desc": "tesseci",
+        "rsa.internal.messageid": "11007",
+        "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "cive2292.api.local",
+        "source.ip": [
+            "10.86.44.130"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-08-29T04:59:40.000Z",
+        "event.code": "11024",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7311-11024: 11024,8/29/18,2:59:40,uid,10.209.71.69,aconsequ2331.www5.localhost,sequat,lor,ccaec,atu",
+        "event.outcome": "success",
+        "fileset.name": "dhcp",
+        "host.hostname": "aconsequ2331.www5.localhost",
+        "input.type": "log",
+        "log.offset": 7270,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.209.71.69"
+        ],
+        "rsa.internal.event_desc": "uid",
+        "rsa.internal.messageid": "11024",
+        "rsa.investigations.ec_outcome": "Success",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2018-08-29T04:59:40.000Z",
+        "service.type": "microsoft",
+        "source.address": "aconsequ2331.www5.localhost",
+        "source.ip": [
+            "10.209.71.69"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-09-12T12:02:15.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4968-1098: 1098,9/12/18,10:02:15,laudanti,10.48.104.137,rsitvolu3596.www.test,uameiusm,adm,gelitsed,tiumto",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "rsitvolu3596.www.test",
+        "input.type": "log",
+        "log.offset": 7378,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.48.104.137"
+        ],
+        "rsa.internal.event_desc": "laudanti",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2018-09-12T12:02:15.000Z",
+        "service.type": "microsoft",
+        "source.address": "rsitvolu3596.www.test",
+        "source.ip": [
+            "10.48.104.137"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-09-27T07:04:49.000Z",
+        "event.code": "11023",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2648-11023: 11023,9/27/18,5:04:49,nihil,10.225.255.211,elites6366.mail.lan,eursinto,litesse,fugiatn,uaeabi",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "elites6366.mail.lan",
+        "input.type": "log",
+        "log.offset": 7493,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.225.255.211"
+        ],
+        "rsa.internal.event_desc": "nihil",
+        "rsa.internal.messageid": "11023",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "elites6366.mail.lan",
+        "source.ip": [
+            "10.225.255.211"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-10-11T14:07:23.000Z",
+        "event.code": "11013",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2724-11013: 11013,10/11/18,12:07:23,olu,10.137.103.62,orumSe4514.www.corp,umquam,emagn,emulla,mips",
+        "fileset.name": "dhcp",
+        "host.hostname": "orumSe4514.www.corp",
+        "input.type": "log",
+        "log.offset": 7608,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.137.103.62"
+        ],
+        "rsa.internal.event_desc": "olu",
+        "rsa.internal.messageid": "11013",
+        "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
+        "service.type": "microsoft",
+        "source.address": "orumSe4514.www.corp",
+        "source.ip": [
+            "10.137.103.62"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-10-25T09:09:57.000Z",
+        "event.code": "11015",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3887-11015: 11015,10/25/18,7:09:57,etdol,10.156.88.51,fdeFi6975.www5.local,equat,aliquid,usantiu,idunt",
+        "fileset.name": "dhcp",
+        "host.hostname": "fdeFi6975.www5.local",
+        "input.type": "log",
+        "log.offset": 7715,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.156.88.51"
+        ],
+        "rsa.internal.event_desc": "etdol",
+        "rsa.internal.messageid": "11015",
+        "rsa.time.event_time": "2018-10-25T09:09:57.000Z",
+        "service.type": "microsoft",
+        "source.address": "fdeFi6975.www5.local",
+        "source.ip": [
+            "10.156.88.51"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-11-09T04:12:32.000Z",
+        "event.code": "11025",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5999-11025: 11025,11/9/18,2:12:32,quiacons,10.7.99.47,dol3000.www5.local,teturadi,ditau,atemaccu,veritat",
+        "fileset.name": "dhcp",
+        "host.hostname": "dol3000.www5.local",
+        "input.type": "log",
+        "log.offset": 7826,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.7.99.47"
+        ],
+        "rsa.internal.event_desc": "quiacons",
+        "rsa.internal.messageid": "11025",
+        "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "dol3000.www5.local",
+        "source.ip": [
+            "10.7.99.47"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-11-23T11:15:06.000Z",
+        "event.code": "11010",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5374-11010: 11010,11/23/18,9:15:06,ueip,10.243.252.157,umd5182.mail.host,tur,acon,Nemoenim,usm",
+        "fileset.name": "dhcp",
+        "host.hostname": "umd5182.mail.host",
+        "input.type": "log",
+        "log.offset": 7939,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.243.252.157"
+        ],
+        "rsa.internal.event_desc": "ueip",
+        "rsa.internal.messageid": "11010",
+        "rsa.investigations.ec_activity": "Start",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "umd5182.mail.host",
+        "source.ip": [
+            "10.243.252.157"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-12-07T06:17:40.000Z",
+        "event.code": "11013",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5397-11013: 11013,12/7/18,4:17:40,tise,10.95.73.196,expl2616.www.test,itinvol,ten,litanim,rQuisaut",
+        "fileset.name": "dhcp",
+        "host.hostname": "expl2616.www.test",
+        "input.type": "log",
+        "log.offset": 8042,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.95.73.196"
+        ],
+        "rsa.internal.event_desc": "tise",
+        "rsa.internal.messageid": "11013",
+        "rsa.time.event_time": "2018-12-07T06:17:40.000Z",
+        "service.type": "microsoft",
+        "source.address": "expl2616.www.test",
+        "source.ip": [
+            "10.95.73.196"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2018-12-21T13:20:14.000Z",
+        "event.code": "11004",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1636-11004: 11004,12/21/18,11:20:14,teni,10.145.104.170,risni1535.example,onemulla,riaturEx,deri,amqu",
+        "fileset.name": "dhcp",
+        "host.hostname": "risni1535.example",
+        "input.type": "log",
+        "log.offset": 8149,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.145.104.170"
+        ],
+        "rsa.internal.event_desc": "teni",
+        "rsa.internal.messageid": "11004",
+        "rsa.time.event_time": "2018-12-21T13:20:14.000Z",
+        "service.type": "microsoft",
+        "source.address": "risni1535.example",
+        "source.ip": [
+            "10.145.104.170"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-01-05T08:22:49.000Z",
+        "event.code": "11018",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-1303-11018: 11018,1/5/19,6:22:49,edquian,10.18.152.236,umtotamr7221.mail.host,rnat,rur,itse,ilm",
+        "fileset.name": "dhcp",
+        "host.hostname": "umtotamr7221.mail.host",
+        "input.type": "log",
+        "log.offset": 8259,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.18.152.236"
+        ],
+        "rsa.internal.event_desc": "edquian",
+        "rsa.internal.messageid": "11018",
+        "rsa.time.event_time": "2019-01-05T08:22:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "umtotamr7221.mail.host",
+        "source.ip": [
+            "10.18.152.236"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-01-19T03:25:23.000Z",
+        "event.code": "11015",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2746-11015: 11015,1/19/19,1:25:23,oloree,10.15.240.220,teir7585.www5.localdomain,quu,xeac,llitanim,quamei",
+        "fileset.name": "dhcp",
+        "host.hostname": "teir7585.www5.localdomain",
+        "input.type": "log",
+        "log.offset": 8363,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.15.240.220"
+        ],
+        "rsa.internal.event_desc": "oloree",
+        "rsa.internal.messageid": "11015",
+        "rsa.time.event_time": "2019-01-19T03:25:23.000Z",
+        "service.type": "microsoft",
+        "source.address": "teir7585.www5.localdomain",
+        "source.ip": [
+            "10.15.240.220"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-02-02T10:27:57.000Z",
+        "event.code": "11000",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5996-11000: 11000,2/2/19,8:27:57,meum,10.147.130.71,tur4536.localdomain,iamqui,tassita,colabori,imidestl",
+        "fileset.name": "dhcp",
+        "host.hostname": "tur4536.localdomain",
+        "input.type": "log",
+        "log.offset": 8477,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.147.130.71"
+        ],
+        "rsa.internal.event_desc": "meum",
+        "rsa.internal.messageid": "11000",
+        "rsa.time.event_time": "2019-02-02T10:27:57.000Z",
+        "service.type": "microsoft",
+        "source.address": "tur4536.localdomain",
+        "source.ip": [
+            "10.147.130.71"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-02-17T05:30:32.000Z",
+        "event.code": "11002",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-956-11002: 11002,2/17/19,3:30:32,isn,10.203.146.137,ffic6926.home,aparia,CSe,exerci,inesciu",
+        "fileset.name": "dhcp",
+        "host.hostname": "ffic6926.home",
+        "input.type": "log",
+        "log.offset": 8590,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.203.146.137"
+        ],
+        "rsa.internal.event_desc": "isn",
+        "rsa.internal.messageid": "11002",
+        "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
+        "service.type": "microsoft",
+        "source.address": "ffic6926.home",
+        "source.ip": [
+            "10.203.146.137"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-03-03T12:33:06.000Z",
+        "event.code": "11012",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5452-11012: 11012,3/3/19,10:33:06,emu,10.5.98.182,ate4386.api.localhost,minimve,serrorsi,tametco,mquisnos",
+        "fileset.name": "dhcp",
+        "host.hostname": "ate4386.api.localhost",
+        "input.type": "log",
+        "log.offset": 8690,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.5.98.182"
+        ],
+        "rsa.internal.event_desc": "emu",
+        "rsa.internal.messageid": "11012",
+        "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "ate4386.api.localhost",
+        "source.ip": [
+            "10.5.98.182"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-03-17T07:35:40.000Z",
+        "event.code": "11014",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-6034-11014: 11014,3/17/19,5:35:40,ici,10.6.180.90,iameaque5093.api.corp,aquio,rspicia,deom,oluptat",
+        "fileset.name": "dhcp",
+        "host.hostname": "iameaque5093.api.corp",
+        "input.type": "log",
+        "log.offset": 8804,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.6.180.90"
+        ],
+        "rsa.internal.event_desc": "ici",
+        "rsa.internal.messageid": "11014",
+        "rsa.time.event_time": "2019-03-17T07:35:40.000Z",
+        "service.type": "microsoft",
+        "source.address": "iameaque5093.api.corp",
+        "source.ip": [
+            "10.6.180.90"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-04-01T14:38:14.000Z",
+        "event.code": "11004",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3545-11004: 11004,4/1/19,12:38:14,onproide,10.111.93.224,tatisetq3237.www5.corp,emag,oquisq,abori,sit",
+        "fileset.name": "dhcp",
+        "host.hostname": "tatisetq3237.www5.corp",
+        "input.type": "log",
+        "log.offset": 8911,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.111.93.224"
+        ],
+        "rsa.internal.event_desc": "onproide",
+        "rsa.internal.messageid": "11004",
+        "rsa.time.event_time": "2019-04-01T14:38:14.000Z",
+        "service.type": "microsoft",
+        "source.address": "tatisetq3237.www5.corp",
+        "source.ip": [
+            "10.111.93.224"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-04-15T09:40:49.000Z",
+        "event.code": "11002",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7051-11002: 11002,4/15/19,7:40:49,lumdolor,10.196.157.28,rvelill32.internal.corp,tatevel,midestl,nci,orroquis",
+        "fileset.name": "dhcp",
+        "host.hostname": "rvelill32.internal.corp",
+        "input.type": "log",
+        "log.offset": 9021,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.196.157.28"
+        ],
+        "rsa.internal.event_desc": "lumdolor",
+        "rsa.internal.messageid": "11002",
+        "rsa.time.event_time": "2019-04-15T09:40:49.000Z",
+        "service.type": "microsoft",
+        "source.address": "rvelill32.internal.corp",
+        "source.ip": [
+            "10.196.157.28"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-04-29T04:43:23.000Z",
+        "event.code": "11017",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4040-11017: 11017,4/29/19,2:43:23,meiusm,10.143.0.78,ectetura2657.www.localdomain,seq,moll,quaeabil,emip",
+        "fileset.name": "dhcp",
+        "host.hostname": "ectetura2657.www.localdomain",
+        "input.type": "log",
+        "log.offset": 9139,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.143.0.78"
+        ],
+        "rsa.internal.event_desc": "meiusm",
+        "rsa.internal.messageid": "11017",
+        "rsa.time.event_time": "2019-04-29T04:43:23.000Z",
+        "service.type": "microsoft",
+        "source.address": "ectetura2657.www.localdomain",
+        "source.ip": [
+            "10.143.0.78"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-05-13T11:45:57.000Z",
+        "event.code": "1103",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3376-1103: 1103,5/13/19,9:45:57,mipsumqu,10.184.187.32,ico3220.api.test,evi,tionula,accus,uatu",
+        "fileset.name": "dhcp",
+        "host.hostname": "ico3220.api.test",
+        "input.type": "log",
+        "log.offset": 9252,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.184.187.32"
+        ],
+        "rsa.internal.event_desc": "mipsumqu",
+        "rsa.internal.messageid": "1103",
+        "rsa.time.event_time": "2019-05-13T11:45:57.000Z",
+        "service.type": "microsoft",
+        "source.address": "ico3220.api.test",
+        "source.ip": [
+            "10.184.187.32"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-05-28T06:48:31.000Z",
+        "event.code": "11019",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-111-11019: 11019,5/28/19,4:48:31,sumquiad,10.30.87.51,Duisa7769.test,iaecon,aevitaed,byCic,leumiur",
+        "fileset.name": "dhcp",
+        "host.hostname": "Duisa7769.test",
+        "input.type": "log",
+        "log.offset": 9355,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.30.87.51"
+        ],
+        "rsa.internal.event_desc": "sumquiad",
+        "rsa.internal.messageid": "11019",
+        "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
+        "service.type": "microsoft",
+        "source.address": "Duisa7769.test",
+        "source.ip": [
+            "10.30.87.51"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-06-11T13:51:06.000Z",
+        "event.code": "11000",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5483-11000: 11000,6/11/19,11:51:06,tno,10.180.62.222,ptatev6552.www.test,ctetura,msequ,nvol,enimadmi",
+        "fileset.name": "dhcp",
+        "host.hostname": "ptatev6552.www.test",
+        "input.type": "log",
+        "log.offset": 9462,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.180.62.222"
+        ],
+        "rsa.internal.event_desc": "tno",
+        "rsa.internal.messageid": "11000",
+        "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
+        "service.type": "microsoft",
+        "source.address": "ptatev6552.www.test",
+        "source.ip": [
+            "10.180.62.222"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-06-25T08:53:40.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7708-1098: 1098,6/25/19,6:53:40,adeser,10.198.9.209,olore6487.www5.local,inea,animid,upta,ioff",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "olore6487.www5.local",
+        "input.type": "log",
+        "log.offset": 9571,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.198.9.209"
+        ],
+        "rsa.internal.event_desc": "adeser",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2019-06-25T08:53:40.000Z",
+        "service.type": "microsoft",
+        "source.address": "olore6487.www5.local",
+        "source.ip": [
+            "10.198.9.209"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-10T03:56:14.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-4197-1098: 1098,7/10/19,1:56:14,iuntN,10.41.217.115,nvol548.corp,sin,idexeac,nimadmin,midest",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "nvol548.corp",
+        "input.type": "log",
+        "log.offset": 9674,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.41.217.115"
+        ],
+        "rsa.internal.event_desc": "iuntN",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
+        "service.type": "microsoft",
+        "source.address": "nvol548.corp",
+        "source.ip": [
+            "10.41.217.115"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-07-24T10:58:48.000Z",
+        "event.code": "11030",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-2952-11030: 11030,7/24/19,8:58:48,quatu,10.212.196.228,pteursi466.www.localdomain,essecill,totamre,rpo,velites",
+        "fileset.name": "dhcp",
+        "host.hostname": "pteursi466.www.localdomain",
+        "input.type": "log",
+        "log.offset": 9775,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.212.196.228"
+        ],
+        "rsa.internal.event_desc": "quatu",
+        "rsa.internal.messageid": "11030",
+        "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
+        "service.type": "microsoft",
+        "source.address": "pteursi466.www.localdomain",
+        "source.ip": [
+            "10.212.196.228"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-07T06:01:23.000Z",
+        "event.code": "11002",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7651-11002: 11002,8/7/19,4:01:23,uisaute,10.166.180.119,olupt1936.host,imide,ncul,taliq,tautfugi",
+        "fileset.name": "dhcp",
+        "host.hostname": "olupt1936.host",
+        "input.type": "log",
+        "log.offset": 9894,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.166.180.119"
+        ],
+        "rsa.internal.event_desc": "uisaute",
+        "rsa.internal.messageid": "11002",
+        "rsa.time.event_time": "2019-08-07T06:01:23.000Z",
+        "service.type": "microsoft",
+        "source.address": "olupt1936.host",
+        "source.ip": [
+            "10.166.180.119"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-21T13:03:57.000Z",
+        "event.code": "11030",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-163-11030: 11030,8/21/19,11:03:57,volup,10.7.142.212,uisaut2157.corp,tuser,ctasu,irat,sitame",
+        "fileset.name": "dhcp",
+        "host.hostname": "uisaut2157.corp",
+        "input.type": "log",
+        "log.offset": 9999,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.7.142.212"
+        ],
+        "rsa.internal.event_desc": "volup",
+        "rsa.internal.messageid": "11030",
+        "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
+        "service.type": "microsoft",
+        "source.address": "uisaut2157.corp",
+        "source.ip": [
+            "10.7.142.212"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-05T08:06:31.000Z",
+        "event.code": "11023",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3403-11023: 11023,9/5/19,6:06:31,uptateve,10.209.237.97,ecte882.www5.host,Malor,boriosa,cillumdo,ditau",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "ecte882.www5.host",
+        "input.type": "log",
+        "log.offset": 10100,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.209.237.97"
+        ],
+        "rsa.internal.event_desc": "uptateve",
+        "rsa.internal.messageid": "11023",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_subject": "Service",
+        "rsa.investigations.ec_theme": "AccessControl",
+        "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
+        "service.type": "microsoft",
+        "source.address": "ecte882.www5.host",
+        "source.ip": [
+            "10.209.237.97"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-09-19T03:09:05.000Z",
+        "event.code": "11025",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-801-11025: 11025,9/19/19,1:09:05,sci,10.61.26.207,doloreeu4417.example,ametcons,tconse,eumf,roquisq",
+        "fileset.name": "dhcp",
+        "host.hostname": "doloreeu4417.example",
+        "input.type": "log",
+        "log.offset": 10211,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.61.26.207"
+        ],
+        "rsa.internal.event_desc": "sci",
+        "rsa.internal.messageid": "11025",
+        "rsa.time.event_time": "2019-09-19T03:09:05.000Z",
+        "service.type": "microsoft",
+        "source.address": "doloreeu4417.example",
+        "source.ip": [
+            "10.61.26.207"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-03T10:11:40.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-3103-1098: 1098,10/3/19,8:11:40,tDuisau,10.139.88.194,tper4341.lan,nulamc,sint,etcon,ctobeat",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "tper4341.lan",
+        "input.type": "log",
+        "log.offset": 10319,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.139.88.194"
+        ],
+        "rsa.internal.event_desc": "tDuisau",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2019-10-03T10:11:40.000Z",
+        "service.type": "microsoft",
+        "source.address": "tper4341.lan",
+        "source.ip": [
+            "10.139.88.194"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-10-18T05:14:14.000Z",
+        "event.code": "11008",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-598-11008: 11008,10/18/19,3:14:14,lorumw,10.86.134.125,nimve4965.mail.corp,ola,ptat,quasi,tium",
+        "fileset.name": "dhcp",
+        "host.hostname": "nimve4965.mail.corp",
+        "input.type": "log",
+        "log.offset": 10420,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.86.134.125"
+        ],
+        "rsa.internal.event_desc": "lorumw",
+        "rsa.internal.messageid": "11008",
+        "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
+        "service.type": "microsoft",
+        "source.address": "nimve4965.mail.corp",
+        "source.ip": [
+            "10.86.134.125"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-01T12:16:48.000Z",
+        "event.code": "11008",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5046-11008: 11008,11/1/19,10:16:48,nul,10.41.78.169,mquisno5146.home,mipsamv,exeacomm,sequines,cto",
+        "fileset.name": "dhcp",
+        "host.hostname": "mquisno5146.home",
+        "input.type": "log",
+        "log.offset": 10523,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.41.78.169"
+        ],
+        "rsa.internal.event_desc": "nul",
+        "rsa.internal.messageid": "11008",
+        "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
+        "service.type": "microsoft",
+        "source.address": "mquisno5146.home",
+        "source.ip": [
+            "10.41.78.169"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-15T07:19:22.000Z",
+        "event.code": "11014",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5270-11014: 11014,11/15/19,5:19:22,lumquid,10.69.181.95,imaveni4500.api.localdomain,ssequamn,ave,taliqui,idi",
+        "fileset.name": "dhcp",
+        "host.hostname": "imaveni4500.api.localdomain",
+        "input.type": "log",
+        "log.offset": 10630,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.69.181.95"
+        ],
+        "rsa.internal.event_desc": "lumquid",
+        "rsa.internal.messageid": "11014",
+        "rsa.time.event_time": "2019-11-15T07:19:22.000Z",
+        "service.type": "microsoft",
+        "source.address": "imaveni4500.api.localdomain",
+        "source.ip": [
+            "10.69.181.95"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-11-30T14:21:57.000Z",
+        "event.code": "1098",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-5895-1098: 1098,11/30/19,12:21:57,mqu,10.222.6.52,veleu2874.www5.localhost,tasnu,loru,iadeser,litess",
+        "event.outcome": "failure",
+        "fileset.name": "dhcp",
+        "host.hostname": "veleu2874.www5.localhost",
+        "input.type": "log",
+        "log.offset": 10747,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.222.6.52"
+        ],
+        "rsa.internal.event_desc": "mqu",
+        "rsa.internal.messageid": "1098",
+        "rsa.investigations.ec_outcome": "Failure",
+        "rsa.investigations.ec_theme": "Communication",
+        "rsa.time.event_time": "2019-11-30T14:21:57.000Z",
+        "service.type": "microsoft",
+        "source.address": "veleu2874.www5.localhost",
+        "source.ip": [
+            "10.222.6.52"
+        ],
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-12-14T09:24:31.000Z",
+        "event.code": "ID",
+        "event.dataset": "microsoft.dhcp",
+        "event.module": "microsoft",
+        "event.original": "%MSDHCP-7704-ID: ID,12/14/19,7:24:31,quovolu,10.218.41.80,nemul5083.api.localdomain,01:00:5e:52:c7:67",
+        "fileset.name": "dhcp",
+        "host.hostname": "nemul5083.api.localdomain",
+        "input.type": "log",
+        "log.offset": 10856,
+        "observer.product": "DHCP",
+        "observer.type": "Application",
+        "observer.vendor": "Microsoft",
+        "related.ip": [
+            "10.218.41.80"
+        ],
+        "rsa.internal.event_desc": "quovolu",
+        "rsa.internal.messageid": "ID",
+        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
+        "service.type": "microsoft",
+        "source.address": "nemul5083.api.localdomain",
+        "source.ip": [
+            "10.218.41.80"
+        ],
+        "source.mac": "01:00:5e:52:c7:67",
+        "tags": [
+            "microsoft.dhcp",
+            "forwarded"
+        ]
+    }
+]

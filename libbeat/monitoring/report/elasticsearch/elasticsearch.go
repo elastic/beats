@@ -19,7 +19,6 @@ package elasticsearch
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"math/rand"
 	"net/url"
@@ -61,12 +60,6 @@ const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
-// default x-pack monitoring api parameters
-var defaultXPackParams = map[string]string{
-	"system_id":          "beats",
-	"system_api_version": "7",
-}
-
 func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
@@ -94,16 +87,11 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format:      report.FormatXPackMonitoringBulk,
 		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
 		c.Username = settings.DefaultUsername
-	}
-
-	if settings.Format != report.FormatUnknown {
-		c.Format = settings.Format
 	}
 
 	return c
@@ -168,7 +156,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 			}), nil
 	}
 
-	monitoring := monitoring.Default.GetRegistry("xpack.monitoring")
+	monitoring := monitoring.Default.GetRegistry("monitoring")
 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
@@ -345,11 +333,7 @@ func makeClient(
 		return nil, err
 	}
 
-	if config.Format != report.FormatXPackMonitoringBulk && config.Format != report.FormatBulk {
-		return nil, fmt.Errorf("unknown reporting format: %v", config.Format)
-	}
-
-	return newPublishClient(esClient, params, config.Format)
+	return newPublishClient(esClient, params)
 }
 
 func closing(log *logp.Logger, c io.Closer) {
@@ -387,11 +371,6 @@ func getClusterUUID() string {
 func makeClientParams(config config) map[string]string {
 	params := map[string]string{}
 
-	if config.Format == report.FormatXPackMonitoringBulk {
-		for k, v := range defaultXPackParams {
-			params[k] = v
-		}
-	}
 	for k, v := range config.Params {
 		params[k] = v
 	}

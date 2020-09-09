@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2019-10-18T15:30:51.027Z",
+        "azure.auditlogs.category": "AuditLogs",
         "azure.auditlogs.identity": "Device Registration Service",
         "azure.auditlogs.operation_name": "Update device",
         "azure.auditlogs.operation_version": "1.0",
@@ -28,11 +29,12 @@
         "azure.resource.provider": "Microsoft.aadiam",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "cloud.provider": "azure",
-        "event.category": "AuditLogs",
+        "event.action": "Update device",
         "event.dataset": "azure.auditlogs",
-        "event.duration": 0.0,
+        "event.duration": 0,
+        "event.kind": "event",
         "event.module": "azure",
-        "event.outcome": "Success",
+        "event.outcome": "success",
         "fileset.name": "auditlogs",
         "input.type": "log",
         "log.level": "Informational",

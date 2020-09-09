@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -40,6 +41,7 @@ const (
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
 	configFile     = "elastic-agent.yml"
+	agentDropPath  = "AGENT_DROP_PATH"
 )
 
 // Aliases for commands required by master makefile
@@ -166,12 +168,15 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
-	binaryName := "configurable"
+	configurableName := "configurable"
+	serviceableName := "serviceable"
 	if runtime.GOOS == "windows" {
-		binaryName += ".exe"
+		configurableName += ".exe"
+		serviceableName += ".exe"
 	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", binaryName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -232,9 +237,10 @@ func (Test) All() {
 }
 
 // Unit runs all the unit tests.
-func (Test) Unit() error {
+func (Test) Unit(ctx context.Context) error {
 	mg.Deps(Prepare.Env, Build.TestBinaries)
-	return RunGo("test", "-race", "-v", "-coverprofile", filepath.Join(buildDir, "coverage.out"), "./...")
+	params := devtools.DefaultGoTestUnitArgs()
+	return devtools.GoTest(ctx, params)
 }
 
 // Coverage takes the coverages report from running all the tests and display the results in the browser.
@@ -264,14 +270,30 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	packageAgent([]string{
-		"darwin-x86_64.tar.gz",
-		"linux-x86.tar.gz",
-		"linux-x86_64.tar.gz",
-		"windows-x86.zip",
-		"windows-x86_64.zip",
-		"linux-arm64.tar.gz",
-	}, devtools.UseElasticAgentPackaging)
+	platformPackages := []struct {
+		platform string
+		packages string
+	}{
+		{"darwin/amd64", "darwin-x86_64.tar.gz"},
+		{"linux/386", "linux-x86.tar.gz"},
+		{"linux/amd64", "linux-x86_64.tar.gz"},
+		{"linux/arm64", "linux-arm64.tar.gz"},
+		{"windows/386", "windows-x86.zip"},
+		{"windows/amd64", "windows-x86_64.zip"},
+	}
+
+	var requiredPackages []string
+	for _, p := range platformPackages {
+		if _, enabled := devtools.Platforms.Get(p.platform); enabled {
+			requiredPackages = append(requiredPackages, p.packages)
+		}
+	}
+
+	if len(requiredPackages) == 0 {
+		panic("elastic-agent package is expected to include other packages")
+	}
+
+	packageAgent(requiredPackages, devtools.UseElasticAgentPackaging)
 }
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
@@ -289,7 +311,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages()
+	return devtools.TestPackages(devtools.WithRootUserContainer())
 }
 
 // RunGo runs go command and output the feedback to the stdout and the stderr.
@@ -321,7 +343,7 @@ func commitID() string {
 	return commitID
 }
 
-// Update is an alias for executing fields, dashboards, config, includes.
+// Update is an alias for executing control protocol, configs, and specs.
 func Update() {
 	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
 }
@@ -339,6 +361,11 @@ func CrossBuildGoDaemon() error {
 // Config generates both the short/reference/docker.
 func Config() {
 	mg.Deps(configYML)
+}
+
+// ControlProto generates pkg/agent/control/proto module.
+func ControlProto() error {
+	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
 }
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
@@ -491,26 +518,50 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		version = release.Version()
 	}
 
-	packedBeats := []string{"filebeat", "metricbeat"}
-
-	for _, b := range packedBeats {
-		pwd, err := filepath.Abs(filepath.Join("..", b))
+	// build deps only when drop is not provided
+	if dropPathEnv, found := os.LookupEnv(agentDropPath); !found || len(dropPathEnv) == 0 {
+		// prepare new drop
+		dropPath := filepath.Join("build", "distributions", "elastic-agent-drop")
+		dropPath, err := filepath.Abs(dropPath)
 		if err != nil {
 			panic(err)
 		}
 
-		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
-			continue
+		if err := os.MkdirAll(dropPath, 0755); err != nil {
+			panic(err)
 		}
 
-		cmd := exec.Command("mage", "package")
-		cmd.Dir = pwd
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+		os.Setenv(agentDropPath, dropPath)
 
-		if err := cmd.Run(); err != nil {
-			panic(err)
+		// cleanup after build
+		defer os.RemoveAll(dropPath)
+		defer os.Unsetenv(agentDropPath)
+
+		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
+
+		for _, b := range packedBeats {
+			pwd, err := filepath.Abs(filepath.Join("..", b))
+			if err != nil {
+				panic(err)
+			}
+
+			if !requiredPackagesPresent(pwd, b, version, requiredPackages) {
+				cmd := exec.Command("mage", "package")
+				cmd.Dir = pwd
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+				if err := cmd.Run(); err != nil {
+					panic(err)
+				}
+			}
+
+			// copy to new drop
+			sourcePath := filepath.Join(pwd, "build", "distributions")
+			if err := copyAll(sourcePath, dropPath); err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -519,7 +570,24 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package)
+	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+func copyAll(from, to string) error {
+	return filepath.Walk(from, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		targetFile := filepath.Join(to, info.Name())
+
+		// overwrites with current build
+		return sh.Copy(targetFile, path)
+	})
 }
 
 func dockerTag() string {

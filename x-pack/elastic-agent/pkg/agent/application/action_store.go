@@ -33,11 +33,19 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	if err != nil {
 		return &actionStore{log: log, store: store}, nil
 	}
+	defer reader.Close()
 
 	var action actionConfigChangeSerializer
 
 	dec := yaml.NewDecoder(reader)
-	if err := dec.Decode(&action); err != nil {
+	err = dec.Decode(&action)
+	if err == io.EOF {
+		return &actionStore{
+			log:   log,
+			store: store,
+		}, nil
+	}
+	if err != nil {
 		return nil, err
 	}
 
@@ -135,6 +143,7 @@ var _ actionConfigChangeSerializer = actionConfigChangeSerializer(fleetapi.Actio
 type actionUnenrollSerializer struct {
 	ActionID   string `yaml:"action_id"`
 	ActionType string `yaml:"action_type"`
+	IsDetected bool   `yaml:"is_detected"`
 }
 
 // Add a guards between the serializer structs and the original struct.

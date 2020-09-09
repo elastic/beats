@@ -26,7 +26,7 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
-    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
@@ -37,8 +37,18 @@ pipeline {
       agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
-        expression {
-          return isCommentTrigger() || isUserTrigger() || isUpstreamTrigger()
+        anyOf {
+          triggeredBy cause: "IssueCommentCause"
+          expression {
+            def ret = isUserTrigger() || isUpstreamTrigger()
+            if(!ret){
+              currentBuild.result = 'NOT_BUILT'
+              currentBuild.description = "The build has been skipped"
+              currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
+              echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
+            }
+            return ret
+          }
         }
       }
       stages {
@@ -69,7 +79,7 @@ pipeline {
                   'x-pack/dockerlogbeat',
                   'x-pack/filebeat',
                   'x-pack/functionbeat',
-                  // 'x-pack/heartbeat',
+                   'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
                   // 'x-pack/packetbeat',
@@ -151,7 +161,6 @@ def pushCIDockerImages(){
     } else if ("${env.BEATS_FOLDER}" == "filebeat") {
       tagAndPush('filebeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
-      tagAndPush('heartbeat')
       tagAndPush('heartbeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
@@ -167,6 +176,8 @@ def pushCIDockerImages(){
       tagAndPush('elastic-agent')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
       tagAndPush('filebeat')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
+        tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
       tagAndPush('metricbeat')
     }
@@ -178,8 +189,14 @@ def tagAndPush(name){
   if("${env.SNAPSHOT}" == "true"){
     libbetaVer += "-SNAPSHOT"
   }
+
+  def tagName = "${libbetaVer}"
+  if (isPR()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
   def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${libbetaVer}"
+  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
   def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
   retry(3){
@@ -212,13 +229,30 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+  if (isPR()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+  }
+  def beatsFolderName = getBeatsName(baseDir)
+  googleStorageUpload(bucket: "${bucketUri}/${beatsFolderName}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
     pattern: "${baseDir}/build/distributions/**/*",
     sharedPublicly: true,
     showInline: true
   )
+}
+
+/**
+* There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
+* therefore the storage bucket in GCP should follow the same folder structure.
+* This is required by https://github.com/elastic/beats-tester
+* e.g.
+* baseDir=name -> return name
+* baseDir=name1/name2/name3-> return name2
+*/
+def getBeatsName(baseDir) {
+  return baseDir.replace('x-pack/', '')
 }
 
 def withBeatsEnv(Closure body) {

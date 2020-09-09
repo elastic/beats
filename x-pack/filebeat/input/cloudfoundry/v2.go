@@ -5,86 +5,51 @@
 package cloudfoundry
 
 import (
-	"context"
-	"sync"
-
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
-// InputV2 defines a Cloudfoundry input that uses the consumer V2 API
-type InputV2 struct {
-	sync.Mutex
-	listener *cloudfoundry.RlpListener
-	started  bool
-	log      *logp.Logger
-	outlet   channel.Outleter
+// inputV2 defines a Cloudfoundry input that uses the consumer V2 API
+type inputV2 struct {
+	config cloudfoundry.Config
 }
 
-func newInputV2(log *logp.Logger, conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV2, error) {
-	hub := cloudfoundry.NewHub(&conf, "filebeat", log)
-	forwarder := harvester.NewForwarder(out)
+func configureV2(config cloudfoundry.Config) (*inputV2, error) {
+	return &inputV2{config: config}, nil
+}
+
+func (i *inputV2) Name() string { return "cloudfoundry-v2" }
+
+func (i *inputV2) Test(ctx v2.TestContext) error {
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", ctx.Logger)
+	_, err := hub.Client()
+	return err
+}
+
+func (i *inputV2) Run(ctx v2.Context, publisher stateless.Publisher) error {
+	log := ctx.Logger
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", log)
+
 	callbacks := cloudfoundry.RlpListenerCallbacks{
 		HttpAccess: func(evt *cloudfoundry.EventHttpAccess) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
+			publisher.Publish(createEvent(evt))
 		},
 		Log: func(evt *cloudfoundry.EventLog) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
+			publisher.Publish(createEvent(evt))
 		},
 		Error: func(evt *cloudfoundry.EventError) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
+			publisher.Publish(createEvent(evt))
 		},
 	}
 
 	listener, err := hub.RlpListener(callbacks)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &InputV2{
-		outlet:   out,
-		listener: listener,
-		started:  false,
-		log:      log,
-	}, nil
-}
 
-// Run starts the listener of cloudfoundry events
-func (p *InputV2) Run() {
-	p.Lock()
-	defer p.Unlock()
-
-	if !p.started {
-		p.log.Info("starting cloudfoundry input")
-		p.listener.Start(context.TODO())
-		p.started = true
-	}
-}
-
-// Stop stops cloudfoundry listener
-func (p *InputV2) Stop() {
-	defer p.outlet.Close()
-	p.Lock()
-	defer p.Unlock()
-
-	p.log.Info("stopping cloudfoundry input")
-	p.listener.Stop()
-	p.started = false
-}
-
-// Wait waits for the input to finalize, and stops it
-func (p *InputV2) Wait() {
-	p.Stop()
+	listener.Start(ctxtool.FromCanceller(ctx.Cancelation))
+	listener.Wait()
+	return nil
 }

@@ -5,159 +5,78 @@
 package application
 
 import (
-	"fmt"
-	"time"
+	"io/ioutil"
 
+	"github.com/elastic/go-ucfg"
+
+	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
-	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
-	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
-
-// Config define the configuration of the Agent.
-type Config struct {
-	Management *config.Config `config:"management"`
-}
-
-func localDefaultConfig() *Config {
-	localModeCfg, _ := config.NewConfigFrom(map[string]interface{}{
-		"mode": "local",
-	})
-
-	return &Config{
-		Management: localModeCfg,
-	}
-}
-
-type managementMode int
-
-// Define the supported mode of management.
-const (
-	localMode managementMode = iota + 1
-	fleetMode
-)
-
-var managementModeMap = map[string]managementMode{
-	"local": localMode,
-	"fleet": fleetMode,
-}
-
-func (m *managementMode) Unpack(v string) error {
-	mgt, ok := managementModeMap[v]
-	if !ok {
-		return fmt.Errorf(
-			"unknown management mode, received '%s' and valid values are local or fleet",
-			v,
-		)
-	}
-	*m = mgt
-	return nil
-}
-
-// ManagementConfig defines the options for the running of the beats.
-type ManagementConfig struct {
-	Mode      managementMode      `config:"mode"`
-	Reporting *logreporter.Config `config:"reporting.log"`
-}
-
-func defaultManagementConfig() *ManagementConfig {
-	return &ManagementConfig{
-		Mode: localMode,
-	}
-}
 
 type localConfig struct {
-	Management *localManagementConfig `config:"management" yaml:"management"`
+	Fleet    *configuration.FleetAgentConfig `config:"fleet"`
+	Settings *configuration.SettingsConfig   `config:"agent" yaml:"agent"`
 }
 
-type localManagementConfig struct {
-	Reload    *reloadConfig       `config:"reload" yaml:"reload"`
-	Path      string              `config:"path" yaml:"path"`
-	Reporting *logreporter.Config `config:"reporting" yaml:"reporting"`
-}
+func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+	cfg := configuration.DefaultFleetAgentConfig()
+	cfg.Enabled = true
+	cfg.AccessAPIKey = accessAPIKey
+	cfg.Kibana = kbn
 
-type reloadConfig struct {
-	Enabled bool          `config:"enabled" yaml:"enabled"`
-	Period  time.Duration `config:"period" yaml:"period"`
-}
-
-func (r *reloadConfig) Validate() error {
-	if r.Enabled {
-		if r.Period <= 0 {
-			return ErrInvalidPeriod
-		}
-	}
-	return nil
-}
-
-func localConfigDefault() *localConfig {
-	return &localConfig{
-		Management: &localManagementConfig{
-			Reload: &reloadConfig{
-				Enabled: true,
-				Period:  10 * time.Second,
-			},
-			Reporting: logreporter.DefaultLogConfig(),
-		},
-	}
-}
-
-// FleetAgentConfig is the internal configuration of the agent after the enrollment is done,
-// this configuration is not exposed in anyway in the elastic-agent.yml and is only internal configuration.
-type FleetAgentConfig struct {
-	API       *APIAccess    `config:"api" yaml:"api"`
-	Reporting *LogReporting `config:"reporting" yaml:"reporting"`
-	Info      *AgentInfo    `config:"agent" yaml:"agent"`
-}
-
-// AgentInfo is a set of agent information.
-type AgentInfo struct {
-	ID string `json:"id" yaml:"id" config:"id"`
-}
-
-// APIAccess contains the required details to connect to the Kibana endpoint.
-type APIAccess struct {
-	AccessAPIKey string         `config:"access_api_key" yaml:"access_api_key"`
-	Kibana       *kibana.Config `config:"kibana" yaml:"kibana"`
-}
-
-// LogReporting define the fleet options for log reporting.
-type LogReporting struct {
-	Log   *logreporter.Config             `config:"log" yaml:"log"`
-	Fleet *fleetreporter.ManagementConfig `config:"fleet" yaml:"fleet"`
-}
-
-// Validate validates the required fields for accessing the API.
-func (e *APIAccess) Validate() error {
-	if len(e.AccessAPIKey) == 0 {
-		return errors.New("empty access token", errors.TypeConfig)
-	}
-
-	if e.Kibana == nil || len(e.Kibana.Host) == 0 {
-		return errors.New("missing Kibana host configuration", errors.TypeConfig)
-	}
-
-	return nil
-}
-
-func defaultFleetAgentConfig() *FleetAgentConfig {
-	return &FleetAgentConfig{
-		Reporting: &LogReporting{
-			Log:   logreporter.DefaultLogConfig(),
-			Fleet: fleetreporter.DefaultFleetManagementConfig(),
-		},
-		Info: &AgentInfo{},
-	}
-}
-
-func createFleetConfigFromEnroll(agentID string, access *APIAccess) (*FleetAgentConfig, error) {
-	if err := access.Validate(); err != nil {
+	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
-
-	cfg := defaultFleetAgentConfig()
-	cfg.API = access
-	cfg.Info.ID = agentID
 	return cfg, nil
+}
+
+// LoadConfigFromFile loads the Agent configuration from a file.
+//
+// This must be used to load the Agent configuration, so that variables defined in the inputs are not
+// parsed by go-ucfg. Variables from the inputs should be parsed by the transpiler.
+func LoadConfigFromFile(path string) (*config.Config, error) {
+	in, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]interface{}
+	if err := yaml.Unmarshal(in, &m); err != nil {
+		return nil, err
+	}
+	return LoadConfig(m)
+}
+
+// LoadConfig loads the Agent configuration from a map.
+//
+// This must be used to load the Agent configuration, so that variables defined in the inputs are not
+// parsed by go-ucfg. Variables from the inputs should be parsed by the transpiler.
+func LoadConfig(m map[string]interface{}) (*config.Config, error) {
+	inputs, ok := m["inputs"]
+	if ok {
+		// remove the inputs
+		delete(m, "inputs")
+	}
+	cfg, err := config.NewConfigFrom(m)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		inputsOnly := map[string]interface{}{
+			"inputs": inputs,
+		}
+		// convert to config without variable substitution
+		inputsCfg, err := config.NewConfigFrom(inputsOnly, ucfg.PathSep("."), ucfg.ResolveNOOP)
+		if err != nil {
+			return nil, err
+		}
+		err = cfg.Merge(inputsCfg, ucfg.PathSep("."), ucfg.ResolveNOOP)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cfg, err
 }

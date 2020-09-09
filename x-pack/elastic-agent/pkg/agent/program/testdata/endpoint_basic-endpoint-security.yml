@@ -1,3 +1,4 @@
+revision: 5
 fleet:
   agent:
     id: fleet-agent-id
@@ -20,12 +21,13 @@ output:
 
 inputs:
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22

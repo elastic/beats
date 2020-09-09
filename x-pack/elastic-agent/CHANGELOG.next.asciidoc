@@ -1,0 +1,21 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+=== Elastic Agent version HEAD
+
+==== Breaking changes
+
+==== Bugfixes
+
+==== New features
+
+- Prepare packaging for endpoint and asc files {pull}20186[20186]
+- Improved version CLI {pull}20359[20359]
+- Enroll CLI now restarts running daemon {pull}20359[20359]
+- Add restart CLI cmd {pull}20359[20359]
+- Add new `synthetics/*` inputs to run Heartbeat {pull}20387[20387]
+- Users of the Docker image can now pass `FLEET_ENROLL_INSECURE=1` to include the `--insecure` flag with the `elastic-agent enroll` command {issue}20312[20312] {pull}20713[20713]
+- Add support for dynamic inputs with providers and `{{variable|"default"}}` substitution. {pull}20839[20839]
+- Add support for EQL based condition on inputs {pull}20994[20994]

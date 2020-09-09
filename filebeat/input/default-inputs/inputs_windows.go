@@ -20,6 +20,7 @@ package inputs
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/filebeat/input/winlog"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -30,7 +31,6 @@ type osComponents interface {
 
 func osInputs(info beat.Info, log *logp.Logger, components osComponents) []v2.Plugin {
 	return []v2.Plugin{
-		// windows events logs are not available yet
-		// winlog.Plugin(log, components),
+		winlog.Plugin(log, components),
 	}
 }
