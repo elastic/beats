@@ -176,7 +176,7 @@ class LogState:
         if ignore_case:
             msg = msg.lower()
 
-        if type(msg) == REGEXP_TYPE:
+        if isinstance(msg, REGEXP_TYPE):
             def match(x): return msg.search(x) is not None
         else:
             def match(x): return x.find(msg) >= 0
