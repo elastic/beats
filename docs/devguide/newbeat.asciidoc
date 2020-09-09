@@ -162,7 +162,7 @@ To fetch dependencies and set up the Beat, run:
 [source,shell]
 ---------
 cd ${GOPATH}/src/github.com/{user}/countbeat
-make setup
+make update
 ---------
 
 The Beat now contains the basic config file, `countbeat.yml`, and template files. The Beat is "complete" in the sense
