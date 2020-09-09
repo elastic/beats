@@ -761,6 +761,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
+- Sanitize `event.host`. {pull}21022[21022]
 
 *Packetbeat*
 
