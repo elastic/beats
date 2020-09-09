@@ -286,6 +286,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
 - Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
 - Update documentation in the azure module filebeat. {pull}20815[20815]
+- Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 
 *Heartbeat*
 
@@ -637,6 +638,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
 - Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
+- Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
 
 *Heartbeat*
 
