@@ -675,6 +675,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 
 *Packetbeat*
 
