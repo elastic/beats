@@ -1,6 +1,5 @@
 {
   "action": "checkin",
-  "success": true,
   "actions": [
     {
       "type": "POLICY_CHANGE",

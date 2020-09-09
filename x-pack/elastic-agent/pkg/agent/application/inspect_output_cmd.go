@@ -5,27 +5,31 @@
 package application
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 )
 
-// IntrospectOutputCmd is an introspect subcommand that shows configurations of the agent.
-type IntrospectOutputCmd struct {
+// InspectOutputCmd is an inspect subcommand that shows configurations of the agent.
+type InspectOutputCmd struct {
 	cfgPath string
 	output  string
 	program string
 }
 
-// NewIntrospectOutputCmd creates a new introspect command.
-func NewIntrospectOutputCmd(configPath, output, program string) (*IntrospectOutputCmd, error) {
-	return &IntrospectOutputCmd{
+// NewInspectOutputCmd creates a new inspect command.
+func NewInspectOutputCmd(configPath, output, program string) (*InspectOutputCmd, error) {
+	return &InspectOutputCmd{
 		cfgPath: configPath,
 		output:  output,
 		program: program,
@@ -33,15 +37,15 @@ func NewIntrospectOutputCmd(configPath, output, program string) (*IntrospectOutp
 }
 
 // Execute tries to enroll the agent into Fleet.
-func (c *IntrospectOutputCmd) Execute() error {
+func (c *InspectOutputCmd) Execute() error {
 	if c.output == "" {
-		return c.introspectOutputs()
+		return c.inspectOutputs()
 	}
 
-	return c.introspectOutput()
+	return c.inspectOutput()
 }
 
-func (c *IntrospectOutputCmd) introspectOutputs() error {
+func (c *InspectOutputCmd) inspectOutputs() error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -94,7 +98,7 @@ func listOutputsFromMap(log *logger.Logger, cfg map[string]interface{}) error {
 	return listOutputsFromConfig(log, c)
 }
 
-func (c *IntrospectOutputCmd) introspectOutput() error {
+func (c *InspectOutputCmd) inspectOutput() error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -149,7 +153,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		}
 
 		if !programFound {
-			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs",
+			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent inspect output` to find available outputs",
 				programName,
 				output)
 		}
@@ -157,7 +161,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		return nil
 	}
 
-	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs", output)
+	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent inspect output` to find available outputs", output)
 
 }
 
@@ -173,8 +177,17 @@ func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[
 func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][]program.Program, error) {
 	monitor := noop.NewMonitor()
 	router := &inmemRouter{}
-	emit := emitter(
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	composableCtrl, err := composable.New(cfg)
+	if err != nil {
+		return nil, err
+	}
+	composableWaiter := newWaitForCompose(composableCtrl)
+	emit, err := emitter(
+		ctx,
 		log,
+		composableWaiter,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
@@ -182,10 +195,14 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := emit(cfg); err != nil {
 		return nil, err
 	}
+	composableWaiter.Wait()
 	return router.programs, nil
 }
 
@@ -200,4 +217,28 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Progr
 
 func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+}
+
+type waitForCompose struct {
+	controller composable.Controller
+	done       chan bool
+}
+
+func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
+	return &waitForCompose{
+		controller: wrapped,
+		done:       make(chan bool),
+	}
+}
+
+func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
+	err := w.controller.Run(ctx, func(vars []transpiler.Vars) {
+		cb(vars)
+		w.done <- true
+	})
+	return err
+}
+
+func (w *waitForCompose) Wait() {
+	<-w.done
 }

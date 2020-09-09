@@ -25,7 +25,6 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 	var metrics []azure.Metric
 	for _, resource := range resources {
 		// return resource size
-		resourceSize := mapResourceSize(resource)
 		for _, metric := range resourceConfig.Metrics {
 			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
 			if err != nil {
@@ -77,7 +76,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				if key != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 				}
-				metrics = append(metrics, client.MapMetricByPrimaryAggregation(metricGroup, resource, "", resourceSize, metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(metricGroup, *resource.ID, "", metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
 			}
 		}
 	}

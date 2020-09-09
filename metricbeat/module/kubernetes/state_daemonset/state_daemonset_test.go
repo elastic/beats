@@ -15,18 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package input
+// +build !integration
+
+package state_daemonset
 
 import (
-	"fmt"
+	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-// ErrInputNotFinished struct for reporting errors related to not finished inputs
-type ErrInputNotFinished struct {
-	State string
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", "state_daemonset",
+		ptest.TestCases{
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.3.0",
+				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
+			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
+			},
+		},
+	)
 }
 
-// Error method of ErrInputNotFinished
-func (e *ErrInputNotFinished) Error() string {
-	return fmt.Sprintf("Can only start an input when all related states are finished: %+v", e.State)
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_daemonset")
 }
