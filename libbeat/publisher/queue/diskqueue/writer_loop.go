@@ -131,19 +131,19 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 		// to writing this block unless the queue is closed in the meantime.
 		frameSize := uint32(frameRequest.frame.sizeOnDisk())
 		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
-		bytesWritten += 4
-		n, err := wl.outputFile.Write(frameRequest.frame.serialized)
-		bytesWritten += int64(n)
 		// TODO: retry forever if there is an error or n isn't the right
 		// length.
+		n, err := wl.outputFile.Write(frameRequest.frame.serialized)
 		if err != nil {
 			wl.logger.Errorf("Couldn't write pending data to disk: %w", err)
 		}
-		// empty crc
-		binary.Write(wl.outputFile, binary.LittleEndian, uint32(0))
-		// duplicate length
+		// Compute / write the frame's checksum
+		checksum := computeChecksum(
+			frameRequest.frame.serialized, wl.settings.ChecksumType)
+		binary.Write(wl.outputFile, binary.LittleEndian, checksum)
+		// Write the frame footer's (duplicate) length
 		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
-		bytesWritten += 8
+		bytesWritten += int64(n) + frameMetadataSize
 	}
 	if bytesWritten > 0 {
 		segments = append(segments, writerSegmentMetadata{

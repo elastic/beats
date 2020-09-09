@@ -197,7 +197,6 @@ func (rl *readerLoop) nextFrame(
 	// Read the actual frame data
 	dataLength := frameLength - frameMetadataSize
 	bytes := rl.decoder.Buffer(int(dataLength))
-	//bytes := make([]byte, dataLength)
 	_, err = reader.Read(bytes)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read data frame: %w", err)
@@ -209,10 +208,13 @@ func (rl *readerLoop) nextFrame(
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read data frame checksum: %w", err)
 	}
-	// TODO: validate checksum
-	/*if computeChecksum(data, reader.checksumType) != checksum {
-		return nil, fmt.Errorf("Disk queue: bad data frame checksum")
-	}*/
+	if rl.settings.ChecksumType != ChecksumTypeNone {
+		expected := computeChecksum(bytes, rl.settings.ChecksumType)
+		if checksum != expected {
+			return nil, fmt.Errorf(
+				"Data frame checksum mismatch (%x != %x)", checksum, expected)
+		}
+	}
 
 	var duplicateLength uint32
 	err = binary.Read(reader, binary.LittleEndian, &duplicateLength)
@@ -274,58 +276,3 @@ func (r autoRetryReader) Read(p []byte) (int, error) {
 func readErrorIsRetriable(err error) bool {
 	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }
-
-/*func (dq *diskQueue) readerLoop() {
-	curFrameID := frameID(0)
-	logger := dq.settings.Logger.Named("readerLoop")
-	for {
-		dq.frameWrittenCond.Wait()
-		reader, errs := dq.nextSegmentReader()
-		for _, err := range errs {
-			// Errors encountered while reading should be logged.
-			logger.Error(err)
-		}
-		if reader == nil {
-			// We couldn't find a readable segment, wait for a new
-			// data frame to be written.
-			dq.frameWrittenCond.Wait()
-			if dq.closedForRead.Load() {
-				// The queue has been closed, shut down.
-				// TODO: cleanup (write the final read position)
-				return
-			}
-			continue
-		}
-		// If we made it here, we have a nonempty reader and we want
-		// to send all its frames to dq.outChan.
-		framesRead := int64(0)
-		for {
-			bytes, err := reader.nextDataFrame()
-			if err != nil {
-				// An error at this stage generally means there has been
-				// data corruption. For now, in this case we log the
-				// error, then discard any remaining frames. When all
-				// successfully read frames have been acknowledged, we
-				// delete the underlying file.
-				break
-			}
-			if bytes == nil {
-				// If bytes is nil with no error, we've reached the end
-				// of this segmentReader. Update the segment's frame count.
-				break
-			}
-			framesRead++
-			output := diskQueueOutput{
-				data:    bytes,
-				segment: reader.segment,
-				frame:   curFrameID,
-			}
-			select {
-			case dq.outChan <- output:
-				curFrameID++
-			case <-dq.done:
-			}
-		}
-		reader.segment.framesRead += framesRead
-	}
-}*/
