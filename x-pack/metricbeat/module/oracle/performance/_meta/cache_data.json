@@ -6,7 +6,8 @@
         "module": "oracle"
     },
     "metricset": {
-        "name": "performance"
+        "name": "performance",
+        "period": 10000
     },
     "oracle": {
         "performance": {
@@ -14,19 +15,19 @@
             "cache": {
                 "buffer": {
                     "hit": {
-                        "pct": 0.9636984728969045
+                        "pct": 0.970465382180896
                     }
                 },
                 "get": {
-                    "consistent": 477505,
-                    "db_blocks": 66990
+                    "consistent": 604979,
+                    "db_blocks": 88580
                 },
-                "physical_reads": 19766
+                "physical_reads": 20484
             }
         }
     },
     "service": {
-        "address": "oracle://sys:Oradoc_db1@localhost/ORCLPDB1.localdomain?connectionClass=\u0026poolIncrement=0\u0026poolMaxSessions=0\u0026poolMinSessions=0\u0026sysdba=1\u0026sysoper=0\u0026sysasm=0\u0026standaloneConnection=0\u0026enableEvents=0\u0026heterogeneousPool=0\u0026prelim=0",
+        "address": "localhost:32769",
         "type": "oracle"
     }
 }
