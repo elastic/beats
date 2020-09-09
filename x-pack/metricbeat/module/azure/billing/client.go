@@ -30,7 +30,7 @@ type Usage struct {
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	usageService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
+	usageService, err := NewService(config)
 	if err != nil {
 		return nil, err
 	}

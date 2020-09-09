@@ -7,6 +7,8 @@ package billing
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -34,11 +36,36 @@ type MetricSet struct {
 
 // Config options
 type Config struct {
-	ClientId       string        `config:"client_id"    validate:"required"`
-	ClientSecret   string        `config:"client_secret" validate:"required"`
-	TenantId       string        `config:"tenant_id" validate:"required"`
-	SubscriptionId string        `config:"subscription_id" validate:"required"`
-	Period         time.Duration `config:"period" validate:"nonzero,required"`
+	ClientId                string        `config:"client_id"    validate:"required"`
+	ClientSecret            string        `config:"client_secret" validate:"required"`
+	TenantId                string        `config:"tenant_id" validate:"required"`
+	SubscriptionId          string        `config:"subscription_id" validate:"required"`
+	Period                  time.Duration `config:"period" validate:"nonzero,required"`
+	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
+	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
+}
+
+func (conf *Config) Validate() error {
+	if conf.ResourceManagerEndpoint == "" {
+		conf.ResourceManagerEndpoint = azure.DefaultBaseURI
+	}
+	if conf.ActiveDirectoryEndpoint == "" {
+		ok, err := azure.AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
+		if err != nil {
+			return err
+		}
+		if ok {
+			add, err := azure.AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
+			if err != nil {
+				return err
+			}
+			conf.ActiveDirectoryEndpoint = add.(string)
+		}
+		if conf.ActiveDirectoryEndpoint == "" {
+			return errors.New("no active directory endpoint has been configured")
+		}
+	}
+	return nil
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking

@@ -29,16 +29,18 @@ type MonitorService struct {
 const metricNameLimit = 20
 
 // NewService instantiates the Azure monitoring service
-func NewService(clientId string, clientSecret string, tenantId string, subscriptionId string) (*MonitorService, error) {
-	clientConfig := auth.NewClientCredentialsConfig(clientId, clientSecret, tenantId)
+func NewService(config Config) (*MonitorService, error) {
+	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
+	clientConfig.AADEndpoint = config.ActiveDirectoryEndpoint
+	clientConfig.Resource = config.ResourceManagerEndpoint
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
 		return nil, err
 	}
-	metricsClient := insights.NewMetricsClient(subscriptionId)
-	metricsDefinitionClient := insights.NewMetricDefinitionsClient(subscriptionId)
-	resourceClient := resources.NewClient(subscriptionId)
-	metricNamespaceClient := insights.NewMetricNamespacesClient(subscriptionId)
+	metricsClient := insights.NewMetricsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	metricsDefinitionClient := insights.NewMetricDefinitionsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	resourceClient := resources.NewClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	metricNamespaceClient := insights.NewMetricNamespacesClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	metricsClient.Authorizer = authorizer
 	metricsDefinitionClient.Authorizer = authorizer
 	resourceClient.Authorizer = authorizer

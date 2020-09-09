@@ -22,14 +22,16 @@ type UsageService struct {
 }
 
 // NewService instantiates the Azure monitoring service
-func NewService(clientId string, clientSecret string, tenantId string, subscriptionId string) (*UsageService, error) {
-	clientConfig := auth.NewClientCredentialsConfig(clientId, clientSecret, tenantId)
+func NewService(config Config) (*UsageService, error) {
+	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
+	clientConfig.AADEndpoint = config.ActiveDirectoryEndpoint
+	clientConfig.Resource = config.ResourceManagerEndpoint
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
 		return nil, err
 	}
-	forcastsClient := consumption.NewForecastsClient(subscriptionId)
-	usageDetailsClient := consumption.NewUsageDetailsClient(subscriptionId)
+	forcastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	forcastsClient.Authorizer = authorizer
 	usageDetailsClient.Authorizer = authorizer
 	service := &UsageService{

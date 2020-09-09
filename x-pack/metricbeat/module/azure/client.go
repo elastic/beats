@@ -32,7 +32,7 @@ type mapResourceMetrics func(client *Client, resources []resources.GenericResour
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
+	azureMonitorService, err := NewService(config)
 	if err != nil {
 		return nil, err
 	}
