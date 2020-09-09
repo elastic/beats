@@ -17,7 +17,6 @@ import (
 
 	"golang.org/x/crypto/openpgp"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
@@ -65,6 +64,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		// remove bits so they can be redownloaded
 		os.Remove(fullPath)
 		os.Remove(fullPath + ".sha512")
+		os.Remove(fullPath + ".asc")
 		return isMatch, err
 	}
 
@@ -94,7 +94,7 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	}
 
 	if expectedHash == "" {
-		return false, fmt.Errorf("hash for '%s' not found", filename)
+		return false, fmt.Errorf("hash for '%s' not found in '%s'", filename, hashFilePath)
 	}
 
 	// compute file hash
@@ -119,7 +119,7 @@ func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 		return true, nil
 	}
 
-	ascBytes, err := v.getPublicAsc(filename)
+	ascBytes, err := v.getPublicAsc(fullPath)
 	if err != nil && v.allowEmptyPgp {
 		// asc not available but we allow empty for dev use-case
 		return true, nil
@@ -147,10 +147,8 @@ func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 	return true, nil
 }
 
-func (v *Verifier) getPublicAsc(filename string) ([]byte, error) {
-	ascFile := fmt.Sprintf("%s%s", filename, ascSuffix)
-	fullPath := filepath.Join(paths.Home(), "downloads", ascFile)
-
+func (v *Verifier) getPublicAsc(fullPath string) ([]byte, error) {
+	fullPath = fmt.Sprintf("%s%s", fullPath, ascSuffix)
 	b, err := ioutil.ReadFile(fullPath)
 	if err != nil {
 		return nil, errors.New(err, fmt.Sprintf("fetching asc file from '%s'", fullPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))

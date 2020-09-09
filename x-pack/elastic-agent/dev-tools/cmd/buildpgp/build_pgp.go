@@ -36,8 +36,6 @@ var tmplPgp = template.Must(template.New("pgp").Parse(`
 package release
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/packer"
 )
 

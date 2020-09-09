@@ -118,7 +118,7 @@ func init() {
 		panic(errors.Wrap(err, "failed to parse SNAPSHOT env value"))
 	}
 
-	DevBuild, err = strconv.ParseBool(EnvOr("DEV", ""))
+	DevBuild, err = strconv.ParseBool(EnvOr("DEV", "false"))
 	if err != nil {
 		panic(errors.Wrap(err, "failed to parse DEV env value"))
 	}

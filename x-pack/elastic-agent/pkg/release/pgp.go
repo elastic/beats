@@ -7,8 +7,6 @@
 package release
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/packer"
 )
 
@@ -23,6 +21,5 @@ func init() {
 
 // PGP return pgpbytes and a flag describing whether or not no pgp is valid.
 func PGP() (bool, []byte) {
-	fmt.Printf(">>>> got bytes: '%v' %v", allowEmptyPgp, string(pgpBytes))
 	return allowEmptyPgp == "true", pgpBytes
 }

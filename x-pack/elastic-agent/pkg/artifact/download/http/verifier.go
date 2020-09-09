@@ -77,6 +77,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		// remove bits so they can be redownloaded
 		os.Remove(fullPath)
 		os.Remove(fullPath + ".sha512")
+		os.Remove(fullPath + ".asc")
 		return isMatch, err
 	}
 
