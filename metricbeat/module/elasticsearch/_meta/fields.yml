@@ -21,6 +21,9 @@
         - name: name
           type: alias
           path: elasticsearch.node.name
+    - name: job.stats.job_id
+      type: alias
+      path: elasticsearch.ml.job.id
     - name: node_stats
       type: group
       fields:
