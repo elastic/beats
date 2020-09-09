@@ -19,14 +19,13 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.1
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
-	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
-	github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb
+	github.com/antlr/antlr4 v0.0.0-20200820155224-be881fa6b91d
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0

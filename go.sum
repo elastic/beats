@@ -108,8 +108,8 @@ github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:cI59GRkC
 github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43 h1:WFwa9pqou0Nb4DdfBOyaBTH0GqLE74Qwdf61E7ITHwQ=
 github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43/go.mod h1:tJPYQG4mnMeUtQvQKNkbsFrnmZOg59Qnf8CcctFv5v4=
 github.com/antihax/optional v0.0.0-20180407024304-ca021399b1a6/go.mod h1:V8iCPQYkqmusNa815XgQio277wI47sdRh1dUOLdyC6Q=
-github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb h1:jGlQhNsk+RHK5IFSvL5wUi+ed8HZPBR2ovtGyahWOcU=
-github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb/go.mod h1:T7PbCXFs94rrTttyxjbyT5+/1V8T2TYDejxUfHJjw1Y=
+github.com/antlr/antlr4 v0.0.0-20200820155224-be881fa6b91d h1:OE3kzLBpy7pOJEzE55j9sdgrSilUPzzj++FWvp1cmIs=
+github.com/antlr/antlr4 v0.0.0-20200820155224-be881fa6b91d/go.mod h1:T7PbCXFs94rrTttyxjbyT5+/1V8T2TYDejxUfHJjw1Y=
 github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 h1:afT88tB6u9JCKQZVAAaa9ICz/uGn5Uw9ekn6P22mYKM=
 github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77/go.mod h1:bXvGk6IkT1Agy7qzJ+DjIw/SJ1AaB3AvAuMDVV+Vkoo=
 github.com/armon/go-radix v1.0.0 h1:F4z6KzEeeQIMeLFa97iZU6vupzoecKdU5TX24SNppXI=

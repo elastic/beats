@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -191,7 +190,6 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.ConstraintFilter},
 		},
 		monitor,
 	)
@@ -232,7 +230,7 @@ func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
 }
 
 func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
-	err := w.controller.Run(ctx, func(vars []transpiler.Vars) {
+	err := w.controller.Run(ctx, func(vars []*transpiler.Vars) {
 		cb(vars)
 		w.done <- true
 	})
