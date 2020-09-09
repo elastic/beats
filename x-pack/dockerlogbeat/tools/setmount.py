@@ -39,10 +39,12 @@ For example: `./setmount.py --to_tar /path/to/write/tar/new_plugin.tar.gz /path/
 To generate a docker plugin from the tarball, unpack the `.tar.gz` archive, and then run `docker plugin create NEW_PLUGIN_NAME PATH_TO_UNPACKED_DIRECTORY`.
 """
 
+
 def cleanup(tmpfs: str):
     """cleanup our tmpdir"""
     print("cleaning up", tmpfs)
     shutil.rmtree(tmpfs)
+
 
 def build_archive(tmpfs: str, target: str, name: str, tag: str):
     """build a tar.gz archive of the plugin build manifest"""
@@ -133,6 +135,7 @@ def setup_create(config: dict, rootfs_raw: bytes, mount_source: str):
 
     return tempdir
 
+
 def setup_session():
     """Setup a stateful session to the registry."""
 
@@ -163,10 +166,11 @@ def setup_session():
 
     return session
 
+
 def get_tag(session: requests.Session, from_release: str):
     """Get the correct tag. 'latest' doesn't seem to play nice with plugins."""
 
-    tags_url = API_URL + "/" + PLUGIN_URI +"/tags/list"
+    tags_url = API_URL + "/" + PLUGIN_URI + "/tags/list"
     tags_resp = session.get(tags_url)
     tags_resp.raise_for_status()
     tags = tags_resp.json()["tags"]
@@ -177,6 +181,7 @@ def get_tag(session: requests.Session, from_release: str):
         print("Available tags: ", tags)
         sys.exit(1)
     return tags[-1]
+
 
 def get_manifest(session: requests.Session, latest_tag: str):
     """get the plugin manifest file"""
