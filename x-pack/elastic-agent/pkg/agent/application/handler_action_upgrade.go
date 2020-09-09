@@ -17,6 +17,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -136,7 +137,20 @@ func (h *handlerUpgrade) unpack(ctx context.Context, action *fleetapi.ActionUpgr
 
 // changeSymlink changes root symlink so it points to updated version
 func (h *handlerUpgrade) changeSymlink(ctx context.Context, action *fleetapi.ActionUpgrade, newHash string) error {
-	return errors.New("not yet implemented")
+	// create symlink to elastic-agent-{hash}
+	hashedDir := fmt.Sprintf("%s-%s", agentName, newHash)
+	originalPath := filepath.Join(paths.Home(), agentName)
+	newPath := filepath.Join(paths.Data(), hashedDir, agentName)
+
+	agentBakName := agentName + ".bak"
+	bakNewPath := filepath.Join(paths.Data(), hashedDir, agentBakName)
+
+	if err := os.Symlink(bakNewPath, originalPath); err != nil {
+		return err
+	}
+
+	// safely rotate
+	return file.SafeFileRotate(newPath, bakNewPath)
 }
 
 // markUpgrade marks update happened so we can handle grace period
