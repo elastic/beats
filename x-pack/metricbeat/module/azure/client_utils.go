@@ -5,7 +5,6 @@
 package azure
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -87,7 +86,7 @@ func metricIsEmpty(metric insights.MetricValue) bool {
 
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.Resource.Id == met.Resource.Id &&
+	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
 		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
 		return true
 	}
@@ -103,27 +102,6 @@ func getResourceGroupFromId(path string) string {
 		}
 	}
 	return ""
-}
-
-// getResourceTypeFromId maps resource group from resource ID
-func getResourceTypeFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "providers" {
-			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
-		}
-	}
-	return ""
-}
-
-// getResourceNameFormId maps resource group from resource ID
-func getResourceNameFromId(path string) string {
-	params := strings.Split(path, "/")
-	if strings.HasSuffix(path, "/") {
-		return params[len(params)-2]
-	}
-	return params[len(params)-1]
-
 }
 
 // mapTags maps resource tags
@@ -181,10 +159,10 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	grouped := make(map[string][]Metric)
 	for _, metric := range metrics {
-		if _, ok := grouped[metric.Resource.Id]; !ok {
-			grouped[metric.Resource.Id] = make([]Metric, 0)
+		if _, ok := grouped[metric.ResourceId]; !ok {
+			grouped[metric.ResourceId] = make([]Metric, 0)
 		}
-		grouped[metric.Resource.Id] = append(grouped[metric.Resource.Id], metric)
+		grouped[metric.ResourceId] = append(grouped[metric.ResourceId], metric)
 	}
 	return grouped
 }
@@ -193,6 +171,15 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 func ContainsDimension(dimension string, dimensions []insights.LocalizableString) bool {
 	for _, dim := range dimensions {
 		if *dim.Value == dimension {
+			return true
+		}
+	}
+	return false
+}
+
+func containsResource(resId string, resources []Resource) bool {
+	for _, res := range resources {
+		if res.Id == resId {
 			return true
 		}
 	}

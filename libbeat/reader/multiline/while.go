@@ -18,6 +18,8 @@
 package multiline
 
 import (
+	"io"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -222,4 +224,13 @@ func negatedLineMatcher(m lineMatcherFunc) lineMatcherFunc {
 	return func(content []byte) bool {
 		return !m(content)
 	}
+}
+
+func (pr *whilePatternReader) Close() error {
+	pr.setState((*whilePatternReader).readClosed)
+	return pr.reader.Close()
+}
+
+func (pr *whilePatternReader) readClosed() (reader.Message, error) {
+	return reader.Message{}, io.EOF
 }

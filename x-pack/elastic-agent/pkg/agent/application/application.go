@@ -26,7 +26,7 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return nil, err
 	}

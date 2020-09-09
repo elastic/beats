@@ -23,7 +23,7 @@ const (
 )
 
 // EventsMapping will map metric values to beats events
-func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) error {
+func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error {
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
@@ -35,7 +35,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 			continue
 		}
 		// build a resource key with unique resource namespace combination
-		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.Id, metric.Namespace)
+		resNamkey := fmt.Sprintf("%s,%s", metric.ResourceId, metric.Namespace)
 		groupByResourceNamespace[resNamkey] = append(groupByResourceNamespace[resNamkey], metric)
 	}
 	// grouping metrics by the dimensions configured
@@ -58,6 +58,7 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple metric values for same aggregation  but different timeframes)
 	for _, grouped := range groupByDimensions {
 		defaultMetric := grouped[0]
+		resource := client.GetResourceForData(defaultMetric.ResourceId)
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
 		for _, metric := range grouped {
 			for _, m := range metric.Values {
@@ -77,13 +78,16 @@ func EventsMapping(metrics []Metric, metricset string, report mb.ReporterV2) err
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						event, metricList = createEvent(timestamp, defaultMetric, groupDimValues)
+						event, metricList = createEvent(timestamp, defaultMetric, resource, groupDimValues)
 					}
 				}
 			} else {
-				event, metricList = createEvent(timestamp, defaultMetric, groupTimeValues)
+				event, metricList = createEvent(timestamp, defaultMetric, resource, groupTimeValues)
 			}
-			if metricset == nativeMetricset {
+			if client.Config.AddCloudMetadata {
+				addCloudVMMetadata(&event, resource)
+			}
+			if client.Config.DefaultResourceType == "" {
 				event.ModuleFields.Put("metrics", metricList)
 			} else {
 				for key, metric := range metricList {
@@ -142,23 +146,37 @@ func replaceUpperCase(src string) string {
 }
 
 // createEvent will create a new base event
-func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) (mb.Event, common.MapStr) {
+func createEvent(timestamp time.Time, metric Metric, resource Resource, metricValues []MetricValue) (mb.Event, common.MapStr) {
+
 	event := mb.Event{
 		ModuleFields: common.MapStr{
 			"timegrain": metric.TimeGrain,
+			"namespace": metric.Namespace,
 			"resource": common.MapStr{
-				"type":  metric.Resource.Type,
-				"group": metric.Resource.Group,
+				"type":  resource.Type,
+				"group": resource.Group,
+				"name":  resource.Name,
 			},
-			"subscription_id": metric.Resource.Subscription,
-			"namespace":       metric.Namespace,
+			"subscription_id": resource.Subscription,
 		},
 		MetricSetFields: common.MapStr{},
 		Timestamp:       timestamp,
+		RootFields: common.MapStr{
+			"cloud": common.MapStr{
+				"provider": "azure",
+				"region":   resource.Location,
+			},
+		},
 	}
-	if len(metric.Resource.Tags) > 0 {
-		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)
+	if metric.ResourceSubId != "" {
+		event.ModuleFields.Put("resource.id", metric.ResourceSubId)
+	} else {
+		event.ModuleFields.Put("resource.id", resource.Id)
 	}
+	if len(resource.Tags) > 0 {
+		event.ModuleFields.Put("resource.tags", resource.Tags)
+	}
+
 	if len(metric.Dimensions) > 0 {
 		for _, dimension := range metric.Dimensions {
 			if dimension.Value == "*" {
@@ -169,18 +187,7 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 
 		}
 	}
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("cloud.provider", "azure")
-	event.RootFields.Put("cloud.region", metric.Resource.Location)
-	event.RootFields.Put("cloud.instance.name", metric.Resource.Name)
-	if metric.Resource.SubId != "" {
-		event.RootFields.Put("cloud.instance.id", metric.Resource.SubId)
-	} else {
-		event.RootFields.Put("cloud.instance.id", metric.Resource.Id)
-	}
-	if metric.Resource.Size != "" {
-		event.RootFields.Put("cloud.machine.type", metric.Resource.Size)
-	}
+
 	metricList := common.MapStr{}
 	for _, value := range metricValues {
 		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
@@ -200,6 +207,7 @@ func createEvent(timestamp time.Time, metric Metric, metricValues []MetricValue)
 			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), *value.count)
 		}
 	}
+	addHostMetadata(&event, metricList)
 	return event, metricList
 }
 
