@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -64,15 +65,26 @@ func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker)
 		return errors.New("unknown hash")
 	}
 
+	if strings.HasPrefix(release.Commit(), newHash) {
+		return errors.New("upgrading to same version")
+	}
+
 	if err := h.changeSymlink(ctx, action, newHash); err != nil {
+		rollbackInstall(newHash)
 		return err
 	}
 
 	if err := h.markUpgrade(ctx, action); err != nil {
+		rollbackInstall(newHash)
 		return err
 	}
 
-	return h.reexec(ctx, action)
+	if err := h.reexec(ctx, action); err != nil {
+		rollbackInstall(newHash)
+		return err
+	}
+
+	return nil
 }
 
 func (h *handlerUpgrade) downloadArtifact(ctx context.Context, action *fleetapi.ActionUpgrade) (string, error) {
@@ -325,4 +337,8 @@ func installDir(ctx context.Context, action *fleetapi.ActionUpgrade, cfg *artifa
 	d := app.NewDescriptor(agentSpec, action.Version, cfg, map[app.Tag]string{})
 
 	return d.Directory()
+}
+
+func rollbackInstall(hash string) {
+	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
 }
