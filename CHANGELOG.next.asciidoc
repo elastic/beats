@@ -640,6 +640,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
 - Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 - Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
+- Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 
 *Heartbeat*
 
