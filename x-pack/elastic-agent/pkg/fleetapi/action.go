@@ -61,7 +61,7 @@ func (a *ActionUnknown) OriginalType() string {
 type ActionPolicyChange struct {
 	ActionID   string
 	ActionType string
-	Policy     map[string]interface{} `json:"config"`
+	Policy     map[string]interface{} `json:"policy"`
 }
 
 func (a *ActionPolicyChange) String() string {

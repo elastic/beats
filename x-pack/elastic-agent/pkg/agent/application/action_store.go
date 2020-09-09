@@ -133,7 +133,7 @@ func (s *actionStore) Actions() []action {
 type ActionPolicyChangeSerializer struct {
 	ActionID   string                 `yaml:"action_id"`
 	ActionType string                 `yaml:"action_type"`
-	Policy     map[string]interface{} `yaml:"config"`
+	Policy     map[string]interface{} `yaml:"policy"`
 }
 
 // Add a guards between the serializer structs and the original struct.
