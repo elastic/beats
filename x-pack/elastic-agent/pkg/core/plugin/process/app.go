@@ -123,20 +123,26 @@ func (a *Application) Started() bool {
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()
-	defer a.appLock.Unlock()
+	status := a.state.Status
+	srvState := a.srvState
+	a.appLock.Unlock()
 
-	if a.state.Status == state.Stopped {
+	if status == state.Stopped {
 		return
 	}
 
 	stopSig := os.Interrupt
-	if a.srvState != nil {
-		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+	if srvState != nil {
+		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
 			// kill the process if stop through GRPC doesn't work
 			stopSig = os.Kill
 		}
-		a.srvState = nil
 	}
+
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	a.srvState = nil
 	if a.state.ProcessInfo != nil {
 		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
 			// no error on signal, so wait for it to stop

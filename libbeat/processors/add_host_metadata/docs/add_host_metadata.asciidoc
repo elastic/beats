@@ -42,6 +42,8 @@ It has the following settings:
 
 `geo.region_iso_code`:: (Optional) ISO region code.
 
+`replace_fields`:: (Optional) Default true. If set to false, original host
+fields from the event will not be replaced by host fields from `add_host_metadata`.
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event look like the following:
@@ -75,3 +77,9 @@ The fields added to the event look like the following:
    }
 }
 -------------------------------------------------------------------------------
+
+Note: `add_host_metadata` processor will overwrite host fields if `host.*`
+fields already exist in the event from Beats by default with `replace_fields`
+equals to `true`.
+Please use `add_observer_metadata` if the beat is being used to monitor external
+systems.

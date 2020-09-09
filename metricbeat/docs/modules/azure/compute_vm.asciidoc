@@ -3,10 +3,12 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-compute_vm]]
+[role="xpack"]
 === Azure compute_vm metricset
 
 include::../../../../x-pack/metricbeat/module/azure/compute_vm/_meta/docs.asciidoc[]
 
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
 ==== Fields
 

@@ -1,12 +1,30 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package synthexec
 
 import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"io"
 	"os/exec"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func ListSuite(suiteFile string) (out *CmdOut, err error) {
@@ -73,7 +91,7 @@ func runCmd(cmd *exec.Cmd, stdinStr *string) (out *CmdOut, err error) {
 		return nil, fmt.Errorf("Could not start cmd: %w", err)
 	}
 
-	if stdinStr	!= nil {
+	if stdinStr != nil {
 		_, err = stdin.Write([]byte(*stdinStr))
 	}
 	if err != nil {
@@ -157,9 +175,9 @@ type CmdOut struct {
 }
 
 type Result struct {
-	formatVersion string `json:"format_version"`
-	Journeys []*Journey `json:"journeys"`
-	Raw *RawResult
+	formatVersion string     `json:"format_version"`
+	Journeys      []*Journey `json:"journeys"`
+	Raw           *RawResult
 }
 
 type RawResult struct {
@@ -167,14 +185,14 @@ type RawResult struct {
 }
 
 type Journey struct {
-	Name string `json:"name"`
+	Name     string      `json:"name"`
 	Url      string      `json:"url"`
 	Steps    []Step      `json:"steps"`
 	DataType string      `json:"__type__"`
 	Error    interface{} `json:"error"`
 	Duration interface{} `json:"elapsedMs"`
 	Raw      map[string]interface{}
-	Status string `json:"status"`
+	Status   string `json:"status"`
 }
 
 type Step struct {

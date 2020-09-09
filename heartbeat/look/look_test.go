@@ -32,7 +32,7 @@ import (
 // helper
 func testRTT(t *testing.T, expected time.Duration, provided time.Duration) {
 	actual, err := RTT(provided).GetValue("us")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
 

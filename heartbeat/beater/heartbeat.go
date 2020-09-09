@@ -19,8 +19,9 @@ package beater
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/synthexec"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/synthexec"
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 
@@ -73,7 +74,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(scheduler, false),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler, false),
 	}
 	return bt, nil
 }
@@ -131,7 +132,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
-	factory := monitors.NewFactory(bt.scheduler, true)
+	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
@@ -147,6 +148,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
@@ -175,13 +178,13 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 			for _, j := range res.Result.Journeys {
 				logp.Warn("JNAME %s", j.Name)
 				cfg, err := common.NewConfigFrom(map[string]interface{}{
-					"type": "suitejourney",
-					"path": suite.Path,
-					"schedule": suite.Schedule,
+					"type":         "suitejourney",
+					"path":         suite.Path,
+					"schedule":     suite.Schedule,
 					"suite_params": suite.Params,
 					"journey_name": j.Name,
-					"name": j.Name,
-					"id": j.Name,
+					"name":         j.Name,
+					"id":           j.Name,
 				})
 				if err != nil {
 					return err

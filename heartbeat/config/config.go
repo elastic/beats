@@ -28,11 +28,11 @@ import (
 // Config defines the structure of heartbeat.yml.
 type Config struct {
 	// Modules is a list of module specific configuration data.
-	Monitors       []*common.Config     `config:"monitors"`
-	ConfigMonitors *common.Config       `config:"config.monitors"`
-	Scheduler      Scheduler            `config:"scheduler"`
-	Autodiscover   *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*SyntheticSuite	`config:"synthetic_suites"`
+	Monitors        []*common.Config     `config:"monitors"`
+	ConfigMonitors  *common.Config       `config:"config.monitors"`
+	Scheduler       Scheduler            `config:"scheduler"`
+	Autodiscover    *autodiscover.Config `config:"autodiscover"`
+	SyntheticSuites []*SyntheticSuite    `config:"synthetic_suites"`
 }
 
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.
@@ -42,10 +42,10 @@ type Scheduler struct {
 }
 
 type SyntheticSuite struct {
-	Path string	`config:"path"`
-	Name string `config:"id_prefix"`
-	Schedule string `config:"schedule"`
-	Params map[string]interface{} `config:"params"`
+	Path     string                 `config:"path"`
+	Name     string                 `config:"id_prefix"`
+	Schedule string                 `config:"schedule"`
+	Params   map[string]interface{} `config:"params"`
 }
 
 // DefaultConfig is the canonical instantiation of Config.
