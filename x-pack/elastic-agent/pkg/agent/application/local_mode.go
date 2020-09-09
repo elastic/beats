@@ -116,7 +116,7 @@ func newLocal(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker},
 		},
 		monitor,
 	)
