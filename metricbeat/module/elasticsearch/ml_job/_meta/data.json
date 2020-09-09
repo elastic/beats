@@ -1,33 +1,116 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "elasticsearch": {
-        "cluster": {
-            "id": "3LbUkLkURz--FR-YO0wLNA",
-            "name": "es1"
-        },
-        "ml": {
-            "job": {
-                "data_counts": {
-                    "invalid_date_count": 0,
-                    "processed_record_count": 0
-                },
-                "id": "total-requests",
-                "state": "closed"
-            }
-        }
-    },
-    "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
-        "name": "ml_job",
-        "namespace": "elasticsearch.ml.job",
-        "rtt": 115
+    "@timestamp": "2020-09-09T12:02:47.753Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
     },
     "service": {
-        "name": "elasticsearch"
+        "type": "elasticsearch",
+        "name": "elasticsearch",
+        "address": "localhost:9200"
+    },
+    "event": {
+        "dataset": "elasticsearch.ml.job",
+        "module": "elasticsearch",
+        "duration": 6753437
+    },
+    "metricset": {
+        "name": "ml_job",
+        "period": 10000
+    },
+    "elasticsearch": {
+        "ml": {
+            "job": {
+                "state": "closed",
+                "data_counts": {
+                    "record": {
+                        "processed": {
+                            "count": 0
+                        },
+                        "earliest": {},
+                        "latest": {},
+                        "input": {
+                            "count": 0
+                        }
+                    },
+                    "field": {
+                        "processed": {
+                            "count": 0
+                        }
+                    },
+                    "input": {
+                        "bytes": 0,
+                        "field": {
+                            "count": 0
+                        }
+                    },
+                    "missing_field": {
+                        "count": 0
+                    },
+                    "out_of_order": {
+                        "timestamp": {
+                            "count": 0
+                        }
+                    },
+                    "bucket": {
+                        "sparse": {
+                            "count": 0
+                        },
+                        "count": 0,
+                        "empty": {
+                            "count": 0
+                        }
+                    },
+                    "invalid_date": {
+                        "count": 0
+                    }
+                },
+                "model_size": {
+                    "model": {
+                        "bytes": 0
+                    },
+                    "total": {
+                        "field": {
+                            "partition": {
+                                "count": 0
+                            },
+                            "by": {
+                                "count": 0
+                            },
+                            "over": {
+                                "count": 0
+                            }
+                        }
+                    },
+                    "bucket_allocation_failures": {
+                        "count": 0
+                    },
+                    "log_time": {
+                        "ms": 1599652967759
+                    },
+                    "timestamp": {},
+                    "result_type": "model_size_stats"
+                },
+                "id": "mario"
+            }
+        },
+        "cluster": {
+            "name": "docker-cluster",
+            "id": "giRKn5pZQ0afY0YrRiXdxQ"
+        }
+    },
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "ephemeral_id": "0860b6a7-2d1d-4062-a4da-756d0d42b282",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro",
+        "type": "metricbeat"
     }
 }
