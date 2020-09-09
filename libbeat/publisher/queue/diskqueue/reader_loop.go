@@ -24,7 +24,6 @@ import (
 	"io"
 	"os"
 	"syscall"
-	"time"
 )
 
 type readerLoopRequest struct {
@@ -91,12 +90,15 @@ func (rl *readerLoop) run() {
 }
 
 func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
-	fmt.Printf("\033[0;32mreaderLoop.processRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
+	//fmt.Printf("\033[0;32mreaderLoop.processRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
 
-	defer time.Sleep(time.Second)
+	//defer time.Sleep(time.Second)
 
 	frameCount := int64(0)
 	byteCount := int64(0)
+	// defer func() {
+	// 	fmt.Printf("  \033[0;32mread %d bytes in %d frames\033[0m\n", byteCount, frameCount)
+	// }()
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader(rl.settings)

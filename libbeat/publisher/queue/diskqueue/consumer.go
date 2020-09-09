@@ -99,6 +99,8 @@ func (batch *diskQueueBatch) Events() []publisher.Event {
 // and we don't want the core loop to bottleneck on manipulating
 // a potentially large dictionary, so we use a lock and let
 // consumer threads handle most of the processing themselves.
+// TODO: this shouldn't really be a dictionary, use a bitfield or
+// something more efficient.
 func (batch *diskQueueBatch) ACK() {
 	dq := batch.queue
 	dq.ackLock.Lock()
@@ -106,13 +108,15 @@ func (batch *diskQueueBatch) ACK() {
 	for _, frameID := range batch.ackIDs {
 		dq.acked[frameID] = true
 	}
-	ackedCount := 0
-	for ; dq.acked[dq.ackedUpTo]; dq.ackedUpTo++ {
-		delete(dq.acked, dq.ackedUpTo)
-		ackedCount++
-	}
-	if ackedCount > 0 {
-		dq.ackedUpTo += frameID(ackedCount)
+	if dq.acked[dq.ackedUpTo] {
+		for ; dq.acked[dq.ackedUpTo]; dq.ackedUpTo++ {
+			delete(dq.acked, dq.ackedUpTo)
+		}
+		// It would be considerate to send this less frequently, so
+		// as not to bother the core loop with messages that are
+		// usually no-ops.
+		// TODO: only inform the core loop when we cross a segment
+		// boundary.
 		dq.consumerAckChan <- dq.ackedUpTo
 	}
 }

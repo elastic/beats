@@ -263,11 +263,12 @@ func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
 	ackedSegmentCount := 0
 	for ; ackedSegmentCount < len(acking); ackedSegmentCount++ {
 		segment := acking[ackedSegmentCount]
-		endFrame += frameID(segment.framesRead)
-		if endFrame > ackedUpTo {
+		if endFrame+frameID(segment.framesRead) > ackedUpTo {
 			// This segment is still waiting for acks, we're done.
 			break
 		}
+		// Otherwise, advance the ending frame ID.
+		endFrame += frameID(segment.framesRead)
 	}
 	if ackedSegmentCount > 0 {
 		// Move fully acked segments to the acked list and remove them
@@ -275,6 +276,7 @@ func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
 		cl.queue.segments.acked =
 			append(cl.queue.segments.acked, acking[:ackedSegmentCount]...)
 		cl.queue.segments.acking = acking[ackedSegmentCount:]
+		// Advance oldestFrameID past the segments we just removed.
 		cl.oldestFrameID = endFrame
 		cl.maybeDeleteAcked()
 	}

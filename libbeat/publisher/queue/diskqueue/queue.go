@@ -209,7 +209,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	deleterLoop := &deleterLoop{
 		settings: &settings,
 
-		requestChan:  make(chan deleterLoopRequest),
+		requestChan:  make(chan deleterLoopRequest, 1),
 		responseChan: make(chan deleterLoopResponse),
 	}
 	go func() {
@@ -320,5 +320,8 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	panic("TODO: not implemented")
+	return &diskQueueConsumer{
+		queue:  dq,
+		closed: false,
+	}
 }

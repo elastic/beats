@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"errors"
 	"os"
+	"time"
 )
 
 type deleterLoop struct {
@@ -65,14 +66,25 @@ func (dl *deleterLoop) run() {
 			// We ignore errors caused by the file not existing: this shouldn't
 			// happen, but it is still safe to report it as successfully removed.
 			if err == nil || errors.Is(err, os.ErrNotExist) {
-				errorList = append(errorList, err)
-			} else {
 				deleted[segment] = true
+			} else {
+				errorList = append(errorList, err)
 			}
 		}
 		dl.responseChan <- deleterLoopResponse{
 			deleted: deleted,
 			errors:  errorList,
+		}
+		if len(request.segments) > 0 && len(deleted) == 0 {
+			// If we were asked to delete segments but could not delete
+			// _any_ of them, we haven't made progress. Returning an error
+			// will log the issue and retry, but in this situation we
+			// want to delay before retrying. The core loop itself can't
+			// delay (it can never sleep or block), so we handle the
+			// delay here, by ignoring the next request until the retry
+			// interval has passed.
+			// TODO: make the retry interval configurable.
+			time.Sleep(time.Second)
 		}
 	}
 }

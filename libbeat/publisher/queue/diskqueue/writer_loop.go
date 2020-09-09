@@ -106,7 +106,8 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 		// If the new segment doesn't match the last one, we need to open a new
 		// file handle and possibly clean up the old one.
 		if wl.currentSegment != frameRequest.segment {
-			wl.logger.Debugf("")
+			wl.logger.Debugf(
+				"Creating new segment file with id %v\n", frameRequest.segment.id)
 			if wl.outputFile != nil {
 				wl.outputFile.Close()
 				wl.outputFile = nil

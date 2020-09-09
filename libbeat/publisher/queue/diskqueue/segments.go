@@ -149,24 +149,19 @@ func (segment *queueSegment) sizeOnDisk() uint64 {
 func (segment *queueSegment) getReader(
 	queueSettings *Settings,
 ) (*os.File, error) {
-	fmt.Printf("\033[94mgetReader(%v)\033[0m\n", segment.id)
-
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("\033[94mfailed: %v\033[0m\n", err)
 		return nil, fmt.Errorf(
 			"Couldn't open segment %d: %w", segment.id, err)
 	}
 	header, err := readSegmentHeader(file)
 	if err != nil {
-		fmt.Printf("\033[94mfailed (header): %v\033[0m\n", err)
 		file.Close()
 		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
 	}
 	segment.header = header
 
-	fmt.Printf("\033[94msuccess\033[0m\n")
 	return file, nil
 }
 
@@ -174,11 +169,9 @@ func (segment *queueSegment) getReader(
 func (segment *queueSegment) getWriter(
 	queueSettings *Settings,
 ) (*os.File, error) {
-	fmt.Printf("\033[0;32mgetWriter(%v)\033[0m\n", segment.id)
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		fmt.Printf("\033[0;32mfailed\033[0m\n")
 		return nil, err
 	}
 	header := &segmentHeader{
@@ -187,10 +180,8 @@ func (segment *queueSegment) getWriter(
 	}
 	err = writeSegmentHeader(file, header)
 	if err != nil {
-		fmt.Printf("\033[0;32mfailed (header)\033[0m\n")
 		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
 	}
-	fmt.Printf("\033[0;32msuccess\033[0m\n")
 
 	return file, nil
 }
