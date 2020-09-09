@@ -1,0 +1,26 @@
+- key: azure-eventhub
+  title: "azure-eventhub"
+  description: >
+    Fields regarding the Azure event hub information.
+  fields:
+    - name: azure-eventhub
+      type: group
+      default_field: false
+      description: >
+        Fields regarding the Azure event hub information.
+      fields:
+        - name: offset
+          type: long
+          description: The position of an event within a partition.
+        - name: sequence_number
+          type: long
+          description: The logical sequence number of the event within the partition stream of the event hub.
+        - name: enqueued_time
+          type: date
+          description: The date and time, in UTC, of when the event was enqueued in the event hub partition.
+        - name: eventhub
+          type: keyword
+          description: The name of the event hub instance.
+        - name: consumer_group
+          type: keyword
+          description: The view (state, position, or offset) of an entire event hub.

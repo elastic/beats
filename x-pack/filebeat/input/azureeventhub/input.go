@@ -186,7 +186,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 			Timestamp: timestamp,
 			Fields: common.MapStr{
 				"message": msg,
-				"azure":   azure,
+				inputName: azure,
 			},
 			Private: event.Data,
 		})
