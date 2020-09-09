@@ -257,7 +257,8 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 				m = append(m, MetadataIndex{
 					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
 					Data: h.metaGen.Generate(
-						pod, metadata.WithFields("container.name", container.Name),
+						pod,
+						metadata.WithFields("container.name", container.Name),
 						metadata.WithFields("container.image", container.Image),
 						metadata.WithFields("container.id", cIDs[container.Name]),
 						metadata.WithFields("container.runtime", runtimes[container.Name]),
