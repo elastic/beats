@@ -82,16 +82,16 @@ func (rl *readerLoop) run() {
 			return
 		}
 		response := rl.processRequest(request)
-		fmt.Printf("\033[0;32mread response: read %d frames and %d bytes\033[0m\n", response.frameCount, response.byteCount)
-		if response.err != nil {
-			fmt.Printf("\033[0;32mresponse had err: %v\033[0m\n", response.err)
-		}
-		rl.responseChan <- rl.processRequest(request)
+		//fmt.Printf("\033[0;32mread response: read %d frames and %d bytes\033[0m\n", response.frameCount, response.byteCount)
+		// if response.err != nil {
+		// 	fmt.Printf("\033[0;32mresponse had err: %v\033[0m\n", response.err)
+		// }
+		rl.responseChan <- response
 	}
 }
 
 func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
-	fmt.Printf("\033[0;32mprocessRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
+	fmt.Printf("\033[0;32mreaderLoop.processRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
 
 	defer time.Sleep(time.Second)
 
@@ -177,8 +177,7 @@ func (rl *readerLoop) nextFrame(
 	var frameLength uint32
 	err := binary.Read(reader, binary.LittleEndian, &frameLength)
 	if err != nil {
-		return nil, fmt.Errorf(
-			"Couldn't read next frame length: %w", err)
+		return nil, fmt.Errorf("Couldn't read data frame header: %w", err)
 	}
 
 	// If the frame extends past the area we were told to read, return an error.
@@ -199,7 +198,7 @@ func (rl *readerLoop) nextFrame(
 	bytes := rl.decoder.Buffer(int(dataLength))
 	_, err = reader.Read(bytes)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read data frame: %w", err)
+		return nil, fmt.Errorf("Couldn't read data frame content: %w", err)
 	}
 
 	// Read the footer (checksum + duplicate length)
@@ -219,25 +218,25 @@ func (rl *readerLoop) nextFrame(
 	var duplicateLength uint32
 	err = binary.Read(reader, binary.LittleEndian, &duplicateLength)
 	if err != nil {
-		return nil, fmt.Errorf(
-			"Disk queue couldn't read trailing frame length: %w", err)
+		return nil, fmt.Errorf("Couldn't read data frame footer: %w", err)
 	}
 	if duplicateLength != frameLength {
 		return nil, fmt.Errorf(
-			"Disk queue: inconsistent frame length (%d vs %d)",
+			"Inconsistent data frame length (%d vs %d)",
 			frameLength, duplicateLength)
 	}
 
 	event, err := rl.decoder.Decode()
 	if err != nil {
-		// TODO: Unlike errors in the segment or frame metadata, this is entirely
-		// a problem in the event [de]serialization which may be isolated.
-		// Rather than pass this error back to the read request, which discards
-		// the rest of the segment, we should just log the error and advance to
-		// the next frame, which is likely still valid.
-		return nil, err
+		// Unlike errors in the segment or frame metadata, this is entirely
+		// a problem in the event [de]serialization which may be isolated (i.e.
+		// may not indicate data corruption in the segment).
+		// TODO: Rather than pass this error back to the read request, which
+		// discards the rest of the segment, we should just log the error and
+		// advance to the next frame, which is likely still valid (especially
+		// if checksums are enabled).
+		return nil, fmt.Errorf("Couldn't decode data frame: %w", err)
 	}
-	fmt.Printf("Decoded event from frame: %v\n", event)
 
 	frame := &readFrame{
 		event:       event,
