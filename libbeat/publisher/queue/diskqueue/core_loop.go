@@ -56,6 +56,9 @@ type coreLoop struct {
 
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
+	// Segment ids in this list always appear in sorted order, even between
+	// requests (that is, a frame added to this list always has segment id
+	// at least as high as every previous frame that has ever been added).
 	pendingFrames []segmentedFrame
 
 	// blockedProducers is a list of all producer write requests that are
@@ -168,25 +171,29 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 }
 
 func (cl *coreLoop) handleProducerCancelRequest(request producerCancelRequest) {
+	// TODO: implement me
 }
 
 func (cl *coreLoop) handleWriterLoopResponse(response writerLoopResponse) {
 	cl.writing = false
 
-	for _, metadata := range response.segments {
-		// Update the segments with their new size and, if the writer
-		// closed them, move them to the reading list.
-		// TODO: i don't like this. It is redundant, and in brittle ways:
-		// segments are always written and closed in strict order, and the
-		// core loop knows what that order is, but we let the writer loop
-		// report them as independent parameters and then depend on those
-		// instead? It works for the moment but needs to be fixed soon.
-		metadata.segment.endOffset += segmentOffset(metadata.bytesWritten)
-		if metadata.closed {
-			cl.queue.segments.writing = cl.queue.segments.writing[1:]
-			cl.queue.segments.reading =
-				append(cl.queue.segments.reading, metadata.segment)
-		}
+	// The writer loop response contains the number of bytes written to
+	// each segment that appeared in the request. Entries always appear in
+	// the same sequence as (the beginning of) segments.writing.
+	for index, bytesWritten := range response.bytesWritten {
+		// Update the segment with its new size.
+		cl.queue.segments.writing[index].endOffset += segmentOffset(bytesWritten)
+	}
+
+	// If there is more than one segment in the response, then all but the
+	// last have been closed and are ready to move to the reading list.
+	closedCount := len(response.bytesWritten) - 1
+	if closedCount > 0 {
+		// Remove the prefix of the writing array and append to to reading.
+		closedSegments := cl.queue.segments.writing[:closedCount]
+		cl.queue.segments.writing = cl.queue.segments.writing[closedCount:]
+		cl.queue.segments.reading =
+			append(cl.queue.segments.reading, closedSegments...)
 	}
 }
 

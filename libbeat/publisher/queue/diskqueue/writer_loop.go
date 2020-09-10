@@ -25,7 +25,7 @@ import (
 )
 
 // A segmentedFrame is a data frame waiting to be written to disk along with
-// the containing segment it has been assigned to.
+// the segment it has been assigned to.
 type segmentedFrame struct {
 	// The frame to be written to disk.
 	frame *writeFrame
@@ -34,29 +34,26 @@ type segmentedFrame struct {
 	segment *queueSegment
 }
 
-// One block for the writer loop consists of a write request and the
-// segment it should be written to.
+// A writer loop request contains a list of writeFrames with the
+// segment each should be written to.
+//
+// Input invariant: If a frame f is included in a writerLoopRequest, then
+// every subsequent frame in this and future requests must have
+// frame id at least f.segment.id.
+//
+// That is: we must write all frames for segment 0 before we start writing
+// to frame 1, etc. This assumption allows all file operations to happen
+// safely in the writer loop without any knowledge of the broader queue state.
 type writerLoopRequest struct {
 	frames []segmentedFrame
 }
 
-// writerSegmentMetadata returns the actions taken by the writer loop
-// on a single segment: the number of bytes written, and whether or
-// not the segment was closed while handling the request (which signals
-// to the core loop that the segment can be moved to segments.reading).
-type writerSegmentMetadata struct {
-	segment      *queueSegment
-	bytesWritten int64
-	closed       bool
-}
-
-// A writerLoopResponse reports the list of segments that have been
-// completely written and can be moved to segments.reading.
-// A segment is determined to have been completely written
-// (and is then closed by the writer loop) when a frameWriteRequest
-// targets a different segment than the previous ones.
+// A writerLoopResponse reports the number of bytes written to each
+// segment in the request. There is guaranteed to be one entry for each
+// segment that appeared in the request, in the same order. If there is
+// more than one entry, then all but the last segment have been closed.
 type writerLoopResponse struct {
-	segments []writerSegmentMetadata
+	bytesWritten []int64
 }
 
 type writerLoop struct {
@@ -92,16 +89,17 @@ func (wl *writerLoop) run() {
 			// The input channel is closed, we are done
 			return
 		}
-		segments := wl.processRequest(block)
-		wl.responseChan <- writerLoopResponse{segments: segments}
+		bytesWritten := wl.processRequest(block)
+		wl.responseChan <- writerLoopResponse{bytesWritten: bytesWritten}
 	}
 }
 
-// Write the given data to disk, returns the list of segments that were
-// completed in the process.
-func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentMetadata {
-	var segments []writerSegmentMetadata
-	bytesWritten := int64(0) // Bytes written to the current segment.
+// processRequest writes the frames in the given request to disk and returns
+// the number of bytes written to each segment, in the order they were
+// encountered.
+func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
+	var bytesWritten []int64    // Bytes written to all segments.
+	curBytesWritten := int64(0) // Bytes written to the current segment.
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
 		// file handle and possibly clean up the old one.
@@ -112,12 +110,10 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// TODO: try to sync?
-				segments = append(segments, writerSegmentMetadata{
-					segment:      wl.currentSegment,
-					bytesWritten: bytesWritten,
-					closed:       true,
-				})
-				bytesWritten = 0
+				// We are done with this segment, add the byte count to the list and
+				// reset the current counter.
+				bytesWritten = append(bytesWritten, curBytesWritten)
+				curBytesWritten = 0
 			}
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriter(wl.settings)
@@ -144,15 +140,10 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []writerSegmentM
 		binary.Write(wl.outputFile, binary.LittleEndian, checksum)
 		// Write the frame footer's (duplicate) length
 		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
-		bytesWritten += int64(n) + frameMetadataSize
+		curBytesWritten += int64(n) + frameMetadataSize
 	}
-	if bytesWritten > 0 {
-		segments = append(segments, writerSegmentMetadata{
-			segment:      wl.currentSegment,
-			bytesWritten: bytesWritten,
-		})
-	}
-	return segments
+	// Return the total byte counts, including the final segment.
+	return append(bytesWritten, curBytesWritten)
 }
 
 /*
