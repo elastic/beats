@@ -41,9 +41,9 @@ type segmentedFrame struct {
 // A writer loop request contains a list of writeFrames with the
 // segment each should be written to.
 //
-// Input invariant: If a frame f is included in a writerLoopRequest, then
-// every subsequent frame in this and future requests must have
-// frame id at least f.segment.id.
+// Input invariant (segment ids are sorted): If a frame f is included in a
+// writerLoopRequest, then every subsequent frame in this and future
+// requests must have segment id at least f.segment.id.
 //
 // That is: we must write all frames for segment 0 before we start writing
 // to frame 1, etc. This assumption allows all file operations to happen
