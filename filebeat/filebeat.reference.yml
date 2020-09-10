@@ -327,6 +327,11 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
+#------------------------------- Pensando Module -------------------------------
+- module: pensando
+  dfw:
+    enabled: true
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
