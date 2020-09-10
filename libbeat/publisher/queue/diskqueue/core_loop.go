@@ -107,20 +107,6 @@ func (cl *coreLoop) run() {
 }
 
 func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
-	if len(cl.blockedProducers) > 0 {
-		// If other requests are still waiting for space, then there
-		// definitely isn't enough for this one.
-		if request.shouldBlock {
-			// Blocked writes don't get a response until there is enough free
-			// space and they are moved to pendingWrites.
-			cl.blockedProducers = append(cl.blockedProducers, request)
-		} else {
-			// If the request is non-blocking, send immediate failure and discard it.
-			request.responseChan <- false
-		}
-		return
-	}
-
 	// Pathological case checking: make sure the incoming frame isn't bigger
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
@@ -133,38 +119,26 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 		return
 	}
 
-	// We will accept this request if there is enough capacity left in
-	// the queue (after accounting for the pending writes that were
-	// already accepted).
-	pendingBytes := uint64(0)
-	for _, request := range cl.pendingFrames {
-		pendingBytes += request.frame.sizeOnDisk()
-	}
-	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
-	// cl.queue.logger.Debugf(
-	// 	"currentSize: %v  frameSize: %v  MaxBufferSize: %v",
-	// 	currentSize, frameSize, cl.queue.settings.MaxBufferSize)
-	if cl.queue.settings.MaxBufferSize > 0 &&
-		currentSize+frameSize > cl.queue.settings.MaxBufferSize {
-		// The queue is too full. Either add the request to blockedWrites,
+	// If no one else is blocked waiting for queue capacity, and there is
+	// enough space, then we add the new frame and report success.
+	// Otherwise, we either add to the end of blockedProducers to wait for
+	// the requested space or report immediate failure, depending on the
+	// producer settings.
+	if len(cl.blockedProducers) == 0 && cl.canAcceptFrameOfSize(frameSize) {
+		// There is enough space for the new frame! Add it to the
+		// pending list and report success, then dispatch it to the
+		// writer loop if no other requests are outstanding.
+		cl.enqueueWriteFrame(request.frame)
+		request.responseChan <- true
+		cl.maybeWritePending()
+	} else {
+		// The queue is too full. Either add the request to blockedProducers,
 		// or send an immediate reject.
 		if request.shouldBlock {
 			cl.blockedProducers = append(cl.blockedProducers, request)
 		} else {
 			request.responseChan <- false
 		}
-	} else {
-		// There is enough space for the new frame! Add it to the
-		// pending list and report success, then dispatch it to the
-		// writer loop if no other requests are outstanding.
-		// Right now we accept any request if there is enough space for it
-		// on disk. High-throughput inputs may produce events faster than
-		// they can be written to disk, so it would make sense to
-		// additionally bound the amount of data in pendingWrites to some
-		// configurable limit to avoid out-of-memory errors.
-		cl.enqueueProducerFrame(request.frame)
-		request.responseChan <- true
-		cl.maybeWritePending()
 	}
 }
 
@@ -323,14 +297,14 @@ func (cl *coreLoop) handleShutdown() {
 	// TODO: write final queue state to the metadata file.
 }
 
-// If the pendingWrites list is nonempty, and there are no outstanding
+// If the pendingFrames list is nonempty, and there are no outstanding
 // requests to the writer loop, send the next batch of frames.
 func (cl *coreLoop) maybeWritePending() {
 	if cl.writing || len(cl.pendingFrames) == 0 {
 		// Nothing to do right now
 		return
 	}
-	// Remove everything from pendingWrites and forward it to the writer loop.
+	// Remove everything from pendingFrames and forward it to the writer loop.
 	requests := cl.pendingFrames
 	cl.pendingFrames = nil
 
@@ -381,13 +355,29 @@ func (cl *coreLoop) maybeDeleteAcked() {
 	}
 }
 
+// maybeUnblockProducers checks whether the queue has enough free space
+// to accept any of the requests in the blockedProducers list, and if so
+// accepts them in order and updates the list.
 func (cl *coreLoop) maybeUnblockProducers() {
-	// TODO: implement me
+	unblockedCount := 0
+	for _, request := range cl.blockedProducers {
+		if !cl.canAcceptFrameOfSize(request.frame.sizeOnDisk()) {
+			// Not enough space for this frame, we're done.
+			break
+		}
+		// Add the frame to pendingFrames and report success.
+		cl.enqueueWriteFrame(request.frame)
+		request.responseChan <- true
+		unblockedCount++
+	}
+	if unblockedCount > 0 {
+		cl.blockedProducers = cl.blockedProducers[unblockedCount:]
+	}
 }
 
-// enqueueProducerFrame determines which segment an incoming frame should be
-// written to and adds the result to pendingWrites.
-func (cl *coreLoop) enqueueProducerFrame(frame *writeFrame) {
+// enqueueWriteFrame determines which segment an incoming frame should be
+// written to and adds the resulting segmentedFrame to pendingFrames.
+func (cl *coreLoop) enqueueWriteFrame(frame *writeFrame) {
 	dq := cl.queue
 
 	// Start with the most recent writing segment if there is one.
@@ -411,4 +401,35 @@ func (cl *coreLoop) enqueueProducerFrame(frame *writeFrame) {
 		frame:   frame,
 		segment: segment,
 	})
+}
+
+// canAcceptFrameOfSize checks whether there is enough free space in the
+// queue (subject to settings.MaxBufferSize) to accept a new frame with
+// the given size. Size includes both the serialized data and the frame
+// header / footer; the easy way to do this for a writeFrame is to pass
+// in frame.sizeOnDisk().
+// Capacity calculations do not include requests in the blockedProducers
+// list (that data is owned by its callers and we can't touch it until
+// we are ready to respond). That allows this helper to be used both while
+// handling producer requests and while deciding whether to unblock
+// producers after free capacity increases.
+// If we decide to add limits on how many events / bytes can be stored
+// in pendingFrames (to avoid unbounded memory use if the input is faster
+// than the disk), this is the function to modify.
+func (cl *coreLoop) canAcceptFrameOfSize(frameSize uint64) bool {
+	if cl.queue.settings.MaxBufferSize == 0 {
+		// Currently we impose no limitations if the queue size is unbounded.
+		return true
+	}
+
+	// Compute the current queue size. We accept if there is enough capacity
+	// left in the queue after accounting for the existing segments and the
+	// pending writes that were already accepted.
+	pendingBytes := uint64(0)
+	for _, request := range cl.pendingFrames {
+		pendingBytes += request.frame.sizeOnDisk()
+	}
+	currentSize := pendingBytes + cl.queue.segments.sizeOnDisk()
+
+	return currentSize+frameSize <= cl.queue.settings.MaxBufferSize
 }
