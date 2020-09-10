@@ -1,0 +1,113 @@
+[
+    {
+        "@timestamp": "2020-04-22T17:24:31.105Z",
+        "destination.address": "172.31.10.2",
+        "destination.port": "22",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "pensando.dfw",
+        "event.kind": "event",
+        "event.module": "pensando",
+        "event.original": "<14>1 2020-04-22T17:24:31Z esx01-dsc pen-tmagent 1570  - [{\"action\":\"allow\",\"app-id\":\"0\",\"destination-address\":\"172.31.10.2\",\"destination-port\":22,\"direction\":\"from-uplink\",\"protocol\":\"TCP\",\"rule-id\":13571811656724295508,\"session-id\":371,\"session-state\":\"flow_delete\",\"source-address\":\"172.31.10.31\",\"source-port\":40030,\"timestamp\":\"2020-04-22T17:24:31.105391561Z\"}]",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "allowed"
+        ],
+        "fileset.name": "dfw",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Distributed Services Platform",
+        "observer.type": "firewall",
+        "observer.vendor": "Pensando Systems",
+        "pensando.dfw.action": "allow",
+        "pensando.dfw.app_id": "0",
+        "pensando.dfw.destination_address": "172.31.10.2",
+        "pensando.dfw.destination_port": 22,
+        "pensando.dfw.direction": "from-uplink",
+        "pensando.dfw.protocol": "TCP",
+        "pensando.dfw.rule_id": 13571811656724295508,
+        "pensando.dfw.session_id": 371,
+        "pensando.dfw.session_state": "flow_delete",
+        "pensando.dfw.source_address": "172.31.10.31",
+        "pensando.dfw.source_port": 40030,
+        "service.type": "pensando",
+        "source.address": "172.31.10.31",
+        "source.port": "40030"
+    },
+    {
+        "@timestamp": "2020-04-22T16:45:12.105Z",
+        "destination.address": "172.31.10.2",
+        "destination.port": "22",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "pensando.dfw",
+        "event.kind": "event",
+        "event.module": "pensando",
+        "event.original": "<14>1 2020-04-22T16:45:12Z esx01-dsc pen-tmagent 1570  - [{\"action\":\"allow\",\"app-id\":\"0\",\"destination-address\":\"172.31.10.2\",\"destination-port\":22,\"direction\":\"from-uplink\",\"protocol\":\"TCP\",\"rule-id\":13571811656724295508,\"session-id\":265,\"session-state\":\"flow_delete\",\"source-address\":\"172.31.10.31\",\"source-port\":37428,\"timestamp\":\"2020-04-22T16:45:12.105412922Z\"}]",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "allowed"
+        ],
+        "fileset.name": "dfw",
+        "input.type": "log",
+        "log.offset": 367,
+        "observer.product": "Distributed Services Platform",
+        "observer.type": "firewall",
+        "observer.vendor": "Pensando Systems",
+        "pensando.dfw.action": "allow",
+        "pensando.dfw.app_id": "0",
+        "pensando.dfw.destination_address": "172.31.10.2",
+        "pensando.dfw.destination_port": 22,
+        "pensando.dfw.direction": "from-uplink",
+        "pensando.dfw.protocol": "TCP",
+        "pensando.dfw.rule_id": 13571811656724295508,
+        "pensando.dfw.session_id": 265,
+        "pensando.dfw.session_state": "flow_delete",
+        "pensando.dfw.source_address": "172.31.10.31",
+        "pensando.dfw.source_port": 37428,
+        "service.type": "pensando",
+        "source.address": "172.31.10.31",
+        "source.port": "37428"
+    },
+    {
+        "@timestamp": "2020-04-22T14:58:42.105Z",
+        "destination.address": "1.1.1.1",
+        "destination.port": "53",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "pensando.dfw",
+        "event.kind": "event",
+        "event.module": "pensando",
+        "event.original": "<14>1 2020-04-22T14:58:42Z esx01-dsc pen-tmagent 1570  - [{\"action\":\"allow\",\"app-id\":\"0\",\"destination-address\":\"1.1.1.1\",\"destination-port\":53,\"direction\":\"from-host\",\"protocol\":\"UDP\",\"rule-id\":8542065728696853408,\"session-id\":390,\"session-state\":\"flow_delete\",\"source-address\":\"172.31.10.2\",\"source-port\":39465,\"timestamp\":\"2020-04-22T14:58:42.105387971Z\"}]",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "allowed"
+        ],
+        "fileset.name": "dfw",
+        "input.type": "log",
+        "log.offset": 734,
+        "observer.product": "Distributed Services Platform",
+        "observer.type": "firewall",
+        "observer.vendor": "Pensando Systems",
+        "pensando.dfw.action": "allow",
+        "pensando.dfw.app_id": "0",
+        "pensando.dfw.destination_address": "1.1.1.1",
+        "pensando.dfw.destination_port": 53,
+        "pensando.dfw.direction": "from-host",
+        "pensando.dfw.protocol": "UDP",
+        "pensando.dfw.rule_id": 8542065728696853408,
+        "pensando.dfw.session_id": 390,
+        "pensando.dfw.session_state": "flow_delete",
+        "pensando.dfw.source_address": "172.31.10.2",
+        "pensando.dfw.source_port": 39465,
+        "service.type": "pensando",
+        "source.address": "172.31.10.2",
+        "source.port": "39465"
+    }
+]

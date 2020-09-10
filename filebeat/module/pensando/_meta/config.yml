@@ -1,0 +1,3 @@
+- module: pensando
+  dfw:
+    enabled: true

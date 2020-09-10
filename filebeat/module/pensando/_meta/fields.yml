@@ -1,0 +1,10 @@
+- key: pensando
+  title: Pensando 
+  description: >
+    pensando Module
+  fields:
+    - name: pensando
+      type: group
+      description: >
+        Fields from Pensando logs.
+      fields:

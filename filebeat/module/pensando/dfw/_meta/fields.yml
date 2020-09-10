@@ -1,0 +1,59 @@
+- name: payload_raw
+  description: Please add description
+  example: Please add example
+  type: text
+- name: dfw 
+  type: group
+  release: beta
+  default_field: false
+  description: >
+   Fields for Pensando DFW
+  fields:
+    - name: action
+      type: keyword
+      description: >
+        Action on the flow. 
+    - name: app_id
+      type: integer 
+      description: >
+        Application ID 
+    - name: destination_address 
+      type: keyword 
+      description: >
+        Address of destination. 
+    - name: destination_port 
+      type: integer 
+      description: >
+        Port of destination. 
+    - name: direction 
+      type: keyword
+      description: >
+        Direction of the flow 
+    - name: protocol 
+      type: keyword
+      description: >
+        Protocol of the flow 
+    - name: rule_id 
+      type: keyword 
+      description: >
+        Rule ID that was matched. 
+    - name: session_id 
+      type: integer 
+      description: >
+        Session ID of the flow 
+    - name: session_state
+      type: keyword 
+      description: >
+        Session state of the flow. 
+    - name: source_address 
+      type: keyword 
+      description: >
+        Source address of the flow. 
+    - name: source_port 
+      type: integer 
+      description: >
+        Source port of the flow. 
+    - name: timestamp 
+      type: date 
+      description: >
+        Timestamp of the log. 
