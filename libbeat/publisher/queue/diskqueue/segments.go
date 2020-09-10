@@ -29,6 +29,7 @@ import (
 
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
+
 	// The segments that are currently being written. The writer loop
 	// writes these segments in order. When a segment has been
 	// completely written, the writer loop notifies the core loop
@@ -62,6 +63,19 @@ type diskQueueSegments struct {
 	// The next sequential unused segment ID. This is what will be assigned
 	// to the next queueSegment we create.
 	nextID segmentID
+
+	// nextWriteOffset is the segment offset at which the next new frame
+	// should be written. This offset always applies to the last entry of
+	// writing[]. This is distinct from the endOffset field within a segment:
+	// endOffset tracks how much data _has_ been written to a segment, while
+	// nextWriteOffset also includes everything that is _scheduled_ to be
+	// written.
+	nextWriteOffset segmentOffset
+
+	// nextReadOffset is the position to start reading during the next
+	// read request. This offset always applies to the first reading
+	// segment: either reading[0], or writing[0] if reading is empty.
+	nextReadOffset segmentOffset
 }
 
 // segmentOffset is a byte index into the segment's data region.

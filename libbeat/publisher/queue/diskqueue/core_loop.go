@@ -39,21 +39,6 @@ type coreLoop struct {
 	// request, false otherwise.
 	deleting bool
 
-	// nextReadOffset is the segment offset to start reading at during
-	// the next read request. This offset always refers to the first read
-	// segment: either segments.reading[0], if that list is nonempty, or
-	// segments.writing[0] (if all segments have been read except the one
-	// currently being written).
-	nextReadOffset segmentOffset
-
-	// nextWriteOffset is the segment offset at which the next new frame
-	// should be written. This offset always refers to the last entry of
-	// segments.writing. This is distinct from the endOffset field
-	// within a segment: endOffset tracks how much data _has_ been
-	// written to disk, while nextWriteOffset also includes all pending
-	// frames that are scheduled to be written to disk.
-	nextWriteOffset segmentOffset
-
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
 	// Segment ids in this list always appear in sorted order, even between
@@ -202,7 +187,7 @@ func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 	segments := cl.queue.segments
 
 	// Advance the read offset based on what was just completed.
-	cl.nextReadOffset += segmentOffset(response.byteCount)
+	segments.nextReadOffset += segmentOffset(response.byteCount)
 
 	var segment *queueSegment
 	if len(segments.reading) > 0 {
@@ -212,10 +197,10 @@ func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 		// so we can rely on their endOffset field to determine the
 		// size of the data.
 		segment = segments.reading[0]
-		if cl.nextReadOffset >= segment.endOffset || response.err != nil {
+		if segments.nextReadOffset >= segment.endOffset || response.err != nil {
 			segments.reading = segments.reading[1:]
 			segments.acking = append(segments.acking, segment)
-			cl.nextReadOffset = 0
+			segments.nextReadOffset = 0
 		}
 	} else {
 		// A segment in the writing list can't be finished writing,
@@ -349,14 +334,16 @@ func (cl *coreLoop) maybeReadPending() {
 		// A read request is already pending
 		return
 	}
-	segment := cl.queue.segments.readingSegment()
-	if segment == nil || cl.nextReadOffset >= segmentOffset(segment.endOffset) {
+	segments := cl.queue.segments
+	segment := segments.readingSegment()
+	if segment == nil ||
+		segments.nextReadOffset >= segmentOffset(segment.endOffset) {
 		// Nothing to read
 		return
 	}
 	request := readerLoopRequest{
 		segment:     segment,
-		startOffset: cl.nextReadOffset,
+		startOffset: segments.nextReadOffset,
 		endOffset:   segment.endOffset,
 	}
 	cl.queue.readerLoop.requestChan <- request
@@ -406,14 +393,14 @@ func (cl *coreLoop) enqueueWriteFrame(frame *writeFrame) {
 	// If segment is nil, or the new segment exceeds its bounds,
 	// we need to create a new writing segment.
 	if segment == nil ||
-		cl.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
+		dq.segments.nextWriteOffset+frameLen > dq.settings.maxSegmentOffset() {
 		segment = &queueSegment{id: dq.segments.nextID}
 		dq.segments.writing = append(dq.segments.writing, segment)
 		dq.segments.nextID++
-		cl.nextWriteOffset = 0
+		dq.segments.nextWriteOffset = 0
 	}
 
-	cl.nextWriteOffset += frameLen
+	dq.segments.nextWriteOffset += frameLen
 	cl.pendingFrames = append(cl.pendingFrames, segmentedFrame{
 		frame:   frame,
 		segment: segment,

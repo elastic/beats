@@ -259,8 +259,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	// to refer back to the queue. (TODO: just merge the core loop fields
 	// and logic into the queue itself.)
 	queue.coreLoop = &coreLoop{
-		queue:          queue,
-		nextReadOffset: 0, // TODO: initialize this if we're opening an existing queue
+		queue: queue,
 	}
 	go func() {
 		queue.coreLoop.run()

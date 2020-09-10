@@ -103,8 +103,8 @@ func (wl *writerLoop) run() {
 // the number of bytes written to each segment, in the order they were
 // encountered.
 func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
-	// A wrapper around the file handle that enables timed retries. After
-	// a call to retryWriter.Write, it is guaranteed that either the write
+	// retryWriter wraps the file handle with timed retries.
+	// retryWriter.Write is guaranteed to return only if the write
 	// completely succeeded or the queue is being closed.
 	retryWriter := callbackRetryWriter{retry: wl.retryCallback}
 
