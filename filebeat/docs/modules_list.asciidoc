@@ -46,6 +46,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-okta>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
+  * <<filebeat-module-pensando>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-rabbitmq>>
   * <<filebeat-module-radware>>
@@ -108,6 +109,7 @@ include::modules/o365.asciidoc[]
 include::modules/okta.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
+include::modules/pensando.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/radware.asciidoc[]
