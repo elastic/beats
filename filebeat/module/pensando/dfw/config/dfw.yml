@@ -1,6 +1,6 @@
 {{ if eq .input "syslog" }}
 
-type: udp 
+type: udp
 udp:
 host: "{{.syslog_host}}:{{.syslog_port}}"
 
@@ -17,3 +17,7 @@ exclude_files: [".gz$"]
 
 processors:
   - add_locale: ~
+  - add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.5.0
