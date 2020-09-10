@@ -32,7 +32,7 @@ func TestManagedModeRouting(t *testing.T) {
 
 	log, _ := logger.New("")
 	router, _ := newRouter(log, streamFn)
-	composableCtrl, _ := composable.New(nil)
+	composableCtrl, _ := composable.New(log, nil)
 	emit, err := emitter(ctx, log, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}})
 	require.NoError(t, err)
 

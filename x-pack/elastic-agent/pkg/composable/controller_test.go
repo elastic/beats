@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 
 	"github.com/stretchr/testify/assert"
@@ -73,7 +75,9 @@ func TestController(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	c, err := composable.New(cfg)
+	log, err := logger.New("")
+	require.NoError(t, err)
+	c, err := composable.New(log, cfg)
 	require.NoError(t, err)
 
 	var wg sync.WaitGroup
