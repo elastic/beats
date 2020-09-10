@@ -22,6 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -45,14 +47,17 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}   // Channel used to initiate shutdown.
-	runners      []module.Runner // Active list of module runners.
-	config       Config
-	autodiscover *autodiscover.Autodiscover
+	done          chan struct{}   // Channel used to initiate shutdown.
+	runners       []module.Runner // Active list of module runners.
+	config        Config
+	autodiscover  *autodiscover.Autodiscover
+	pluginFactory PluginFactory
 
 	// Options
 	moduleOptions []module.Option
 }
+
+type PluginFactory func(beat.Info, *logp.Logger) []v2.Plugin
 
 // Option specifies some optional arguments used for configuring the behavior
 // of the Metricbeat framework.
@@ -71,6 +76,12 @@ func WithLightModules() Option {
 	return func(*Metricbeat) {
 		path := paths.Resolve(paths.Home, "module")
 		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+	}
+}
+
+func WithV2Inputs(pf PluginFactory) Option {
+	return func(m *Metricbeat) {
+		m.pluginFactory = pf
 	}
 }
 
@@ -93,14 +104,16 @@ func Creator(options ...Option) beat.Creator {
 //             module.WithMetricSetInfo(),
 //         ),
 //     )
-func DefaultCreator() beat.Creator {
-	return Creator(
+func DefaultCreator(opts ...Option) beat.Creator {
+	opts = append(opts,
 		WithLightModules(),
 		WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithServiceName(),
 		),
 	)
+
+	return Creator(opts...)
 }
 
 // DefaultTestModulesCreator returns a customized instance of Metricbeat
@@ -159,14 +172,26 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, moduleOptions...)
+	var runnerFactory cfgfile.RunnerFactory
+	runnerFactory = module.NewFactory(b.Info, moduleOptions...)
+	if metricbeat.pluginFactory != nil {
+		inputsLogger := logp.NewLogger("input")
+		v2Inputs := metricbeat.pluginFactory(b.Info, inputsLogger)
+		v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "module", "")
+		if err != nil {
+			panic(err)
+		}
+
+		v2InputFactory := compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader)
+		runnerFactory = compat.Combine(runnerFactory, v2InputFactory)
+	}
 
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
 			continue
 		}
 
-		runner, err := factory.Create(b.Publisher, moduleCfg)
+		runner, err := runnerFactory.Create(b.Publisher, moduleCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +208,8 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover(
 			"metricbeat",
 			b.Publisher,
-			factory, autodiscover.QueryConfig(),
+			runnerFactory,
+			autodiscover.QueryConfig(),
 			config.Autodiscover,
 			b.Keystore,
 		)

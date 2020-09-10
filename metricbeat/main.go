@@ -27,11 +27,31 @@ package main
 import (
 	"os"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v7/metricbeat/module/systemtest"
 )
 
 func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
+	rootCmd := cmd.RootCmd(beater.WithV2Inputs(v2Inputs))
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func v2Inputs(info beat.Info, log *logp.Logger) []v2.Plugin {
+	flatten := func(lists ...[]v2.Plugin) []v2.Plugin {
+		var inputs []v2.Plugin
+		for _, l := range lists {
+			inputs = append(inputs, l...)
+		}
+		return inputs
+	}
+
+	return flatten(
+		systemtest.Inputs(),
+	)
 }
