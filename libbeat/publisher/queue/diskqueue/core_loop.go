@@ -72,7 +72,8 @@ func (cl *coreLoop) run() {
 	cl.queue.logger.Debug("Core loop starting up...")
 	dq := cl.queue
 
-	// Wake up the reader loop if there are segments available to read.
+	// Wake up the reader loop if there are segments available to read
+	// (from a previous instantiation of the queue).
 	cl.maybeReadPending()
 
 	for {
@@ -81,11 +82,19 @@ func (cl *coreLoop) run() {
 		case producerWriteRequest := <-dq.producerWriteRequestChan:
 			cl.handleProducerWriteRequest(producerWriteRequest)
 
+			// After a write request, there may be data ready to send to the
+			// writer loop.
+			cl.maybeWritePending()
+
 		case cancelRequest := <-dq.producerCancelRequestChan:
+			// TODO: this isn't really handled yet.
 			cl.handleProducerCancelRequest(cancelRequest)
 
 		case ackedUpTo := <-dq.consumerAckChan:
 			cl.handleConsumerAck(ackedUpTo)
+
+			// After receiving new ACKs, a segment might be ready to delete.
+			cl.maybeDeleteAcked()
 
 		case <-dq.done:
 			cl.handleShutdown()
@@ -95,13 +104,30 @@ func (cl *coreLoop) run() {
 		case writerLoopResponse := <-dq.writerLoop.responseChan:
 			cl.handleWriterLoopResponse(writerLoopResponse)
 
+			// The writer loop completed a request, so check if there is more
+			// data to be sent.
+			cl.maybeWritePending()
+			// We also check whether the reader loop is waiting for the data
+			// that was just written.
+			cl.maybeReadPending()
+
 		// Reader loop handling
 		case readerLoopResponse := <-dq.readerLoop.responseChan:
 			cl.handleReaderLoopResponse(readerLoopResponse)
 
+			// If there is more data to read, start a new read request.
+			cl.maybeReadPending()
+
 		// Deleter loop handling
 		case deleterLoopResponse := <-dq.deleterLoop.responseChan:
 			cl.handleDeleterLoopResponse(deleterLoopResponse)
+
+			// If there are still files waiting to be deleted, send another request.
+			cl.maybeDeleteAcked()
+
+			// If there were blocked producers waiting for more queue space,
+			// we might be able to unblock them now.
+			cl.maybeUnblockProducers()
 		}
 	}
 }
@@ -130,7 +156,6 @@ func (cl *coreLoop) handleProducerWriteRequest(request producerWriteRequest) {
 		// writer loop if no other requests are outstanding.
 		cl.enqueueWriteFrame(request.frame)
 		request.responseChan <- true
-		cl.maybeWritePending()
 	} else {
 		// The queue is too full. Either add the request to blockedProducers,
 		// or send an immediate reject.
@@ -163,11 +188,6 @@ func (cl *coreLoop) handleWriterLoopResponse(response writerLoopResponse) {
 				append(cl.queue.segments.reading, metadata.segment)
 		}
 	}
-
-	// New data is available, so we also check if we should send a new
-	// read request.
-	cl.maybeReadPending()
-	cl.maybeWritePending()
 }
 
 func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
@@ -203,9 +223,6 @@ func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 			"Error reading segment file %s: %v",
 			cl.queue.settings.segmentPath(segment.id), response.err)
 	}
-
-	// If there is more data to read, start a new read request.
-	cl.maybeReadPending()
 }
 
 func (cl *coreLoop) handleDeleterLoopResponse(response deleterLoopResponse) {
@@ -226,12 +243,6 @@ func (cl *coreLoop) handleDeleterLoopResponse(response deleterLoopResponse) {
 		dq.logger.Errorw("Couldn't delete old segment files",
 			"errors", response.errors)
 	}
-	// If there are still files to delete, send the next request.
-	cl.maybeDeleteAcked()
-
-	// If there are blocked producers waiting for more queue space, this
-	// deletion might have unblocked them.
-	cl.maybeUnblockProducers()
 }
 
 func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
@@ -259,7 +270,6 @@ func (cl *coreLoop) handleConsumerAck(ackedUpTo frameID) {
 		cl.queue.segments.acking = acking[ackedSegmentCount:]
 		// Advance oldestFrameID past the segments we just removed.
 		cl.oldestFrameID = endFrame
-		cl.maybeDeleteAcked()
 	}
 }
 
