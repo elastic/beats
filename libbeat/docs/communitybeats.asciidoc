@@ -92,6 +92,7 @@ https://github.com/radoondas/owmbeat[owmbeat]:: Open Weather Map beat to pull we
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
 https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance metrics on the AIX operating system.
+https://github.com/stric-co/phishbeat[phishbeat]:: Lightweight beat for generating and monitoring for Phishing/Defamatory Domains.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
