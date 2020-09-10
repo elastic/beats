@@ -79,10 +79,13 @@ type diskQueue struct {
 	segments *diskQueueSegments
 
 	// The queue's helper loops, each of which is run in its own goroutine.
-	coreLoop    *coreLoop
 	readerLoop  *readerLoop
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
+
+	// Wait group for shutdown of the goroutines associated with this queue:
+	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
+	waitGroup *sync.WaitGroup
 
 	// The API channels used by diskQueueProducer to send write / cancel calls.
 	producerWriteRequestChan  chan producerWriteRequest
@@ -96,6 +99,34 @@ type diskQueue struct {
 	// waiting on ackLock.
 	consumerAckChan chan frameID
 
+	// writing is true if a writeRequest is currently being processed by the
+	// writer loop, false otherwise.
+	writing bool
+
+	// reading is true if the reader loop is processing a readBlock, false
+	// otherwise.
+	reading bool
+
+	// deleting is true if the segment-deletion loop is processing a deletion
+	// request, false otherwise.
+	deleting bool
+
+	// pendingFrames is a list of all incoming data frames that have been
+	// accepted by the queue and are waiting to be sent to the writer loop.
+	// Segment ids in this list always appear in sorted order, even between
+	// requests (that is, a frame added to this list always has segment id
+	// at least as high as every previous frame that has ever been added).
+	pendingFrames []segmentedFrame
+
+	// blockedProducers is a list of all producer write requests that are
+	// waiting for free space in the queue.
+	blockedProducers []producerWriteRequest
+
+	// This value represents the oldest frame ID for a segment that has not
+	// yet been moved to the acked list. It is used to detect when the oldest
+	// outstanding segment has been fully acknowledged by the consumer.
+	oldestFrameID frameID
+
 	// This lock must be held to read and write acked and ackedUpTo.
 	ackLock sync.Mutex
 
@@ -106,10 +137,6 @@ type diskQueue struct {
 	// can't yet be acknowledged as a continuous block).
 	// TODO: do this better.
 	acked map[frameID]bool
-
-	// Wait group for shutdown of the goroutines associated with this queue:
-	// core loop, reader loop, writer loop, deleter loop.
-	waitGroup *sync.WaitGroup
 
 	// The channel to signal our goroutines to shut down.
 	done chan struct{}
@@ -255,14 +282,9 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		done:      make(chan struct{}),
 	}
 
-	// The core loop is created last because it's the only one that needs
-	// to refer back to the queue. (TODO: just merge the core loop fields
-	// and logic into the queue itself.)
-	queue.coreLoop = &coreLoop{
-		queue: queue,
-	}
+	// Start the queue's main loop.
 	go func() {
-		queue.coreLoop.run()
+		queue.run()
 		waitGroup.Done()
 	}()
 
