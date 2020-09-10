@@ -14,7 +14,7 @@ import (
 
 const (
 	// DefaultBaseURI is the default URI used for the service Insights
-	DefaultBaseURI = "https://management.azure.com"
+	DefaultBaseURI = "https://management.azure.com/"
 )
 
 var (
