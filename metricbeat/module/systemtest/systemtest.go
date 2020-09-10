@@ -33,7 +33,7 @@ func Inputs() []v2.Plugin {
 	// TODO: better allow HostFS to be configured using settings
 	// system.HostFS = &hostFS
 
-	systemModule := &mba.ModuleAdapter{Name: "system-ng", Factory: system.NewModule}
+	systemModule := &mba.ModuleAdapter{Name: "system", Factory: system.NewModule}
 	return []v2.Plugin{
 		mba.Plugin(feature.Stable, false,
 			systemModule.MetricsetInput("system.cpu", "cpu", cpu.New),
