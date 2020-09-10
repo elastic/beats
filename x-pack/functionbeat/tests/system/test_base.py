@@ -113,6 +113,6 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         log = self.get_log()
         # Trim the extra output from the Go test wrapper (like PASS/FAIL and
         # coverage information).
-        log = log[:log.rindex('}')+1]
+        log = log[:log.rindex('}') + 1]
         function_template = json.loads(log)
         return function_template

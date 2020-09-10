@@ -105,7 +105,7 @@ class Test(BaseTest):
 
         try:
             self.es.indices.delete(index=self.index_name)
-        except:
+        except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
