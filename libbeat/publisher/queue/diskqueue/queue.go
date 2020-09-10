@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -140,6 +141,7 @@ func queueFactory(
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
 func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
+	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
 
@@ -320,6 +322,8 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
+	fmt.Printf("diskQueue.Consumer()\n")
+	debug.PrintStack()
 	return &diskQueueConsumer{
 		queue:  dq,
 		closed: false,

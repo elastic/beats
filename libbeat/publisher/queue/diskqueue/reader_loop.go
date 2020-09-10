@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"syscall"
+	"time"
 )
 
 type readerLoopRequest struct {
@@ -92,7 +93,7 @@ func (rl *readerLoop) run() {
 func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
 	//fmt.Printf("\033[0;32mreaderLoop.processRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
 
-	//defer time.Sleep(time.Second)
+	defer time.Sleep(time.Second)
 
 	frameCount := int64(0)
 	byteCount := int64(0)
@@ -123,7 +124,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 			// We've read the frame, try sending it to the output channel.
 			select {
 			case rl.output <- frame:
-				// Success! Increment the total for this request.
+				// Successfully sent! Increment the total for this request.
 				frameCount++
 				byteCount += frame.bytesOnDisk
 			case <-rl.requestChan:

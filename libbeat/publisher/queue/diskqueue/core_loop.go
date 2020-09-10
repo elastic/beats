@@ -223,6 +223,13 @@ func (cl *coreLoop) handleReaderLoopResponse(response readerLoopResponse) {
 	}
 	segment.framesRead += response.frameCount
 
+	// If there was an error, report it.
+	if response.err != nil {
+		cl.queue.logger.Errorf(
+			"Error reading segment file %s: %v",
+			cl.queue.settings.segmentPath(segment.id), response.err)
+	}
+
 	// If there is more data to read, start a new read request.
 	cl.maybeReadPending()
 }

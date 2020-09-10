@@ -52,10 +52,11 @@ func DefaultSettings() Settings {
 func SettingsForUserConfig(config *common.Config) (Settings, error) {
 	userConfig := userConfig{}
 	if err := config.Unpack(&userConfig); err != nil {
+		// TODO: report error / decide what to do
 		return Settings{}, err
 	}
 	settings := DefaultSettings()
 	settings.Path = userConfig.Path
 
-	return Settings{}, nil
+	return settings, nil
 }

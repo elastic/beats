@@ -95,7 +95,12 @@ func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
 		return nil, err
 	}
 
-	return e.buf.Bytes(), nil
+	// Copy the encoded bytes to a new array owned by the caller.
+	bytes := e.buf.Bytes()
+	result := make([]byte, len(bytes))
+	copy(result, bytes)
+
+	return result, nil
 }
 
 func newEventDecoder() *eventDecoder {
