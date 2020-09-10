@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"reflect"
 	"sort"
@@ -38,11 +39,8 @@ type controller struct {
 }
 
 // New creates a new controller.
-func New(c *config.Config) (Controller, error) {
-	l, err := logger.New("composable")
-	if err != nil {
-		return nil, err
-	}
+func New(log *logger.Logger, c *config.Config) (Controller, error) {
+	l := log.Named("composable")
 	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
@@ -61,7 +59,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l, pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
@@ -78,7 +76,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l.Named(strings.Join([]string{"providers", name}, ".")), pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}

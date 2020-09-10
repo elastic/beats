@@ -178,7 +178,7 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 	router := &inmemRouter{}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	composableCtrl, err := composable.New(cfg)
+	composableCtrl, err := composable.New(log, cfg)
 	if err != nil {
 		return nil, err
 	}
