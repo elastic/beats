@@ -19,7 +19,11 @@ package diskqueue
 
 import (
 	"encoding/binary"
+	"errors"
+	"io"
 	"os"
+	"syscall"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -63,9 +67,11 @@ type writerLoop struct {
 	// The logger for the writer loop, assigned when the queue creates it.
 	logger *logp.Logger
 
-	// The writer loop listens on requestChan for write blocks, and
+	// The writer loop listens on requestChan for frames to write, and
 	// writes them to disk immediately (all queue capacity checking etc. is
 	// done by the core loop before sending it to the writer).
+	// When this channel is closed, any in-progress writes are aborted and
+	// the run loop terminates.
 	requestChan chan writerLoopRequest
 
 	// The writer loop sends to responseChan when it has finished handling a
@@ -82,11 +88,10 @@ type writerLoop struct {
 }
 
 func (wl *writerLoop) run() {
-	wl.logger.Debug("Writer loop starting up...")
 	for {
 		block, ok := <-wl.requestChan
 		if !ok {
-			// The input channel is closed, we are done
+			// The requst channel is closed, we are done
 			return
 		}
 		bytesWritten := wl.processRequest(block)
@@ -98,8 +103,14 @@ func (wl *writerLoop) run() {
 // the number of bytes written to each segment, in the order they were
 // encountered.
 func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
+	// A wrapper around the file handle that enables timed retries. After
+	// a call to retryWriter.Write, it is guaranteed that either the write
+	// completely succeeded or the queue is being closed.
+	retryWriter := callbackRetryWriter{retry: wl.retryCallback}
+
 	var bytesWritten []int64    // Bytes written to all segments.
 	curBytesWritten := int64(0) // Bytes written to the current segment.
+outerLoop:
 	for _, frameRequest := range request.frames {
 		// If the new segment doesn't match the last one, we need to open a new
 		// file handle and possibly clean up the old one.
@@ -107,59 +118,126 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
 			wl.logger.Debugf(
 				"Creating new segment file with id %v\n", frameRequest.segment.id)
 			if wl.outputFile != nil {
+				// TODO: try to sync?
 				wl.outputFile.Close()
 				wl.outputFile = nil
-				// TODO: try to sync?
 				// We are done with this segment, add the byte count to the list and
 				// reset the current counter.
 				bytesWritten = append(bytesWritten, curBytesWritten)
 				curBytesWritten = 0
 			}
 			wl.currentSegment = frameRequest.segment
-			file, err := wl.currentSegment.getWriter(wl.settings)
+			file, err := wl.currentSegment.getWriterWithRetry(
+				wl.settings, wl.retryCallback)
 			if err != nil {
-				wl.logger.Errorf("Couldn't open new segment file: %v", err)
-				// TODO: retry, etc
+				// This can only happen if the queue is being closed; abort.
+				break
 			}
 			wl.outputFile = file
 		}
+		// Make sure our writer points to the current file handle.
+		retryWriter.wrapped = wl.outputFile
 
 		// We have the data and a file to write it to. We are now committed
 		// to writing this block unless the queue is closed in the meantime.
 		frameSize := uint32(frameRequest.frame.sizeOnDisk())
-		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
-		// TODO: retry forever if there is an error or n isn't the right
-		// length.
-		n, err := wl.outputFile.Write(frameRequest.frame.serialized)
+
+		// The Write calls below all pass through retryWriter, so they can
+		// only return an error if the write should be aborted. Thus, all we
+		// need to do when we see an error is break out of the request loop.
+		err := binary.Write(retryWriter, binary.LittleEndian, frameSize)
 		if err != nil {
-			wl.logger.Errorf("Couldn't write pending data to disk: %w", err)
+			break
+		}
+		_, err = retryWriter.Write(frameRequest.frame.serialized)
+		if err != nil {
+			break
 		}
 		// Compute / write the frame's checksum
 		checksum := computeChecksum(
 			frameRequest.frame.serialized, wl.settings.ChecksumType)
-		binary.Write(wl.outputFile, binary.LittleEndian, checksum)
+		err = binary.Write(wl.outputFile, binary.LittleEndian, checksum)
+		if err != nil {
+			break
+		}
 		// Write the frame footer's (duplicate) length
-		binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
-		curBytesWritten += int64(n) + frameMetadataSize
+		err = binary.Write(wl.outputFile, binary.LittleEndian, frameSize)
+		if err != nil {
+			break
+		}
+		// Update the byte count as the last step: that way if we abort while
+		// a frame is partially written, we only report up to the last
+		// complete frame. (This almost never matters, but it allows for
+		// more controlled recovery after a bad shutdown.)
+		curBytesWritten += int64(frameSize)
+
+		// Explicitly check if we should abort before starting the next frame.
+		select {
+		case <-wl.requestChan:
+			break outerLoop
+		default:
+		}
 	}
 	// Return the total byte counts, including the final segment.
 	return append(bytesWritten, curBytesWritten)
 }
 
-/*
-func writeAll(writer io.Writer, p []byte) (int, error) {
-	var N int
-	for len(p) > 0 {
-		n, err := writer.Write(p)
-		N, p = N+n, p[n:]
-		if err != nil && isRetryErr(err) {
-			return N, err
-		}
+// retryCallback is called (by way of retryCallbackWriter) when there is
+// an error writing to a segment file. It pauses for a configurable
+// interval and returns true if the operation should be retried (which
+// it always should, unless the queue is being closed).
+func (wl *writerLoop) retryCallback(err error) bool {
+	if writeErrorIsRetriable(err) {
+		return true
 	}
-	return N, nil
+	// If the error is not immediately retriable, log the error
+	// and wait for the retry interval before trying again, but
+	// abort if the queue is closed (indicated by the request channel
+	// becoming unblocked).
+	wl.logger.Errorf("Writing to segment %v: %v",
+		wl.currentSegment.id, err)
+	select {
+	case <-time.After(time.Second):
+		// TODO: use a configurable interval here
+		return true
+	case <-wl.requestChan:
+		return false
+	}
 }
 
-func isRetryErr(err error) bool {
-	return err == syscall.EINTR || err == syscall.EAGAIN
+// writeErrorIsRetriable returns true if the given IO error can be
+// immediately retried.
+func writeErrorIsRetriable(err error) bool {
+	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }
-*/
+
+// callbackRetryWriter is an io.Writer that wraps another writer and enables
+// write-with-retry. When a Write encounters an error, it is passed to the
+// retry callback. If the callback returns true, the the writer retries
+// any unwritten portion of the input, otherwise it passes the error back
+// to the caller.
+// This helper is specifically for working with the writer loop, which needs
+// to be able to retry forever at configurable intervals, but also cancel
+// immediately if the queue is closed.
+// This writer is unbuffered. In particular, it is safe to modify
+// "wrapped" in-place as long as it isn't captured by the callback.
+type callbackRetryWriter struct {
+	wrapped io.Writer
+	retry   func(error) bool
+}
+
+func (w callbackRetryWriter) Write(p []byte) (int, error) {
+	bytesWritten := 0
+	writer := w.wrapped
+	n, err := writer.Write(p)
+	for n < len(p) {
+		if err != nil && !w.retry(err) {
+			return bytesWritten + n, err
+		}
+		// Advance p and try again.
+		bytesWritten += n
+		p = p[n:]
+		n, err = writer.Write(p)
+	}
+	return bytesWritten + n, nil
+}

@@ -186,6 +186,21 @@ func (segment *queueSegment) getWriter(
 	return file, nil
 }
 
+// getWriterWithRetry tries to create a file handle for writing via
+// queueSegment.getWriter. On error, it retries as long as the given
+// retry callback returns true. This is used for timed retries when
+// creating a queue segment from the writer loop.
+func (segment *queueSegment) getWriterWithRetry(
+	queueSettings *Settings, retry func(error) bool,
+) (*os.File, error) {
+	file, err := segment.getWriter(queueSettings)
+	for err != nil && retry(err) {
+		// Try again
+		file, err = segment.getWriter(queueSettings)
+	}
+	return file, err
+}
+
 func readSegmentHeader(in *os.File) (*segmentHeader, error) {
 	header := &segmentHeader{}
 	err := binary.Read(in, binary.LittleEndian, &header.version)
@@ -230,69 +245,3 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	}
 	return total
 }
-
-// nextDataFrame returns the bytes of the next data frame, or an error if the
-// frame couldn't be read. If an error is returned, the caller should log it
-// and drop the containing segment. A nil return value with no error means
-// there are no frames to read.
-/*func (reader *segmentReader) nextDataFrame() ([]byte, error) {
-	if reader.curPosition >= reader.endPosition {
-		return nil, nil
-	}
-	var frameLength uint32
-	err := binary.Read(reader.raw, binary.LittleEndian, &frameLength)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Disk queue couldn't read next frame length: %w", err)
-	}
-
-	// Bounds checking to make sure we can read this frame.
-	if reader.curPosition+segmentOffset(frameLength) > reader.endPosition {
-		// This frame extends past the end of our data region, which
-		// should never happen unless there is data corruption.
-		return nil, fmt.Errorf(
-			"Data frame length (%d) exceeds remaining data (%d)",
-			frameLength, reader.endPosition-reader.curPosition)
-	}
-	if frameLength <= frameMetadataSize {
-		// Actual enqueued data must have positive length
-		return nil, fmt.Errorf(
-			"Data frame with no data (length %d)", frameLength)
-	}
-
-	// Read the actual frame data
-	dataLength := frameLength - frameMetadataSize
-	data := make([]byte, dataLength)
-	_, err = io.ReadFull(reader.raw, data)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Couldn't read data frame from disk: %w", err)
-	}
-
-	// Read the footer (length + checksum)
-	var duplicateLength uint32
-	err = binary.Read(reader.raw, binary.LittleEndian, &duplicateLength)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Disk queue couldn't read trailing frame length: %w", err)
-	}
-	if duplicateLength != frameLength {
-		return nil, fmt.Errorf(
-			"Disk queue: inconsistent frame length (%d vs %d)",
-			frameLength, duplicateLength)
-	}
-
-	// Validate the checksum
-	var checksum uint32
-	err = binary.Read(reader.raw, binary.LittleEndian, &checksum)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Disk queue couldn't read data frame's checksum: %w", err)
-	}
-	if computeChecksum(data, reader.checksumType) != checksum {
-		return nil, fmt.Errorf("Disk queue: bad data frame checksum")
-	}
-
-	reader.curPosition += segmentOffset(frameLength)
-	return data, nil
-}*/
