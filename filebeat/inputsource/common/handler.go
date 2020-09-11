@@ -79,13 +79,10 @@ func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback Me
 					return errors.Wrap(err, string(family)+" split_client error")
 				}
 				r.Reset()
-				bytes := scanner.Bytes()
 
-				// A copy needs to be made to ensure that the asyncronus nature of the pipeline doesnt rely on bytes
-				// that have been overwritten by the scanner.
-				msg := make([]byte, len(bytes))
-				copy(msg, bytes)
-				callback(msg, metadata)
+				// Scanner.Bytes() returns a byte slice whose life span is only the span of `callback()`. Copies should
+				// be made in case asynchronous processing is done.
+				callback(scanner.Bytes(), metadata)
 			}
 
 			// We are out of the scanner, either we reached EOF or another fatal error occurred.

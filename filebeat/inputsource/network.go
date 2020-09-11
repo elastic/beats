@@ -43,4 +43,5 @@ type TLSMetadata struct {
 }
 
 // NetworkFunc defines callback executed when a new event is received from a network source.
+// data is a safe reference only for the lifespan of this func. Any offline usage should be done on a copy.
 type NetworkFunc = func(data []byte, metadata NetworkMetadata)
