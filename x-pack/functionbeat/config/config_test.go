@@ -105,9 +105,24 @@ func TestFunctionName(t *testing.T) {
 		assert.Equal(t, functionName("hello-world"), f)
 	})
 
+	t.Run("valid function name: length of 29 chars", func(t *testing.T) {
+		f := functionName("")
+		err := f.Unpack("something-which-is--29-chars")
+		if !assert.NoError(t, err) {
+			return
+		}
+		assert.Equal(t, functionName("something-which-is--29-chars"), f)
+	})
+
 	t.Run("invalid function name", func(t *testing.T) {
 		f := functionName("")
 		err := f.Unpack("hello world")
+		assert.Error(t, err)
+	})
+
+	t.Run("invalid function name: length", func(t *testing.T) {
+		f := functionName("")
+		err := f.Unpack("something-which-is-greater-than-twenty-nine-characters")
 		assert.Error(t, err)
 	})
 }
