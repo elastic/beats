@@ -50,6 +50,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "root",
 		},
 		3: {
 			name:  "systemd",
@@ -65,6 +66,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "root",
 		},
 	}
 
@@ -136,6 +138,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"username":   "root",
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -217,6 +220,7 @@ func TestAddProcessMetadata(t *testing.T) {
 						"pid":        1,
 						"ppid":       0,
 						"start_time": startTime,
+						"username":   "root",
 					},
 					"container": common.MapStr{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -245,6 +249,7 @@ func TestAddProcessMetadata(t *testing.T) {
 						"pid":        1,
 						"ppid":       0,
 						"start_time": startTime,
+						"username":   "root",
 						"env": map[string]string{
 							"HOME":       "/",
 							"TERM":       "linux",
@@ -280,6 +285,7 @@ func TestAddProcessMetadata(t *testing.T) {
 						"pid":        1,
 						"ppid":       0,
 						"start_time": startTime,
+						"username":   "root",
 						"env": map[string]string{
 							"HOME":       "/",
 							"TERM":       "linux",
@@ -474,6 +480,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"username":   "root",
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -593,6 +600,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"username":   "root",
 				},
 			},
 		},

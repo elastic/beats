@@ -69,6 +69,7 @@ var defaultFields = common.MapStr{
 		"pid":        nil,
 		"ppid":       nil,
 		"start_time": nil,
+		"username":   nil,
 	},
 	"container": common.MapStr{
 		"id": nil,

@@ -65,11 +65,11 @@ type addProcessMetadata struct {
 }
 
 type processMetadata struct {
-	name, title, exe string
-	args             []string
-	env              map[string]string
-	startTime        time.Time
-	pid, ppid        int
+	name, title, exe, username string
+	args                       []string
+	env                        map[string]string
+	startTime                  time.Time
+	pid, ppid                  int
 	//
 	fields common.MapStr
 }
@@ -311,6 +311,7 @@ func (p *processMetadata) toMap() common.MapStr {
 			"pid":        p.pid,
 			"ppid":       p.ppid,
 			"start_time": p.startTime,
+			"username":   p.username,
 		},
 	}
 }
