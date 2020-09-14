@@ -18366,7 +18366,7 @@ Nodes statistics.
 
 
 
-*`elasticsearch.cluster.stats.nodes.count`*::
+*`elasticsearch.cluster.stats.nodes.total`*::
 +
 --
 Total number of nodes in cluster.
@@ -18403,7 +18403,7 @@ Indices statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.count`*::
+*`elasticsearch.cluster.stats.indices.total`*::
 +
 --
 Total number of indices in cluster.
@@ -18420,7 +18420,7 @@ Shard statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.shards.count`*::
+*`elasticsearch.cluster.stats.indices.shards.total`*::
 +
 --
 Total number of shards in cluster.

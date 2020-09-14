@@ -23,7 +23,6 @@ import (
 	"hash/fnv"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -148,7 +147,7 @@ func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
 	return clusterSettings, nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -216,19 +215,11 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		},
 	}
 
-	event := mb.Event{}
-	event.RootFields = common.MapStr{
-		"cluster_uuid":  info.ClusterID,
-		"cluster_name":  clusterName,
-		"timestamp":     common.Time(time.Now()),
-		"interval_ms":   m.Module().Config().Period / time.Millisecond,
-		"type":          "cluster_stats",
-		"license":       l,
-		"version":       info.Version.Number.String(),
-		"cluster_stats": clusterStats,
-		"cluster_state": clusterState,
-		"stack_stats":   stackStats,
+	event := mb.Event{
+		ModuleFields: common.MapStr{},
 	}
+	event.ModuleFields.Put("cluster.name", info.ClusterName)
+	event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 	clusterSettings, err := getClusterMetadataSettings(m)
 	if err != nil {
@@ -238,7 +229,27 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	metricSetFields, err := schema.Apply(data)
+	if err != nil {
+		return errors.Wrap(err, "failure applying cluster stats schema")
+	}
+
+	stackData, err := stackSchema.Apply(stackStats)
+	if err != nil {
+		return errors.Wrap(err, "failure applying stack schema")
+	}
+
+	metricSetFields.Put("stack", stackData)
+	metricSetFields.Put("license", l)
+	metricSetFields.Put("version", info.Version.Number.String())
+	metricSetFields.Put("cluster_name", clusterName)
+	//metricSetFields.Put("cluster_stats", clusterStats)
+	metricSetFields.Put("state", clusterState)
+	//metricSetFields.Put("stack_stats", stackStats)
+
+	event.MetricSetFields = metricSetFields
+
+	//event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 	r.Event(event)
 
 	return nil
