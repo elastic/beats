@@ -52,6 +52,16 @@ type Settings struct {
 	MaxSegmentSize uint64
 
 	ChecksumType ChecksumType
+
+	// How many events will be read from disk while waiting for a consumer
+	// request.
+	ReadAheadLimit int
+
+	// How many events will be queued in memory waiting to be written to disk.
+	// This setting should rarely matter in practice, but if data is coming
+	// in faster than it can be written to disk for an extended period,
+	// this limit can keep it from overflowing memory.
+	WriteAheadLimit int
 }
 
 type segmentID uint64
@@ -61,7 +71,7 @@ type queuePosition struct {
 	segment segmentID
 
 	// The byte offset of this position within its segment.
-	// This is specified relative to the start of the segment's data region, i.e.
+	// This is relative to the start of the segment's data region, i.e.
 	// an offset of 0 means the first byte after the end of the segment header.
 	offset segmentOffset
 }
@@ -159,7 +169,7 @@ func queueFactory(
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Disk queue couldn't load user config: %w", err)
 	}
 	//settings.producerAckListener = ackListener
 	return NewQueue(logger, settings)
@@ -186,18 +196,23 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
 	}
 
+	// Index any existing data segments to be placed in segments.reading.
+	initialSegments, err := scanExistingSegments(settings.directoryPath())
+	if err != nil {
+		return nil, err
+	}
+	var nextSegmentID segmentID
+	if len(initialSegments) > 0 {
+		lastID := initialSegments[len(initialSegments)-1].id
+		nextSegmentID = lastID + 1
+	}
+
 	// Load the file handle for the queue state.
 	stateFile, err := stateFileForPath(settings.stateFilePath())
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
 	}
-	defer func() {
-		if err != nil {
-			// If the function is returning because of an error, close the
-			// file handle.
-			stateFile.Close()
-		}
-	}()
+	//if stateFile.loadedState.
 
 	// We wait for four goroutines: core loop, reader loop, writer loop,
 	// deleter loop.
@@ -215,7 +230,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 		requestChan:  make(chan readerLoopRequest, 1),
 		responseChan: make(chan readerLoopResponse),
-		output:       make(chan *readFrame, 100), // TODO: customize this buffer size
+		output:       make(chan *readFrame, settings.ReadAheadLimit),
 		decoder:      newEventDecoder(),
 	}
 	go func() {
@@ -246,17 +261,6 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		waitGroup.Done()
 	}()
 
-	// Index any existing data segments to be placed in segments.reading.
-	initialSegments, err := scanExistingSegments(settings.directoryPath())
-	if err != nil {
-		return nil, err
-	}
-	var nextSegmentID segmentID
-	if len(initialSegments) > 0 {
-		lastID := initialSegments[len(initialSegments)-1].id
-		nextSegmentID = lastID + 1
-	}
-
 	queue := &diskQueue{
 		logger:   logger,
 		settings: settings,
@@ -271,7 +275,10 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		writerLoop:  writerLoop,
 		deleterLoop: deleterLoop,
 
-		// TODO: customize this channel buffer size
+		// TODO: is this a reasonable size for this channel buffer?
+		// Should this be customizable? (Tentatively: no, since we
+		// expect most producer write requests to be handled near-
+		// instantly so the requests are unlikely to accumulate).
 		producerWriteRequestChan:  make(chan producerWriteRequest, 10),
 		producerCancelRequestChan: make(chan producerCancelRequest),
 
