@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func init() {
@@ -32,6 +33,6 @@ func (*contextProvider) Run(comm composable.ContextProviderComm) error {
 }
 
 // ContextProviderBuilder builds the context provider.
-func ContextProviderBuilder(_ *config.Config) (composable.ContextProvider, error) {
+func ContextProviderBuilder(_ *logger.Logger, _ *config.Config) (composable.ContextProvider, error) {
 	return &contextProvider{}, nil
 }

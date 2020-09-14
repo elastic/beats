@@ -16,6 +16,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
+const missingNamespace = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case."
+
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
@@ -27,7 +29,11 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
 			}
 			if len(*metricDefinitions.Value) == 0 {
-				return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
+				if metric.IgnoreUnsupported {
+					client.Log.Infof(missingNamespace, *resource.ID, metric.Namespace)
+					continue
+				}
+				return nil, errors.Errorf(missingNamespace, *resource.ID, metric.Namespace)
 			}
 
 			// validate metric names and filter on the supported metrics
@@ -54,7 +60,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, resource, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
 			}
 		}
 	}
