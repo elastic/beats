@@ -1,5 +1,8 @@
 description: Pipeline for parsing Google Santa logs.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
@@ -20,6 +23,7 @@ processors:
     field: '@timestamp'
     value: '{{ process.start }}'
     ignore_failure: true
+    ignore_empty_value: true
 - split:
     field: santa.args
     separator: ' '
@@ -69,7 +73,7 @@ processors:
 - set:
     field: event.action
     value: "{{santa.action}}"
-    if: "ctx?.santa?.action != null"
+    ignore_empty_value: true
 - lowercase:
     field: event.action
     ignore_missing: true
@@ -85,6 +89,10 @@ processors:
     field: related.hash
     value: "{{process.hash.sha256}}"
     if: "ctx?.process?.hash != null"
+- set:
+    field: file.x509.issuer.common_name
+    value: "{{santa.certificate.common_name}}"
+    ignore_empty_value: true
 on_failure:
 - set:
     field: error.message

@@ -44,28 +44,28 @@ type configServer struct {
 	f      *os.File
 	ctx    context.Context
 	cancel context.CancelFunc
-	client *client.Client
+	client client.Client
 }
 
 func (s *configServer) OnConfig(cfgString string) {
-	s.client.Status(proto.StateObserved_CONFIGURING, "Writing config file")
+	s.client.Status(proto.StateObserved_CONFIGURING, "Writing config file", nil)
 
 	testCfg := &TestConfig{}
 	if err := yaml.Unmarshal([]byte(cfgString), &testCfg); err != nil {
-		s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to unmarshall config: %s", err))
+		s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to unmarshall config: %s", err), nil)
 		return
 	}
 
 	if testCfg.TestFile != "" {
 		tf, err := os.Create(testCfg.TestFile)
 		if err != nil {
-			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to create file %s: %s", testCfg.TestFile, err))
+			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to create file %s: %s", testCfg.TestFile, err), nil)
 			return
 		}
 
 		err = tf.Close()
 		if err != nil {
-			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to close file %s: %s", testCfg.TestFile, err))
+			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to close file %s: %s", testCfg.TestFile, err), nil)
 			return
 		}
 	}
@@ -75,14 +75,20 @@ func (s *configServer) OnConfig(cfgString string) {
 	}
 
 	if testCfg.Status != nil {
-		s.client.Status(*testCfg.Status, "Custom status")
+		s.client.Status(*testCfg.Status, "Custom status", map[string]interface{}{
+			"status":  *testCfg.Status,
+			"message": "Custom status",
+		})
 	} else {
-		s.client.Status(proto.StateObserved_HEALTHY, "Running")
+		s.client.Status(proto.StateObserved_HEALTHY, "Running", map[string]interface{}{
+			"status":  proto.StateObserved_HEALTHY,
+			"message": "Running",
+		})
 	}
 }
 
 func (s *configServer) OnStop() {
-	s.client.Status(proto.StateObserved_STOPPING, "Stopping")
+	s.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 	s.cancel()
 }
 

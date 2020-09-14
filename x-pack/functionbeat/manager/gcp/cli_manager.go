@@ -76,14 +76,19 @@ func (c *CLIManager) deploy(update bool, name string) error {
 	executer.Add(newOpEnsureBucket(c.log, c.config))
 	executer.Add(newOpUploadToBucket(c.log, c.config, name, functionData.raw))
 
-	ctx := &functionContext{}
-	if update {
-		executer.Add(newOpUpdateFunction(ctx, c.log, c.tokenSrc, functionData.function.Name, functionData.function))
-	} else {
-		executer.Add(newOpCreateFunction(ctx, c.log, c.tokenSrc, c.location, name, functionData.function))
+	token, err := c.getTokenSrc()
+	if err != nil {
+		return err
 	}
 
-	executer.Add(newOpWaitForFunction(ctx, c.log, c.tokenSrc))
+	ctx := &functionContext{}
+	if update {
+		executer.Add(newOpUpdateFunction(ctx, c.log, token, functionData.function.Name, functionData.function))
+	} else {
+		executer.Add(newOpCreateFunction(ctx, c.log, token, c.location, name, functionData.function))
+	}
+
+	executer.Add(newOpWaitForFunction(ctx, c.log, token))
 
 	if err := executer.Execute(nil); err != nil {
 		if rollbackErr := executer.Rollback(nil); rollbackErr != nil {
@@ -104,9 +109,14 @@ func (c *CLIManager) Remove(name string) error {
 		return err
 	}
 
+	token, err := c.getTokenSrc()
+	if err != nil {
+		return err
+	}
+
 	ctx := &functionContext{}
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpDeleteFunction(ctx, c.log, c.location, functionData.function.Name, c.tokenSrc))
+	executer.Add(newOpDeleteFunction(ctx, c.log, c.location, functionData.function.Name, token))
 	executer.Add(newOpDeleteFromBucket(c.log, c.config, name))
 
 	if err := executer.Execute(nil); err != nil {
@@ -151,6 +161,20 @@ func (c *CLIManager) Package(outputPattern string) error {
 	return nil
 }
 
+func (c *CLIManager) getTokenSrc() (oauth2.TokenSource, error) {
+	if c.tokenSrc != nil {
+		return c.tokenSrc, nil
+	}
+
+	var err error
+	c.tokenSrc, err = google.DefaultTokenSource(context.Background(), "https://www.googleapis.com/auth/cloud-platform")
+	if err != nil {
+		return nil, fmt.Errorf("error while creating CLIManager: %+v", err)
+	}
+
+	return c.tokenSrc, nil
+}
+
 // NewCLI returns the interface to manage functions on Google Cloud Platform.
 func NewCLI(
 	log *logp.Logger,
@@ -173,16 +197,10 @@ func NewCLI(
 
 	location := fmt.Sprintf(locationTemplate, config.ProjectID, config.Location)
 
-	tokenSrc, err := google.DefaultTokenSource(context.TODO(), "https://www.googleapis.com/auth/cloud-platform")
-	if err != nil {
-		return nil, fmt.Errorf("error while creating CLIManager: %+v", err)
-	}
-
 	return &CLIManager{
 		config:          config,
 		log:             logp.NewLogger("gcp"),
 		location:        location,
-		tokenSrc:        tokenSrc,
 		templateBuilder: templateBuilder,
 	}, nil
 }

@@ -65,14 +65,14 @@ func NewConfigFromURL(kURL string) (*Config, error) {
 		password, _ = u.User.Password()
 	}
 
-	c := defaultClientConfig()
+	c := DefaultClientConfig()
 	c.Protocol = Protocol(u.Scheme)
 	c.Host = u.Host
 	c.Path = u.Path
 	c.Username = username
 	c.Password = password
 
-	return &c, nil
+	return c, nil
 }
 
 // NewWithRawConfig returns a new Kibana client with a specified configuration.

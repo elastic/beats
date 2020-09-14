@@ -1,4 +1,4 @@
-- name: ftd
+- name: cisco.ftd
   type: group
   description: >
     Fields for Cisco Firepower Threat Defense Firewall.

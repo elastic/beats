@@ -6,22 +6,30 @@ metricbeat:
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:
-        target: "dataset"
+        target: "data_stream"
         fields:
           type: metrics
-          name: docker.status
+          dataset: docker.status
           namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: docker.status
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:
-        target: "dataset"
+        target: "data_stream"
         fields:
           type: metrics
-          name: generic
+          dataset: generic
           namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: generic
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
@@ -31,11 +39,15 @@ metricbeat:
           fields:
             should_be: first
       - add_fields:
-          target: "dataset"
+          target: "data_stream"
           fields:
             type: metrics
-            name: generic
+            dataset: generic
             namespace: testing
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
 
 output:
   elasticsearch:

@@ -1,28 +1,31 @@
 description: Pipeline for parsing gsuite logs
 processors:
   - geoip:
-      field: client.ip
-      target_field: client.geo
+      field: source.ip
+      target_field: source.geo
       ignore_missing: true
   - geoip:
       database_file: GeoLite2-ASN.mmdb
-      field: client.ip
-      target_field: client.as
+      field: source.ip
+      target_field: source.as
       properties:
         - asn
         - organization_name
       ignore_missing: true
   - rename:
-      field: client.as.asn
-      target_field: client.as.number
+      field: source.as.asn
+      target_field: source.as.number
       ignore_missing: true
   - rename:
-      field: client.as.organization_name
-      target_field: client.as.organization.name
+      field: source.as.organization_name
+      target_field: source.as.organization.name
       ignore_missing: true
   - remove:
       field: json
       ignore_missing: true
+  - set:
+      field: event.ingested
+      value: "{{ _ingest.timestamp }}"
 
 on_failure:
   - set:

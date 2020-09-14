@@ -67,7 +67,7 @@ func TestMapMetric(t *testing.T) {
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
@@ -78,11 +78,8 @@ func TestMapMetric(t *testing.T) {
 		metricConfig.Name = []string{"*"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.Nil(t, err)
-		assert.Equal(t, metrics[0].Resource.Id, "123")
-		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
-		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
-		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
+		assert.NoError(t, err)
+		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
@@ -97,13 +94,10 @@ func TestMapMetric(t *testing.T) {
 		metricConfig.Aggregations = []string{"Average"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		assert.True(t, len(metrics) > 0)
-		assert.Equal(t, metrics[0].Resource.Id, "123")
-		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
-		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
-		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
@@ -144,7 +138,6 @@ func TestIntersections(t *testing.T) {
 	intersection, difference = intersections(firstStr, sercondStr)
 	assert.Equal(t, len(intersection), 0)
 	assert.Equal(t, difference, []string{"test4", "test5"})
-
 }
 
 func TestGetMetricDefinitionsByNames(t *testing.T) {
