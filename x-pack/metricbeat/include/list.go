@@ -12,6 +12,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/ec2"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/rds"

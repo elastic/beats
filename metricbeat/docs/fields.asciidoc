@@ -1569,13 +1569,172 @@ type: object
 
 
 
-
-*`aws.billing.metrics.EstimatedCharges.max`*::
+*`aws.billing.EstimatedCharges`*::
 +
 --
 Maximum estimated charges for AWS acccount.
 
 type: long
+
+--
+
+*`aws.billing.Currency`*::
++
+--
+Estimated charges currency unit.
+
+type: keyword
+
+--
+
+*`aws.billing.ServiceName`*::
++
+--
+Service name for the maximum estimated charges.
+
+type: keyword
+
+--
+
+
+*`aws.billing.AmortizedCost.amount`*::
++
+--
+Amortized cost amount
+
+type: double
+
+--
+
+*`aws.billing.AmortizedCost.unit`*::
++
+--
+Amortized cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.BlendedCost.amount`*::
++
+--
+Blended cost amount
+
+type: double
+
+--
+
+*`aws.billing.BlendedCost.unit`*::
++
+--
+Blended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.NormalizedUsageAmount.amount`*::
++
+--
+Normalized usage amount
+
+type: double
+
+--
+
+*`aws.billing.NormalizedUsageAmount.unit`*::
++
+--
+Normalized usage amount unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.UnblendedCost.amount`*::
++
+--
+Unblended cost amount
+
+type: double
+
+--
+
+*`aws.billing.UnblendedCost.unit`*::
++
+--
+Unblended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.UsageQuantity.amount`*::
++
+--
+Usage quantity amount
+
+type: double
+
+--
+
+*`aws.billing.UsageQuantity.unit`*::
++
+--
+Usage quantity unit
+
+type: keyword
+
+--
+
+*`aws.billing.start_date`*::
++
+--
+Start date for retrieving AWS costs
+
+type: keyword
+
+--
+
+*`aws.billing.end_date`*::
++
+--
+End date for retrieving AWS costs
+
+type: keyword
+
+--
+
+
+*`aws.billing.group_definition.key`*::
++
+--
+The string that represents a key for a specified group
+
+type: keyword
+
+--
+
+*`aws.billing.group_definition.type`*::
++
+--
+The string that represents the type of group
+
+type: keyword
+
+--
+
+*`aws.billing.group_by.*`*::
++
+--
+Cost explorer group by key values
+
+
+type: object
 
 --
 
