@@ -166,6 +166,7 @@ var defaultConfig = Config{
 			MaxCapacity:     10000,
 		},
 		FailureCache: CacheSettings{
+			MinTTL:          time.Minute,
 			TTL:             time.Minute,
 			InitialCapacity: 1000,
 			MaxCapacity:     10000,
