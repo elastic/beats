@@ -4,3 +4,4 @@ metricsets:
  - container_instance
  - container_service
  - database_account
+ - compute_vm

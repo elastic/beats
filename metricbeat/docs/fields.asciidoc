@@ -4679,6 +4679,16 @@ type: object
 
 --
 
+*`azure.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
 [float]
 === app_insights
 
@@ -4908,17 +4918,6 @@ type: object
 
 monitor
 
-
-
-*`azure.monitor.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
 
 *`azure.storage.*.*`*::
 +
