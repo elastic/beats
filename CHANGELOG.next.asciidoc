@@ -648,6 +648,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
+- Added new module for Zoom webhooks {pull}20414[20414]
 
 *Heartbeat*
 
