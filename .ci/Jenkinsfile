@@ -312,7 +312,7 @@ def installTools() {
 * the changeset affects a specific module.
 *
 * For such, it's required to look for changes under the module folder and exclude anything else
-* such as ascidoc and png files.
+* such as asciidoc and png files.
 */
 def getCommonModuleInTheChangeSet(String directory) {
   // Use contains to support the target(target: 'make -C <folder>') while target(directory: '<folder>', target: '...')
