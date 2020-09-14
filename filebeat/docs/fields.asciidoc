@@ -1496,7 +1496,7 @@ Fields from Cloudtrail Digest Logs
 *`aws.cloudtrail.digest.log_files`*::
 +
 --
-A list of Logfiles contained in the digest
+A list of Logfiles contained in the digest.
 
 type: nested
 
@@ -1589,6 +1589,15 @@ type: keyword
 The algorithm used to sign the digest file.
 
 type: keyword
+
+--
+
+*`aws.cloudtrail.insight_details`*::
++
+--
+Shows information about the underlying triggers of an Insights event, such as event source, user agent, statistics, API name, and whether the event is the start or end of the Insights event.
+
+type: flattened
 
 --
 

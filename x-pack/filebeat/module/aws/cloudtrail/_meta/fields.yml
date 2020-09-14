@@ -231,7 +231,7 @@
         - name: log_files
           type: nested
           description: >-
-            A list of Logfiles contained in the digest
+            A list of Logfiles contained in the digest.
         - name: start_time
           type: date
           description: >-
@@ -283,3 +283,10 @@
           type: keyword
           description: >-
             The algorithm used to sign the digest file.
+    - name: insight_details
+      type: flattened
+      description: >-
+        Shows information about the underlying triggers of an Insights
+        event, such as event source, user agent, statistics, API name,
+        and whether the event is the start or end of the Insights
+        event.

@@ -694,6 +694,10 @@ processors:
       field: "json.digestSignatureAlgorithm"
       target_field: "aws.cloudtrail.digest.signature_algorithm"
       ignore_failure: true
+  - rename:
+      field: "json.insightDetails"
+      target_field: "aws.cloudtrail.insight_details"
+      ignore_failure: true
   - remove:
       field:
         - "json"
