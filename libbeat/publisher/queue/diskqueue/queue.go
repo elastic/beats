@@ -215,7 +215,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 		requestChan:  make(chan readerLoopRequest, 1),
 		responseChan: make(chan readerLoopResponse),
-		output:       make(chan *readFrame, 20), // TODO: customize this buffer size
+		output:       make(chan *readFrame, 100), // TODO: customize this buffer size
 		decoder:      newEventDecoder(),
 	}
 	go func() {
