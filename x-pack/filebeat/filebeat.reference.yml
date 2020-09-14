@@ -1450,6 +1450,27 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#--------------------------------- Zoom Module ---------------------------------
+- module: zoom
+  webhook:
+    enabled: true
+
+    # The type of input to use
+    #var.input: http_endpoint
+
+    # The interface to listen for incoming HTTP requests. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.listen_address: localhost
+
+    # The port to bind to
+    #var.listen_port: 80
+
+    # The header Zoom uses to send its secret token, defaults to "Authorization"
+    #secret.header: Authorization
+
+    # The secret token value created by Zoom
+    #secret.value: ZOOMTOKEN
+
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
   zia:

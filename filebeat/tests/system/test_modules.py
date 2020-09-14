@@ -261,6 +261,7 @@ def clean_keys(obj):
         "gsuite.login",
         "gsuite.saml",
         "gsuite.user_accounts",
+        "zoom.webhook",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
