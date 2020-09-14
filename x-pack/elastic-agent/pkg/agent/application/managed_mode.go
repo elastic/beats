@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -57,6 +58,7 @@ func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
 	rawConfig *config.Config,
+	reexec reexecManager,
 ) (*Managed, error) {
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
@@ -209,9 +211,12 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
 		&handlerUpgrade{
-			settings: cfg.Settings.DownloadConfig,
-			log:      log,
-			closers:  []context.CancelFunc{managedApplication.cancelCtxFn},
+			upgrader: upgrade.NewUpgrader(
+				cfg.Settings.DownloadConfig,
+				log,
+				[]context.CancelFunc{managedApplication.cancelCtxFn},
+				reexec),
+			log: log,
 		},
 	)
 
