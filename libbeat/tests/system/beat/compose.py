@@ -202,7 +202,7 @@ class ComposeMixin(object):
         basename = os.path.basename(cls.find_compose_path())
 
         def positivehash(x):
-            return hash(x) % ((sys.maxsize+1) * 2)
+            return hash(x) % ((sys.maxsize + 1) * 2)
 
         return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
 

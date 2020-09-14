@@ -103,7 +103,7 @@ func newLocal(
 	}
 	localApplication.router = router
 
-	composableCtrl, err := composable.New(rawConfig)
+	composableCtrl, err := composable.New(log, rawConfig)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
@@ -116,7 +116,7 @@ func newLocal(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker},
 		},
 		monitor,
 	)
