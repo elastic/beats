@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
+- Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
 
 ==== Added
 
