@@ -82,6 +82,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Tracking session end reason in panw module. {pull}18705[18705]
 - Removed experimental modules `citrix`, `kaspersky`, `rapid7` and `tenable`. {pull}20706[20706]
+- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 
 *Heartbeat*
 
