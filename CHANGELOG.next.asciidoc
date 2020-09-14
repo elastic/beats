@@ -402,6 +402,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Functionbeat*
 
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
+- Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
 
 ==== Added
 
