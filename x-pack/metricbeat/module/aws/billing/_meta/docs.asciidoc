@@ -31,6 +31,26 @@ image::./images/metricbeat-aws-billing-overview.png[]
 - module: aws
   period: 24h
   metricsets:
-    - cost
+    - billing
   credential_profile_name: elastic-beats
+  cost_explorer_config:
+    group_by_dimension_keys:
+      - "AZ"
+      - "INSTANCE_TYPE"
+      - "SERVICE"
+    group_by_tag_keys:
+      - "aws:createdBy"
 ----
+
+[float]
+=== Metricset-specific configuration notes
+When querying AWS Cost Explorer API, you can group AWS costs using up to two
+different groups, either dimensions, tag keys, or both. Right now we support
+group by type dimension and type tag with separate config parameters:
+
+* *group_by_dimension_keys*: A list of keys used in Cost Explorer to group by
+dimensions. Valid values are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME,
+LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TAGS, TENANCY, and
+USAGE_TYPE.
+
+* *group_by_tag_keys*: A list of keys used in Cost Explorer to group by tags.

@@ -150,7 +150,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) getCloudWatchBillingMetrics(svcCloudwatch cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) []mb.Event {
+func (m *MetricSet) getCloudWatchBillingMetrics(
+	svcCloudwatch cloudwatchiface.ClientAPI,
+	startTime time.Time,
+	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
 	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
@@ -159,38 +162,39 @@ func (m *MetricSet) getCloudWatchBillingMetrics(svcCloudwatch cloudwatchiface.Cl
 		return nil
 	}
 
-	if listMetricsOutput != nil && len(listMetricsOutput) != 0 {
-		metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
+	if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
+		return events
+	}
 
-		metricDataOutput, err := aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
-		if err != nil {
-			err = fmt.Errorf("aws GetMetricDataResults failed with %w, skipping region %s", err, regionName)
-			m.Logger().Error(err.Error())
-			return nil
-		}
+	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
+	metricDataOutput, err := aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
+	if err != nil {
+		err = fmt.Errorf("aws GetMetricDataResults failed with %w, skipping region %s", err, regionName)
+		m.Logger().Error(err.Error())
+		return nil
+	}
 
-		// Find a timestamp for all metrics in output
-		timestamp := aws.FindTimestamp(metricDataOutput)
-		if !timestamp.IsZero() {
-			for _, output := range metricDataOutput {
-				if len(output.Values) == 0 {
-					continue
+	// Find a timestamp for all metrics in output
+	timestamp := aws.FindTimestamp(metricDataOutput)
+	if !timestamp.IsZero() {
+		for _, output := range metricDataOutput {
+			if len(output.Values) == 0 {
+				continue
+			}
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, labelSeparator)
+
+				event := aws.InitEvent("", m.AccountName, m.AccountID)
+				event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+
+				i := 1
+				for i < len(labels)-1 {
+					event.MetricSetFields.Put(labels[i], labels[i+1])
+					i += 2
 				}
-				exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-				if exists {
-					labels := strings.Split(*output.Label, labelSeparator)
-
-					event := aws.InitEvent("", m.AccountName, m.AccountID)
-					event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
-
-					i := 1
-					for i < len(labels)-1 {
-						event.MetricSetFields.Put(labels[i], labels[i+1])
-						i += 2
-					}
-					event.Timestamp = endTime
-					events = append(events, event)
-				}
+				event.Timestamp = endTime
+				events = append(events, event)
 			}
 		}
 	}
