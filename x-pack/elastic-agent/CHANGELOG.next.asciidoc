@@ -18,3 +18,4 @@
 - Add new `synthetics/*` inputs to run Heartbeat {pull}20387[20387]
 - Users of the Docker image can now pass `FLEET_ENROLL_INSECURE=1` to include the `--insecure` flag with the `elastic-agent enroll` command {issue}20312[20312] {pull}20713[20713]
 - Add support for dynamic inputs with providers and `{{variable|"default"}}` substitution. {pull}20839[20839]
+- Add support for EQL based condition on inputs {pull}20994[20994]

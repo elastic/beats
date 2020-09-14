@@ -148,7 +148,7 @@ func newManaged(
 	}
 	managedApplication.router = router
 
-	composableCtrl, err := composable.New(rawConfig)
+	composableCtrl, err := composable.New(log, rawConfig)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
@@ -160,7 +160,7 @@ func newManaged(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config), filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config)},
 		},
 		monitor,
 	)
