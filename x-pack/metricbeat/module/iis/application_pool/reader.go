@@ -45,16 +45,16 @@ type WorkerProcess struct {
 }
 
 var appPoolCounters = map[string]string{
-	"process.pid":                          "\\Process(w3wp*)\\ID Process",
-	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
-	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
-	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
-	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
-	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
-	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
-	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
-	"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
+	"process.pid": "\\Process(w3wp*)\\ID Process",
+	//"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
+	//"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
+	//"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
+	//"process.working_set":                  "\\Process(w3wp*)\\Working Set",
+	//"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
+	//"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
+	//"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
+	//"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
+	//"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
 	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
 	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
 	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
@@ -101,10 +101,10 @@ func (r *Reader) initAppPools() error {
 			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value)
-				continue
 			} else {
-				return errors.Wrapf(err, `failed to expand counter (query="%v")`, value)
+				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
 			}
+			continue
 		}
 		newQueries = append(newQueries, childQueries...)
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
