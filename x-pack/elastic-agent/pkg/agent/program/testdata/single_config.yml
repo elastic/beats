@@ -1,13 +1,13 @@
 name: Production Website DB Servers
 fleet:
+  enabled: true
   agent:
     id: fleet-agent-id
-  api:
-    access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-    kibana:
-      protocol: https
-      host: localhost:5601
-      timeout: 30s
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  kibana:
+    protocol: https
+    host: localhost:5601
+    timeout: 30s
 
 outputs:
   default:
@@ -29,11 +29,11 @@ inputs:
   use_output: default
   streams:
     - metricset: status
-      dataset:
-        name: docker.status
+      data_stream:
+        dataset: docker.status
     - metricset: info
-      dataset:
-        name: ""
+      data_stream:
+        dataset: ""
   hosts: ["http://127.0.0.1:8080"]
 - type: logfile
   use_output: default
@@ -44,7 +44,7 @@ inputs:
   vars:
     var: value
 - type: logfile
-  dataset:
+  data_stream:
     type: testtype
   use_output: default
   streams:
@@ -55,7 +55,7 @@ inputs:
     var: value
 - id: apache-metrics-id
   type: apache/metrics
-  dataset:
+  data_stream:
     namespace: testing
   use_output: default
   processors:
@@ -67,13 +67,21 @@ inputs:
       metricset: info
       hosts: ["http://apache.remote"]
   hosts: ["http://apache.local"]
+- type: synthetics/http
+  id: unique-http-id
+  name: my-http
+  schedule: '*/5 * * * * * *'
+  host: "http://localhost:80/service/status"
+  timeout: 16s
+  wait: 1s
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22
@@ -157,11 +165,8 @@ inputs:
         file: true
         network: true
 
-settings.monitoring:
+agent.monitoring:
   use_output: monitoring
 
-management:
-  host: "localhost"
-
-config:
+agent:
   reload: 123

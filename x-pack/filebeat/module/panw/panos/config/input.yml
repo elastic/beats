@@ -101,6 +101,7 @@ processors:
         source.packets: 44
         server.packets: 45
         destination.packets: 45
+        panw.panos.endreason: 46
         observer.hostname: 52
 
   - extract_array:

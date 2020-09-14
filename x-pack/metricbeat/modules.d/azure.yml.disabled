@@ -93,3 +93,24 @@
 #  tenant_id: '${AZURE_TENANT_ID:""}'
 #  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 #  refresh_list_interval: 600s
+
+#- module: azure
+#  metricsets:
+#  - billing
+#  enabled: true
+#  period: 24h
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
+
+#- module: azure
+#  metricsets:
+#    - app_insights
+#  enabled: true
+#  period: 300s
+#  application_id: ''
+#  api_key: ''
+#  metrics:
+#   - id: ["requests/count", "requests/duration"]

@@ -2,8 +2,11 @@
 description: Pipeline for normalizing Zeek ssl.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.ssl.ts
     formats:
@@ -62,7 +65,7 @@ processors:
 - kv:
     field: zeek.ssl.issuer
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.server.issuer
     ignore_missing: true
 - rename:
@@ -73,26 +76,50 @@ processors:
     field: zeek.ssl.server.issuer.C
     target_field: zeek.ssl.server.issuer.country
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.country
+    value: '{{zeek.ssl.server.issuer.country}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.issuer.CN
     target_field: zeek.ssl.server.issuer.common_name
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.common_name
+    value: '{{zeek.ssl.server.issuer.common_name}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.issuer.L
     target_field: zeek.ssl.server.issuer.locality
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.locality
+    value: '{{zeek.ssl.server.issuer.locality}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.issuer.O
     target_field: zeek.ssl.server.issuer.organization
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.organization
+    value: '{{zeek.ssl.server.issuer.organization}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.issuer.OU
     target_field: zeek.ssl.server.issuer.organizational_unit
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.organizational_unit
+    value: '{{zeek.ssl.server.issuer.organizational_unit}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.issuer.ST
     target_field: zeek.ssl.server.issuer.state
     ignore_missing: true
+- set:
+    field: tls.server.x509.issuer.state_or_province
+    value: '{{zeek.ssl.server.issuer.state}}'
+    ignore_empty_value: true
 - gsub:
     field: zeek.ssl.subject
     pattern: \\,
@@ -101,7 +128,7 @@ processors:
 - kv:
     field: zeek.ssl.subject
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.server.subject
     ignore_missing: true
 - remove:
@@ -111,26 +138,50 @@ processors:
     field: zeek.ssl.server.subject.C
     target_field: zeek.ssl.server.subject.country
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.country
+    value: '{{zeek.ssl.server.subject.country}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.subject.CN
     target_field: zeek.ssl.server.subject.common_name
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.common_name
+    value: '{{zeek.ssl.server.subject.common_name}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.subject.L
     target_field: zeek.ssl.server.subject.locality
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.locality
+    value: '{{zeek.ssl.server.subject.locality}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.subject.O
     target_field: zeek.ssl.server.subject.organization
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.organization
+    value: '{{zeek.ssl.server.subject.organization}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.subject.OU
     target_field: zeek.ssl.server.subject.organizational_unit
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.organizational_unit
+    value: '{{zeek.ssl.server.subject.organizational_unit}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.server.subject.ST
     target_field: zeek.ssl.server.subject.state
     ignore_missing: true
+- set:
+    field: tls.server.x509.subject.state_or_province
+    value: '{{zeek.ssl.server.subject.state}}'
+    ignore_empty_value: true
 - gsub:
     field: zeek.ssl.client_issuer
     pattern: \\,
@@ -139,7 +190,7 @@ processors:
 - kv:
     field: zeek.ssl.client_issuer
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.client.issuer
     ignore_missing: true
 - rename:
@@ -150,26 +201,50 @@ processors:
     field: zeek.ssl.client.issuer.C
     target_field: zeek.ssl.client.issuer.country
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.country
+    value: '{{zeek.ssl.client.issuer.country}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.issuer.CN
     target_field: zeek.ssl.client.issuer.common_name
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.common_name
+    value: '{{zeek.ssl.client.issuer.common_name}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.issuer.L
     target_field: zeek.ssl.client.issuer.locality
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.locality
+    value: '{{zeek.ssl.client.issuer.locality}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.issuer.O
     target_field: zeek.ssl.client.issuer.organization
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.organization
+    value: '{{zeek.ssl.client.issuer.organization}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.issuer.OU
     target_field: zeek.ssl.client.issuer.organizational_unit
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.organizational_unit
+    value: '{{zeek.ssl.client.issuer.organizational_unit}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.issuer.ST
     target_field: zeek.ssl.client.issuer.state
     ignore_missing: true
+- set:
+    field: tls.client.x509.issuer.state_or_province
+    value: '{{zeek.ssl.client.issuer.state}}'
+    ignore_empty_value: true
 - gsub:
     field: zeek.ssl.client_subject
     pattern: \\,
@@ -178,7 +253,7 @@ processors:
 - kv:
     field: zeek.ssl.client_subject
     field_split: ','
-    value_split: =
+    value_split: '='
     target_field: zeek.ssl.client.subject
     ignore_missing: true
 - remove:
@@ -188,26 +263,50 @@ processors:
     field: zeek.ssl.client.subject.C
     target_field: zeek.ssl.client.subject.country
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.country
+    value: '{{zeek.ssl.client.subject.country}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.subject.CN
     target_field: zeek.ssl.client.subject.common_name
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.common_name
+    value: '{{zeek.ssl.client.subject.common_name}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.subject.L
     target_field: zeek.ssl.client.subject.locality
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.locality
+    value: '{{zeek.ssl.client.subject.locality}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.subject.O
     target_field: zeek.ssl.client.subject.organization
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.organization
+    value: '{{zeek.ssl.client.subject.organization}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.subject.OU
     target_field: zeek.ssl.client.subject.organizational_unit
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.organizational_unit
+    value: '{{zeek.ssl.client.subject.organizational_unit}}'
+    ignore_empty_value: true
 - rename:
     field: zeek.ssl.client.subject.ST
     target_field: zeek.ssl.client.subject.state
     ignore_missing: true
+- set:
+    field: tls.client.x509.subject.state_or_province
+    value: '{{zeek.ssl.client.subject.state}}'
+    ignore_empty_value: true
 - set:
     field: tls.cipher
     value: '{{zeek.ssl.cipher}}'

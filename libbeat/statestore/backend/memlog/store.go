@@ -196,6 +196,16 @@ func (s *store) Remove(key string) error {
 	return s.logOperation(&opRemove{K: key})
 }
 
+// Checkpoint triggers a state checkpoint operation. All state will be written
+// to a new transaction data file and fsync'ed. The log file will be reset after
+// a successful write.
+func (s *store) Checkpoint() error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	return s.disk.WriteCheckpoint(s.mem.table)
+}
+
 // lopOperation ensures that the diskstore reflects the recent changes to the
 // in memory store by either triggering a checkpoint operations or adding the
 // operation type to the update log file.

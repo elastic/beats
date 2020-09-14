@@ -21,6 +21,9 @@ import (
 // EnrollType is the type of enrollment to do with the elastic-agent.
 type EnrollType string
 
+// ErrTooManyRequests is received when the remote server is overloaded.
+var ErrTooManyRequests = errors.New("too many requests received (429)")
+
 const (
 	// PermanentEnroll is default enrollment type, by default an Agent is permanently enroll to Agent.
 	PermanentEnroll = EnrollType("PERMANENT")
@@ -109,7 +112,6 @@ func (e *EnrollRequest) Validate() error {
 // Example:
 // {
 //   "action": "created",
-//   "success": true,
 //   "item": {
 //     "id": "a4937110-e53e-11e9-934f-47a8e38a522c",
 //     "active": true,
@@ -123,9 +125,8 @@ func (e *EnrollRequest) Validate() error {
 //   }
 // }
 type EnrollResponse struct {
-	Action  string             `json:"action"`
-	Success bool               `json:"success"`
-	Item    EnrollItemResponse `json:"item"`
+	Action string             `json:"action"`
+	Item   EnrollItemResponse `json:"item"`
 }
 
 // EnrollItemResponse item response.
@@ -189,6 +190,10 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return nil, ErrTooManyRequests
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, extract(resp.Body)

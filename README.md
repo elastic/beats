@@ -1,7 +1,6 @@
-[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/job/master/)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/)
 [![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
-[![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 # Beats - The Lightweight Shippers of the Elastic Stack
@@ -94,11 +93,13 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 (This service is only available for users affiliated with Elastic and not for open-source contributors.)
 
 * [beats][]
-  * `jenkins run the tests please`
-  * `jenkins run tests`
+  * `jenkins run the tests please` or `jenkins run tests` or `/test` will kick off a default build.
+  * `/test macos` will kick off a default build with also the `macos` stages.
 * [apm-beats-update][]
   * `/run apm-beats-update`
+* [apm-beats-packaging][]
+  * `/package` or `/packaging` will kick of a build to generate the packages for beats.
 
-
-[beats]: https://beats-ci.elastic.co/job/Beats/job/beats-beats-mbp/
+[beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
 [apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
+[apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/

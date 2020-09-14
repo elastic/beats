@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -46,7 +46,7 @@ func TestGenerateSteps(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
-			operator, _ := getMonitorableTestOperator(t, "tests/scripts", m)
+			operator := getMonitorableTestOperator(t, "tests/scripts", m)
 			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
@@ -96,8 +96,8 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) (*Operator, *operatorCfg.Config) {
-	operatorConfig := &operatorCfg.Config{
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) *Operator {
+	cfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
 			RetriesCount: 2,
@@ -111,11 +111,6 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 		},
 	}
 
-	cfg, err := config.NewConfigFrom(operatorConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	l := getLogger()
 
 	fetcher := &DummyDownloader{}
@@ -127,7 +122,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +135,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 
 	operator.apps["dummy"] = &testMonitorableApp{monitor: m}
 
-	return operator, operatorConfig
+	return operator
 }
 
 type testMonitorableApp struct {
@@ -157,10 +152,10 @@ func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
-func (*testMonitorableApp) State() state.State                { return state.State{} }
-func (*testMonitorableApp) SetState(_ state.Status, _ string) {}
-func (a *testMonitorableApp) Monitor() monitoring.Monitor     { return a.monitor }
-func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string) {
+func (*testMonitorableApp) State() state.State                                          { return state.State{} }
+func (*testMonitorableApp) SetState(_ state.Status, _ string, _ map[string]interface{}) {}
+func (a *testMonitorableApp) Monitor() monitoring.Monitor                               { return a.monitor }
+func (a *testMonitorableApp) OnStatusChange(_ *server.ApplicationState, _ proto.StateObserved_Status, _ string, _ map[string]interface{}) {
 }
 
 type testMonitor struct {

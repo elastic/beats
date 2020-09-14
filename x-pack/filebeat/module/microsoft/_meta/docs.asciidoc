@@ -1,0 +1,176 @@
+[role="xpack"]
+
+:modulename: microsoft
+:has-dashboards: true
+
+== Microsoft module
+
+This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
+
+- `defender_atp` fileset: Supports Microsoft Defender ATP
+- `dhcp` fileset: Supports Microsoft DHCP logs
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: defender_atp
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `defender_atp` fileset settings
+
+beta[]
+
+To allow the filebeat module to ingest data from the Microsoft Defender API, you would need to create a new application on your Azure domain.
+
+The procedure to create an application is found on the below link:
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/exposed-apis-create-app-webapp[Create a new Azure Application]
+
+When giving the application the API permissions described in the documentation (Windows Defender ATP Alert.Read.All) it will only grant access to read alerts from ATP and nothing else in the Azure Domain.
+
+After the application has been created, it should contain 3 values that you need to apply to the module configuration.
+
+These values are:
+
+- Client ID
+- Client Secret
+- Tenant ID
+
+Example config:
+
+[source,yaml]
+----
+- module: microsoft
+  defender_atp:
+    enabled: true
+    var.oauth2.client.id: "123abc-879546asd-349587-ad64508"
+    var.oauth2.client.secret: "980453~-Sg99gedf"
+    var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/token"
+----
+
+*`var.oauth2.client.id`*::
+
+This is the client ID related to creating a new application on Azure.
+
+*`var.oauth2.client.secret`*::
+
+The secret related to the client ID.
+
+*`var.oauth2.token_url`*::
+
+A predefined URL towards the Oauth2 service for Microsoft. The URL should always be the same with the exception of the Tenant ID that needs to be added to the full URL.
+
+[float]
+==== Defender ATP ECS fields
+
+This is a list of Defender ATP fields that are mapped to ECS.
+
+[options="header"]
+|======================================================================
+| Defender ATP Fields                 | ECS Fields                     |
+| alertCreationTime                   | @timestamp                     |
+| aadTenantId                         | cloud.account.id               |
+| category                            | threat.technique.name          |
+| computerDnsName                     | host.hostname                  |
+| description                         | rule.description               |
+| detectionSource                     | observer.name                  |
+| evidence.fileName                   | file.name                      |
+| evidence.filePath                   | file.path                      |
+| evidence.processId                  | process.pid                    |
+| evidence.processCommandLine         | process.command_line           |
+| evidence.processCreationTime        | process.start                  |
+| evidence.parentProcessId            | process.parent.pid             |
+| evidence.parentProcessCreationTime  | process.parent.start           |
+| evidence.sha1                       | file.hash.sha1                 |
+| evidence.sha256                     | file.hash.sha256               |
+| evidence.url                        | url.full                       |
+| firstEventTime                      | event.start                    |
+| id                                  | event.id                       |
+| lastEventTime                       | event.end                      |
+| machineId                           | cloud.instance.id              |
+| relatedUser.userName                | host.user.name                 |
+| relatedUser.domainName              | host.user.domain               |
+| title                               | message                        |
+| severity                            | event.severity                 |
+|======================================================================
+
+:has-dashboards!:
+
+[float]
+=== Dashboards
+
+This module comes with a sample dashboard for Defender ATP.
+
+[role="screenshot"]
+image::./images/filebeat-defender-atp-overview.png[]
+
+The best way to view Defender ATP events and alert data is in the SIEM. 
+
+[role="screenshot"]
+image::./images/siem-alerts-cs.jpg[]
+
+[float]
+For alerts, go to Detections -> External alerts.
+
+[role="screenshot"]
+image::./images/siem-events-cs.jpg[]
+
+[float]
+And for all other Defender ATP event types, go to Host -> Events.
+
+:fileset_ex: dhcp
+
+[float]
+==== `dhcp` fileset settings
+
+experimental[]
+
+NOTE: This was converted from RSA NetWitness log parser XML "msdhcp" device revision 99.
+
+include::../include/var-paths.asciidoc[]
+
+*`var.input`*::
+
+The input from which messages are read. One of `file`, `tcp` or `udp`.
+
+*`var.syslog_host`*::
+
+The address to listen to UDP or TCP based syslog traffic.
+Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to `9515`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+*`var.tz_offset`*::
+
+By default, datetimes in the logs will be interpreted as relative to
+the timezone configured in the host where {beatname_uc} is running. If ingesting
+logs from a host on a different timezone, use this field to set the timezone
+offset so that datetimes are correctly parsed. Valid values are in the form
+±HH:mm, for example, `-07:00` for `UTC-7`.
+
+*`var.rsa_fields`*::
+
+Flag to control the addition of non-ECS fields to the event. Defaults to true,
+which causes both ECS and custom fields under `rsa` to be are added.
+
+*`var.keep_raw_fields`*::
+
+Flag to control the addition of the raw parser fields to the event. This fields
+will be found under `rsa.raw`. The default is false.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+

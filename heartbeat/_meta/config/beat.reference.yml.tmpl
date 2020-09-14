@@ -31,6 +31,9 @@ heartbeat.monitors:
   # Human readable display name for this service in Uptime UI and elsewhere
   name: my-icmp-monitor
 
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  # service_name: my-apm-service-name
+
   # Enable/Disable monitor
   #enabled: true
 
@@ -76,6 +79,14 @@ heartbeat.monitors:
 
     # Interval between file file changed checks.
     #interval: 5s
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # The index name associated with this input. If this is set, it
+  # overwrites the index option from the Elasticsearch output.
+  #index:
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
@@ -165,6 +176,14 @@ heartbeat.monitors:
 
     # Interval between file file changed checks.
     #interval: 5s
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # The index name associated with this input. If this is set, it
+  # overwrites the index option from the Elasticsearch output.
+  #index:
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
@@ -257,6 +276,14 @@ heartbeat.monitors:
 
     # Interval between file file changed checks.
     #interval: 5s
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # The index name associated with this input. If this is set, it
+  # overwrites the index option from the Elasticsearch output.
+  #index:
 
   # Set to true to publish fields with null values in events.
   #keep_null: false

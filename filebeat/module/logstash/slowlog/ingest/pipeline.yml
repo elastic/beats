@@ -1,5 +1,8 @@
 description: Pipeline for parsing logstash slow logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: '@timestamp'
     target_field: event.created

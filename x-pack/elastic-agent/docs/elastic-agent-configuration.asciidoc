@@ -2,20 +2,29 @@
 [role="xpack"]
 = Configuration settings
 
-experimental[]
+beta[]
+
+// TODO: This topic assumes users know what standalone and fleet are. When we
+// add the settings reference, we should clean this up: describe the available
+// options, then show how to configure them manually for standalone. We should
+// assume Fleet is the common use case, even if it's not the default, and make
+// sure this reference is useful for both use cases.
 
 By default {agent} runs in standalone mode to ingest system data and send it to
 a local {es} instance running on port 9200. It uses the demo credentials of the
-`elastic` user. It's also configured to monitor all {beats} managed by the Agent
-and send the {beats} logs and metrics to the same {es) instance.
+`elastic` user. It's also configured to monitor all programs managed by {agent}
+and send the logs and metrics to the same {es} instance.
 
-To alter this behavior, configure the output and other configuration settings:
+To alter this behavior, configure the output and other configuration settings.
+When running the agent standalone, specify configuration settings in the
+`elastic-agent.yml` file. When using {fleet}, do not modify settings in
+the `elastic-agent.yml` file. Instead, use {ingest-manager} in {kib} to change
+settings.
 
-* <<elastic-agent-output-configuration>>
-* <<elastic-agent-monitoring-configuration>>
-* <<elastic-agent-datasource-configuration>>
+TIP: To get started quickly, you can use {fleet} to generate a standalone
+configuration. For more information, see <<agent-standalone-mode>>.
 
-[float]
+[discrete]
 [[elastic-agent-output-configuration]]
 == Output settings
 
@@ -51,16 +60,16 @@ username and password pair, and the second one contains an API key.
 A default output configuration is required.
 ==============
 
-[float]
+[discrete]
 [[elastic-agent-monitoring-configuration]]
 == {beats} monitoring settings
 
 {agent} monitors {beats} by default. To disable or change monitoring
-settings, set options under `settings.monitoring`:
+settings, set options under `agent.monitoring`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-settings.monitoring:
+agent.monitoring:
   # enabled turns on monitoring of running processes
   enabled: true
   # enables log monitoring
@@ -72,17 +81,18 @@ settings.monitoring:
 -------------------------------------------------------------------------------------
 
 
-To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to
+To disable monitoring, set `agent.monitoring.enabled` to `false`. When set to
 `false`, {beats} monitoring is turned off, and all other options in this section
 are ignored.
 
-To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the
+To enable monitoring, set `agent.monitoring.enabled` to `true`. Also set the
 `logs` and `metrics` settings to control whether logs, metrics, or both are
 collected. If neither setting is specified, monitoring is disabled. Set
 `use_output` to specify the output to which monitoring events are sent.
 
-[[elastic-agent-datasource-configuration]]
-== Datasource settings
+[discrete]
+[[elastic-agent-input-configuration]]
+== Input settings
 
 By default {agent} collects system metrics, such as cpu, memory, network, and
 filesystem metrics, and sends them to the default output. For example:
@@ -92,17 +102,17 @@ filesystem metrics, and sends them to the default output. For example:
 -------------------------------------------------------------------------------------
 inputs:
   - type: system/metrics
-    dataset.namespace: default
+    data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
-        dataset.name: system.cpu
+        data_stream.dataset: system.cpu
       - metricset: memory
-        dataset.name: system.memory
+        data_stream.dataset: system.memory
       - metricset: network
-        dataset.name: system.network
+        data_stream.dataset: system.network
       - metricset: filesystem
-        dataset.name: system.filesystem
+        data_stream.dataset: system.filesystem
 -------------------------------------------------------------------------------------
 
 If `use_output` is not specified, the `default` output is used.

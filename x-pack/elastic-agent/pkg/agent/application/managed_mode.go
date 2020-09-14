@@ -11,11 +11,15 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/go-sysinfo"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -42,7 +46,7 @@ type Managed struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
-	Config      FleetAgentConfig
+	Config      configuration.FleetAgentConfig
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     *fleetGateway
@@ -56,7 +60,6 @@ func newManaged(
 	log *logger.Logger,
 	rawConfig *config.Config,
 ) (*Managed, error) {
-
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
@@ -81,31 +84,42 @@ func newManaged(
 	}
 
 	// merge local configuration and configuration persisted from fleet.
-	rawConfig.Merge(config)
+	err = rawConfig.Merge(config)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyPath, path))
+	}
 
-	cfg := defaultFleetAgentConfig()
-	if err := config.Unpack(cfg); err != nil {
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, path))
 	}
 
-	// Extract only management related configuration.
-	managementCfg := &Config{}
-	if err := rawConfig.Unpack(managementCfg); err != nil {
+	if err := cfg.Fleet.Valid(); err != nil {
 		return nil, errors.New(err,
-			fmt.Sprintf("fail to unpack configuration from %s", path),
+			"fleet configuration is invalid",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, path))
 	}
 
-	client, err := fleetapi.NewAuthWithConfig(log, cfg.API.AccessAPIKey, cfg.API.Kibana)
+	client, err := fleetapi.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.API.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
+	}
+
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to get system information",
+			errors.TypeUnexpected)
 	}
 
 	managedApplication := &Managed{
@@ -114,7 +128,7 @@ func newManaged(
 	}
 
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
-	managedApplication.srv, err = server.NewFromConfig(log, rawConfig, &operation.ApplicationStatusHandler{})
+	managedApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener", errors.TypeNetwork)
 	}
@@ -125,33 +139,43 @@ func newManaged(
 		return nil, errors.New(err, "starting GRPC listener", errors.TypeNetwork)
 	}
 
-	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
-	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet)
+	logR := logreporter.NewReporter(log)
+	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Fleet.Reporting)
 	if err != nil {
 		return nil, errors.New(err, "fail to create reporters")
 	}
 
 	combinedReporter := reporting.NewReporter(managedApplication.bgContext, log, agentInfo, logR, fleetR)
-	monitor, err := monitoring.NewMonitor(rawConfig)
+	monitor, err := monitoring.NewMonitor(cfg.Settings)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, managedApplication.srv, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 	managedApplication.router = router
 
-	emit := emitter(
+	composableCtrl, err := composable.New(log, rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
+	emit, err := emitter(
+		managedApplication.bgContext,
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{injectFleet(config), filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info())},
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
@@ -183,10 +207,11 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
-			log:        log,
-			emitter:    emit,
-			dispatcher: router,
-			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
+			log:         log,
+			emitter:     emit,
+			dispatcher:  router,
+			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
+			actionStore: actionStore,
 		},
 	)
 
@@ -209,7 +234,6 @@ func newManaged(
 	gateway, err := newFleetGateway(
 		managedApplication.bgContext,
 		log,
-		managementCfg.Management,
 		agentInfo,
 		client,
 		actionDispatcher,

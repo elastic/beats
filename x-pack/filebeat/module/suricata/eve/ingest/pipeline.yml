@@ -3,6 +3,9 @@ description: Pipeline for parsing Suricata EVE logs
 
 processors:
   - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
       value: "{{suricata.eve.http.http_method}}"
       field: http.request.method
       if: "ctx?.suricata?.eve?.http?.http_method != null"
@@ -231,6 +234,105 @@ processors:
       field: related.hash
       value: "{{tls.server.hash.sha1}}"
       if: "ctx?.tls?.server?.hash?.sha1 != null"
+  - gsub:
+      field: suricata.eve.tls.issuerdn
+      pattern: \\,
+      replacement: ""
+      ignore_missing: true
+  - kv:
+      field: suricata.eve.tls.issuerdn
+      field_split: ', '
+      value_split: '='
+      target_field: suricata.eve.tls.kv_issuerdn
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.C
+      target_field: file.x509.issuer.country
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.CN
+      target_field: file.x509.issuer.common_name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.L
+      target_field: file.x509.issuer.locality
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.O
+      target_field: file.x509.issuer.organization
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.OU
+      target_field: file.x509.issuer.organizational_unit
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_issuerdn.ST
+      target_field: file.x509.issuer.state_or_province
+      ignore_missing: true
+  - gsub:
+      field: suricata.eve.tls.subject
+      pattern: \\,
+      replacement: ""
+      ignore_missing: true
+  - kv:
+      field: suricata.eve.tls.subject
+      field_split: ', '
+      value_split: '='
+      target_field: suricata.eve.tls.kv_subject
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.C
+      target_field: file.x509.subject.country
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.CN
+      target_field: file.x509.subject.common_name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.L
+      target_field: file.x509.subject.locality
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.O
+      target_field: file.x509.subject.organization
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.OU
+      target_field: file.x509.subject.organizational_unit
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.tls.kv_subject.ST
+      target_field: file.x509.subject.state_or_province
+      ignore_missing: true
+  - set:
+      field: file.x509.serial_number
+      value: '{{suricata.eve.tls.serial}}'
+      ignore_empty_value: true
+  - gsub:
+      field: file.x509.serial_number
+      pattern: ':'
+      replacement: ''
+      ignore_missing: true
+  - date:
+      field: suricata.eve.tls.notafter
+      target_field: tls.server.not_after
+      formats:
+        - ISO8601
+      if: ctx.suricata?.eve?.tls?.notafter != null
+  - date:
+      field: suricata.eve.tls.notbefore
+      target_field: tls.server.not_before
+      formats:
+        - ISO8601
+      if: ctx.suricata?.eve?.tls?.notbefore != null
+  - set:
+      field: file.x509.not_after
+      value: '{{tls.server.not_after}}'
+      ignore_empty_value: true
+  - set:
+      field: file.x509.not_before
+      value: '{{tls.server.not_before}}'
+      ignore_empty_value: true
   - remove:
       field:
         - suricata.eve.app_proto
@@ -238,6 +340,8 @@ processors:
         - suricata.eve.flow.start
         - suricata.eve.http.http_method
         - suricata.eve.http.http_user_agent
+        - suricata.eve.tls.kv_issuerdn
+        - suricata.eve.tls.kv_subject
       ignore_missing: true
 on_failure:
   - set:

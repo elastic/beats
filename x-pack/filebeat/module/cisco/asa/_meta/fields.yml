@@ -1,4 +1,4 @@
-- name: asa
+- name: cisco.asa
   type: group
   description: >
     Fields for Cisco ASA Firewall.
@@ -109,3 +109,69 @@
     type: keyword
     description: >
       The assigned DAP records
+
+  - name: command_line_arguments
+    default_field: false
+    type: keyword
+    description: >
+      The command line arguments logged by the local audit log
+
+  - name: assigned_ip
+    default_field: false
+    type: ip
+    description: >
+      The IP address assigned to a VPN client successfully connecting
+
+  - name: privilege.old
+    default_field: false
+    type: keyword
+    description: >
+      When a users privilege is changed this is the old value
+
+  - name: privilege.new
+    default_field: false
+    type: keyword
+    description: >
+      When a users privilege is changed this is the new value
+
+  - name: burst.object
+    default_field: false
+    type: keyword
+    description: >
+      The related object for burst warnings
+
+  - name: burst.id
+    default_field: false
+    type: keyword
+    description: >
+      The related rate ID for burst warnings
+
+  - name: burst.current_rate
+    default_field: false
+    type: keyword
+    description: >
+      The current burst rate seen
+
+  - name: burst.configured_rate
+    default_field: false
+    type: keyword
+    description: >
+      The current configured burst rate
+
+  - name: burst.avg_rate
+    default_field: false
+    type: keyword
+    description: >
+      The current average burst rate seen
+
+  - name: burst.configured_avg_rate
+    default_field: false
+    type: keyword
+    description: >
+      The current configured average burst rate allowed
+
+  - name: burst.cumulative_count
+    default_field: false
+    type: keyword
+    description: >
+      The total count of burst rate hits since the object was created or cleared

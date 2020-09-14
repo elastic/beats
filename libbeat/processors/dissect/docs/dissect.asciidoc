@@ -11,7 +11,7 @@ The `dissect` processor tokenizes incoming strings using defined patterns.
 -------
 processors:
   - dissect:
-      tokenizer: "%{key1} %{key2}"
+      tokenizer: "%{key1} %{key2} %{key3|convert_datatype}"
       field: "message"
       target_prefix: "dissect"
 -------
@@ -19,6 +19,8 @@ processors:
 The `dissect` processor has the following configuration settings:
 
 `tokenizer`:: The field used to define the *dissection* pattern.
+              Optional convert datatype can be provided after the key using `|` as separator
+              to convert the value from string to integer, long, float, double, boolean or ip.
 
 `field`:: (Optional) The event field to tokenize. Default is `message`.
 
@@ -64,12 +66,12 @@ For this example, imagine that an application generates the following messages:
 
 [source,sh]
 ----
-"App01 - WebServer is starting"
-"App01 - WebServer is up and running"
-"App01 - WebServer is scaling 2 pods"
-"App02 - Database is will be restarted in 5 minutes"
-"App02 - Database is up and running"
-"App02 - Database is refreshing tables"
+"321 - App01 - WebServer is starting"
+"321 - App01 - WebServer is up and running"
+"321 - App01 - WebServer is scaling 2 pods"
+"789 - App02 - Database is will be restarted in 5 minutes"
+"789 - App02 - Database is up and running"
+"789 - App02 - Database is refreshing tables"
 ----
 
 Use the `dissect` processor to split each message into two fields, for example,
@@ -79,7 +81,7 @@ Use the `dissect` processor to split each message into two fields, for example,
 ----
 processors:
   - dissect:
-      tokenizer: '"%{service.name} - %{service.status}"'
+      tokenizer: '"%{pid|integer} - %{service.name} - %{service.status}"'
       field: "message"
       target_prefix: ""
 ----
@@ -89,6 +91,7 @@ This configuration produces fields like:
 [source,json]
 ----
 "service": {
+  "pid": 321,
   "name": "App01",
   "status": "WebServer is up and running"
 },

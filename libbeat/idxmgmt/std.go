@@ -241,7 +241,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 	if !ilmComponent.load {
 		warn += "ILM policy and write alias loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
-		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite:true` for enabling.\n"
+		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.\n"
 	}
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
