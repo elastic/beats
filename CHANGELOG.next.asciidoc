@@ -476,6 +476,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 - Add container ECS fields in kubernetes metadata. {pull}20984[20984]
+- Add ingress controller dashboards. {pull}21052[21052]
 
 *Auditbeat*
 
