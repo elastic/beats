@@ -5,13 +5,13 @@
 package aws
 
 import (
+	"context"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -25,6 +25,13 @@ type ConfigAWS struct {
 	Endpoint             string `config:"endpoint"`
 	RoleArn              string `config:"role_arn"`
 	AWSPartition         string `config:"aws_partition"`
+	WebIdentityProvider  WebIdentityProvider `config:"web_identity_provider"`
+}
+
+type WebIdentityProvider struct {
+	RoleArn 	 string `config:"role_arn"`
+	RoleSession 	 string `config:"session_name"`
+	TokenFilePath string `config:"token_file_path"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -64,6 +71,27 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		stsSvc := sts.New(awsConfig)
 		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
 		awsConfig.Credentials = stsCredProvider
+		return awsConfig, nil
+	}
+
+	emptyWebIdentity := WebIdentityProvider{}
+	if config.WebIdentityProvider != emptyWebIdentity {
+		logger.Debug("Using web_identity_role for AWS credential")
+		awsConfig, err := external.LoadDefaultAWSConfig()
+		if err != nil {
+			return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed when using role_arn")
+		}
+
+		stsSvc := sts.New(awsConfig)
+		p := stscreds.NewWebIdentityRoleProvider(stsSvc, config.WebIdentityProvider.RoleArn, config.WebIdentityProvider.RoleSession, stscreds.IdentityTokenFile(config.WebIdentityProvider.TokenFilePath))
+		cred, err := p.Retrieve(context.Background())
+		if err != nil {
+			return awsConfig, errors.Wrap(err, "retrieve web identity role provider failed")
+		}
+
+		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+			Value: cred,
+		}
 		return awsConfig, nil
 	}
 
