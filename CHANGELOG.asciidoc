@@ -326,6 +326,12 @@ https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
 
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
 
+==== Known Issue
+
+*Functionbeat*
+
+- Functionbeat cannot be deployed on Google Cloud Platform. {issue}20830[20830]
+
 [[release-notes-7.8.0]]
 === Beats version 7.8.0
 https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
