@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/2.0-beats') _
+@Library('apm@current') _
 
 import groovy.transform.Field
 /**
