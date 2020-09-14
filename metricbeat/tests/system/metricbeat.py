@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import sys
@@ -11,7 +12,6 @@ COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
-import logging
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
@@ -50,7 +50,7 @@ class BaseTest(TestCase):
 
         # Dedot further levels recursively
         for key in fields:
-            if type(fields[key]) is dict:
+            if isinstance(fields[key], dict):
                 fields[key] = self.de_dot(fields[key])
 
         return fields
@@ -61,7 +61,7 @@ class BaseTest(TestCase):
         """
         log = self.get_log()
 
-        pattern = self.build_log_regex("\[cfgwarn\]")
+        pattern = self.build_log_regex(r"\[cfgwarn\]")
         log = pattern.sub("", log)
 
         # Jenkins runs as a Windows service and when Jenkins executes these

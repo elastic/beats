@@ -134,7 +134,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         heartbeat_proc.check_kill_and_wait()
 
         doc = self.read_output()[0]
-        self.assertDictContainsSubset(expected, doc)
+        assert expected.items() <= doc.items()
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")

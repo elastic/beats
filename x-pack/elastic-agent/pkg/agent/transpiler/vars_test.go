@@ -12,25 +12,23 @@ import (
 )
 
 func TestVars_Replace(t *testing.T) {
-	vars := &Vars{
-		Mapping: map[string]interface{}{
-			"un-der_score": map[string]interface{}{
-				"key1": "data1",
-				"key2": "data2",
-				"list": []string{
-					"array1",
-					"array2",
-				},
-				"dict": map[string]interface{}{
-					"key1": "value1",
-					"key2": "value2",
-				},
+	vars := mustMakeVars(map[string]interface{}{
+		"un-der_score": map[string]interface{}{
+			"key1": "data1",
+			"key2": "data2",
+			"list": []string{
+				"array1",
+				"array2",
 			},
-			"other": map[string]interface{}{
-				"data": "info",
+			"dict": map[string]interface{}{
+				"key1": "value1",
+				"key2": "value2",
 			},
 		},
-	}
+		"other": map[string]interface{}{
+			"data": "info",
+		},
+	})
 	tests := []struct {
 		Input   string
 		Result  Node
@@ -199,8 +197,8 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 			},
 		},
 	}
-	vars := &Vars{
-		Mapping: map[string]interface{}{
+	vars, err := NewVarsWithProcessors(
+		map[string]interface{}{
 			"testing": map[string]interface{}{
 				"key1": "data1",
 			},
@@ -216,9 +214,9 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 				},
 			},
 		},
-		ProcessorsKey: "dynamic",
-		Processors:    processers,
-	}
+		"dynamic",
+		processers)
+	require.NoError(t, err)
 
 	res, err := vars.Replace("${testing.key1}")
 	require.NoError(t, err)

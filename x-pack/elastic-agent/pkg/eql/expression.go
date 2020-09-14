@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package boolexp
+package eql
 
 import (
 	"errors"
@@ -10,17 +10,17 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp/parser"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql/parser"
 )
 
 // VarStore is the interface to implements when you want the expression engine to be able to fetch
 // the value of a variables. Variables are defined using the field reference syntax likes
-/// this: `%{[hello.var]}`.
+// this: `${hello.var|other.var|'constant'}`.
 type VarStore interface {
 	// Lookup allows to lookup a value of a variable from the store, the lookup method will received
 	// the name of variable like this.
 	//
-	// %{[hello.var]} => hello.var
+	// ${hello.var|other.var} => hello.var, followed by other.var if hello.var is not found
 	Lookup(string) (interface{}, bool)
 }
 
@@ -33,7 +33,6 @@ var (
 type Expression struct {
 	expression string
 	tree       antlr.ParseTree
-	methodsReg *MethodsReg
 	vars       VarStore
 }
 
@@ -48,7 +47,7 @@ func (e *Expression) Eval(store VarStore) (result bool, err error) {
 		}
 	}()
 
-	visitor := &expVisitor{methodsReg: e.methodsReg, vars: store}
+	visitor := &expVisitor{vars: store}
 	r := visitor.Visit(e.tree)
 
 	if visitor.err != nil {
@@ -59,18 +58,18 @@ func (e *Expression) Eval(store VarStore) (result bool, err error) {
 }
 
 // New create a new boolean expression parser will return an error if the expression if invalid.
-func New(expression string, methods *MethodsReg) (*Expression, error) {
+func New(expression string) (*Expression, error) {
 	if len(expression) == 0 {
 		return nil, ErrEmptyExpression
 	}
 
 	input := antlr.NewInputStream(expression)
-	lexer := parser.NewBoolexpLexer(input)
+	lexer := parser.NewEqlLexer(input)
 	lexer.RemoveErrorListeners()
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	p := parser.NewBoolexpParser(tokens)
+	p := parser.NewEqlParser(tokens)
 	p.RemoveErrorListeners()
 	tree := p.ExpList()
 
-	return &Expression{expression: expression, tree: tree, methodsReg: methods}, nil
+	return &Expression{expression: expression, tree: tree}, nil
 }
