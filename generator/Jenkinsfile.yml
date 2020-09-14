@@ -8,7 +8,7 @@ when:
         - "@oss"               ## special token regarding the changeset for the oss
     comments:                  ## when PR comment contains any of those entries
         - "/test generator"
-    labels:                    ## when PR labels matche any of those entries
+    labels:                    ## when PR labels matches any of those entries
         - "generator"
     parameters:                ## when parameter was selected in the UI.
         - "generator"

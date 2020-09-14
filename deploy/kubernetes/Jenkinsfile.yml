@@ -4,7 +4,7 @@ when:
         - "^deploy/kubernetes/.*"
     comments:                  ## when PR comment contains any of those entries
         - "/test deploy/kubernetes"
-    labels:                    ## when PR labels matche any of those entries
+    labels:                    ## when PR labels matches any of those entries
         - "kubernetes"
     parameters:                ## when parameter was selected in the UI.
         - "kubernetes"

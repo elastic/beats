@@ -6,7 +6,7 @@ when:
         - "@oss"               ## special token regarding the changeset for the oss
     comments:                  ## when PR comment contains any of those entries
         - "/test packetbeat"
-    labels:                    ## when PR labels matche any of those entries
+    labels:                    ## when PR labels matches any of those entries
         - "packetbeat"
     parameters:                ## when parameter was selected in the UI.
         - "packetbeat"

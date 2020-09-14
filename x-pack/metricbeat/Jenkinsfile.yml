@@ -6,7 +6,7 @@ when:
         - "@xpack"             ## special token regarding the changeset for the xpack
     comments:                  ## when PR comment contains any of those entries
         - "/test x-pack/metricbeat"
-    labels:                    ## when PR labels matche any of those entries
+    labels:                    ## when PR labels matches any of those entries
         - "x-pack-metricbeat"
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-metricbeat"
