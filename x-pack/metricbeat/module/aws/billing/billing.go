@@ -6,6 +6,8 @@ package billing
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -244,7 +246,11 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 			costResultGroups := groupByOutput.ResultsByTime[0].Groups
 			for _, group := range costResultGroups {
 				event := m.addCostMetrics(group.Metrics, groupByOutput.GroupDefinitions[0], startDate, endDate)
+
+				// generate unique event ID for each event
+				eventID := startDate + endDate + *groupByOutput.GroupDefinitions[0].Key + string(groupByOutput.GroupDefinitions[0].Type)
 				for _, key := range group.Keys {
+					eventID += key
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
 						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
@@ -263,6 +269,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					event.Timestamp = t
 				}
 
+				event.ID = generateEventID(eventID)
 				events = append(events, event)
 			}
 		}
@@ -388,4 +395,13 @@ func getGroupBys(groupByTags []string, groupByDimKeys []string) []groupBy {
 		}
 	}
 	return groupBys
+}
+
+func generateEventID(eventID string) string {
+	// create eventID using hash of startDate + endDate + groupDefinitionKey + groupDefinitionType + values
+	// This will prevent more than one billing metric getting collected in the same day.
+	h := sha256.New()
+	h.Write([]byte(eventID))
+	prefix := hex.EncodeToString(h.Sum(nil))
+	return prefix[:20]
 }
