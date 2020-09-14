@@ -10,7 +10,7 @@ file_selectors:
   - regex: '^AWSLogs/\d+/CloudTrail-Digest/'
 {{ end }}
 
-{{ if .process_insight_logs }
+{{ if .process_insight_logs }}
   - regex: '^AWSLogs/\d+/CloudTrail-Insight/'
     expand_event_list_from_field: 'Records'
 {{ end }}
