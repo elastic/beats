@@ -53,7 +53,6 @@ func (Update) IncludeFields() error {
 
 // VendorBeats collects the vendor folder required to deploy the function for GCP.
 func (Update) VendorBeats() error {
-	// TODO run download
 	for _, f := range []string{"pubsub", "storage"} {
 		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
 		err := os.RemoveAll(gcpVendorPath)
