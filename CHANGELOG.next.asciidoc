@@ -388,6 +388,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 - Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
+- Update fields.yml in the azure module, missing metrics field. {pull}20918[20918]
 - The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 - Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
 
