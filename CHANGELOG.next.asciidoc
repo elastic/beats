@@ -653,6 +653,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
 - Added new module for Zoom webhooks {pull}20414[20414]
+- Add type and sub_type to panw panos fileset {pull}20912[20912]
 
 *Heartbeat*
 

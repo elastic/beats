@@ -96107,6 +96107,20 @@ type: keyword
 
 --
 
+*`panw.panos.type`*::
++
+--
+Specifies the type of the log
+
+--
+
+*`panw.panos.sub_type`*::
++
+--
+Specifies the sub type of the log
+
+--
+
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
