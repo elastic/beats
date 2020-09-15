@@ -122,3 +122,22 @@
               type: long
               description: Duration in microseconds
 
+- key: synthetics
+  title: "Synthetics types"
+  description:
+  fields:
+    - name: synthetics
+      type: group
+      description: >
+        Journey related fields.
+      fields:
+        - name: "type"
+          type: keyword
+        - name: package_version
+          type: keyword
+        - name: payload
+          type: object
+          enabled: false
+        - name: journey
+          type: object
+          enabled: false

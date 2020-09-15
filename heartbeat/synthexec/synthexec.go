@@ -17,6 +17,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -31,7 +32,6 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		"-e", "production",
 		"--json",
 		"--headless",
-		"--screenshots",
 		"--dry-run",
 	)
 
@@ -66,7 +66,7 @@ func ScriptJob(ctx context.Context, script string, params common.MapStr) jobs.Jo
 		"npx",
 		"@elastic/synthetics",
 		"--stdin",
-		"--screenshots",
+		//"--screenshots",
 	)
 
 	return cmdJob(ctx, cmd, &script, params)
@@ -81,8 +81,19 @@ func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.
 		}
 		select {
 		case se := <- mpx.SynthEvents():
-			event.Timestamp = se.Timestamp
-			eventext.MergeEventFields(event, se.ToMap())
+			var emptyTime time.Time
+			if se.Timestamp != emptyTime {
+				event.Timestamp = se.Timestamp
+			}
+			if se.Error != nil {
+				eventext.MergeEventFields(event, common.MapStr{
+					"error": common.MapStr{
+						"type": "synthetics-exit",
+						"message": err,
+					},
+				})
+			}
+			eventext.MergeEventFields(event, common.MapStr{"synthetics": se.ToMap()})
 			return []jobs.Job{j}, nil
 		case <- mpx.Done():
 			return nil, nil
@@ -104,12 +115,17 @@ func runCmd(
 	if err != nil {
 		return nil, err
 	}
-	defer resultsWriter.Close()
-	defer resultsReader.Close()
+	logp.Warn("PIPES ARE %d / %d", resultsReader.Fd(), resultsWriter.Fd())
 
 	// Common args
+	cmd.Env = append(os.Environ(), "NODE_ENV=production")
+	// We need to pass both files in here otherwise we get a broken pipe, even
+	// though node only touches the writer
+	cmd.ExtraFiles = []*os.File{resultsWriter, resultsReader}
 	cmd.Args = append(cmd.Args,
-		"--outfd", fmt.Sprintf("%d", resultsWriter.Fd()),
+		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
+		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
+		"--outfd", "3",
 		"--json",
 		"--headless",
 	)
@@ -121,6 +137,7 @@ func runCmd(
 	logp.Info("Running command: %s", cmd.String())
 
 	if stdinStr	!= nil {
+		logp.Info("Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -133,6 +150,7 @@ func runCmd(
 		sendConsoleLines(stdoutPipe, "console/stdout", mpx.writeSynthEvent)
 		wg.Done()
 	}()
+
 	stderrPipe, err := cmd.StderrPipe()
 	wg.Add(1)
 	go func() {
@@ -159,7 +177,16 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := cmd.Wait()
-		logp.Warn("error executing command '%s': %w", cmd.String(), err)
+		resultsWriter.Close()
+		resultsReader.Close()
+		logp.Info("COMMAND IS DONE %d", cmd.ProcessState.ExitCode())
+		if err != nil {
+			mpx.writeSynthEvent(SynthEvent{
+				Type: "cmd/status",
+				Error: fmt.Errorf("command exited with status %d: %w", cmd.ProcessState.ExitCode(), err),
+			})
+			logp.Warn("error executing command '%s': %s", cmd.String(), err)
+		}
 		wg.Wait()
 		mpx.Close()
 	}()
@@ -175,6 +202,7 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 		if scanner.Err() != nil {
 			logp.Warn("Error encountered scanning console line: %s. Line was %s", scanner.Err(), scanner.Text())
 		}
+		logp.Info(scanner.Text())
 		if cb != nil {
 			cb(SynthEvent{
 				Type: typ,
@@ -190,22 +218,32 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 func sendResults(rdr io.Reader, cb func(SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
-	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
+	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
+
+	emptyString := regexp.MustCompile(`^\s*$`)
+
 	for scanner.Scan() {
 		if scanner.Err() != nil {
+			logp.Warn("Error scanning results %s", scanner.Err())
 			return scanner.Err()
+		}
+
+		// Skip empty lines
+		if emptyString.Match(scanner.Bytes()) {
+			continue
 		}
 
 		var res = SynthEvent{}
 		err := json.Unmarshal(scanner.Bytes(), &res)
 		if err != nil {
-			return err
+			logp.Warn("Could not unmarshal %s", scanner.Text())
 		}
 
-		if cb != nil {
+		if err == nil && cb != nil {
 			cb(res)
 		}
 	}
+	logp.Info("DONE WITH RESULTs %s", scanner.Err())
 	return nil
 }
 
@@ -216,6 +254,7 @@ type SynthEvent struct {
 	Journey        SynthJourney           `json:"journey"`
 	Timestamp      time.Time              `json:"@timestamp"`
 	Payload        map[string]interface{} `json:"payload"`
+	Error error `json:"error"`
 }
 
 func (se SynthEvent) ToMap() common.MapStr {
