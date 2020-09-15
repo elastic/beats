@@ -45,7 +45,7 @@ type emitterController struct {
 	lock   sync.RWMutex
 	config *config.Config
 	ast    *transpiler.AST
-	vars   []transpiler.Vars
+	vars   []*transpiler.Vars
 }
 
 func (e *emitterController) Update(c *config.Config) error {
@@ -68,38 +68,6 @@ func (e *emitterController) Update(c *config.Config) error {
 		}
 	}
 
-	// sanitary check that nothing in the config is wrong when it comes to variable syntax
-	ast := rawAst.Clone()
-	inputs, ok := transpiler.Lookup(ast, "inputs")
-	if ok {
-		renderedInputs, err := renderInputs(inputs, []transpiler.Vars{
-			{
-				Mapping: map[string]interface{}{},
-			},
-		})
-		if err != nil {
-			return err
-		}
-		err = transpiler.Insert(ast, renderedInputs, "inputs")
-		if err != nil {
-			return err
-		}
-	}
-
-	programsToRun, err := program.Programs(ast)
-	if err != nil {
-		return err
-	}
-
-	for _, decorator := range e.modifiers.Decorators {
-		for outputType, ptr := range programsToRun {
-			programsToRun[outputType], err = decorator(outputType, ast, ptr)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	e.lock.Lock()
 	e.config = c
 	e.ast = rawAst
@@ -108,7 +76,7 @@ func (e *emitterController) Update(c *config.Config) error {
 	return e.update()
 }
 
-func (e *emitterController) Set(vars []transpiler.Vars) {
+func (e *emitterController) Set(vars []*transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
@@ -170,19 +138,16 @@ func (e *emitterController) update() error {
 func emitter(ctx context.Context, log *logger.Logger, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
+	init, _ := transpiler.NewVars(map[string]interface{}{})
 	ctrl := &emitterController{
 		logger:      log,
 		controller:  controller,
 		router:      router,
 		modifiers:   modifiers,
 		reloadables: reloadables,
-		vars: []transpiler.Vars{
-			{
-				Mapping: map[string]interface{}{},
-			},
-		},
+		vars:        []*transpiler.Vars{init},
 	}
-	err := controller.Run(ctx, func(vars []transpiler.Vars) {
+	err := controller.Run(ctx, func(vars []*transpiler.Vars) {
 		ctrl.Set(vars)
 	})
 	if err != nil {
@@ -202,7 +167,7 @@ func readfiles(files []string, emitter emitterFunc) error {
 	return emitter(c)
 }
 
-func renderInputs(inputs transpiler.Node, varsArray []transpiler.Vars) (transpiler.Node, error) {
+func renderInputs(inputs transpiler.Node, varsArray []*transpiler.Vars) (transpiler.Node, error) {
 	l, ok := inputs.Value().(*transpiler.List)
 	if !ok {
 		return nil, fmt.Errorf("inputs must be an array")
@@ -223,6 +188,10 @@ func renderInputs(inputs transpiler.Node, varsArray []transpiler.Vars) (transpil
 			if err != nil {
 				// another error that needs to be reported
 				return nil, err
+			}
+			if n == nil {
+				// condition removed it
+				continue
 			}
 			dict = n.(*transpiler.Dict)
 			dict = promoteProcessors(dict)
