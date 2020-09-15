@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/go-sysinfo"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -117,6 +119,13 @@ func newManaged(
 			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
 	}
 
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to get system information",
+			errors.TypeUnexpected)
+	}
+
 	managedApplication := &Managed{
 		log:       log,
 		agentInfo: agentInfo,
@@ -164,7 +173,7 @@ func newManaged(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config)},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info())},
 		},
 		monitor,
 	)
