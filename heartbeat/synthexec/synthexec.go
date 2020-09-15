@@ -9,17 +9,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func ListJourneys(ctx context.Context, suiteFile string) (journeyNames []string, err error) {
+func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
 	cmd := exec.Command(
 		"node",
 		suiteFile,
@@ -30,75 +35,88 @@ func ListJourneys(ctx context.Context, suiteFile string) (journeyNames []string,
 		"--dry-run",
 	)
 
-	handler := NewExecHandler()
-	handler.OnResult = func(result Result) {
-		if result.Type == "journey/start" {
-			journeyNames = append(journeyNames, result.Journey.Name)
+	mpx, err := runCmd(ctx, cmd, nil, params)
+	for {
+		select {
+		case se := <- mpx.SynthEvents():
+			if se.Type == "journey/start" {
+				journeyNames = append(journeyNames, se.Journey.Name)
+			}
+		case <- mpx.Done():
+			break
 		}
-	}
-
-	err = runCmd(ctx, cmd, nil, handler)
-	if err != nil {
-		return nil, err
-	}
-
-	select {
-		case <- handler.Done:
-		case <- ctx.Done():
 	}
 
 	return journeyNames, nil
 }
 
-func RunSuite(ctx context.Context, suiteFile string, journeyName string, handler *ExecHandler) error {
-	logp.Warn("RUNNING JOURNEY %s", journeyName)
+func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr, ) jobs.Job {
 	cmd := exec.Command(
 		"node",
 		suiteFile,
-		"-e", "production",
-		"--json",
-		"--headless",
 		"--screenshots",
 		"--journey-name", journeyName,
 	)
 
-	return runCmd(ctx, cmd, nil, handler)
+	return cmdJob(ctx, cmd, nil, params)
 }
 
-func RunScript(ctx context.Context, script string, handler *ExecHandler) (err error) {
+func ScriptJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
 	cmd := exec.Command(
 		"npx",
 		"@elastic/synthetics",
 		"--stdin",
-		"--json",
-		"--headless",
 		"--screenshots",
 	)
 
-	return runCmd(ctx, cmd, &script, handler)
+	return cmdJob(ctx, cmd, &script, params)
+}
+
+func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
+	var j jobs.Job
+	var mpx *ExecMultiplexer
+	j = func (event *beat.Event) (conts []jobs.Job, err error) {
+		if mpx == nil { // Start the script on the first invocation of this job
+			mpx, err = runCmd(ctx, cmd, stdinStr, params)
+		}
+		select {
+		case se := <- mpx.SynthEvents():
+			event.Timestamp = se.Timestamp
+			eventext.MergeEventFields(event, se.ToMap())
+			return []jobs.Job{j}, nil
+		case <- mpx.Done():
+			return nil, nil
+		}
+	}
+
+	return j
 }
 
 func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
-	handler *ExecHandler,
-	) error {
-	if handler.OnDone != nil {
-		defer handler.OnDone()
-	}
-	if handler.Done != nil {
-		defer func() {handler.Done <- struct {}{}}()
-	}
+	params common.MapStr,
+	) (mpx *ExecMultiplexer, err error) {
+	mpx = NewExecMultiplexer()
 	// Setup a pipe for structured output
 	resultsReader, resultsWriter, err := os.Pipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resultsWriter.Close()
 	defer resultsReader.Close()
 
-	cmd.Args = append(cmd.Args, "--outfd", fmt.Sprintf("%d", resultsWriter.Fd()))
+	// Common args
+	cmd.Args = append(cmd.Args,
+		"--outfd", fmt.Sprintf("%d", resultsWriter.Fd()),
+		"--json",
+		"--headless",
+	)
+	if len(params) > 0 {
+		paramsBytes, _ := json.Marshal(params)
+		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
+	}
 
 	logp.Info("Running command: %s", cmd.String())
 
@@ -106,22 +124,29 @@ func runCmd(
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	// Handle the console output
-	lineCounter := atomic.MakeInt(0)
+	wg := sync.WaitGroup{}
+
 	// Send stdout into the output
 	stdoutPipe, err := cmd.StdoutPipe()
-	go sendConsoleLines(stdoutPipe, "stdout", lineCounter, handler.OnConsole)
-	// Send stderr into the output
+	wg.Add(1)
+	go func() {
+		sendConsoleLines(stdoutPipe, "console/stdout", mpx.writeSynthEvent)
+		wg.Done()
+	}()
 	stderrPipe, err := cmd.StderrPipe()
-	go sendConsoleLines(stderrPipe, "stderr", lineCounter,  handler.OnConsole)
+	wg.Add(1)
+	go func() {
+		sendConsoleLines(stderrPipe, "console/stderr", mpx.writeSynthEvent)
+		wg.Done()
+	}()
 
 	// Send the test results into the output
-	go sendResults(resultsReader, handler.OnResult)
-
+	wg.Add(1)
+	go func() {
+		sendResults(resultsReader, mpx.writeSynthEvent)
+		wg.Done()
+	}()
 	err = cmd.Start()
-	if err != nil {
-		return err
-	}
 
 	// Kill the process if the context ends
 	go func() {
@@ -131,12 +156,18 @@ func runCmd(
 		}
 	}()
 
-	cmd.Wait()
+	// Close mpx after the process is done and all events have been sent / consumed
+	go func() {
+		err := cmd.Wait()
+		logp.Warn("error executing command '%s': %w", cmd.String(), err)
+		wg.Wait()
+		mpx.Close()
+	}()
 
-	return nil
+	return mpx, nil
 }
 
-func sendConsoleLines(rdr io.Reader, typ string, lineCounter atomic.Int, cb func(line ConsoleLine)) {
+func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
@@ -145,16 +176,18 @@ func sendConsoleLines(rdr io.Reader, typ string, lineCounter atomic.Int, cb func
 			logp.Warn("Error encountered scanning console line: %s. Line was %s", scanner.Err(), scanner.Text())
 		}
 		if cb != nil {
-			cb(ConsoleLine{
-				Type:    typ,
-				Message: scanner.Text(),
-				Number:  lineCounter.Inc(),
+			cb(SynthEvent{
+				Type: typ,
+				Timestamp: time.Now(),
+				Payload: map[string]interface{}{
+					"message": scanner.Text(),
+				},
 			})
 		}
 	}
 }
 
-func sendResults(rdr io.Reader, cb func(Result)) error {
+func sendResults(rdr io.Reader, cb func(SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
@@ -163,7 +196,7 @@ func sendResults(rdr io.Reader, cb func(Result)) error {
 			return scanner.Err()
 		}
 
-		var res = Result{}
+		var res = SynthEvent{}
 		err := json.Unmarshal(scanner.Bytes(), &res)
 		if err != nil {
 			return err
@@ -176,38 +209,77 @@ func sendResults(rdr io.Reader, cb func(Result)) error {
 	return nil
 }
 
-type ConsoleLine struct {
-	Message string `json:"message"`
-	Number int `json:"index"`
-	Type string `json:"type"`
+type SynthEvent struct {
+	Type           string                 `json:"type"`
+	PackageVersion string                 `json:"package_version"`
+	Index          int                    `json:"index""`
+	Journey        SynthJourney           `json:"journey"`
+	Timestamp      time.Time              `json:"@timestamp"`
+	Payload        map[string]interface{} `json:"payload"`
 }
 
-type Result struct {
-	Type string `json:"type"`
-	PackageVersion string `json:"package_version"`
-	Journey ResultJourney `json:"journey"`
-	Timestamp time.Time `json:"@timestamp"`
-	Payload map[string]interface{} `json:"payload"`
+func (se SynthEvent) ToMap() common.MapStr {
+	// We don't add @timestamp to the map string since that's specially handled in beat.Event
+	return common.MapStr{
+		"type": se.Type,
+		"package_version": se.PackageVersion,
+		"index": se.Index,
+		"journey": se.Journey.ToMap(),
+		"payload": se.Payload,
+	}
 }
 
-type ResultJourney struct {
+type SynthJourney struct {
 	Name string `json:"name"`
 	Id string `json:"id"`
+}
+
+func (sj SynthJourney) ToMap() common.MapStr {
+	return common.MapStr{
+		"name": sj.Name,
+		"id": sj.Id,
+	}
 }
 
 type RawResult struct {
 	Journeys []map[string]interface{} `json:"journeys"`
 }
 
-type ExecHandler struct {
-	OnConsole func(line ConsoleLine)
-	OnResult func(result Result)
-	OnDone func()
-	Done chan struct{}
+type ExecMultiplexer struct {
+	eventCounter *atomic.Int
+	synthEvents  chan SynthEvent
+	done         chan struct{}
 }
 
-func NewExecHandler() *ExecHandler {
-	return &ExecHandler{
-		Done: make(chan struct{}),
+func (e ExecMultiplexer) Close() {
+	close(e.done)
+	close(e.synthEvents)
+}
+
+func (e ExecMultiplexer) writeSynthEvent(se SynthEvent) {
+	se.Index = e.eventCounter.Inc()
+	e.synthEvents <- se
+}
+
+// SynthEvents returns a read only channel for synth events
+func (e ExecMultiplexer) SynthEvents() <- chan SynthEvent {
+	return e.synthEvents
+}
+
+// Done returns a channel that is closed when all output has been received
+func (e ExecMultiplexer) Done() <- chan struct{} {
+	return e.done
+}
+
+// Wait blocks until the multiplexer is done and has returned all data
+func (e ExecMultiplexer) Wait() {
+	<- e.done
+}
+
+func NewExecMultiplexer() *ExecMultiplexer {
+	return &ExecMultiplexer{
+		eventCounter: atomic.NewInt(-1), // Start from -1 so first call to Inc returns 0
+		synthEvents: make(chan SynthEvent),
+		done: make(chan struct{}),
 	}
 }

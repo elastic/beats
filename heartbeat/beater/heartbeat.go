@@ -169,7 +169,7 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 	for _, suite := range bt.config.SyntheticSuites {
 		logp.Warn("Listing suite", suite.Path)
-		journeyNames, err := synthexec.ListJourneys(context.TODO(), suite.Path)
+		journeyNames, err := synthexec.ListJourneys(context.TODO(), suite.Path, suite.Params)
 		if err != nil {
 			return err
 		}
