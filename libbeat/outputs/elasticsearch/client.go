@@ -405,13 +405,13 @@ func bulkCollectPublishFails(
 				stats.tooMany++
 			} else {
 				// hard failure, don't collect
-				log.Warn("Cannot index event",zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg))
+				log.With(zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg)).Warn("Cannot index event")
 				stats.nonIndexable++
 				continue
 			}
 		}
 
-		log.Debug("Bulk item insert failed",zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg))
+		log.With(zap.Int("status",status),zap.Any("event",data[i]),zap.ByteString("error",msg)).Debug("Bulk item insert failed")
 		stats.fails++
 		failed = append(failed, data[i])
 	}
