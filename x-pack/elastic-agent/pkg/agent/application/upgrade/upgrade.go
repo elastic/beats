@@ -78,7 +78,6 @@ func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI string) error
 	}
 
 	u.reexec.ReExec()
-
 	return nil
 }
 

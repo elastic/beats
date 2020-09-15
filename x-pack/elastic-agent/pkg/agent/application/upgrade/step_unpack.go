@@ -99,14 +99,12 @@ func unzip(version, archivePath string) (string, error) {
 	}
 
 	for _, f := range r.File {
-		// TODO: verify if needed
 		if rootDir == "" && filepath.Base(f.Name) == filepath.Dir(f.Name) {
 			return f.Name, nil
 		}
 		if currentDir := filepath.Dir(f.Name); rootDir == "" || len(currentDir) < len(rootDir) {
 			rootDir = currentDir
 		}
-		// EOT
 
 		if err := unpackFile(f); err != nil {
 			return "", err
@@ -139,6 +137,7 @@ func untar(version, archivePath string) (string, error) {
 	tr := tar.NewReader(zr)
 	var rootDir string
 	var hash string
+	fileNamePrefix := strings.TrimSuffix(filepath.Base(archivePath), ".tar.gz") + "/" // omitting `elastic-agent-{version}-{os}-{arch}/` in filename
 
 	for {
 		f, err := tr.Next()
@@ -154,7 +153,9 @@ func untar(version, archivePath string) (string, error) {
 		}
 
 		//get hash
-		if f.Name == agentCommitFile {
+		fileName := strings.TrimPrefix(f.Name, fileNamePrefix)
+
+		if fileName == agentCommitFile {
 			hashBytes, err := ioutil.ReadAll(tr)
 			if err != nil || len(hashBytes) < hashLen {
 				return "", err
@@ -165,11 +166,11 @@ func untar(version, archivePath string) (string, error) {
 		}
 
 		// skip everything outside data/
-		if !strings.HasPrefix(f.Name, "data/") {
+		if !strings.HasPrefix(fileName, "data/") {
 			continue
 		}
 
-		rel := filepath.FromSlash(strings.TrimPrefix(f.Name, "data/"))
+		rel := filepath.FromSlash(strings.TrimPrefix(fileName, "data/"))
 		abs := filepath.Join(paths.Data(), rel)
 
 		// find the root dir
@@ -203,7 +204,7 @@ func untar(version, archivePath string) (string, error) {
 				return "", errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
 			}
 		default:
-			return "", errors.New(fmt.Sprintf("tar file entry %s contained unsupported file type %v", f.Name, mode), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
+			return "", errors.New(fmt.Sprintf("tar file entry %s contained unsupported file type %v", fileName, mode), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fileName))
 		}
 	}
 

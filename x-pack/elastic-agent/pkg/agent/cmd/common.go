@@ -75,6 +75,10 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
 
+	// TODO: remove before merging
+	cmd.AddCommand(newUpgradeCommandWithArgs(flags, args, streams))
+	// EOf TODO
+
 	// windows special hidden sub-command (only added on windows)
 	reexec := newReExecWindowsCommand(flags, args, streams)
 	if reexec != nil {

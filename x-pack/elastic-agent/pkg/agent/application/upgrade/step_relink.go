@@ -18,16 +18,16 @@ import (
 func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
 	// create symlink to elastic-agent-{hash}
 	hashedDir := fmt.Sprintf("%s-%s", agentName, newHash)
-	originalPath := filepath.Join(paths.Home(), agentName)
 	newPath := filepath.Join(paths.Data(), hashedDir, agentName)
 
 	agentBakName := agentName + ".bak"
-	bakNewPath := filepath.Join(paths.Data(), hashedDir, agentBakName)
+	symlinkPath := filepath.Join(paths.Config(), agentName)
+	bakNewPath := filepath.Join(paths.Config(), agentBakName)
 
-	if err := os.Symlink(bakNewPath, originalPath); err != nil {
+	if err := os.Symlink(newPath, bakNewPath); err != nil {
 		return err
 	}
 
 	// safely rotate
-	return file.SafeFileRotate(newPath, bakNewPath)
+	return file.SafeFileRotate(symlinkPath, bakNewPath)
 }

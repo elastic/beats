@@ -7,12 +7,14 @@ package upgrade
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"gopkg.in/yaml.v2"
 )
 
 const markerFilename = ".update-marker"
@@ -33,6 +35,10 @@ type updateMarker struct {
 
 // markUpgrade marks update happened so we can handle grace period
 func (h *Upgrader) markUpgrade(ctx context.Context, version, hash string) error {
+	if err := updateHomePath(hash); err != nil {
+		return err
+	}
+
 	prevVersion := release.Version()
 	prevHash := release.Commit()
 	if len(prevHash) > hashLen {
@@ -53,5 +59,33 @@ func (h *Upgrader) markUpgrade(ctx context.Context, version, hash string) error 
 		return err
 	}
 
-	return ioutil.WriteFile(markerPath, markerBytes, 0600)
+	if err := ioutil.WriteFile(markerPath, markerBytes, 0600); err != nil {
+		return err
+	}
+
+	activeCommitPath := filepath.Join(paths.Config(), agentCommitFile)
+	return ioutil.WriteFile(activeCommitPath, []byte(hash), 0644)
+}
+
+func updateHomePath(hash string) error {
+	pathsMap := make(map[string]string)
+	pathsFilepath := filepath.Join(paths.Data(), "paths.yml")
+
+	pathsBytes, err := ioutil.ReadFile(pathsFilepath)
+	if err != nil {
+		return err
+	}
+
+	if err := yaml.Unmarshal(pathsBytes, &pathsMap); err != nil {
+		return err
+	}
+
+	pathsMap["path.home"] = filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, hash)) //replace base with new hashed
+
+	pathsBytes, err = yaml.Marshal(pathsMap)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(pathsFilepath, pathsBytes, 0740)
 }
