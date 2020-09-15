@@ -68,7 +68,7 @@ def rebuild_plugin(tmpfs: str, name: str, tag: str):
     # so we don't collide we anything else, iterate the semver string
     reg = re.compile(r'''(\d+)\.(\d+)\.(\d+)''')
     semver = list(reg.findall(tag))[0]
-    if len(semver) is not 3:
+    if len(semver) != 3:
         print("Got bad tag, expecting semver: ", tag)
         sys.exit(1)
     patch = int(semver[-1]) + 1
@@ -176,7 +176,7 @@ def get_tag(session: requests.Session, from_release: str):
     tags = tags_resp.json()["tags"]
     if from_release in tags:
         return from_release
-    if from_release is not "" and from_release not in tags:
+    if from_release != "" and from_release != tags:
         print("Release tag {} was not found in tags.".format(from_release))
         print("Available tags: ", tags)
         sys.exit(1)
