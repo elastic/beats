@@ -68,7 +68,16 @@ pipeline {
       environment {
         GOFLAGS = '-mod=readonly'
       }
+      steps {
+        target(context: 'Lint', target: 'make check')
+      }
+    }
+    stage('Build&Test') {
+      options { skipDefaultCheckout() }
       when {
+        // Always when running builds on branches/tags
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
         anyOf {
           not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
@@ -78,14 +87,6 @@ pipeline {
           expression { return params.runAllStages }         // If UI forced
         }
       }
-      steps {
-        whenFalse(true) { // TODO: disable for the time being.
-          target(context: "Lint", target: 'make check')
-        }
-      }
-    }
-    stage('Build&Test') {
-      options { skipDefaultCheckout() }
       steps {
         deleteDir()
         unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
