@@ -48,6 +48,7 @@ https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
 https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodically gather internet download speed from  https://fast.com[fast.com].
+https://github.com/Ardiea/fileagebeat[fileagebeat]:: Watches a series of directories for files exceeding a given age threshold.
 https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
