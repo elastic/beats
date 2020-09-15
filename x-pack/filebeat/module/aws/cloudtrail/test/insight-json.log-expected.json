@@ -1,0 +1,64 @@
+[
+    {
+        "@timestamp": "2020-09-09T23:00:00.000Z",
+        "aws.cloudtrail.event_type": "AwsCloudTrailInsight",
+        "aws.cloudtrail.event_version": "1.07",
+        "aws.cloudtrail.insight_details.eventName": "AttachUserPolicy",
+        "aws.cloudtrail.insight_details.eventSource": "iam.amazonaws.com",
+        "aws.cloudtrail.insight_details.insffightContext.attributions": [
+            {
+                "attribute": "userIdentityArn",
+                "baseline": [],
+                "insight": [
+                    {
+                        "average": 2.0,
+                        "value": "arn:aws:iam::123456789012:user/Alice"
+                    }
+                ]
+            },
+            {
+                "attribute": "userAgent",
+                "baseline": [],
+                "insight": [
+                    {
+                        "average": 2.0,
+                        "value": "console.amazonaws.com"
+                    }
+                ]
+            },
+            {
+                "attribute": "errorCode",
+                "baseline": [],
+                "insight": [
+                    {
+                        "average": 2.0,
+                        "value": "null"
+                    }
+                ]
+            }
+        ],
+        "aws.cloudtrail.insight_details.insffightContext.statistics.baseline.average": 0.0,
+        "aws.cloudtrail.insight_details.insffightContext.statistics.baselineDuration": 11459,
+        "aws.cloudtrail.insight_details.insffightContext.statistics.insight.average": 2.0,
+        "aws.cloudtrail.insight_details.insffightContext.statistics.insightDuration": 1,
+        "aws.cloudtrail.insight_details.insightType": "ApiCallRateInsight",
+        "aws.cloudtrail.insight_details.state": "End",
+        "aws.cloudtrail.recipient_account_id": "123456789012",
+        "cloud.region": "us-east-1",
+        "event.action": "Insight",
+        "event.dataset": "aws.cloudtrail",
+        "event.id": "41ed77ca-d659-b45a-8e9a-74e504300007",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "{\"eventVersion\":\"1.07\",\"eventTime\":\"2020-09-09T23:00:00Z\",\"awsRegion\":\"us-east-1\",\"eventID\":\"41ed77ca-d659-b45a-8e9a-74e504300007\",\"eventType\":\"AwsCloudTrailInsight\",\"recipientAccountId\":\"123456789012\",\"sharedEventID\":\"e672c2b1-e71a-4779-f96c-02da7bb30d2e\",\"insightDetails\":{\"state\":\"End\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"AttachUserPolicy\",\"insightType\":\"ApiCallRateInsight\",\"insffightContext\":{\"statistics\":{\"baseline\":{\"average\":0.0},\"insight\":{\"average\":2.0},\"insightDuration\":1,\"baselineDuration\":11459},\"attributions\":[{\"attribute\":\"userIdentityArn\",\"insight\":[{\"value\":\"arn:aws:iam::123456789012:user/Alice\",\"average\":2.0}],\"baseline\":[]},{\"attribute\":\"userAgent\",\"insight\":[{\"value\":\"console.amazonaws.com\",\"average\":2.0}],\"baseline\":[]},{\"attribute\":\"errorCode\",\"insight\":[{\"value\":\"null\",\"average\":2.0}],\"baseline\":[]}]}},\"eventCategory\":\"Insight\"}",
+        "event.outcome": "success",
+        "event.type": "info",
+        "fileset.name": "cloudtrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]
