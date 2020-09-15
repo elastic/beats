@@ -263,6 +263,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 - Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 - Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
+- Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
 
 *Heartbeat*
 
@@ -356,6 +357,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
+- Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
+- Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
 
 ==== Added
 
@@ -559,6 +562,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
+- Added new module for Zoom webhooks {pull}20414[20414]
 
 *Heartbeat*
 
@@ -674,10 +678,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add state_daemonset metricset for Kubernetes Metricbeat module {pull}20649[20649]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
+- Add billing data collection from Cost Explorer into aws billing metricset. {pull}20527[20527] {issue}20103[20103]
 - Migrate `compute_vm` metricset to a light one, map `cloud.instance.id` field. {pull}20889[20889]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
+- Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
 
 *Packetbeat*

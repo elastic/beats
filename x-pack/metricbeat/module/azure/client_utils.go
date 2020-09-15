@@ -6,6 +6,7 @@ package azure
 
 import (
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -14,6 +15,8 @@ import (
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
 const DefaultTimeGrain = "PT5M"
+
+var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
 func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
@@ -167,21 +170,41 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	return grouped
 }
 
-// ContainsDimension will check if the dimension value is found in the list
-func ContainsDimension(dimension string, dimensions []insights.LocalizableString) bool {
+// getDimension will check if the dimension value is found in the list
+func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
 	for _, dim := range dimensions {
-		if *dim.Value == dimension {
+		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+			return dim, true
+		}
+	}
+	return Dimension{}, false
+}
+
+func containsResource(resourceId string, resources []Resource) bool {
+	for _, res := range resources {
+		if res.Id == resourceId {
 			return true
 		}
 	}
 	return false
 }
 
-func containsResource(resId string, resources []Resource) bool {
-	for _, res := range resources {
-		if res.Id == resId {
-			return true
+func getInstanceId(dimensionValue string) string {
+	matches := instanceIdRegex.FindStringSubmatch(dimensionValue)
+	if len(matches) == 2 {
+		return matches[1]
+	}
+	return ""
+}
+
+func getVM(vmName string, vms []VmResource) (VmResource, bool) {
+	if len(vms) == 0 {
+		return VmResource{}, false
+	}
+	for _, vm := range vms {
+		if vm.Name == vmName {
+			return vm, true
 		}
 	}
-	return false
+	return VmResource{}, false
 }
