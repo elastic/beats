@@ -5,6 +5,7 @@ go 1.14
 require (
 	4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
 	cloud.google.com/go v0.51.0
+	cloud.google.com/go/bigquery v1.0.1
 	cloud.google.com/go/pubsub v1.0.1
 	cloud.google.com/go/storage v1.0.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -18,14 +19,13 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.1
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
-	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
-	github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb
+	github.com/antlr/antlr4 v0.0.0-20200820155224-be881fa6b91d
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
@@ -123,7 +123,7 @@ require (
 	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
-	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
+	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
@@ -166,7 +166,7 @@ require (
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692
+	golang.org/x/tools v0.0.0-20200904185747-39188db58858
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.29.1

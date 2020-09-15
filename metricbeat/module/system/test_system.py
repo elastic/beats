@@ -533,7 +533,7 @@ class Test(metricbeat.BaseTest):
             assert isinstance(udp["all"]["count"], int)
 
     def check_username(self, observed, expected=None):
-        if expected == None:
+        if expected is None:
             expected = getpass.getuser()
 
         if os.name == 'nt':
