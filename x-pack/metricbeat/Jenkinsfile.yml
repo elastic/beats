@@ -18,10 +18,6 @@ stages:
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         dirs:                  ## run the cloud tests for the given modules.
             - "x-pack/metricbeat/module/aws"
-        when:                  ## Aggregate when with the top-level one.
-            parameters:
-                - "awsCloudTests"
-                - "allCloudTests"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
