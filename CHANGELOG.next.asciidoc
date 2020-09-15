@@ -291,6 +291,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 - Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
 - Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
+- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 
 *Heartbeat*
 
