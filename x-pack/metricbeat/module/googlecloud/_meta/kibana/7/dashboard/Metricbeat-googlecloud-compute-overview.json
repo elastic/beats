@@ -32,7 +32,7 @@
             "panelIndex": "28706ab2-1142-401d-9143-f4176a034c10",
             "panelRefName": "panel_0",
             "title": "Filters",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
             "panelRefName": "panel_1",
             "title": "Instance Uptime",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
             "panelRefName": "panel_2",
             "title": "CPU Utilization",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
             "panelRefName": "panel_3",
             "title": "Read I/O",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
             "panelRefName": "panel_4",
             "title": "Write I/O",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
             "panelRefName": "panel_5",
             "title": "Network Sent Bytes",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -128,7 +128,7 @@
             "panelIndex": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
             "panelRefName": "panel_6",
             "title": "Network Received Bytes",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -144,7 +144,7 @@
             "panelIndex": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
             "panelRefName": "panel_7",
             "title": "Firewall Dropped Bytes",
-            "version": "7.9.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -160,7 +160,7 @@
             "panelIndex": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
             "panelRefName": "panel_8",
             "title": "Firewall Dropped Packets",
-            "version": "7.9.0"
+            "version": "7.9.1"
           }
         ],
         "timeRestore": false,
@@ -222,37 +222,15 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-09-15T04:07:08.347Z",
-      "version": "Wzg1NzYsOF0="
+      "updated_at": "2020-09-15T16:22:48.674Z",
+      "version": "Wzk1NCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "googlecloud.compute"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "googlecloud.compute"
-                  }
-                }
-              }
-            ],
+            "filter": [],
             "query": {
               "language": "kuery",
               "query": ""
@@ -330,11 +308,6 @@
       "references": [
         {
           "id": "metricbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
@@ -350,8 +323,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-09-15T04:06:57.675Z",
-      "version": "Wzg1NzQsOF0="
+      "updated_at": "2020-09-15T16:22:42.806Z",
+      "version": "Wzk1MSwxXQ=="
     },
     {
       "attributes": {
@@ -474,8 +447,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T03:49:15.418Z",
-      "version": "WzgzOTgsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzNCwxXQ=="
     },
     {
       "attributes": {
@@ -544,8 +517,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjIsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzNSwxXQ=="
     },
     {
       "attributes": {
@@ -613,8 +586,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjMsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzNiwxXQ=="
     },
     {
       "attributes": {
@@ -682,8 +655,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjQsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzNywxXQ=="
     },
     {
       "attributes": {
@@ -751,8 +724,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjUsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzOCwxXQ=="
     },
     {
       "attributes": {
@@ -820,8 +793,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjYsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQzOSwxXQ=="
     },
     {
       "attributes": {
@@ -908,8 +881,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjcsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQ0MCwxXQ=="
     },
     {
       "attributes": {
@@ -997,9 +970,9 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-15T02:56:01.216Z",
-      "version": "Wzc4NjgsOF0="
+      "updated_at": "2020-09-15T16:01:39.831Z",
+      "version": "WzQ0MSwxXQ=="
     }
   ],
-  "version": "7.9.0"
+  "version": "7.9.1"
 }
