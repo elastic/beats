@@ -1,14 +1,19 @@
-- key: script
+- key: synthetics
   title: "HTTP monitor"
   description:
   fields:
-    - name: script
+    - name: synthetics
       type: group
       description: >
-        Script related fields.
+        Journey related fields.
       fields:
-        - name: lines
-          type: text
+        - name: "type"
+          type: keyword
+        - name: package_version
+          type: keyword
+        - name: payload
+          type: object
+          enabled: false
         - name: journey
           type: object
           enabled: false
