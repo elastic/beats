@@ -4,9 +4,78 @@
     `billing` contains the estimated charges for your AWS account in Cloudwatch.
   release: beta
   fields:
-    - name: metrics
+    - name: EstimatedCharges
+      type: long
+      description: Maximum estimated charges for AWS acccount.
+    - name: Currency
+      type: keyword
+      description: Estimated charges currency unit.
+    - name: ServiceName
+      type: keyword
+      description: Service name for the maximum estimated charges.
+    - name: AmortizedCost
       type: group
       fields:
-        - name: EstimatedCharges.max
-          type: long
-          description: Maximum estimated charges for AWS acccount.
+        - name: amount
+          type: double
+          description: Amortized cost amount
+        - name: unit
+          type: keyword
+          description: Amortized cost unit
+    - name: BlendedCost
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Blended cost amount
+        - name: unit
+          type: keyword
+          description: Blended cost unit
+    - name: NormalizedUsageAmount
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Normalized usage amount
+        - name: unit
+          type: keyword
+          description: Normalized usage amount unit
+    - name: UnblendedCost
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Unblended cost amount
+        - name: unit
+          type: keyword
+          description: Unblended cost unit
+    - name: UsageQuantity
+      type: group
+      fields:
+        - name: amount
+          type: double
+          description: Usage quantity amount
+        - name: unit
+          type: keyword
+          description: Usage quantity unit
+    - name: start_date
+      type: keyword
+      description: Start date for retrieving AWS costs
+    - name: end_date
+      type: keyword
+      description: End date for retrieving AWS costs
+    - name: group_definition
+      type: group
+      fields:
+        - name: key
+          type: keyword
+          description: The string that represents a key for a specified group
+        - name: type
+          type: keyword
+          description: The string that represents the type of group
+    - name: group_by.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
+      description: >
+        Cost explorer group by key values

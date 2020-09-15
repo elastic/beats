@@ -56,9 +56,9 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "objects" in js
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < 1024 * 1024, "Kibana index pattern must be less than 1MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_index_pattern_migration(self):
         """
@@ -68,9 +68,9 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "objects" in js
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < 1024 * 1024, "Kibana index pattern must be less than 1MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_config(self):
         """

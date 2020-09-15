@@ -102,6 +102,18 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Process CloudTrail logs
+    # default is true, set to false to skip Cloudtrail logs
+    # var.process_cloudtrail_logs: false
+
+    # Process CloudTrail Digest logs
+    # default true, set to false to skip CloudTrail Digest logs
+    # var.process_digest_logs: false
+
+    # Process CloudTrail Insight logs
+    # default true, set to false to skip CloudTrail Insight logs
+    # var.process_insight_logs: false
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -1297,8 +1309,10 @@ filebeat.modules:
 
     # known firewalls
     #var.known_devices:
-    #   "device1_serialnumber": "a.host.local"
-    #   "device2_serialnumber": "b.host.local"
+      #- serial_number: "1234567890123457"
+      #  hostname: "a.host.local"
+      #- serial_number: "1234234590678557"
+      #  hostname: "b.host.local"
 
 
 #-------------------------------- Squid Module --------------------------------
@@ -1447,6 +1461,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#--------------------------------- Zoom Module ---------------------------------
+- module: zoom
+  webhook:
+    enabled: true
+
+    # The type of input to use
+    #var.input: http_endpoint
+
+    # The interface to listen for incoming HTTP requests. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.listen_address: localhost
+
+    # The port to bind to
+    #var.listen_port: 80
+
+    # The header Zoom uses to send its secret token, defaults to "Authorization"
+    #secret.header: Authorization
+
+    # The secret token value created by Zoom
+    #secret.value: ZOOMTOKEN
 
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
