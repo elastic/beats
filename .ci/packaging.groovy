@@ -118,6 +118,7 @@ pipeline {
                     deleteDir()
                     release()
                     pushCIDockerImages()
+                    runE2ETestForPackages()
                   }
                 }
               }
@@ -206,6 +207,26 @@ def tagAndPush(name){
       docker tag ${oldName} ${commitName}
       docker push ${commitName}
     """)
+  }
+}
+
+def runE2ETestForPackages(){
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
+    if ("${env.BEATS_FOLDER}" == "filebeat") {
+      echo('Triggering E2E tests for filebeat-oss. Test suite: helm:filebeat & ingest-manager')
+    } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
+      echo('Triggering E2E tests for heartbeat-oss. Test suite: ingest-manager')
+    } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
+      echo('Triggering E2E tests for metricbeat-oss. Test suite: helm:metricbeat && ingest-manager && metricbeat')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
+      echo('Triggering E2E tests for elastic-agent. Test suite: ingest-manager')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
+      echo('Triggering E2E tests for filebeat. Test suite: helm:filebeat & ingest-manager')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
+      echo('Triggering E2E tests for heartbeat. Test suite: ingest-manager')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
+      echo('Triggering E2E tests for metricbeat. Test suite: helm:metricbeat && ingest-manager && metricbeat')
+    }
   }
 }
 
