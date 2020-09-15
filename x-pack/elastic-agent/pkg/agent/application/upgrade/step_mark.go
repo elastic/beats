@@ -20,6 +20,9 @@ import (
 const markerFilename = ".update-marker"
 
 type updateMarker struct {
+	// ActionID is used to identify action for ack purposes
+	ActionID string `json:"action_id" yaml:"action_id"`
+
 	// Version agent is updated to
 	Version string `json:"version" yaml:"version"`
 	// Hash agent is updated to
@@ -34,7 +37,7 @@ type updateMarker struct {
 }
 
 // markUpgrade marks update happened so we can handle grace period
-func (h *Upgrader) markUpgrade(ctx context.Context, version, hash string) error {
+func (h *Upgrader) markUpgrade(ctx context.Context, version, hash, actionID string) error {
 	if err := updateHomePath(hash); err != nil {
 		return err
 	}
@@ -51,6 +54,7 @@ func (h *Upgrader) markUpgrade(ctx context.Context, version, hash string) error 
 		UpdatenOn:   time.Now(),
 		PrevVersion: prevVersion,
 		PrevHash:    prevHash,
+		ActionID:    actionID,
 	}
 
 	markerPath := filepath.Join(paths.Data(), markerFilename)

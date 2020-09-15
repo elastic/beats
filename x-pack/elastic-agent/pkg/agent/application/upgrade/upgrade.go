@@ -48,7 +48,7 @@ func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []contex
 }
 
 // Upgrade upgrades running agent
-func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI string) error {
+func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI, actionID string) error {
 	archivePath, err := u.downloadArtifact(ctx, version, sourceURI)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI string) error
 		return err
 	}
 
-	if err := u.markUpgrade(ctx, version, newHash); err != nil {
+	if err := u.markUpgrade(ctx, version, newHash, actionID); err != nil {
 		rollbackInstall(newHash)
 		return err
 	}
