@@ -6,15 +6,20 @@ package synthexec
 
 import (
 	"bufio"
-	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"io"
+	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func ListSuite(suiteFile string) (out *CmdOut, err error) {
+func ListJourneys(ctx context.Context, suiteFile string) (journeyNames []string, err error) {
 	cmd := exec.Command(
 		"node",
 		suiteFile,
@@ -25,10 +30,27 @@ func ListSuite(suiteFile string) (out *CmdOut, err error) {
 		"--dry-run",
 	)
 
-	return runCmd(cmd, nil)
+	handler := NewExecHandler()
+	handler.OnResult = func(result Result) {
+		if result.Type == "journey/start" {
+			journeyNames = append(journeyNames, result.Journey.Name)
+		}
+	}
+
+	err = runCmd(ctx, cmd, nil, handler)
+	if err != nil {
+		return nil, err
+	}
+
+	select {
+		case <- handler.Done:
+		case <- ctx.Done():
+	}
+
+	return journeyNames, nil
 }
 
-func RunSuite(suiteFile string, journeyName string) (out *CmdOut, err error) {
+func RunSuite(ctx context.Context, suiteFile string, journeyName string, handler *ExecHandler) error {
 	logp.Warn("RUNNING JOURNEY %s", journeyName)
 	cmd := exec.Command(
 		"node",
@@ -40,111 +62,152 @@ func RunSuite(suiteFile string, journeyName string) (out *CmdOut, err error) {
 		"--journey-name", journeyName,
 	)
 
-	return runCmd(cmd, nil)
+	return runCmd(ctx, cmd, nil, handler)
 }
 
-func RunScript(script string) (out *CmdOut, err error) {
+func RunScript(ctx context.Context, script string, handler *ExecHandler) (err error) {
 	cmd := exec.Command(
 		"npx",
-		"elastic-synthetics",
+		"@elastic/synthetics",
 		"--stdin",
 		"--json",
 		"--headless",
 		"--screenshots",
 	)
 
-	return runCmd(cmd, &script)
+	return runCmd(ctx, cmd, &script, handler)
 }
 
-func runCmd(cmd *exec.Cmd, stdinStr *string) (*CmdOut, error) {
+func runCmd(
+	ctx context.Context,
+	cmd *exec.Cmd,
+	stdinStr *string,
+	handler *ExecHandler,
+	) error {
+	if handler.OnDone != nil {
+		defer handler.OnDone()
+	}
+	if handler.Done != nil {
+		defer func() {handler.Done <- struct {}{}}()
+	}
+	// Setup a pipe for structured output
+	resultsReader, resultsWriter, err := os.Pipe()
+	if err != nil {
+		return err
+	}
+	defer resultsWriter.Close()
+	defer resultsReader.Close()
+
+	cmd.Args = append(cmd.Args, "--outfd", fmt.Sprintf("%d", resultsWriter.Fd()))
+
 	logp.Info("Running command: %s", cmd.String())
 
 	if stdinStr	!= nil {
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	outBytes, err := cmd.CombinedOutput()
+	// Handle the console output
+	lineCounter := atomic.MakeInt(0)
+	// Send stdout into the output
+	stdoutPipe, err := cmd.StdoutPipe()
+	go sendConsoleLines(stdoutPipe, "stdout", lineCounter, handler.OnConsole)
+	// Send stderr into the output
+	stderrPipe, err := cmd.StderrPipe()
+	go sendConsoleLines(stderrPipe, "stderr", lineCounter,  handler.OnConsole)
+
+	// Send the test results into the output
+	go sendResults(resultsReader, handler.OnResult)
+
+	err = cmd.Start()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	out := &CmdOut{}
-	scanner := bufio.NewScanner(bytes.NewReader(outBytes))
+	// Kill the process if the context ends
+	go func() {
+		select {
+		case <- ctx.Done():
+			cmd.Process.Kill()
+		}
+	}()
+
+	cmd.Wait()
+
+	return nil
+}
+
+func sendConsoleLines(rdr io.Reader, typ string, lineCounter atomic.Int, cb func(line ConsoleLine)) {
+	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			return nil, scanner.Err()
+			logp.Warn("Error encountered scanning console line: %s. Line was %s", scanner.Err(), scanner.Text())
 		}
-
-		var result *Result
-		if out.Result == nil {
-			result = decodeResult(scanner.Bytes())
-			out.Result = result
-		}
-		if result != nil {
-		}
-		if result == nil {
-			out.Lines = append(out.Lines, scanner.Text())
+		if cb != nil {
+			cb(ConsoleLine{
+				Type:    typ,
+				Message: scanner.Text(),
+				Number:  lineCounter.Inc(),
+			})
 		}
 	}
-
-	return out, err
 }
 
-// decodeResult attempts to decode the given line to our result type, returns nil if invalid.
-func decodeResult(line []byte) (*Result) {
-	// We need to yield both a map[string]interface{} version of "Journeys" to pass through to ES
-	// and a richer version that has accessible fields. Let's do both
-	var rawRes = &RawResult{}
-	res := &Result{}
+func sendResults(rdr io.Reader, cb func(Result)) error {
+	scanner := bufio.NewScanner(rdr)
+	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
+	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			return scanner.Err()
+		}
 
-	err := json.Unmarshal(line, rawRes)
-	// This must just be a plain line
-	if err != nil {
-		return nil
+		var res = Result{}
+		err := json.Unmarshal(scanner.Bytes(), &res)
+		if err != nil {
+			return err
+		}
+
+		if cb != nil {
+			cb(res)
+		}
 	}
-
-	err = json.Unmarshal(line, res)
-	if err != nil {
-		logp.Warn("Raw result decoded successfully, but richer one did not: %s", line)
-		return nil
-	}
-
-	res.Raw = rawRes
-	for idx, j := range res.Journeys {
-		j.Raw = rawRes.Journeys[idx]
-	}
-
-	return res
+	return nil
 }
 
-type CmdOut struct {
-	Result *Result
-	Lines []string
+type ConsoleLine struct {
+	Message string `json:"message"`
+	Number int `json:"index"`
+	Type string `json:"type"`
 }
 
 type Result struct {
-	formatVersion string     `json:"format_version"`
-	Journeys      []*Journey `json:"journeys"`
-	Raw           *RawResult
+	Type string `json:"type"`
+	PackageVersion string `json:"package_version"`
+	Journey ResultJourney `json:"journey"`
+	Timestamp time.Time `json:"@timestamp"`
+	Payload map[string]interface{} `json:"payload"`
+}
+
+type ResultJourney struct {
+	Name string `json:"name"`
+	Id string `json:"id"`
 }
 
 type RawResult struct {
 	Journeys []map[string]interface{} `json:"journeys"`
 }
 
-type Journey struct {
-	Name     string      `json:"name"`
-	Url      string      `json:"url"`
-	Steps    []Step      `json:"steps"`
-	DataType string      `json:"__type__"`
-	Error    interface{} `json:"error"`
-	Duration interface{} `json:"elapsedMs"`
-	Raw      map[string]interface{}
-	Status   string `json:"status"`
+type ExecHandler struct {
+	OnConsole func(line ConsoleLine)
+	OnResult func(result Result)
+	OnDone func()
+	Done chan struct{}
 }
 
-type Step struct {
-	Screenshot string `json:"screenshot"`
+func NewExecHandler() *ExecHandler {
+	return &ExecHandler{
+		Done: make(chan struct{}),
+	}
 }
