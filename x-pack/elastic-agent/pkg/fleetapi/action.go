@@ -12,6 +12,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+const (
+	// ActionTypeUpgrade specifies upgrade action.
+	ActionTypeUpgrade = "UPGRADE_ACTION"
+	// ActionTypeUnenroll specifies unenroll action.
+	ActionTypeUnenroll = "UNENROLL"
+	// ActionTypeConfigChange specifies config change action.
+	ActionTypeConfigChange = "CONFIG_CHANGE"
+)
+
 // Action base interface for all the implemented action from the fleet API.
 type Action interface {
 	fmt.Stringer
@@ -160,7 +169,7 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 
 	for _, response := range responses {
 		switch response.ActionType {
-		case "CONFIG_CHANGE":
+		case ActionTypeConfigChange:
 			action = &ActionConfigChange{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
@@ -170,13 +179,13 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 					"fail to decode CONFIG_CHANGE action",
 					errors.TypeConfig)
 			}
-		case "UNENROLL":
+		case ActionTypeUnenroll:
 			action = &ActionUnenroll{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
-		case "UPGRADE_ACTION":
-			action = &ActionUnenroll{
+		case ActionTypeUpgrade:
+			action = &ActionUpgrade{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
