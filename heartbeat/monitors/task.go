@@ -21,8 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -30,39 +28,24 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // configuredJob represents a job combined with its config and any
 // subsequent processors.
 type configuredJob struct {
-	job        jobs.Job
-	config     jobConfig
-	monitor    *Monitor
-	processors *processors.Processors
-	cancelFn   context.CancelFunc
-	client     beat.Client
+	job      jobs.Job
+	config   jobConfig
+	monitor  *Monitor
+	cancelFn context.CancelFunc
+	client   beat.Client
 }
 
 func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
-	t := &configuredJob{
+	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
-	}
-
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, ProcessorsError{err}
-	}
-	t.processors = processors
-
-	if err != nil {
-		logp.Critical("Could not create client for monitor configuredJob %+v", t.monitor)
-		return nil, errors.Wrap(err, "could not create client for monitor configuredJob")
-	}
-
-	return t, nil
+	}, nil
 }
 
 // jobConfig represents fields needed to execute a single job.
@@ -70,13 +53,6 @@ type jobConfig struct {
 	Name     string             `config:"pluginName"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
-
-	// Fields and tags to add to monitor.
-	EventMetadata common.EventMetadata    `config:",inline"`
-	Processors    processors.PluginConfig `config:"processors"`
-
-	// KeepNull determines whether published events will keep null values or omit them.
-	KeepNull bool `config:"keep_null"`
 }
 
 // ProcessorsError is used to indicate situations when processors could not be loaded.
@@ -101,22 +77,14 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 func (t *configuredJob) Start() {
 	var err error
 
-	fields := common.MapStr{"event": common.MapStr{"dataset": "uptime"}}
-	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			EventMetadata: t.config.EventMetadata,
-			Processor:     t.processors,
-			KeepNull:      t.config.KeepNull,
-			Fields:        fields,
-		},
-	})
+	t.client, err = t.monitor.pipelineConnector.Connect()
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 		return
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.id, tf)
+	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.stdFields.ID, tf)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}

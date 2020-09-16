@@ -106,7 +106,7 @@ grouped in the following categories:
 
 """.format(**dict))
 
-    docs = yaml.load(input)
+    docs = yaml.load(input, Loader=yaml.FullLoader)
 
     # fields file is empty
     if docs is None:
@@ -121,9 +121,8 @@ grouped in the following categories:
         for field in section["fields"]:
             name = field["name"]
             if name in fields:
-                assert field["type"] == (fields[name]["type"],
-                                         'field "{}" redefined with different type "{}"'.format(
-                    name, field["type"]))
+                assert field["type"] == fields[name]["type"], 'field "{}" redefined with different type "{}"'.format(
+                    name, field["type"])
                 fields[name].update(field)
             else:
                 fields[name] = field

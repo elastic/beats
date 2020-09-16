@@ -1,5 +1,8 @@
 description: Pipeline for parsing Kafka log messages
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     trace_match: true

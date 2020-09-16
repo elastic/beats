@@ -6,9 +6,10 @@ import unittest
 import time
 import yaml
 from shutil import copyfile
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
     def test_start_with_local_journal(self):
@@ -44,18 +45,13 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        required_log_snippets = [
-            # journalbeat can be started
-            "journalbeat is running",
-            # journalbeat can seek to the position defined in the cursor
-            "Tailing the journal file",
-        ]
-        for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet),
-                            name="Line in '{}' Journalbeat log".format(snippet))
+        self.wait_until(lambda: self.log_contains("journalbeat is running"))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
+
+        # journalbeat is tailing an inactive journal
+        assert self.output_is_empty()
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
     def test_start_with_selected_journal_file(self):
@@ -73,17 +69,7 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        required_log_snippets = [
-            # journalbeat can be started
-            "journalbeat is running",
-            # journalbeat can seek to the position defined in the cursor
-            "Reading from the beginning of the journal file",
-            # message can be read from test journal
-            "\"message\": \"thinkpad_acpi: unhandled HKEY event 0x60b0\"",
-        ]
-        for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet),
-                            name="Line in '{}' Journalbeat log".format(snippet))
+        self.wait_until(lambda: self.output_has(lines=23))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -105,20 +91,13 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        required_log_snippets = [
-            # journalbeat can be started
-            "journalbeat is running",
-            # journalbeat can seek to the position defined in cursor_seek_fallback.
-            "Seeking method set to cursor, but no state is saved for reader. Starting to read from the end",
-            # message can be read from test journal
-            "\"message\": \"thinkpad_acpi: please report the conditions when this event happened to ibm-acpi-devel@lists.sourceforge.net\"",
-        ]
-        for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet),
-                            name="Line in '{}' Journalbeat log".format(snippet))
+        self.wait_until(lambda: self.log_contains("journalbeat is running"))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
+
+        # journalbeat is tailing an inactive journal with no cursor data
+        assert self.output_is_empty()
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
     def test_read_events_with_existing_registry(self):
@@ -142,19 +121,7 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        required_log_snippets = [
-            # journalbeat can be started
-            "journalbeat is running",
-            # journalbeat can seek to the position defined in the cursor
-            "Seeked to position defined in cursor",
-            # message can be read from test journal
-            "please report the conditions when this event happened to",
-            # only one event is read and published
-            'journalbeat successfully published events\t{"event.count": 1}',
-        ]
-        for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet),
-                            name="Line in '{}' Journalbeat log".format(snippet))
+        self.wait_until(lambda: self.output_has(lines=9))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -172,27 +139,13 @@ class Test(BaseTest):
                 ],
                 "seek": "head",
                 "include_matches": [
-                    "syslog.priority=5",
+                    "syslog.priority=6",
                 ]
             }],
         )
         journalbeat_proc = self.start_beat()
 
-        required_log_snippets = [
-            # journalbeat can be started
-            "journalbeat is running",
-            # journalbeat can seek to the position defined in the cursor
-            "Added matcher expression",
-            # message can be read from test journal
-            "unhandled HKEY event 0x60b0",
-            "please report the conditions when this event happened to",
-            "unhandled HKEY event 0x60b1",
-            # Four events with priority 5 is publised
-            'journalbeat successfully published events\t{"event.count": 4}',
-        ]
-        for snippet in required_log_snippets:
-            self.wait_until(lambda: self.log_contains(snippet),
-                            name="Line in '{}' Journalbeat log".format(snippet))
+        self.wait_until(lambda: self.output_has(lines=6))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0

@@ -11,8 +11,12 @@ import groovy.transform.Field
 
 /**
  List of supported windows versions to be tested with
+ NOTE:
+   - 'windows-10' is too slow
+   - 'windows-2012-r2', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit' are disabled
+      since we are working on releasing each windows version incrementally.
 */
-@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012-r2', 'windows-10', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit']
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012-r2']
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -66,9 +70,7 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          // NOTE: commented to run faster the windows pipeline.
-          //       when required then it can be enabled.
-          // loadConfigEnvVars()
+          loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
@@ -246,7 +248,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            mageTargetWin("Winlogbeat x-pack Windows", "x-pack/winlogbeat", "build unitTest")
           }
         }
         stage('Functionbeat'){
@@ -254,12 +256,13 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FUNCTIONBEAT_XPACK != "false"
+              return params.windowsTest
+              // NOTE: commented to run all the windows stages.
+              //return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
           stages {
-            stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
+            stage('Functionbeat Windows x-pack'){
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -268,7 +271,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+                mageTargetWin("Functionbeat x-pack Windows Unit test", "x-pack/functionbeat", "build unitTest")
               }
             }
           }
@@ -345,16 +348,23 @@ def mageTargetWin(String context, String directory, String target, String label)
   return {
     log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
     def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
-    node("${immutable} && ${label}"){
-      withBeatsEnvWin() {
-        whenTrue(params.debug) {
-          dumpFilteredEnvironment()
-          dumpMageWin()
-        }
 
-        def verboseFlag = params.debug ? "-v" : ""
-        dir(directory) {
-          bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+    // NOTE: skip filebeat with windows-2016/2012-r2 since there are some test failures.
+    //       See https://github.com/elastic/beats/issues/19787 https://github.com/elastic/beats/issues/19641
+    if (directory.equals('filebeat') && (label.equals('windows-2016') || label.equals('windows-2012-r2'))) {
+      log(level: 'WARN', text: "Skipped stage for the 'filebeat' with '${label}' as long as there are test failures to be analysed.")
+    } else {
+      node("${immutable} && ${label}"){
+        withBeatsEnvWin() {
+          whenTrue(params.debug) {
+            dumpFilteredEnvironment()
+            dumpMageWin()
+          }
+
+          def verboseFlag = params.debug ? "-v" : ""
+          dir(directory) {
+            bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+          }
         }
       }
     }
@@ -407,13 +417,17 @@ def withBeatsEnv(boolean archive, Closure body) {
 def withBeatsEnvWin(Closure body) {
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
+  // NOTE: to support Windows 7 32 bits the arch in the go context path is required.
+  def arch = is32bit() ? '386' : 'amd64'
+  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${arch}"
 
   withEnv([
     "HOME=${env.WORKSPACE}",
+    "DEV_ARCH=${arch}",
+    "DEV_OS=windows",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
-    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}",
+    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw64\\bin;${env.PATH}",
     "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
@@ -446,6 +460,11 @@ def installTools() {
   } else {
     retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
+}
+
+def is32bit(){
+  def labels = env.NODE_LABELS
+  return labels.contains('i386')
 }
 
 def goos(){
@@ -508,7 +527,8 @@ def dumpFilteredEnvironment(){
   echo "PROCESSES: ${env.PROCESSES}"
   echo "TIMEOUT: ${env.TIMEOUT}"
   echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
-  echo "NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}"
+  echo "PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}"
+  echo "PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}"
   echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
@@ -576,7 +596,7 @@ def isChanged(patterns){
 def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -589,7 +609,7 @@ def isChangedOSSCode(patterns) {
 def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
-    "^vendor/.*",
+    "^go.mod",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",
@@ -799,9 +819,10 @@ def getVendorPatterns(beatName){
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
   ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
-        |awk '{print \$1"/.*"}'\
-        |sed -e "s#github.com/elastic/beats/v7/##g"
+      go list -deps ./${beatName} \
+        | grep 'elastic/beats' \
+        | sed -e "s#github.com/elastic/beats/v7/##g" \
+        | awk '{print "^" \$1 "/.*"}'
     """)
   }
   return output?.split('\n').collect{ item -> item as String }

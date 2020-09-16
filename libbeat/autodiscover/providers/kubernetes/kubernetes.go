@@ -20,7 +20,14 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8s "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -47,19 +54,45 @@ type Eventer interface {
 	Stop()
 }
 
+// EventManager allows defining ways in which kubernetes resource events are observed and processed
+type EventManager interface {
+	GenerateHints(event bus.Event) bus.Event
+	Start()
+	Stop()
+}
+
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config    *Config
-	bus       bus.Bus
-	templates template.Mapper
-	builders  autodiscover.Builders
-	appenders autodiscover.Appenders
-	logger    *logp.Logger
-	eventer   Eventer
+	config       *Config
+	bus          bus.Bus
+	templates    template.Mapper
+	builders     autodiscover.Builders
+	appenders    autodiscover.Appenders
+	logger       *logp.Logger
+	eventManager EventManager
+}
+
+// eventerManager implements start/stop methods for autodiscover provider with resource eventer
+type eventerManager struct {
+	eventer Eventer
+	logger  *logp.Logger
+}
+
+// leaderElectionManager implements start/stop methods for autodiscover provider with leaderElection
+type leaderElectionManager struct {
+	leaderElection       leaderelection.LeaderElectionConfig
+	cancelLeaderElection context.CancelFunc
+	logger               *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -67,6 +100,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 	}
 
 	config := defaultConfig()
+	config.LeaderLease = fmt.Sprintf("%v-cluster-leader", beatName)
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, errWrap(err)
@@ -103,15 +137,10 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		logger:    logger,
 	}
 
-	switch config.Resource {
-	case "pod":
-		p.eventer, err = NewPodEventer(uuid, c, client, p.publish)
-	case "node":
-		p.eventer, err = NewNodeEventer(uuid, c, client, p.publish)
-	case "service":
-		p.eventer, err = NewServiceEventer(uuid, c, client, p.publish)
-	default:
-		return nil, fmt.Errorf("unsupported autodiscover resource %s", config.Resource)
+	if p.config.Unique {
+		p.eventManager, err = NewLeaderElectionManager(uuid, config, client, p.startLeading, p.stopLeading, logger)
+	} else {
+		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish)
 	}
 
 	if err != nil {
@@ -123,14 +152,12 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 
 // Start for Runner interface.
 func (p *Provider) Start() {
-	if err := p.eventer.Start(); err != nil {
-		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
-	}
+	p.eventManager.Start()
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
-	p.eventer.Stop()
+	p.eventManager.Stop()
 }
 
 // String returns a description of kubernetes autodiscover provider.
@@ -144,7 +171,7 @@ func (p *Provider) publish(event bus.Event) {
 		event["config"] = config
 	} else {
 		// If there isn't a default template then attempt to use builders
-		e := p.eventer.GenerateHints(event)
+		e := p.eventManager.GenerateHints(event)
 		if config := p.builders.GetConfig(e); config != nil {
 			event["config"] = config
 		}
@@ -153,4 +180,150 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 	p.bus.Publish(event)
+}
+
+func (p *Provider) startLeading(uuid string, eventID string) {
+	event := bus.Event{
+		"start":    true,
+		"provider": uuid,
+		"id":       eventID,
+		"unique":   "true",
+	}
+	if config := p.templates.GetConfig(event); config != nil {
+		event["config"] = config
+	}
+	p.bus.Publish(event)
+}
+
+func (p *Provider) stopLeading(uuid string, eventID string) {
+	event := bus.Event{
+		"stop":     true,
+		"provider": uuid,
+		"id":       eventID,
+		"unique":   "true",
+	}
+	if config := p.templates.GetConfig(event); config != nil {
+		event["config"] = config
+	}
+	p.bus.Publish(event)
+}
+
+func NewEventerManager(
+	uuid uuid.UUID,
+	c *common.Config,
+	cfg *Config,
+	client k8s.Interface,
+	publish func(event bus.Event),
+) (EventManager, error) {
+	var err error
+	em := &eventerManager{}
+	switch cfg.Resource {
+	case "pod":
+		em.eventer, err = NewPodEventer(uuid, c, client, publish)
+	case "node":
+		em.eventer, err = NewNodeEventer(uuid, c, client, publish)
+	case "service":
+		em.eventer, err = NewServiceEventer(uuid, c, client, publish)
+	default:
+		return nil, fmt.Errorf("unsupported autodiscover resource %s", cfg.Resource)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return em, nil
+}
+
+func NewLeaderElectionManager(
+	uuid uuid.UUID,
+	cfg *Config,
+	client k8s.Interface,
+	startLeading func(uuid string, eventID string),
+	stopLeading func(uuid string, eventID string),
+	logger *logp.Logger,
+) (EventManager, error) {
+	lem := &leaderElectionManager{logger: logger}
+	var id string
+	if cfg.Node != "" {
+		id = "beats-leader-" + cfg.Node
+	} else {
+		id = "beats-leader-" + uuid.String()
+	}
+	lease := metav1.ObjectMeta{
+		Name:      cfg.LeaderLease,
+		Namespace: "default",
+	}
+	metaUID := lease.GetObjectMeta().GetUID()
+	lem.leaderElection = leaderelection.LeaderElectionConfig{
+		Lock: &resourcelock.LeaseLock{
+			LeaseMeta: lease,
+			Client:    client.CoordinationV1(),
+			LockConfig: resourcelock.ResourceLockConfig{
+				Identity: id,
+			},
+		},
+		ReleaseOnCancel: true,
+		LeaseDuration:   15 * time.Second,
+		RenewDeadline:   10 * time.Second,
+		RetryPeriod:     2 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: func(ctx context.Context) {
+				logger.Debugf("leader election lock GAINED, id %v", id)
+				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				startLeading(uuid.String(), eventID)
+			},
+			OnStoppedLeading: func() {
+				logger.Debugf("leader election lock LOST, id %v", id)
+				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				stopLeading(uuid.String(), eventID)
+			},
+		},
+	}
+	return lem, nil
+}
+
+// Start for EventManager interface.
+func (p *eventerManager) Start() {
+	if err := p.eventer.Start(); err != nil {
+		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
+	}
+}
+
+// Stop signals the stop channel to force the watch loop routine to stop.
+func (p *eventerManager) Stop() {
+	p.eventer.Stop()
+}
+
+// GenerateHints for EventManager interface.
+func (p *eventerManager) GenerateHints(event bus.Event) bus.Event {
+	return p.eventer.GenerateHints(event)
+}
+
+// Start for EventManager interface.
+func (p *leaderElectionManager) Start() {
+	ctx, cancel := context.WithCancel(context.TODO())
+	p.cancelLeaderElection = cancel
+	p.startLeaderElector(ctx, p.leaderElection)
+}
+
+// Stop signals the stop channel to force the leader election loop routine to stop.
+func (p *leaderElectionManager) Stop() {
+	if p.cancelLeaderElection != nil {
+		p.cancelLeaderElection()
+	}
+}
+
+// GenerateHints for EventManager interface.
+func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
+	return event
+}
+
+// startLeaderElector starts a Leader Elector in the background with the provided config
+func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
+	le, err := leaderelection.NewLeaderElector(lec)
+	if err != nil {
+		p.logger.Errorf("error while creating Leader Elector: %v", err)
+	}
+	p.logger.Debugf("Starting Leader Elector")
+	go le.Run(ctx)
 }

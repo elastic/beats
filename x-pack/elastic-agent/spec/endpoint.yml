@@ -16,13 +16,13 @@ post_install:
     - "--upgrade"
     - "--resources"
     - "endpoint-security-resources.zip"
-    timeout: 120
+    timeout: 600
 pre_uninstall:
 - exec_file:
     path: "endpoint-security"
     args:
       - "uninstall"
-    timeout: 120
+    timeout: 600
 rules:
 - fix_stream: {}
 
@@ -38,10 +38,23 @@ rules:
     values:
     - true
 
+- select_into:
+    selectors: [fleet.access_api_key, fleet.kibana]
+    path: fleet.api
+
+- map:
+    path: fleet
+    rules:
+    - remove_key:
+        key: access_api_key
+    - remove_key:
+        key: kibana
+
 - filter:
     selectors:
     - fleet
     - inputs
     - output
+    - revision
 
-when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')
+when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')

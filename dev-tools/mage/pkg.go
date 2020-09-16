@@ -20,6 +20,7 @@ package mage
 import (
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 	"strconv"
 
@@ -71,6 +72,8 @@ func Package() error {
 					continue
 				}
 
+				agentPackageDrop, _ := os.LookupEnv("AGENT_DROP_PATH")
+
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
@@ -83,6 +86,7 @@ func Package() error {
 					"AgentArchName": agentPackageArch,
 					"PackageType":   pkgType.String(),
 					"BinaryExt":     binaryExtension(target.GOOS()),
+					"AgentDropPath": agentPackageDrop,
 				}
 
 				spec.packageDir, err = pkgType.PackagingDir(packageStagingDir, target, spec)

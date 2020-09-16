@@ -41,7 +41,7 @@ func TestReadLine(t *testing.T) {
 	logFile := absPath + "/tmp" + strconv.Itoa(rand.Int()) + ".log"
 
 	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	if err != nil {
 		t.Fatalf("Error creating the absolute path: %s", absPath)
@@ -51,18 +51,18 @@ func TestReadLine(t *testing.T) {
 	defer file.Close()
 	defer os.Remove(logFile)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, file)
 
 	firstLineString := "9Characte\n"
 	secondLineString := "This is line 2\n"
 
 	length, err := file.WriteString(firstLineString)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, length)
 
 	length, err = file.WriteString(secondLineString)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, length)
 
 	file.Sync()
@@ -70,7 +70,7 @@ func TestReadLine(t *testing.T) {
 	// Open file for reading
 	readFile, err := os.Open(logFile)
 	defer readFile.Close()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	source := File{File: readFile}
 
@@ -102,7 +102,7 @@ func TestReadLine(t *testing.T) {
 	// Read third line
 	_, text, bytesread, _, err := readLine(r)
 	t.Logf("received line: '%s'\n", text)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 
@@ -111,7 +111,7 @@ func TestReadLine(t *testing.T) {
 	t.Logf("received line: '%s'\n", text)
 	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Read third line, which doesn't exist
 	_, text, bytesread, _, err = readLine(r)

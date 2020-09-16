@@ -41,8 +41,11 @@ type Config struct {
 	// multiple filebeats will shard the load of receiving and sending events.
 	ShardID string `config:"shard_id"`
 
-	// Maximum amount of time to cache application objects from CF client
+	// Maximum amount of time to cache application objects from CF client.
 	CacheDuration time.Duration `config:"cache_duration"`
+
+	// Time to wait before retrying to get application info in case of error.
+	CacheRetryDelay time.Duration `config:"cache_retry_delay"`
 }
 
 // InitDefaults initialize the defaults for the configuration.
@@ -55,6 +58,7 @@ func (c *Config) InitDefaults() {
 	}
 	c.ShardID = uuid.String()
 	c.CacheDuration = 120 * time.Second
+	c.CacheRetryDelay = 20 * time.Second
 	c.Version = ConsumerVersionV1
 }
 

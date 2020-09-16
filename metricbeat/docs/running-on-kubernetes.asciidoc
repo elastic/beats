@@ -4,6 +4,8 @@
 You can use {beatname_uc} <<running-on-docker,Docker images>> on Kubernetes to
 retrieve cluster metrics.
 
+TIP: Running {ecloud} on Kubernetes? See {eck-ref}/k8s-beat.html[Run {beats} on ECK].
+
 ifeval::["{release-state}"=="unreleased"]
 
 However, version {version} of {beatname_uc} has not yet been
@@ -15,18 +17,21 @@ endif::[]
 [float]
 ==== Kubernetes deploy manifests
 
-You deploy {beatname_uc} in two different ways at the same time:
-
-* As a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
+You deploy {beatname_uc} as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
 to ensure that there's a running instance on each node of the cluster. These
 instances are used to retrieve most metrics from the host, such as system
 metrics, Docker stats, and metrics from all the services running on top of
 Kubernetes.
 
-* As a single {beatname_uc} instance created using a https://kubernetes.io/docs/concepts/workloads/controllers/Deployment/[Deployment].
+In addition, one of the Pods in the DaemonSet will constantly hold a _leader lock_ which makes it responsible for
+handling cluster-wide monitoring.
 This instance is used to retrieve metrics that are unique for the whole
 cluster, such as Kubernetes events or
 https://github.com/kubernetes/kube-state-metrics[kube-state-metrics].
+You can find more information about leader election configuration options at <<configuration-autodiscover>>.
+
+Note: If you are upgrading from older versions, please make sure there are no redundant parts
+as left-overs from the old manifests. Deployment specification and its ConfigMaps might be the case.
 
 Everything is deployed under the `kube-system` namespace by default. To change
 the namespace, modify the manifest file.
@@ -195,3 +200,12 @@ metricbeat                1         1         1            1           1m
 ------------------------------------------------
 
 Metrics should start flowing to Elasticsearch.
+
+
+[float]
+==== Deploying Metricbeat to collect cluster-level metrics in large clusters
+
+The size and the number of nodes in a Kubernetes cluster can be fairly large at times, and in such cases
+the Pod that will be collecting cluster level metrics might face performance issues due to
+resources limitations. In this case users might consider to avoid using the leader election strategy
+and instead run a dedicated, standalone Metribceat instance using a Deployment in addition to the DaemonSet.

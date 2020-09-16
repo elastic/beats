@@ -8,9 +8,361 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This is the sql module that fetches metrics from a SQL database. You can define driver and SQL query.
+The SQL module allows to execute custom queries against an SQL database and store the results to Elasticsearch.
+
+The currently supported databases are the ones already included in Metricbeat, which are:
+- PostgreSQL
+- MySQL
+- Oracle
+- Microsoft SQL
+- CockroachDB
+
+== Quickstart
+
+You can setup the module by activating it first running
+
+    metricbeat module enable sql
+
+Once it is activated, open `modules.d/sql.yml` and fill the required fields. This is an example that captures Innodb related metrics from the result of the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL database:
+
+.sql.yml
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["root:root@tcp(localhost:3306)/ps"]
+
+  driver: "mysql"
+  sql_query: "SHOW GLOBAL STATUS LIKE 'Innodb_system%'"
+  sql_response_format: variables
+----
+
+.SHOW GLOBAL STATUS LIKE 'Innodb_system%'
+|====
+|Variable_name|Value
+
+|Innodb_system_rows_deleted|0
+|Innodb_system_rows_inserted|0
+|Innodb_system_rows_read|5062
+|Innodb_system_rows_updated|315
+|====
 
 
+Keys in the YAML are defined as follow:
+
+- `driver`: The drivers currently supported are those which already have a Metricbeat module like `mssql` or `postgres`.
+- `sql_query`: Is the single query you want to run
+- `sql_response_format`: You have 2 options here:
+    - `variables`: Expects a table which looks like a key/value result. With 2 columns, left column will be considered a key and the right column the value. This mode generates a single event on each fetch operation.
+    - `table`: Table mode can contain any number of columns and a single event will be generated for each row.
+
+Results will be grouped by type in the result event for convenient mapping in Elasticsearch. So `strings` values will be grouped into `sql.strings`, `numeric` into `sql.numeric` and so on and so forth.
+
+The event generated with the example above looks like this:
+
+[source,json]
+----
+{
+  "@timestamp": "2020-06-09T15:09:14.407Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "service": {
+    "address": "172.18.0.2:3306",
+    "type": "sql"
+  },
+  "event": {
+    "dataset": "sql.query",
+    "module": "sql",
+    "duration": 1272810
+  },
+  "sql": {
+    "driver": "mysql",
+    "query": "SHOW GLOBAL STATUS LIKE 'Innodb_system%'",
+    "metrics": {
+      "numeric": {
+        "innodb_system_rows_updated": 315,
+        "innodb_system_rows_deleted": 0,
+        "innodb_system_rows_inserted": 0,
+        "innodb_system_rows_read": 5062
+      }
+    }
+  },
+  "metricset": {
+    "name": "query",
+    "period": 10000
+  },
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "host": {
+    "name": "elastic"
+  },
+  "agent": {
+    "name": "elastic",
+    "type": "metricbeat",
+    "version": "8.0.0",
+    "ephemeral_id": "488431bd-bd3c-4442-ad51-0c50eb555787",
+    "id": "670ef211-87f0-4f38-8beb-655c377f1629"
+  }
+}
+----
+
+In this example, we are querying PostgreSQL and generate a "table" result, hence a single event for each row returned
+
+.sql.yml
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:postgres@localhost:5432/stuff?sslmode=disable"]
+
+  driver: "postgres"
+  sql_query: "SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database"
+  sql_response_format: table
+----
+
+.SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database
+|====
+|datid|datname|blks_read|blks_hit|tup_returned|tup_fetched|stats_reset
+
+|69448|stuff|8652|205976|1484625|53218|2020-06-07 22:50:12
+|13408|postgres|0|0|0|0|
+|13407|template0|0|0|0|0|
+|====
+
+With 3 rows on the table, three events will be generated with the contents of each row. As an example, below you can see the event created for the first row:
+
+[source,json]
+----
+{
+  "@timestamp": "2020-06-09T14:47:35.481Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "service": {
+    "address": "localhost:5432",
+    "type": "sql"
+  },
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "host": {
+    "name": "elastic"
+  },
+  "agent": {
+    "type": "metricbeat",
+    "version": "8.0.0",
+    "ephemeral_id": "1bffe66d-a1ae-4ed6-985a-fd48548a1971",
+    "id": "670ef211-87f0-4f38-8beb-655c377f1629",
+    "name": "elastic"
+  },
+  "sql": {
+    "metrics": {
+      "numeric": {
+        "tup_fetched": 53350,
+        "datid": 69448,
+        "blks_read": 8652,
+        "blks_hit": 206501,
+        "tup_returned": 1.491873e+06
+      },
+      "string": {
+        "stats_reset": "2020-06-07T20:50:12.632975Z",
+        "datname": "stuff"
+      }
+    },
+    "driver": "postgres",
+    "query": "SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database"
+  },
+  "event": {
+    "dataset": "sql.query",
+    "module": "sql",
+    "duration": 14076705
+  },
+  "metricset": {
+    "name": "query",
+    "period": 10000
+  }
+}
+----
+
+
+== More examples
+
+=== Oracle:
+
+Get the buffer cache hit ratio:
+
+.sql.yml
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["oracle://sys:Oradoc_db1@172.17.0.3:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  driver: "oracle"
+  sql_query: 'SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio" FROM V$BUFFER_POOL_STATISTICS'
+  sql_response_format: table
+----
+
+
+[source,json]
+----
+{
+  "@timestamp": "2020-06-09T15:41:02.200Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "sql": {
+    "metrics": {
+      "numeric": {
+        "hit ratio": 0.9742963357937117,
+        "physical_reads": 17161,
+        "db_block_gets": 122221,
+        "consistent_gets": 545427
+      },
+      "string": {
+        "name": "DEFAULT"
+      }
+    },
+    "driver": "oracle",
+    "query": "SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) \"Hit Ratio\" FROM V$BUFFER_POOL_STATISTICS"
+  },
+  "metricset": {
+    "period": 10000,
+    "name": "query"
+  },
+  "service": {
+    "address": "172.17.0.3:1521",
+    "type": "sql"
+  },
+  "event": {
+    "dataset": "sql.query",
+    "module": "sql",
+    "duration": 39233704
+  },
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "host": {
+    "name": "elastic"
+  },
+  "agent": {
+    "id": "670ef211-87f0-4f38-8beb-655c377f1629",
+    "name": "elastic",
+    "type": "metricbeat",
+    "version": "8.0.0",
+    "ephemeral_id": "49e00060-0fa4-4b34-80f1-446881f7a788"
+  }
+}
+----
+
+=== MSSQL
+
+Get the buffer cache hit ratio:
+
+.sql.yml
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["sqlserver://SA:password@localhost"]
+
+  driver: "mssql"
+  sql_query: 'SELECT * FROM sys.dm_db_log_space_usage'
+  sql_response_format: table
+----
+
+[source,json]
+----
+{
+  "@timestamp": "2020-06-09T15:39:14.421Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "sql": {
+    "driver": "mssql",
+    "query": "SELECT * FROM sys.dm_db_log_space_usage",
+    "metrics": {
+      "numeric": {
+        "log_space_in_bytes_since_last_backup": 524288,
+        "database_id": 1,
+        "total_log_size_in_bytes": 2.08896e+06,
+        "used_log_space_in_bytes": 954368,
+        "used_log_space_in_percent": 45.686275482177734
+      }
+    }
+  },
+  "event": {
+    "dataset": "sql.query",
+    "module": "sql",
+    "duration": 40750570
+  },
+  "metricset": {
+    "name": "query",
+    "period": 10000
+  },
+  "service": {
+    "address": "172.17.0.2",
+    "type": "sql"
+  },
+  "agent": {
+    "id": "670ef211-87f0-4f38-8beb-655c377f1629",
+    "name": "elastic",
+    "type": "metricbeat",
+    "version": "8.0.0",
+    "ephemeral_id": "3da88889-036e-47cb-a88b-275037fa2bc9"
+  },
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "host": {
+    "name": "elastic"
+  }
+}
+----
+
+=== Two or more queries
+
+If you want to launch two or more queries, you need to specify them with their full configuration for each query. For example:
+
+.sql.yml
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:postgres@localhost:5432/stuff?sslmode=disable"]
+  driver: "postgres"
+  sql_query: "SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database"
+  sql_response_format: table
+
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:postgres@localhost:5432/stuff?sslmode=disable"]
+  driver: "postgres"
+  sql_query: "SELECT * FROM pg_catalog.pg_tables pt WHERE schemaname ='pg_catalog'"
+  sql_response_format: table
+----
 
 
 [float]

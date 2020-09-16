@@ -33,7 +33,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
 |<<metricbeat-module-azure,Azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
+.10+| .10+|  |<<metricbeat-metricset-azure-app_insights,app_insights>> beta[]  
+|<<metricbeat-metricset-azure-billing,billing>> beta[]  
+|<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>   
 |<<metricbeat-metricset-azure-container_instance,container_instance>>   
 |<<metricbeat-metricset-azure-container_registry,container_registry>>   
@@ -109,10 +111,11 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
 |<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-googlecloud-billing,billing>> beta[]  
+|<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
+|<<metricbeat-metricset-googlecloud-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
-|<<metricbeat-metricset-googlecloud-stackdriver,stackdriver>> beta[]  
 |<<metricbeat-metricset-googlecloud-storage,storage>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   
@@ -146,7 +149,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.21+| .21+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.22+| .22+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -156,15 +159,16 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-scheduler,scheduler>>   
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>   
+|<<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
-|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>   
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>   
-|<<metricbeat-metricset-kubernetes-state_service,state_service>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_service,state_service>>   
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
-|<<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>> experimental[]  
+|<<metricbeat-metricset-kubernetes-state_storageclass,state_storageclass>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,KVM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -191,7 +195,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+.4+| .4+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
+|<<metricbeat-metricset-mysql-performance,performance>> beta[]  
+|<<metricbeat-metricset-mysql-query,query>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   

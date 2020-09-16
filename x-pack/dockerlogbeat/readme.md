@@ -9,7 +9,7 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 ## Running
 
-`docker run --log-driver=elastic-logging-plugin:8.0.0 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
+`docker run --log-driver=elastic/elastic-logging-plugin:8.0.0 --log-opt hosts="172.18.0.2:9200" -it debian:jessie /bin/bash`
 
 
 ## Config Options
@@ -48,3 +48,13 @@ The location of the logs AND the container base directory in the docker docs is 
 You can use this to find the list of plugins running on the host: `runc --root /containers/services/docker/rootfs/run/docker/plugins/runtime-root/plugins.moby/ list`
 
 The logs are in `/var/log/docker`. If you want to make the logs useful, you need to find the ID of the plugin. Back on the darwin host, run `docker plugin inspect $name_of_plugin | grep Id` use the hash ID to grep through the logs: `grep 22bb02c1506677cd48cc1cfccc0847c1b602f48f735e51e4933001804f86e2e docker.*`
+
+
+## Local logs
+
+This plugin fully supports `docker logs`, and it maintains a local copy of logs that can be read without a connection to Elasticsearch. Unfortunately, due to the limitations in the docker plugin API, we can't "clean up" log files when a container is destroyed. The plugin mounts the `/var/lib/docker` directory on the host to write logs. This mount point can be changed via [Docker](https://docs.docker.com/engine/reference/commandline/plugin_set/#change-the-source-of-a-mount). The plugin can also be configured to do a "hard" cleanup and destroy logs when a container stops. To enable this, set the `DESTROY_LOGS_ON_STOP` environment var inside the plugin:
+```
+docker plugin set d805664c550e DESTROY_LOGS_ON_STOP=true
+```
+
+You can also set `max-file`, `max-size` and `compress` via `--log-opts`

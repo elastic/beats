@@ -179,7 +179,7 @@ func TestFleetGateway(t *testing.T) {
 	) {
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
 			}),
 			dispatcher.Answer(func(actions ...action) error {
@@ -220,8 +220,7 @@ func TestFleetGateway(t *testing.T) {
 			"type": "ANOTHER_ACTION",
 			"id": "id2"
 		}
-	],
-	"success": true
+	]
 }
 `)
 				return resp, nil
@@ -265,7 +264,7 @@ func TestFleetGateway(t *testing.T) {
 		for {
 			received := ackSeq(
 				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+					resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 					return resp, nil
 				}),
 				dispatcher.Answer(func(actions ...action) error {
@@ -305,7 +304,7 @@ func TestFleetGateway(t *testing.T) {
 
 				require.Equal(t, 1, len(cr.Events))
 
-				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
 			}),
 			dispatcher.Answer(func(actions ...action) error {
@@ -358,7 +357,7 @@ func TestFleetGateway(t *testing.T) {
 
 		// Make sure that all API calls to the checkin API are successfull, the following will happen:
 		ch2 := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
-			resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+			resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 			return resp, nil
 		})
 
@@ -424,7 +423,7 @@ func TestRetriesOnFailures(t *testing.T) {
 
 					require.Equal(t, 1, len(cr.Events))
 
-					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+					resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 					return resp, nil
 				}),
 
@@ -468,7 +467,7 @@ func TestRetriesOnFailures(t *testing.T) {
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
-	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultFleetManagementConfig())
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
 	}

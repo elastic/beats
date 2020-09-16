@@ -2,9 +2,9 @@
     {
         "@timestamp": "1986-04-25T19:23:45.101-02:00",
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "rmbkmonitor04",
         "input.type": "log",
@@ -18,9 +18,9 @@
     {
         "@timestamp": "1986-04-25T19:23:45.388-02:00",
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "rmbkmonitor04",
         "input.type": "log",
@@ -33,9 +33,9 @@
     {
         "@timestamp": "2019-06-14T10:40:20.912-02:00",
         "event.dataset": "system.syslog",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
-        "event.type": "event",
         "fileset.name": "syslog",
         "host.hostname": "localhost",
         "input.type": "log",

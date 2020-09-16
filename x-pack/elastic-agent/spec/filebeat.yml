@@ -38,7 +38,6 @@ rules:
     - translate:
         path: type
         mapper:
-          logs: log
           logfile: log
           event/file: log
           event/stdin: stdin
@@ -50,31 +49,37 @@ rules:
     - remove_key:
         key: use_output
     - remove_key:
-        key: dataset
+        key: data_stream
     - remove_key:
-        key: dataset.namespace
+        key: data_stream.namespace
     - remove_key:
-        key: dataset.name
+        key: data_stream.dataset
 
 - filter_values:
     selector: inputs
     key: type
     values:
-    - log
-    - stdin
-    - udp
-    - tcp
-    - docker
-    - redis
-    - syslog
-    - s3
-    - netflow
-    - httpjson
-    - o365audit
+    - awscloudwatch
     - azureeventhub
     - cloudfoundry
+    - container
+    - docker
     - googlepubsub
+    - http_endpoint
+    - httpjson
     - kafka
+    - log
+    - mqtt
+    - netflow
+    - o365audit
+    - redis
+    - s3
+    - stdin
+    - syslog
+    - tcp
+    - udp
+    - unix
+    - winlog
 
 - filter_values:
     selector: inputs
@@ -91,5 +96,5 @@ rules:
     - filebeat
     - output
     - keystore
-when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

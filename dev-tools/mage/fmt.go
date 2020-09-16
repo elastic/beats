@@ -66,19 +66,10 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if UseVendor {
-		if err := gotool.Install(
-			gotool.Install.Vendored(),
-			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
-		); err != nil {
-			return err
-		}
-	} else {
-		if err := gotool.Install(
-			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
-		); err != nil {
-			return err
-		}
+	if err := gotool.Install(
+		gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+	); err != nil {
+		return err
 	}
 
 	args := append(

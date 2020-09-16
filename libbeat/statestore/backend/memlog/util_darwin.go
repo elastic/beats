@@ -19,17 +19,20 @@ package memlog
 
 import (
 	"os"
+	"syscall"
 
 	"golang.org/x/sys/unix"
 )
+
+var errno0 = syscall.Errno(0)
 
 // syncFile implements the fsync operation for darwin. On darwin fsync is not
 // reliable, instead the fcntl syscall with F_FULLFSYNC must be used.
 func syncFile(f *os.File) error {
 	for {
 		_, err := unix.FcntlInt(f.Fd(), unix.F_FULLFSYNC, 0)
-		err = normalizeIOError(err)
-		if err == nil || isIOError(err) {
+		rootCause := errorRootCause(err)
+		if err == nil || isIOError(rootCause) {
 			return err
 		}
 
@@ -43,4 +46,29 @@ func syncFile(f *os.File) error {
 		}
 		return err
 	}
+}
+
+func isIOError(err error) bool {
+	return err == unix.EIO ||
+		// space/quota
+		err == unix.ENOSPC || err == unix.EDQUOT || err == unix.EFBIG ||
+		// network
+		err == unix.ECONNRESET || err == unix.ENETDOWN || err == unix.ENETUNREACH
+}
+
+// normalizeSysError returns the underlying error or nil, if the underlying
+// error indicates it is no error.
+func errorRootCause(err error) error {
+	for err != nil {
+		u, ok := err.(interface{ Unwrap() error })
+		if !ok {
+			break
+		}
+		err = u.Unwrap()
+	}
+
+	if err == nil || err == errno0 {
+		return nil
+	}
+	return err
 }

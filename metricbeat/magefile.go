@@ -190,19 +190,19 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest executes the python system tests in the integration
 // environment (Docker).
-// Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
-// Use any other NOSE_* environment variable to influence the behavior of
-// nosetests.
+// Use MODULE=module to run only tests for `module`.
+// Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
+// Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("PYTEST_")...)
 	if err != nil {
 		return err
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+		return devtools.PythonTestForModule(devtools.DefaultPythonTestIntegrationArgs())
 	})
 }

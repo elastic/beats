@@ -138,11 +138,28 @@ func (p *pod) OnUpdate(obj interface{}) {
 	switch pod.Status.Phase {
 	case kubernetes.PodSucceeded, kubernetes.PodFailed:
 		// If Pod is in a phase where all containers in the have terminated emit a stop event
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		p.logger.Debugf("Watcher Pod update (terminated): %+v", obj)
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 		return
 	case kubernetes.PodPending:
 		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
+		return
+	}
+
+	// here handle the case when a Pod is in `Terminating` phase.
+	// In this case the pod is neither `PodSucceeded` nor `PodFailed` and
+	// hence requires special handling.
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		// Pod is terminating, don't reload its configuration and ignore the event
+		// if some pod is still running, we will receive more events when containers
+		// terminate.
+		for _, container := range pod.Status.ContainerStatuses {
+			if container.State.Running != nil {
+				return
+			}
+		}
+		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 		return
 	}
 
@@ -190,6 +207,9 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	}
 	if port, ok := event["port"]; ok {
 		e["port"] = port
+	}
+	if ports, ok := event["ports"]; ok {
+		e["ports"] = ports
 	}
 
 	if rawCont, ok := kubeMeta["container"]; ok {
@@ -284,6 +304,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	var (
 		annotations = common.MapStr{}
 		nsAnn       = common.MapStr{}
+		events      = make([]bus.Event, 0)
 	)
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
@@ -299,7 +320,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 	}
 
-	emitted := 0
+	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -314,19 +335,29 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
+		meta := p.metagen.Generate(
+			pod,
+			metadata.WithFields("container.name", c.Name),
+			metadata.WithFields("container.image", c.Image),
+		)
+
 		cmeta := common.MapStr{
+			"id": cid,
+			"image": common.MapStr{
+				"name": c.Image,
+			},
+			"runtime": runtimes[c.Name],
+		}
+
+		// Information that can be used in discovering a workload
+		kubemeta := meta.Clone()
+		kubemeta["annotations"] = annotations
+		kubemeta["container"] = common.MapStr{
 			"id":      cid,
 			"name":    c.Name,
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name),
-			metadata.WithFields("container.image", c.Image))
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
-		kubemeta["annotations"] = annotations
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
 		}
@@ -343,13 +374,14 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
-			p.publish(event)
-			emitted++
+			events = append(events, event)
 		}
 
 		for _, port := range c.Ports {
+			podPorts[port.Name] = port.ContainerPort
 			event := bus.Event{
 				"provider":   p.uuid,
 				"id":         eventID,
@@ -359,18 +391,19 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
-			p.publish(event)
-			emitted++
+			events = append(events, event)
 		}
 	}
 
-	// Finally publish a pod level event so that hints that have no exposed ports can get processed.
+	// Publish a pod level event so that hints that have no exposed ports can get processed.
 	// Log hints would just ignore this event as there is no ${data.container.id}
-	// Publish the pod level hint only if atleast one container level hint was emitted. This ensures that there is
+	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
 	// no unnecessary pod level events emitted prematurely.
-	if emitted != 0 {
+	// We publish the pod level hint first so that it doesn't override a valid container level event.
+	if len(events) != 0 {
 		meta := p.metagen.Generate(pod)
 
 		// Information that can be used in discovering a workload
@@ -386,12 +419,17 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
 			flag:         true,
 			"host":       host,
+			"ports":      podPorts,
 			"kubernetes": kubemeta,
 			"meta": common.MapStr{
 				"kubernetes": meta,
 			},
 		}
 		p.publish(event)
+	}
 
+	// Publish the container level hints finally.
+	for _, event := range events {
+		p.publish(event)
 	}
 }

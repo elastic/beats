@@ -22,6 +22,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
@@ -43,7 +45,7 @@ func BuildGoDaemon() error {
 	}
 
 	// Test if binaries are up-to-date.
-	godaemonDir, err := listModuleDir("github.com/tsg/go-daemon")
+	godaemonDir, err := gotool.ListModuleCacheDir("github.com/tsg/go-daemon")
 	if err != nil {
 		return err
 	}

@@ -90,16 +90,28 @@
       type: keyword
       description: >-
         The parameters, if any, that were sent with the request.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
     - name: response_elements
       type: keyword
       description: >-
         The response element for actions that make changes (create,
         update, or delete actions).
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
     - name: additional_eventdata
       type: keyword
       description: >-
         Additional data about the event that was not part of the
         request or response.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
     - name: request_id
       type: keyword
       description: >-
@@ -149,6 +161,10 @@
       description: >-
         Identifies the service event, including what triggered the
         event and the result.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
     - name: shared_event_id
       type: keyword
       description: >-
@@ -183,3 +199,94 @@
               description: >-
                 Identifies whether multi factor authentication was
                 used during ConsoleLogin
+    - name: flattened
+      type: group
+      description: >-
+        ES flattened datatype for objects where the subfields aren't known in advance.
+      fields:
+        - name: additional_eventdata
+          type: flattened
+          description: >
+            Additional data about the event that was not part of the
+            request or response.
+        - name: request_parameters
+          type: flattened
+          description: >-
+            The parameters, if any, that were sent with the request.
+        - name: response_elements
+          type: flattened
+          description: >-
+            The response element for actions that make changes (create,
+            update, or delete actions).
+        - name: service_event_details
+          type: flattened
+          description: >-
+            Identifies the service event, including what triggered the
+            event and the result.
+    - name: digest
+      type: group
+      description: >-
+        Fields from Cloudtrail Digest Logs
+      fields:
+        - name: log_files
+          type: nested
+          description: >-
+            A list of Logfiles contained in the digest.
+        - name: start_time
+          type: date
+          description: >-
+            The starting UTC time range that the digest file covers,
+            taking as a reference the time in which log files have
+            been delivered by CloudTrail.
+        - name: end_time
+          type: date
+          description: >-
+            The ending UTC time range that the digest file covers,
+            taking as a reference the time in which log files have
+            been delivered by CloudTrail.
+        - name: s3_bucket
+          type: keyword
+          description: >-
+            The name of the Amazon S3 bucket to which the current
+            digest file has been delivered.
+        - name: s3_object
+          type: keyword
+          description: >-
+            The Amazon S3 object key (that is, the Amazon S3 bucket
+            location) of the current digest file.
+        - name: newest_event_time
+          type: date
+          description: >-
+            The UTC time of the most recent event among all of the
+            events in the log files in the digest.
+        - name: oldest_event_time
+          type: date
+          description: >-
+            The UTC time of the oldest event among all of the events
+            in the log files in the digest.
+        - name: previous_s3_bucket
+          type: keyword
+          description: >-
+            The Amazon S3 bucket to which the previous digest file was
+            delivered.
+        - name: previous_hash_algorithm
+          type: keyword
+          description: >-
+            The name of the hash algorithm that was used to hash the
+            previous digest file.
+        - name: public_key_fingerprint
+          type: keyword
+          description: >-
+            The hexadecimal encoded fingerprint of the public key that
+            matches the private key used to sign this digest file.
+        - name: signature_algorithm
+          type: keyword
+          description: >-
+            The algorithm used to sign the digest file.
+    - name: insight_details
+      type: flattened
+      description: >-
+        Shows information about the underlying triggers of an Insights
+        event, such as event source, user agent, statistics, API name,
+        and whether the event is the start or end of the Insights
+        event.

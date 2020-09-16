@@ -45,6 +45,16 @@ Note: Kube-state-metrics is not deployed by default in Kubernetes. For these cas
 
 The apiserver metricset requires access to the Kubernetes API, which should be easily available in all Kubernetes environments. Depending on the Kubernetes configuration, the API access might require SSL (`https`) and token based authentication.
 
+In order to access the `/metrics` path of the API service, some Kubernetes environments might require the following permission to be added to a ClusterRole.
+
+```yaml
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+```
+
 [float]
 ==== proxy
 
@@ -200,6 +210,7 @@ metricbeat.modules:
   enabled: true
   metricsets:
     - state_node
+    - state_daemonset
     - state_deployment
     - state_replicaset
     - state_statefulset
@@ -293,6 +304,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>
 
+* <<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>
+
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
@@ -334,6 +347,8 @@ include::kubernetes/scheduler.asciidoc[]
 include::kubernetes/state_container.asciidoc[]
 
 include::kubernetes/state_cronjob.asciidoc[]
+
+include::kubernetes/state_daemonset.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
 

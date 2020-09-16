@@ -1,4 +1,5 @@
 from base import BaseTest
+from beat import common_tests
 
 import json
 import os
@@ -9,7 +10,7 @@ import sys
 import unittest
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_base(self):
         """
