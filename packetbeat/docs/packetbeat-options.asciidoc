@@ -31,7 +31,7 @@ Currently Packetbeat has several options for traffic capturing:
 
 The `af_packet` option, also known as "memory-mapped sniffing," makes use of a
 Linux-specific
-http://lxr.free-electrons.com/source/Documentation/networking/packet_mmap.txt[feature].
+https://www.kernel.org/doc/Documentation/networking/packet_mmap.txt[feature].
 This could be the optimal sniffing mode for both the dedicated server and
 when Packetbeat is deployed on an existing application server.
 
