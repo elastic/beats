@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // guess udp_sendmsg arguments:
@@ -39,7 +38,7 @@ type udpSendMsgCountGuess struct {
 }
 
 type guessUDPSendMsg struct {
-	ctx    kprobes.GuessContext
+	ctx    tracing.GuessContext
 	cs     inetClientServer
 	length uintptr
 }
@@ -67,20 +66,20 @@ func (g *guessUDPSendMsg) Requires() []string {
 }
 
 // Probes returns a probe on udp_sendmsg that dumps all 4 possible arguments.
-func (g *guessUDPSendMsg) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessUDPSendMsg) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "udp_sendmsg_guess",
 				Address:   "udp_sendmsg",
 				Fetchargs: "c={{.P3}} d={{.P4}}",
 			},
-			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(udpSendMsgCountGuess) }),
+			Decoder: tracing.MakeStructDecoder(func() interface{} { return new(udpSendMsgCountGuess) }),
 		},
 	}, nil
 }
 
-func (g *guessUDPSendMsg) Prepare(ctx kprobes.GuessContext) error {
+func (g *guessUDPSendMsg) Prepare(ctx tracing.GuessContext) error {
 	g.ctx = ctx
 	return g.cs.SetupUDP()
 }

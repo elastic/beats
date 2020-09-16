@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"bytes"
@@ -13,20 +13,19 @@ import (
 	"text/template"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // ProbeDef couples a probe with a decoder factory.
 type ProbeDef struct {
-	Probe   tracing.Probe
-	Decoder func(desc tracing.ProbeFormat) (tracing.Decoder, error)
+	Probe   Probe
+	Decoder func(desc ProbeFormat) (Decoder, error)
 }
 
 // ProbeTransform transforms a probe before its installed.
 type ProbeTransform func(ProbeDef) ProbeDef
 
 // ProbeCondition is a function that allows to filter probes.
-type ProbeCondition func(probe tracing.Probe) bool
+type ProbeCondition func(probe Probe) bool
 
 // ApplyTemplate returns a new probe definition after expanding all templates.
 func (pdef ProbeDef) ApplyTemplate(vars common.MapStr) ProbeDef {
@@ -44,11 +43,11 @@ func applyTemplate(s string, vars common.MapStr) string {
 	return buf.String()
 }
 
-// NewStructDecoder is a helper to create struct decoder factories
+// MakeStructDecoder is a helper to create struct decoder factories
 // for a given allocator function.
-func NewStructDecoder(allocator tracing.AllocateFn) func(tracing.ProbeFormat) (tracing.Decoder, error) {
-	return func(format tracing.ProbeFormat) (tracing.Decoder, error) {
-		return tracing.NewStructDecoder(format, allocator)
+func MakeStructDecoder(allocator AllocateFn) func(ProbeFormat) (Decoder, error) {
+	return func(format ProbeFormat) (Decoder, error) {
+		return NewStructDecoder(format, allocator)
 	}
 }
 

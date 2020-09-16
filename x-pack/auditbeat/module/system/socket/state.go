@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
 
@@ -346,7 +345,7 @@ type state struct {
 	kernelEpoch time.Time
 
 	reporter mb.PushReporterV2
-	log      kprobes.Logger
+	log      tracing.Logger
 
 	processes map[uint32]*process
 	socks     map[uintptr]*socket
@@ -404,7 +403,7 @@ func NewState(r mb.PushReporterV2, log *logp.Logger, inactiveTimeout, socketTime
 	return s
 }
 
-func makeState(r mb.PushReporterV2, log kprobes.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
+func makeState(r mb.PushReporterV2, log tracing.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
 	return &state{
 		reporter:        r,
 		log:             log,

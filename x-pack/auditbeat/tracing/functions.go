@@ -4,13 +4,12 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 func (e *Engine) isKernelFunctionAvailable(name string, tracingFns common.StringSet) bool {
@@ -19,18 +18,18 @@ func (e *Engine) isKernelFunctionAvailable(name string, tracingFns common.String
 	}
 	defer e.uninstallProbes()
 	checkProbe := ProbeDef{
-		Probe: tracing.Probe{
+		Probe: Probe{
 			Name:      "check_" + name,
 			Address:   name,
 			Fetchargs: "%ax:u64", // dump decoder needs it.
 		},
-		Decoder: tracing.NewDumpDecoder,
+		Decoder: NewDumpDecoder,
 	}
 	_, _, err := e.installProbe(checkProbe)
 	return err == nil
 }
 
-func loadTracingFunctions(tfs *tracing.TraceFS) (common.StringSet, error) {
+func loadTracingFunctions(tfs *TraceFS) (common.StringSet, error) {
 	fnList, err := tfs.AvailableFilterFunctions()
 	if err != nil {
 		return nil, err

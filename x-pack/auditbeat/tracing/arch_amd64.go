@@ -4,7 +4,7 @@
 
 // +build linux
 
-package kprobes
+package tracing
 
 import "github.com/elastic/beats/v7/libbeat/common"
 

@@ -4,13 +4,12 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // ConfigFn is a function type that configures the kprobe tracing engine.
@@ -120,7 +119,7 @@ func WithSyscall(variable, syscallName string) ConfigFn {
 }
 
 // WithPerfChannelConf sets the configuration for the underlying perf channel.
-func WithPerfChannelConf(cfg ...tracing.PerfChannelConf) ConfigFn {
+func WithPerfChannelConf(cfg ...PerfChannelConf) ConfigFn {
 	return func(engine *Engine) error {
 		engine.perfChannelConf = append(engine.perfChannelConf, cfg...)
 		return nil

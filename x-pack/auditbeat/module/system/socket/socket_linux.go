@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 
@@ -56,7 +55,7 @@ type MetricSet struct {
 	config     Config
 	log        *logp.Logger
 	detailLog  *logp.Logger
-	engine     *kprobes.Engine
+	engine     *tracing.Engine
 	sniffer    dns.Sniffer
 	isDebug    bool
 	isDetailed bool
@@ -107,17 +106,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.log.Debugf("IPv6 enabled: %v", hasIPv6)
 
-	cfg := []kprobes.ConfigFn{
-		kprobes.WithPerfChannelConf(
+	cfg := []tracing.ConfigFn{
+		tracing.WithPerfChannelConf(
 			tracing.WithTID(perf.AllThreads),
 			tracing.WithBufferSize(ms.config.PerfQueueSize),
 			tracing.WithErrBufferSize(ms.config.ErrQueueSize),
 			tracing.WithLostBufferSize(ms.config.LostQueueSize),
 			tracing.WithRingSizeExponent(ms.config.RingSizeExp),
 		),
-		kprobes.WithAutoMount(true),
-		kprobes.WithLogger(ms.log),
-		kprobes.WithTemplateVars(common.MapStr{
+		tracing.WithAutoMount(true),
+		tracing.WithLogger(ms.log),
+		tracing.WithTemplateVars(common.MapStr{
 			"HAS_IPV6":    hasIPv6,
 			"AF_INET":     2,
 			"AF_INET6":    10,
@@ -131,21 +130,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				return int(unsafe.Sizeof(uintptr(0))) * index
 			},
 		}),
-		kprobes.WithSymbolResolution("IP_LOCAL_OUT", []string{"ip_local_out", "ip_local_out_sk"}),
-		kprobes.WithSymbolResolution("RECV_UDP_DATAGRAM", []string{"__skb_recv_udp", "__skb_recv_datagram", "skb_recv_datagram"}),
-		kprobes.WithSyscall("SYS_EXECVE", "execve"),
-		kprobes.WithSyscall("SYS_GETTIMEOFDAY", "gettimeofday"),
-		kprobes.WithSyscall("SYS_UNAME", "newuname"),
-		kprobes.WithProbes(getKProbes(hasIPv6)...),
-		kprobes.WithGuesses(guess.Registry.GetList()...),
+		tracing.WithSymbolResolution("IP_LOCAL_OUT", []string{"ip_local_out", "ip_local_out_sk"}),
+		tracing.WithSymbolResolution("RECV_UDP_DATAGRAM", []string{"__skb_recv_udp", "__skb_recv_datagram", "skb_recv_datagram"}),
+		tracing.WithSyscall("SYS_EXECVE", "execve"),
+		tracing.WithSyscall("SYS_GETTIMEOFDAY", "gettimeofday"),
+		tracing.WithSyscall("SYS_UNAME", "newuname"),
+		tracing.WithProbes(getKProbes(hasIPv6)...),
+		tracing.WithGuesses(guess.Registry.GetList()...),
 	}
 	if ms.config.TraceFSPath != nil {
-		cfg = append(cfg, kprobes.WithTraceFSPath(*ms.config.TraceFSPath))
+		cfg = append(cfg, tracing.WithTraceFSPath(*ms.config.TraceFSPath))
 	}
 	if ms.config.DevelopmentMode {
-		cfg = append(cfg, kprobes.WithTransform(filterPort(22)))
+		cfg = append(cfg, tracing.WithTransform(filterPort(22)))
 	}
-	if ms.engine, err = kprobes.New(groupNamePrefix, cfg...); err != nil {
+	if ms.engine, err = tracing.New(groupNamePrefix, cfg...); err != nil {
 		return nil, errors.Wrap(err, "creating probe engine")
 	}
 	return ms, ms.engine.Setup()
@@ -312,11 +311,11 @@ func detectIPv6() (bool, error) {
 // an SSH connection. Otherwise there is a feedback loop when tracing events
 // printed on the terminal are transmitted over SSH, which causes more tracing
 // events.
-func filterPort(portnum uint16) kprobes.ProbeTransform {
+func filterPort(portnum uint16) tracing.ProbeTransform {
 	var buf [2]byte
 	tracing.MachineEndian.PutUint16(buf[:], portnum)
 	filter := fmt.Sprintf("lport!=0x%02x%02x", buf[0], buf[1])
-	return func(probe kprobes.ProbeDef) kprobes.ProbeDef {
+	return func(probe tracing.ProbeDef) tracing.ProbeDef {
 		if strings.Contains(probe.Probe.Fetchargs, "lport=") {
 			if probe.Probe.Filter == "" {
 				probe.Probe.Filter = filter

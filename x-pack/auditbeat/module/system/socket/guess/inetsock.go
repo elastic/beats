@@ -15,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // Guess the offsets within a struct inet_sock where the local and remote
@@ -41,7 +40,7 @@ func init() {
 }
 
 type guessInetSockIPv4 struct {
-	ctx            kprobes.GuessContext
+	ctx            tracing.GuessContext
 	local, remote  unix.SockaddrInet4
 	server, client int
 }
@@ -74,14 +73,14 @@ func (g *guessInetSockIPv4) Requires() []string {
 
 // Probes returns a kretprobe on inet_sock_accept that dumps the return
 // value (an inet_sock*).
-func (g *guessInetSockIPv4) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessInetSockIPv4) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "inet_sock_guess",
 				Address:   "inet_csk_accept",
-				Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, 2048),
+				Fetchargs: tracing.MakeMemoryDump("{{.RET}}", 0, 2048),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -90,7 +89,7 @@ func (g *guessInetSockIPv4) Probes() ([]kprobes.ProbeDef, error) {
 
 // Prepare creates a TCP/IP client and server bound to random loopback addresses
 // (127.x.x.x).
-func (g *guessInetSockIPv4) Prepare(ctx kprobes.GuessContext) (err error) {
+func (g *guessInetSockIPv4) Prepare(ctx tracing.GuessContext) (err error) {
 	g.ctx = ctx
 	g.local = unix.SockaddrInet4{
 		Port: 0,

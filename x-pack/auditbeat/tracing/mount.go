@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"sync"
@@ -12,8 +12,6 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
-
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 type mountPoint struct {
@@ -91,7 +89,7 @@ func (fs *unmounter) Release(path string) error {
 func (e *Engine) openTraceFS() (err error) {
 	if e.traceFSpath != nil {
 		fsTracker.Use(*e.traceFSpath)
-		e.traceFS, err = tracing.NewTraceFSWithPath(*e.traceFSpath)
+		e.traceFS, err = NewTraceFSWithPath(*e.traceFSpath)
 		return err
 	}
 	if e.autoMount {
@@ -100,7 +98,7 @@ func (e *Engine) openTraceFS() (err error) {
 				e.log.Debugf("Mount %s failed: %v", mount, err)
 				continue
 			}
-			if tracing.IsTraceFSAvailable() != nil {
+			if IsTraceFSAvailable() != nil {
 				e.log.Warnf("Mounted %s but no kprobes available", mount, err)
 				fsTracker.Release(mount.path)
 				continue
@@ -109,6 +107,6 @@ func (e *Engine) openTraceFS() (err error) {
 			break
 		}
 	}
-	e.traceFS, err = tracing.NewTraceFS()
+	e.traceFS, err = NewTraceFS()
 	return err
 }

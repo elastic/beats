@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -39,14 +38,14 @@ const (
 )
 
 type guessDeref struct {
-	ctx     kprobes.GuessContext
+	ctx     tracing.GuessContext
 	tries   int
 	garbage bool
 }
 
 // Condition allows the guess to run if the environment variable is set to a
 // decimal value greater than zero.
-func (g *guessDeref) Condition(ctx kprobes.GuessContext) (run bool, err error) {
+func (g *guessDeref) Condition(ctx tracing.GuessContext) (run bool, err error) {
 	v := os.Getenv(envVar)
 	if v == "" {
 		return false, nil
@@ -79,14 +78,14 @@ func (g *guessDeref) Requires() []string {
 
 // Probes returns a kprobe on uname() that dumps the first bytes
 // pointed to by its first parameter.
-func (g *guessDeref) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessDeref) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKProbe,
 				Name:      "guess_null_ptr_deref",
 				Address:   "{{.SYS_UNAME}}",
-				Fetchargs: kprobes.MakeMemoryDump("{{.SYS_P1}}", 0, credDumpBytes),
+				Fetchargs: tracing.MakeMemoryDump("{{.SYS_P1}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -94,7 +93,7 @@ func (g *guessDeref) Probes() ([]kprobes.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessDeref) Prepare(ctx kprobes.GuessContext) error {
+func (g *guessDeref) Prepare(ctx tracing.GuessContext) error {
 	g.ctx = ctx
 	return nil
 }

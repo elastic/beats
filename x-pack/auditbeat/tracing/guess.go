@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"fmt"
@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // GuessContext shared with guesses.
@@ -142,8 +141,8 @@ func (e *Engine) guessOnce(guesser Guesser, ctx GuessContext) (result common.Map
 		return nil, errors.Wrap(err, "failed generating probes")
 	}
 
-	decoders := make([]tracing.Decoder, 0, len(probes))
-	formats := make([]tracing.ProbeFormat, 0, len(probes))
+	decoders := make([]Decoder, 0, len(probes))
+	formats := make([]ProbeFormat, 0, len(probes))
 	defer e.uninstallProbes()
 	for _, pdesc := range probes {
 		format, decoder, err := e.installProbe(pdesc)
@@ -167,13 +166,13 @@ func (e *Engine) guessOnce(guesser Guesser, ctx GuessContext) (result common.Map
 	thread := NewFixedThreadExecutor(executorQueueSize)
 	defer thread.Close()
 
-	perfchan, err := tracing.NewPerfChannel(
-		tracing.WithBufferSize(8),
-		tracing.WithErrBufferSize(1),
-		tracing.WithLostBufferSize(8),
-		tracing.WithRingSizeExponent(2),
-		tracing.WithTID(thread.TID),
-		tracing.WithPollTimeout(time.Millisecond*10))
+	perfchan, err := NewPerfChannel(
+		WithBufferSize(8),
+		WithErrBufferSize(1),
+		WithLostBufferSize(8),
+		WithRingSizeExponent(2),
+		WithTID(thread.TID),
+		WithPollTimeout(time.Millisecond*10))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create perfchannel")
 	}

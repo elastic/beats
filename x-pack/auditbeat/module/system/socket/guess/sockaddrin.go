@@ -15,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -36,7 +35,7 @@ func init() {
 }
 
 type guessSockaddrIn struct {
-	ctx            kprobes.GuessContext
+	ctx            tracing.GuessContext
 	local, remote  unix.SockaddrInet4
 	server, client int
 }
@@ -64,13 +63,13 @@ func (g *guessSockaddrIn) Requires() []string {
 
 // Probes sets a probe on tcp_v4_connect and dumps its second argument, which
 // has a type of struct sockaddr* (struct sockaddr_in* for AF_INET).
-func (g *guessSockaddrIn) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessSockaddrIn) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "sockaddr_in_guess",
 				Address:   "tcp_v4_connect",
-				Fetchargs: kprobes.MakeMemoryDump("{{.P2}}", 0, 32),
+				Fetchargs: tracing.MakeMemoryDump("{{.P2}}", 0, 32),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -78,7 +77,7 @@ func (g *guessSockaddrIn) Probes() ([]kprobes.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessSockaddrIn) Prepare(ctx kprobes.GuessContext) (err error) {
+func (g *guessSockaddrIn) Prepare(ctx tracing.GuessContext) (err error) {
 	g.ctx = ctx
 	g.local = unix.SockaddrInet4{
 		Port: 0,

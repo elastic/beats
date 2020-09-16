@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // Guess how to get a struct sock* from an ip_local_out() call.
@@ -54,7 +53,7 @@ type skbuffSockGuess struct {
 }
 
 type guessIPLocalOut struct {
-	ctx  kprobes.GuessContext
+	ctx  tracing.GuessContext
 	cs   inetClientServer
 	sock uintptr
 }
@@ -92,16 +91,16 @@ func (g *guessIPLocalOut) Requires() []string {
 // 		* arg2 (arg1 if this system has ip_local_out_sk)
 //		* dump of arg1 (arg2 if this system has ip_local_out_sk)
 // - tcp_sendmsg, returning the sock* argument.
-func (g *guessIPLocalOut) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessIPLocalOut) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:    "ip_local_out_sock_guess",
 				Address: "{{.IP_LOCAL_OUT}}",
 				Fetchargs: "arg={{if eq .IP_LOCAL_OUT \"ip_local_out\"}}{{.P2}}{{else}}{{.P1}}{{end}} dump=" +
-					kprobes.MakeMemoryDump("{{if eq .IP_LOCAL_OUT \"ip_local_out\"}}{{.P1}}{{else}}{{.P2}}{{end}}", 0, skbuffDumpSize),
+					tracing.MakeMemoryDump("{{if eq .IP_LOCAL_OUT \"ip_local_out\"}}{{.P1}}{{else}}{{.P2}}{{end}}", 0, skbuffDumpSize),
 			},
-			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
+			Decoder: tracing.MakeStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
 		},
 		{
 			Probe: tracing.Probe{
@@ -109,13 +108,13 @@ func (g *guessIPLocalOut) Probes() ([]kprobes.ProbeDef, error) {
 				Address:   "tcp_sendmsg",
 				Fetchargs: "sock={{.TCP_SENDMSG_SOCK}}",
 			},
-			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
+			Decoder: tracing.MakeStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
 		},
 	}, nil
 }
 
 // Prepare sets up a connected TCP client/server.
-func (g *guessIPLocalOut) Prepare(ctx kprobes.GuessContext) error {
+func (g *guessIPLocalOut) Prepare(ctx tracing.GuessContext) error {
 	g.ctx = ctx
 	return g.cs.SetupTCP()
 }

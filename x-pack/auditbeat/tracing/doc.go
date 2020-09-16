@@ -8,7 +8,4 @@
 // of a candidate package http://golang.org/x/sys/unix/linux/perf currently in review
 // at https://go-review.googlesource.com/c/sys/+/168059.
 //
-// For a higher-level API see the kprobes sub-package at
-// http://godoc.org/github.com/elastic/beats/x-pack/auditbeat/tracing/kprobes and
-// *kprobes.Engine
 package tracing

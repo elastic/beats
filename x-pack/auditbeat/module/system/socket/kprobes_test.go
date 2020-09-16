@@ -11,8 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
-
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
@@ -50,7 +48,7 @@ func validateProbe(p tracing.Probe) error {
 
 // These tests are to make KProbes that are not compatible with older kernels
 // are not inadvertently introduced.
-func validateProbeList(t *testing.T, probes []kprobes.ProbeDef) {
+func validateProbeList(t *testing.T, probes []tracing.ProbeDef) {
 	for _, probe := range probes {
 		t.Run(probe.Probe.Name, func(t *testing.T) {
 			if err := validateProbe(probe.Probe); err != nil {
@@ -66,10 +64,10 @@ func TestRuntimeKProbesAreBackwardsCompatible(t *testing.T) {
 }
 
 func TestGuessKProbesAreBackwardsCompatible(t *testing.T) {
-	var probes []kprobes.ProbeDef
+	var probes []tracing.ProbeDef
 	for _, iface := range guess.Registry.GetList() {
 		switch v := iface.(type) {
-		case kprobes.Guesser:
+		case tracing.Guesser:
 			p, err := v.Probes()
 			if err != nil {
 				t.Fatal("error getting probes from", v.Name(), err)

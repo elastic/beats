@@ -15,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 /*
@@ -57,7 +56,7 @@ func init() {
 }
 
 type guessStructCreds struct {
-	ctx kprobes.GuessContext
+	ctx tracing.GuessContext
 }
 
 // Name of this guess.
@@ -84,14 +83,14 @@ func (g *guessStructCreds) Requires() []string {
 
 // Probes returns a kretprobe on prepare_creds that dumps the first bytes
 // pointed to by the return value, which is a struct cred.
-func (g *guessStructCreds) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessStructCreds) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_struct_creds",
 				Address:   "prepare_creds",
-				Fetchargs: kprobes.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
+				Fetchargs: tracing.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -99,7 +98,7 @@ func (g *guessStructCreds) Probes() ([]kprobes.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessStructCreds) Prepare(ctx kprobes.GuessContext) error {
+func (g *guessStructCreds) Prepare(ctx tracing.GuessContext) error {
 	return nil
 }
 

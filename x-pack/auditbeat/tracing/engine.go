@@ -4,7 +4,7 @@
 
 // +build linux,386 linux,amd64
 
-package kprobes
+package tracing
 
 import (
 	"fmt"
@@ -20,24 +20,23 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/go-sysinfo/providers/linux"
 )
 
 type Engine struct {
 	log                       Logger
-	traceFS                   *tracing.TraceFS
+	traceFS                   *TraceFS
 	traceFSpath               *string
 	autoMount                 bool
 	vars                      common.MapStr
 	transforms                []ProbeTransform
 	resolveSymbols            map[string][]string
-	installed                 []tracing.Probe
+	installed                 []Probe
 	probes                    []ProbeDef
 	guesses                   []Guesser
-	perfChannelConf           []tracing.PerfChannelConf
+	perfChannelConf           []PerfChannelConf
 	groupName, effectiveGroup string
-	perfChannel               *tracing.PerfChannel
+	perfChannel               *PerfChannel
 }
 
 var kernelVersion string
@@ -60,7 +59,7 @@ func New(groupName string, cfg ...ConfigFn) (*Engine, error) {
 		groupName:      groupName,
 		effectiveGroup: fmt.Sprintf("%s%d", groupName, os.Getpid()),
 	}
-	eng.perfChannelConf = append(eng.perfChannelConf, tracing.WithTimestamp())
+	eng.perfChannelConf = append(eng.perfChannelConf, WithTimestamp())
 	eng.transforms = append(eng.transforms,
 		withGroup(eng.effectiveGroup),
 		withTemplates(eng.vars))
@@ -81,7 +80,7 @@ func (e *Engine) Vars() common.MapStr {
 	return e.vars
 }
 
-func (e *Engine) installProbe(pdef ProbeDef) (format tracing.ProbeFormat, decoder tracing.Decoder, err error) {
+func (e *Engine) installProbe(pdef ProbeDef) (format ProbeFormat, decoder Decoder, err error) {
 	for _, d := range e.transforms {
 		pdef = d(pdef)
 	}
@@ -199,7 +198,7 @@ func (e *Engine) Setup() (err error) {
 	//
 	// Create perf channel
 	//
-	e.perfChannel, err = tracing.NewPerfChannel(e.perfChannelConf...)
+	e.perfChannel, err = NewPerfChannel(e.perfChannelConf...)
 	if err != nil {
 		return errors.Wrapf(err, "unable to create perf channel")
 	}
@@ -259,7 +258,7 @@ func isRunningProcess(pid int) bool {
 }
 
 func probeFromTerminatedProcess(groupName string) ProbeCondition {
-	return func(probe tracing.Probe) bool {
+	return func(probe Probe) bool {
 		if strings.HasPrefix(probe.Group, groupName) {
 			if pid, err := strconv.Atoi(probe.Group[len(groupName):]); err == nil && !isRunningProcess(pid) {
 				return true
@@ -270,7 +269,7 @@ func probeFromTerminatedProcess(groupName string) ProbeCondition {
 }
 
 func conflictingProbe(group string) ProbeCondition {
-	return func(probe tracing.Probe) bool {
+	return func(probe Probe) bool {
 		return probe.Group == group
 	}
 }

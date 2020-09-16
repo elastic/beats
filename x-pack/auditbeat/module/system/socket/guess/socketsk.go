@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // Guess the offset of (struct socket*)->sk (type struct sock*)
@@ -39,7 +38,7 @@ type sockEvent struct {
 }
 
 type guessSocketSock struct {
-	ctx      kprobes.GuessContext
+	ctx      tracing.GuessContext
 	initData *sockEvent
 }
 
@@ -66,22 +65,22 @@ func (g *guessSocketSock) Requires() []string {
 // Probes returns two probes:
 // - sock_init_data, fetching its 1st argument.
 // - inet_release, dumping its only argument.
-func (g *guessSocketSock) Probes() ([]kprobes.ProbeDef, error) {
-	return []kprobes.ProbeDef{
+func (g *guessSocketSock) Probes() ([]tracing.ProbeDef, error) {
+	return []tracing.ProbeDef{
 		{
 			Probe: tracing.Probe{
 				Name:      "struct_socket_guess",
 				Address:   "sock_init_data",
 				Fetchargs: "sock={{.P2}}",
 			},
-			Decoder: kprobes.NewStructDecoder(func() interface{} { return new(sockEvent) }),
+			Decoder: tracing.MakeStructDecoder(func() interface{} { return new(sockEvent) }),
 		},
 
 		{
 			Probe: tracing.Probe{
 				Name:      "struct_socket_guess2",
 				Address:   "inet_release",
-				Fetchargs: kprobes.MakeMemoryDump("{{.P1}}", 0, 128),
+				Fetchargs: tracing.MakeMemoryDump("{{.P1}}", 0, 128),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -89,7 +88,7 @@ func (g *guessSocketSock) Probes() ([]kprobes.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessSocketSock) Prepare(ctx kprobes.GuessContext) error {
+func (g *guessSocketSock) Prepare(ctx tracing.GuessContext) error {
 	g.ctx = ctx
 	return nil
 }

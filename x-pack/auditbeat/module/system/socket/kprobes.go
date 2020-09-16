@@ -11,7 +11,6 @@ import (
 	"unsafe"
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing/kprobes"
 )
 
 // This is how many data we dump from sk_buff->data to read full packet headers
@@ -20,7 +19,7 @@ import (
 const skBuffDataDumpBytes = 256
 
 // KProbes shared with IPv4 and IPv6.
-var sharedKProbes = []kprobes.ProbeDef{
+var sharedKProbes = []tracing.ProbeDef{
 
 	/***************************************************************************
 	 * RUNNING PROCESSES
@@ -31,16 +30,16 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Name:    "sys_execve_call",
 			Address: "{{.SYS_EXECVE}}",
 			Fetchargs: fmt.Sprintf("path=%s argptrs=%s param0=%s param1=%s param2=%s param3=%s param4=%s",
-				kprobes.MakeMemoryDump("{{.SYS_P1}}", 0, maxProgArgLen),                                  // path
-				kprobes.MakeMemoryDump("{{.SYS_P2}}", 0, int((maxProgArgs+1)*unsafe.Sizeof(uintptr(0)))), // argptrs
-				kprobes.MakeMemoryDump("+{{call .POINTER_INDEX 0}}({{.SYS_P2}})", 0, maxProgArgLen),      // param0
-				kprobes.MakeMemoryDump("+{{call .POINTER_INDEX 1}}({{.SYS_P2}})", 0, maxProgArgLen),      // param1
-				kprobes.MakeMemoryDump("+{{call .POINTER_INDEX 2}}({{.SYS_P2}})", 0, maxProgArgLen),      // param2
-				kprobes.MakeMemoryDump("+{{call .POINTER_INDEX 3}}({{.SYS_P2}})", 0, maxProgArgLen),      // param3
-				kprobes.MakeMemoryDump("+{{call .POINTER_INDEX 4}}({{.SYS_P2}})", 0, maxProgArgLen),      // param4
+				tracing.MakeMemoryDump("{{.SYS_P1}}", 0, maxProgArgLen),                                  // path
+				tracing.MakeMemoryDump("{{.SYS_P2}}", 0, int((maxProgArgs+1)*unsafe.Sizeof(uintptr(0)))), // argptrs
+				tracing.MakeMemoryDump("+{{call .POINTER_INDEX 0}}({{.SYS_P2}})", 0, maxProgArgLen),      // param0
+				tracing.MakeMemoryDump("+{{call .POINTER_INDEX 1}}({{.SYS_P2}})", 0, maxProgArgLen),      // param1
+				tracing.MakeMemoryDump("+{{call .POINTER_INDEX 2}}({{.SYS_P2}})", 0, maxProgArgLen),      // param2
+				tracing.MakeMemoryDump("+{{call .POINTER_INDEX 3}}({{.SYS_P2}})", 0, maxProgArgLen),      // param3
+				tracing.MakeMemoryDump("+{{call .POINTER_INDEX 4}}({{.SYS_P2}})", 0, maxProgArgLen),      // param4
 			),
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(execveCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(execveCall) }),
 	},
 
 	{
@@ -50,7 +49,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "{{.SYS_EXECVE}}",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(execveRet) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(execveRet) }),
 	},
 
 	{
@@ -58,7 +57,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Name:    "do_exit",
 			Address: "do_exit",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(doExit) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(doExit) }),
 	},
 
 	{
@@ -67,7 +66,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "commit_creds",
 			Fetchargs: "uid=+{{.STRUCT_CRED_UID}}({{.P1}}):u32 gid=+{{.STRUCT_CRED_GID}}({{.P1}}):u32 euid=+{{.STRUCT_CRED_EUID}}({{.P1}}):u32 egid=+{{.STRUCT_CRED_EGID}}({{.P1}}):u32",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(commitCreds) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(commitCreds) }),
 	},
 
 	/***************************************************************************
@@ -80,7 +79,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "sock_init_data",
 			Fetchargs: "socket={{.P1}} sock={{.P2}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(sockInitData) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(sockInitData) }),
 	},
 
 	// IPv4/TCP/UDP socket created. Good for associating sockets with pids.
@@ -95,7 +94,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			// proto=0 will select the protocol by looking at socket type (STREAM|DGRAM)
 			Filter: "proto==0 || proto=={{.IPPROTO_TCP}} || proto=={{.IPPROTO_UDP}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(inetCreate) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(inetCreate) }),
 	},
 
 	// IPv4/TCP/UDP socket released. Good for associating sockets with pids.
@@ -105,7 +104,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "inet_release",
 			Fetchargs: "sock=+{{.SOCKET_SOCK}}({{.P1}})",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(inetReleaseCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(inetReleaseCall) }),
 	},
 
 	/***************************************************************************
@@ -122,7 +121,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Fetchargs: "sock={{.P1}} laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN_AF}}({{.P2}}):u16 addr=+{{.SOCKADDR_IN_ADDR}}({{.P2}}):u32 port=+{{.SOCKADDR_IN_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpIPv4ConnectCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpIPv4ConnectCall) }),
 	},
 
 	// Result of IPv4/TCP connect:
@@ -135,7 +134,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "tcp_v4_connect",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpConnectResult) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpConnectResult) }),
 	},
 
 	// IPv4 packet is sent. Acceptable as a packet counter,
@@ -151,7 +150,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Fetchargs: "sock={{.IP_LOCAL_OUT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.IP_LOCAL_OUT_SK_BUFF}}):u32 af=+{{.INET_SOCK_AF}}({{.IP_LOCAL_OUT_SOCK}}):u16 laddr=+{{.INET_SOCK_LADDR}}({{.IP_LOCAL_OUT_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.IP_LOCAL_OUT_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.IP_LOCAL_OUT_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.IP_LOCAL_OUT_SOCK}}):u16",
 			Filter:    "(af=={{.AF_INET}} || af=={{.AF_INET6}})",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(ipLocalOutCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(ipLocalOutCall) }),
 	},
 
 	// Count received IPv4/TCP packets.
@@ -163,7 +162,7 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "tcp_v4_do_rcv",
 			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.P1}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpV4DoRcv) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpV4DoRcv) }),
 	},
 
 	/***************************************************************************
@@ -180,16 +179,16 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Address:   "udp_sendmsg",
 			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.SOCKADDR_IN_ADDR}}(+0({{.UDP_SENDMSG_MSG}})):u32 siptr=+0({{.UDP_SENDMSG_MSG}}) siaf=+{{.SOCKADDR_IN_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16 rport=+{{.SOCKADDR_IN_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddr=+{{.INET_SOCK_RADDR}}({{.UDP_SENDMSG_SOCK}}):u32 altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(udpSendMsgCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(udpSendMsgCall) }),
 	},
 
 	{
 		Probe: tracing.Probe{
 			Name:      "udp_queue_rcv_skb",
 			Address:   "udp_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + kprobes.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + tracing.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
 	},
 
 	/***************************************************************************
@@ -205,12 +204,12 @@ var sharedKProbes = []kprobes.ProbeDef{
 			Fetchargs: "magic=+0({{.SYS_P1}}):u64 timestamp=+8({{.SYS_P1}}):u64",
 			Filter:    fmt.Sprintf("magic==0x%x", clockSyncMagic),
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(clockSyncCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(clockSyncCall) }),
 	},
 }
 
 // KProbes used only when IPv6 is disabled.
-var ipv4OnlyKProbes = []kprobes.ProbeDef{
+var ipv4OnlyKProbes = []tracing.ProbeDef{
 	// Return of accept(). Local side is usually zero so not fetched. Needs
 	// further I/O to populate source.Good for marking a connection as inbound.
 	//
@@ -224,7 +223,7 @@ var ipv4OnlyKProbes = []kprobes.ProbeDef{
 				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16",
 			Filter: "family=={{.AF_INET}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpAcceptResult4) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpAcceptResult4) }),
 	},
 
 	// Data is sent via TCP.
@@ -239,12 +238,12 @@ var ipv4OnlyKProbes = []kprobes.ProbeDef{
 			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall4) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpSendMsgCall4) }),
 	},
 }
 
 // KProbes used when IPv6 is enabled.
-var ipv6KProbes = []kprobes.ProbeDef{
+var ipv6KProbes = []tracing.ProbeDef{
 	/***************************************************************************
 	 * IPv6
 	 **************************************************************************/
@@ -263,7 +262,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			// proto=0 will select the protocol by looking at socket type (STREAM|DGRAM)
 			Filter: "proto==0 || proto=={{.IPPROTO_TCP}} || proto=={{.IPPROTO_UDP}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(inetCreate) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(inetCreate) }),
 	},
 
 	/***************************************************************************
@@ -284,7 +283,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Address:   "inet6_csk_xmit",
 			Fetchargs: "sock={{.INET6_CSK_XMIT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.INET6_CSK_XMIT_SKBUFF}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(inet6CskXmitCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(inet6CskXmitCall) }),
 	},
 
 	// Count received IPv6/TCP packets.
@@ -296,7 +295,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Address:   "tcp_v6_do_rcv",
 			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpV6DoRcv) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpV6DoRcv) }),
 	},
 
 	// An IPv6 / TCP socket connect attempt:
@@ -309,7 +308,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Fetchargs: "sock={{.P1}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET6}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpIPv6ConnectCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpIPv6ConnectCall) }),
 	},
 
 	// Result of IPv6/TCP connect:
@@ -322,7 +321,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Address:   "tcp_v6_connect",
 			Fetchargs: "retval={{.RET}}:s32",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpConnectResult) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpConnectResult) }),
 	},
 
 	/***************************************************************************
@@ -342,7 +341,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Address:   "udpv6_sendmsg",
 			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddra=+{{.SOCKADDR_IN6_ADDRA}}(+0({{.UDP_SENDMSG_MSG}})):u64 raddrb=+{{.SOCKADDR_IN6_ADDRB}}(+0({{.UDP_SENDMSG_MSG}})):u64 rport=+{{.SOCKADDR_IN6_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddra={{.INET_SOCK_V6_RADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altraddrb={{.INET_SOCK_V6_RADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16 si6ptr=+0({{.UDP_SENDMSG_MSG}}) si6af=+{{.SOCKADDR_IN6_AF}}(+0({{.UDP_SENDMSG_MSG}})):u16",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(udpv6SendMsgCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(udpv6SendMsgCall) }),
 	},
 
 	/* UDP/IPv6 receive datagram. Good for counting payload bytes and packets.*/
@@ -350,9 +349,9 @@ var ipv6KProbes = []kprobes.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udpv6_queue_rcv_skb",
 			Address:   "udpv6_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + kprobes.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + tracing.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(udpv6QueueRcvSkb) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(udpv6QueueRcvSkb) }),
 	},
 
 	/***************************************************************************
@@ -371,7 +370,7 @@ var ipv6KProbes = []kprobes.ProbeDef{
 			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
 				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
 	},
 
 	// Return of accept(). Local side is usually zero so not fetched. Needs
@@ -387,11 +386,11 @@ var ipv6KProbes = []kprobes.ProbeDef{
 				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}}",
 			Filter: "family=={{.AF_INET}} || family=={{.AF_INET6}}",
 		},
-		Decoder: kprobes.NewStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
+		Decoder: tracing.MakeStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
 	},
 }
 
-func getKProbes(hasIPv6 bool) (list []kprobes.ProbeDef) {
+func getKProbes(hasIPv6 bool) (list []tracing.ProbeDef) {
 	list = append(list, sharedKProbes...)
 	if hasIPv6 {
 		list = append(list, ipv6KProbes...)
@@ -401,7 +400,7 @@ func getKProbes(hasIPv6 bool) (list []kprobes.ProbeDef) {
 	return list
 }
 
-func getAllKProbes() (list []kprobes.ProbeDef) {
+func getAllKProbes() (list []tracing.ProbeDef) {
 	list = append(list, sharedKProbes...)
 	list = append(list, ipv6KProbes...)
 	list = append(list, ipv4OnlyKProbes...)
