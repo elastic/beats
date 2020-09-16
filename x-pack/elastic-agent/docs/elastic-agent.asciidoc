@@ -5,6 +5,12 @@
 
 experimental[]
 
+// tag::experimental-warning[]
+**This experimental release allows you to try out new capabilities. There is no
+migration path for future releases. You must test in a dedicated cluster. Delete
+the cluster when you are done. You will not be able to upgrade the cluster.**
+// end::experimental-warning[]
+
 // tag::agent-install-intro[]
 {agent} is a single, unified agent that you can deploy to hosts or containers to
 collect data and send it to the {stack}. Behind the scenes, {agent} runs the

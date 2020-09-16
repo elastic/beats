@@ -2,6 +2,10 @@
 [role="xpack"]
 = Stop {agent}
 
+experimental[]
+
+include::elastic-agent.asciidoc[tag=experimental-warning]
+
 To stop {agent} and its related executables, stop the {agent} process. Use the
 commands that work for your system. 
 
