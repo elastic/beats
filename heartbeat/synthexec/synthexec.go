@@ -11,10 +11,12 @@ import (
 	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -24,6 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+const debugSelector = "synthexec"
 
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
 	cmd := exec.Command(
@@ -36,17 +40,22 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 	)
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
-	for {
+	running := true
+	for running {
 		select {
+		case <- mpx.Done():
+			running = false
 		case se := <- mpx.SynthEvents():
+			if se.Type == "" {
+				running = false
+			}
 			if se.Type == "journey/start" {
 				journeyNames = append(journeyNames, se.Journey.Name)
 			}
-		case <- mpx.Done():
-			break
 		}
 	}
 
+	logp.Info("Discovered journeys %#v", journeyNames)
 	return journeyNames, nil
 }
 
@@ -66,7 +75,7 @@ func ScriptJob(ctx context.Context, script string, params common.MapStr) jobs.Jo
 		"npx",
 		"@elastic/synthetics",
 		"--stdin",
-		//"--screenshots",
+		"--screenshots",
 	)
 
 	return cmdJob(ctx, cmd, &script, params)
@@ -85,15 +94,8 @@ func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.
 			if se.Timestamp != emptyTime {
 				event.Timestamp = se.Timestamp
 			}
-			if se.Error != nil {
-				eventext.MergeEventFields(event, common.MapStr{
-					"error": common.MapStr{
-						"type": "synthetics-exit",
-						"message": err,
-					},
-				})
-			}
-			eventext.MergeEventFields(event, common.MapStr{"synthetics": se.ToMap()})
+
+			eventext.MergeEventFields(event, se.ToMap())
 			return []jobs.Job{j}, nil
 		case <- mpx.Done():
 			return nil, nil
@@ -115,7 +117,6 @@ func runCmd(
 	if err != nil {
 		return nil, err
 	}
-	logp.Warn("PIPES ARE %d / %d", resultsReader.Fd(), resultsWriter.Fd())
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
@@ -137,7 +138,7 @@ func runCmd(
 	logp.Info("Running command: %s", cmd.String())
 
 	if stdinStr	!= nil {
-		logp.Info("Using stdin str %s", *stdinStr)
+		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -161,7 +162,7 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		sendResults(resultsReader, mpx.writeSynthEvent)
+		sendSynthEvents(resultsReader, mpx.writeSynthEvent)
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -179,13 +180,14 @@ func runCmd(
 		err := cmd.Wait()
 		resultsWriter.Close()
 		resultsReader.Close()
-		logp.Info("COMMAND IS DONE %d", cmd.ProcessState.ExitCode())
+		logp.Debug(debugSelector, "command has completed %d", cmd.ProcessState.ExitCode())
 		if err != nil {
+			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(SynthEvent{
 				Type: "cmd/status",
-				Error: fmt.Errorf("command exited with status %d: %w", cmd.ProcessState.ExitCode(), err),
+				Error: &str,
 			})
-			logp.Warn("error executing command '%s': %s", cmd.String(), err)
+			logp.Warn("Error executing command '%s': %s", cmd.String(), err)
 		}
 		wg.Wait()
 		mpx.Close()
@@ -200,9 +202,9 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			logp.Warn("Error encountered scanning console line: %s. Line was %s", scanner.Err(), scanner.Text())
+			logp.Debug("could not scan console line: %s. Line was %s", scanner.Err(), scanner.Text())
 		}
-		logp.Info(scanner.Text())
+		logp.Info("%s: %s", typ, scanner.Text())
 		if cb != nil {
 			cb(SynthEvent{
 				Type: typ,
@@ -215,7 +217,7 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 	}
 }
 
-func sendResults(rdr io.Reader, cb func(SynthEvent)) error {
+func sendSynthEvents(rdr io.Reader, cb func(SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
@@ -236,14 +238,18 @@ func sendResults(rdr io.Reader, cb func(SynthEvent)) error {
 		var res = SynthEvent{}
 		err := json.Unmarshal(scanner.Bytes(), &res)
 		if err != nil {
-			logp.Warn("Could not unmarshal %s", scanner.Text())
+			logp.Warn("Could not unmarshal %s from synthexec: %s", scanner.Text(), err)
+		}
+
+		if res.Type == "" {
+			logp.Warn("Unmarshal succeeded, but no type found for: %s", scanner.Text())
+			continue
 		}
 
 		if err == nil && cb != nil {
 			cb(res)
 		}
 	}
-	logp.Info("DONE WITH RESULTs %s", scanner.Err())
 	return nil
 }
 
@@ -251,32 +257,70 @@ type SynthEvent struct {
 	Type           string                 `json:"type"`
 	PackageVersion string                 `json:"package_version"`
 	Index          int                    `json:"index""`
-	Journey        SynthJourney           `json:"journey"`
+	Step           *Step                   `json:"step"`
+	Journey        *Journey                `json:"journey"`
 	Timestamp      time.Time              `json:"@timestamp"`
 	Payload        map[string]interface{} `json:"payload"`
-	Error error `json:"error"`
+	Blob           *string                 `json:"blob"`
+	Error          *string                 `json:"error"`
+	URL            *string                 `json:"url"`
 }
 
 func (se SynthEvent) ToMap() common.MapStr {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	return common.MapStr{
+	e := common.MapStr{
 		"type": se.Type,
 		"package_version": se.PackageVersion,
 		"index": se.Index,
-		"journey": se.Journey.ToMap(),
 		"payload": se.Payload,
+		"blob": se.Blob,
+	}
+	if se.Step != nil {
+		e.Put("step", se.Step.ToMap())
+	}
+	if se.Journey != nil {
+		e.Put("journey", se.Journey.ToMap())
+	}
+	m := common.MapStr{"synthetics": e}
+	if se.Error != nil {
+		m["error"] = common.MapStr{
+			"type": "synthetics",
+			"message": se.Error,
+		}
+	}
+	if se.URL != nil {
+		u, e := url.Parse(*se.URL)
+		if e != nil {
+			m["url"] = wrappers.URLFields(u)
+		} else {
+			logp.Warn("Could not parse synthetics URL '%s'", se.URL)
+		}
+	}
+
+	return m
+}
+
+type Step struct {
+	Name string `json:"name"`
+	Index int `json:"index"`
+}
+
+func (s *Step) ToMap() common.MapStr {
+	return common.MapStr{
+		"name": s.Name,
+		"index": s.Index,
 	}
 }
 
-type SynthJourney struct {
+type Journey struct {
 	Name string `json:"name"`
 	Id string `json:"id"`
 }
 
-func (sj SynthJourney) ToMap() common.MapStr {
+func (j Journey) ToMap() common.MapStr {
 	return common.MapStr{
-		"name": sj.Name,
-		"id": sj.Id,
+		"name": j.Name,
+		"id": j.Id,
 	}
 }
 

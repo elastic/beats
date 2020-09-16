@@ -38,4 +38,3 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	j := synthexec.ScriptJob(context.TODO(), config.Script, config.ScriptParams)
 	return []jobs.Job{j}, 1, nil
 }
-
