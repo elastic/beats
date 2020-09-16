@@ -66,7 +66,7 @@ func runUpgrade(flags *globalFlags, streams *cli.IOStreams) error { // Windows: 
 		r)
 
 	//https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz
-	if upgrader.Upgrade(context.Background(), "8.0.0-SNAPSHOT", "https://snapshots.elastic.co/8.0.0-5942871b/downloads"); err != nil {
+	if upgrader.Upgrade(context.Background(), "8.0.0-SNAPSHOT", "https://snapshots.elastic.co/8.0.0-5942871b/downloads", "12345-abcd"); err != nil {
 		return err
 	}
 	return nil
