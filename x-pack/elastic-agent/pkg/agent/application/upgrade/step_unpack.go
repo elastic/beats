@@ -48,6 +48,8 @@ func unzip(version, archivePath string) (string, error) {
 	}
 	defer r.Close()
 
+	fileNamePrefix := strings.TrimSuffix(filepath.Base(archivePath), ".zip") + "/" // omitting `elastic-agent-{version}-{os}-{arch}/` in filename
+
 	unpackFile := func(f *zip.File) (err error) {
 		rc, err := f.Open()
 		if err != nil {
@@ -60,7 +62,8 @@ func unzip(version, archivePath string) (string, error) {
 		}()
 
 		//get hash
-		if f.Name == agentCommitFile {
+		fileName := strings.TrimPrefix(f.Name, fileNamePrefix)
+		if fileName == agentCommitFile {
 			hashBytes, err := ioutil.ReadAll(rc)
 			if err != nil || len(hashBytes) < hashLen {
 				return err
@@ -71,11 +74,11 @@ func unzip(version, archivePath string) (string, error) {
 		}
 
 		// skip everything outside data/
-		if !strings.HasPrefix(f.Name, "data/") {
+		if !strings.HasPrefix(fileName, "data/") {
 			return nil
 		}
 
-		path := filepath.Join(paths.Data(), strings.TrimPrefix(f.Name, "data/"))
+		path := filepath.Join(paths.Data(), strings.TrimPrefix(fileName, "data/"))
 
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, f.Mode())
@@ -108,14 +111,6 @@ func unzip(version, archivePath string) (string, error) {
 
 		if err := unpackFile(f); err != nil {
 			return "", err
-		}
-	}
-
-	// if root directory is not the same as desired directory rename
-	// e.g contains `-windows-` or  `-SNAPSHOT-`
-	if dataPath := paths.Data(); rootDir != dataPath {
-		if err := os.Rename(rootDir, dataPath); err != nil {
-			return "", errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, dataPath))
 		}
 	}
 

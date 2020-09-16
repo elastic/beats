@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -22,8 +23,15 @@ func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
 
 	agentBakName := agentName + ".bak"
 	symlinkPath := filepath.Join(paths.Config(), agentName)
-	bakNewPath := filepath.Join(paths.Config(), agentBakName)
 
+	// handle windows suffixes
+	if runtime.GOOS == "windows" {
+		agentBakName = agentName + ".exe.sbak"
+		symlinkPath += ".exe"
+		newPath += ".exe"
+	}
+
+	bakNewPath := filepath.Join(paths.Config(), agentBakName)
 	if err := os.Symlink(newPath, bakNewPath); err != nil {
 		return err
 	}

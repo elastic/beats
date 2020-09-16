@@ -9,7 +9,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -72,6 +74,10 @@ func (h *Upgrader) markUpgrade(ctx context.Context, version, hash, actionID stri
 }
 
 func updateHomePath(hash string) error {
+	if err := createPathsSymlink(hash); err != nil {
+		return err
+	}
+
 	pathsMap := make(map[string]string)
 	pathsFilepath := filepath.Join(paths.Data(), "paths.yml")
 
@@ -92,4 +98,19 @@ func updateHomePath(hash string) error {
 	}
 
 	return ioutil.WriteFile(pathsFilepath, pathsBytes, 0740)
+}
+
+func createPathsSymlink(hash string) error {
+	if runtime.GOOS != "windows" {
+		return nil
+	}
+
+	dir := filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash))
+	versionedPath := filepath.Join(dir, "data", "paths.yml")
+	if err := os.MkdirAll(filepath.Dir(versionedPath), 0700); err != nil {
+		return err
+	}
+
+	pathsCfgPath := filepath.Join(paths.Data(), "paths.yml")
+	return os.Symlink(pathsCfgPath, versionedPath)
 }
