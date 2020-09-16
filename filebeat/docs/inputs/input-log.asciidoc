@@ -90,7 +90,7 @@ more volatile.
 
 ["source","sh",subs="attributes"]
 ----
-$ lsblk -o MOUNTPOINT,UUD | grep /logs | awk '{print $2}' >> /logs/.filebeat-marker
+$ lsblk -o MOUNTPOINT,UUID | grep /logs | awk '{print $2}' >> /logs/.filebeat-marker
 ----
 
 To set the generated file as a marker for `file_identity` you should configure
