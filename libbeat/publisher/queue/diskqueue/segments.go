@@ -108,12 +108,11 @@ type queueSegment struct {
 }
 
 type segmentHeader struct {
-	version      uint32
-	checksumType ChecksumType
+	version uint32
 }
 
-// Each segment header has a 32-bit version and a 32-bit checksum type.
-const segmentHeaderSize = 8
+// Segment headers are currently just a 32-bit version.
+const segmentHeaderSize = 4
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -188,10 +187,7 @@ func (segment *queueSegment) getWriter(
 	if err != nil {
 		return nil, err
 	}
-	header := &segmentHeader{
-		version:      0,
-		checksumType: queueSettings.ChecksumType,
-	}
+	header := &segmentHeader{version: 0}
 	err = writeSegmentHeader(file, header)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
@@ -224,20 +220,11 @@ func readSegmentHeader(in *os.File) (*segmentHeader, error) {
 	if header.version != 0 {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
 	}
-	var rawChecksumType uint32
-	err = binary.Read(in, binary.LittleEndian, &rawChecksumType)
-	if err != nil {
-		return nil, err
-	}
-	header.checksumType = ChecksumType(rawChecksumType)
 	return header, nil
 }
 
 func writeSegmentHeader(out *os.File, header *segmentHeader) error {
 	err := binary.Write(out, binary.LittleEndian, header.version)
-	if err == nil {
-		err = binary.Write(out, binary.LittleEndian, uint32(header.checksumType))
-	}
 	return err
 }
 

@@ -64,7 +64,6 @@ func (c *userConfig) Validate() error {
 // for all important fields.
 func DefaultSettings() Settings {
 	return Settings{
-		ChecksumType:   ChecksumTypeCRC32,
 		MaxSegmentSize: 100 * (1 << 20), // 100MiB
 		MaxBufferSize:  (1 << 30),       // 1GiB
 

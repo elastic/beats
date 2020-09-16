@@ -33,9 +33,8 @@ import (
 )
 
 type eventEncoder struct {
-	buf          bytes.Buffer
-	folder       *gotype.Iterator
-	checksumType ChecksumType
+	buf    bytes.Buffer
+	folder *gotype.Iterator
 }
 
 type eventDecoder struct {

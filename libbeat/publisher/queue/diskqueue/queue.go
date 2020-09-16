@@ -50,8 +50,6 @@ type Settings struct {
 	// to a single segment file before creating a new one.
 	MaxSegmentSize uint64
 
-	ChecksumType ChecksumType
-
 	// How many events will be read from disk while waiting for a consumer
 	// request.
 	ReadAheadLimit int

@@ -210,12 +210,10 @@ func (rl *readerLoop) nextFrame(
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read data frame checksum: %w", err)
 	}
-	if rl.settings.ChecksumType != ChecksumTypeNone {
-		expected := computeChecksum(bytes, rl.settings.ChecksumType)
-		if checksum != expected {
-			return nil, fmt.Errorf(
-				"Data frame checksum mismatch (%x != %x)", checksum, expected)
-		}
+	expected := computeChecksum(bytes)
+	if checksum != expected {
+		return nil, fmt.Errorf(
+			"Data frame checksum mismatch (%x != %x)", checksum, expected)
 	}
 
 	var duplicateLength uint32

@@ -22,30 +22,12 @@ import (
 	"hash/crc32"
 )
 
-// ChecksumType specifies what checksum algorithm the queue should use to
-// verify its data frames.
-type ChecksumType uint32
-
-// ChecksumTypeNone: Don't compute or verify checksums.
-// ChecksumTypeCRC32: Compute the checksum with the Go standard library's
-//   "hash/crc32" package.
-const (
-	ChecksumTypeNone = iota
-
-	ChecksumTypeCRC32
-)
-
-func computeChecksum(data []byte, checksumType ChecksumType) uint32 {
-	switch checksumType {
-	case ChecksumTypeNone:
-		return 0
-	case ChecksumTypeCRC32:
-		hash := crc32.NewIEEE()
-		frameLength := uint32(len(data) + frameMetadataSize)
-		binary.Write(hash, binary.LittleEndian, &frameLength)
-		hash.Write(data)
-		return hash.Sum32()
-	default:
-		panic("segmentReader: invalid checksum type")
-	}
+// Computes the checksum that should be written / read in a frame footer
+// based on the raw content of that frame (excluding header / footer).
+func computeChecksum(data []byte) uint32 {
+	hash := crc32.NewIEEE()
+	frameLength := uint32(len(data) + frameMetadataSize)
+	binary.Write(hash, binary.LittleEndian, &frameLength)
+	hash.Write(data)
+	return hash.Sum32()
 }

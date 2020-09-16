@@ -154,8 +154,7 @@ outerLoop:
 			break
 		}
 		// Compute / write the frame's checksum
-		checksum := computeChecksum(
-			frameRequest.frame.serialized, wl.settings.ChecksumType)
+		checksum := computeChecksum(frameRequest.frame.serialized)
 		err = binary.Write(wl.outputFile, binary.LittleEndian, checksum)
 		if err != nil {
 			break
