@@ -129,6 +129,7 @@ func runCmd(
 		"--outfd", "3",
 		"--json",
 		"--headless",
+		"--network",
 	)
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
@@ -202,7 +203,7 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			logp.Debug("could not scan console line: %s. Line was %s", scanner.Err(), scanner.Text())
+			logp.Debug("could not scan console line: %s. Line was %s", scanner.Err().Error(), scanner.Text())
 		}
 		logp.Info("%s: %s", typ, scanner.Text())
 		if cb != nil {
