@@ -52,6 +52,7 @@ type Managed struct {
 	router      *router
 	srv         *server.Server
 	as          *actionStore
+	upgrader    *upgrade.Upgrader
 }
 
 func newManaged(
@@ -189,6 +190,13 @@ func newManaged(
 		return nil, err
 	}
 
+	managedApplication.upgrader = upgrade.NewUpgrader(
+		cfg.Settings.DownloadConfig,
+		log,
+		[]context.CancelFunc{managedApplication.cancelCtxFn},
+		reexec,
+		acker)
+
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionConfigChange{},
 		&handlerConfigChange{
@@ -211,12 +219,8 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
 		&handlerUpgrade{
-			upgrader: upgrade.NewUpgrader(
-				cfg.Settings.DownloadConfig,
-				log,
-				[]context.CancelFunc{managedApplication.cancelCtxFn},
-				reexec),
-			log: log,
+			upgrader: managedApplication.upgrader,
+			log:      log,
 		},
 	)
 
@@ -262,7 +266,8 @@ func (m *Managed) Start() error {
 	}
 
 	m.gateway.Start()
-	return nil
+
+	return m.upgrader.Ack(m.bgContext)
 }
 
 // Stop stops a managed elastic-agent.

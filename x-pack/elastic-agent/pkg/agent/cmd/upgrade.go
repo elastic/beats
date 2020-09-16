@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 // TODO: remove before merging
@@ -63,7 +64,8 @@ func runUpgrade(flags *globalFlags, streams *cli.IOStreams) error { // Windows: 
 		cfg.Settings.DownloadConfig,
 		logger,
 		[]context.CancelFunc{},
-		r)
+		r,
+		&acker{})
 
 	//https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz
 	if upgrader.Upgrade(context.Background(), "8.0.0-SNAPSHOT", "https://snapshots.elastic.co/8.0.0-5942871b/downloads", "12345-abcd"); err != nil {
@@ -78,4 +80,17 @@ type rexecer struct {
 
 func (r *rexecer) ReExec(argOverrides ...string) {
 	r.logger.Warn("REEXEC started")
+}
+
+type acker struct {
+	logger *logp.Logger
+}
+
+func (r *acker) Ack(ctx context.Context, action fleetapi.Action) error {
+	r.logger.Warn("ACK ", action.ID)
+	return nil
+}
+
+func (r *acker) Commit(ctx context.Context) error {
+	return nil
 }

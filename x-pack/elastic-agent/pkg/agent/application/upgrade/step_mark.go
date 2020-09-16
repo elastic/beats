@@ -6,7 +6,6 @@ package upgrade
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -36,6 +35,9 @@ type updateMarker struct {
 	PrevVersion string `json:"prev_version" yaml:"prev_version"`
 	// PrevHash is a hash agent is updated from
 	PrevHash string `json:"prev_hash" yaml:"prev_hash"`
+
+	// Acked is a flag marking whether or not action was acked
+	Acked bool `json:"acked" yaml:"acked"`
 }
 
 // markUpgrade marks update happened so we can handle grace period
@@ -60,7 +62,7 @@ func (h *Upgrader) markUpgrade(ctx context.Context, version, hash, actionID stri
 	}
 
 	markerPath := filepath.Join(paths.Data(), markerFilename)
-	markerBytes, err := json.Marshal(marker)
+	markerBytes, err := yaml.Marshal(marker)
 	if err != nil {
 		return err
 	}

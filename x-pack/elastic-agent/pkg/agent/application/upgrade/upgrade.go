@@ -7,6 +7,7 @@ package upgrade
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +16,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -31,19 +34,26 @@ type Upgrader struct {
 	log      *logger.Logger
 	closers  []context.CancelFunc
 	reexec   reexecManager
+	acker    acker
 }
 
 type reexecManager interface {
 	ReExec(argOverrides ...string)
 }
 
+type acker interface {
+	Ack(ctx context.Context, action fleetapi.Action) error
+	Commit(ctx context.Context) error
+}
+
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
-func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager) *Upgrader {
+func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker) *Upgrader {
 	return &Upgrader{
 		settings: settings,
 		log:      log,
 		closers:  closers,
 		reexec:   reexec,
+		acker:    a,
 	}
 }
 
@@ -79,6 +89,44 @@ func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI, actionID str
 
 	u.reexec.ReExec()
 	return nil
+}
+
+// Ack acks last upgrade action
+func (u *Upgrader) Ack(ctx context.Context) error {
+	// get upgrade action
+	markerFile := filepath.Join(paths.Data(), markerFilename)
+	markerBytes, err := ioutil.ReadFile(markerFile)
+	if err != nil && os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	marker := updateMarker{}
+	if err := yaml.Unmarshal(markerBytes, &marker); err != nil {
+		return err
+	}
+
+	if marker.Acked {
+		return nil
+	}
+
+	a := &fleetapi.ActionUpgrade{ActionID: marker.ActionID, ActionType: fleetapi.ActionTypeUpgrade}
+	if err := u.acker.Ack(ctx, a); err != nil {
+		return err
+	}
+
+	if err := u.acker.Commit(ctx); err != nil {
+		return err
+	}
+
+	marker.Acked = true
+	markerBytes, err = yaml.Marshal(marker)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(markerFile, markerBytes, 0600)
 }
 
 func isSubdir(base, target string) (bool, error) {
