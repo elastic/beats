@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -62,6 +61,10 @@ type Settings struct {
 	// in faster than it can be written to disk for an extended period,
 	// this limit can keep it from overflowing memory.
 	WriteAheadLimit int
+
+	// A listener that should be sent ACKs when an event is successfully
+	// written to disk.
+	WriteToDiskListener queue.ACKListener
 }
 
 type segmentID uint64
@@ -171,7 +174,7 @@ func queueFactory(
 	if err != nil {
 		return nil, fmt.Errorf("Disk queue couldn't load user config: %w", err)
 	}
-	//settings.producerAckListener = ackListener
+	settings.WriteToDiskListener = ackListener
 	return NewQueue(logger, settings)
 }
 
@@ -350,8 +353,6 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	fmt.Printf("diskQueue.Consumer()\n")
-	debug.PrintStack()
 	return &diskQueueConsumer{
 		queue:  dq,
 		closed: false,

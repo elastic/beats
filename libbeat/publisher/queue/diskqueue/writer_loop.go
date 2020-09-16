@@ -171,6 +171,18 @@ outerLoop:
 		// more controlled recovery after a bad shutdown.)
 		curBytesWritten += int64(frameSize)
 
+		// If the producer has an ack listener, notify it the frame was written.
+		// TODO: it probably makes sense to batch these up and send them at the
+		// end of a full request.
+		if frameRequest.frame.producer.config.ACK != nil {
+			frameRequest.frame.producer.config.ACK(1)
+		}
+
+		// If the queue has an ack listener, notify it the frame was written.
+		if wl.settings.WriteToDiskListener != nil {
+			wl.settings.WriteToDiskListener.OnACK(1)
+		}
+
 		// Explicitly check if we should abort before starting the next frame.
 		select {
 		case <-wl.requestChan:
