@@ -2,23 +2,21 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package script
+package browser
 
 import (
 	"context"
 	"fmt"
 	"os/user"
-
 	"github.com/elastic/beats/v7/heartbeat/synthexec"
-
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func init() {
-	monitors.RegisterActive("script", create)
-	monitors.RegisterActive("synthetic/script", create)
+	monitors.RegisterActive("browser", create)
+	monitors.RegisterActive("synthetic/browser", create)
 }
 
 func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {

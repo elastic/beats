@@ -13,7 +13,7 @@ heartbeat.synthetic_suites:
   schedule: "@every 1m"
 
 heartbeat.monitors:
-- type: script
+- type: browser
   id: my-monitor
   name: My Monitor
   script: |-

@@ -146,6 +146,9 @@
         - name: blob
           type: binary
           description: binary data payload
+        - name: blob_mime
+          type: keyword
+          description: mime type of blob data
         - name: step
           type: group
           fields:

@@ -11,19 +11,15 @@ import (
 	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"io"
-	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -33,20 +29,16 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 	cmd := exec.Command(
 		"node",
 		suiteFile,
-		"-e", "production",
-		"--json",
 		"--dry-run",
 	)
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
-	running := true
-	for running {
+	Outer:
+	for {
 		select {
-		case <- mpx.Done():
-			running = false
 		case se := <- mpx.SynthEvents():
-			if se.Type == "" {
-				running = false
+			if se == nil {
+				break Outer
 			}
 			if se.Type == "journey/start" {
 				journeyNames = append(journeyNames, se.Journey.Name)
@@ -89,6 +81,9 @@ func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.
 		}
 		select {
 		case se := <- mpx.SynthEvents():
+			if se == nil {
+				return nil, nil
+			}
 			var emptyTime time.Time
 			if se.Timestamp != emptyTime {
 				event.Timestamp = se.Timestamp
@@ -96,10 +91,8 @@ func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.
 
 			eventext.MergeEventFields(event, se.ToMap())
 			return []jobs.Job{j}, nil
-		case <- mpx.Done():
-			return nil, nil
 		}
-	}
+}
 
 	return j
 }
@@ -182,7 +175,7 @@ func runCmd(
 		logp.Debug(debugSelector, "command has completed %d", cmd.ProcessState.ExitCode())
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			mpx.writeSynthEvent(SynthEvent{
+			mpx.writeSynthEvent(&SynthEvent{
 				Type: "cmd/status",
 				Error: &SynthError{Name: "cmdexit", Message: str},
 			})
@@ -195,7 +188,7 @@ func runCmd(
 	return mpx, nil
 }
 
-func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
+func sendConsoleLines(rdr io.Reader, typ string, cb func(se *SynthEvent)) {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
@@ -205,7 +198,7 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 		}
 		logp.Info("%s: %s", typ, scanner.Text())
 		if cb != nil {
-			cb(SynthEvent{
+			cb(&SynthEvent{
 				Type: typ,
 				Timestamp: time.Now(),
 				Payload: map[string]interface{}{
@@ -216,7 +209,7 @@ func sendConsoleLines(rdr io.Reader, typ string, cb func(se SynthEvent)) {
 	}
 }
 
-func sendSynthEvents(rdr io.Reader, cb func(SynthEvent)) error {
+func sendSynthEvents(rdr io.Reader, cb func(*SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
@@ -246,135 +239,8 @@ func sendSynthEvents(rdr io.Reader, cb func(SynthEvent)) error {
 		}
 
 		if err == nil && cb != nil {
-			cb(res)
+			cb(&res)
 		}
 	}
 	return nil
-}
-
-type SynthEvent struct {
-	Type           string                 `json:"type"`
-	PackageVersion string                 `json:"package_version"`
-	Index          int                    `json:"index""`
-	Step           *Step                   `json:"step"`
-	Journey        *Journey                `json:"journey"`
-	Timestamp      time.Time              `json:"@timestamp"`
-	Payload        map[string]interface{} `json:"payload"`
-	Blob           *string                 `json:"blob"`
-	Error          *SynthError                 `json:"error"`
-	URL            *string                 `json:"url"`
-}
-
-type SynthError struct {
-	Name string `json:"name"`
-	Message string `json:"message"`
-	Stack string `json:"stack"`
-}
-
-func (se *SynthError) String() string {
-	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
-}
-
-func (se SynthEvent) ToMap() common.MapStr {
-	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	e := common.MapStr{
-		"type": se.Type,
-		"package_version": se.PackageVersion,
-		"index": se.Index,
-		"payload": se.Payload,
-		"blob": se.Blob,
-	}
-	if se.Step != nil {
-		e.Put("step", se.Step.ToMap())
-	}
-	if se.Journey != nil {
-		e.Put("journey", se.Journey.ToMap())
-	}
-	m := common.MapStr{"synthetics": e}
-	if se.Error != nil {
-		m["error"] = common.MapStr{
-			"type": "synthetics",
-			"message": se.Error.String(),
-		}
-	}
-	if se.URL != nil {
-		u, e := url.Parse(*se.URL)
-		if e != nil {
-			logp.Warn("Could not parse synthetics URL '%s': %s", *se.URL, e.Error())
-		} else {
-			m["url"] = wrappers.URLFields(u)
-		}
-	}
-
-	return m
-}
-
-type Step struct {
-	Name string `json:"name"`
-	Index int `json:"index"`
-}
-
-func (s *Step) ToMap() common.MapStr {
-	return common.MapStr{
-		"name": s.Name,
-		"index": s.Index,
-	}
-}
-
-type Journey struct {
-	Name string `json:"name"`
-	Id string `json:"id"`
-}
-
-func (j Journey) ToMap() common.MapStr {
-	return common.MapStr{
-		"name": j.Name,
-		"id": j.Id,
-	}
-}
-
-type RawResult struct {
-	Journeys []map[string]interface{} `json:"journeys"`
-}
-
-type ExecMultiplexer struct {
-	eventCounter *atomic.Int
-	synthEvents  chan SynthEvent
-	done         chan struct{}
-}
-
-func (e ExecMultiplexer) Close() {
-	close(e.done)
-	close(e.synthEvents)
-}
-
-func (e ExecMultiplexer) writeSynthEvent(se SynthEvent) {
-	if se.Type == "" {
-		logp.Warn("Empty se type! %#v", se)
-	}
-	se.Index = e.eventCounter.Inc()
-	e.synthEvents <- se
-}
-
-// SynthEvents returns a read only channel for synth events
-func (e ExecMultiplexer) SynthEvents() <- chan SynthEvent {
-	return e.synthEvents
-}
-
-// Done returns a channel that is closed when all output has been received
-func (e ExecMultiplexer) Done() <- chan struct{} {
-	return e.done
-}
-
-// Wait blocks until the multiplexer is done and has returned all data
-func (e ExecMultiplexer) Wait() {
-	<- e.done
-}
-
-func NewExecMultiplexer() *ExecMultiplexer {
-	return &ExecMultiplexer{
-		eventCounter: atomic.NewInt(-1), // Start from -1 so first call to Inc returns 0
-		synthEvents: make(chan SynthEvent),
-		done: make(chan struct{}),
-	}
 }
