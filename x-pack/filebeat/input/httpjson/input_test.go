@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 func TestStatelessHTTPJSONInput(t *testing.T) {
@@ -225,25 +224,23 @@ func TestStatelessHTTPJSONInput(t *testing.T) {
 
 			cfg := common.MustNewConfigFrom(tc.baseConfig)
 
-			conf := config.Default()
+			conf := newDefaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
-			input, err := newInput(conf)
+			input, err := newStatelessInput(conf)
 
 			assert.NoError(t, err)
-			assert.Equal(t, "httpjson", input.Name())
-			assert.NoError(t, input.test())
+			assert.Equal(t, "httpjson-stateless", input.Name())
+			assert.NoError(t, input.Test(v2.TestContext{}))
 
 			chanClient := beattest.NewChanClient(len(tc.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
-
-			pub := statelessPublisher{wrapped: chanClient}
 
 			ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
-			g.Go(func() error { return input.run(ctx, pub, nil) })
+			g.Go(func() error { return input.Run(ctx, chanClient) })
 
 			timeout := time.NewTimer(5 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })

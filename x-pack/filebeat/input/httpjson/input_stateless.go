@@ -9,31 +9,36 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 type statelessInput struct {
-	*input
+	config    config
+	tlsConfig *tlscommon.TLSConfig
+}
+
+func (statelessInput) Name() string {
+	return "httpjson-stateless"
 }
 
 func statelessConfigure(cfg *common.Config) (stateless.Input, error) {
-	conf := config.Default()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
 	return newStatelessInput(conf)
 }
 
-func newStatelessInput(config config.Config) (*statelessInput, error) {
-	input, err := newInput(config)
+func newStatelessInput(config config) (*statelessInput, error) {
+	tlsConfig, err := newTLSConfig(config)
 	if err != nil {
 		return nil, err
 	}
-	return &statelessInput{input: input}, nil
+	return &statelessInput{config: config, tlsConfig: tlsConfig}, nil
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
-	return in.test()
+	return test(in.config.URL.URL)
 }
 
 type statelessPublisher struct {
@@ -49,5 +54,5 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 // It will return on context cancellation, any other error will be retried.
 func (in *statelessInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	pub := statelessPublisher{wrapped: publisher}
-	return in.run(ctx, pub, nil)
+	return run(ctx, in.config, in.tlsConfig, pub, nil)
 }

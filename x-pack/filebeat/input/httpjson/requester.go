@@ -17,7 +17,6 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 type requestInfo struct {
@@ -41,10 +40,12 @@ type requester struct {
 	authScheme    string
 	jsonObjects   string
 	splitEventsBy string
+
+	cursorState cursorState
 }
 
 func newRequester(
-	config config.Config,
+	config config,
 	rateLimiter *rateLimiter,
 	dateCursor *dateCursor,
 	pagination *pagination,
@@ -75,7 +76,7 @@ type response struct {
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
 func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Publisher) error {
 	ri := &requestInfo{
-		url:        r.dateCursor.getURL(),
+		url:        r.dateCursor.getURL(r.cursorState.LastDateCursorValue),
 		contentMap: common.MapStr{},
 		headers:    r.headers,
 	}
@@ -167,7 +168,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 	}
 
 	if lastObj != nil && r.dateCursor.enabled {
-		r.dateCursor.advance(common.MapStr(lastObj))
+		r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
 	}
 
 	return nil
@@ -222,7 +223,7 @@ func (r *requester) processEventArray(publisher cursor.Publisher, events []inter
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal %+v: %w", e, err)
 				}
-				if err := publisher.Publish(makeEvent(string(d)), r.getCursor()); err != nil {
+				if err := publisher.Publish(makeEvent(string(d)), r.cursorState); err != nil {
 					return nil, fmt.Errorf("failed to publish: %w", err)
 				}
 			}
@@ -278,15 +279,13 @@ func splitEvent(splitKey string, event map[string]interface{}) []map[string]inte
 }
 
 type cursorState struct {
-	LastCalledURL       config.URL
+	LastCalledURL       string
 	LastDateCursorValue string
 }
 
-func (r *requester) getCursor() cursorState {
-	return cursorState{
-		LastCalledURL:       config.URL{URL: &r.dateCursor.url},
-		LastDateCursorValue: r.dateCursor.value,
-	}
+func (r *requester) updateCursorState(url, value string) {
+	r.cursorState.LastCalledURL = url
+	r.cursorState.LastDateCursorValue = value
 }
 
 func (r *requester) loadCursor(c *cursor.Cursor, log *logp.Logger) {
@@ -294,12 +293,7 @@ func (r *requester) loadCursor(c *cursor.Cursor, log *logp.Logger) {
 		return
 	}
 
-	var cs cursorState
-	if err := c.Unpack(&cs); err != nil {
+	if err := c.Unpack(&r.cursorState); err != nil {
 		log.Errorf("Reset http cursor state. Failed to read from registry: %v", err)
-		return
 	}
-
-	r.dateCursor.url = *cs.LastCalledURL.URL
-	r.dateCursor.value = cs.LastDateCursorValue
 }

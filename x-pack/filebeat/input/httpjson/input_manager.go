@@ -13,7 +13,6 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 // inputManager wraps one stateless input manager
@@ -37,7 +36,7 @@ func (m inputManager) Init(grp unison.Group, mode v2.Mode) error {
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
 func (m inputManager) Create(cfg *common.Config) (v2.Input, error) {
-	var config config.Config
+	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}

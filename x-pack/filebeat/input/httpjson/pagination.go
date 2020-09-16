@@ -12,20 +12,19 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 type pagination struct {
 	extraBodyContent common.MapStr
-	header           *config.Header
+	header           *headerConfig
 	idField          string
 	requestField     string
 	urlField         string
 	url              string
 }
 
-func newPaginationFromConfig(config config.Config) *pagination {
-	if !config.Pagination.IsEnabled() {
+func newPaginationFromConfig(config config) *pagination {
+	if !config.Pagination.isEnabled() {
 		return nil
 	}
 	return &pagination{

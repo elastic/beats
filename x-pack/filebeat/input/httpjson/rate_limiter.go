@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/config"
 )
 
 type rateLimiter struct {
@@ -23,7 +22,7 @@ type rateLimiter struct {
 	remaining string
 }
 
-func newRateLimiterFromConfig(config config.Config, log *logp.Logger) *rateLimiter {
+func newRateLimiterFromConfig(config config, log *logp.Logger) *rateLimiter {
 	if config.RateLimit == nil {
 		return nil
 	}
