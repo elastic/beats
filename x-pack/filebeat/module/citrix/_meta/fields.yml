@@ -1,0 +1,5 @@
+- key: citrix
+  title: Citrix NetScaler
+  description: >
+    citrix fields.
+  fields:
