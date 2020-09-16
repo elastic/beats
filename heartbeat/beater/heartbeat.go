@@ -175,7 +175,6 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 		}
 		factory := monitors.NewFactory(b.Info, bt.scheduler, false)
 		for _, name := range journeyNames {
-			logp.Warn("JNAME %s", name)
 			cfg, err := common.NewConfigFrom(map[string]interface{}{
 				"type":         "suitejourney",
 				"path":         suite.Path,

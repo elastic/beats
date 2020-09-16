@@ -35,7 +35,6 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		suiteFile,
 		"-e", "production",
 		"--json",
-		"--headless",
 		"--dry-run",
 	)
 
@@ -128,7 +127,6 @@ func runCmd(
 		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 		"--outfd", "3",
 		"--json",
-		"--headless",
 		"--network",
 	)
 	if len(params) > 0 {
@@ -186,7 +184,7 @@ func runCmd(
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(SynthEvent{
 				Type: "cmd/status",
-				Error: &str,
+				Error: &SynthError{Name: "cmdexit", Message: str},
 			})
 			logp.Warn("Error executing command '%s': %s", cmd.String(), err)
 		}
@@ -263,8 +261,18 @@ type SynthEvent struct {
 	Timestamp      time.Time              `json:"@timestamp"`
 	Payload        map[string]interface{} `json:"payload"`
 	Blob           *string                 `json:"blob"`
-	Error          *string                 `json:"error"`
+	Error          *SynthError                 `json:"error"`
 	URL            *string                 `json:"url"`
+}
+
+type SynthError struct {
+	Name string `json:"name"`
+	Message string `json:"message"`
+	Stack string `json:"stack"`
+}
+
+func (se *SynthError) String() string {
+	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
 }
 
 func (se SynthEvent) ToMap() common.MapStr {
@@ -286,15 +294,15 @@ func (se SynthEvent) ToMap() common.MapStr {
 	if se.Error != nil {
 		m["error"] = common.MapStr{
 			"type": "synthetics",
-			"message": se.Error,
+			"message": se.Error.String(),
 		}
 	}
 	if se.URL != nil {
 		u, e := url.Parse(*se.URL)
 		if e != nil {
-			m["url"] = wrappers.URLFields(u)
+			logp.Warn("Could not parse synthetics URL '%s': %s", *se.URL, e.Error())
 		} else {
-			logp.Warn("Could not parse synthetics URL '%s'", se.URL)
+			m["url"] = wrappers.URLFields(u)
 		}
 	}
 
@@ -341,6 +349,9 @@ func (e ExecMultiplexer) Close() {
 }
 
 func (e ExecMultiplexer) writeSynthEvent(se SynthEvent) {
+	if se.Type == "" {
+		logp.Warn("Empty se type! %#v", se)
+	}
 	se.Index = e.eventCounter.Inc()
 	e.synthEvents <- se
 }
