@@ -6,6 +6,7 @@ import json
 from filebeat import BaseTest
 from requests.auth import HTTPBasicAuth
 
+
 class Test(BaseTest):
     """
     Test filebeat with the http_endpoint input

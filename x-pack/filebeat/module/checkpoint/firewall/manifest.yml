@@ -10,8 +10,6 @@ var:
   - name: input
     default: syslog
   - name: ssl
-  - name: pipeline
-    default: ""
 
 ingest_pipeline:
   - ingest/pipeline.yml

@@ -9,9 +9,6 @@ ssl: {{ .ssl | tojson }}
 type: syslog
 protocol.udp:
   host: "{{.syslog_host}}:{{.syslog_port}}"
-  {{ if ne .pipeline "" }}
-  pipeline: "{{.pipeline}}"
-  {{ end }}
 
 {{ else if eq .input "file" }}
 
@@ -22,10 +19,6 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
-{{ end }}
-
-{{ if ne .pipeline "" }}
-pipeline: "{{.pipeline}}"
 {{ end }}
 
 tags: {{.tags | tojson}}

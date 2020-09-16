@@ -1,12 +1,9 @@
-from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
 import json
 import os
 import stat
 import sys
 
-curdir = os.path.dirname(__file__)
-sys.path.append(os.path.join(curdir, '../../../libbeat/tests/system'))
-
+from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
 
 default_registry_path = 'registry/filebeat'
 
