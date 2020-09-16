@@ -25,12 +25,12 @@ The Cloud Foundry module includes some dashboards.
 The overview dashboard can be used to visualize the current status of your Cloud
 Foundry deployments.
 
-image::./images/metricbeat-cloudfoundry-overview.png
+image::./images/metricbeat-cloudfoundry-overview.png[]
 
 The platform health dashboard includes visualizations that help diagnosting
 issues related to the applications deployed in Cloud Foundry.
 
-image::./images/metricbeat-cloudfoundry-platform-health.png
+image::./images/metricbeat-cloudfoundry-platform-health.png[]
 
 
 [float]
