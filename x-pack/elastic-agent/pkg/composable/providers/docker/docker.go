@@ -100,16 +100,12 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(c *config.Config) (composable.DynamicProvider, error) {
-	logger, err := logger.New("composable.providers.docker")
-	if err != nil {
-		return nil, err
-	}
+func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable.DynamicProvider, error) {
 	var cfg Config
 	if c == nil {
 		c = config.New()
 	}
-	err = c.Unpack(&cfg)
+	err := c.Unpack(&cfg)
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
