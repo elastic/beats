@@ -69,7 +69,8 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        target(context: 'Lint', target: 'make check')
+        // Use targetCommand to reuse the top level worker
+        targetCommand(context: 'Lint', target: 'make check')
       }
     }
     stage('Build&Test') {
@@ -187,23 +188,37 @@ def k8sTest(Map args = [:]) {
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
+def targetCommand(Map args = [:]) {
+  def context = args.context
+  def command = args.command
+  def directory = args.directory
+  def withModule = args.withModule
+  def isMage = args.isMage
+  def id = args.id
+  withGithubNotify(context: "${context}") {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: id) {
+      dumpVariables()
+      // make commands use -C <folder> while mage commands require the dir(folder)
+      // let's support this scenario with the location variable.
+      dir(isMage ? directory : '') {
+        cmd(label: "${command}", script: "${command}")
+      }
+    }
+  }
+}
+
+/**
+* This method runs the targetCommand in a given worker.
+*/
 def target(Map args = [:]) {
   def context = args.context
   def command = args.command
+  def id = args.id
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
   node(args.label) {
-    withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
-        dumpVariables()
-        // make commands use -C <folder> while mage commands require the dir(folder)
-        // let's support this scenario with the location variable.
-        dir(isMage ? directory : '') {
-          cmd(label: "${command}", script: "${command}")
-        }
-      }
-    }
+    targetCommand(context: context, command: command, directory: directory, withModule: withModule, isMage: isMage, id: id)
   }
 }
 
