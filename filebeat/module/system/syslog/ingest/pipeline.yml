@@ -54,6 +54,10 @@ processors:
 - set:
     field: event.kind
     value: event
+- append:
+    field: related.hosts
+    value: "{{host.hostname}}"
+    if: "ctx.host?.hostname != null"
 on_failure:
 - set:
     field: error.message
