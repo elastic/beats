@@ -108,6 +108,13 @@ func (wl *writerLoop) processRequest(request writerLoopRequest) []int64 {
 	// completely succeeded or the queue is being closed.
 	retryWriter := callbackRetryWriter{retry: wl.retryCallback}
 
+	// We keep track of how many frames are written during this request,
+	// and send the associated ACKs to the queue / producer listeners
+	// in a batch at the end (since each ACK call can involve a round-trip
+	// to the registry).
+	totalACKCount := 0
+	producerACKCounts := make(map[*diskQueueProducer]int)
+
 	var bytesWritten []int64    // Bytes written to all segments.
 	curBytesWritten := int64(0) // Bytes written to the current segment.
 outerLoop:
@@ -118,7 +125,8 @@ outerLoop:
 			wl.logger.Debugf(
 				"Creating new segment file with id %v\n", frameRequest.segment.id)
 			if wl.outputFile != nil {
-				// TODO: try to sync?
+				// Try to sync to disk, then close the file.
+				wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
 				// We are done with this segment, add the byte count to the list and
@@ -170,16 +178,10 @@ outerLoop:
 		// more controlled recovery after a bad shutdown.)
 		curBytesWritten += int64(frameSize)
 
-		// If the producer has an ack listener, notify it the frame was written.
-		// TODO: it probably makes sense to batch these up and send them at the
-		// end of a full request.
+		// Update the ACKs that will be sent at the end of the request.
+		totalACKCount++
 		if frameRequest.frame.producer.config.ACK != nil {
-			frameRequest.frame.producer.config.ACK(1)
-		}
-
-		// If the queue has an ack listener, notify it the frame was written.
-		if wl.settings.WriteToDiskListener != nil {
-			wl.settings.WriteToDiskListener.OnACK(1)
+			producerACKCounts[frameRequest.frame.producer]++
 		}
 
 		// Explicitly check if we should abort before starting the next frame.
@@ -189,6 +191,19 @@ outerLoop:
 		default:
 		}
 	}
+	// Try to sync the written data to disk.
+	wl.outputFile.Sync()
+
+	// If the queue has an ACK listener, notify it the frames were written.
+	if wl.settings.WriteToDiskListener != nil {
+		wl.settings.WriteToDiskListener.OnACK(totalACKCount)
+	}
+
+	// Notify any producers with ACK listeners that their frames were written.
+	for producer, ackCount := range producerACKCounts {
+		producer.config.ACK(ackCount)
+	}
+
 	// Return the total byte counts, including the final segment.
 	return append(bytesWritten, curBytesWritten)
 }
