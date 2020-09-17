@@ -93,11 +93,6 @@ type queueSegment struct {
 	// on disk is segmentHeaderSize + segment.endOffset.
 	endOffset segmentOffset
 
-	// The header metadata for this segment file. This field is nil if the
-	// segment has not yet been opened for reading. It should only be
-	// accessed by the reader loop.
-	header *segmentHeader
-
 	// The number of frames read from this segment during this session. This
 	// does not necessarily equal the number of frames in the segment, even
 	// after reading is complete, since the segment may have been partially
@@ -168,12 +163,13 @@ func (segment *queueSegment) getReader(
 		return nil, fmt.Errorf(
 			"Couldn't open segment %d: %w", segment.id, err)
 	}
-	header, err := readSegmentHeader(file)
+	// Right now there is only one valid header (indicating schema version
+	// zero) so we don't need the value itself.
+	_, err = readSegmentHeader(file)
 	if err != nil {
 		file.Close()
 		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
 	}
-	segment.header = header
 
 	return file, nil
 }
