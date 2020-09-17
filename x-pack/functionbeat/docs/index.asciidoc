@@ -57,4 +57,4 @@ include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-include::{libbeat-dir}/shared/redirects.asciidoc[]
+
