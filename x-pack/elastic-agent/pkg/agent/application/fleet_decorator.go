@@ -7,12 +7,14 @@ package application
 import (
 	"fmt"
 
+	"github.com/elastic/go-sysinfo/types"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func injectFleet(cfg *config.Config) func(*logger.Logger, *transpiler.AST) error {
+func injectFleet(cfg *config.Config, hostInfo types.HostInfo) func(*logger.Logger, *transpiler.AST) error {
 	return func(logger *logger.Logger, rootAst *transpiler.AST) error {
 		config, err := cfg.ToMapStr()
 		if err != nil {
@@ -37,7 +39,11 @@ func injectFleet(cfg *config.Config) func(*logger.Logger, *transpiler.AST) error
 			return fmt.Errorf("failed to get agent key from fleet config")
 		}
 
-		fleet := transpiler.NewDict([]transpiler.Node{agent, token, kbn})
+		host := transpiler.NewKey("host", transpiler.NewDict([]transpiler.Node{
+			transpiler.NewKey("id", transpiler.NewStrVal(hostInfo.UniqueID)),
+		}))
+
+		fleet := transpiler.NewDict([]transpiler.Node{agent, token, kbn, host})
 		err = transpiler.Insert(rootAst, fleet, "fleet")
 		if err != nil {
 			return err
