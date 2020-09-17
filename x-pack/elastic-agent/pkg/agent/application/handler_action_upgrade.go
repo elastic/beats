@@ -27,5 +27,5 @@ func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker)
 		return fmt.Errorf("invalid type, expected ActionUpgrade and received %T", a)
 	}
 
-	return h.upgrader.Upgrade(ctx, action.Version, action.SourceURI, action.ActionID)
+	return h.upgrader.Upgrade(ctx, action)
 }

@@ -267,7 +267,12 @@ func (m *Managed) Start() error {
 
 	m.gateway.Start()
 
-	return m.upgrader.Ack(m.bgContext)
+	err := m.upgrader.Ack(m.bgContext)
+	if err != nil {
+		m.log.Warnf("failed to ack update %v", err)
+	}
+
+	return nil
 }
 
 // Stop stops a managed elastic-agent.

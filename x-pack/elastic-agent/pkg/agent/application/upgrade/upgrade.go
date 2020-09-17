@@ -58,13 +58,13 @@ func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []contex
 }
 
 // Upgrade upgrades running agent
-func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI, actionID string) error {
-	archivePath, err := u.downloadArtifact(ctx, version, sourceURI)
+func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error {
+	archivePath, err := u.downloadArtifact(ctx, a.Version, a.SourceURI)
 	if err != nil {
 		return err
 	}
 
-	newHash, err := u.unpack(ctx, version, sourceURI, archivePath)
+	newHash, err := u.unpack(ctx, a.Version, a.SourceURI, archivePath)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, version, sourceURI, actionID str
 		return err
 	}
 
-	if err := u.markUpgrade(ctx, version, newHash, actionID); err != nil {
+	if err := u.markUpgrade(ctx, newHash, a); err != nil {
 		rollbackInstall(newHash)
 		return err
 	}
@@ -111,8 +111,7 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 		return nil
 	}
 
-	a := &fleetapi.ActionUpgrade{ActionID: marker.ActionID, ActionType: fleetapi.ActionTypeUpgrade}
-	if err := u.acker.Ack(ctx, a); err != nil {
+	if err := u.acker.Ack(ctx, marker.Action); err != nil {
 		return err
 	}
 

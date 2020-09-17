@@ -67,8 +67,14 @@ func runUpgrade(flags *globalFlags, streams *cli.IOStreams) error { // Windows: 
 		r,
 		&acker{})
 
-	//https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz
-	if upgrader.Upgrade(context.Background(), "8.0.0-SNAPSHOT", "https://snapshots.elastic.co/8.0.0-5942871b/downloads", "12345-abcd"); err != nil {
+	// https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz
+	action := &fleetapi.ActionUpgrade{
+		ActionID:   "12345-abcd",
+		ActionType: "UPGRADE",
+		Version:    "8.0.0-SNAPSHOT",
+		SourceURI:  "https://snapshots.elastic.co/8.0.0-5942871b/downloads",
+	}
+	if upgrader.Upgrade(context.Background(), action); err != nil {
 		return err
 	}
 	return nil

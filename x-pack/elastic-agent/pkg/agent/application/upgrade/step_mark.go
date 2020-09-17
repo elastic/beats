@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"gopkg.in/yaml.v2"
 )
@@ -21,11 +22,6 @@ import (
 const markerFilename = ".update-marker"
 
 type updateMarker struct {
-	// ActionID is used to identify action for ack purposes
-	ActionID string `json:"action_id" yaml:"action_id"`
-
-	// Version agent is updated to
-	Version string `json:"version" yaml:"version"`
 	// Hash agent is updated to
 	Hash string `json:"hash" yaml:"hash"`
 	//UpdatenOn marks a date when update happened
@@ -37,11 +33,12 @@ type updateMarker struct {
 	PrevHash string `json:"prev_hash" yaml:"prev_hash"`
 
 	// Acked is a flag marking whether or not action was acked
-	Acked bool `json:"acked" yaml:"acked"`
+	Acked  bool                    `json:"acked" yaml:"acked"`
+	Action *fleetapi.ActionUpgrade `json:"action" yaml:"action"`
 }
 
 // markUpgrade marks update happened so we can handle grace period
-func (h *Upgrader) markUpgrade(ctx context.Context, version, hash, actionID string) error {
+func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action *fleetapi.ActionUpgrade) error {
 	if err := updateHomePath(hash); err != nil {
 		return err
 	}
@@ -53,12 +50,11 @@ func (h *Upgrader) markUpgrade(ctx context.Context, version, hash, actionID stri
 	}
 
 	marker := updateMarker{
-		Version:     version,
 		Hash:        hash,
 		UpdatenOn:   time.Now(),
 		PrevVersion: prevVersion,
 		PrevHash:    prevHash,
-		ActionID:    actionID,
+		Action:      action,
 	}
 
 	markerPath := filepath.Join(paths.Data(), markerFilename)
