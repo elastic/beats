@@ -20,62 +20,13 @@ package diskqueue
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
-
-// Settings contains the configuration fields to create a new disk queue
-// or open an existing one.
-type Settings struct {
-	// The path on disk of the queue's containing directory, which will be
-	// created if it doesn't exist. Within the directory, the queue's state
-	// is stored in state.dat and each segment's data is stored in
-	// {segmentIndex}.seg
-	// If blank, the default directory is "diskqueue" within the beat's data
-	// directory.
-	Path string
-
-	// MaxBufferSize is the maximum number of bytes that the queue should
-	// ever occupy on disk. A value of 0 means the queue can grow until the
-	// disk is full (this is not recommended on a primary system disk).
-	MaxBufferSize uint64
-
-	// MaxSegmentSize is the maximum number of bytes that should be written
-	// to a single segment file before creating a new one.
-	MaxSegmentSize uint64
-
-	// How many events will be read from disk while waiting for a consumer
-	// request.
-	ReadAheadLimit int
-
-	// How many events will be queued in memory waiting to be written to disk.
-	// This setting should rarely matter in practice, but if data is coming
-	// in faster than it can be written to disk for an extended period,
-	// this limit can keep it from overflowing memory.
-	WriteAheadLimit int
-
-	// A listener that should be sent ACKs when an event is successfully
-	// written to disk.
-	WriteToDiskListener queue.ACKListener
-}
-
-type segmentID uint64
-
-type queuePosition struct {
-	// The index of this position's segment within the queue.
-	segment segmentID
-
-	// The byte offset of this position within its segment.
-	// This is relative to the start of the segment's data region, i.e.
-	// an offset of 0 means the first byte after the end of the segment header.
-	offset segmentOffset
-}
 
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
@@ -88,6 +39,10 @@ type diskQueue struct {
 
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
+
+	// Metadata related to consumer acks / positions of the oldest remaining
+	// frame.
+	acks *diskQueueACKs
 
 	// The queue's helper loops, each of which is run in its own goroutine.
 	readerLoop  *readerLoop
@@ -108,7 +63,7 @@ type diskQueue struct {
 	// The value sent on the channel is redundant with the value of ackedUpTo,
 	// but we send it anyway so we don't have to worry about the core loop
 	// waiting on ackLock.
-	consumerAckChan chan frameID
+	consumerACKChan chan frameID
 
 	// writing is true if a writeRequest is currently being processed by the
 	// writer loop, false otherwise.
@@ -153,6 +108,26 @@ type diskQueue struct {
 	done chan struct{}
 }
 
+// queuePosition represents a logical position within the queue buffer.
+type queuePosition struct {
+	segment segmentID
+	offset  segmentOffset
+}
+
+type diskQueueACKs struct {
+	// This lock must be held to access this structure.
+	lock sync.Mutex
+
+	// The id and position of the first unacknowledged frame.
+	nextFrameID  frameID
+	nextPosition queuePosition
+
+	// A map of all acked indices that are above ackedUpTo (and thus
+	// can't yet be acknowledged as a continuous block).
+	// TODO: do this better.
+	acked map[frameID]bool
+}
+
 func init() {
 	queue.RegisterQueueType(
 		"disk",
@@ -163,8 +138,8 @@ func init() {
 			feature.Beta))
 }
 
-// queueFactory matches the queue.Factory type, and is used to add the disk
-// queue to the registry.
+// queueFactory matches the queue.Factory interface, and is used to add the
+// disk queue to the registry.
 func queueFactory(
 	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
 ) (queue.Queue, error) {
@@ -283,7 +258,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		producerWriteRequestChan:  make(chan producerWriteRequest, 10),
 		producerCancelRequestChan: make(chan producerCancelRequest),
 
-		consumerAckChan: make(chan frameID),
+		consumerACKChan: make(chan frameID),
 		acked:           make(map[frameID]bool),
 
 		waitGroup: &waitGroup,
@@ -297,32 +272,6 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}()
 
 	return queue, nil
-}
-
-//
-// bookkeeping helpers
-//
-
-func (settings Settings) directoryPath() string {
-	if settings.Path == "" {
-		return paths.Resolve(paths.Data, "diskqueue")
-	}
-
-	return settings.Path
-}
-
-func (settings Settings) stateFilePath() string {
-	return filepath.Join(settings.directoryPath(), "state.dat")
-}
-
-func (settings Settings) segmentPath(segmentID segmentID) string {
-	return filepath.Join(
-		settings.directoryPath(),
-		fmt.Sprintf("%v.seg", segmentID))
-}
-
-func (settings Settings) maxSegmentOffset() segmentOffset {
-	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
 }
 
 //

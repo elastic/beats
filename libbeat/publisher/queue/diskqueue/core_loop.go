@@ -44,11 +44,11 @@ func (dq *diskQueue) run() {
 			// TODO: this isn't really handled yet.
 			dq.handleProducerCancelRequest(cancelRequest)
 
-		case ackedUpTo := <-dq.consumerAckChan:
-			dq.handleConsumerAck(ackedUpTo)
+		case ackedUpTo := <-dq.consumerACKChan:
+			dq.handleConsumerACK(ackedUpTo)
 
 			// After receiving new ACKs, a segment might be ready to delete.
-			dq.maybeDeleteAcked()
+			dq.maybeDeleteACKed()
 
 		case <-dq.done:
 			dq.handleShutdown()
@@ -77,7 +77,7 @@ func (dq *diskQueue) run() {
 			dq.handleDeleterLoopResponse(deleterLoopResponse)
 
 			// If there are still files waiting to be deleted, send another request.
-			dq.maybeDeleteAcked()
+			dq.maybeDeleteACKed()
 
 			// If there were blocked producers waiting for more queue space,
 			// we might be able to unblock them now.
@@ -153,7 +153,8 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 	dq.reading = false
 
-	// Advance the read offset based on what was just completed.
+	// Advance the frame / offset based on what was just completed.
+	dq.segments.nextReadFrameID += frameID(response.frameCount)
 	dq.segments.nextReadOffset += segmentOffset(response.byteCount)
 
 	var segment *queueSegment
@@ -161,8 +162,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 		// A segment is finished if we have read all the data, or
 		// the read response reports an error.
 		// Segments in the reading list have been completely written,
-		// so we can rely on their endOffset field to determine the
-		// size of the data.
+		// so we can rely on their endOffset field to determine their size.
 		segment = dq.segments.reading[0]
 		if dq.segments.nextReadOffset >= segment.endOffset || response.err != nil {
 			dq.segments.reading = dq.segments.reading[1:]
@@ -174,7 +174,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 		// so we don't check the endOffset.
 		segment = dq.segments.writing[0]
 	}
-	segment.framesRead += response.frameCount
+	segment.framesRead = int64(dq.segments.nextReadFrameID - segment.firstFrameID)
 
 	// If there was an error, report it.
 	if response.err != nil {
@@ -203,7 +203,7 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 	}
 }
 
-func (dq *diskQueue) handleConsumerAck(ackedUpTo frameID) {
+func (dq *diskQueue) handleConsumerACK(ackedUpTo frameID) {
 	acking := dq.segments.acking
 	if len(acking) == 0 {
 		return
@@ -305,10 +305,15 @@ func (dq *diskQueue) maybeReadPending() {
 		// Nothing to read
 		return
 	}
+	if dq.segments.nextReadOffset == 0 {
+		// If we're reading the beginning of this segment, assign its firstFrameID.
+		segment.firstFrameID = dq.segments.nextReadFrameID
+	}
 	request := readerLoopRequest{
-		segment:     segment,
-		startOffset: dq.segments.nextReadOffset,
-		endOffset:   segment.endOffset,
+		segment:      segment,
+		startFrameID: dq.segments.nextReadFrameID,
+		startOffset:  dq.segments.nextReadOffset,
+		endOffset:    segment.endOffset,
 	}
 	dq.readerLoop.requestChan <- request
 	dq.reading = true
@@ -316,7 +321,7 @@ func (dq *diskQueue) maybeReadPending() {
 
 // If the acked list is nonempty, and there are no outstanding deletion
 // requests, send one.
-func (dq *diskQueue) maybeDeleteAcked() {
+func (dq *diskQueue) maybeDeleteACKed() {
 	if !dq.deleting && len(dq.segments.acked) > 0 {
 		dq.deleterLoop.requestChan <- deleterLoopRequest{
 			segments: dq.segments.acked}

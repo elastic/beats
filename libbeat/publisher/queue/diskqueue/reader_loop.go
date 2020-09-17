@@ -19,18 +19,16 @@ package diskqueue
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
-	"io"
 	"os"
-	"syscall"
 	"time"
 )
 
 type readerLoopRequest struct {
-	segment     *queueSegment
-	startOffset segmentOffset
-	endOffset   segmentOffset
+	segment      *queueSegment
+	startOffset  segmentOffset
+	startFrameID frameID
+	endOffset    segmentOffset
 }
 
 type readerLoopResponse struct {
@@ -66,11 +64,6 @@ type readerLoop struct {
 	// The helper object to deserialize binary blobs from the queue into
 	// publisher.Event objects that can be returned in a readFrame.
 	decoder *eventDecoder
-
-	// The id that will be assigned to the next successfully-read frame.
-	// Always starts from 0; this is just to track which frames have been
-	// acknowledged, and doesn't need any consistency between runs.
-	nextFrameID frameID
 }
 
 func (rl *readerLoop) run() {
@@ -97,6 +90,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 
 	frameCount := int64(0)
 	byteCount := int64(0)
+	nextFrameID := request.startFrameID
 	// defer func() {
 	// 	fmt.Printf("  \033[0;32mread %d bytes in %d frames\033[0m\n", byteCount, frameCount)
 	// }()
@@ -119,8 +113,9 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		// Try to read the next frame, clipping to the given bound.
 		// If the next frame extends past this boundary, nextFrame will return
 		// an error.
-		frame, err := rl.nextFrame(handle, remainingLength)
+		frame, err := rl.nextFrame(handle, remainingLength, nextFrameID)
 		if frame != nil {
+			nextFrameID++
 			// We've read the frame, try sending it to the output channel.
 			select {
 			case rl.output <- frame:
@@ -167,7 +162,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 }
 
 func (rl *readerLoop) nextFrame(
-	handle *os.File, maxLength int64,
+	handle *os.File, maxLength int64, id frameID,
 ) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
@@ -234,45 +229,15 @@ func (rl *readerLoop) nextFrame(
 		// may not indicate data corruption in the segment).
 		// TODO: Rather than pass this error back to the read request, which
 		// discards the rest of the segment, we should just log the error and
-		// advance to the next frame, which is likely still valid (especially
-		// if checksums are enabled).
+		// advance to the next frame, which is likely still valid.
 		return nil, fmt.Errorf("Couldn't decode data frame: %w", err)
 	}
 
 	frame := &readFrame{
 		event:       event,
-		id:          rl.nextFrameID,
+		id:          id,
 		bytesOnDisk: int64(frameLength),
 	}
-	rl.nextFrameID++
 
 	return frame, nil
-}
-
-// A wrapper for an io.Reader that tries to read the full number of bytes
-// requested, retrying on EAGAIN and EINTR, and returns an error if
-// and only if the number of bytes read is less than requested.
-// This is similar to io.ReadFull but with retrying.
-type autoRetryReader struct {
-	wrapped io.Reader
-}
-
-func (r autoRetryReader) Read(p []byte) (int, error) {
-	bytesRead := 0
-	reader := r.wrapped
-	n, err := reader.Read(p)
-	for n < len(p) {
-		if err != nil && !readErrorIsRetriable(err) {
-			return bytesRead + n, err
-		}
-		// If there is an error, it is retriable, so advance p and try again.
-		bytesRead += n
-		p = p[n:]
-		n, err = reader.Read(p)
-	}
-	return bytesRead + n, nil
-}
-
-func readErrorIsRetriable(err error) bool {
-	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }

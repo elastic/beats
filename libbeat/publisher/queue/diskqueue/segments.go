@@ -30,34 +30,30 @@ import (
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
 
-	// The segments that are currently being written. The writer loop
-	// writes these segments in order. When a segment has been
-	// completely written, the writer loop notifies the core loop
-	// in a writeResponse, and it is moved to the reading list.
-	// If the reading list is empty, the reader loop may read from
-	// a segment that is still being written, but it will always
-	// be writing[0], since later entries have generally not been
-	// created yet.
+	// A list of the segments that have not yet been completely written, sorted
+	// by increasing segment ID. When the first entry has been completely
+	// written, it is removed from this list and appended to reading.
+	//
+	// If the reading list is empty, the queue may read from a segment that is
+	// still being written, but it will always be writing[0], since later
+	// entries do not yet exist on disk.
 	writing []*queueSegment
 
 	// A list of the segments that have been completely written but have
-	// not yet been completely processed by the reader loop, sorted by increasing
-	// segment ID. Segments are always read in order. When a segment has
-	// been read completely, it is removed from the front of this list and
-	// appended to read.
+	// not yet been completely read, sorted by increasing segment ID. When the
+	// first entry has been completely read, it is removed from this list and
+	// appended to acking.
 	reading []*queueSegment
 
-	// A list of the segments that have been read but have not yet been
-	// completely acknowledged, sorted by increasing segment ID. When the
-	// first entry of this list is completely acknowledged, it is removed
-	// from this list and added to acked.
+	// A list of the segments that have been completely read but have not yet
+	// been completely acknowledged, sorted by increasing segment ID. When the
+	// first entry has been completely acknowledged, it is removed from this
+	// list and appended to acked.
 	acking []*queueSegment
 
-	// A list of the segments that have been completely processed and are
-	// ready to be deleted. The writer loop always tries to delete segments
-	// in this list before writing new data. When a segment is successfully
-	// deleted, it is removed from this list and the queue's
-	// segmentDeletedCond is signalled.
+	// A list of the segments that have been completely read and acknowledged
+	// and are ready to be deleted. When a segment is successfully deleted, it
+	// is removed from this list and discarded.
 	acked []*queueSegment
 
 	// The next sequential unused segment ID. This is what will be assigned
@@ -72,11 +68,19 @@ type diskQueueSegments struct {
 	// written.
 	nextWriteOffset segmentOffset
 
-	// nextReadOffset is the position to start reading during the next
-	// read request. This offset always applies to the first reading
+	// nextReadFrameID is the first frame ID in the current or pending
+	// read request.
+	nextReadFrameID frameID
+
+	// nextReadOffset is the segment offset corresponding to the frame
+	// nextReadFrameID. This offset always applies to the first reading
 	// segment: either reading[0], or writing[0] if reading is empty.
 	nextReadOffset segmentOffset
 }
+
+// segmentID is a unique persistent integer id assigned to each created
+// segment in ascending order.
+type segmentID uint64
 
 // segmentOffset is a byte index into the segment's data region.
 // An offset of 0 means the first byte after the segment file header.
@@ -92,6 +96,12 @@ type queueSegment struct {
 	// to the end of a complete data frame. The total size of a segment file
 	// on disk is segmentHeaderSize + segment.endOffset.
 	endOffset segmentOffset
+
+	// The ID of the first frame that was / will be read from this segment.
+	// This field is only valid after a read request has been sent for
+	// this segment. (Currently it is only used to handle consumer ACKs,
+	// which can only happen after reading has begun on the segment.)
+	firstFrameID frameID
 
 	// The number of frames read from this segment during this session. This
 	// does not necessarily equal the number of frames in the segment, even

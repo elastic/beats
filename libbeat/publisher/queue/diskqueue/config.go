@@ -19,10 +19,49 @@ package diskqueue
 
 import (
 	"errors"
+	"fmt"
+	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+// Settings contains the configuration fields to create a new disk queue
+// or open an existing one.
+type Settings struct {
+	// The path on disk of the queue's containing directory, which will be
+	// created if it doesn't exist. Within the directory, the queue's state
+	// is stored in state.dat and each segment's data is stored in
+	// {segmentIndex}.seg
+	// If blank, the default directory is "diskqueue" within the beat's data
+	// directory.
+	Path string
+
+	// MaxBufferSize is the maximum number of bytes that the queue should
+	// ever occupy on disk. A value of 0 means the queue can grow until the
+	// disk is full (this is not recommended on a primary system disk).
+	MaxBufferSize uint64
+
+	// MaxSegmentSize is the maximum number of bytes that should be written
+	// to a single segment file before creating a new one.
+	MaxSegmentSize uint64
+
+	// How many events will be read from disk while waiting for a consumer
+	// request.
+	ReadAheadLimit int
+
+	// How many events will be queued in memory waiting to be written to disk.
+	// This setting should rarely matter in practice, but if data is coming
+	// in faster than it can be written to disk for an extended period,
+	// this limit can keep it from overflowing memory.
+	WriteAheadLimit int
+
+	// A listener that should be sent ACKs when an event is successfully
+	// written to disk.
+	WriteToDiskListener queue.ACKListener
+}
 
 // userConfig holds the parameters for a disk queue that are configurable
 // by the end user in the beats yml file.
@@ -92,4 +131,30 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 	}
 
 	return settings, nil
+}
+
+//
+// bookkeeping helpers
+//
+
+func (settings Settings) directoryPath() string {
+	if settings.Path == "" {
+		return paths.Resolve(paths.Data, "diskqueue")
+	}
+
+	return settings.Path
+}
+
+func (settings Settings) stateFilePath() string {
+	return filepath.Join(settings.directoryPath(), "state.dat")
+}
+
+func (settings Settings) segmentPath(segmentID segmentID) string {
+	return filepath.Join(
+		settings.directoryPath(),
+		fmt.Sprintf("%v.seg", segmentID))
+}
+
+func (settings Settings) maxSegmentOffset() segmentOffset {
+	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
 }

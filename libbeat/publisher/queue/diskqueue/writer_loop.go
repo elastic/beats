@@ -19,10 +19,7 @@ package diskqueue
 
 import (
 	"encoding/binary"
-	"errors"
-	"io"
 	"os"
-	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -229,41 +226,4 @@ func (wl *writerLoop) retryCallback(err error) bool {
 	case <-wl.requestChan:
 		return false
 	}
-}
-
-// writeErrorIsRetriable returns true if the given IO error can be
-// immediately retried.
-func writeErrorIsRetriable(err error) bool {
-	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
-}
-
-// callbackRetryWriter is an io.Writer that wraps another writer and enables
-// write-with-retry. When a Write encounters an error, it is passed to the
-// retry callback. If the callback returns true, the the writer retries
-// any unwritten portion of the input, otherwise it passes the error back
-// to the caller.
-// This helper is specifically for working with the writer loop, which needs
-// to be able to retry forever at configurable intervals, but also cancel
-// immediately if the queue is closed.
-// This writer is unbuffered. In particular, it is safe to modify
-// "wrapped" in-place as long as it isn't captured by the callback.
-type callbackRetryWriter struct {
-	wrapped io.Writer
-	retry   func(error) bool
-}
-
-func (w callbackRetryWriter) Write(p []byte) (int, error) {
-	bytesWritten := 0
-	writer := w.wrapped
-	n, err := writer.Write(p)
-	for n < len(p) {
-		if err != nil && !w.retry(err) {
-			return bytesWritten + n, err
-		}
-		// Advance p and try again.
-		bytesWritten += n
-		p = p[n:]
-		n, err = writer.Write(p)
-	}
-	return bytesWritten + n, nil
 }

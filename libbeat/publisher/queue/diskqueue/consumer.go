@@ -117,6 +117,6 @@ func (batch *diskQueueBatch) ACK() {
 		// usually no-ops.
 		// TODO: only inform the core loop when we cross a segment
 		// boundary.
-		dq.consumerAckChan <- dq.ackedUpTo
+		dq.consumerACKChan <- dq.ackedUpTo
 	}
 }
