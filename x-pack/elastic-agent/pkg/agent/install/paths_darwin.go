@@ -20,7 +20,7 @@ const (
 	ServiceName = "com.elastic.elastic-agent"
 
 	// ShellWrapperPath is the path to the installed shell wrapper.
-	ShellWrapperPath = "/usr/bin/elastic-agent"
+	ShellWrapperPath = "/usr/local/bin/elastic-agent"
 
 	// ShellWrapper is the wrapper that is installed.
 	ShellWrapper = `
