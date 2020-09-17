@@ -31,7 +31,7 @@ func Install() error {
 	if err != nil {
 		return errors.New(err, "failed to discover the source directory for installation", errors.TypeFilesystem)
 	}
-	err = os.Mkdir(filepath.Dir(InstallPath), 0755)
+	err = os.MkdirAll(filepath.Dir(InstallPath), 0755)
 	if err != nil {
 		return errors.New(
 			err,
