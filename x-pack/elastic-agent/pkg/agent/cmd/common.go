@@ -72,6 +72,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	run := newRunCommandWithArgs(flags, args, streams)
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(run)
+	cmd.AddCommand(newInstallCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
 
@@ -80,7 +81,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	if reexec != nil {
 		cmd.AddCommand(reexec)
 	}
-	cmd.PersistentPreRunE = preRunCheck(flags)
+	run.PersistentPreRunE = preRunCheck(flags)
 	cmd.Run = run.Run
 
 	return cmd
