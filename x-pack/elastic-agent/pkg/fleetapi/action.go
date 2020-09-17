@@ -14,7 +14,7 @@ import (
 
 const (
 	// ActionTypeUpgrade specifies upgrade action.
-	ActionTypeUpgrade = "UPGRADE_ACTION"
+	ActionTypeUpgrade = "UPGRADE"
 	// ActionTypeUnenroll specifies unenroll action.
 	ActionTypeUnenroll = "UNENROLL"
 	// ActionTypeConfigChange specifies config change action.
@@ -96,8 +96,8 @@ func (a *ActionConfigChange) ID() string {
 type ActionUpgrade struct {
 	ActionID   string
 	ActionType string
-	Version    string `json:"Version"`
-	SourceURI  string `json:"SourceURI"`
+	Version    string `json:"version"`
+	SourceURI  string `json:"source_uri"`
 }
 
 func (a *ActionUpgrade) String() string {
@@ -189,6 +189,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
+			fmt.Println(response)
+			fmt.Println(string(response.Data))
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
 					"fail to decode UPGRADE_ACTION action",
