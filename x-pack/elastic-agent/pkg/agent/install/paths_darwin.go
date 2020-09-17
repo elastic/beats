@@ -8,7 +8,7 @@ package install
 
 const (
 	// BinaryName is the name of the installed binary.
-	BinaryName = "elastic_agent"
+	BinaryName = "elastic-agent"
 
 	// InstallPath is the installation path using for install command.
 	InstallPath = "/Library/Elastic/Agent"
