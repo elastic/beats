@@ -26,7 +26,7 @@ func NewController(
 	log *logp.Logger,
 	info beat.Info,
 	inputsRegistry v2.Registry,
-	outputFactory publishing.OutputFactory,
+	outputs []publishing.Plugin,
 	settings Settings,
 ) (*Controller, error)
 ```

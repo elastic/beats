@@ -13,7 +13,7 @@ selectively, such that configuration rewrites are possible.
 #### func  NewOutputFactory
 
 ```go
-func NewOutputFactory(info beat.Info) publishing.OutputFactory
+func NewOutputFactory(info beat.Info, outputType string) publishing.OutputFactory
 ```
 NewOutputFactory creates a new publishing.OutputFactory, that can be used to
 create outputs based on existing libbeat outputs.
@@ -22,3 +22,9 @@ When creating an output we create a complete libbeat publisher pipeline
 including queue, ack handling and actual libbeat outputs for publishing the
 events. The pipeline is wrapped, such that is satifies the publishing.Output
 interface.
+
+#### func  NewPipelineOutput
+
+```go
+func NewPipelineOutput(info beat.Info, pipelineSettings beatpipe.Config, outputType string, outputConfig *common.Config) publishing.Output
+```

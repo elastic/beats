@@ -43,6 +43,26 @@ const (
 )
 ```
 
+#### type Loader
+
+```go
+type Loader struct {
+}
+```
+
+
+#### func  NewLoader
+
+```go
+func NewLoader(plugins []Plugin) (*Loader, error)
+```
+
+#### func (*Loader) ConfigureOutput
+
+```go
+func (l *Loader) ConfigureOutput(log *logp.Logger, cfg *common.Config) (Output, error)
+```
+
 #### type Output
 
 ```go
@@ -74,6 +94,32 @@ type OutputFactory interface {
 ```
 
 OutputFactory configures an output.
+
+#### type Plugin
+
+```go
+type Plugin struct {
+	// Name of the output type.
+	Name string
+
+	// Configure the output stability. If the stability is not 'Stable' a message
+	// is logged when the output type is configured.
+	Stability feature.Stability
+
+	// Deprecated marks the plugin as deprecated. If set a deprecation message is logged if
+	// an output is configured.
+	Deprecated bool
+
+	// Info contains a short description of the output type.
+	Info string
+
+	// Doc contains an optional longer description.
+	Doc string
+
+	Configure func(*logp.Logger, *common.Config) (Output, error)
+}
+```
+
 
 #### type Publisher
 
@@ -109,3 +155,21 @@ type Publisher interface {
 ```
 
 Publisher publishes events.
+
+#### type SetupError
+
+```go
+type SetupError struct {
+	Fails []error
+}
+```
+
+SetupError indicates that the loader initialization has detected errors in
+individual plugin configurations or duplicates.
+
+#### func (*SetupError) Error
+
+```go
+func (e *SetupError) Error() string
+```
+Error returns the errors string repesentation
