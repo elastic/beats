@@ -60,11 +60,11 @@ rules:
     key: type
     values:
     - awscloudwatch
-    - azureeventhub
+    - azure-eventhub
     - cloudfoundry
     - container
     - docker
-    - googlepubsub
+    - google-pubsub
     - http_endpoint
     - httpjson
     - kafka
