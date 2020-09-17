@@ -27,7 +27,7 @@
               "i": "1",
               "w": 4,
               "x": 15,
-              "y": 0
+              "y": 2
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
@@ -42,7 +42,7 @@
               "i": "8",
               "w": 5,
               "x": 38,
-              "y": 34
+              "y": 36
             },
             "panelIndex": "8",
             "panelRefName": "panel_1",
@@ -57,7 +57,7 @@
               "i": "9",
               "w": 5,
               "x": 33,
-              "y": 34
+              "y": 36
             },
             "panelIndex": "9",
             "panelRefName": "panel_2",
@@ -72,7 +72,7 @@
               "i": "11",
               "w": 5,
               "x": 43,
-              "y": 34
+              "y": 36
             },
             "panelIndex": "11",
             "panelRefName": "panel_3",
@@ -87,7 +87,7 @@
               "i": "13",
               "w": 15,
               "x": 0,
-              "y": 0
+              "y": 2
             },
             "panelIndex": "13",
             "panelRefName": "panel_4",
@@ -102,7 +102,7 @@
               "i": "14",
               "w": 7,
               "x": 26,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "14",
             "panelRefName": "panel_5",
@@ -117,7 +117,7 @@
               "i": "15",
               "w": 7,
               "x": 19,
-              "y": 21
+              "y": 23
             },
             "panelIndex": "15",
             "panelRefName": "panel_6",
@@ -132,7 +132,7 @@
               "i": "16",
               "w": 5,
               "x": 0,
-              "y": 25
+              "y": 27
             },
             "panelIndex": "16",
             "panelRefName": "panel_7",
@@ -147,7 +147,7 @@
               "i": "17",
               "w": 5,
               "x": 10,
-              "y": 25
+              "y": 27
             },
             "panelIndex": "17",
             "panelRefName": "panel_8",
@@ -162,7 +162,7 @@
               "i": "18",
               "w": 5,
               "x": 5,
-              "y": 25
+              "y": 27
             },
             "panelIndex": "18",
             "panelRefName": "panel_9",
@@ -177,7 +177,7 @@
               "i": "19",
               "w": 19,
               "x": 0,
-              "y": 15
+              "y": 17
             },
             "panelIndex": "19",
             "panelRefName": "panel_10",
@@ -193,7 +193,7 @@
               "i": "26",
               "w": 14,
               "x": 19,
-              "y": 0
+              "y": 2
             },
             "panelIndex": "26",
             "panelRefName": "panel_11",
@@ -208,7 +208,7 @@
               "i": "28",
               "w": 14,
               "x": 19,
-              "y": 34
+              "y": 36
             },
             "panelIndex": "28",
             "panelRefName": "panel_12",
@@ -224,7 +224,7 @@
               "i": "29",
               "w": 19,
               "x": 0,
-              "y": 31
+              "y": 33
             },
             "panelIndex": "29",
             "panelRefName": "panel_13",
@@ -240,7 +240,7 @@
               "i": "30",
               "w": 15,
               "x": 33,
-              "y": 0
+              "y": 2
             },
             "panelIndex": "30",
             "panelRefName": "panel_14",
@@ -256,7 +256,7 @@
               "i": "31",
               "w": 15,
               "x": 33,
-              "y": 16
+              "y": 18
             },
             "panelIndex": "31",
             "panelRefName": "panel_15",
@@ -272,7 +272,7 @@
               "i": "36",
               "w": 7,
               "x": 19,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "36",
             "panelRefName": "panel_16",
@@ -287,7 +287,7 @@
               "i": "37",
               "w": 7,
               "x": 26,
-              "y": 21
+              "y": 23
             },
             "panelIndex": "37",
             "panelRefName": "panel_17",
@@ -302,7 +302,7 @@
               "i": "38",
               "w": 4,
               "x": 24,
-              "y": 15
+              "y": 17
             },
             "panelIndex": "38",
             "panelRefName": "panel_18",
@@ -317,7 +317,7 @@
               "i": "39",
               "w": 4,
               "x": 24,
-              "y": 28
+              "y": 30
             },
             "panelIndex": "39",
             "panelRefName": "panel_19",
@@ -332,7 +332,7 @@
               "i": "41",
               "w": 5,
               "x": 19,
-              "y": 28
+              "y": 30
             },
             "panelIndex": "41",
             "panelRefName": "panel_20",
@@ -347,7 +347,7 @@
               "i": "42",
               "w": 5,
               "x": 28,
-              "y": 28
+              "y": 30
             },
             "panelIndex": "42",
             "panelRefName": "panel_21",
@@ -362,7 +362,7 @@
               "i": "43",
               "w": 5,
               "x": 28,
-              "y": 15
+              "y": 17
             },
             "panelIndex": "43",
             "panelRefName": "panel_22",
@@ -377,7 +377,7 @@
               "i": "44",
               "w": 5,
               "x": 19,
-              "y": 15
+              "y": 17
             },
             "panelIndex": "44",
             "panelRefName": "panel_23",
@@ -392,7 +392,7 @@
               "i": "46",
               "w": 5,
               "x": 0,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "46",
             "panelRefName": "panel_24",
@@ -407,7 +407,7 @@
               "i": "47",
               "w": 5,
               "x": 10,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "47",
             "panelRefName": "panel_25",
@@ -422,10 +422,25 @@
               "i": "48",
               "w": 5,
               "x": 5,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "48",
             "panelRefName": "panel_26",
+            "version": "7.9.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": ""
+            },
+            "gridData": {
+              "h": 2,
+              "i": "f770c0d9-bc9a-4250-ad73-35a8cae0bcda",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "f770c0d9-bc9a-4250-ad73-35a8cae0bcda",
+            "panelRefName": "panel_27",
             "version": "7.9.0"
           },
           {
@@ -437,10 +452,10 @@
               "i": "8a83ab84-5aa6-4e68-97cc-fd8be2b65eb5",
               "w": 4,
               "x": 15,
-              "y": 8
+              "y": 10
             },
             "panelIndex": "8a83ab84-5aa6-4e68-97cc-fd8be2b65eb5",
-            "panelRefName": "panel_27",
+            "panelRefName": "panel_28",
             "version": "7.9.0"
           },
           {
@@ -452,10 +467,10 @@
               "i": "fbd35912-3c3a-4ab9-878c-b68b598df8f0",
               "w": 4,
               "x": 15,
-              "y": 25
+              "y": 27
             },
             "panelIndex": "fbd35912-3c3a-4ab9-878c-b68b598df8f0",
-            "panelRefName": "panel_28",
+            "panelRefName": "panel_29",
             "version": "7.9.0"
           }
         ],
@@ -613,19 +628,24 @@
           "type": "visualization"
         },
         {
-          "id": "9410e9ea-f851-11ea-b70d-9bda9c286e02",
+          "id": "f771b65c-f8d0-11ea-bf74-8bbda818957f",
           "name": "panel_27",
           "type": "visualization"
         },
         {
-          "id": "93911f12-f851-11ea-9a0a-bb5ff28cf81a",
+          "id": "9410e9ea-f851-11ea-b70d-9bda9c286e02",
           "name": "panel_28",
+          "type": "visualization"
+        },
+        {
+          "id": "93911f12-f851-11ea-9a0a-bb5ff28cf81a",
+          "name": "panel_29",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-09-16T19:44:53.405Z",
-      "version": "Wzc0NiwxXQ=="
+      "updated_at": "2020-09-17T10:34:14.592Z",
+      "version": "WzE1MCwxXQ=="
     },
     {
       "attributes": {
@@ -748,8 +768,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcwNywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyMCwxXQ=="
     },
     {
       "attributes": {
@@ -881,8 +901,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcwOCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyMSwxXQ=="
     },
     {
       "attributes": {
@@ -1014,8 +1034,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcwOSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyMiwxXQ=="
     },
     {
       "attributes": {
@@ -1147,8 +1167,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxMCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyMywxXQ=="
     },
     {
       "attributes": {
@@ -1304,8 +1324,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxMSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyNCwxXQ=="
     },
     {
       "attributes": {
@@ -1445,8 +1465,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxMiwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyNSwxXQ=="
     },
     {
       "attributes": {
@@ -1586,8 +1606,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxMywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyNiwxXQ=="
     },
     {
       "attributes": {
@@ -1721,8 +1741,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxNCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyNywxXQ=="
     },
     {
       "attributes": {
@@ -1856,8 +1876,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxNSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyOCwxXQ=="
     },
     {
       "attributes": {
@@ -1991,8 +2011,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxNiwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEyOSwxXQ=="
     },
     {
       "attributes": {
@@ -2128,8 +2148,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxNywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzMCwxXQ=="
     },
     {
       "attributes": {
@@ -2257,8 +2277,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxOCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzMSwxXQ=="
     },
     {
       "attributes": {
@@ -2394,8 +2414,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcxOSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzMiwxXQ=="
     },
     {
       "attributes": {
@@ -2617,8 +2637,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyMCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzMywxXQ=="
     },
     {
       "attributes": {
@@ -2736,8 +2756,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyMSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzNCwxXQ=="
     },
     {
       "attributes": {
@@ -2846,8 +2866,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyMiwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzNSwxXQ=="
     },
     {
       "attributes": {
@@ -2986,8 +3006,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyMywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzNiwxXQ=="
     },
     {
       "attributes": {
@@ -3127,8 +3147,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyNCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzNywxXQ=="
     },
     {
       "attributes": {
@@ -3268,8 +3288,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyNSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzOCwxXQ=="
     },
     {
       "attributes": {
@@ -3409,8 +3429,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyNiwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzEzOSwxXQ=="
     },
     {
       "attributes": {
@@ -3550,8 +3570,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyNywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0MCwxXQ=="
     },
     {
       "attributes": {
@@ -3691,8 +3711,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyOCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0MSwxXQ=="
     },
     {
       "attributes": {
@@ -3832,8 +3852,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzcyOSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0MiwxXQ=="
     },
     {
       "attributes": {
@@ -3973,8 +3993,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzczMCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0MywxXQ=="
     },
     {
       "attributes": {
@@ -4108,8 +4128,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzczMSwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0NCwxXQ=="
     },
     {
       "attributes": {
@@ -4243,8 +4263,46 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzczMiwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Dashboards Navigation Platform Health [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 12,
+            "markdown": "[Overview](#/dashboard/9c81cf34-f84e-11ea-a49d-f3f94f5e4fac) | **Platform Health**",
+            "openLinksInNewTab": false
+          },
+          "title": "Dashboards Navigation [Metricbeat Cloud Foundry]",
+          "type": "markdown"
+        }
+      },
+      "id": "f771b65c-f8d0-11ea-bf74-8bbda818957f",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-09-17T10:37:54.081Z",
+      "version": "WzE4MiwxXQ=="
     },
     {
       "attributes": {
@@ -4281,8 +4339,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzczMywxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0NiwxXQ=="
     },
     {
       "attributes": {
@@ -4319,8 +4377,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-16T19:39:01.131Z",
-      "version": "WzczNCwxXQ=="
+      "updated_at": "2020-09-17T10:33:07.259Z",
+      "version": "WzE0NywxXQ=="
     }
   ],
   "version": "7.9.0"
