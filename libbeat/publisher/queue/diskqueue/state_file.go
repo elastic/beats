@@ -68,7 +68,7 @@ func persistentStateFromHandle(
 		return nil, err
 	}
 
-	err = binary.Read(reader, binary.LittleEndian, &state.firstPosition.segment)
+	err = binary.Read(reader, binary.LittleEndian, &state.firstPosition.segmentID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func writePersistentStateToHandle(
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian, &firstPosition.segment)
+	err = binary.Write(file, binary.LittleEndian, &firstPosition.segmentID)
 	if err != nil {
 		return err
 	}
@@ -115,6 +115,19 @@ func writePersistentStateToHandle(
 
 func (stateFile *stateFile) Close() error {
 	return stateFile.file.Close()
+}
+
+func nextReadPositionFromPath(path string) (queuePosition, error) {
+	// Try to open an existing state file.
+	file, err := os.OpenFile(path, os.O_RDONLY, 0600)
+	if err != nil {
+		return queuePosition{}, err
+	}
+	state, err := persistentStateFromHandle(file)
+	if err != nil {
+		return queuePosition{}, err
+	}
+	return state.firstPosition, nil
 }
 
 func stateFileForPath(path string) (*stateFile, error) {

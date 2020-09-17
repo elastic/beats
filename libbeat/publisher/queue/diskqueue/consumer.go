@@ -30,9 +30,10 @@ type diskQueueConsumer struct {
 }
 
 type diskQueueBatch struct {
-	queue  *diskQueue
-	events []publisher.Event
-	ackIDs []frameID
+	queue *diskQueue
+	//events []publisher.Event
+	//ackIDs []frameID
+	frames []*readFrame
 }
 
 //
@@ -67,17 +68,9 @@ eventLoop:
 		}
 	}
 
-	var ackIDs []frameID
-	var events []publisher.Event
-	for _, frame := range frames {
-		events = append(events, frame.event)
-		ackIDs = append(ackIDs, frame.id)
-	}
-
 	return &diskQueueBatch{
 		queue:  consumer.queue,
-		events: events,
-		ackIDs: ackIDs,
+		frames: frames,
 	}, nil
 }
 
@@ -91,7 +84,11 @@ func (consumer *diskQueueConsumer) Close() error {
 //
 
 func (batch *diskQueueBatch) Events() []publisher.Event {
-	return batch.events
+	events := make([]publisher.Event, len(batch.frames))
+	for i, frame := range batch.frames {
+		events[i] = frame.event
+	}
+	return events
 }
 
 // This is the only place that the queue state is changed from
@@ -102,21 +99,5 @@ func (batch *diskQueueBatch) Events() []publisher.Event {
 // TODO: this shouldn't really be a dictionary, use a bitfield or
 // something more efficient.
 func (batch *diskQueueBatch) ACK() {
-	dq := batch.queue
-	dq.ackLock.Lock()
-	defer dq.ackLock.Unlock()
-	for _, frameID := range batch.ackIDs {
-		dq.acked[frameID] = true
-	}
-	if dq.acked[dq.ackedUpTo] {
-		for ; dq.acked[dq.ackedUpTo]; dq.ackedUpTo++ {
-			delete(dq.acked, dq.ackedUpTo)
-		}
-		// It would be considerate to send this less frequently, so
-		// as not to bother the core loop with messages that are
-		// usually no-ops.
-		// TODO: only inform the core loop when we cross a segment
-		// boundary.
-		dq.consumerACKChan <- dq.ackedUpTo
-	}
+	batch.queue.acks.ackFrames(batch.frames)
 }

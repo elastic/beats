@@ -44,8 +44,8 @@ func (dq *diskQueue) run() {
 			// TODO: this isn't really handled yet.
 			dq.handleProducerCancelRequest(cancelRequest)
 
-		case ackedUpTo := <-dq.consumerACKChan:
-			dq.handleConsumerACK(ackedUpTo)
+		case ackedSegmentID := <-dq.acks.segmentACKChan:
+			dq.handleSegmentACK(ackedSegmentID)
 
 			// After receiving new ACKs, a segment might be ready to delete.
 			dq.maybeDeleteACKed()
@@ -203,8 +203,8 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 	}
 }
 
-func (dq *diskQueue) handleConsumerACK(ackedUpTo frameID) {
-	acking := dq.segments.acking
+func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
+	/*acking := dq.segments.acking
 	if len(acking) == 0 {
 		return
 	}
@@ -228,7 +228,7 @@ func (dq *diskQueue) handleConsumerACK(ackedUpTo frameID) {
 		dq.segments.acking = acking[ackedSegmentCount:]
 		// Advance oldestFrameID past the segments we just removed.
 		dq.oldestFrameID = endFrame
-	}
+	}*/
 }
 
 func (dq *diskQueue) handleShutdown() {

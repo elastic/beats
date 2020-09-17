@@ -75,7 +75,9 @@ func (producer *diskQueueProducer) publish(
 			serialized: serialized,
 			producer:   producer,
 		},
-		shouldBlock:  shouldBlock,
+		shouldBlock: shouldBlock,
+		// This response channel will be used by the core loop, so it must have
+		// buffer size 1 to guarantee that the core loop will not need to block.
 		responseChan: make(chan bool, 1),
 	}
 

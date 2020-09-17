@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -33,9 +34,6 @@ import (
 type diskQueue struct {
 	logger   *logp.Logger
 	settings Settings
-
-	// The persistent queue state (wraps diskQueuePersistentState on disk).
-	stateFile *stateFile
 
 	// Metadata related to the segment files.
 	segments *diskQueueSegments
@@ -56,14 +54,6 @@ type diskQueue struct {
 	// The API channels used by diskQueueProducer to send write / cancel calls.
 	producerWriteRequestChan  chan producerWriteRequest
 	producerCancelRequestChan chan producerCancelRequest
-
-	// When a consumer ack increments ackedUpTo, the consumer sends
-	// its new value to this channel. The core loop then decides whether to
-	// delete the containing segments.
-	// The value sent on the channel is redundant with the value of ackedUpTo,
-	// but we send it anyway so we don't have to worry about the core loop
-	// waiting on ackLock.
-	consumerACKChan chan frameID
 
 	// writing is true if a writeRequest is currently being processed by the
 	// writer loop, false otherwise.
@@ -106,26 +96,6 @@ type diskQueue struct {
 
 	// The channel to signal our goroutines to shut down.
 	done chan struct{}
-}
-
-// queuePosition represents a logical position within the queue buffer.
-type queuePosition struct {
-	segment segmentID
-	offset  segmentOffset
-}
-
-type diskQueueACKs struct {
-	// This lock must be held to access this structure.
-	lock sync.Mutex
-
-	// The id and position of the first unacknowledged frame.
-	nextFrameID  frameID
-	nextPosition queuePosition
-
-	// A map of all acked indices that are above ackedUpTo (and thus
-	// can't yet be acknowledged as a continuous block).
-	// TODO: do this better.
-	acked map[frameID]bool
 }
 
 func init() {
@@ -172,6 +142,14 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
 	}
 
+	// Load the previous queue position, if any.
+	nextReadPosition, err := nextReadPositionFromPath(settings.stateFilePath())
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		// Errors reading / writing the position are non-fatal -- we just log a
+		// warning and fall back on the oldest existing segment, if any.
+		logger.Warnf("Couldn't load most recent queue position: %v", err)
+	}
+
 	// Index any existing data segments to be placed in segments.reading.
 	initialSegments, err := scanExistingSegments(settings.directoryPath())
 	if err != nil {
@@ -179,16 +157,26 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}
 	var nextSegmentID segmentID
 	if len(initialSegments) > 0 {
+		// Initialize nextSegmentID to the first ID after the existing segments.
 		lastID := initialSegments[len(initialSegments)-1].id
 		nextSegmentID = lastID + 1
 	}
 
-	// Load the file handle for the queue state.
-	stateFile, err := stateFileForPath(settings.stateFilePath())
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
+	// If any of the initial segments are older than the read position from
+	// the state file, move them directly to the acked list where they can be
+	// deleted.
+	ackedSegments := []*queueSegment{}
+	readSegmentID := nextReadPosition.segmentID
+	for len(initialSegments) > 0 && initialSegments[0].id < readSegmentID {
+		ackedSegments = append(ackedSegments, initialSegments[0])
+		initialSegments = initialSegments[1:]
 	}
-	//if stateFile.loadedState.
+
+	// If the next read position is older than all existing segments, advance
+	// it to the beginning of the first one.
+	if len(initialSegments) > 0 && readSegmentID < initialSegments[0].id {
+		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
+	}
 
 	// We wait for four goroutines: core loop, reader loop, writer loop,
 	// deleter loop.
@@ -241,25 +229,23 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		logger:   logger,
 		settings: settings,
 
-		stateFile: stateFile,
 		segments: &diskQueueSegments{
-			reading: initialSegments,
-			nextID:  nextSegmentID,
+			reading:        initialSegments,
+			nextID:         nextSegmentID,
+			nextReadOffset: nextReadPosition.offset,
+		},
+
+		acks: &diskQueueACKs{
+			nextPosition:   nextReadPosition,
+			segmentACKChan: make(chan segmentID),
 		},
 
 		readerLoop:  readerLoop,
 		writerLoop:  writerLoop,
 		deleterLoop: deleterLoop,
 
-		// TODO: is this a reasonable size for this channel buffer?
-		// Should this be customizable? (Tentatively: no, since we
-		// expect most producer write requests to be handled near-
-		// instantly so the requests are unlikely to accumulate).
-		producerWriteRequestChan:  make(chan producerWriteRequest, 10),
+		producerWriteRequestChan:  make(chan producerWriteRequest),
 		producerCancelRequestChan: make(chan producerCancelRequest),
-
-		consumerACKChan: make(chan frameID),
-		acked:           make(map[frameID]bool),
 
 		waitGroup: &waitGroup,
 		done:      make(chan struct{}),
