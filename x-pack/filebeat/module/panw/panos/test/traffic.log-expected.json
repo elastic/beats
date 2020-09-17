@@ -79,6 +79,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "184.51.253.152",
@@ -185,6 +188,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -294,6 +300,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.253.3.202",
@@ -400,6 +409,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -509,6 +521,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "216.58.194.99",
@@ -615,6 +630,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "209.234.224.22",
@@ -721,6 +739,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -827,6 +848,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.2.238",
@@ -933,6 +957,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1039,6 +1066,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1145,6 +1175,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.249.60.78",
@@ -1251,6 +1284,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1357,6 +1393,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1463,6 +1502,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1569,6 +1611,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1675,6 +1720,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1781,6 +1829,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1887,6 +1938,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "98.138.49.44",
@@ -1993,6 +2047,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "72.30.3.43",
@@ -2099,6 +2156,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -2205,6 +2265,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2311,6 +2374,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -2420,6 +2486,9 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.84.80.198",
@@ -2527,6 +2596,9 @@
         "panw.panos.sub_type": "drop",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -2633,6 +2705,9 @@
         "panw.panos.sub_type": "deny",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -2735,6 +2810,9 @@
         "panw.panos.source.zone": "trust",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -2838,6 +2916,9 @@
         "panw.panos.sub_type": "test",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2944,6 +3025,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -3053,6 +3137,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.66",
@@ -3159,6 +3246,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3265,6 +3355,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -3371,6 +3464,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.253.193",
@@ -3477,6 +3573,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3584,6 +3683,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -3693,6 +3795,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.52.219",
@@ -3802,6 +3907,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.71.117.196",
@@ -3908,6 +4016,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4014,6 +4125,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4123,6 +4237,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.194.41",
@@ -4228,6 +4345,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.124.9",
@@ -4337,6 +4457,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.131.237",
@@ -4443,6 +4566,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -4552,6 +4678,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.190.88.148",
@@ -4661,6 +4790,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.243.83",
@@ -4767,6 +4899,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4873,6 +5008,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4982,6 +5120,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.165.74",
@@ -5088,6 +5229,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -5193,6 +5337,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.94.140",
@@ -5295,6 +5442,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5401,6 +5551,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5507,6 +5660,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5613,6 +5769,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5719,6 +5878,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5825,6 +5987,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5931,6 +6096,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6037,6 +6205,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -6143,6 +6314,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6249,6 +6423,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6355,6 +6532,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6461,6 +6641,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6567,6 +6750,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6673,6 +6859,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6782,6 +6971,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "66.28.0.45",
@@ -6888,6 +7080,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6994,6 +7189,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7100,6 +7298,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7206,6 +7407,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7312,6 +7516,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7421,6 +7628,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.52.174.25",
@@ -7527,6 +7737,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7633,6 +7846,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7742,6 +7958,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.230.5.228",
@@ -7848,6 +8067,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7954,6 +8176,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8060,6 +8285,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8166,6 +8394,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.195",
             "208.83.246.20",
@@ -8271,6 +8502,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -8376,6 +8610,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8481,6 +8718,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8588,6 +8828,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.185.88.112",
@@ -8694,6 +8937,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8800,6 +9046,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8906,6 +9155,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -9015,6 +9267,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9124,6 +9379,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9233,6 +9491,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9339,6 +9600,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "104.254.150.9",
@@ -9448,6 +9712,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9557,6 +9824,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.0.218.108",
@@ -9666,6 +9936,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.6.117.19",
@@ -9775,6 +10048,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "34.238.96.22",
@@ -9884,6 +10160,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "130.211.47.17",
@@ -9990,6 +10269,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10096,6 +10378,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10202,6 +10487,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10308,6 +10596,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10414,6 +10705,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10520,6 +10814,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10626,6 +10923,9 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",

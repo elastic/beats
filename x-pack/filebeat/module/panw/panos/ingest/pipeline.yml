@@ -472,6 +472,11 @@ processors:
      value: "{{panw.panos.file.hash}}"
      if: "ctx?.panw?.panos?.file?.hash != null"
 
+ - append:
+     field: related.hosts
+     value: "{{observer.hostname}}"
+     if: "ctx?.observer?.hostname != null"
+
 # Remove temporary fields.
  - remove:
      field:
