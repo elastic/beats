@@ -343,6 +343,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 - Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
 - Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
+- Handle missing counters in the application_pool metricset. {pull}21071[21071]
 
 *Packetbeat*
 
@@ -414,6 +415,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 - Add container ECS fields in kubernetes metadata. {pull}20984[20984]
 - Add ingress controller dashboards. {pull}21052[21052]
+- Added experimental `citrix` module. {pull}20820[20820]
+- Added experimental `cyberark` module. {pull}20820[20820]
+- Added experimental `proofpoint` module. {pull}20820[20820]
+- Added experimental `snort` module. {pull}20820[20820]
+- Added experimental `symantec` module. {pull}20820[20820]
+- Added experimental dataset `barracuda/spamfirewall`. {pull}20820[20820]
+- Added experimental dataset `cisco/meraki`. {pull}20820[20820]
+- Added experimental dataset `f5/bigipafm`. {pull}20820[20820]
+- Added experimental dataset `fortinet/fortimail`. {pull}20820[20820]
+- Added experimental dataset `fortinet/fortimanager`. {pull}20820[20820]
+- Added experimental dataset `juniper/netscreen`. {pull}20820[20820]
+- Added experimental dataset `sophos/utm`. {pull}20820[20820]
 
 *Auditbeat*
 
@@ -564,6 +577,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
 - Added new module for Zoom webhooks {pull}20414[20414]
+- Add type and sub_type to panw panos fileset {pull}20912[20912]
 
 *Heartbeat*
 
