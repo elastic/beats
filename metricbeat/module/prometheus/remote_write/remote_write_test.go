@@ -78,8 +78,8 @@ func TestGenerateEventsCounter(t *testing.T) {
 	assert.Equal(t, len(events), 2)
 	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	//assert.EqualValues(t, e.Timestamp, timestamp.Time())
+	assert.EqualValues(t, e.Timestamp, timestamp.Time())
 	e = events[timeStampedLabels1.String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	//assert.EqualValues(t, e.Timestamp, timestamp1.Time())
+	assert.EqualValues(t, e.Timestamp, timestamp1.Time())
 }
