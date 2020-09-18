@@ -21,7 +21,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
-	"time"
 )
 
 type readerLoopRequest struct {
@@ -75,25 +74,14 @@ func (rl *readerLoop) run() {
 			return
 		}
 		response := rl.processRequest(request)
-		//fmt.Printf("\033[0;32mread response: read %d frames and %d bytes\033[0m\n", response.frameCount, response.byteCount)
-		// if response.err != nil {
-		// 	fmt.Printf("\033[0;32mresponse had err: %v\033[0m\n", response.err)
-		// }
 		rl.responseChan <- response
 	}
 }
 
 func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
-	//fmt.Printf("\033[0;32mreaderLoop.processRequest(segment %d from %d to %d)\033[0m\n", request.segment.id, request.startOffset, request.endOffset)
-
-	defer time.Sleep(time.Second)
-
 	frameCount := int64(0)
 	byteCount := int64(0)
 	nextFrameID := request.startFrameID
-	// defer func() {
-	// 	fmt.Printf("  \033[0;32mread %d bytes in %d frames\033[0m\n", byteCount, frameCount)
-	// }()
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader(rl.settings)
@@ -113,8 +101,11 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		// Try to read the next frame, clipping to the given bound.
 		// If the next frame extends past this boundary, nextFrame will return
 		// an error.
-		frame, err := rl.nextFrame(handle, remainingLength, nextFrameID)
+		frame, err := rl.nextFrame(handle, remainingLength)
 		if frame != nil {
+			// Add the segment / frame ID, which nextFrame leaves blank.
+			frame.segment = request.segment
+			frame.id = nextFrameID
 			nextFrameID++
 			// We've read the frame, try sending it to the output channel.
 			select {
@@ -161,8 +152,11 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 	}
 }
 
+// nextFrame reads and decodes one frame from the given file handle, as long
+// it does not exceed the given length bound. The returned frame leaves the
+// segment and frame IDs unset.
 func (rl *readerLoop) nextFrame(
-	handle *os.File, maxLength int64, id frameID,
+	handle *os.File, maxLength int64,
 ) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
@@ -235,7 +229,6 @@ func (rl *readerLoop) nextFrame(
 
 	frame := &readFrame{
 		event:       event,
-		id:          id,
 		bytesOnDisk: int64(frameLength),
 	}
 

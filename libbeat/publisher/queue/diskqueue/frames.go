@@ -53,8 +53,14 @@ type writeFrame struct {
 // A frame that has been read from disk and is waiting to be read /
 // acknowledged through the consumer API.
 type readFrame struct {
+	// The segment containing this frame.
+	segment *queueSegment
+
+	// The id of this frame.
+	id frameID
+
+	// The event decoded from the data frame.
 	event publisher.Event
-	id    frameID
 
 	// How much space this frame occupied on disk (before deserialization),
 	// including the frame header / footer.

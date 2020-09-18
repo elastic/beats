@@ -26,9 +26,10 @@ package diskqueue
 func (dq *diskQueue) run() {
 	dq.logger.Debug("Core loop starting up...")
 
-	// Wake up the reader loop if there are segments available to read
-	// (from a previous instantiation of the queue).
+	// Wake up the reader and deleter loops if there are segments to process
+	// from a previous instantiation of the queue.
 	dq.maybeReadPending()
+	dq.maybeDeleteACKed()
 
 	for {
 		select {

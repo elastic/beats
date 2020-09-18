@@ -30,9 +30,7 @@ type diskQueueConsumer struct {
 }
 
 type diskQueueBatch struct {
-	queue *diskQueue
-	//events []publisher.Event
-	//ackIDs []frameID
+	queue  *diskQueue
 	frames []*readFrame
 }
 
@@ -99,5 +97,5 @@ func (batch *diskQueueBatch) Events() []publisher.Event {
 // TODO: this shouldn't really be a dictionary, use a bitfield or
 // something more efficient.
 func (batch *diskQueueBatch) ACK() {
-	batch.queue.acks.ackFrames(batch.frames)
+	batch.queue.acks.addFrames(batch.frames)
 }

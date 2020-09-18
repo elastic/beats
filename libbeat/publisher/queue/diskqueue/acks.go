@@ -36,7 +36,9 @@ type diskQueueACKs struct {
 	// A map of all acked indices that are above ackedUpTo (and thus can't yet
 	// be acknowledged as a continuous block).
 	// TODO: do this better.
-	acked map[frameID]bool
+	//acked map[frameID]bool
+
+	segments map[segmentID]segmentACKs
 
 	// When a segment has been completely acknowledged by a consumer, it sends
 	// the segment ID to this channel, where it is read by the core loop and
@@ -44,17 +46,27 @@ type diskQueueACKs struct {
 	segmentACKChan chan segmentID
 }
 
-func (dqa *diskQueueACKs) ackFrames(frames []*readFrame) {
+// segmentACKs stores the ACKs for a single segment. If a frame has been
+// ACKed, then segmentACKs[frameID] contains its size on disk. The size is
+// used to track the queuePosition of the oldest remaining frame, which is
+// written to disk as ACKs are received. (We do this to avoid duplicating
+// events if the beat terminates without a clean shutdown.)
+type segmentACKs map[frameID]int64
+
+func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.lock.Lock()
 	defer dqa.lock.Unlock()
 	for _, frame := range frames {
-		dqa.acked[frame.id] = true
+		segmentID := frame.segmentID
+		segment := dqa.segments[segmentID]
+		segment[frame.id] = frame.bytesOnDisk
+		//dqa.acked[frame.id] = true
 	}
 	if dqa.acked[dqa.nextFrameID] {
 		for ; dqa.acked[dqa.nextFrameID]; dqa.nextFrameID++ {
 			delete(dqa.acked, dqa.nextFrameID)
 		}
 		// TODO: we now need to send the segment id, not the frame id.
-		dqa.segmentACKChan <- dqa.nextFrameID
+		//dqa.segmentACKChan <- dqa.nextFrameID
 	}
 }
