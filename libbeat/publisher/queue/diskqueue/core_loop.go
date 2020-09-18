@@ -205,21 +205,16 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 }
 
 func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
-	/*acking := dq.segments.acking
+	acking := dq.segments.acking
 	if len(acking) == 0 {
 		return
 	}
-	startFrame := dq.oldestFrameID
-	endFrame := startFrame
 	ackedSegmentCount := 0
 	for ; ackedSegmentCount < len(acking); ackedSegmentCount++ {
-		segment := acking[ackedSegmentCount]
-		if endFrame+frameID(segment.framesRead) > ackedUpTo {
-			// This segment is still waiting for acks, we're done.
+		if acking[ackedSegmentCount].id > ackedSegmentID {
+			// This segment has not been acked yet, we're done.
 			break
 		}
-		// Otherwise, advance the ending frame ID.
-		endFrame += frameID(segment.framesRead)
 	}
 	if ackedSegmentCount > 0 {
 		// Move fully acked segments to the acked list and remove them
@@ -227,9 +222,7 @@ func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
 		dq.segments.acked =
 			append(dq.segments.acked, acking[:ackedSegmentCount]...)
 		dq.segments.acking = acking[ackedSegmentCount:]
-		// Advance oldestFrameID past the segments we just removed.
-		dq.oldestFrameID = endFrame
-	}*/
+	}
 }
 
 func (dq *diskQueue) handleShutdown() {

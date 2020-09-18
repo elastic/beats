@@ -38,7 +38,17 @@ type diskQueueACKs struct {
 	// TODO: do this better.
 	//acked map[frameID]bool
 
-	segments map[segmentID]segmentACKs
+	// If a frame has been ACKed, then frames[frameID] contains its size on
+	// disk. The size is used to track the queuePosition of the oldest
+	// remaining frame, which is written to disk as ACKs are received. (We do
+	// this to avoid duplicating events if the beat terminates without a clean
+	// shutdown.)
+	frames map[frameID]int64
+	//segments map[segmentID]segmentACKs
+
+	// segmentBoundaries maps the first frameID of each segment to its
+	// corresponding segment ID.
+	segmentBoundaries map[frameID]segmentID
 
 	// When a segment has been completely acknowledged by a consumer, it sends
 	// the segment ID to this channel, where it is read by the core loop and
@@ -57,14 +67,29 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.lock.Lock()
 	defer dqa.lock.Unlock()
 	for _, frame := range frames {
-		segmentID := frame.segmentID
-		segment := dqa.segments[segmentID]
-		segment[frame.id] = frame.bytesOnDisk
+		//segmentID := frame.segmentID
+		segment := frame.segment
+		if frame.id == segment.firstFrameID {
+			// This is the first frame in its segment, mark it so we know when
+			// we're starting a new segment.
+			dqa.segmentBoundaries[frame.id] = segment.id
+		}
+		//segment := dqa.segments[segmentID]
+		//segment[frame.id] = frame.bytesOnDisk
 		//dqa.acked[frame.id] = true
+		dqa.frames[frame.id] = frame.bytesOnDisk
 	}
-	if dqa.acked[dqa.nextFrameID] {
-		for ; dqa.acked[dqa.nextFrameID]; dqa.nextFrameID++ {
-			delete(dqa.acked, dqa.nextFrameID)
+	if dqa.frames[dqa.nextFrameID] != 0 {
+		//for ; dqa.frames[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
+		for dqa.frames[dqa.nextFrameID] != 0 {
+			segmentID, ok := dqa.segmentBoundaries[dqa.nextFrameID]
+			if ok {
+				// This is the start of a new segment, inform the ACK channel that
+				// earlier segments are completely acknowledged.
+				dqa.segmentACKChan <- segmentID - 1
+				delete(dqa.segmentBoundaries, dqa.nextFrameID)
+			}
+			delete(dqa.frames, dqa.nextFrameID)
 		}
 		// TODO: we now need to send the segment id, not the frame id.
 		//dqa.segmentACKChan <- dqa.nextFrameID
