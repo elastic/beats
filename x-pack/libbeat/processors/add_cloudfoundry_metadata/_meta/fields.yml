@@ -11,7 +11,7 @@
         - name: app.id
           type: keyword
           description: >
-            Cloud Foundry application ID.
+            Cloud Foundry application identifier.
 
         - name: app.name
           type: keyword
@@ -21,7 +21,7 @@
         - name: space.id
           type: keyword
           description: >
-            Cloud Foundry space name.
+            Cloud Foundry space identifier.
 
         - name: space.name
           type: keyword
@@ -31,7 +31,7 @@
         - name: org.id
           type: keyword
           description: >
-            Cloud Foundry organization ID.
+            Cloud Foundry organization identifier.
 
         - name: org.name
           type: keyword
