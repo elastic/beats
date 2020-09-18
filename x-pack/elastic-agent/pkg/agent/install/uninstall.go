@@ -16,10 +16,7 @@ func Uninstall() error {
 	if err != nil {
 		return err
 	}
-	status, err := svc.Status()
-	if err != nil {
-		return err
-	}
+	status, _ := svc.Status()
 	if status == service.StatusRunning {
 		err := svc.Stop()
 		if err != nil {
@@ -52,7 +49,7 @@ func Uninstall() error {
 	// remove, if present on platform
 	if ShellWrapperPath != "" {
 		err = os.Remove(ShellWrapperPath)
-		if !os.IsNotExist(err) {
+		if !os.IsNotExist(err) && err != nil {
 			return errors.New(
 				err,
 				fmt.Sprintf("failed to remove shell wrapper (%s)", ShellWrapperPath),

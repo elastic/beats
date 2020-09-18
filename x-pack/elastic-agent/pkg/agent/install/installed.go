@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 )
 
+// InstallStatus is the return status types.
 type InstallStatus int
 
 const (
@@ -24,20 +25,18 @@ const (
 // Status returns the installation status of Agent.
 func Status() (InstallStatus, string) {
 	expected := filepath.Join(InstallPath, BinaryName)
+	status, reason := checkService()
 	_, err := os.Stat(expected)
 	if os.IsNotExist(err) {
-		return NotInstalled, "binary not located at install path"
+		if status == Installed {
+			// service installed, but no install path
+			return Broken, "service exists but installation path is missing"
+		}
+		return NotInstalled, "no install path or service"
 	}
-	svc, err := newService()
-	if err != nil {
-		return Broken, "unable to check service status"
-	}
-	status, err := svc.Status()
-	if err != nil {
-		return Broken, "unable to check service status"
-	}
-	if status == service.StatusUnknown {
-		return Broken, "service is not installed"
+	if status == NotInstalled {
+		// install path present, but not service
+		return Broken, reason
 	}
 	return Installed, ""
 }
@@ -50,4 +49,17 @@ func RunningInstalled() bool {
 	expected := filepath.Join(InstallPath, BinaryName)
 	execPath, _ := os.Executable()
 	return expected == execPath
+}
+
+// checkService only checks the status of the service.
+func checkService() (InstallStatus, string) {
+	svc, err := newService()
+	if err != nil {
+		return NotInstalled, "unable to check service status"
+	}
+	status, _ := svc.Status()
+	if status == service.StatusUnknown {
+		return NotInstalled, "service is not installed"
+	}
+	return Installed, ""
 }
