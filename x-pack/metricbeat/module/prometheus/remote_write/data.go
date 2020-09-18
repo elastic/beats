@@ -122,16 +122,11 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 		promType := g.findMetricType(name, labels)
 
-		timeStampedLabels := labels.Clone()
-		timeStampedLabels.Put("timestamp", metric.Timestamp.Time())
-
-		labelsHash := timeStampedLabels.String()
+		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		labelsClone := labels.Clone()
 		labelsClone.Delete("le")
 		if promType == histogramType {
-			timeStampedLabels := labelsClone.Clone()
-			timeStampedLabels.Put("timestamp", metric.Timestamp.Time())
-			labelsHash = timeStampedLabels.String()
+			labelsHash = labelsClone.String() + metric.Timestamp.Time().String()
 		}
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
@@ -225,9 +220,7 @@ func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels commo
 // processPromHistograms receives a group of Histograms and converts each one to ES histogram
 func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
 	for _, histogram := range histograms {
-		timeStampedLabels := histogram.labels.Clone()
-		timeStampedLabels.Put("timestamp", histogram.timestamp)
-		labelsHash := timeStampedLabels.String()
+		labelsHash := histogram.labels.String() + histogram.timestamp.String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
 				ModuleFields: common.MapStr{},

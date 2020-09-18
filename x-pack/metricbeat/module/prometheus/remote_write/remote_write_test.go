@@ -32,8 +32,6 @@ func TestGenerateEventsCounter(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 	// first fetch
 	metrics := model.Samples{
 		&model.Sample{
@@ -56,7 +54,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -81,7 +79,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -100,8 +98,6 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -137,7 +133,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -174,7 +170,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -194,14 +190,10 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
-	timeStampedLabels2 := labels2.Clone()
-	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -253,9 +245,9 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -308,9 +300,9 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 }
@@ -329,14 +321,10 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
-	timeStampedLabels2 := labels2.Clone()
-	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -400,9 +388,9 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -467,9 +455,9 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 }
@@ -490,19 +478,13 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.25"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.50"),
 	}
-	timeStampedLabels2 := labels2.Clone()
-	timeStampedLabels2.Put("timestamp", timestamp.Time())
 	labels3 := common.MapStr{
 		"runtime": model.LabelValue("linux"),
 	}
-	timeStampedLabels3 := labels3.Clone()
-	timeStampedLabels3.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -580,11 +562,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 3)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
-	e = events[timeStampedLabels3.String()]
+	e = events[labels3.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected3)
 
 	// repeat in order to test the rate
@@ -663,11 +645,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 3)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
-	e = events[timeStampedLabels3.String()]
+	e = events[labels3.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected3)
 
 }
@@ -686,13 +668,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	labels := common.MapStr{
 		"runtime": model.LabelValue("linux"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"runtime": model.LabelValue("darwin"),
 	}
-	timeStampedLabels2 := labels2.Clone()
-	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -880,9 +858,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(events))
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -1071,9 +1049,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(events))
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[timeStampedLabels2.String()]
+	e = events[labels2.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 }
 
@@ -1098,8 +1076,6 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -1123,7 +1099,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -1148,7 +1124,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -1173,8 +1149,6 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -1201,7 +1175,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -1229,7 +1203,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[timeStampedLabels.String()]
+	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }

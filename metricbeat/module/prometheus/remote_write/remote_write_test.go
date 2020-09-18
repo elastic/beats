@@ -31,15 +31,10 @@ func TestGenerateEventsCounter(t *testing.T) {
 	g := remoteWriteEventGenerator{}
 
 	timestamp := model.Time(424242)
+	timestamp1 := model.Time(424243)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-	timeStampedLabels := labels.Clone()
-	timeStampedLabels.Put("timestamp", timestamp.Time())
-
-	timestamp1 := model.Time(424243)
-	timeStampedLabels1 := labels.Clone()
-	timeStampedLabels1.Put("timestamp", timestamp1.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -76,10 +71,10 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e := events[timeStampedLabels.String()]
+	e := events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 	assert.EqualValues(t, e.Timestamp, timestamp.Time())
-	e = events[timeStampedLabels1.String()]
+	e = events[labels.String()+timestamp1.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
 	assert.EqualValues(t, e.Timestamp, timestamp1.Time())
 }
