@@ -57,13 +57,16 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 			labels[string(k)] = v
 		}
 
-		// join metrics with same labels in a single event
-		labelsHash := labels.String()
+		// join metrics with same labels and same timestamp in a single event
+		timeStampedLabels := labels.Clone()
+		timeStampedLabels.Put("timestamp", metric.Timestamp.Time())
+		labelsHash := timeStampedLabels.String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
 				ModuleFields: common.MapStr{
 					"metrics": common.MapStr{},
 				},
+				Timestamp: metric.Timestamp.Time(),
 			}
 
 			// Add labels
@@ -74,7 +77,6 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
-		e.Timestamp = metric.Timestamp.Time()
 		data := common.MapStr{
 			name: val,
 		}

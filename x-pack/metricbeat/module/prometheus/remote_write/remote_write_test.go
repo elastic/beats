@@ -28,10 +28,12 @@ func TestGenerateEventsCounter(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
-
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 	// first fetch
 	metrics := model.Samples{
 		&model.Sample{
@@ -40,7 +42,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -54,7 +56,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -65,7 +67,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -79,7 +81,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -94,9 +96,12 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -106,7 +111,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -114,7 +119,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(43),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -132,7 +137,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -143,7 +148,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -151,7 +156,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(47),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -169,7 +174,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -184,13 +189,19 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
+	timeStampedLabels2 := labels2.Clone()
+	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -200,7 +211,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -208,7 +219,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(43),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -217,7 +228,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(44),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -242,9 +253,9 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -255,7 +266,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -263,7 +274,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(47),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -272,7 +283,7 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(50),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -297,9 +308,9 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 }
@@ -314,13 +325,18 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
+	timeStampedLabels2 := labels2.Clone()
+	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -330,7 +346,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -338,7 +354,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(43),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -347,7 +363,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(44),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -356,7 +372,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(49),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -384,9 +400,9 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -397,7 +413,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -405,7 +421,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(47),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -414,7 +430,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(50),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -423,7 +439,7 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 				"device":        "eth0",
 			},
 			Value:     model.SampleValue(59),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -451,9 +467,9 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 2)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected1)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 }
@@ -468,17 +484,25 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.25"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.50"),
 	}
+	timeStampedLabels2 := labels2.Clone()
+	timeStampedLabels2.Put("timestamp", timestamp.Time())
 	labels3 := common.MapStr{
 		"runtime": model.LabelValue("linux"),
 	}
+	timeStampedLabels3 := labels3.Clone()
+	timeStampedLabels3.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -489,7 +513,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.25",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -498,7 +522,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.50",
 			},
 			Value:     model.SampleValue(43),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -506,7 +530,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(44),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -514,7 +538,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -523,7 +547,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.25",
 			},
 			Value:     model.SampleValue(46),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -556,11 +580,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 3)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
-	e = events[labels3.String()]
+	e = events[timeStampedLabels3.String()]
 	assert.EqualValues(t, e.ModuleFields, expected3)
 
 	// repeat in order to test the rate
@@ -572,7 +596,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.25",
 			},
 			Value:     model.SampleValue(52),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -581,7 +605,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.50",
 			},
 			Value:     model.SampleValue(53),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -589,7 +613,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(54),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -597,7 +621,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(55),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -606,7 +630,7 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 				"quantile": "0.25",
 			},
 			Value:     model.SampleValue(56),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -639,11 +663,11 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 3)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
-	e = events[labels3.String()]
+	e = events[timeStampedLabels3.String()]
 	assert.EqualValues(t, e.ModuleFields, expected3)
 
 }
@@ -658,12 +682,17 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 		rateCounters: true,
 	}
 	g.counterCache.Start()
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"runtime": model.LabelValue("linux"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 	labels2 := common.MapStr{
 		"runtime": model.LabelValue("darwin"),
 	}
+	timeStampedLabels2 := labels2.Clone()
+	timeStampedLabels2.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -674,7 +703,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -683,7 +712,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(43),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -692,7 +721,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(44),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -700,7 +729,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -708,7 +737,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(46),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		// second histogram same label
 		&model.Sample{
@@ -718,7 +747,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(52),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -727,7 +756,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(53),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -736,7 +765,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(54),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -744,7 +773,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(55),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -752,7 +781,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(56),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		// third histogram different label
 		&model.Sample{
@@ -762,7 +791,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(62),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -771,7 +800,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(63),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -780,7 +809,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(64),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -788,7 +817,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "darwin",
 			},
 			Value:     model.SampleValue(65),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -796,7 +825,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "darwin",
 			},
 			Value:     model.SampleValue(66),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -851,9 +880,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(events))
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 
 	// repeat in order to test the rate
@@ -865,7 +894,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(142),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -874,7 +903,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(143),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -883,7 +912,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(144),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -891,7 +920,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(145),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -899,7 +928,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(146),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		// second histogram same label
 		&model.Sample{
@@ -909,7 +938,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(252),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -918,7 +947,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(253),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -927,7 +956,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(254),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -935,7 +964,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(255),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -943,7 +972,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "linux",
 			},
 			Value:     model.SampleValue(256),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		// third histogram different label
 		&model.Sample{
@@ -953,7 +982,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.25",
 			},
 			Value:     model.SampleValue(362),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -962,7 +991,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "0.50",
 			},
 			Value:     model.SampleValue(363),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -971,7 +1000,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"le":       "+Inf",
 			},
 			Value:     model.SampleValue(364),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -979,7 +1008,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "darwin",
 			},
 			Value:     model.SampleValue(365),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 		&model.Sample{
 			Metric: map[model.LabelName]model.LabelValue{
@@ -987,7 +1016,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 				"runtime":  "darwin",
 			},
 			Value:     model.SampleValue(366),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -1042,9 +1071,9 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 
 	assert.Equal(t, 2, len(events))
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
-	e = events[labels2.String()]
+	e = events[timeStampedLabels2.String()]
 	assert.EqualValues(t, e.ModuleFields, expected2)
 }
 
@@ -1064,9 +1093,13 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 
 	g.counterCache.Start()
+
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -1076,7 +1109,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -1090,7 +1123,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -1101,7 +1134,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 				"listener_name": "http",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -1115,7 +1148,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }
@@ -1136,9 +1169,12 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 
 	g.counterCache.Start()
+	timestamp := model.Time(424242)
 	labels := common.MapStr{
 		"listener_name": model.LabelValue("http"),
 	}
+	timeStampedLabels := labels.Clone()
+	timeStampedLabels.Put("timestamp", timestamp.Time())
 
 	// first fetch
 	metrics := model.Samples{
@@ -1149,7 +1185,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 				"le":            "20",
 			},
 			Value:     model.SampleValue(42),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events := g.GenerateEvents(metrics)
@@ -1165,7 +1201,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e := events[labels.String()]
+	e := events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 	// repeat in order to test the rate
@@ -1177,7 +1213,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 				"le":            "20",
 			},
 			Value:     model.SampleValue(45),
-			Timestamp: model.Time(424242),
+			Timestamp: timestamp,
 		},
 	}
 	events = g.GenerateEvents(metrics)
@@ -1193,7 +1229,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 
 	assert.Equal(t, len(events), 1)
-	e = events[labels.String()]
+	e = events[timeStampedLabels.String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
 }

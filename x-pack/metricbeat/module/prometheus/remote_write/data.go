@@ -122,16 +122,22 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 		promType := g.findMetricType(name, labels)
 
-		labelsHash := labels.String()
+		timeStampedLabels := labels.Clone()
+		timeStampedLabels.Put("timestamp", metric.Timestamp.Time())
+
+		labelsHash := timeStampedLabels.String()
 		labelsClone := labels.Clone()
 		labelsClone.Delete("le")
 		if promType == histogramType {
-			labelsHash = labelsClone.String()
+			timeStampedLabels := labelsClone.Clone()
+			timeStampedLabels.Put("timestamp", metric.Timestamp.Time())
+			labelsHash = timeStampedLabels.String()
 		}
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
 				ModuleFields: common.MapStr{},
+				Timestamp:    metric.Timestamp.Time(),
 			}
 
 			// Add labels
@@ -145,7 +151,6 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 
 		e := eventList[labelsHash]
-		e.Timestamp = metric.Timestamp.Time()
 		switch promType {
 		case counterType:
 			data = common.MapStr{
@@ -220,10 +225,13 @@ func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels commo
 // processPromHistograms receives a group of Histograms and converts each one to ES histogram
 func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]mb.Event, histograms map[string]histogram) {
 	for _, histogram := range histograms {
-		labelsHash := histogram.labels.String()
+		timeStampedLabels := histogram.labels.Clone()
+		timeStampedLabels.Put("timestamp", histogram.timestamp)
+		labelsHash := timeStampedLabels.String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
 				ModuleFields: common.MapStr{},
+				Timestamp:    histogram.timestamp,
 			}
 
 			// Add labels
@@ -233,7 +241,6 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 		}
 
 		e := eventList[labelsHash]
-		e.Timestamp = histogram.timestamp
 
 		hist := dto.Histogram{
 			Bucket: histogram.buckets,
