@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 
@@ -35,8 +36,9 @@ would like the Agent to operate.
 		},
 	}
 
-	cmd.Flags().StringP("kibana-url", "", "", "URL of Kibana to enroll Agent into Fleet")
-	cmd.Flags().StringP("enrollment-token", "", "", "Enrollment token to use to enroll Agent into Fleet")
+	cmd.Flags().StringP("kibana-url", "k", "", "URL of Kibana to enroll Agent into Fleet")
+	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
+	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	addEnrollFlags(cmd)
 
 	return cmd
@@ -82,89 +84,73 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 	err = install.StartService()
 	if err != nil {
-		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.")
+		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
 		return fmt.Errorf("Error: %s", err)
 	}
-	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.")
+	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
 
-	/*
-		insecure, _ := cmd.Flags().GetBool("insecure")
-
-		logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	askEnroll := true
+	kibana, _ := cmd.Flags().GetString("kibana-url")
+	token, _ := cmd.Flags().GetString("enrollment-token")
+	if kibana != "" && token != "" {
+		askEnroll = false
+	}
+	if force {
+		askEnroll = false
+	}
+	if askEnroll {
+		confirm, err := c.Confirm("Do you want to enroll this Agent into Fleet?", true)
 		if err != nil {
-			return err
+			return fmt.Errorf("Error: problem reading prompt response")
 		}
-
-		url := args[0]
-		enrollmentToken := args[1]
-
-		caStr, _ := cmd.Flags().GetString("certificate-authorities")
-		CAs := cli.StringToSlice(caStr)
-
-		caSHA256str, _ := cmd.Flags().GetString("ca-sha256")
-		caSHA256 := cli.StringToSlice(caSHA256str)
-
-		delay(defaultDelay)
-
-		options := application.EnrollCmdOption{
-			ID:                   "", // TODO(ph), This should not be an empty string, will clarify in a new PR.
-			EnrollAPIKey:         enrollmentToken,
-			URL:                  url,
-			CAs:                  CAs,
-			CASha256:             caSHA256,
-			Insecure:             insecure,
-			UserProvidedMetadata: make(map[string]interface{}),
-			Staging:              staging,
-		}
-
-		c, err := application.NewEnrollCmd(
-			logger,
-			&options,
-			pathConfigFile,
-		)
-
-		if err != nil {
-			return err
-		}
-
-		err = c.Execute()
-		signal := make(chan struct{})
-
-		backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
-
-		for errors.Is(err, fleetapi.ErrTooManyRequests) {
-			fmt.Fprintln(streams.Out, "Too many requests on the remote server, will retry in a moment.")
-			backExp.Wait()
-			fmt.Fprintln(streams.Out, "Retrying to enroll...")
-			err = c.Execute()
-		}
-
-		close(signal)
-
-		if err != nil {
-			return errors.New(err, "fail to enroll")
-		}
-
-		fmt.Fprintln(streams.Out, "Successfully enrolled the Elastic Agent.")
-
-		// skip restarting
-		noRestart, _ := cmd.Flags().GetBool("no-restart")
-		if noRestart {
+		if !confirm {
+			// not enrolling, all done (standalone mode)
 			return nil
 		}
-
-		daemon := client.New()
-		err = daemon.Connect(context.Background())
-		if err == nil {
-			defer daemon.Disconnect()
-			err = daemon.Restart(context.Background())
-			if err == nil {
-				fmt.Fprintln(streams.Out, "Successfully triggered restart on running Elastic Agent.")
-				return nil
-			}
-		}
-		fmt.Fprintln(streams.Out, "Elastic Agent might not be running; unable to trigger restart")
+	}
+	if !askEnroll && (kibana == "" || token == "") {
+		// force was performed without required enrollment arguments, all done (standalone mode)
 		return nil
-	*/
-	return nil
+	}
+
+	if kibana == "" {
+		kibana, err := c.ReadInput("Kibana URL you want to enroll this Agent into:")
+		if err != nil {
+			return fmt.Errorf("Error: problem reading prompt response")
+		}
+		if kibana == "" {
+			fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
+			return nil
+		}
+	}
+	if token == "" {
+		token, err := c.ReadInput("Fleet enrollment token:")
+		if err != nil {
+			return fmt.Errorf("Error: problem reading prompt response")
+		}
+		if token == "" {
+			fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
+			return nil
+		}
+	}
+
+	enrollArgs := []string{"enroll", kibana, token, "--force"}
+	enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
+	enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
+	enrollCmd.Stdin = os.Stdin
+	enrollCmd.Stdout = os.Stdout
+	enrollCmd.Stderr = os.Stderr
+	err = enrollCmd.Start()
+	if err != nil {
+		return fmt.Errorf("Error: failed to execute enroll command: %s", err)
+	}
+	err = enrollCmd.Wait()
+	if err == nil {
+		return nil
+	}
+	exitErr, ok := err.(*exec.ExitError)
+	if ok {
+		return fmt.Errorf("Error: enroll command failed with exit code %d", exitErr.ExitCode())
+	}
+	return fmt.Errorf("Error: enroll command failed for unknown reason: %s", err)
 }

@@ -5,9 +5,10 @@
 package install
 
 import (
-	"github.com/kardianos/service"
 	"os"
 	"path/filepath"
+
+	"github.com/kardianos/service"
 )
 
 // InstallStatus is the return status types.

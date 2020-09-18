@@ -43,6 +43,8 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 	}
 
 	addEnrollFlags(cmd)
+	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
+	cmd.Flags().Bool("no-restart", false, "Skip restarting the currently running daemon")
 
 	return cmd
 }
@@ -50,10 +52,33 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("certificate-authorities", "a", "", "Comma separated list of root certificate for server verifications")
 	cmd.Flags().StringP("ca-sha256", "p", "", "Comma separated list of certificate authorities hash pins used for certificate verifications")
-	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	cmd.Flags().BoolP("insecure", "i", false, "Allow insecure connection to Kibana")
 	cmd.Flags().StringP("staging", "", "", "Configures agent to download artifacts from a staging build")
-	cmd.Flags().Bool("no-restart", false, "Skip restarting the currently running daemon")
+}
+
+func buildEnrollmentFlags(cmd *cobra.Command) []string {
+	ca, _ := cmd.Flags().GetString("certificate-authorities")
+	sha256, _ := cmd.Flags().GetString("ca-sha256")
+	insecure, _ := cmd.Flags().GetBool("insecure")
+	staging, _ := cmd.Flags().GetString("staging")
+
+	args := []string{}
+	if ca != "" {
+		args = append(args, "--certificate-authorities")
+		args = append(args, ca)
+	}
+	if sha256 != "" {
+		args = append(args, "--ca-sha256")
+		args = append(args, sha256)
+	}
+	if insecure {
+		args = append(args, "--insecure")
+	}
+	if staging != "" {
+		args = append(args, "--staging")
+		args = append(args, staging)
+	}
+	return args
 }
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
