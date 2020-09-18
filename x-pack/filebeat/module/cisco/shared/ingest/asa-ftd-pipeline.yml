@@ -29,7 +29,6 @@ processors:
   # Parse FTD/ASA style message
   #
   # This parses the header of an EMBLEM-style message for FTD and ASA prefixes.
-
   - grok:
       field: log.original
       patterns:
