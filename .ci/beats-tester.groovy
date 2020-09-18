@@ -69,7 +69,9 @@ pipeline {
           options { skipDefaultCheckout() }
           when { triggeredBy cause: "IssueCommentCause" }
           steps {
-            runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
+            runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT",
+                              apm: "https://storage.googleapis.com/apm-ci-artifacts/jobs/pull-requests/pr-${env.CHANGE_ID}",
+                              beats: "https://storage.googleapis.com/beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}")
           }
         }
         stage('Build release branch') {
