@@ -20,8 +20,7 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/beats-tester$')
-    // disable upstream trigger on a PR basis
-    upstream("Beats/packaging/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/packaging/${env.JOB_BASE_NAME}")
   }
   stages {
     stage('Filter build') {
@@ -67,7 +66,7 @@ pipeline {
         }
         stage('Build PullRequest') {
           options { skipDefaultCheckout() }
-          when { triggeredBy cause: "IssueCommentCause" }
+          when { changeRequest() }
           steps {
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT",
                               apm: "https://storage.googleapis.com/apm-ci-artifacts/jobs/pull-requests/pr-${env.CHANGE_ID}",
@@ -78,7 +77,10 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             not {
-              branch comparator: 'REGEXP', pattern: '(master|.*x)'
+              allOf {
+                branch comparator: 'REGEXP', pattern: '(master|.*x)'
+                changeRequest()
+              }
             }
            }
           steps {
