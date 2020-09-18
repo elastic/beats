@@ -21,7 +21,7 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)^\\/beats-tester$')
     // disable upstream trigger on a PR basis
-    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/packaging/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   stages {
     stage('Filter build') {
