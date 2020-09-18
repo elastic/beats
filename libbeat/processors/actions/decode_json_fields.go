@@ -108,17 +108,32 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 
-		text, ok := data.(string)
-		if !ok {
-			// ignore non string fields when unmarshaling
-			continue
-		}
-
 		var output interface{}
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
-		if err != nil {
-			f.logger.Debugf("Error trying to unmarshal %s", text)
-			errs = append(errs, err.Error())
+		switch text := data.(type) {
+		case string:
+			err = unmarshal(f.maxDepth, text, &output, f.processArray)
+			if err != nil {
+				f.logger.Debugf("Error trying to unmarshal %s", text)
+				errs = append(errs, err.Error())
+				continue
+			}
+		case []interface{}:
+			outputArray := make([]interface{}, len(text))
+			for i, j := range text {
+				text := j.(string)
+				var innerOutput interface{}
+				err = unmarshal(f.maxDepth, text, &innerOutput, f.processArray)
+				if err != nil {
+					f.logger.Debugf("Error trying to unmarshal %s", text)
+					errs = append(errs, err.Error())
+					continue
+				}
+				outputArray[i] = innerOutput
+			}
+
+			output = outputArray
+		default:
+			// ignore non string or array of strings when unmarshaling
 			continue
 		}
 
@@ -170,6 +185,34 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+func tryUnmarshal(maxDepth int, v interface{}, processArray bool) (interface{}, bool) {
+	ar, isAr := v.([]interface{})
+	if isAr {
+		for k, w := range ar {
+			if decoded, ok := tryUnmarshal(maxDepth, w, processArray); ok {
+				ar[k] = decoded
+			}
+		}
+
+		return ar, true
+	}
+
+	str, isString := v.(string)
+	if !isString {
+		return v, false
+	} else if !isStructured(str) {
+		return str, false
+	}
+
+	var tmp interface{}
+	err := unmarshal(maxDepth, str, &tmp, processArray)
+	if err != nil {
+		return v, err == errProcessingSkipped
+	}
+
+	return tmp, true
+}
+
 func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
 	if err := decodeJSON(text, fields); err != nil {
 		return err
@@ -180,28 +223,35 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		return nil
 	}
 
-	tryUnmarshal := func(v interface{}) (interface{}, bool) {
-		str, isString := v.(string)
-		if !isString {
-			return v, false
-		} else if !isStructured(str) {
-			return str, false
-		}
-
-		var tmp interface{}
-		err := unmarshal(maxDepth, str, &tmp, processArray)
-		if err != nil {
-			return v, err == errProcessingSkipped
-		}
-
-		return tmp, true
-	}
+	//tryUnmarshal := func(v interface{}) (interface{}, bool) {
+	//	ar, isAr := v.([]interface{})
+	//	if isAr {
+	//		for k, v := range ar {
+	//
+	//		}
+	//	}
+	//
+	//	str, isString := v.(string)
+	//	if !isString {
+	//		return v, false
+	//	} else if !isStructured(str) {
+	//		return str, false
+	//	}
+	//
+	//	var tmp interface{}
+	//	err := unmarshal(maxDepth, str, &tmp, processArray)
+	//	if err != nil {
+	//		return v, err == errProcessingSkipped
+	//	}
+	//
+	//	return tmp, true
+	//}
 
 	// try to deep unmarshal fields
 	switch O := interface{}(*fields).(type) {
 	case map[string]interface{}:
 		for k, v := range O {
-			if decoded, ok := tryUnmarshal(v); ok {
+			if decoded, ok := tryUnmarshal(maxDepth, v, processArray); ok {
 				O[k] = decoded
 			}
 		}
@@ -212,7 +262,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		}
 
 		for i, v := range O {
-			if decoded, ok := tryUnmarshal(v); ok {
+			if decoded, ok := tryUnmarshal(maxDepth, v, processArray); ok {
 				O[i] = decoded
 			}
 		}

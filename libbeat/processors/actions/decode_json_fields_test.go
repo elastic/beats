@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -336,6 +337,33 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 	expected := common.MapStr{
 		"msg": common.MapStr{
 			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestArrayWithJsonObjectsStringified(t *testing.T) {
+	m := common.MapStr{
+		"inner": []string{`{"a": "b"}`},
+	}
+	byt, _ := json.Marshal(m)
+
+	input := common.MapStr{
+		"msg": string(byt),
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"inner": []common.MapStr{{"a": "b"}},
 		},
 	}
 
