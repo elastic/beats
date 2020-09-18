@@ -238,7 +238,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		acks: &diskQueueACKs{
 			nextFrameID:       0,
 			nextPosition:      nextReadPosition,
-			frames:            make(map[frameID]int64),
+			frameSize:         make(map[frameID]int64),
 			segmentBoundaries: make(map[frameID]segmentID),
 			segmentACKChan:    make(chan segmentID),
 		},

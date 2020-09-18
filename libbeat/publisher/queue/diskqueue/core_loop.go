@@ -266,11 +266,11 @@ func (dq *diskQueue) maybeWritePending() {
 		return
 	}
 	// Remove everything from pendingFrames and forward it to the writer loop.
-	requests := dq.pendingFrames
+	frames := dq.pendingFrames
 	dq.pendingFrames = nil
 
 	dq.writerLoop.requestChan <- writerLoopRequest{
-		frames: requests,
+		frames: frames,
 	}
 	dq.writing = true
 }

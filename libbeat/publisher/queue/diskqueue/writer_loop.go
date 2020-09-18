@@ -88,7 +88,7 @@ func (wl *writerLoop) run() {
 	for {
 		block, ok := <-wl.requestChan
 		if !ok {
-			// The requst channel is closed, we are done
+			// The request channel is closed, we are done
 			return
 		}
 		bytesWritten := wl.processRequest(block)

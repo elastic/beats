@@ -35,18 +35,12 @@ type diskQueueACKs struct {
 	nextFrameID  frameID
 	nextPosition queuePosition
 
-	// A map of all acked indices that are above ackedUpTo (and thus can't yet
-	// be acknowledged as a continuous block).
-	// TODO: do this better.
-	//acked map[frameID]bool
-
-	// If a frame has been ACKed, then frames[frameID] contains its size on
+	// If a frame has been ACKed, then frameSize[frameID] contains its size on
 	// disk. The size is used to track the queuePosition of the oldest
 	// remaining frame, which is written to disk as ACKs are received. (We do
 	// this to avoid duplicating events if the beat terminates without a clean
 	// shutdown.)
-	frames map[frameID]int64
-	//segments map[segmentID]segmentACKs
+	frameSize map[frameID]int64
 
 	// segmentBoundaries maps the first frameID of each segment to its
 	// corresponding segment ID.
@@ -58,35 +52,41 @@ type diskQueueACKs struct {
 	segmentACKChan chan segmentID
 }
 
-// segmentACKs stores the ACKs for a single segment. If a frame has been
-// ACKed, then segmentACKs[frameID] contains its size on disk. The size is
-// used to track the queuePosition of the oldest remaining frame, which is
-// written to disk as ACKs are received. (We do this to avoid duplicating
-// events if the beat terminates without a clean shutdown.)
-type segmentACKs map[frameID]int64
-
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.lock.Lock()
 	defer dqa.lock.Unlock()
 	for _, frame := range frames {
 		segment := frame.segment
-		if frame.id == segment.firstFrameID {
+		if frame.id != 0 && frame.id == segment.firstFrameID {
 			// This is the first frame in its segment, mark it so we know when
 			// we're starting a new segment.
+			//
+			// Subtlety: we don't count the very first frame as a "boundary" even
+			// though it is the first frame we read from its segment. This prevents
+			// us from resetting our segment offset to zero, in case the initial
+			// offset was restored from a previous session instead of starting at
+			// the beginning of the first segment.
 			dqa.segmentBoundaries[frame.id] = segment.id
 		}
-		dqa.frames[frame.id] = frame.bytesOnDisk
+		dqa.frameSize[frame.id] = frame.bytesOnDisk
 	}
-	if dqa.frames[dqa.nextFrameID] != 0 {
-		for ; dqa.frames[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
-			segmentID := dqa.segmentBoundaries[dqa.nextFrameID]
-			if segmentID > 0 {
+	if dqa.frameSize[dqa.nextFrameID] != 0 {
+		for ; dqa.frameSize[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
+			newSegment, ok := dqa.segmentBoundaries[dqa.nextFrameID]
+			if ok {
 				// This is the start of a new segment, inform the ACK channel that
 				// earlier segments are completely acknowledged.
-				dqa.segmentACKChan <- segmentID - 1
+				dqa.segmentACKChan <- newSegment - 1
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
+
+				// Update the position to the start of the new segment.
+				dqa.nextPosition = queuePosition{
+					segmentID: newSegment,
+					offset:    0,
+				}
 			}
-			delete(dqa.frames, dqa.nextFrameID)
+			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
+			delete(dqa.frameSize, dqa.nextFrameID)
 		}
 	}
 }
