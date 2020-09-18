@@ -94,8 +94,8 @@ func (a *ActionConfigChange) ID() string {
 
 // ActionUpgrade is a request for agent to unhook from fleet.
 type ActionUpgrade struct {
-	ActionID   string `json:"id" "yaml:"id"`
-	ActionType string `json:"type" "yaml:"type"`
+	ActionID   string `json:"id" yaml:"id"`
+	ActionType string `json:"type" yaml:"type"`
 	Version    string `json:"version" yaml:"version"`
 	SourceURI  string `json:"source_uri" yaml:"source_uri"`
 }
