@@ -24,7 +24,10 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -69,11 +72,17 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 
 // ReadPEMFile reads a PEM format file on disk and decrypt it with the privided password and
 // return the raw content.
-func ReadPEMFile(log *logp.Logger, path, passphrase string) ([]byte, error) {
+func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 	pass := []byte(passphrase)
 	var blocks []*pem.Block
 
-	content, err := ioutil.ReadFile(path)
+	r, err := NewPEMReader(s)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	content, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +111,7 @@ func ReadPEMFile(log *logp.Logger, path, passphrase string) ([]byte, error) {
 
 			if err != nil {
 				log.Errorf("Dropping encrypted pem '%v' block read from %v. %+v",
-					block.Type, path, err)
+					block.Type, s, err)
 				continue
 			}
 
@@ -139,20 +148,28 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 
 	log := logp.NewLogger(logSelector)
 	roots := x509.NewCertPool()
-	for _, path := range CAs {
-		pemData, err := ioutil.ReadFile(path)
+	for _, s := range CAs {
+		r, err := NewPEMReader(s)
 		if err != nil {
 			log.Errorf("Failed reading CA certificate: %+v", err)
-			errors = append(errors, fmt.Errorf("%v reading %v", err, path))
+			errors = append(errors, fmt.Errorf("%v reading %v", err, s))
+			continue
+		}
+		defer r.Close()
+
+		pemData, err := ioutil.ReadAll(r)
+		if err != nil {
+			log.Errorf("Failed reading CA certificate: %+v", err)
+			errors = append(errors, fmt.Errorf("%v reading %v", err, s))
 			continue
 		}
 
 		if ok := roots.AppendCertsFromPEM(pemData); !ok {
-			log.Error("Failed to add CA to the cert pool, CA is not a valid PEM file")
-			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, path))
+			log.Error("Failed to add CA to the cert pool, CA is not a valid PEM document")
+			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, s))
 			continue
 		}
-		log.Debugf("tls", "successfully loaded CA certificate: %v", path)
+		log.Debugf("tls", "successfully loaded CA certificate: %v", s)
 	}
 
 	return roots, errors
@@ -186,4 +203,59 @@ func ResolveTLSVersion(v uint16) string {
 // ResolveCipherSuite takes the integer representation and return the cipher name.
 func ResolveCipherSuite(cipher uint16) string {
 	return tlsCipherSuite(cipher).String()
+}
+
+// PEMReader allows to read a certificate in PEM format either through the disk or from a string.
+type PEMReader struct {
+	reader io.ReadCloser
+}
+
+// NewPEMReader returns a new PEMReader.
+func NewPEMReader(certificate string) (*PEMReader, error) {
+	if IsPEMString(certificate) {
+		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate))}, nil
+	}
+
+	r, err := os.Open(certificate)
+	if err != nil {
+		return nil, err
+	}
+	return &PEMReader{reader: &ReadCloser{r}}, nil
+}
+
+// Close closes the target io.ReadCloser.
+func (p *PEMReader) Close() error {
+	return p.reader.Close()
+}
+
+// Read read bytes from the io.ReadCloser.
+func (p *PEMReader) Read(b []byte) (n int, err error) {
+	return p.reader.Read(b)
+}
+
+// ReadCloser wraps a io.Reader into a ReadCloser and call close if available on the target.
+type ReadCloser struct {
+	reader io.Reader
+}
+
+// Read proxy the Read call to wrapped reader.
+func (r *ReadCloser) Read(b []byte) (n int, err error) {
+	return r.reader.Read(b)
+}
+
+// Close closes the wrapped reader if it respond to the Close function.
+func (r *ReadCloser) Close() error {
+	if c, ok := r.reader.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
+
+// IsPEMString returns true if the provided string match a PEM formatted certificate. try to pem decode to validate.
+func IsPEMString(s string) bool {
+	if block, _ := pem.Decode([]byte(strings.TrimSpace(s))); block != nil {
+		return true
+	}
+
+	return false
 }
