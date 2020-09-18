@@ -782,6 +782,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 
 *Packetbeat*
 

@@ -60,7 +60,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
-|<<metricbeat-module-cloudfoundry,Cloudfoundry>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-cloudfoundry,Cloudfoundry>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> beta[]  
 |<<metricbeat-metricset-cloudfoundry-counter,counter>> beta[]  
 |<<metricbeat-metricset-cloudfoundry-value,value>> beta[]  
