@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- The Kibana collector applies backoff when errored at getting usage stats {pull}20772[20772]
 - The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 - Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
 - Handle missing counters in the application_pool metricset. {pull}21071[21071]
