@@ -27,6 +27,10 @@
         "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats",
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",

@@ -26,6 +26,10 @@
         "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats",
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -69,6 +73,10 @@
         "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats",
+            "beats"
+        ],
         "related.ip": [
             "10.13.12.11",
             "192.168.33.12"
