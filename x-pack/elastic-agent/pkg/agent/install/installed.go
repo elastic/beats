@@ -5,9 +5,42 @@
 package install
 
 import (
+	"github.com/kardianos/service"
 	"os"
 	"path/filepath"
 )
+
+type InstallStatus int
+
+const (
+	// NotInstalled returned when Elastic Agent is not installed.
+	NotInstalled InstallStatus = iota
+	// Installed returned when Elastic Agent is installed currectly.
+	Installed
+	// Broken returned when Elastic Agent is installed but broken.
+	Broken
+)
+
+// Status returns the installation status of Agent.
+func Status() (InstallStatus, string) {
+	expected := filepath.Join(InstallPath, BinaryName)
+	_, err := os.Stat(expected)
+	if os.IsNotExist(err) {
+		return NotInstalled, "binary not located at install path"
+	}
+	svc, err := newService()
+	if err != nil {
+		return Broken, "unable to check service status"
+	}
+	status, err := svc.Status()
+	if err != nil {
+		return Broken, "unable to check service status"
+	}
+	if status == service.StatusUnknown {
+		return Broken, "service is not installed"
+	}
+	return Installed, ""
+}
 
 // RunningInstalled returns true when executing Agent is the installed Agent.
 //
@@ -17,16 +50,4 @@ func RunningInstalled() bool {
 	expected := filepath.Join(InstallPath, BinaryName)
 	execPath, _ := os.Executable()
 	return expected == execPath
-}
-
-// Installed returns installed path of Agent when it is installed on the system.
-//
-// This returns path even if the executing Agent is not the system installed Agent.
-func Installed() string {
-	expected := filepath.Join(InstallPath, BinaryName)
-	_, err := os.Stat(expected)
-	if !os.IsNotExist(err) {
-		return InstallPath
-	}
-	return ""
 }

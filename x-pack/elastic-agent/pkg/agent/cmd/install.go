@@ -46,20 +46,33 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if !install.HasRoot() {
 		return fmt.Errorf("Error: unable to start install command, not executed with %s permissions.", install.PermissionUser)
 	}
-	installPath := install.Installed()
-	if installPath != "" {
-		return fmt.Errorf("Error: Elastic Agent is already installed at: %s", installPath)
+	status, reason := install.Status()
+	if status == install.Installed {
+		return fmt.Errorf("Error: Elastic Agent is already installed at: %s", install.InstallPath)
 	}
 
 	warn.PrintNotGA(streams.Out)
 	force, _ := cmd.Flags().GetBool("force")
-	if !force {
-		confirm, err := c.Confirm("Elastic Agent will be installed onto your system and will run as a service. Do you want to continue?", true)
-		if err != nil {
-			return fmt.Errorf("Error: problem reading prompt response")
+	if status == install.Broken {
+		if !force {
+			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s", reason)
+			confirm, err := c.Confirm("Continuing will re-install Elastic Agent over the current installation. Do you want to continue?", true)
+			if err != nil {
+				return fmt.Errorf("Error: problem reading prompt response")
+			}
+			if !confirm {
+				return fmt.Errorf("Warn: Installation was cancelled by the user")
+			}
 		}
-		if !confirm {
-			return fmt.Errorf("Warn: Installation was cancelled by the user")
+	} else {
+		if !force {
+			confirm, err := c.Confirm("Elastic Agent will be installed onto your system and will run as a service. Do you want to continue?", true)
+			if err != nil {
+				return fmt.Errorf("Error: problem reading prompt response")
+			}
+			if !confirm {
+				return fmt.Errorf("Warn: Installation was cancelled by the user")
+			}
 		}
 	}
 

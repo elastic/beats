@@ -10,19 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kardianos/service"
 	"github.com/otiai10/copy"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-)
-
-const (
-	// ServiceDisplayName is the service display name for the service.
-	ServiceDisplayName = "Elastic Agent"
-
-	ServiceDescription = `
-Elastic Agent is a unified agent to observe, monitor and protect your system.
-`
 )
 
 // Install installs Elastic Agent persistently on the system including creating and starting its service.
@@ -31,6 +21,14 @@ func Install() error {
 	if err != nil {
 		return errors.New(err, "failed to discover the source directory for installation", errors.TypeFilesystem)
 	}
+
+	// uninstall current installation
+	err = Uninstall()
+	if err != nil {
+		return err
+	}
+
+	// ensure parent directory exists, copy source into install path
 	err = os.MkdirAll(filepath.Dir(InstallPath), 0755)
 	if err != nil {
 		return errors.New(
@@ -50,6 +48,8 @@ func Install() error {
 			fmt.Sprintf("failed to copy source directory (%s) to destination (%s)", dir, InstallPath),
 			errors.M("source", dir), errors.M("destination", InstallPath))
 	}
+
+	// place shell wrapper, if present on platform
 	if ShellWrapperPath != "" {
 		err = ioutil.WriteFile(ShellWrapperPath, []byte(ShellWrapper), 0755)
 		if err != nil {
@@ -59,6 +59,8 @@ func Install() error {
 				errors.M("destination", ShellWrapperPath))
 		}
 	}
+
+	// install service
 	svc, err := newService()
 	if err != nil {
 		return err
@@ -118,18 +120,4 @@ func verifyDirectory(dir string) error {
 		return fmt.Errorf("missing %s", BinaryName)
 	}
 	return nil
-}
-
-func newService() (service.Service, error) {
-	exec := filepath.Join(InstallPath, BinaryName)
-	if ShellWrapperPath != "" {
-		exec = ShellWrapperPath
-	}
-	return service.New(nil, &service.Config{
-		Name:             ServiceName,
-		DisplayName:      ServiceDisplayName,
-		Description:      ServiceDescription,
-		Executable:       exec,
-		WorkingDirectory: InstallPath,
-	})
 }
