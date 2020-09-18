@@ -55,8 +55,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.212.11.114",
-            "10.38.77.13"
+            "10.38.77.13",
+            "10.212.11.114"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uam",
@@ -194,8 +194,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.182.199.231",
-            "10.24.67.250"
+            "10.24.67.250",
+            "10.182.199.231"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "oei",
@@ -885,8 +885,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.222.183.123",
-            "10.165.33.19"
+            "10.165.33.19",
+            "10.222.183.123"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "usan",
@@ -925,8 +925,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.890",
         "related.ip": [
-            "10.238.223.171",
-            "10.52.190.18"
+            "10.52.190.18",
+            "10.238.223.171"
         ],
         "rsa.crypto.sig_type": "Finibus",
         "rsa.internal.messageid": "16539",
@@ -975,8 +975,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.3902",
         "related.ip": [
-            "10.68.233.163",
-            "10.160.178.109"
+            "10.160.178.109",
+            "10.68.233.163"
         ],
         "rsa.crypto.sig_type": "ctobeat",
         "rsa.internal.messageid": "26992",
@@ -1113,8 +1113,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.6627",
         "related.ip": [
-            "10.116.175.84",
-            "10.213.100.153"
+            "10.213.100.153",
+            "10.116.175.84"
         ],
         "rsa.crypto.sig_type": "exercit",
         "rsa.internal.messageid": "11634",
@@ -1511,8 +1511,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.201.132.114",
-            "10.140.209.249"
+            "10.140.209.249",
+            "10.201.132.114"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "lor",
@@ -1593,8 +1593,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.2633",
         "related.ip": [
-            "10.198.44.231",
-            "10.36.122.169"
+            "10.36.122.169",
+            "10.198.44.231"
         ],
         "rsa.crypto.sig_type": "umquam",
         "rsa.internal.messageid": "13228",
@@ -1645,8 +1645,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.144.162.122",
-            "10.77.86.215"
+            "10.77.86.215",
+            "10.144.162.122"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "eav",
@@ -1945,8 +1945,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.2115",
         "related.ip": [
-            "10.60.137.215",
-            "10.28.105.106"
+            "10.28.105.106",
+            "10.60.137.215"
         ],
         "rsa.crypto.sig_type": "tionu",
         "rsa.internal.messageid": "5155",
@@ -2052,9 +2052,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.20.167.114",
-            "10.49.190.163",
             "10.166.40.137",
+            "10.49.190.163",
+            "10.20.167.114",
             "10.65.144.119"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
@@ -2096,8 +2096,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.162.128.87",
-            "10.104.78.147"
+            "10.104.78.147",
+            "10.162.128.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emu",
@@ -2133,8 +2133,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.237.43.87",
-            "10.82.180.46"
+            "10.82.180.46",
+            "10.237.43.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "oloremqu",
@@ -2175,8 +2175,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.4189",
         "related.ip": [
-            "10.180.28.156",
-            "10.234.234.205"
+            "10.234.234.205",
+            "10.180.28.156"
         ],
         "rsa.crypto.sig_type": "mnihil",
         "rsa.internal.messageid": "5315",
@@ -2257,8 +2257,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.40.250.209",
-            "10.166.10.187"
+            "10.166.10.187",
+            "10.40.250.209"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2334,8 +2334,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.198.202.72",
-            "10.78.180.219"
+            "10.78.180.219",
+            "10.198.202.72"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "equaturv",
@@ -2377,8 +2377,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.2390",
         "related.ip": [
-            "10.147.155.100",
-            "10.232.67.182"
+            "10.232.67.182",
+            "10.147.155.100"
         ],
         "rsa.crypto.sig_type": "eufugi",
         "rsa.internal.messageid": "26152",
@@ -2609,8 +2609,8 @@
         "observer.vendor": "Snort",
         "observer.version": "1.6298",
         "related.ip": [
-            "10.231.10.63",
-            "10.38.22.60"
+            "10.38.22.60",
+            "10.231.10.63"
         ],
         "rsa.crypto.sig_type": "taliquip",
         "rsa.internal.messageid": "10329",
@@ -2664,8 +2664,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.46.57.181",
-            "10.29.231.11"
+            "10.29.231.11",
+            "10.46.57.181"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "remape",
@@ -3371,8 +3371,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.179.27.185",
-            "10.14.46.141"
+            "10.14.46.141",
+            "10.179.27.185"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "llumdolo",
@@ -3539,10 +3539,10 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
+            "10.125.130.61",
             "10.118.103.185",
-            "10.32.195.34",
             "10.240.77.10",
-            "10.125.130.61"
+            "10.32.195.34"
         ],
         "rsa.internal.event_desc": "TCP Flow is no longer offloaded for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -3583,8 +3583,8 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "related.ip": [
-            "10.188.88.133",
-            "10.111.130.177"
+            "10.111.130.177",
+            "10.188.88.133"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "numqu",

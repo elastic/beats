@@ -476,6 +476,7 @@ processors:
      field: related.hosts
      value: "{{observer.hostname}}"
      if: "ctx?.observer?.hostname != null"
+     allow_duplicates: false
 
 # Remove temporary fields.
  - remove:

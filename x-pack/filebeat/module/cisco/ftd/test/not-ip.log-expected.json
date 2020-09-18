@@ -84,7 +84,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "localhost",
             "localhost"
         ],
         "related.ip": [
@@ -145,7 +144,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "localhost",
             "localhost",
             "example.org"
         ],

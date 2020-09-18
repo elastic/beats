@@ -337,6 +337,7 @@ processors:
       field: related.hosts
       value: '{{url.domain}}'
       if: ctx.url?.domain != null
+      allow_duplicates: false
   - remove:
       field:
         - suricata.eve.app_proto

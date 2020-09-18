@@ -38,7 +38,6 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "related.hosts": [
-            "beats",
             "beats"
         ],
         "related.ip": [
@@ -86,7 +85,6 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "related.hosts": [
-            "beats",
             "beats"
         ],
         "service.type": "cisco",
@@ -129,7 +127,6 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "related.hosts": [
-            "beats",
             "beats"
         ],
         "service.type": "cisco",
@@ -184,7 +181,6 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "related.hosts": [
-            "beats",
             "beats"
         ],
         "related.ip": [

@@ -58,6 +58,7 @@ processors:
     field: related.hosts
     value: "{{host.hostname}}"
     if: "ctx.host?.hostname != null"
+    allow_duplicates: false
 on_failure:
 - set:
     field: error.message

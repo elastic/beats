@@ -63,7 +63,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "firepower",
             "firepower"
         ],
         "related.ip": [
@@ -149,7 +148,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "firepower",
             "firepower"
         ],
         "related.ip": [
@@ -231,7 +229,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "firepower",
             "firepower"
         ],
         "related.ip": [
@@ -313,7 +310,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "firepower",
             "firepower"
         ],
         "related.ip": [

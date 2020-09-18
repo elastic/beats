@@ -33,7 +33,6 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "localhost",
-            "localhost",
             "target.destination.hostname.local",
             "Prod-host.name.addr"
         ],
@@ -80,7 +79,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
-            "MYHOSTNAME",
             "MYHOSTNAME"
         ],
         "related.ip": [

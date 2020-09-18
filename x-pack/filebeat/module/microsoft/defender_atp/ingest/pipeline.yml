@@ -283,6 +283,7 @@ processors:
     field: related.hosts
     value: '{{host.hostname}}'
     if: ctx.host?.hostname != null
+    allow_duplicates: false
 
 #############
 ## Cleanup ##
