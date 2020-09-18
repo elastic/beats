@@ -24,10 +24,12 @@ processors:
         # exactly match the syntax for firepower management logs
         PROCESS_HOST: "(?:%{PROCESS:process.name}:\\s%{SYSLOGHOST:host.name})"
         HOST_PROCESS: "(?:%{SYSLOGHOST:host.hostname}:?\\s+)?(?:%{PROCESS:process.name}?(?:\\[%{POSINT:process.pid:long}\\])?)?"
+
   #
   # Parse FTD/ASA style message
   #
   # This parses the header of an EMBLEM-style message for FTD and ASA prefixes.
+
   - grok:
       field: log.original
       patterns:
@@ -38,6 +40,7 @@ processors:
         FTD_SUFFIX: "[^0-9-]+"
         # Before version 6.3, FTD used ASA prefix in syslog messages
         FTD_PREFIX: "%{DATA}%(?:[A-Z]+)"
+
   #
   # Create missing fields when no %FTD label is present
   #
@@ -46,6 +49,7 @@ processors:
       field: _temp_.cisco.message_id
       value: ""
       if: "ctx?._temp_?.cisco?.message_id == null"
+
   #
   # set default event.severity to 7 (debug):
   #
@@ -57,11 +61,13 @@ processors:
       field: event.severity
       value: 7
       if: "ctx?.event?.severity == null"
+
   #
   # Drop messages above configured log_level
   #
   - drop:
       if: "ctx.event.severity > {< .log_level >}"
+
   #
   # Parse the date included in FTD logs
   #
@@ -97,6 +103,7 @@ processors:
               },
           },
         ]
+
   - date:
       if: "ctx.event.timezone != null"
       timezone: "{{ event.timezone }}"
@@ -165,6 +172,7 @@ processors:
       field: "log.level"
       if: "ctx.event.severity == 7"
       value: debug
+      
   #
   # Firewall messages
   #
