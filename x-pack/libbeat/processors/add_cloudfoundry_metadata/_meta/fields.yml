@@ -11,29 +11,35 @@
         - name: app.id
           type: keyword
           description: >
-            Cloud Foundry application ID
+            Cloud Foundry application ID.
 
         - name: app.name
           type: keyword
           description: >
-            Cloud Foundry application name
+            Cloud Foundry application name.
 
         - name: space.id
           type: keyword
           description: >
-            Cloud Foundry space name
+            Cloud Foundry space name.
 
         - name: space.name
           type: keyword
           description: >
-            Cloud Foundry space name
+            Cloud Foundry space name.
 
         - name: org.id
           type: keyword
           description: >
-            Cloud Foundry organization ID
+            Cloud Foundry organization ID.
 
         - name: org.name
           type: keyword
           description: >
-            Cloud Foundry organization name
+            Cloud Foundry organization name.
+
+        - name: tags.*
+          type: object
+          object_type: keyword
+          description: >
+            Cloud Foundry tags.

@@ -1,27 +1,23 @@
 {
-    "@timestamp": "2020-02-27T18:20:48.379Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
-        "value": {
-            "unit": "",
-            "value": 5.125735912782789e-05,
-            "timestamp": "2020-02-27T18:20:48.379Z",
-            "type": "value",
-            "name": "go_memstats_gc_cpu_fraction"
-        },
         "envelope": {
-            "origin": "loggregator_forwarder_agent",
-            "deployment": "cf",
-            "ip": "10.144.0.11",
-            "job": "scheduler",
-            "index": "d6b7bb59-ac57-4ed5-a0a7-0b23e19d9f8f"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "4cba3472-979a-463c-a145-64dd3177020f",
+            "ip": "192.168.16.21",
+            "job": "router",
+            "origin": "gorouter"
+        },
+        "tags": {
+            "source_id": "gorouter"
+        },
+        "type": "value",
+        "value": {
+            "name": "buffered_messages",
+            "timestamp": "2020-09-18T20:05:21.96716221+02:00",
+            "unit": "message",
+            "value": 0
         }
-    },
-    "event": {
-        "dataset": "cloudfoundry.value",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "value"
     },
     "service": {
         "type": "cloudfoundry"
