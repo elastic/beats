@@ -10,7 +10,7 @@ pipeline {
     BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/master'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    timeout(time: 1, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
