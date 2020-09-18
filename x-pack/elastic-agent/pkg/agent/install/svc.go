@@ -16,16 +16,21 @@ Elastic Agent is a unified agent to observe, monitor and protect your system.
 `
 )
 
-func newService() (service.Service, error) {
+// ExecutablePath returns the path for the installed Agents executable.
+func ExecutablePath() string {
 	exec := filepath.Join(InstallPath, BinaryName)
 	if ShellWrapperPath != "" {
 		exec = ShellWrapperPath
 	}
+	return exec
+}
+
+func newService() (service.Service, error) {
 	return service.New(nil, &service.Config{
 		Name:             ServiceName,
 		DisplayName:      ServiceDisplayName,
 		Description:      ServiceDescription,
-		Executable:       exec,
+		Executable:       ExecutablePath(),
 		WorkingDirectory: InstallPath,
 	})
 }

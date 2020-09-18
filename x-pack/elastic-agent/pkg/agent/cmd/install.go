@@ -20,9 +20,9 @@ import (
 func newInstallCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install",
-		Short: "Install Agent permanently on this system",
+		Short: "Install Elastic Agent permanently on this system",
 		Long: `
-This will install Agent permanently on this system and will become managed by the systems service manager.
+This will install Elastic Agent permanently on this system and will become managed by the systems service manager.
 
 Unless all the require command-line parameters are provided or -f is used this command will ask questions on how you
 would like the Agent to operate.
@@ -44,11 +44,11 @@ would like the Agent to operate.
 
 func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	if !install.HasRoot() {
-		return fmt.Errorf("Error: unable to start install command, not executed with %s permissions.", install.PermissionUser)
+		return fmt.Errorf("Error: unable to perform install command, not executed with %s permissions.", install.PermissionUser)
 	}
 	status, reason := install.Status()
 	if status == install.Installed {
-		return fmt.Errorf("Error: Elastic Agent is already installed at: %s", install.InstallPath)
+		return fmt.Errorf("Elastic Agent is already installed at: %s", install.InstallPath)
 	}
 
 	warn.PrintNotGA(streams.Out)
@@ -61,7 +61,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 				return fmt.Errorf("Error: problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Warn: Installation was cancelled by the user")
+				return fmt.Errorf("Installation was cancelled by the user")
 			}
 		}
 	} else {
@@ -71,7 +71,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 				return fmt.Errorf("Error: problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Warn: Installation was cancelled by the user")
+				return fmt.Errorf("Installation was cancelled by the user")
 			}
 		}
 	}
@@ -85,6 +85,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.")
 		return fmt.Errorf("Error: %s", err)
 	}
+	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.")
 
 	/*
 		insecure, _ := cmd.Flags().GetBool("insecure")
