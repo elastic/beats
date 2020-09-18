@@ -17,7 +17,9 @@
 
 package diskqueue
 
-import "sync"
+import (
+	"sync"
+)
 
 // queuePosition represents a logical position within the queue buffer.
 type queuePosition struct {
@@ -67,23 +69,18 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.lock.Lock()
 	defer dqa.lock.Unlock()
 	for _, frame := range frames {
-		//segmentID := frame.segmentID
 		segment := frame.segment
 		if frame.id == segment.firstFrameID {
 			// This is the first frame in its segment, mark it so we know when
 			// we're starting a new segment.
 			dqa.segmentBoundaries[frame.id] = segment.id
 		}
-		//segment := dqa.segments[segmentID]
-		//segment[frame.id] = frame.bytesOnDisk
-		//dqa.acked[frame.id] = true
 		dqa.frames[frame.id] = frame.bytesOnDisk
 	}
 	if dqa.frames[dqa.nextFrameID] != 0 {
-		//for ; dqa.frames[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
-		for dqa.frames[dqa.nextFrameID] != 0 {
-			segmentID, ok := dqa.segmentBoundaries[dqa.nextFrameID]
-			if ok {
+		for ; dqa.frames[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
+			segmentID := dqa.segmentBoundaries[dqa.nextFrameID]
+			if segmentID > 0 {
 				// This is the start of a new segment, inform the ACK channel that
 				// earlier segments are completely acknowledged.
 				dqa.segmentACKChan <- segmentID - 1
@@ -91,7 +88,5 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			}
 			delete(dqa.frames, dqa.nextFrameID)
 		}
-		// TODO: we now need to send the segment id, not the frame id.
-		//dqa.segmentACKChan <- dqa.nextFrameID
 	}
 }
