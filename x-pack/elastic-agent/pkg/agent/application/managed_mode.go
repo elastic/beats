@@ -265,12 +265,12 @@ func (m *Managed) Start() error {
 		return nil
 	}
 
-	m.gateway.Start()
-
 	err := m.upgrader.Ack(m.bgContext)
 	if err != nil {
 		m.log.Warnf("failed to ack update %v", err)
 	}
+
+	m.gateway.Start()
 
 	return nil
 }

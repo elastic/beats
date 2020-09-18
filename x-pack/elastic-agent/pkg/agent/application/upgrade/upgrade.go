@@ -95,6 +95,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error
 func (u *Upgrader) Ack(ctx context.Context) error {
 	// get upgrade action
 	markerFile := filepath.Join(paths.Data(), markerFilename)
+	fmt.Println("reading", markerFile)
 	markerBytes, err := ioutil.ReadFile(markerFile)
 	if err != nil && os.IsNotExist(err) {
 		return nil
@@ -102,8 +103,8 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 		return err
 	}
 
-	marker := updateMarker{}
-	if err := yaml.Unmarshal(markerBytes, &marker); err != nil {
+	marker := &updateMarker{}
+	if err := yaml.Unmarshal(markerBytes, marker); err != nil {
 		return err
 	}
 
@@ -111,6 +112,9 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 		return nil
 	}
 
+	fmt.Println(marker.Action)
+	fmt.Println(marker.Action.ID())
+	fmt.Println(marker.Action.Type())
 	if err := u.acker.Ack(ctx, marker.Action); err != nil {
 		return err
 	}
