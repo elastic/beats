@@ -666,6 +666,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Avoid goroutine leaks in Filebeat readers. {issue}19193[19193] {pull}20455[20455]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
+- Added new properties field support for event.outcome in azure module {pull}20998[20998]
 - Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 - Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
