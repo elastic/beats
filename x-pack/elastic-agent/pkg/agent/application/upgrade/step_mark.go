@@ -88,7 +88,7 @@ func updateHomePath(hash string) error {
 		return err
 	}
 
-	pathsMap["path.home"] = filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, hash)) //replace base with new hashed
+	pathsMap["path.home"] = filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, hash))
 
 	pathsBytes, err = yaml.Marshal(pathsMap)
 	if err != nil {
@@ -99,6 +99,8 @@ func updateHomePath(hash string) error {
 }
 
 func createPathsSymlink(hash string) error {
+	// only on windows
+	// on other systems path is shared
 	if runtime.GOOS != "windows" {
 		return nil
 	}

@@ -189,8 +189,7 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
-			fmt.Println(response)
-			fmt.Println(string(response.Data))
+
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
 					"fail to decode UPGRADE_ACTION action",

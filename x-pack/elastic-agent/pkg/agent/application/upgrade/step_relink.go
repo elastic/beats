@@ -19,14 +19,14 @@ import (
 func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
 	// create symlink to elastic-agent-{hash}
 	hashedDir := fmt.Sprintf("%s-%s", agentName, newHash)
-	newPath := filepath.Join(paths.Data(), hashedDir, agentName)
 
 	agentBakName := agentName + ".bak"
 	symlinkPath := filepath.Join(paths.Config(), agentName)
+	newPath := filepath.Join(paths.Data(), hashedDir, agentName)
 
 	// handle windows suffixes
 	if runtime.GOOS == "windows" {
-		agentBakName = agentName + ".exe.sbak"
+		agentBakName = agentName + ".exe.back" //.bak is already used
 		symlinkPath += ".exe"
 		newPath += ".exe"
 	}

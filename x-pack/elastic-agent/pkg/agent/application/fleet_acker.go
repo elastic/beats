@@ -6,7 +6,6 @@ package application
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -52,8 +51,7 @@ func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
-		panic(errors.New(err, fmt.Sprintf("acknowledge action '%s' for elastic-agent '%s' failed", action.ID(), agentID), errors.TypeNetwork))
-		// return errors.New(err, fmt.Sprintf("acknowledge action '%s' for elastic-agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
+		return errors.New(err, fmt.Sprintf("acknowledge action '%s' for elastic-agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
 	}
 
 	return nil
@@ -85,9 +83,6 @@ func (f *actionAcker) Commit(ctx context.Context) error {
 }
 
 func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
-	fmt.Println(fmt.Sprintf("Action '%s' of type '%s' acknowledged.", action.ID(), action.Type()))
-	b, _ := json.Marshal(action)
-	fmt.Println("aaa", string(b))
 	return fleetapi.AckEvent{
 		EventType: "ACTION_RESULT",
 		SubType:   "ACKNOWLEDGED",
