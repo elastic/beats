@@ -78,22 +78,6 @@ type diskQueue struct {
 	// waiting for free space in the queue.
 	blockedProducers []producerWriteRequest
 
-	// This value represents the oldest frame ID for a segment that has not
-	// yet been moved to the acked list. It is used to detect when the oldest
-	// outstanding segment has been fully acknowledged by the consumer.
-	oldestFrameID frameID
-
-	// This lock must be held to read and write acked and ackedUpTo.
-	ackLock sync.Mutex
-
-	// The lowest frame id that has not yet been acknowledged.
-	ackedUpTo frameID
-
-	// A map of all acked indices that are above ackedUpTo (and thus
-	// can't yet be acknowledged as a continuous block).
-	// TODO: do this better.
-	acked map[frameID]bool
-
 	// The channel to signal our goroutines to shut down.
 	done chan struct{}
 }
