@@ -264,6 +264,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 - Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
 - Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
+- Provide backwards compatibility for the `append` processor when Elasticsearch is less than 7.10.0. {pull}21159[21159]
 
 *Heartbeat*
 
@@ -345,6 +346,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
 - Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
 - Handle missing counters in the application_pool metricset. {pull}21071[21071]
+- Fix remote_write flaky test. {pull}21173[21173]
 
 *Packetbeat*
 
@@ -580,6 +582,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
 - Added new module for Zoom webhooks {pull}20414[20414]
 - Add type and sub_type to panw panos fileset {pull}20912[20912]
+- Always attempt community_id processor on zeek module {pull}21155[21155]
 
 *Heartbeat*
 
