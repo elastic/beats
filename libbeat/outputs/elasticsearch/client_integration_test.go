@@ -79,7 +79,7 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 }
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
-	output, client := connectTestEsWithStats(t, cfg)
+	output, client := connectTestEsWithStats(t, cfg, index)
 
 	// drop old index preparing test
 	client.conn.Delete(index, "", "", nil)
@@ -109,7 +109,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 	assert.Equal(t, 1, resp.Count)
 
-	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output"), monitoring.Full, true)
+	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output-"+index), monitoring.Full, true)
 	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
 	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
@@ -321,13 +321,10 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
-func connectTestEsWithStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
-	m := monitoring.Default.GetRegistry("output")
-	if m == nil {
-		m = monitoring.Default.NewRegistry("output")
-	}
-	st := outputs.NewStats(m)
-	return connectTestEs(t, cfg, st)
+func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
+	m := monitoring.Default.NewRegistry("output-" + suffix)
+	s := outputs.NewStats(m)
+	return connectTestEs(t, cfg, s)
 }
 
 func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
