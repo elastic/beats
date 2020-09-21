@@ -1,27 +1,19 @@
 {
-    "@timestamp": "2020-02-24T18:49:02.674Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "counter": {
-            "total": 0,
-            "name": "promhttp_metric_handler_errors_total",
             "delta": 0,
-            "timestamp": "2020-02-24T18:49:02.674Z",
-            "type": "counter"
+            "name": "sinks.dropped",
+            "total": 89547093
         },
         "envelope": {
-            "origin": "loggregator_forwarder_agent",
-            "deployment": "cf",
-            "ip": "10.144.0.13",
-            "job": "diego-cell",
-            "index": "1e58e943-a498-4339-9d5f-2885bf223db9"
-        }
-    },
-    "event": {
-        "dataset": "cloudfoundry.counter",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "counter"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "9adedbd0-3af3-47af-9707-99016050b123",
+            "ip": "192.168.16.54",
+            "job": "doppler",
+            "origin": "loggregator.doppler"
+        },
+        "type": "counter"
     },
     "service": {
         "type": "cloudfoundry"
