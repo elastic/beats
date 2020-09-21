@@ -67,7 +67,7 @@ func runUpgrade(flags *globalFlags, streams *cli.IOStreams) error { // Windows: 
 		r,
 		&acker{})
 
-	// https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz
+	// https://snapshots.elastic.co/8.0.0-5942871b/downloads/beats/elastic-agent/elastic-agent-8.0.0-SNAPSHOT-darwin-x86_64.tar.gz - vhanhin hash
 	action := &fleetapi.ActionUpgrade{
 		ActionID:   "12345-abcd",
 		ActionType: "UPGRADE",
