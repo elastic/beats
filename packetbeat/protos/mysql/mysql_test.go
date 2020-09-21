@@ -74,6 +74,7 @@ func Test_parseStateNames(t *testing.T) {
 }
 
 func TestMySQLParser_simpleRequest(t *testing.T) {
+	mysql := mysqlModForTests(nil)
 	data := []byte(
 		"6f00000003494e5345525420494e544f20706f737" +
 			"42028757365726e616d652c207469746c652c2062" +
@@ -89,7 +90,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -109,6 +110,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 	}
 }
 func TestMySQLParser_OKResponse(t *testing.T) {
+	mysql := mysqlModForTests(nil)
 	data := []byte(
 		"0700000100010401000000")
 
@@ -119,7 +121,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -145,6 +147,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 }
 
 func TestMySQLParser_errorResponse(t *testing.T) {
+	mysql := mysqlModForTests(nil)
 	data := []byte(
 		"2e000001ff7a042334325330325461626c6520276d696e69747769742e706f737373742720646f65736e2774206578697374")
 
@@ -155,7 +158,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -200,7 +203,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -229,7 +232,8 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if len(raw) == 0 {
 		t.Errorf("Empty raw data")
 	}
-	fields, rows := mysql.parseMysqlResponse(raw)
+	stream.message.raw = raw
+	fields, rows := mysql.parseMysqlResponse(stream.message)
 	if len(fields) != stream.message.numberOfFields {
 		t.Errorf("Failed to parse the fields")
 	}
@@ -241,8 +245,76 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	}
 }
 
+func TestMySQLParse_clientDeprecateEOFDataResponse(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("mysqldetailed"))
+	mysql := mysqlModForTests(nil)
+
+	data := []byte(
+		"0100000105" +
+			"2f00000203646566086d696e697477697404706f737404706f737407706f73745f69640269640c3f000b000000030342000000" +
+			"3b00000303646566086d696e697477697404706f737404706f73740d706f73745f757365726e616d6508757365726e616d650c2100f0000000fd0000000000" +
+			"3500000403646566086d696e697477697404706f737404706f73740a706f73745f7469746c65057469746c650c2100f0000000fd0000000000" +
+			"3300000503646566086d696e697477697404706f737404706f737409706f73745f626f647904626f64790c2100fdff0200fc1000000000" +
+			"3b00000603646566086d696e697477697404706f737404706f73740d706f73745f7075625f64617465087075625f646174650c3f00130000000c8000000000" +
+			"2e000007013109416e6f6e796d6f75730474657374086461736461730d0a13323031332d30372d32322031373a33343a3032" +
+			"46000008013209416e6f6e796d6f757312506f737465617a6120544f444f206c6973741270656e7472752063756d706172617475726913323031332d30372d32322031383a32393a3330" +
+			"2a000009013309416e6f6e796d6f75730454657374047465737413323031332d30372d32322031383a33323a3130" +
+			"2a00000a013409416e6f6e796d6f75730474657374047465737413323031332d30372d32322031383a34343a3137" +
+			"0500000bfe00002200")
+
+	message, err := hex.DecodeString(string(data))
+	if err != nil {
+		t.Errorf("Failed to decode hex string")
+	}
+
+	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream.message.clientDeprecateEOF = true
+
+	ok, complete := mysql.mysqlMessageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+	if stream.message.isRequest {
+		t.Errorf("Failed to parse MySQL Query response")
+	}
+	if !stream.message.isOK || stream.message.isError {
+		t.Errorf("Failed to parse MySQL Query response")
+	}
+	if stream.message.tables != "minitwit.post" {
+		t.Errorf("Failed to get table name: %s", stream.message.tables)
+	}
+	if stream.message.numberOfFields != 5 {
+		t.Errorf("Failed to get the number of fields")
+	}
+	if stream.message.numberOfRows != 4 {
+		t.Errorf("Failed to get the number of rows")
+	}
+
+	// parse fields and rows
+	raw := stream.data[stream.message.start:stream.message.end]
+	if len(raw) == 0 {
+		t.Errorf("Empty raw data")
+	}
+	stream.message.raw = raw
+	fields, rows := mysql.parseMysqlResponse(stream.message)
+	if len(fields) != stream.message.numberOfFields {
+		t.Errorf("Failed to parse the fields")
+	}
+	if len(rows) != stream.message.numberOfRows {
+		t.Errorf("Failed to parse the rows")
+	}
+	if stream.message.size != 519 {
+		t.Errorf("Wrong message size %d", stream.message.size)
+	}
+}
+
 func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mysqldetailed"))
+	mysql := mysqlModForTests(nil)
 
 	data := []byte("300000010001000100000028526f7773206d6174636865643a203120204368616e6765643a203120205761726e696e67733a2030")
 
@@ -253,7 +325,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -277,6 +349,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 
 func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mysql", "mysqldetailed"))
+	mysql := mysqlModForTests(nil)
 
 	data1 := "300000010001000100000028526f7773206d6174636865"
 	data2 := "643a203120204368616e6765643a"
@@ -289,7 +362,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 
 	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
 
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -304,7 +377,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 	stream.data = append(stream.data, message...)
-	ok, complete = mysqlMessageParser(stream)
+	ok, complete = mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -319,7 +392,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 	stream.data = append(stream.data, message...)
-	ok, complete = mysqlMessageParser(stream)
+	ok, complete = mysql.mysqlMessageParser(stream)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -574,7 +647,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 	assert.NoError(t, err)
 
 	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
-	ok, complete := mysqlMessageParser(stream)
+	ok, complete := mysql.mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -630,7 +703,7 @@ func Test_parseMysqlResponse_invalid(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		fields, rows := mysql.parseMysqlResponse(input)
+		fields, rows := mysql.parseMysqlResponse(&mysqlMessage{raw: input})
 		assert.Equal(t, []string{}, fields)
 		assert.Equal(t, [][]string{}, rows)
 	}
@@ -648,7 +721,7 @@ func Test_parseMysqlResponse_invalid(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		fields, rows := mysql.parseMysqlResponse(input)
+		fields, rows := mysql.parseMysqlResponse(&mysqlMessage{raw: input})
 		assert.Equal(t, []string{""}, fields)
 		assert.Equal(t, [][]string{}, rows)
 	}

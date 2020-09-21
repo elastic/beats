@@ -18,6 +18,7 @@
 package mysql
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -55,6 +56,7 @@ type mysqlMessage struct {
 	end   int
 
 	ts             time.Time
+	isLogin        bool
 	isRequest      bool
 	packetLength   uint32
 	seq            uint8
@@ -84,6 +86,14 @@ type mysqlMessage struct {
 	statementID    int
 	numberOfParams int
 	params         []string
+
+	//Capability Flags
+	clientDeprecateEOF bool
+}
+
+type mysqlConnection struct {
+	//Capability Flags
+	clientDeprecateEOF bool
 }
 
 type mysqlTransaction struct {
@@ -150,6 +160,8 @@ type mysqlPlugin struct {
 	sendRequest  bool
 	sendResponse bool
 
+	connections *common.Cache
+
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
@@ -158,6 +170,8 @@ type mysqlPlugin struct {
 	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
+
+	counterOfFields int
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -190,6 +204,11 @@ func New(
 func (mysql *mysqlPlugin) init(results protos.Reporter, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
+	mysql.connections = common.NewCache(
+		mysql.transactionTimeout,
+		protos.DefaultTransactionHashSize)
+	mysql.connections.StartJanitor(mysql.transactionTimeout)
+
 	mysql.transactions = common.NewCache(
 		mysql.transactionTimeout,
 		protos.DefaultTransactionHashSize)
@@ -221,6 +240,14 @@ func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransa
 	v := mysql.transactions.Get(k)
 	if v != nil {
 		return v.(*mysqlTransaction)
+	}
+	return nil
+}
+
+func (mysql *mysqlPlugin) getConnection(k common.HashableIPPortTuple) *mysqlConnection {
+	v := mysql.connections.Get(k)
+	if v != nil {
+		return v.(*mysqlConnection)
 	}
 	return nil
 }
@@ -269,7 +296,7 @@ func isRequest(typ uint8) bool {
 	return false
 }
 
-func mysqlMessageParser(s *mysqlStream) (bool, bool) {
+func (mysql *mysqlPlugin) mysqlMessageParser(s *mysqlStream) (bool, bool) {
 	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
 	m := s.message
@@ -294,7 +321,12 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				if m.seq == 0 && isRequest(m.typ) {
 					// parse request
 					m.isRequest = true
-					m.start = s.parseOffset
+					//m.start = s.parseOffset
+					s.parseState = mysqlStateEatMessage
+				} else if m.seq == 1 {
+					// login request
+					m.isLogin = true
+					m.isRequest = true
 					s.parseState = mysqlStateEatMessage
 				} else {
 					// ignore command
@@ -317,6 +349,10 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					m.isError = true
 				} else if m.packetLength == 1 {
 					logp.Debug("mysqldetailed", "Query response. Number of fields %d", hdr[4])
+					conn := mysql.getConnection(m.tcpTuple.IPPort().Hashable())
+					if conn != nil {
+						m.clientDeprecateEOF = conn.clientDeprecateEOF
+					}
 					m.numberOfFields = int(hdr[4])
 					m.start = s.parseOffset
 					s.parseOffset += 5
@@ -341,8 +377,20 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				// get the statement id
 				if m.typ == mysqlCmdStmtExecute || m.typ == mysqlCmdStmtClose {
 					m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
+				} else if m.isLogin {
+					m.query = "Login"
+					if s.data[m.start+7]&1 == 1 {
+						m.clientDeprecateEOF = true
+					}
 				} else {
-					m.query = string(s.data[m.start+5 : m.end])
+					commStartOff := bytes.Index(s.data[m.start+5:], []byte{47, 42})
+					commEndOff := bytes.Index(s.data[m.start+5:], []byte{42, 47}) + 2
+					if commStartOff != -1 && commStartOff < commEndOff {
+						// Delete comments in SQL statements
+						m.query = string(s.data[m.start+5+commEndOff : m.end])
+					} else {
+						m.query = string(s.data[m.start+5 : m.end])
+					}
 				}
 
 			} else if m.isOK {
@@ -402,10 +450,19 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			}
 
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
+
 			m.packetLength = leUint24(hdr[:3])
 			m.seq = hdr[3]
 
 			if len(s.data[s.parseOffset:]) >= int(m.packetLength)+4 {
+				// When the CLIENT_DEPRECATE_EOF client capability flag is set
+				if mysql.counterOfFields == m.numberOfFields && m.clientDeprecateEOF {
+					logp.Debug("mysqldetailed", "Fields complete, the CLIENT_DEPRECATE_EOF client capability flag is set")
+					mysql.counterOfFields = 0
+					s.parseState = mysqlStateEatRows
+					break
+				}
+
 				s.parseOffset += 4 // header
 
 				if s.data[s.parseOffset] == 0xfe {
@@ -449,6 +506,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 					}
 					logp.Debug("mysqldetailed", "db=%s, table=%s", db, table)
 					s.parseOffset += int(m.packetLength)
+					mysql.counterOfFields++
 					// go to next field
 				}
 			} else {
@@ -588,8 +646,9 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		if stream.message == nil {
 			stream.message = &mysqlMessage{ts: pkt.Ts}
 		}
+		stream.message.tcpTuple = *tcptuple
 
-		ok, complete := mysqlMessageParser(priv.data[dir])
+		ok, complete := mysql.mysqlMessageParser(priv.data[dir])
 		logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
@@ -643,13 +702,18 @@ func (mysql *mysqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 	// TODO: check if we have data pending and either drop it to free
 	// memory or send it up the stack.
+	iptuple := tcptuple.IPPort()
+	mysql.connections.Delete(iptuple.Hashable())
+	mysql.connections.Delete(iptuple.RevHashable())
+
+	mysql.transactions.Delete(tcptuple.Hashable())
+	mysql.prepareStatements.Delete(tcptuple.Hashable())
 	return private
 }
 
 func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 	dir uint8, rawMsg []byte) {
 
-	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	m.raw = rawMsg
@@ -719,7 +783,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 
 	// Extract the method, by simply taking the first word and
 	// making it upper case.
-	query := strings.Trim(trans.query, " \r\n\t")
+	query := strings.Trim(trans.query, " ;\r\n\t")
 	index := strings.IndexAny(query, " \r\n\t")
 	var method string
 	if index > 0 {
@@ -732,6 +796,11 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 	trans.method = method
 
 	trans.mysql = common.MapStr{}
+	if msg.isLogin {
+		conn := &mysqlConnection{}
+		conn.clientDeprecateEOF = msg.clientDeprecateEOF
+		mysql.connections.Put(msg.tcpTuple.IPPort().Hashable(), conn)
+	}
 
 	trans.notes = msg.notes
 
@@ -790,7 +859,7 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 
 	// save Raw message
 	if len(msg.raw) > 0 {
-		fields, rows := mysql.parseMysqlResponse(msg.raw)
+		fields, rows := mysql.parseMysqlResponse(msg)
 
 		trans.responseRaw = common.DumpInCSVFormat(fields, rows)
 	}
@@ -998,7 +1067,8 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	return paramString
 }
 
-func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
+func (mysql *mysqlPlugin) parseMysqlResponse(m *mysqlMessage) ([]string, [][]string) {
+	data := m.raw
 	length, err := readLength(data, 0)
 	if err != nil {
 		logp.Warn("Invalid response: %v", err)
@@ -1028,6 +1098,10 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 		// Read fields
 		for {
+			if m.clientDeprecateEOF && mysql.counterOfFields == m.numberOfFields {
+				mysql.counterOfFields = 0
+				break
+			}
 			length, err = readLength(data, offset)
 			if err != nil {
 				logp.Warn("Invalid response: %v", err)
@@ -1079,6 +1153,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 			fields = append(fields, string(name))
 
 			offset += length + 4
+			mysql.counterOfFields++
 			if len(data) < offset {
 				logp.Warn("Invalid response.")
 				return []string{}, [][]string{}

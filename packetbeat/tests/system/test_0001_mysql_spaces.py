@@ -12,22 +12,25 @@ class Test(BaseTest):
 
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
-        assert len(objs) == 7
+        assert len(objs) == 8
         assert all([o["server.port"] == 3306 for o in objs])
 
-        assert objs[0]["method"] == "SET"
+        assert objs[0]["method"] == "LOGIN"
         assert objs[0]["status"] == "OK"
 
-        assert objs[2]["method"] == "DROP"
-        assert objs[2]["status"] == "OK"
+        assert objs[1]["method"] == "SET"
+        assert objs[1]["status"] == "OK"
 
-        assert objs[3]["method"] == "CREATE"
+        assert objs[3]["method"] == "DROP"
         assert objs[3]["status"] == "OK"
 
-        assert objs[5]["method"] == "SELECT"
-        assert objs[5]["path"] == "test.test"
-        assert objs[5]["status"] == "OK"
-        assert objs[5]["destination.bytes"] == 118
+        assert objs[4]["method"] == "CREATE"
+        assert objs[4]["status"] == "OK"
+
+        assert objs[6]["method"] == "SELECT"
+        assert objs[6]["path"] == "test.test"
+        assert objs[6]["status"] == "OK"
+        assert objs[6]["destination.bytes"] == 118
 
         assert all(["source.bytes" in list(o.keys()) for o in objs])
         assert all(["destination.bytes" in list(o.keys()) for o in objs])

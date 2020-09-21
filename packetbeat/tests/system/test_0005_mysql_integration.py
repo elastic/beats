@@ -15,7 +15,7 @@ class Test(BaseTest):
 
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
-        assert len(objs) == 157
+        assert len(objs) == 158
         assert all([o["server.port"] == 13001 for o in objs])
 
         assert len([o for o in objs
