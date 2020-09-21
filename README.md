@@ -50,6 +50,10 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
 * [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)
 
+## Documentation and Getting Started information for the Elastic Agent
+
+You can find the documentation and getting started guides for the Elastic Agent
+on the [elastic.co site](https://www.elastic.co/downloads/elastic-agent)
 
 ## Getting Help
 
@@ -99,7 +103,10 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
   * `/run apm-beats-update`
 * [apm-beats-packaging][]
   * `/package` or `/packaging` will kick of a build to generate the packages for beats.
+* [apm-beats-tester][]
+  * `/beats-tester` will kick of a build to validate the generated packages.
 
 [beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
 [apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
 [apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/
+[apm-beats-tester]: https://beats-ci.elastic.co/job/Beats/job/beats-tester/

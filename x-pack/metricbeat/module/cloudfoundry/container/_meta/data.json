@@ -1,33 +1,25 @@
 {
-    "@timestamp": "2020-02-27T18:09:35.583Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
+        "app": {
+            "id": "c0874969-2811-4d80-837a-301fd485a7bf"
+        },
         "container": {
-            "instance_index": 0,
-            "cpu.pct": 0.18815706013687805,
-            "memory.bytes": 23320985,
-            "memory.quota.bytes": 134217728,
-            "disk.bytes": 186187776,
-            "timestamp": "2020-02-27T18:09:35.583Z",
-            "type": "container",
-            "disk.quota.bytes": 2122136037
+            "cpu.pct": 0.45456369228159,
+            "disk.bytes": 21970944,
+            "disk.quota.bytes": 1073741824,
+            "instance_index": 1,
+            "memory.bytes": 14101162,
+            "memory.quota.bytes": 67108864
         },
         "envelope": {
-            "origin": "rep",
-            "deployment": "cf",
-            "ip": "10.144.0.13",
-            "job": "diego-cell",
-            "index": "3a0034ac-59ef-43e2-8b06-b14b32fe62f0"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
+            "ip": "192.168.16.31",
+            "job": "diego_cell",
+            "origin": "rep"
         },
-        "app": {
-            "id": "8cfc6857-3576-45a9-b1cd-890b28aa9c4a"
-        }
-    },
-    "event": {
-        "dataset": "cloudfoundry.container",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "container"
+        "type": "container"
     },
     "service": {
         "type": "cloudfoundry"

@@ -156,18 +156,7 @@ Create an API Key with the specified privilege(s). No required flags.
 +
 The user requesting to create an API Key needs to have APM privileges used by the APM Server.
 A superuser, by default, has these privileges. For other users,
-you can create them. Create a role that is then assigned to the user:
-+
-["source","sh",subs="attributes"]
-----
-PUT /_security/role/apm-privileges {
-	"applications": [{
-	  "application": "apm",
-	  "privileges": ["sourcemap:write", "event:write", "config_agent:read"],
-	  "resources": ["*"]
-	}]
-}
-----
+you can create them. See <<privileges-api-key,create an API key user>> for required privileges.
 
 *`info`*::
 Query API Key(s). `--id` or `--name` required.
@@ -252,7 +241,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to deploy.  
+Specifies the name of the function to deploy.
 
 *FLAGS*
 
@@ -498,7 +487,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
 
-{package-command-short-desc}. 
+{package-command-short-desc}.
 
 *SYNOPSIS*
 
@@ -513,7 +502,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 Shows help for the `package` command.
 
 *`-o, --output`*::
-Specifies the full path pattern to use when creating the packages. 
+Specifies the full path pattern to use when creating the packages.
 
 {global-flags}
 
@@ -538,7 +527,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to remove.  
+Specifies the name of the function to remove.
 
 *FLAGS*
 
@@ -941,7 +930,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to update.  
+Specifies the name of the function to update.
 
 *FLAGS*
 

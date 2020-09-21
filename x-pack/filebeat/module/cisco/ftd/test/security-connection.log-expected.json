@@ -59,6 +59,12 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
+        "observer.egress.interface.name": "output",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "input",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -142,6 +148,12 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
+        "observer.egress.interface.name": "output",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "input",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -233,6 +245,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -331,6 +349,12 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -417,6 +441,12 @@
         "log.offset": 2515,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -521,6 +551,12 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -610,6 +646,12 @@
         "log.offset": 3919,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -710,6 +752,12 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -789,6 +837,12 @@
         "log.offset": 5177,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "output",
+        "observer.hostname": "firepower",
+        "observer.ingress.interface.name": "input",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -881,6 +935,12 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "observer.egress.interface.name": "input",
+        "observer.hostname": "siem-ftd",
+        "observer.ingress.interface.name": "output",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
