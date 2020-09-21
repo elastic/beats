@@ -7,6 +7,7 @@ package install
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/kardianos/service"
 
@@ -41,15 +42,6 @@ func Uninstall() error {
 		}
 	}
 
-	// remove existing directory
-	err = os.RemoveAll(InstallPath)
-	if err != nil {
-		return errors.New(
-			err,
-			fmt.Sprintf("failed to remove installation directory (%s)", InstallPath),
-			errors.M("directory", InstallPath))
-	}
-
 	// remove, if present on platform
 	if ShellWrapperPath != "" {
 		err = os.Remove(ShellWrapperPath)
@@ -59,6 +51,20 @@ func Uninstall() error {
 				fmt.Sprintf("failed to remove shell wrapper (%s)", ShellWrapperPath),
 				errors.M("destination", ShellWrapperPath))
 		}
+	}
+
+	// remove existing directory
+	err = os.RemoveAll(InstallPath)
+	if err != nil {
+		if runtime.GOOS == "windows" {
+			// possible to fail on Windows, because elastic-agent.exe is running from
+			// this directory.
+			return nil
+		}
+		return errors.New(
+			err,
+			fmt.Sprintf("failed to remove installation directory (%s)", InstallPath),
+			errors.M("directory", InstallPath))
 	}
 
 	return nil

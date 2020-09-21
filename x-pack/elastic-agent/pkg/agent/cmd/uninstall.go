@@ -7,6 +7,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -77,5 +80,13 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		return fmt.Errorf("Error: %s", err)
 	}
 	fmt.Fprintf(streams.Out, "Elastic Agent has been uninstalled.\n")
+
+	if runtime.GOOS == "windows" {
+		// The installation path will still exists because we are executing from that
+		// directory. So cmd.exe is spawned to remove the directory after we exit.
+		cmd := exec.Command(filepath.Join(os.Getenv("windir"), "system32", "cmd.exe"), "/C", "rmdir", "/s", "/q", install.InstallPath)
+		_ = cmd.Start()
+	}
+
 	return nil
 }
