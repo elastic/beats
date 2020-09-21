@@ -84,7 +84,8 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 	if runtime.GOOS == "windows" {
 		// The installation path will still exists because we are executing from that
 		// directory. So cmd.exe is spawned to remove the directory after we exit.
-		cmd := exec.Command(filepath.Join(os.Getenv("windir"), "system32", "cmd.exe"), "/C", "rmdir", "/s", "/q", install.InstallPath)
+		command := fmt.Sprintf("sleep 3 && rmdir /s /q %s", install.InstallPath)
+		cmd := exec.Command(filepath.Join(os.Getenv("windir"), "system32", "cmd.exe"), "/C", command)
 		_ = cmd.Start()
 	}
 
