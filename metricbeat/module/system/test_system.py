@@ -45,6 +45,12 @@ SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "u
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
+SYSTEM_CPU_HOST_FIELDS = ["pct"]
+
+SYSTEM_NETWORK_HOST_FIELDS = ["in.bytes", "out.bytes", "in.packets", "out.packets"]
+
+SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
+
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
@@ -74,8 +80,12 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        cpu = evt["system"]["cpu"]
-        self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
+        if "system" in evt:
+            cpu = evt["system"]["cpu"]
+            self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
+        else:
+            host_cpu = evt["host"]["cpu"]
+            self.assertCountEqual(self.de_dot(SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
@@ -196,8 +206,12 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             if 'error' not in evt:
-                diskio = evt["system"]["diskio"]
-                self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+                if "system" in evt:
+                    diskio = evt["system"]["diskio"]
+                    self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+                elif "host" in evt:
+                    host_disk = evt["host"]["disk"]
+                    self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):
@@ -219,8 +233,12 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            diskio = evt["system"]["diskio"]
-            self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
+            if "system" in evt:
+                diskio = evt["system"]["diskio"]
+                self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
+            else:
+                host_disk = evt["host"]["disk"]
+                self.assertCountEqual(SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -328,8 +346,12 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            network = evt["system"]["network"]
-            self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
+            if "system" in evt:
+                network = evt["system"]["network"]
+                self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
+            else:
+                host_network = evt["host"]["network"]
+                self.assertCountEqual(self.de_dot(SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_summary(self):
