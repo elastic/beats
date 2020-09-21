@@ -10,9 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
-
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
@@ -20,8 +19,7 @@ func newUninstallCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IO
 	cmd := &cobra.Command{
 		Use:   "uninstall",
 		Short: "Uninstall permanent Elastic Agent from this system",
-		Long: `
-This will uninstall permanent Elastic Agent from this system and will no longer be managed by this system.
+		Long: `This will uninstall permanent Elastic Agent from this system and will no longer be managed by this system.
 
 Unless -f is used this command will ask confirmation before performing removal.
 `,

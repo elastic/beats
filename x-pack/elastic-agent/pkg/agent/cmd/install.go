@@ -11,9 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
-
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -22,8 +21,7 @@ func newInstallCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOSt
 	cmd := &cobra.Command{
 		Use:   "install",
 		Short: "Install Elastic Agent permanently on this system",
-		Long: `
-This will install Elastic Agent permanently on this system and will become managed by the systems service manager.
+		Long: `This will install Elastic Agent permanently on this system and will become managed by the systems service manager.
 
 Unless all the require command-line parameters are provided or -f is used this command will ask questions on how you
 would like the Agent to operate.
@@ -150,7 +148,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 	exitErr, ok := err.(*exec.ExitError)
 	if ok {
-		return fmt.Errorf("Error: enroll command failed with exit code %d", exitErr.ExitCode())
+		return fmt.Errorf("Error: enroll command failed with exit code: %d", exitErr.ExitCode())
 	}
 	return fmt.Errorf("Error: enroll command failed for unknown reason: %s", err)
 }

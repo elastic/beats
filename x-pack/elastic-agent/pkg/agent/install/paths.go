@@ -24,8 +24,7 @@ const (
 	ShellWrapperPath = "/usr/bin/elastic-agent"
 
 	// ShellWrapper is the wrapper that is installed.
-	ShellWrapper = `
-#!/bin/sh
+	ShellWrapper = `#!/bin/sh
 exec /opt/Elastic/Agent/elastic-agent $@
 `
 )
