@@ -52,7 +52,7 @@ processors:
 - remove:
     field: system.syslog.timestamp
 - set:
-    field: event.type
+    field: event.kind
     value: event
 on_failure:
 - set:
