@@ -220,7 +220,7 @@ func NewPEMReader(certificate string) (*PEMReader, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &PEMReader{reader: &ReadCloser{r}}, nil
+	return &PEMReader{reader: r}, nil
 }
 
 // Close closes the target io.ReadCloser.
@@ -231,24 +231,6 @@ func (p *PEMReader) Close() error {
 // Read read bytes from the io.ReadCloser.
 func (p *PEMReader) Read(b []byte) (n int, err error) {
 	return p.reader.Read(b)
-}
-
-// ReadCloser wraps a io.Reader into a ReadCloser and call close if available on the target.
-type ReadCloser struct {
-	reader io.Reader
-}
-
-// Read proxy the Read call to wrapped reader.
-func (r *ReadCloser) Read(b []byte) (n int, err error) {
-	return r.reader.Read(b)
-}
-
-// Close closes the wrapped reader if it respond to the Close function.
-func (r *ReadCloser) Close() error {
-	if c, ok := r.reader.(io.Closer); ok {
-		return c.Close()
-	}
-	return nil
 }
 
 // IsPEMString returns true if the provided string match a PEM formatted certificate. try to pem decode to validate.
