@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
 - Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
+- Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
 
 *Auditbeat*
 
@@ -364,6 +365,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 - Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
 - Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
+- Fix catchall bucket config errors by adding more validation. {issue}17572[16282] {pull}20887[16287]
 
 ==== Added
 

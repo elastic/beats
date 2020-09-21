@@ -3,20 +3,19 @@
     "cloudfoundry": {
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "4cba3472-979a-463c-a145-64dd3177020f",
-            "ip": "192.168.16.21",
-            "job": "router",
-            "origin": "gorouter"
+            "index": "dffd1799-d03a-405a-9309-3fcce23f536f",
+            "ip": "192.168.16.15",
+            "job": "diego_database",
+            "origin": "silk-controller"
         },
         "tags": {
-            "source_id": "gorouter"
+            "source_id": "silk-controller"
         },
         "type": "value",
         "value": {
-            "name": "buffered_messages",
-            "timestamp": "2020-09-18T20:05:21.96716221+02:00",
-            "unit": "message",
-            "value": 0
+            "name": "LeasesIndexRequestTime",
+            "unit": "ms",
+            "value": 0.681265
         }
     },
     "service": {
