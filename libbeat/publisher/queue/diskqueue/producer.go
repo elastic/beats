@@ -30,6 +30,13 @@ type diskQueueProducer struct {
 	config queue.ProducerConfig
 
 	encoder *eventEncoder
+
+	// When a producer is cancelled, cancelled is set to true and the done
+	// channel is closed. (We could get by with just a done channel, but we
+	// need to make sure that calling Cancel repeatedly doesn't close an
+	// already-closed channel, which would panic.)
+	cancelled bool
+	done      chan struct{}
 }
 
 // A request sent from a producer to the core loop to add a frame to the queue.
@@ -63,6 +70,9 @@ func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
 func (producer *diskQueueProducer) publish(
 	event publisher.Event, shouldBlock bool,
 ) bool {
+	if producer.cancelled {
+		return false
+	}
 	serialized, err := producer.encoder.encode(&event)
 	if err != nil {
 		producer.queue.logger.Errorf(
@@ -91,9 +101,19 @@ func (producer *diskQueueProducer) publish(
 		return response
 	case <-producer.queue.done:
 		return false
+	case <-producer.done:
+		return false
 	}
 }
 
 func (producer *diskQueueProducer) Cancel() int {
-	panic("TODO: not implemented")
+	if producer.cancelled {
+		return 0
+	}
+	producer.cancelled = true
+	close(producer.done)
+	return 0
+
+	// TODO (possibly?): message the core loop to remove any pending events that
+	// were sent through this producer.
 }

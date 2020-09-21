@@ -229,7 +229,7 @@ func (dq *diskQueue) handleShutdown() {
 	// we do final cleanup and write our position to disk.
 
 	// Close the reader loop's request channel to signal an abort in case it's
-	// still processing a request -- we don't need any more frames.
+	// still processing a request (we don't need any more frames).
 	// We still wait for acknowledgement afterwards: if there is a request in
 	// progress, it's possible that a consumer already read and acknowledged
 	// some of its data, so we want the final metadata before we write our
@@ -241,7 +241,7 @@ func (dq *diskQueue) handleShutdown() {
 	}
 
 	// We are assured by our callers within Beats that we will not be sent a
-	// shutdown signal until all our producers have already been finalized /
+	// shutdown signal until all our producers have been finalized /
 	// shut down -- thus, there should be no writer requests outstanding, and
 	// writerLop.requestChan should be idle. But just in case (and in particular
 	// to handle the case where a request is stuck retrying a fatal error),
@@ -296,7 +296,7 @@ func (dq *diskQueue) handleShutdown() {
 		dq.handleSegmentACK(finalPosition.segmentID - 1)
 	}
 
-	// Do one last round of deletions, then terminate the deleter loop.
+	// Do one last round of deletions, then shut down the deleter loop.
 	dq.maybeDeleteACKed()
 	if dq.deleting {
 		response := <-dq.deleterLoop.responseChan

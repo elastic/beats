@@ -270,6 +270,7 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 		queue:   dq,
 		config:  cfg,
 		encoder: newEventEncoder(),
+		done:    make(chan struct{}),
 	}
 }
 
