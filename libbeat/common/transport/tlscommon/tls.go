@@ -242,9 +242,7 @@ func (p *PEMReader) String() string {
 
 // IsPEMString returns true if the provided string match a PEM formatted certificate. try to pem decode to validate.
 func IsPEMString(s string) bool {
-	if block, _ := pem.Decode([]byte(strings.TrimSpace(s))); block != nil {
-		return true
-	}
-
-	return false
+	// Trim the certificates to make sure we tolerate any yaml weirdness, we assume that the string starts
+	// with "-" and let further validation verifies the PEM format.
+	return strings.HasPrefix(strings.TrimSpace(s), "-")
 }
