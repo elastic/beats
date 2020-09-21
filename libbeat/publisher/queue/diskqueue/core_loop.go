@@ -284,10 +284,18 @@ func (dq *diskQueue) handleShutdown() {
 	finalPosition := dq.acks.nextPosition
 	dq.acks.lock.Unlock()
 
-	if finalPosition.segmentID > 0 {
-		// All segments before the current one have been fully acknowledged.
+	// First check for the rare and fortunate case that every single event we
+	// wrote to the queue was ACKed. In this case it is safe to delete
+	// everything up to and including the current segment. Otherwise, we only
+	// delete things before the current segment.
+	if len(dq.segments.writing) > 0 &&
+		finalPosition.segmentID == dq.segments.writing[0].id &&
+		finalPosition.offset >= dq.segments.writing[0].endOffset {
+		dq.handleSegmentACK(finalPosition.segmentID)
+	} else if finalPosition.segmentID > 0 {
 		dq.handleSegmentACK(finalPosition.segmentID - 1)
 	}
+
 	// Do one last round of deletions, then terminate the deleter loop.
 	dq.maybeDeleteACKed()
 	if dq.deleting {
