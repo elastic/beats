@@ -242,6 +242,40 @@ running configuration for a container, 60s by default.
           include_labels: ["nodelabel2"]
 -------------------------------------------------------------------------------------
 
+`unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
+  making the provider to enable the provided templates only when it will gain the leader lease.
+  This setting can only be combined with `cluster` scope. When `unique` is enabled enabled, `resource`
+  and `add_resource_metadata` settings are not taken into account.
+`leader_lease`:: (Optional) Defaults to `{beatname_lc}-cluster-leader`. This will be name of the lock lease.
+  One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
+  Different Beats that refer to the same leader lease will be competetitors in holding the lease
+  and only one will be elected as leader each time. Example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      scope: cluster
+      node: ${NODE_NAME}
+      unique: true
+      identifier: leader-election-metricbeat
+      templates:
+        - config:
+            - module: kubernetes
+              hosts: ["kube-state-metrics:8080"]
+              period: 10s
+              add_metadata: true
+              metricsets:
+                - state_node
+-------------------------------------------------------------------------------------
+
+The above configuration when deployed on one or more Metribceat instances will enable `state_node`
+metricset only for the Metricbeat instance that will gain the leader lease/lock. With this deployment
+strategy we can ensure that cluster-wide metricsets are only enabled by one Beat instance when
+deploying a Beat as Daemonset.
+
+
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
 ifdef::autodiscoverJolokia[]

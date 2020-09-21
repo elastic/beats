@@ -27,6 +27,10 @@
         "log.offset": 0,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.hostname": "localhost",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "service.type": "cisco",
         "source.domain": "Prod-host.name.addr",
         "source.nat.ip": "10.0.55.66",
@@ -65,6 +69,10 @@
         "log.offset": 169,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.hostname": "MYHOSTNAME",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.134",
             "192.0.2.15"

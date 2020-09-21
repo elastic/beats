@@ -117,7 +117,7 @@ func TestParseDHCPRequest(t *testing.T) {
 				"port": 67,
 			},
 			"event": common.MapStr{
-				"category": []string{"network_traffic", "network"},
+				"category": []string{"network"},
 				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
@@ -201,7 +201,7 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes": 300,
 			},
 			"event": common.MapStr{
-				"category": []string{"network_traffic", "network"},
+				"category": []string{"network"},
 				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",

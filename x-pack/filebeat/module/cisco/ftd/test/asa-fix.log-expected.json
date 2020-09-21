@@ -35,6 +35,12 @@
         "network.bytes": 148,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Outside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.233.123.123"
@@ -79,6 +85,12 @@
         "log.offset": 200,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -122,6 +134,11 @@
         "log.offset": 381,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -168,6 +185,12 @@
         "log.offset": 545,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -207,6 +230,10 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 734,
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"

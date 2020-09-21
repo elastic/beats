@@ -60,7 +60,7 @@ func TestMetricExists(t *testing.T) {
 
 func TestMatchMetrics(t *testing.T) {
 	prev := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -69,7 +69,7 @@ func TestMatchMetrics(t *testing.T) {
 		TimeGrain:    "1PM",
 	}
 	current := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -79,7 +79,7 @@ func TestMatchMetrics(t *testing.T) {
 	}
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
-	current.Resource.Id = "id1"
+	current.ResourceId = "id1"
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
@@ -111,18 +111,6 @@ func TestGetResourceGroupFromID(t *testing.T) {
 	assert.Equal(t, group, "obs-infrastructure")
 }
 
-func TestGetResourceTypeFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	rType := getResourceTypeFromId(path)
-	assert.Equal(t, rType, "Microsoft.Compute/virtualMachines")
-}
-
-func TestGetResourceNameFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	name := getResourceNameFromId(path)
-	assert.Equal(t, name, "obstestmemleak")
-}
-
 func TestExpired(t *testing.T) {
 	resConfig := ResourceConfiguration{}
 	result := resConfig.Expired()
@@ -143,28 +131,94 @@ func TestCompareMetricValues(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestContainsDimension(t *testing.T) {
+func TestGetDimension(t *testing.T) {
 	dimension := "VMName"
 	dim1 := "SlotID"
 	dim2 := "VNU"
 	dim3 := "VMName"
-	dimensionList := []insights.LocalizableString{
+	dimensionList := []Dimension{
 		{
-			Value:          &dim1,
-			LocalizedValue: &dim1,
+			Name:  dim1,
+			Value: dim1,
 		},
 		{
-			Value:          &dim2,
-			LocalizedValue: &dim2,
+			Name:  dim2,
+			Value: dim2,
 		},
 		{
-			Value:          &dim3,
-			LocalizedValue: &dim3,
+			Name:  dim3,
+			Value: dim3,
 		},
 	}
-	result := ContainsDimension(dimension, dimensionList)
-	assert.True(t, result)
+	result, ok := getDimension(dimension, dimensionList)
+	assert.True(t, ok)
+	assert.Equal(t, result.Name, dim3)
+	assert.Equal(t, result.Value, dim3)
 	dimension = "VirtualMachine"
-	result = ContainsDimension(dimension, dimensionList)
-	assert.False(t, result)
+	result, ok = getDimension(dimension, dimensionList)
+	assert.False(t, ok)
+	assert.Equal(t, result.Name, "")
+	assert.Equal(t, result.Value, "")
+}
+
+func TestContainsResource(t *testing.T) {
+	resourceId := "resId"
+	resourceList := []Resource{
+		{
+			Name: "resource name",
+			Id:   "resId",
+		},
+		{
+			Name: "resource name1",
+			Id:   "resId1",
+		},
+		{
+			Name: "resource name2",
+			Id:   "resId2",
+		},
+	}
+	ok := containsResource(resourceId, resourceList)
+	assert.True(t, ok)
+	resourceId = "ressId"
+	ok = containsResource(resourceId, resourceList)
+	assert.False(t, ok)
+}
+
+func TestGetVM(t *testing.T) {
+	vmName := "resource name1"
+	vmResourceList := []VmResource{
+		{
+			Name: "resource name",
+			Id:   "resId",
+		},
+		{
+			Name: "resource name1",
+			Id:   "resId1",
+		},
+		{
+			Name: "resource name2",
+			Id:   "resId2",
+		},
+	}
+	vm, ok := getVM(vmName, vmResourceList)
+	assert.True(t, ok)
+	assert.Equal(t, vm.Name, vmName)
+	assert.Equal(t, vm.Id, "resId1")
+	vmName = "resource name3"
+	vm, ok = getVM(vmName, vmResourceList)
+	assert.False(t, ok)
+	assert.Equal(t, vm.Name, "")
+	assert.Equal(t, vm.Id, "")
+}
+
+func TestGetInstanceId(t *testing.T) {
+	dimensionValue := "sfjsfjghhbsjsjskjkf"
+	result := getInstanceId(dimensionValue)
+	assert.Empty(t, result)
+	dimensionValue = "fjsfhfhsjhjsfs_34"
+	result = getInstanceId(dimensionValue)
+	assert.Equal(t, result, "34")
+	dimensionValue = "fjsfhfhsjhjsfs_34sjsjfhsfsjjsjf_242"
+	result = getInstanceId(dimensionValue)
+	assert.Equal(t, result, "242")
 }

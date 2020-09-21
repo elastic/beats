@@ -61,6 +61,14 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
 on_failure:
 - set:
     field: error.message
