@@ -322,7 +322,10 @@ func TestClientPublishTracer(t *testing.T) {
 }
 
 func connectTestEsWithStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
-	m := monitoring.Default.NewRegistry("output")
+	m := monitoring.Default.GetRegistry("output")
+	if m == nil {
+		m = monitoring.Default.NewRegistry("output")
+	}
 	st := outputs.NewStats(m)
 	return connectTestEs(t, cfg, st)
 }
