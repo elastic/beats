@@ -13,10 +13,11 @@ import (
 	"runtime"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-	"gopkg.in/yaml.v2"
 )
 
 const markerFilename = ".update-marker"
