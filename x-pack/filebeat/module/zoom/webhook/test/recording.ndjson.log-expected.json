@@ -1,0 +1,385 @@
+[
+    {
+        "event.action": "recording.stopped",
+        "event.dataset": "zoom.webhook",
+        "event.end": "2019-07-31T22:43:29Z",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1076,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 8,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_file.recording_end": "2019-07-31T22:43:29Z",
+        "zoom.recording.recording_file.recording_start": "2019-07-31T22:41:02Z",
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.completed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1455,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_email": "somemeail@someemailservice.fjdjf",
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.renamed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3433,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "zdhghgCfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPhgfhfghfYxHMA",
+        "zoom.old_values.id": 7000000,
+        "zoom.old_values.topic": "My Fancy Recording Title",
+        "zoom.old_values.type": 1,
+        "zoom.old_values.uuid": "9xxxkifpPUz+Ow==",
+        "zoom.operator": "shrifdfdh@kjdmail.com",
+        "zoom.operator_id": "zdhghgCfp8uQ",
+        "zoom.recording.id": 7000000,
+        "zoom.recording.topic": "Edited Recording Title",
+        "zoom.recording.type": 1,
+        "zoom.recording.uuid": "9xxxkifpPUz+Ow=="
+    },
+    {
+        "event.action": "recording.trashed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "deletion"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3787,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.deleted",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "deletion"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 5715,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.recovered",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 7643,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.transcript_completed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 9573,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 1,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.recording_count": 4,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.total_size": 529758,
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "recording.registration_created",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 10346,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 120,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg==",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person"
+    },
+    {
+        "event.action": "recording.registration_approved",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 10753,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 120,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg==",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person"
+    },
+    {
+        "event.action": "recording.registration_denied",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 11161,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.recording.duration": 120,
+        "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.recording.id": 150000008,
+        "zoom.recording.start_time": "2019-07-11T20:00:00Z",
+        "zoom.recording.timezone": "America/Los_Angeles",
+        "zoom.recording.topic": "A test meeting",
+        "zoom.recording.type": 2,
+        "zoom.recording.uuid": "dj12vck6sdTn6yy7qdy3dQg==",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person"
+    }
+]
