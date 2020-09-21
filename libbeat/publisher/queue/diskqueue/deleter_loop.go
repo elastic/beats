@@ -71,20 +71,24 @@ func (dl *deleterLoop) run() {
 				errorList = append(errorList, err)
 			}
 		}
-		dl.responseChan <- deleterLoopResponse{
-			deleted: deleted,
-			errors:  errorList,
-		}
 		if len(request.segments) > 0 && len(deleted) == 0 {
 			// If we were asked to delete segments but could not delete
 			// _any_ of them, we haven't made progress. Returning an error
 			// will log the issue and retry, but in this situation we
 			// want to delay before retrying. The core loop itself can't
 			// delay (it can never sleep or block), so we handle the
-			// delay here, by ignoring the next request until the retry
-			// interval has passed.
+			// delay here, by waiting before sending the result.
+			// The delay can be interrupted if the request channel is closed,
+			// indicating queue shutdown.
+			select {
 			// TODO: make the retry interval configurable.
-			time.Sleep(time.Second)
+			case <-time.After(time.Second):
+			case <-dl.requestChan:
+			}
+		}
+		dl.responseChan <- deleterLoopResponse{
+			deleted: deleted,
+			errors:  errorList,
 		}
 	}
 }

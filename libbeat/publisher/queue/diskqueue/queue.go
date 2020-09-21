@@ -225,6 +225,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 			frameSize:         make(map[frameID]int64),
 			segmentBoundaries: make(map[frameID]segmentID),
 			segmentACKChan:    make(chan segmentID),
+			done:              make(chan struct{}),
 		},
 
 		readerLoop:  readerLoop,
@@ -273,8 +274,5 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{
-		queue:  dq,
-		closed: false,
-	}
+	return &diskQueueConsumer{queue: dq}
 }

@@ -28,7 +28,8 @@ type queuePosition struct {
 }
 
 type diskQueueACKs struct {
-	// This lock must be held to access this structure.
+	// This lock must be held to access diskQueueACKs fields (except for
+	// diskQueueACKs.done, which is always safe).
 	lock sync.Mutex
 
 	// The id and position of the first unacknowledged frame.
@@ -50,11 +51,22 @@ type diskQueueACKs struct {
 	// the segment ID to this channel, where it is read by the core loop and
 	// scheduled for deletion.
 	segmentACKChan chan segmentID
+
+	// When the queue is closed, diskQueueACKs.done is closed to signal that
+	// the core loop will not accept any more acked segments and any future
+	// ACKs should be ignored.
+	done chan struct{}
 }
 
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.lock.Lock()
 	defer dqa.lock.Unlock()
+	select {
+	case <-dqa.done:
+		// We are already done and should ignore any leftover ACKs we receive.
+		return
+	default:
+	}
 	for _, frame := range frames {
 		segment := frame.segment
 		if frame.id != 0 && frame.id == segment.firstFrameID {
@@ -65,21 +77,20 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			// though it is the first frame we read from its segment. This prevents
 			// us from resetting our segment offset to zero, in case the initial
 			// offset was restored from a previous session instead of starting at
-			// the beginning of the first segment.
+			// the beginning of the first file.
 			dqa.segmentBoundaries[frame.id] = segment.id
 		}
 		dqa.frameSize[frame.id] = frame.bytesOnDisk
 	}
+	oldSegmentID := dqa.nextPosition.segmentID
 	if dqa.frameSize[dqa.nextFrameID] != 0 {
 		for ; dqa.frameSize[dqa.nextFrameID] != 0; dqa.nextFrameID++ {
 			newSegment, ok := dqa.segmentBoundaries[dqa.nextFrameID]
 			if ok {
-				// This is the start of a new segment, inform the ACK channel that
-				// earlier segments are completely acknowledged.
-				dqa.segmentACKChan <- newSegment - 1
+				// This is the start of a new segment. Remove this frame from the
+				// segment boundary list and set the position to the start of the
+				// new segment.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
-
-				// Update the position to the start of the new segment.
 				dqa.nextPosition = queuePosition{
 					segmentID: newSegment,
 					offset:    0,
@@ -87,6 +98,16 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			}
 			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
 			delete(dqa.frameSize, dqa.nextFrameID)
+		}
+	}
+	if oldSegmentID != dqa.nextPosition.segmentID {
+		// We crossed at least one segment boundary, inform the listener that
+		// everything before the current segment has been acknowledged (but bail
+		// out if our done channel has been closed, since that means there is no
+		// listener on the other end.)
+		select {
+		case dqa.segmentACKChan <- dqa.nextPosition.segmentID - 1:
+		case <-dqa.done:
 		}
 	}
 }

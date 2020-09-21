@@ -24,8 +24,6 @@ package diskqueue
 // logical "state transition diagram" for queue operation.
 
 func (dq *diskQueue) run() {
-	dq.logger.Debug("Core loop starting up...")
-
 	// Wake up the reader and deleter loops if there are segments to process
 	// from a previous instantiation of the queue.
 	dq.maybeReadPending()
@@ -226,36 +224,79 @@ func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
 }
 
 func (dq *diskQueue) handleShutdown() {
-	// We need to close the input channels for all other goroutines and
-	// wait for any outstanding responses. Order is important: handling
-	// a read response may require the deleter, so the reader must be
-	// shut down first.
+	// Shutdown: first, we wait for any outstanding requests to complete, to
+	// make sure the helper loops are idle and all state is finalized, then
+	// we do final cleanup and write our position to disk.
 
+	// Close the reader loop's request channel to signal an abort in case it's
+	// still processing a request -- we don't need any more frames.
+	// We still wait for acknowledgement afterwards: if there is a request in
+	// progress, it's possible that a consumer already read and acknowledged
+	// some of its data, so we want the final metadata before we write our
+	// closing state.
 	close(dq.readerLoop.requestChan)
 	if dq.reading {
 		response := <-dq.readerLoop.responseChan
 		dq.handleReaderLoopResponse(response)
 	}
 
+	// We are assured by our callers within Beats that we will not be sent a
+	// shutdown signal until all our producers have already been finalized /
+	// shut down -- thus, there should be no writer requests outstanding, and
+	// writerLop.requestChan should be idle. But just in case (and in particular
+	// to handle the case where a request is stuck retrying a fatal error),
+	// we signal abort by closing the request channel, and read the final
+	// state if there is any.
 	close(dq.writerLoop.requestChan)
 	if dq.writing {
-		<-dq.writerLoop.responseChan
+		response := <-dq.writerLoop.responseChan
+		dq.handleWriterLoopResponse(response)
 	}
 
-	close(dq.deleterLoop.requestChan)
+	// We let the deleter loop finish its current request, but we don't send
+	// the abort signal yet, since we might want to do one last deletion
+	// after checking the final consumer ACK state.
 	if dq.deleting {
 		response := <-dq.deleterLoop.responseChan
-		// We can't retry any more if deletion failed, but we still check the
-		// response so we can log any errors.
-		if len(response.errors) > 0 {
-			dq.logger.Errorw("Couldn't delete old segment files",
-				"errors", response.errors)
-		}
+		dq.handleDeleterLoopResponse(response)
 	}
 
-	// TODO: wait (with timeout?) for any outstanding acks?
+	// If there are any blocked producers still hoping for space to open up
+	// in the queue, send them the bad news.
+	for _, request := range dq.blockedProducers {
+		request.responseChan <- false
+	}
+	dq.blockedProducers = nil
 
-	// TODO: write final queue state to the metadata file.
+	// The reader and writer loops are now shut down, and the deleter loop is
+	// idle. The remaining cleanup is in finalizing the read position in the
+	// queue (the first event that hasn't been acknowledged by consumers), and
+	// in deleting any older segment files that may be left.
+	//
+	// Events read by consumers have been accumulating their ACK data in
+	// dq.acks. During regular operation the core loop is not allowed to use
+	// this data, since it requires holding a mutex, but during shutdown we're
+	// allowed to block to acquire it. However, we still must close its done
+	// channel first, otherwise the lock may be held by a consumer that is
+	// blocked trying to send us a message we're no longer listening to...
+	close(dq.acks.done)
+	dq.acks.lock.Lock()
+	finalPosition := dq.acks.nextPosition
+	dq.acks.lock.Unlock()
+
+	if finalPosition.segmentID > 0 {
+		// All segments before the current one have been fully acknowledged.
+		dq.handleSegmentACK(finalPosition.segmentID - 1)
+	}
+	// Do one last round of deletions, then terminate the deleter loop.
+	dq.maybeDeleteACKed()
+	if dq.deleting {
+		response := <-dq.deleterLoop.responseChan
+		dq.handleDeleterLoopResponse(response)
+	}
+	close(dq.deleterLoop.requestChan)
+
+	// TODO: write finalPosition to disk.
 }
 
 // If the pendingFrames list is nonempty, and there are no outstanding

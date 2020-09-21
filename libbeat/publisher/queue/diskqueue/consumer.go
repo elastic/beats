@@ -40,8 +40,9 @@ type diskQueueBatch struct {
 
 func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
 	if consumer.closed {
-		return nil, fmt.Errorf("Tried to read from closed disk queue consumer")
+		return nil, fmt.Errorf("Tried to read from a closed disk queue consumer")
 	}
+
 	// Read at least one frame. This is guaranteed to eventually
 	// succeed unless the queue is closed.
 	frame, ok := <-consumer.queue.readerLoop.output
@@ -52,7 +53,7 @@ func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
 eventLoop:
 	for eventCount <= 0 || len(frames) < eventCount {
 		select {
-		case frame, ok = <-consumer.queue.readerLoop.output:
+		case frame, ok := <-consumer.queue.readerLoop.output:
 			if !ok {
 				// The queue was closed while we were reading it, just send back
 				// what we have so far.
@@ -65,6 +66,25 @@ eventLoop:
 			break eventLoop
 		}
 	}
+
+	// There is a mild race condition here based on queue closure: events
+	// written to readerLoop.output may have been buffered before the
+	// queue was closed, and we may be reading its leftovers afterwards.
+	// We could try to detect this case here by checking the
+	// consumer.queue.done channel, and return nothing if it's been closed.
+	// But this gives rise to another race: maybe the queue was
+	// closed _after_ we read those frames, and we _ought_ to return them
+	// to the reader. The queue interface doesn't specify the proper
+	// behavior in this case.
+	//
+	// Lacking formal requirements, we elect to be permissive: if we have
+	// managed to read frames, then the queue already knows and considers them
+	// "read," so we lose no consistency by returning them. If someone closes
+	// the queue while we are draining the channel, nothing changes functionally
+	// except that any ACKs after that point will be ignored. A well-behaved
+	// Beats shutdown will always ACK / close its consumers before closing the
+	// queue itself, so we expect this corner case not to arise in practice, but
+	// if it does it is innocuous.
 
 	return &diskQueueBatch{
 		queue:  consumer.queue,
@@ -89,13 +109,6 @@ func (batch *diskQueueBatch) Events() []publisher.Event {
 	return events
 }
 
-// This is the only place that the queue state is changed from
-// outside the core loop. This is because ACKs are messy and bursty
-// and we don't want the core loop to bottleneck on manipulating
-// a potentially large dictionary, so we use a lock and let
-// consumer threads handle most of the processing themselves.
-// TODO: this shouldn't really be a dictionary, use a bitfield or
-// something more efficient.
 func (batch *diskQueueBatch) ACK() {
 	batch.queue.acks.addFrames(batch.frames)
 }
