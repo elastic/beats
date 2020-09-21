@@ -3,7 +3,3 @@
   description: >
     sophos Module
   fields:
-    - name: sophos
-      type: group
-      description: >
-      fields:

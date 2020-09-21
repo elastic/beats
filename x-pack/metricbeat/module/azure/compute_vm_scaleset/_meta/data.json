@@ -1,84 +1,46 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
-        "dimensions": {
-            "vmname": "obslinuxvmss_0"
-        },
-        "metrics": {
-            "disk_read_bytes": {
-                "total": 0
-            },
-            "disk_read_operations_per_sec": {
+        "compute_vm_scaleset": {
+            "os_per_disk_qd": {
                 "avg": 0
             },
-            "disk_write_bytes": {
-                "total": 1032189.54
-            },
-            "disk_write_operations_per_sec": {
-                "avg": 0.254
-            },
-            "inbound_flows": {
-                "avg": 58.2
-            },
-            "inbound_flows_maximum_creation_rate": {
-                "avg": 8.4
-            },
-            "network_in": {
-                "total": 253142
-            },
-            "network_in_total": {
-                "total": 646125
-            },
-            "network_out": {
-                "total": 874827
-            },
-            "network_out_total": {
-                "total": 1140051
-            },
-            "os_disk_bandwidth_consumed_percentage": {
+            "os_per_disk_read_bytes_per_sec": {
                 "avg": 0
             },
-            "os_disk_iops_consumed_percentage": {
+            "os_per_disk_read_operations_per_sec": {
                 "avg": 0
             },
-            "os_disk_queue_depth": {
-                "avg": 0
+            "os_per_disk_write_bytes_per_sec": {
+                "avg": 1872.1200000000001
             },
-            "os_disk_read_bytes_per_sec": {
-                "avg": 0
-            },
-            "os_disk_read_operations_per_sec": {
-                "avg": 0
-            },
-            "os_disk_write_bytes_per_sec": {
-                "avg": 3440.626
-            },
-            "os_disk_write_operations_per_sec": {
-                "avg": 0.508
-            },
-            "outbound_flows": {
-                "avg": 58.2
-            },
-            "outbound_flows_maximum_creation_rate": {
-                "avg": 11.2
-            },
-            "percentage_cpu": {
-                "avg": 0.966
+            "os_per_disk_write_operations_per_sec": {
+                "avg": 0.296
             }
         },
         "namespace": "Microsoft.Compute/virtualMachineScaleSets",
         "resource": {
-            "group": "obs-infrastructure",
-            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/obslinuxvmss",
-            "name": "obslinuxvmss",
+            "group": "testgroup",
+            "id": "/subscriptions/70bd6e23-e3er3-4835-6785-db77b8eef364/resourceGroups/testgroup/providers/Microsoft.Compute/virtualMachineScaleSets/vmscaleset",
+            "name": "vmscaleset",
+            "tags": {
+                "environment": "staging",
+                "role": "allocator"
+            },
             "type": "Microsoft.Compute/virtualMachineScaleSets"
         },
-        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
+        "subscription_id": "70bd6e23-e3er3-4835-6785-db77b8eef364",
         "timegrain": "PT5M"
     },
     "cloud": {
+        "instance": {
+            "name": "vmscaleset"
+        },
+        "machine": {
+            "type": "Standard_D4s_v3"
+        },
         "provider": "azure",
-        "region": "westeurope"
+        "region": "eastus2"
     },
     "event": {
         "dataset": "azure.compute_vm_scaleset",
@@ -86,27 +48,7 @@
         "module": "azure"
     },
     "host": {
-        "cpu": {
-            "pct": 0.00966
-        },
-        "disk": {
-            "read": {
-                "bytes": 0
-            },
-            "write": {
-                "bytes": 1032189.54
-            }
-        },
-        "network": {
-            "in": {
-                "bytes": 646125,
-                "packets": 253142
-            },
-            "out": {
-                "bytes": 1140051,
-                "packets": 874827
-            }
-        }
+        "name": "vmscaleset"
     },
     "metricset": {
         "name": "compute_vm_scaleset",
