@@ -89,6 +89,9 @@ func TestEventTypeHttpAccess(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 		"http": common.MapStr{
 			"response": common.MapStr{
@@ -164,6 +167,9 @@ func TestEventTypeLog(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 		"message": "log message",
 		"stream":  "stdout",
@@ -212,6 +218,9 @@ func TestEventCounter(t *testing.T) {
 				"job":        "job",
 				"index":      "index",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 	}, evt.ToFields())
 }
@@ -257,6 +266,9 @@ func TestEventValueMetric(t *testing.T) {
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
+			},
+			"tags": common.MapStr{
+				"tag": "value",
 			},
 		},
 	}, evt.ToFields())
@@ -322,6 +334,9 @@ func TestEventContainerMetric(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 	}, evt.ToFields())
 }
@@ -365,6 +380,9 @@ func TestEventError(t *testing.T) {
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
+			},
+			"tags": common.MapStr{
+				"tag": "value",
 			},
 		},
 		"message": "message",
