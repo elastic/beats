@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"io"
 	"os"
 	"os/exec"
@@ -20,11 +21,11 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const debugSelector = "synthexec"
 
+// ListJourneys takes the given suite perfors a dry run, capturing the Journey names, and returns the list.
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
 	cmd := exec.Command(
 		"node",
@@ -33,10 +34,10 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 	)
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
-	Outer:
+Outer:
 	for {
 		select {
-		case se := <- mpx.SynthEvents():
+		case se := <-mpx.SynthEvents():
 			if se == nil {
 				break Outer
 			}
@@ -50,6 +51,7 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 	return journeyNames, nil
 }
 
+// SuiteJob will run a single journey by name from the given suite file.
 func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr, ) jobs.Job {
 	cmd := exec.Command(
 		"node",
@@ -61,7 +63,8 @@ func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params 
 	return cmdJob(ctx, cmd, nil, params)
 }
 
-func ScriptJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
+// JourneyJob returns a job tha runs the given source as a single journey.
+func JourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
 	cmd := exec.Command(
 		"npx",
 		"@elastic/synthetics",
@@ -72,15 +75,18 @@ func ScriptJob(ctx context.Context, script string, params common.MapStr) jobs.Jo
 	return cmdJob(ctx, cmd, &script, params)
 }
 
+// cmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
+// available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
+// Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
 	var j jobs.Job
 	var mpx *ExecMultiplexer
-	j = func (event *beat.Event) (conts []jobs.Job, err error) {
+	j = func(event *beat.Event) (conts []jobs.Job, err error) {
 		if mpx == nil { // Start the script on the first invocation of this job
 			mpx, err = runCmd(ctx, cmd, stdinStr, params)
 		}
 		select {
-		case se := <- mpx.SynthEvents():
+		case se := <-mpx.SynthEvents():
 			if se == nil {
 				return nil, nil
 			}
@@ -92,20 +98,22 @@ func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.
 			eventext.MergeEventFields(event, se.ToMap())
 			return []jobs.Job{j}, nil
 		}
-}
+	}
 
 	return j
 }
 
+// runCmd runs the given command, piping stdinStr if present to the command's stdin, and supplying
+// the params var as a CLI argument.
 func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
 	params common.MapStr,
-	) (mpx *ExecMultiplexer, err error) {
+) (mpx *ExecMultiplexer, err error) {
 	mpx = NewExecMultiplexer()
-	// Setup a pipe for structured output
-	resultsReader, resultsWriter, err := os.Pipe()
+	// Setup a pipe for JSON structured output
+	jsonReader, jsonWriter, err := os.Pipe()
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +122,7 @@ func runCmd(
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
 	// We need to pass both files in here otherwise we get a broken pipe, even
 	// though node only touches the writer
-	cmd.ExtraFiles = []*os.File{resultsWriter, resultsReader}
+	cmd.ExtraFiles = []*os.File{jsonWriter, jsonReader}
 	cmd.Args = append(cmd.Args,
 		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
 		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
@@ -129,7 +137,7 @@ func runCmd(
 
 	logp.Info("Running command: %s", cmd.String())
 
-	if stdinStr	!= nil {
+	if stdinStr != nil {
 		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
@@ -140,21 +148,21 @@ func runCmd(
 	stdoutPipe, err := cmd.StdoutPipe()
 	wg.Add(1)
 	go func() {
-		sendConsoleLines(stdoutPipe, "console/stdout", mpx.writeSynthEvent)
+		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
 
 	stderrPipe, err := cmd.StderrPipe()
 	wg.Add(1)
 	go func() {
-		sendConsoleLines(stderrPipe, "console/stderr", mpx.writeSynthEvent)
+		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
 
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		sendSynthEvents(resultsReader, mpx.writeSynthEvent)
+		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -162,7 +170,7 @@ func runCmd(
 	// Kill the process if the context ends
 	go func() {
 		select {
-		case <- ctx.Done():
+		case <-ctx.Done():
 			cmd.Process.Kill()
 		}
 	}()
@@ -170,13 +178,13 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := cmd.Wait()
-		resultsWriter.Close()
-		resultsReader.Close()
-		logp.Debug(debugSelector, "command has completed %d", cmd.ProcessState.ExitCode())
+		jsonWriter.Close()
+		jsonReader.Close()
+		logp.Debug(debugSelector, "Command has completed %d", cmd.ProcessState.ExitCode())
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(&SynthEvent{
-				Type: "cmd/status",
+				Type:  "cmd/status",
 				Error: &SynthError{Name: "cmdexit", Message: str},
 			})
 			logp.Warn("Error executing command '%s': %s", cmd.String(), err)
@@ -188,33 +196,12 @@ func runCmd(
 	return mpx, nil
 }
 
-func sendConsoleLines(rdr io.Reader, typ string, cb func(se *SynthEvent)) {
+// scanToSynthEvents takes a reader, a transform function, and a callback, and processes
+// each scanned line via the reader before invoking it with the callback.
+func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) *SynthEvent, cb func(*SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
-	scanner.Buffer(buf, 1024*1024*200) // Max 200MiB Buffer
-	for scanner.Scan() {
-		if scanner.Err() != nil {
-			logp.Debug("could not scan console line: %s. Line was %s", scanner.Err().Error(), scanner.Text())
-		}
-		logp.Info("%s: %s", typ, scanner.Text())
-		if cb != nil {
-			cb(&SynthEvent{
-				Type: typ,
-				Timestamp: time.Now(),
-				Payload: map[string]interface{}{
-					"message": scanner.Text(),
-				},
-			})
-		}
-	}
-}
-
-func sendSynthEvents(rdr io.Reader, cb func(*SynthEvent)) error {
-	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2) // 2MiB initial buffer
+	buf := make([]byte, 1024*1024*2)   // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
-
-	emptyString := regexp.MustCompile(`^\s*$`)
 
 	for scanner.Scan() {
 		if scanner.Err() != nil {
@@ -222,25 +209,49 @@ func sendSynthEvents(rdr io.Reader, cb func(*SynthEvent)) error {
 			return scanner.Err()
 		}
 
-		// Skip empty lines
-		if emptyString.Match(scanner.Bytes()) {
-			continue
-		}
-
-		var res = SynthEvent{}
-		err := json.Unmarshal(scanner.Bytes(), &res)
-		if err != nil {
-			logp.Warn("Could not unmarshal %s from synthexec: %s", scanner.Text(), err)
-		}
-
-		if res.Type == "" {
-			logp.Warn("Unmarshal succeeded, but no type found for: %s", scanner.Text())
-			continue
-		}
-
-		if err == nil && cb != nil {
-			cb(&res)
+		se := transform(scanner.Bytes(), scanner.Text())
+		if se != nil {
+			cb(se)
 		}
 	}
+
 	return nil
+}
+
+var stdoutToSynthEvent = consoleLineToSynthEvent("stdout")
+var stderrToSynthEvent = consoleLineToSynthEvent("stderr")
+
+// consoleLineToSynthEvent is a factory that can take a line from the scanner and transform it into a *SynthEvent.
+func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *SynthEvent) {
+	return func(bytes []byte, text string) (res *SynthEvent) {
+		logp.Info("%s: %s", typ, text)
+		return &SynthEvent{
+			Type:      typ,
+			Timestamp: time.Now(),
+			Payload: map[string]interface{}{
+				"message": text,
+			},
+		}
+	}
+}
+
+var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
+
+// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent.
+func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent) {
+	// Skip empty lines
+	if emptyStringRegexp.Match(bytes) {
+		return nil
+	}
+
+	err := json.Unmarshal(bytes, &res)
+	if err != nil {
+		logp.Warn("Could not unmarshal %s from synthexec: %s", text, err)
+	}
+
+	if res.Type == "" {
+		logp.Warn("Unmarshal succeeded, but no type found for: %s", text)
+		return nil
+	}
+	return
 }
