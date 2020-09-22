@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -31,11 +33,12 @@ const (
 
 // Upgrader performs an upgrade
 type Upgrader struct {
-	settings *artifact.Config
-	log      *logger.Logger
-	closers  []context.CancelFunc
-	reexec   reexecManager
-	acker    acker
+	settings   *artifact.Config
+	log        *logger.Logger
+	closers    []context.CancelFunc
+	reexec     reexecManager
+	acker      acker
+	upgradable bool
 }
 
 type reexecManager interface {
@@ -50,16 +53,28 @@ type acker interface {
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
 func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker) *Upgrader {
 	return &Upgrader{
-		settings: settings,
-		log:      log,
-		closers:  closers,
-		reexec:   reexec,
-		acker:    a,
+		settings:   settings,
+		log:        log,
+		closers:    closers,
+		reexec:     reexec,
+		acker:      a,
+		upgradable: getUpgradable(),
 	}
+}
+
+// Upgradable returns true if the Elastic Agent can be upgraded.
+func (u *Upgrader) Upgradable() bool {
+	return u.upgradable
 }
 
 // Upgrade upgrades running agent
 func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error {
+	if !u.upgradable {
+		return fmt.Errorf(
+			"cannot be upgraded; must be installed with install sub-command and " +
+				"running under control of the systems supervisor")
+	}
+
 	archivePath, err := u.downloadArtifact(ctx, a.Version, a.SourceURI)
 	if err != nil {
 		return err
@@ -131,4 +146,10 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 
 func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+}
+
+func getUpgradable() bool {
+	// only upgradable if running from Agent installer and running under the
+	// control of the system supervisor.
+	return install.RunningInstalled() && install.RunningUnderSupervisor()
 }
