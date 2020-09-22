@@ -46,15 +46,6 @@ type producerWriteRequest struct {
 	responseChan chan bool
 }
 
-// A request to the core loop to cancel the specified producer.
-type producerCancelRequest struct {
-	producer *diskQueueProducer
-	// If producer.config.DropOnCancel is true, then the core loop will respond
-	// on responseChan with the number of dropped events.
-	// Otherwise, this field may be nil.
-	responseChan chan int
-}
-
 //
 // diskQueueProducer implementation of the queue.Producer interface
 //

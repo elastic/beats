@@ -39,10 +39,6 @@ func (dq *diskQueue) run() {
 			// writer loop.
 			dq.maybeWritePending()
 
-		case cancelRequest := <-dq.producerCancelRequestChan:
-			// TODO: this isn't really handled yet.
-			dq.handleProducerCancelRequest(cancelRequest)
-
 		case ackedSegmentID := <-dq.acks.segmentACKChan:
 			dq.handleSegmentACK(ackedSegmentID)
 
@@ -118,12 +114,6 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 			request.responseChan <- false
 		}
 	}
-}
-
-func (dq *diskQueue) handleProducerCancelRequest(
-	request producerCancelRequest,
-) {
-	// TODO: implement me
 }
 
 func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {

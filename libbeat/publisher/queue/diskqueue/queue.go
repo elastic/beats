@@ -51,9 +51,8 @@ type diskQueue struct {
 	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
 	waitGroup *sync.WaitGroup
 
-	// The API channels used by diskQueueProducer to send write / cancel calls.
-	producerWriteRequestChan  chan producerWriteRequest
-	producerCancelRequestChan chan producerCancelRequest
+	// The API channel used by diskQueueProducer to write events.
+	producerWriteRequestChan chan producerWriteRequest
 
 	// writing is true if a writeRequest is currently being processed by the
 	// writer loop, false otherwise.
@@ -236,8 +235,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		writerLoop:  writerLoop,
 		deleterLoop: deleterLoop,
 
-		producerWriteRequestChan:  make(chan producerWriteRequest),
-		producerCancelRequestChan: make(chan producerCancelRequest),
+		producerWriteRequestChan: make(chan producerWriteRequest),
 
 		waitGroup: &waitGroup,
 		done:      make(chan struct{}),
