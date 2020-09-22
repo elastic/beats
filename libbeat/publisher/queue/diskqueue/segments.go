@@ -165,7 +165,7 @@ func (segment *queueSegment) sizeOnDisk() uint64 {
 
 // Should only be called from the reader loop.
 func (segment *queueSegment) getReader(
-	queueSettings *Settings,
+	queueSettings Settings,
 ) (*os.File, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.Open(path)
@@ -186,7 +186,7 @@ func (segment *queueSegment) getReader(
 
 // Should only be called from the writer loop.
 func (segment *queueSegment) getWriter(
-	queueSettings *Settings,
+	queueSettings Settings,
 ) (*os.File, error) {
 	path := queueSettings.segmentPath(segment.id)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
@@ -207,7 +207,7 @@ func (segment *queueSegment) getWriter(
 // retry callback returns true. This is used for timed retries when
 // creating a queue segment from the writer loop.
 func (segment *queueSegment) getWriterWithRetry(
-	queueSettings *Settings, retry func(error) bool,
+	queueSettings Settings, retry func(error) bool,
 ) (*os.File, error) {
 	file, err := segment.getWriter(queueSettings)
 	for err != nil && retry(err) {

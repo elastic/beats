@@ -25,7 +25,7 @@ import (
 
 type deleterLoop struct {
 	// The settings for the queue that created this loop.
-	settings *Settings
+	settings Settings
 
 	// When one or more segments are ready to delete, they are sent to
 	// requestChan. At most one deleteRequest may be outstanding at any time.

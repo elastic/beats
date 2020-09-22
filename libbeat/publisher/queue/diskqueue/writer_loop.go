@@ -59,7 +59,7 @@ type writerLoopResponse struct {
 
 type writerLoop struct {
 	// The settings for the queue that created this loop.
-	settings *Settings
+	settings Settings
 
 	// The logger for the writer loop, assigned when the queue creates it.
 	logger *logp.Logger

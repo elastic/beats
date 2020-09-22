@@ -233,10 +233,10 @@ func (dq *diskQueue) handleShutdown() {
 	// We are assured by our callers within Beats that we will not be sent a
 	// shutdown signal until all our producers have been finalized /
 	// shut down -- thus, there should be no writer requests outstanding, and
-	// writerLop.requestChan should be idle. But just in case (and in particular
-	// to handle the case where a request is stuck retrying a fatal error),
-	// we signal abort by closing the request channel, and read the final
-	// state if there is any.
+	// writerLoop.requestChan should be idle. But just in case (and in
+	// particular to handle the case where a request is stuck retrying a fatal
+	// error), we signal abort by closing the request channel, and read the
+	// final state if there is any.
 	close(dq.writerLoop.requestChan)
 	if dq.writing {
 		response := <-dq.writerLoop.responseChan

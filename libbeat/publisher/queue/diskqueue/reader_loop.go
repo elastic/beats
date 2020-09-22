@@ -44,7 +44,7 @@ type readerLoopResponse struct {
 
 type readerLoop struct {
 	// The settings for the queue that created this loop.
-	settings *Settings
+	settings Settings
 
 	// When there is a block available for reading, it will be sent to
 	// requestChan. When the reader loop has finished processing it, it
@@ -69,7 +69,7 @@ func (rl *readerLoop) run() {
 	for {
 		request, ok := <-rl.requestChan
 		if !ok {
-			// The channel has closed, we are shutting down.
+			// The channel is closed, we are shutting down.
 			close(rl.output)
 			return
 		}
