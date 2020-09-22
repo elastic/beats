@@ -17,6 +17,8 @@
 
 package diskqueue
 
+import "fmt"
+
 // This file contains the queue's "core loop" -- the central goroutine
 // that owns all queue state that is not encapsulated in one of the
 // self-contained helper loops. This is the only file that is allowed to
@@ -175,20 +177,26 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 
 func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 	dq.deleting = false
-	if len(response.deleted) > 0 {
-		// One or more segments were deleted, recompute the outstanding list.
-		newAckedSegments := []*queueSegment{}
-		for _, segment := range dq.segments.acked {
-			if !response.deleted[segment] {
-				// This segment wasn't deleted, so it goes in the new list.
-				newAckedSegments = append(newAckedSegments, segment)
-			}
+	newAckedSegments := []*queueSegment{}
+	errors := []error{}
+	for i, err := range response.results {
+		if err != nil {
+			// This segment had an error, so it stays in the acked list.
+			newAckedSegments = append(newAckedSegments, dq.segments.acked[i])
+			errors = append(errors,
+				fmt.Errorf("Couldn't delete segment %d: %w",
+					dq.segments.acked[i].id, err))
 		}
-		dq.segments.acked = newAckedSegments
 	}
-	if len(response.errors) > 0 {
-		dq.logger.Errorw("Couldn't delete old segment files",
-			"errors", response.errors)
+	if len(dq.segments.acked) > len(response.results) {
+		// Preserve any new acked segments that were added during the deletion
+		// request.
+		tail := dq.segments.acked[len(response.results):]
+		newAckedSegments = append(newAckedSegments, tail...)
+	}
+	dq.segments.acked = newAckedSegments
+	if len(errors) > 0 {
+		dq.logger.Errorw("Deleting segment files", "errors", errors)
 	}
 }
 

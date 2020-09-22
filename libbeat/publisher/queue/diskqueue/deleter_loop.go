@@ -44,11 +44,7 @@ type deleterLoopRequest struct {
 }
 
 type deleterLoopResponse struct {
-	// The queue segments that were successfully deleted.
-	deleted map[*queueSegment]bool
-
-	// Errors
-	errors []error
+	results []error
 }
 
 func (dl *deleterLoop) run() {
@@ -58,20 +54,21 @@ func (dl *deleterLoop) run() {
 			// The channel has been closed, time to shut down.
 			return
 		}
-		deleted := make(map[*queueSegment]bool, len(request.segments))
-		errorList := []error{}
+		results := []error{}
+		deletedCount := 0
 		for _, segment := range request.segments {
 			path := dl.settings.segmentPath(segment.id)
 			err := os.Remove(path)
 			// We ignore errors caused by the file not existing: this shouldn't
 			// happen, but it is still safe to report it as successfully removed.
 			if err == nil || errors.Is(err, os.ErrNotExist) {
-				deleted[segment] = true
+				deletedCount++
+				results = append(results, nil)
 			} else {
-				errorList = append(errorList, err)
+				results = append(results, err)
 			}
 		}
-		if len(request.segments) > 0 && len(deleted) == 0 {
+		if len(request.segments) > 0 && deletedCount == 0 {
 			// If we were asked to delete segments but could not delete
 			// _any_ of them, we haven't made progress. Returning an error
 			// will log the issue and retry, but in this situation we
@@ -87,8 +84,7 @@ func (dl *deleterLoop) run() {
 			}
 		}
 		dl.responseChan <- deleterLoopResponse{
-			deleted: deleted,
-			errors:  errorList,
+			results: results,
 		}
 	}
 }
