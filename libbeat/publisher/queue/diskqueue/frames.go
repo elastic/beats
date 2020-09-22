@@ -29,12 +29,6 @@ type frameID uint64
 // A data frame created through the producer API and waiting to be
 // written to disk.
 type writeFrame struct {
-	// The original event provided by the client to diskQueueProducer.
-	// We keep this as well as the serialized form until we are done
-	// writing, because we may need to send this value back to the producer
-	// callback if it is cancelled.
-	event publisher.Event
-
 	// The event, serialized for writing to disk and wrapped in a frame
 	// header / footer.
 	serialized []byte
