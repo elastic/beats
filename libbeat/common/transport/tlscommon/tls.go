@@ -70,8 +70,8 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 	return &cert, nil
 }
 
-// ReadPEMFile reads a PEM format file on disk and decrypt it with the privided password and
-// return the raw content.
+// ReadPEMFile reads a PEM formatted string either from disk or passed as a plain text starting with a "-"
+// and decrypt it with the provided password and  return the raw content.
 func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 	pass := []byte(passphrase)
 	var blocks []*pem.Block
