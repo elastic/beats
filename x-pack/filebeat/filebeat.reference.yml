@@ -690,16 +690,6 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#-------------------------------- F5asm Module --------------------------------
-- module: f5asm
-  # All logs
-  {fileset}:
-    enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:

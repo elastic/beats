@@ -1,9 +1,0 @@
-- key: f5asm
-  title: "f5asm"
-  description: >
-    f5asm Module
-  fields:
-    - name: f5asm
-      type: group
-      description: >
-      fields:
