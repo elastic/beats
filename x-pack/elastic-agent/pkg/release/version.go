@@ -23,6 +23,10 @@ var snapshot = ""
 // without valid pgp
 var allowEmptyPgp string
 
+// allowUpgrade is used as a debug flag and allows working
+// with upgrade without requiring Agent to be installed correctly
+var allowUpgrade string
+
 // Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return libbeatVersion.Commit()

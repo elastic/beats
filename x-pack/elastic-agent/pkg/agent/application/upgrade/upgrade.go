@@ -150,6 +150,6 @@ func rollbackInstall(hash string) {
 
 func getUpgradable() bool {
 	// only upgradable if running from Agent installer and running under the
-	// control of the system supervisor.
-	return install.RunningInstalled() && install.RunningUnderSupervisor()
+	// control of the system supervisor (or built specifically with upgrading enabled)
+	return release.Upgradable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
 }
