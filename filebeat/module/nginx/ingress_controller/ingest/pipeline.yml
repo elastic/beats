@@ -73,10 +73,10 @@ processors:
         for (def item : ctx.nginx.ingress_controller.upstream.response.length_list) {
           length = length + Integer.parseInt(item);
         }
-        ctx.nginx.ingress_controller.upstream.response.length = length;
+        ctx.nginx.ingress_controller.upstream.response.length_total = length;
       }
       catch (Exception e) {
-        ctx.nginx.ingress_controller.upstream.response.length = null;
+        ctx.nginx.ingress_controller.upstream.response.length_total = null;
       }
 - script:
     if: ctx.nginx?.ingress_controller?.upstream?.response?.time_list != null && ctx.nginx.ingress_controller.upstream.response.time_list.length > 0
@@ -90,10 +90,10 @@ processors:
         for (def item : ctx.nginx.ingress_controller.upstream.response.time_list) {
           res_time = res_time + Float.parseFloat(item);
         }
-        ctx.nginx.ingress_controller.upstream.response.time = res_time;
+        ctx.nginx.ingress_controller.upstream.response.time_total = res_time;
       }
       catch (Exception e) {
-        ctx.nginx.ingress_controller.upstream.response.time = null;
+        ctx.nginx.ingress_controller.upstream.response.time_total = null;
       }
 - script:
     if: ctx.nginx?.ingress_controller?.upstream?.response?.status_code_list != null && ctx.nginx.ingress_controller.upstream.response.status_code_list.length > 0

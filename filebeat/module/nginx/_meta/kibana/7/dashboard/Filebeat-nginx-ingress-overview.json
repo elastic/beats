@@ -917,7 +917,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "nginx.ingress_controller.upstream.response.time",
+                    "field": "nginx.ingress_controller.upstream.response.time_total",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -1004,7 +1004,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "nginx.ingress_controller.upstream.response.length",
+                    "field": "nginx.ingress_controller.upstream.response.length_total",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum",
                     "values": [

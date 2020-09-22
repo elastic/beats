@@ -49,13 +49,13 @@
       type: keyword
       description: >
         The name of the alternative upstream.
-    - name: upstream.response.length
+    - name: upstream.response.length_total
       type: long
       format: bytes
       description: >
         The length of the response obtained from the upstream server. If several servers were contacted during request process,
         the summary of the multiple response lengths is stored.
-    - name: upstream.response.time
+    - name: upstream.response.time_total
       type: double
       format: duration
       description: >
