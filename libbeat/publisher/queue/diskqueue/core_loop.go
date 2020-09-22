@@ -282,6 +282,9 @@ func (dq *diskQueue) handleShutdown() {
 	close(dq.acks.done)
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
+	// We won't be updating the position anymore, so we can close the file.
+	dq.acks.positionFile.Sync()
+	dq.acks.positionFile.Close()
 	dq.acks.lock.Unlock()
 
 	// First check for the rare and fortunate case that every single event we
@@ -303,8 +306,6 @@ func (dq *diskQueue) handleShutdown() {
 		dq.handleDeleterLoopResponse(response)
 	}
 	close(dq.deleterLoop.requestChan)
-
-	// TODO: write finalPosition to disk.
 }
 
 // If the pendingFrames list is nonempty, and there are no outstanding

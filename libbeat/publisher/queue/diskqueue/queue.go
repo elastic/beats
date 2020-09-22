@@ -133,6 +133,17 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		// warning and fall back on the oldest existing segment, if any.
 		logger.Warnf("Couldn't load most recent queue position: %v", err)
 	}
+	positionFile, err := os.OpenFile(
+		settings.stateFilePath(), os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		// This is not the _worst_ error: we could try operating even without a
+		// position file. But it indicates a problem with the queue permissions on
+		// disk, which keeps us from tracking our position within the segment files
+		// and could also prevent us from creating new ones, so we treat this as a
+		// fatal error on startup rather than quietly providing degraded
+		// performance.
+		return nil, fmt.Errorf("Couldn't write to state file: %v", err)
+	}
 
 	// Index any existing data segments to be placed in segments.reading.
 	initialSegments, err := scanExistingSegments(settings.directoryPath())
@@ -219,14 +230,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 			nextReadOffset: nextReadPosition.offset,
 		},
 
-		acks: &diskQueueACKs{
-			nextFrameID:       0,
-			nextPosition:      nextReadPosition,
-			frameSize:         make(map[frameID]int64),
-			segmentBoundaries: make(map[frameID]segmentID),
-			segmentACKChan:    make(chan segmentID),
-			done:              make(chan struct{}),
-		},
+		acks: makeDiskQueueACKs(logger, nextReadPosition, positionFile),
 
 		readerLoop:  readerLoop,
 		writerLoop:  writerLoop,

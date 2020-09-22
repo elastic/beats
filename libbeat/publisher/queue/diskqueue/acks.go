@@ -18,7 +18,10 @@
 package diskqueue
 
 import (
+	"os"
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // queuePosition represents a logical position within the queue buffer.
@@ -28,6 +31,8 @@ type queuePosition struct {
 }
 
 type diskQueueACKs struct {
+	logger *logp.Logger
+
 	// This lock must be held to access diskQueueACKs fields (except for
 	// diskQueueACKs.done, which is always safe).
 	lock sync.Mutex
@@ -52,10 +57,31 @@ type diskQueueACKs struct {
 	// scheduled for deletion.
 	segmentACKChan chan segmentID
 
+	// An open writable file handle to the file that stores the queue position.
+	// This position is advanced as we receive ACKs, confirming it is safe
+	// to move forward, so the acking code is responsible for updating this
+	// file.
+	positionFile *os.File
+
 	// When the queue is closed, diskQueueACKs.done is closed to signal that
 	// the core loop will not accept any more acked segments and any future
 	// ACKs should be ignored.
 	done chan struct{}
+}
+
+func makeDiskQueueACKs(
+	logger *logp.Logger, position queuePosition, positionFile *os.File,
+) *diskQueueACKs {
+	return &diskQueueACKs{
+		logger:            logger,
+		nextFrameID:       0,
+		nextPosition:      position,
+		frameSize:         make(map[frameID]int64),
+		segmentBoundaries: make(map[frameID]segmentID),
+		segmentACKChan:    make(chan segmentID),
+		positionFile:      positionFile,
+		done:              make(chan struct{}),
+	}
 }
 
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
@@ -98,6 +124,13 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			}
 			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
 			delete(dqa.frameSize, dqa.nextFrameID)
+		}
+		// We advanced the ACK position at least somewhat, so write its
+		// new value.
+		err := writeQueuePositionToHandle(dqa.positionFile, dqa.nextPosition)
+		if err != nil {
+			// TODO: Don't spam this warning on every ACK if it's a permanent error.
+			dqa.logger.Warnf("Couldn't save queue position: %v", err)
 		}
 	}
 	if oldSegmentID != dqa.nextPosition.segmentID {
