@@ -216,23 +216,13 @@ def runE2ETestForPackages(){
   def slackChannel = 'ingest-management'
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "filebeat") {
-      echo('Triggering E2E tests for filebeat-oss. Test suite: helm:filebeat & ingest-manager')
-      //triggerE2ETests('helm', slackChannel)
-      triggerE2ETests('ingest-manager', slackChannel)
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
-      echo('Triggering E2E tests for metricbeat-oss. Test suite: helm:metricbeat && ingest-manager && metricbeat')
+    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "metricbeat" ||
+      "${env.BEATS_FOLDER}" == "x-pack/filebeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
       triggerE2ETests('all', slackChannel)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      echo('Triggering E2E tests for elastic-agent. Test suite: ingest-manager')
       triggerE2ETests('ingest-manager', slackChannel)
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
-      echo('Triggering E2E tests for filebeat. Test suite: helm:filebeat & ingest-manager')
-      //triggerE2ETests('helm', slackChannel)
-      triggerE2ETests('ingest-manager', slackChannel)
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
-      echo('Triggering E2E tests for metricbeat. Test suite: helm:metricbeat && ingest-manager && metricbeat')
-      triggerE2ETests('all', slackChannel)
+    } else {
+      echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
     }
   }
 }
@@ -247,6 +237,8 @@ def release(){
 }
 
 def triggerE2ETests(String suite, String channel) {
+  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}. Build result will be sent the ${channel} Slack channel")
+
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
   build(job: "${e2eTestsPipeline}",
