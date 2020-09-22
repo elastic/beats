@@ -120,8 +120,8 @@ pipeline {
                     deleteDir()
                     release()
                     pushCIDockerImages()
-                    runE2ETestForPackages()
                   }
+                  runE2ETestForPackages()
                 }
               }
               stage('Package Mac OS'){
@@ -266,7 +266,8 @@ def triggerE2ETests(String suite, String channel) {
     wait: false
   )
 
-    githubNotify(context: "${env.GITHUB_CHECK_E2E_TESTS_NAME}", description: "${env.GITHUB_CHECK_E2E_TESTS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
+  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME} for ${env.BEATS_FOLDER}"
+  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){
