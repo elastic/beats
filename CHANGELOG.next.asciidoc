@@ -189,6 +189,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
 - [Autodiscover] Handle input-not-finished errors in config reload. {pull}20915[20915]
 - Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
+- Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
 
 *Auditbeat*
 
