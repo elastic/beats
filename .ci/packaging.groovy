@@ -5,12 +5,14 @@
 pipeline {
   agent none
   environment {
+    REPO = 'beats'
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
   }
@@ -246,7 +248,8 @@ def release(){
 
 def triggerE2ETests(String suite, String channel) {
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
-  build(job: "e2e-tests/e2e-testing-mbp/${branchName}",
+  def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+  build(job: "${e2eTestsPipeline}",
     parameters: [
       booleanParam(name: 'forceSkipGitChecks', value: true),
       booleanParam(name: 'forceSkipPresubmit', value: true),
@@ -255,10 +258,15 @@ def triggerE2ETests(String suite, String channel) {
       string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'runTestsSuite', value: suite),
       string(name: 'SLACK_CHANNEL', value: channel),
+      string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
+      string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
     ],
     propagate: false,
     wait: false
   )
+
+    githubNotify(context: "${env.GITHUB_CHECK_E2E_TESTS_NAME}", description: "${env.GITHUB_CHECK_E2E_TESTS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){
