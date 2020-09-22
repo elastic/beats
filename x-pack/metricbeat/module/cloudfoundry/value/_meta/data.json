@@ -3,16 +3,19 @@
     "cloudfoundry": {
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "439bb519-3e68-4d08-a973-8f013f364d61",
-            "ip": "192.168.16.18",
-            "job": "cloud_controller",
-            "origin": "routing_api"
+            "index": "dffd1799-d03a-405a-9309-3fcce23f536f",
+            "ip": "192.168.16.15",
+            "job": "diego_database",
+            "origin": "silk-controller"
+        },
+        "tags": {
+            "source_id": "silk-controller"
         },
         "type": "value",
         "value": {
-            "name": "memoryStats.lastGCPauseTimeNS",
-            "unit": "count",
-            "value": 77499
+            "name": "LeasesIndexRequestTime",
+            "unit": "ms",
+            "value": 0.681265
         }
     },
     "service": {
