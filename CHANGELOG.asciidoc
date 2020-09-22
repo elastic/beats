@@ -13,31 +13,6 @@ https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
 
 - Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
-
-*Heartbeat*
-
-
-*Journalbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -45,20 +20,11 @@ https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
 - Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 - Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 - Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
 - Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
-
-*Heartbeat*
-
-
-*Journalbeat*
-
 
 *Metricbeat*
 
@@ -66,12 +32,6 @@ https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
 - The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 - Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
 - Handle missing counters in the application_pool metricset. {pull}21071[21071]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
 
 *Functionbeat*
 
@@ -83,60 +43,6 @@ https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
 *Affecting all Beats*
 
 - Add container ECS fields in kubernetes metadata. {pull}20984[20984]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
-
 
 [[release-notes-7.9.1]]
 === Beats version 7.9.1
