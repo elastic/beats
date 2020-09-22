@@ -245,7 +245,7 @@ def release(){
 }
 
 def triggerE2ETests(String suite, String channel) {
-  def branchName = isPR() ? "${env.CHANGE.TARGET}" : "${env.JOB_BASE_NAME}"
+  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   build(job: "e2e-tests/e2e-testing-mbp/${branchName}",
     parameters: [
       booleanParam(name: 'forceSkipGitChecks', value: true),
