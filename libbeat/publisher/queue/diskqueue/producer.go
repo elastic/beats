@@ -96,7 +96,6 @@ func (producer *diskQueueProducer) publish(
 		// The request has been sent, and we are now guaranteed to get a result on
 		// the response channel, so we must read from it immediately to avoid
 		// blocking the core loop.
-		// TODO: this should be unblocked by a call to Cancel
 		response := <-request.responseChan
 		return response
 	case <-producer.queue.done:
@@ -112,8 +111,9 @@ func (producer *diskQueueProducer) Cancel() int {
 	}
 	producer.cancelled = true
 	close(producer.done)
-	return 0
 
 	// TODO (possibly?): message the core loop to remove any pending events that
-	// were sent through this producer.
+	// were sent through this producer. If we do, return the number of cancelled
+	// events here instead of zero.
+	return 0
 }

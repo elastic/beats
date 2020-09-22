@@ -51,6 +51,11 @@ type entry struct {
 	Fields    common.MapStr
 }
 
+const (
+	// If
+	flagGuaranteed uint8 = 1 << 0
+)
+
 func newEventEncoder() *eventEncoder {
 	e := &eventEncoder{}
 	e.reset()
@@ -77,15 +82,14 @@ func (e *eventEncoder) reset() {
 func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
 	e.buf.Reset()
 
-	var flags uint8
-	// TODO: handle guaranteed send?
-	/*if (event.Flags & publisher.GuaranteedSend) == publisher.GuaranteedSend {
+	/*var flags uint8
+	if (event.Flags & publisher.GuaranteedSend) == publisher.GuaranteedSend {
 		flags = flagGuaranteed
 	}*/
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
-		Flags:     flags,
+		Flags:     uint8(event.Flags),
 		Meta:      event.Content.Meta,
 		Fields:    event.Content.Fields,
 	})
@@ -144,14 +148,8 @@ func (d *eventDecoder) Decode() (publisher.Event, error) {
 		return publisher.Event{}, err
 	}
 
-	var flags publisher.EventFlags
-	// TODO: handle guaranteed send?
-	/*if (to.Flags & flagGuaranteed) != 0 {
-		flags |= publisher.GuaranteedSend
-	}*/
-
 	return publisher.Event{
-		Flags: flags,
+		Flags: publisher.EventFlags(to.Flags),
 		Content: beat.Event{
 			Timestamp: time.Unix(0, to.Timestamp),
 			Fields:    to.Fields,
