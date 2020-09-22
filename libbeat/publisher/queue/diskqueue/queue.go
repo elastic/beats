@@ -51,20 +51,20 @@ type diskQueue struct {
 	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
 	waitGroup *sync.WaitGroup
 
-	// The API channel used by diskQueueProducer to write events.
-	producerWriteRequestChan chan producerWriteRequest
-
-	// writing is true if a writeRequest is currently being processed by the
-	// writer loop, false otherwise.
+	// writing is true if the writer loop is processing a request, false
+	// otherwise.
 	writing bool
 
-	// reading is true if the reader loop is processing a readBlock, false
+	// reading is true if the reader loop is processing a request, false
 	// otherwise.
 	reading bool
 
-	// deleting is true if the segment-deletion loop is processing a deletion
-	// request, false otherwise.
+	// deleting is true if the deleter loop is processing a request, false
+	// otherwise.
 	deleting bool
+
+	// The API channel used by diskQueueProducer to write events.
+	producerWriteRequestChan chan producerWriteRequest
 
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
