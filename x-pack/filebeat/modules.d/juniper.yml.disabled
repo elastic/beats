@@ -20,7 +20,6 @@
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
-<<<<<<< HEAD
 
   netscreen:
     enabled: true
@@ -40,7 +39,7 @@
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
-=======
+
   srx:
     enabled: true
 
@@ -53,4 +52,3 @@
 
     # The port to listen for syslog traffic. Defaults to 9006.
     #var.syslog_port: 9006
->>>>>>> stashing changes for later
