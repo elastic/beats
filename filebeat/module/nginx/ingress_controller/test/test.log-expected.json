@@ -26,11 +26,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -80,11 +83,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -134,11 +140,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -188,11 +197,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -314,11 +326,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -368,11 +383,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -426,11 +444,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -483,11 +504,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.6",
         "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.length_list": [
             "61"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -541,11 +565,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -598,11 +625,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -656,11 +686,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -713,11 +746,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -770,11 +806,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -828,11 +867,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -885,11 +927,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.6",
         "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.length_list": [
             "61"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -943,11 +988,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -1000,11 +1048,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -1054,11 +1105,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.6",
         "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.length_list": [
             "61"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -1111,11 +1165,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.5",
         "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.length_list": [
             "59"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -1168,11 +1225,14 @@
             "192.168.64.1"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.6",
         "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.length_list": [
             "61"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200"
         ],
@@ -1225,12 +1285,15 @@
             "192.168.64.14"
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.7",
         "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 161,
         "nginx.ingress_controller.upstream.response.length_list": [
             "61",
             "100"
         ],
+        "nginx.ingress_controller.upstream.response.status_code": 203,
         "nginx.ingress_controller.upstream.response.status_code_list": [
             "200",
             "203"

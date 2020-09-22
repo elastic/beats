@@ -105222,7 +105222,7 @@ type: keyword
 *`nginx.ingress_controller.upstream.response.length`*::
 +
 --
-The length of the response obtained from the upstream
+The length of the response obtained from the upstream server. If several servers were contacted during request process, the summary of the multiple response lengths is stored.
 
 
 type: long
@@ -105234,12 +105234,42 @@ format: bytes
 *`nginx.ingress_controller.upstream.response.time`*::
 +
 --
-The time spent on receiving the response from the upstream as seconds with millisecond resolution
+The time spent on receiving the response from the upstream as seconds with millisecond resolution. If several servers were contacted during request process, the summary of the multiple response times is stored.
 
 
 type: double
 
 format: duration
+
+--
+
+*`nginx.ingress_controller.upstream.response.status_code`*::
++
+--
+The status code of the response obtained from the upstream server. If several servers were contacted during request process, only the status code of the response from the last one is stored in this field.
+
+
+type: long
+
+--
+
+*`nginx.ingress_controller.upstream.ip`*::
++
+--
+The IP address of the upstream server. If several servers were contacted during request process, only the last one is stored in this field.
+
+
+type: ip
+
+--
+
+*`nginx.ingress_controller.upstream.port`*::
++
+--
+The port of the upstream server. If several servers were contacted during request process, only the last one is stored in this field.
+
+
+type: long
 
 --
 

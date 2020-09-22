@@ -53,12 +53,29 @@
       type: long
       format: bytes
       description: >
-        The length of the response obtained from the upstream
+        The length of the response obtained from the upstream server. If several servers were contacted during request process,
+        the summary of the multiple response lengths is stored.
     - name: upstream.response.time
       type: double
       format: duration
       description: >
-        The time spent on receiving the response from the upstream as seconds with millisecond resolution
+        The time spent on receiving the response from the upstream as seconds with millisecond resolution.
+        If several servers were contacted during request process, the summary of the multiple response times is stored.
+    - name: upstream.response.status_code
+      type: long
+      description: >
+        The status code of the response obtained from the upstream server. If several servers were contacted during
+        request process, only the status code of the response from the last one is stored in this field.
+    - name: upstream.ip
+      type: ip
+      description: >
+        The IP address of the upstream server. If several servers were contacted during request process,
+        only the last one is stored in this field.
+    - name: upstream.port
+      type: long
+      description: >
+        The port of the upstream server. If several servers were contacted during request process,
+        only the last one is stored in this field.
     - name: http.request.id
       type: keyword
       description: >
