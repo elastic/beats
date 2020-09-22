@@ -28,10 +28,10 @@ var (
 
 // Config options
 type Config struct {
-	ClientId                string           `config:"client_id"`
-	ClientSecret            string           `config:"client_secret"`
-	TenantId                string           `config:"tenant_id"`
-	SubscriptionId          string           `config:"subscription_id"`
+	ClientId                string           `config:"client_id"  validate:"required"`
+	ClientSecret            string           `config:"client_secret"  validate:"required"`
+	TenantId                string           `config:"tenant_id"  validate:"required"`
+	SubscriptionId          string           `config:"subscription_id"  validate:"required"`
 	Period                  time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources               []ResourceConfig `config:"resources"`
 	RefreshListInterval     time.Duration    `config:"refresh_list_interval"`
@@ -70,18 +70,6 @@ type DimensionConfig struct {
 }
 
 func (conf *Config) Validate() error {
-	if conf.SubscriptionId == "" {
-		return errors.New("no subscription ID has been configured")
-	}
-	if conf.ClientSecret == "" {
-		return errors.New("no client secret has been configured")
-	}
-	if conf.ClientId == "" {
-		return errors.New("no client ID has been configured")
-	}
-	if conf.TenantId == "" {
-		return errors.New("no tenant ID has been configured")
-	}
 	if conf.ResourceManagerEndpoint == "" {
 		conf.ResourceManagerEndpoint = DefaultBaseURI
 	}

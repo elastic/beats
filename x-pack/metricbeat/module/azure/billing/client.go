@@ -6,6 +6,7 @@ package billing
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"time"
 
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ import (
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
 type Client struct {
 	BillingService Service
-	Config         Config
+	Config         azure.Config
 	Log            *logp.Logger
 }
 
@@ -29,7 +30,7 @@ type Usage struct {
 }
 
 // NewClient instantiates the an Azure monitoring client
-func NewClient(config Config) (*Client, error) {
+func NewClient(config azure.Config) (*Client, error) {
 	usageService, err := NewService(config)
 	if err != nil {
 		return nil, err

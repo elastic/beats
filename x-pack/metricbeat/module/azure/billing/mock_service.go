@@ -5,6 +5,7 @@
 package billing
 
 import (
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -27,7 +28,7 @@ type MockService struct {
 func NewMockClient() *Client {
 	return &Client{
 		new(MockService),
-		Config{},
+		azure.Config{},
 		logp.NewLogger("test azure monitor"),
 	}
 }
