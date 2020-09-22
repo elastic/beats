@@ -64,7 +64,7 @@ type readFrame struct {
 
 	// How much space this frame occupied on disk (before deserialization),
 	// including the frame header / footer.
-	bytesOnDisk int64
+	bytesOnDisk uint64
 }
 
 // Each data frame has a 32-bit length in the header, and a 32-bit checksum

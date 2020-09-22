@@ -109,7 +109,7 @@ type queueSegment struct {
 	// read during a previous session.
 	//
 	// Used to count how many frames still need to be acknowledged by consumers.
-	framesRead int64
+	framesRead uint64
 }
 
 type segmentHeader struct {

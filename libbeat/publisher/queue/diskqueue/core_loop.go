@@ -163,7 +163,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 		// so we don't check the endOffset.
 		segment = dq.segments.writing[0]
 	}
-	segment.framesRead = int64(dq.segments.nextReadFrameID - segment.firstFrameID)
+	segment.framesRead = uint64(dq.segments.nextReadFrameID - segment.firstFrameID)
 
 	// If there was an error, report it.
 	if response.err != nil {

@@ -32,10 +32,10 @@ type readerLoopRequest struct {
 
 type readerLoopResponse struct {
 	// The number of frames successfully read from the requested segment file.
-	frameCount int64
+	frameCount uint64
 
 	// The number of bytes successfully read from the requested segment file.
-	byteCount int64
+	byteCount uint64
 
 	// If there was an error in the segment file (i.e. inconsistent data), the
 	// err field is set.
@@ -79,8 +79,8 @@ func (rl *readerLoop) run() {
 }
 
 func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopResponse {
-	frameCount := int64(0)
-	byteCount := int64(0)
+	frameCount := uint64(0)
+	byteCount := uint64(0)
 	nextFrameID := request.startFrameID
 
 	// Open the file and seek to the starting position.
@@ -94,7 +94,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 
-	targetLength := int64(request.endOffset - request.startOffset)
+	targetLength := uint64(request.endOffset - request.startOffset)
 	for {
 		remainingLength := targetLength - byteCount
 
@@ -156,7 +156,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 // it does not exceed the given length bound. The returned frame leaves the
 // segment and frame IDs unset.
 func (rl *readerLoop) nextFrame(
-	handle *os.File, maxLength int64,
+	handle *os.File, maxLength uint64,
 ) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
@@ -174,9 +174,9 @@ func (rl *readerLoop) nextFrame(
 
 	// If the frame extends past the area we were told to read, return an error.
 	// This should never happen unless the segment file is corrupted.
-	if maxLength < int64(frameLength) {
+	if maxLength < uint64(frameLength) {
 		return nil, fmt.Errorf(
-			"Can't read next frame: frame size is %v but remaining data is only %v",
+			"Can't read next frame: frame size is %d but remaining data is only %d",
 			frameLength, maxLength)
 	}
 	if frameLength <= frameMetadataSize {
@@ -229,7 +229,7 @@ func (rl *readerLoop) nextFrame(
 
 	frame := &readFrame{
 		event:       event,
-		bytesOnDisk: int64(frameLength),
+		bytesOnDisk: uint64(frameLength),
 	}
 
 	return frame, nil

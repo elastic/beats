@@ -46,7 +46,7 @@ type diskQueueACKs struct {
 	// remaining frame, which is written to disk as ACKs are received. (We do
 	// this to avoid duplicating events if the beat terminates without a clean
 	// shutdown.)
-	frameSize map[frameID]int64
+	frameSize map[frameID]uint64
 
 	// segmentBoundaries maps the first frameID of each segment to its
 	// corresponding segment ID.
@@ -76,7 +76,7 @@ func makeDiskQueueACKs(
 		logger:            logger,
 		nextFrameID:       0,
 		nextPosition:      position,
-		frameSize:         make(map[frameID]int64),
+		frameSize:         make(map[frameID]uint64),
 		segmentBoundaries: make(map[frameID]segmentID),
 		segmentACKChan:    make(chan segmentID),
 		positionFile:      positionFile,
