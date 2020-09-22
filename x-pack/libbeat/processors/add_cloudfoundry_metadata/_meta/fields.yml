@@ -38,6 +38,12 @@
           description: >
             Cloud Foundry organization name.
 
+        - name: tags.*
+          type: object
+          object_type: keyword
+          description: >
+            Cloud Foundry tags.
+
         - name: envelope
           type: group
           fields:
