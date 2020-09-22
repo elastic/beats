@@ -256,6 +256,7 @@ def triggerE2ETests(String suite, String channel) {
       booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
       booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
       string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
+      string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'runTestsSuite', value: suite),
       string(name: 'SLACK_CHANNEL', value: channel),
       string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
