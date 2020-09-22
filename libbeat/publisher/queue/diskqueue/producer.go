@@ -72,7 +72,6 @@ func (producer *diskQueueProducer) publish(
 	}
 	request := producerWriteRequest{
 		frame: &writeFrame{
-			event:      event,
 			serialized: serialized,
 			producer:   producer,
 		},
