@@ -213,17 +213,25 @@ def tagAndPush(name){
 }
 
 def runE2ETestForPackages(){
-  def slackChannel = 'ingest-management'
+  def suite = ''
+  def slackChannel = ''
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "metricbeat" ||
-      "${env.BEATS_FOLDER}" == "x-pack/filebeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
-      triggerE2ETests('all', slackChannel)
+    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
+      suite = 'all'
+      slackChannel = 'integrations'
+    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
+      suite = 'all'
+      slackChannel = 'integrations'
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      triggerE2ETests('ingest-manager', slackChannel)
+      suite = 'ingest-manager'
+      slackChannel = 'ingest-management'
     } else {
       echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
+      return
     }
+
+    triggerE2ETests(suite, slackChannel)
   }
 }
 
