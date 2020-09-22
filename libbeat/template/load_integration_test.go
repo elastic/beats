@@ -65,7 +65,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		t.Fatal(err)
 	}
 	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
-	client.Request("DELETE", "/_template/"+cfg.Name, "", nil, nil)
+	client.Request("DELETE", esVersionTemplatePath(client.GetVersion())+cfg.Name, "", nil, nil)
 	require.False(t, s.loader.templateExists(cfg.Name))
 	return &s
 }
@@ -303,7 +303,7 @@ func TestTemplateWithData(t *testing.T) {
 }
 
 func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
-	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
+	status, body, err := client.Request("GET", esVersionTemplatePath(client.GetVersion())+templateName, "", nil, nil)
 	require.NoError(t, err)
 	require.Equal(t, status, 200)
 

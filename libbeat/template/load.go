@@ -119,8 +119,9 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
-	path := "/_template/" + templateName
-	params := esVersionParams(l.client.GetVersion())
+	clientVersion := l.client.GetVersion()
+	path := esVersionTemplatePath(clientVersion) + templateName
+	params := esVersionParams(clientVersion)
 	status, body, err := l.client.Request("PUT", path, "", params, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
@@ -129,6 +130,13 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 		return fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 	return nil
+}
+
+func esVersionTemplatePath(v common.Version) string {
+	if v.LessThan(common.MustNewVersion("7.8.0")) {
+		return "/_template/"
+	}
+	return "/_index_template/"
 }
 
 // templateExists checks if a given template already exist. It returns true if
