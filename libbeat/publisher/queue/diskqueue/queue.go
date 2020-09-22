@@ -49,7 +49,7 @@ type diskQueue struct {
 
 	// Wait group for shutdown of the goroutines associated with this queue:
 	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
-	waitGroup *sync.WaitGroup
+	waitGroup sync.WaitGroup
 
 	// writing is true if the writer loop is processing a request, false
 	// otherwise.
