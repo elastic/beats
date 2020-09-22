@@ -127,7 +127,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}
 
 	// Load the previous queue position, if any.
-	nextReadPosition, err := nextReadPositionFromPath(settings.stateFilePath())
+	nextReadPosition, err := queuePositionFromPath(settings.stateFilePath())
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		// Errors reading / writing the position are non-fatal -- we just log a
 		// warning and fall back on the oldest existing segment, if any.

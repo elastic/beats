@@ -24,70 +24,57 @@ import (
 	"os"
 )
 
-// This is the queue metadata that is saved to disk. Currently it only
-// tracks the read position in the queue; all other data is contained
-// in the segment files.
-type diskQueuePersistentState struct {
-	// The schema version for the state file (currently always 0).
-	version uint32
-
-	// The oldest position in the queue. This is advanced as we receive ACKs from
-	// downstream consumers indicating it is safe to remove old events.
-	firstPosition queuePosition
-}
-
-// A wrapper around os.File that saves and loads the queue state.
-type stateFile struct {
-	// An open file handle to the queue's state file.
-	file *os.File
-
-	// A pointer to the disk queue state that was read when this queue was
-	// opened, or nil if there was no preexisting state file.
-	loadedState *diskQueuePersistentState
-
-	// If there was a non-fatal error loading the queue state, it is stored
-	// here. In this case, the queue overwrites the existing state file with
-	// a valid starting state.
-	stateErr error
-}
-
-// Given an open file handle, decode the file as a diskQueuePersistentState
+// Given an open file handle to the queue state, decode the current position
 // and return the result if successful, otherwise an error.
-func persistentStateFromHandle(
+func queuePositionFromHandle(
 	file *os.File,
-) (*diskQueuePersistentState, error) {
+) (queuePosition, error) {
 	_, err := file.Seek(0, 0)
 	if err != nil {
-		return nil, err
+		return queuePosition{}, err
 	}
-	state := diskQueuePersistentState{}
 
 	reader := bufio.NewReader(file)
-	err = binary.Read(reader, binary.LittleEndian, &state.version)
+	var version uint32
+	err = binary.Read(reader, binary.LittleEndian, &version)
 	if err != nil {
-		return nil, err
+		return queuePosition{}, err
+	}
+	if version != 0 {
+		return queuePosition{},
+			fmt.Errorf("Unsupported queue metadata version (%d)", version)
 	}
 
-	err = binary.Read(reader, binary.LittleEndian, &state.firstPosition.segmentID)
+	position := queuePosition{}
+	err = binary.Read(reader, binary.LittleEndian, &position.segmentID)
 	if err != nil {
-		return nil, err
+		return queuePosition{}, err
 	}
 
 	err = binary.Read(
-		reader, binary.LittleEndian, &state.firstPosition.offset)
+		reader, binary.LittleEndian, &position.offset)
 	if err != nil {
-		return nil, err
+		return queuePosition{}, err
 	}
 
-	return &state, nil
+	return position, nil
 }
 
-// Given an open file handle and the first remaining position of a disk queue,
-// binary encode the corresponding diskQueuePersistentState and overwrite the
-// file with the result. Returns nil if successful, otherwise an error.
-func writePersistentStateToHandle(
+func queuePositionFromPath(path string) (queuePosition, error) {
+	// Try to open an existing state file.
+	file, err := os.OpenFile(path, os.O_RDONLY, 0600)
+	if err != nil {
+		return queuePosition{}, err
+	}
+	defer file.Close()
+	return queuePositionFromHandle(file)
+}
+
+// Given the queue position, encode and write it to the given file handle.
+// Returns nil if successful, otherwise an error.
+func writeQueuePositionToHandle(
 	file *os.File,
-	firstPosition queuePosition,
+	position queuePosition,
 ) error {
 	_, err := file.Seek(0, 0)
 	if err != nil {
@@ -100,69 +87,15 @@ func writePersistentStateToHandle(
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian, &firstPosition.segmentID)
+	err = binary.Write(file, binary.LittleEndian, &position.segmentID)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian, &firstPosition.offset)
+	err = binary.Write(file, binary.LittleEndian, &position.offset)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (stateFile *stateFile) Close() error {
-	return stateFile.file.Close()
-}
-
-func nextReadPositionFromPath(path string) (queuePosition, error) {
-	// Try to open an existing state file.
-	file, err := os.OpenFile(path, os.O_RDONLY, 0600)
-	if err != nil {
-		return queuePosition{}, err
-	}
-	state, err := persistentStateFromHandle(file)
-	if err != nil {
-		return queuePosition{}, err
-	}
-	return state.firstPosition, nil
-}
-
-func stateFileForPath(path string) (*stateFile, error) {
-	var state *diskQueuePersistentState
-	var stateErr error
-	// Try to open an existing state file.
-	file, err := os.OpenFile(path, os.O_RDWR, 0600)
-	if err != nil {
-		// If we can't open the file, it's likely a new queue, so try to create it.
-		file, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
-		if err != nil {
-			return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
-		}
-	} else {
-		// Read the existing state.
-		state, stateErr = persistentStateFromHandle(file)
-		// This
-		if err != nil {
-			// TODO: this shouldn't be a fatal error. If the state file exists but
-			// its contents are invalid, then we should log a warning and overwrite
-			// it with metadata derived from the segment files instead.
-			return nil, err
-		}
-	}
-	result := &stateFile{
-		file:        file,
-		loadedState: state,
-		stateErr:    stateErr,
-	}
-	if state == nil {
-		// Initialize with new zero state.
-		err = writePersistentStateToHandle(file, queuePosition{0, 0})
-		if err != nil {
-			return nil, fmt.Errorf("Couldn't write queue state to disk: %w", err)
-		}
-	}
-	return result, nil
 }
