@@ -1,5 +1,6 @@
 :beatname_uc: Heartbeat
 :beatname_lc: heartbeat
+:beatname_pkg: heartbeat
 ++++
 <div class="tabs" data-tab-group="os">
   <div role="tablist" aria-label="Start-h">

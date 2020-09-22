@@ -1,5 +1,6 @@
 :beatname_uc: Metricbeat
 :beatname_lc: metricbeat
+:beatname_pkg: metricbeat
 ++++
 <div class="tabs" data-tab-group="os">
   <div role="tablist" aria-label="Start-m">

@@ -1,5 +1,6 @@
 :beatname_uc: Filebeat
 :beatname_lc: filebeat
+:beatname_pkg: filebeat
 ++++
 <div class="tabs" data-tab-group="os">
   <div role="tablist" aria-label="Start-f">
