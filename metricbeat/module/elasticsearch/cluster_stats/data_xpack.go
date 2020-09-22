@@ -217,6 +217,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 
 	event := mb.Event{
 		ModuleFields: common.MapStr{},
+		RootFields:   common.MapStr{},
 	}
 	event.ModuleFields.Put("cluster.name", info.ClusterName)
 	event.ModuleFields.Put("cluster.id", info.ClusterID)
