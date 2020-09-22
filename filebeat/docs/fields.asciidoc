@@ -105135,6 +105135,46 @@ type: array
 
 --
 
+*`nginx.ingress_controller.upstream_ip_list`*::
++
+--
+An array of the upstream IP addresses. It is a list because it is common that several upstream servers were contacted during request processing.
+
+
+type: array
+
+--
+
+*`nginx.ingress_controller.upstream.response.length_list`*::
++
+--
+An array of upstream response lengths. It is a list because it is common that several upstream servers were contacted during request processing.
+
+
+type: array
+
+--
+
+*`nginx.ingress_controller.upstream.response.time_list`*::
++
+--
+An array of upstream response durations. It is a list because it is common that several upstream servers were contacted during request processing.
+
+
+type: array
+
+--
+
+*`nginx.ingress_controller.upstream.response.status_code_list`*::
++
+--
+An array of upstream response status codes. It is a list because it is common that several upstream servers were contacted during request processing.
+
+
+type: array
+
+--
+
 *`nginx.ingress_controller.http.request.length`*::
 +
 --
@@ -105182,7 +105222,7 @@ type: keyword
 *`nginx.ingress_controller.upstream.response.length`*::
 +
 --
-The length of the response obtained from the upstream server
+The length of the response obtained from the upstream
 
 
 type: long
@@ -105194,22 +105234,12 @@ format: bytes
 *`nginx.ingress_controller.upstream.response.time`*::
 +
 --
-The time spent on receiving the response from the upstream server as seconds with millisecond resolution
+The time spent on receiving the response from the upstream as seconds with millisecond resolution
 
 
 type: double
 
 format: duration
-
---
-
-*`nginx.ingress_controller.upstream.response.status_code`*::
-+
---
-The status code of the response obtained from the upstream server
-
-
-type: long
 
 --
 
@@ -105220,26 +105250,6 @@ The randomly generated ID of the request
 
 
 type: keyword
-
---
-
-*`nginx.ingress_controller.upstream.ip`*::
-+
---
-The IP address of the upstream server. If several servers were contacted during request processing, their addresses are separated by commas.
-
-
-type: ip
-
---
-
-*`nginx.ingress_controller.upstream.port`*::
-+
---
-The port of the upstream server.
-
-
-type: long
 
 --
 

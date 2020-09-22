@@ -11,6 +11,26 @@
         Real source IP is restored to `source.ip`.
 
     # ingress-controller specific fields
+    - name: upstream_ip_list
+      type: array
+      description: >
+        An array of the upstream IP addresses. It is a list because it is common that several upstream servers
+        were contacted during request processing.
+    - name: upstream.response.length_list
+      type: array
+      description: >
+        An array of upstream response lengths. It is a list because it is common that several upstream servers
+        were contacted during request processing.
+    - name: upstream.response.time_list
+      type: array
+      description: >
+        An array of upstream response durations. It is a list because it is common that several upstream servers
+        were contacted during request processing.
+    - name: upstream.response.status_code_list
+      type: array
+      description: >
+        An array of upstream response status codes. It is a list because it is common that several upstream servers
+        were contacted during request processing.
     - name: http.request.length
       type: long
       format: bytes
@@ -33,28 +53,16 @@
       type: long
       format: bytes
       description: >
-        The length of the response obtained from the upstream server
+        The length of the response obtained from the upstream
     - name: upstream.response.time
       type: double
       format: duration
       description: >
-        The time spent on receiving the response from the upstream server as seconds with millisecond resolution
-    - name: upstream.response.status_code
-      type: long
-      description: >
-        The status code of the response obtained from the upstream server
+        The time spent on receiving the response from the upstream as seconds with millisecond resolution
     - name: http.request.id
       type: keyword
       description: >
         The randomly generated ID of the request
-    - name: upstream.ip
-      type: ip
-      description: >
-        The IP address of the upstream server. If several servers were contacted during request processing, their addresses are separated by commas.
-    - name: upstream.port
-      type: long
-      description: >
-        The port of the upstream server.
 
     - name: body_sent.bytes
       type: alias
