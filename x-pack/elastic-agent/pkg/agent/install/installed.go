@@ -11,12 +11,12 @@ import (
 	"github.com/kardianos/service"
 )
 
-// InstallStatus is the return status types.
-type InstallStatus int
+// StatusType is the return status types.
+type StatusType int
 
 const (
 	// NotInstalled returned when Elastic Agent is not installed.
-	NotInstalled InstallStatus = iota
+	NotInstalled StatusType = iota
 	// Installed returned when Elastic Agent is installed currectly.
 	Installed
 	// Broken returned when Elastic Agent is installed but broken.
@@ -24,7 +24,7 @@ const (
 )
 
 // Status returns the installation status of Agent.
-func Status() (InstallStatus, string) {
+func Status() (StatusType, string) {
 	expected := filepath.Join(InstallPath, BinaryName)
 	status, reason := checkService()
 	_, err := os.Stat(expected)
@@ -53,7 +53,7 @@ func RunningInstalled() bool {
 }
 
 // checkService only checks the status of the service.
-func checkService() (InstallStatus, string) {
+func checkService() (StatusType, string) {
 	svc, err := newService()
 	if err != nil {
 		return NotInstalled, "unable to check service status"

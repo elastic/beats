@@ -41,14 +41,14 @@ Unless -f is used this command will ask confirmation before performing removal.
 
 func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	if !install.HasRoot() {
-		return fmt.Errorf("Error: unable to perform uninstall command, not executed with %s permissions.", install.PermissionUser)
+		return fmt.Errorf("unable to perform uninstall command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
 	if status == install.NotInstalled {
-		return fmt.Errorf("Elastic Agent is not installed")
+		return fmt.Errorf("not installed")
 	}
 	if status == install.Installed && !install.RunningInstalled() {
-		return fmt.Errorf("Elastic Agent can only be uninstall by executing the installed Elastic Agent at: %s", install.ExecutablePath())
+		return fmt.Errorf("can only be uninstall by executing the installed Elastic Agent at: %s", install.ExecutablePath())
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -57,27 +57,27 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
 			confirm, err := c.Confirm("Continuing will uninstall the broken Elastic Agent. Do you want to continue?", true)
 			if err != nil {
-				return fmt.Errorf("Error: problem reading prompt response")
+				return fmt.Errorf("problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Uninstall was cancelled by the user")
+				return fmt.Errorf("uninstall was cancelled by the user")
 			}
 		}
 	} else {
 		if !force {
 			confirm, err := c.Confirm("Elastic Agent will be uninstalled from your system. Do you want to continue?", true)
 			if err != nil {
-				return fmt.Errorf("Error: problem reading prompt response")
+				return fmt.Errorf("problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Uninstall was cancelled by the user")
+				return fmt.Errorf("uninstall was cancelled by the user")
 			}
 		}
 	}
 
 	err := install.Uninstall()
 	if err != nil {
-		return fmt.Errorf("Error: %s", err)
+		return err
 	}
 	fmt.Fprintf(streams.Out, "Elastic Agent has been uninstalled.\n")
 

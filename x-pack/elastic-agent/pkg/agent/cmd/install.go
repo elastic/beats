@@ -44,11 +44,11 @@ would like the Agent to operate.
 
 func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	if !install.HasRoot() {
-		return fmt.Errorf("Error: unable to perform install command, not executed with %s permissions.", install.PermissionUser)
+		return fmt.Errorf("unable to perform install command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
 	if status == install.Installed {
-		return fmt.Errorf("Elastic Agent is already installed at: %s", install.InstallPath)
+		return fmt.Errorf("already installed at: %s", install.InstallPath)
 	}
 
 	warn.PrintNotGA(streams.Out)
@@ -61,7 +61,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 				return fmt.Errorf("Error: problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Installation was cancelled by the user")
+				return fmt.Errorf("installation was cancelled by the user")
 			}
 		}
 	} else {
@@ -71,7 +71,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 				return fmt.Errorf("Error: problem reading prompt response")
 			}
 			if !confirm {
-				return fmt.Errorf("Installation was cancelled by the user")
+				return fmt.Errorf("installation was cancelled by the user")
 			}
 		}
 	}
@@ -83,7 +83,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	err = install.StartService()
 	if err != nil {
 		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
-		return fmt.Errorf("Error: %s", err)
+		return err
 	}
 	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
 
@@ -99,7 +99,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if askEnroll {
 		confirm, err := c.Confirm("Do you want to enroll this Agent into Fleet?", true)
 		if err != nil {
-			return fmt.Errorf("Error: problem reading prompt response")
+			return fmt.Errorf("problem reading prompt response")
 		}
 		if !confirm {
 			// not enrolling, all done (standalone mode)
@@ -114,7 +114,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if kibana == "" {
 		kibana, err := c.ReadInput("Kibana URL you want to enroll this Agent into:")
 		if err != nil {
-			return fmt.Errorf("Error: problem reading prompt response")
+			return fmt.Errorf("problem reading prompt response")
 		}
 		if kibana == "" {
 			fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
@@ -124,7 +124,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if token == "" {
 		token, err := c.ReadInput("Fleet enrollment token:")
 		if err != nil {
-			return fmt.Errorf("Error: problem reading prompt response")
+			return fmt.Errorf("problem reading prompt response")
 		}
 		if token == "" {
 			fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
@@ -140,7 +140,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	enrollCmd.Stderr = os.Stderr
 	err = enrollCmd.Start()
 	if err != nil {
-		return fmt.Errorf("Error: failed to execute enroll command: %s", err)
+		return fmt.Errorf("failed to execute enroll command: %s", err)
 	}
 	err = enrollCmd.Wait()
 	if err == nil {
@@ -148,7 +148,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 	exitErr, ok := err.(*exec.ExitError)
 	if ok {
-		return fmt.Errorf("Error: enroll command failed with exit code: %d", exitErr.ExitCode())
+		return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
 	}
-	return fmt.Errorf("Error: enroll command failed for unknown reason: %s", err)
+	return fmt.Errorf("enroll command failed for unknown reason: %s", err)
 }
