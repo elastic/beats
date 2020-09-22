@@ -1,27 +1,25 @@
 {
-    "@timestamp": "2020-02-27T18:20:48.379Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
-        "value": {
-            "unit": "",
-            "value": 5.125735912782789e-05,
-            "timestamp": "2020-02-27T18:20:48.379Z",
-            "type": "value",
-            "name": "go_memstats_gc_cpu_fraction"
-        },
         "envelope": {
-            "origin": "loggregator_forwarder_agent",
-            "deployment": "cf",
-            "ip": "10.144.0.11",
-            "job": "scheduler",
-            "index": "d6b7bb59-ac57-4ed5-a0a7-0b23e19d9f8f"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
+            "ip": "192.168.16.31",
+            "job": "diego_cell",
+            "origin": "rep"
+        },
+        "tags": {
+            "instance_id": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
+            "product": "Pivotal Application Service",
+            "source_id": "rep"
+        },
+        "type": "value",
+        "value": {
+            "name": "memoryStats.numBytesAllocatedStack",
+            "timestamp": "2020-09-22T17:17:40.257407125+02:00",
+            "unit": "Bytes",
+            "value": 3899392
         }
-    },
-    "event": {
-        "dataset": "cloudfoundry.value",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "value"
     },
     "service": {
         "type": "cloudfoundry"

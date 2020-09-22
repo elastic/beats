@@ -497,8 +497,17 @@ func baseMap(evt Event) common.MapStr {
 				"timestamp": evt.Timestamp(),
 			},
 			"envelope": envelopMap(evt),
+			"tags":     dedotedTags(evt.Tags()),
 		},
 	}
+}
+
+func dedotedTags(tags map[string]string) common.MapStr {
+	result := common.MapStr{}
+	for name, value := range tags {
+		result[common.DeDot(name)] = value
+	}
+	return result
 }
 
 func baseMapWithApp(evt EventWithAppID) common.MapStr {
