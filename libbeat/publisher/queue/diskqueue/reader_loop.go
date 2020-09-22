@@ -65,6 +65,17 @@ type readerLoop struct {
 	decoder *eventDecoder
 }
 
+func newReaderLoop(settings Settings) *readerLoop {
+	return &readerLoop{
+		settings: settings,
+
+		requestChan:  make(chan readerLoopRequest, 1),
+		responseChan: make(chan readerLoopResponse),
+		output:       make(chan *readFrame, settings.ReadAheadLimit),
+		decoder:      newEventDecoder(),
+	}
+}
+
 func (rl *readerLoop) run() {
 	for {
 		request, ok := <-rl.requestChan

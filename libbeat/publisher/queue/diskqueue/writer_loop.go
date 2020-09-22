@@ -84,6 +84,16 @@ type writerLoop struct {
 	outputFile *os.File
 }
 
+func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
+	return &writerLoop{
+		logger:   logger,
+		settings: settings,
+
+		requestChan:  make(chan writerLoopRequest, 1),
+		responseChan: make(chan writerLoopResponse),
+	}
+}
+
 func (wl *writerLoop) run() {
 	for {
 		block, ok := <-wl.requestChan

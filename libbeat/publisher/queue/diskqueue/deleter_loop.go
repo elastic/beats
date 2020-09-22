@@ -47,6 +47,15 @@ type deleterLoopResponse struct {
 	results []error
 }
 
+func newDeleterLoop(settings Settings) *deleterLoop {
+	return &deleterLoop{
+		settings: settings,
+
+		requestChan:  make(chan deleterLoopRequest, 1),
+		responseChan: make(chan deleterLoopResponse),
+	}
+}
+
 func (dl *deleterLoop) run() {
 	for {
 		request, ok := <-dl.requestChan

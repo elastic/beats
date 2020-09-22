@@ -69,7 +69,7 @@ type diskQueueACKs struct {
 	done chan struct{}
 }
 
-func makeDiskQueueACKs(
+func newDiskQueueACKs(
 	logger *logp.Logger, position queuePosition, positionFile *os.File,
 ) *diskQueueACKs {
 	return &diskQueueACKs{

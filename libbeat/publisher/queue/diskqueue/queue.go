@@ -172,53 +172,6 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
 	}
 
-	// We wait for four goroutines: core loop, reader loop, writer loop,
-	// deleter loop.
-	var waitGroup sync.WaitGroup
-	waitGroup.Add(4)
-
-	// The helper loops all have an input channel with buffer size 1, to ensure
-	// that the core loop can never block when sending a request (the core
-	// loop never sends a request until receiving the response from the
-	// previous one, so there is never more than one outstanding request for
-	// any helper loop).
-
-	readerLoop := &readerLoop{
-		settings: settings,
-
-		requestChan:  make(chan readerLoopRequest, 1),
-		responseChan: make(chan readerLoopResponse),
-		output:       make(chan *readFrame, settings.ReadAheadLimit),
-		decoder:      newEventDecoder(),
-	}
-	go func() {
-		readerLoop.run()
-		waitGroup.Done()
-	}()
-
-	writerLoop := &writerLoop{
-		logger:   logger,
-		settings: settings,
-
-		requestChan:  make(chan writerLoopRequest, 1),
-		responseChan: make(chan writerLoopResponse),
-	}
-	go func() {
-		writerLoop.run()
-		waitGroup.Done()
-	}()
-
-	deleterLoop := &deleterLoop{
-		settings: settings,
-
-		requestChan:  make(chan deleterLoopRequest, 1),
-		responseChan: make(chan deleterLoopResponse),
-	}
-	go func() {
-		deleterLoop.run()
-		waitGroup.Done()
-	}()
-
 	queue := &diskQueue{
 		logger:   logger,
 		settings: settings,
@@ -229,22 +182,37 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 			nextReadOffset: nextReadPosition.offset,
 		},
 
-		acks: makeDiskQueueACKs(logger, nextReadPosition, positionFile),
+		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
-		readerLoop:  readerLoop,
-		writerLoop:  writerLoop,
-		deleterLoop: deleterLoop,
+		readerLoop:  newReaderLoop(settings),
+		writerLoop:  newWriterLoop(logger, settings),
+		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
 
-		waitGroup: &waitGroup,
-		done:      make(chan struct{}),
+		done: make(chan struct{}),
 	}
 
-	// Start the queue's main loop.
+	// We wait for four goroutines on shutdown: core loop, reader loop,
+	// writer loop, deleter loop.
+	queue.waitGroup.Add(4)
+
+	// Start the goroutines and return the queue!
+	go func() {
+		queue.readerLoop.run()
+		queue.waitGroup.Done()
+	}()
+	go func() {
+		queue.writerLoop.run()
+		queue.waitGroup.Done()
+	}()
+	go func() {
+		queue.deleterLoop.run()
+		queue.waitGroup.Done()
+	}()
 	go func() {
 		queue.run()
-		waitGroup.Done()
+		queue.waitGroup.Done()
 	}()
 
 	return queue, nil
