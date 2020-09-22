@@ -4,6 +4,8 @@
 
 experimental[]
 
+include::elastic-agent.asciidoc[tag=experimental-warning]
+
 The `elastic-agent run` command provides flags that alter the behavior of an
 agent:
 

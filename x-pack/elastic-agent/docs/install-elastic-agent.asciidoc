@@ -4,6 +4,8 @@
 
 experimental[]
 
+include::elastic-agent.asciidoc[tag=experimental-warning]
+
 Download and install the Agent on each system you want to monitor.
 
 //TODO: Replace with tabbed panel when the code is stable. 

@@ -4,6 +4,8 @@
 
 experimental[]
 
+include::elastic-agent.asciidoc[tag=experimental-warning]
+
 The following example shows a full list of configuration options:
 
 [source,yaml]
