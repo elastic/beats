@@ -21,6 +21,7 @@ To learn how to install, configure, and run your {agent}s, see:
 * <<unenroll-elastic-agent>>
 * <<elastic-agent-cmd-options>>
 * <<elastic-agent-configuration>>
+* <<faq-development>>
 
 include::install-elastic-agent.asciidoc[leveloffset=+1]
 
@@ -33,5 +34,7 @@ include::unenroll-elastic-agent.asciidoc[leveloffset=+1]
 include::elastic-agent-command-line.asciidoc[leveloffset=+1]
 
 include::elastic-agent-configuration.asciidoc[leveloffset=+1]
+
+include::faq-development.asciidoc[leveloffset=+1]
 
 //include::elastic-agent-configuration-example.asciidoc[leveloffset=+1]
