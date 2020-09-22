@@ -66,26 +66,22 @@ func (e *eventEncoder) reset() {
 	e.folder = nil
 
 	visitor := json.NewVisitor(&e.buf)
-	folder, err := gotype.NewIterator(visitor,
+	// This can't return an error: NewIterator is deterministic based on its
+	// input, and doesn't return an error when called with valid options. In
+	// this case the options are hard-coded to fixed values, so they are
+	// guaranteed to be valid and we can safely proceed.
+	folder, _ := gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),
 			codec.MakeBCTimestampEncoder(),
 		),
 	)
-	if err != nil {
-		panic(err)
-	}
 
 	e.folder = folder
 }
 
 func (e *eventEncoder) encode(event *publisher.Event) ([]byte, error) {
 	e.buf.Reset()
-
-	/*var flags uint8
-	if (event.Flags & publisher.GuaranteedSend) == publisher.GuaranteedSend {
-		flags = flagGuaranteed
-	}*/
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
@@ -113,10 +109,9 @@ func newEventDecoder() *eventDecoder {
 }
 
 func (d *eventDecoder) reset() {
-	unfolder, err := gotype.NewUnfolder(nil)
-	if err != nil {
-		panic(err) // can not happen
-	}
+	// When called on nil, NewUnfolder deterministically returns a nil error,
+	// so it's safe to ignore the error result.
+	unfolder, _ := gotype.NewUnfolder(nil)
 
 	d.unfolder = unfolder
 	d.parser = json.NewParser(unfolder)
