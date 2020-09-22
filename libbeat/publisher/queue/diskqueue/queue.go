@@ -184,7 +184,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	// any helper loop).
 
 	readerLoop := &readerLoop{
-		settings: &settings,
+		settings: settings,
 
 		requestChan:  make(chan readerLoopRequest, 1),
 		responseChan: make(chan readerLoopResponse),
@@ -198,7 +198,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 
 	writerLoop := &writerLoop{
 		logger:   logger,
-		settings: &settings,
+		settings: settings,
 
 		requestChan:  make(chan writerLoopRequest, 1),
 		responseChan: make(chan writerLoopResponse),
@@ -209,7 +209,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}()
 
 	deleterLoop := &deleterLoop{
-		settings: &settings,
+		settings: settings,
 
 		requestChan:  make(chan deleterLoopRequest, 1),
 		responseChan: make(chan deleterLoopResponse),
