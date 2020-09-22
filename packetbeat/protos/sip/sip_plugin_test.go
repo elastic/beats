@@ -31,56 +31,52 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-func TestInit(t *testing.T) {
-	// TODO: Is it need test implementation?
-}
-
 func TestInitDetailOption(t *testing.T) {
 	// Detail of headers
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.useDefaultHeaders = true
 	sip.initDetailOption()
 
 	assert.Equal(t, 14, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["from"], "Initiation fiald, from")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["to"], "Initiation fiald, to")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["contact"], "Initiation fiald, contact")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["record-route"], "Initiation fiald, record-route")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["p-asserted-identity"], "Initiation fiald, p-asserted-identity")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["p-preferred-identity"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
-	assert.Equal(t, SipDetailInt, sip.parseSet["rseq"], "Initiation fiald, rseq")
-	assert.Equal(t, SipDetailInt, sip.parseSet["content-length"], "Initiation fiald, content-length")
-	assert.Equal(t, SipDetailInt, sip.parseSet["max-forwards"], "Initiation fiald, max-forwards")
-	assert.Equal(t, SipDetailInt, sip.parseSet["expires"], "Initiation fiald, expires")
-	assert.Equal(t, SipDetailInt, sip.parseSet["session-expires"], "Initiation fiald, session-expires")
-	assert.Equal(t, SipDetailInt, sip.parseSet["min-se"], "Initiation fiald, min-se")
+	assert.Equal(t, detailNameAddr, sip.parseSet["from"], "Initiation fiald, from")
+	assert.Equal(t, detailNameAddr, sip.parseSet["to"], "Initiation fiald, to")
+	assert.Equal(t, detailNameAddr, sip.parseSet["contact"], "Initiation fiald, contact")
+	assert.Equal(t, detailNameAddr, sip.parseSet["record-route"], "Initiation fiald, record-route")
+	assert.Equal(t, detailNameAddr, sip.parseSet["p-asserted-identity"], "Initiation fiald, p-asserted-identity")
+	assert.Equal(t, detailNameAddr, sip.parseSet["p-preferred-identity"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, detailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, detailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, detailInt, sip.parseSet["rseq"], "Initiation fiald, rseq")
+	assert.Equal(t, detailInt, sip.parseSet["content-length"], "Initiation fiald, content-length")
+	assert.Equal(t, detailInt, sip.parseSet["max-forwards"], "Initiation fiald, max-forwards")
+	assert.Equal(t, detailInt, sip.parseSet["expires"], "Initiation fiald, expires")
+	assert.Equal(t, detailInt, sip.parseSet["session-expires"], "Initiation fiald, session-expires")
+	assert.Equal(t, detailInt, sip.parseSet["min-se"], "Initiation fiald, min-se")
 }
 
 func TestInitDetailOptionWithOverwriteFlag(t *testing.T) {
 	// Detail of headers
 	//sip.parseSet = make(map[string]int)
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.useDefaultHeaders = false
 	sip.initDetailOption()
 
 	assert.Equal(t, 2, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, detailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, detailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
 }
 
 func TestInitDetailOptionWithOverwriteFlagAndAddtionalHeaderFromSetting(t *testing.T) {
 	// Detail of headers
 	//sip.parseSet = make(map[string]int)
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.useDefaultHeaders = false
@@ -89,17 +85,17 @@ func TestInitDetailOptionWithOverwriteFlagAndAddtionalHeaderFromSetting(t *testi
 	sip.initDetailOption()
 
 	assert.Equal(t, 6, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["x-original-header1"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SipDetailNameAddr, sip.parseSet["x-original-header2"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SipDetailInt, sip.parseSet["x-original-header3"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SipDetailInt, sip.parseSet["x-original-header4"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, detailNameAddr, sip.parseSet["x-original-header1"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, detailNameAddr, sip.parseSet["x-original-header2"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, detailInt, sip.parseSet["x-original-header3"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, detailInt, sip.parseSet["x-original-header4"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, detailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, detailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
 }
 
 func TestSetFromConfig(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	cfg.Ports = []int{5060, 5061}
@@ -124,7 +120,7 @@ func TestSetFromConfig(t *testing.T) {
 
 func TestSetFromConfigDefault(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	assert.Equal(t, 0, len(sip.ports), "There should be included 5060.")
@@ -134,7 +130,7 @@ func TestSetFromConfigDefault(t *testing.T) {
 
 func TestGetPorts(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.ports = []int{5060, 5061, 1123, 5555}
@@ -148,7 +144,7 @@ func TestGetPorts(t *testing.T) {
 
 func TestPublishMessage(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	rawText := "test raw string"
@@ -173,16 +169,19 @@ func TestPublishMessage(t *testing.T) {
 
 	sip.results = store.publish
 	sip.publishMessage(&msg)
+	fields := store.events[0].Fields
 	sipFields := store.events[0].Fields["sip"].(common.MapStr)
+	statusPhrase, _ := sipFields.GetValue("status.phrase")
 	assert.Equal(t, 1, store.size(), "There should be added one packet in store after publish.")
-	assert.Equal(t, phraseText, sipFields["status-phrase"], "Compare published packet and stored data.")
+	assert.Equal(t, phraseText, statusPhrase, "Compare published packet and stored data.")
 	assert.Equal(t, nil, sipFields["method"], "Compare published packet and stored data.")
-	assert.Equal(t, rawText, sipFields["raw"], "Compare published packet and stored data.")
+	gotRaw, _ := fields.GetValue("event.original")
+	assert.Equal(t, rawText, gotRaw, "Compare published packet and stored data.")
 }
 
 func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.parseDetail = true
@@ -213,7 +212,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	callidH := []common.NetString{}
 	callidH = append(callidH, common.NetString(callid))
 	headers["from"] = fromH
-	headers["call-id"] = callidH
+	headers["call_id"] = callidH
 	headers["p-asserted-identity"] = paiH
 	headers["to"] = toH
 	headers["orig"] = toH
@@ -237,18 +236,18 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 
 	stored := store.events[0].Fields["sip"].(common.MapStr)
 	assert.Equal(t, methodText, stored["method"], "Invalid Method text")
-	assert.Equal(t, requestURI, stored["request-uri"], "Invalid Request URI")
+	assert.Equal(t, requestURI, stored["request_uri"], "Invalid Request URI")
 	assert.Equal(t, to, stored["to"], "Invalid To text")
 	assert.Equal(t, from, stored["from"], "Invalid from text")
 	assert.Equal(t, cseq, stored["cseq"], "Invalid CSeq text")
 
 	userpart := "+8137890123;npdi;rn=+81312341234"
-	assert.Equal(t, userpart, stored["request-uri-user"], "Invalid Request URI user info")
-	assert.Equal(t, "hoge.com", stored["request-uri-host"], "Invalid Request URI host")
-	assert.Equal(t, 5060, stored["request-uri-port"], "Invalid Request URI host")
-	assert.Contains(t, stored["request-uri-params"], "user=phone", "Invalid Request URI parameter")
-	assert.Contains(t, stored["request-uri-params"], "transport=udp", "Invalid Request URI parameter")
-	assert.Equal(t, 2, len(stored["request-uri-params"].([]string)), "Invalid Request URI parameter length")
+	assert.Equal(t, userpart, stored["request_uri_user"], "Invalid Request URI user info")
+	assert.Equal(t, "hoge.com", stored["request_uri_host"], "Invalid Request URI host")
+	assert.Equal(t, 5060, stored["request_uri_port"], "Invalid Request URI host")
+	assert.Contains(t, stored["request_uri_params"], "user=phone", "Invalid Request URI parameter")
+	assert.Contains(t, stored["request_uri_params"], "transport=udp", "Invalid Request URI parameter")
+	assert.Equal(t, 2, len(stored["request_uri_params"].([]string)), "Invalid Request URI parameter length")
 
 	headersP := (stored["headers"].(common.MapStr))["from"].([]common.MapStr)
 	assert.Equal(t, common.NetString(from), headersP[0]["raw"], "Invalid from text")
@@ -258,7 +257,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	assert.Equal(t, 5060, headersP[0]["port"], "Invalid from port")
 	assert.Contains(t, headersP[0]["params"], "tag=FromTag", "Invalid from params")
 	assert.Equal(t, 1, len(headersP[0]["params"].([]string)), "Invalid from params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid from uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid from uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["to"].([]common.MapStr)
 	assert.Equal(t, common.NetString(to), headersP[0]["raw"], "Invalid to text")
@@ -267,7 +266,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	assert.Equal(t, "192.168.0.1", headersP[0]["host"], "Invalid to host")
 	assert.Equal(t, nil, headersP[0]["port"], "Invalid to port")
 	assert.Equal(t, nil, headersP[0]["params"], "Invalid to params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid to uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid to uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["p-asserted-identity"].([]common.MapStr)
 	assert.Equal(t, common.NetString(pai0), headersP[0]["raw"], "Invalid p-asserted-identity text")
@@ -276,26 +275,26 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	assert.Equal(t, "+81312341234", headersP[0]["host"], "Invalid p-asserted-identity host")
 	assert.Equal(t, nil, headersP[0]["port"], "Invalid p-asserted-identity port")
 	assert.Equal(t, nil, headersP[0]["params"], "Invalid p-asserted-identity params")
-	assert.Contains(t, headersP[0]["uri-params"], "cpc=ordinary", "Invalid p-asserted-identity uri-params")
-	assert.Equal(t, 1, len(headersP[0]["uri-params"].([]string)), "Invalid p-asserted-identity uri-params")
+	assert.Contains(t, headersP[0]["uri_params"], "cpc=ordinary", "Invalid p-asserted-identity uri_params")
+	assert.Equal(t, 1, len(headersP[0]["uri_params"].([]string)), "Invalid p-asserted-identity uri_params")
 	assert.Equal(t, common.NetString(pai1), headersP[1]["raw"], "Invalid p-asserted-identity text")
 	assert.Equal(t, nil, headersP[1]["display"], "Invalid p-asserted-identity display")
 	assert.Equal(t, "+81312341234", headersP[1]["user"], "Invalid p-asserted-identity user")
 	assert.Equal(t, "hoge.com", headersP[1]["host"], "Invalid p-asserted-identity host")
 	assert.Equal(t, nil, headersP[1]["port"], "Invalid p-asserted-identity port")
 	assert.Equal(t, nil, headersP[1]["params"], "Invalid p-asserted-identity params")
-	assert.Contains(t, headersP[1]["uri-params"], "cpc=ordinary", "Invalid p-asserted-identity uri-params")
-	assert.Contains(t, headersP[1]["uri-params"], "user=phone", "Invalid p-asserted-identity uri-params")
-	assert.Equal(t, 2, len(headersP[1]["uri-params"].([]string)), "Invalid p-asserted-identity uri-params")
+	assert.Contains(t, headersP[1]["uri_params"], "cpc=ordinary", "Invalid p-asserted-identity uri_params")
+	assert.Contains(t, headersP[1]["uri_params"], "user=phone", "Invalid p-asserted-identity uri_params")
+	assert.Equal(t, 2, len(headersP[1]["uri_params"].([]string)), "Invalid p-asserted-identity uri_params")
 
-	headersP = (stored["headers"].(common.MapStr))["call-id"].([]common.MapStr)
-	assert.Equal(t, common.NetString(callid), headersP[0]["raw"], "Invalid call-id text")
-	assert.Equal(t, nil, headersP[0]["display"], "Invalid call-id display")
-	assert.Equal(t, nil, headersP[0]["user"], "Invalid call-id user")
-	assert.Equal(t, nil, headersP[0]["host"], "Invalid call-id host")
-	assert.Equal(t, nil, headersP[0]["port"], "Invalid call-id port")
-	assert.Equal(t, nil, headersP[0]["params"], "Invalid call-id params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid call-id uri-params")
+	headersP = (stored["headers"].(common.MapStr))["call_id"].([]common.MapStr)
+	assert.Equal(t, common.NetString(callid), headersP[0]["raw"], "Invalid call_id text")
+	assert.Equal(t, nil, headersP[0]["display"], "Invalid call_id display")
+	assert.Equal(t, nil, headersP[0]["user"], "Invalid call_id user")
+	assert.Equal(t, nil, headersP[0]["host"], "Invalid call_id host")
+	assert.Equal(t, nil, headersP[0]["port"], "Invalid call_id port")
+	assert.Equal(t, nil, headersP[0]["params"], "Invalid call_id params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid call_id uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["orig"].([]common.MapStr)
 	assert.Equal(t, common.NetString(to), headersP[0]["raw"], "Invalid orig text")
@@ -304,7 +303,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	assert.Equal(t, nil, headersP[0]["host"], "Invalid orig host")
 	assert.Equal(t, nil, headersP[0]["port"], "Invalid orig port")
 	assert.Equal(t, nil, headersP[0]["params"], "Invalid orig params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid orig uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid orig uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["cseq"].([]common.MapStr)
 	assert.Equal(t, cseqNum, headersP[0]["number"], "Invalid cseq number")
@@ -313,7 +312,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 
 func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	sip.parseDetail = true
@@ -339,7 +338,7 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	callidH := []common.NetString{}
 	callidH = append(callidH, common.NetString(callid))
 	headers["from"] = fromH
-	headers["call-id"] = callidH
+	headers["call_id"] = callidH
 	headers["to"] = toH
 	headers["orig"] = toH
 	cseqH := []common.NetString{}
@@ -361,9 +360,12 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	sip.results = store.publish
 	sip.publishMessage(&msg)
 
-	stored := store.events[0].Fields["sip"].(common.MapStr)
-	assert.Equal(t, statusText, stored["status-phrase"], "Invalid Status Phrase")
-	assert.Equal(t, int(statusNumber), stored["status-code"], "Invalid Status Code")
+	fields := store.events[0].Fields
+	stored := fields["sip"].(common.MapStr)
+	statusPhrase, _ := stored.GetValue("status.phrase")
+	statusCode, _ := stored.GetValue("status.code")
+	assert.Equal(t, statusText, statusPhrase, "Invalid Status Phrase")
+	assert.Equal(t, int(statusNumber), statusCode, "Invalid Status Code")
 	assert.Equal(t, to, stored["to"], "Invalid To text")
 	assert.Equal(t, from, stored["from"], "Invalid from text")
 	assert.Equal(t, cseq, stored["cseq"], "Invalid CSeq text")
@@ -376,7 +378,7 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	assert.Equal(t, 5060, headersP[0]["port"], "Invalid from port")
 	assert.Contains(t, headersP[0]["params"], "tag=FromTag", "Invalid from params")
 	assert.Equal(t, 1, len(headersP[0]["params"].([]string)), "Invalid from params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid from uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid from uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["to"].([]common.MapStr)
 	assert.Equal(t, common.NetString(to), headersP[0]["raw"], "Invalid to text")
@@ -386,16 +388,16 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	assert.Equal(t, nil, headersP[0]["port"], "Invalid to port")
 	assert.Contains(t, headersP[0]["params"], "tag=ToTag", "Invalid to params")
 	assert.Equal(t, 1, len(headersP[0]["params"].([]string)), "Invalid to params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid to uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid to uri_params")
 
-	headersP = (stored["headers"].(common.MapStr))["call-id"].([]common.MapStr)
-	assert.Equal(t, common.NetString(callid), headersP[0]["raw"], "Invalid call-id text")
-	assert.Equal(t, nil, headersP[0]["display"], "Invalid call-id display")
-	assert.Equal(t, nil, headersP[0]["user"], "Invalid call-id user")
-	assert.Equal(t, nil, headersP[0]["host"], "Invalid call-id host")
-	assert.Equal(t, nil, headersP[0]["port"], "Invalid call-id port")
-	assert.Equal(t, nil, headersP[0]["params"], "Invalid call-id params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid call-id uri-params")
+	headersP = (stored["headers"].(common.MapStr))["call_id"].([]common.MapStr)
+	assert.Equal(t, common.NetString(callid), headersP[0]["raw"], "Invalid call_id text")
+	assert.Equal(t, nil, headersP[0]["display"], "Invalid call_id display")
+	assert.Equal(t, nil, headersP[0]["user"], "Invalid call_id user")
+	assert.Equal(t, nil, headersP[0]["host"], "Invalid call_id host")
+	assert.Equal(t, nil, headersP[0]["port"], "Invalid call_id port")
+	assert.Equal(t, nil, headersP[0]["params"], "Invalid call_id params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid call_id uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["orig"].([]common.MapStr)
 	assert.Equal(t, common.NetString(to), headersP[0]["raw"], "Invalid orig text")
@@ -404,7 +406,7 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 	assert.Equal(t, nil, headersP[0]["host"], "Invalid orig host")
 	assert.Equal(t, nil, headersP[0]["port"], "Invalid orig port")
 	assert.Equal(t, nil, headersP[0]["params"], "Invalid orig params")
-	assert.Equal(t, nil, headersP[0]["uri-params"], "Invalid orig uri-params")
+	assert.Equal(t, nil, headersP[0]["uri_params"], "Invalid orig uri_params")
 
 	headersP = (stored["headers"].(common.MapStr))["cseq"].([]common.MapStr)
 	assert.Equal(t, cseqNum, headersP[0]["number"], "Invalid cseq number")
@@ -413,7 +415,7 @@ func TestPublishMessageWithDetailOptionResponse(t *testing.T) {
 
 func TestPublishMessageWithoutRawMessage(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	cfg.IncludeRawMessage = false
 	sip.setFromConfig(&cfg)
 
@@ -439,16 +441,18 @@ func TestPublishMessageWithoutRawMessage(t *testing.T) {
 
 	sip.results = store.publish
 	sip.publishMessage(&msg)
-	sipFields := store.events[0].Fields["sip"].(common.MapStr)
+	fields := store.events[0].Fields
+	sipFields := fields["sip"].(common.MapStr)
+	statusPhrase, _ := sipFields.GetValue("status.phrase")
 	assert.Equal(t, 1, store.size(), "There should be added one packet in store after publish.")
-	assert.Equal(t, phraseText, sipFields["status-phrase"], "Compare published packet and stored data.")
+	assert.Equal(t, phraseText, statusPhrase, "Compare published packet and stored data.")
 	assert.Equal(t, nil, sipFields["method"], "Compare published packet and stored data.")
 	assert.Equal(t, nil, sipFields["raw"], "Compare published packet and stored data.")
 }
 
 func TestCreateSIPMessage(t *testing.T) {
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	var trans transport
@@ -596,11 +600,11 @@ func TestParseUdp_requestPacketWithSDP(t *testing.T) {
 			"There should be [INVITE].")
 
 		assert.Equal(t, "sip:0312345678@192.168.0.1;user=phone",
-			sipFields["request-uri"],
+			sipFields["request_uri"],
 			"There should be [sip:0312345678@192.168.0.1;user=phone].")
 
 		assert.Equal(t, "hogehoge@192.168.0.1",
-			sipFields["call-id"],
+			sipFields["call_id"],
 			"There should be [hogehoge@192.168.0.1].")
 
 		assert.Equal(t, "<sip:sipurl@192.168.0.1>;tag=269050131",
@@ -663,7 +667,7 @@ func TestParseUdp_requestPacketWithoutSDP(t *testing.T) {
 		"Via: SIP/2.0/UDP 10.0.0.1:5060;branch=z9hG4bK3408987398\r\n" +
 		"From: <sip:hogehoge@example.com>;tag=5408647717\r\n" +
 		"To: <sip:0312345678@192.168.0.1>;tag=3713480994\r\n" +
-		"Call-ID: hogehoge@10.0.0.1\r\n" +
+		"Call_ID: hogehoge@10.0.0.1\r\n" +
 		"CSeq: 1 ACK\r\n" +
 		"Content-Length: 0\r\n" +
 		"Max-Forwards: 70\r\n" +
@@ -685,7 +689,7 @@ func TestParseUdp_requestPacketBeforeStartCRLF(t *testing.T) {
 		"Via: SIP/2.0/UDP 10.0.0.1:5060;branch=z9hG4bK3408987398\r\n" +
 		"From: <sip:hogehoge@example.com>;tag=5408647717\r\n" +
 		"To: <sip:0312345678@192.168.0.1>;tag=3713480994\r\n" +
-		"Call-ID: hogehoge@10.0.0.1\r\n" +
+		"Call_ID: hogehoge@10.0.0.1\r\n" +
 		"CSeq: 1 ACK\r\n" +
 		"Content-Length: 0\r\n" +
 		"Max-Forwards: 70\r\n" +
@@ -730,17 +734,18 @@ func TestParseUdp_responsePacketWithSDP(t *testing.T) {
 		sipFields := fields["sip"].(common.MapStr)
 		headers, _ := sipFields["headers"].(common.MapStr)
 
-		// mandatories
+		statusPhrase, _ := sipFields.GetValue("status.phrase")
+		statusCode, _ := sipFields.GetValue("status.code")
 		assert.Equal(t, "Session Progess",
-			sipFields["status-phrase"],
+			statusPhrase,
 			"There should be [Session Progress].")
 
 		assert.Equal(t, 183,
-			sipFields["status-code"],
+			statusCode,
 			"There should be 183.")
 
 		assert.Equal(t, "1-2363@10.0.0.1",
-			sipFields["call-id"],
+			sipFields["call_id"],
 			"There should be [1-2363@10.0.0.1].")
 
 		assert.Equal(t, "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001",
@@ -789,7 +794,7 @@ func TestParseUdp_responsePacketWithoutSDP(t *testing.T) {
 		"Via: SIP/2.0/UDP 10.0.0.1:5060;branch=z9hG4bK3408987398\r\n" +
 		"From: <sip:hogehoge@10.0.0.1>;tag=5408647717\r\n" +
 		"To: <sip:0312345678@192.168.0.1>;tag=3713480994\r\n" +
-		"Call-ID: hogehoge@192.168.0.1\r\n" +
+		"Call_ID: hogehoge@192.168.0.1\r\n" +
 		"CSeq: 1 INVITE\r\n" +
 		"Content-Length: 0\r\n" +
 		"Date: Mon, 04 Sep 2017 02:29:54 GMT\r\n" +
@@ -810,7 +815,7 @@ func TestParseUdp_IncompletePacketInBody(t *testing.T) {
 		"Via: SIP/2.0/UDP 10.0.0.1:5060;branch=z9hG4bK1701109339\r\n" +
 		"From: <sip:hogehoge@example.cm>;tag=1451088881\r\n" +
 		"To: <sip:0312345678@192.168.0.1>\r\n" +
-		"Call-ID: hogehoge@10.0.0.1\r\n" +
+		"Call_ID: hogehoge@10.0.0.1\r\n" +
 		"CSeq: 2 INVITE\r\n" +
 		"Contact: <sip:1833176976@10.0.0.1:5060;transport=udp>\r\n" +
 		"Supported: 100rel, timer\r\n" +
@@ -846,7 +851,7 @@ func TestParseUdp_IncompletePacketInHeader(t *testing.T) {
 		"Via: SIP/2.0/UDP 10.0.0.1:5060;branch=z9hG4bK1701109339\r\n" +
 		"From: <sip:hogehoge@example.cm>;tag=1451088881\r\n" +
 		"To: <sip:0312345678@192.168.0.1>\r\n" +
-		"Call-ID: hogehoge@10.0.0.1\r\n" +
+		"Call_ID: hogehoge@10.0.0.1\r\n" +
 		"CSeq: 2 INVITE\r\n" +
 		"Contact: <sip:1833176976@10.0.0.1:5060;transport=udp>\r\n" +
 		"Supported: 100rel, timer\r\n" +
@@ -906,12 +911,12 @@ func TestParseUdp_compact_form(t *testing.T) {
 			"SIP method should be [INVITE].")
 
 		assert.Equal(t, "sip:0312345678@192.168.0.1;user=phone",
-			sipFields["request-uri"],
+			sipFields["request_uri"],
 			"Request uri should be [sip:0312345678@192.168.0.1;user=phone].")
 
 		assert.Equal(t, "hogehoge@192.168.0.1",
-			sipFields["call-id"],
-			"Call-ID should be [hogehoge@192.168.0.1].")
+			sipFields["call_id"],
+			"Call_ID should be [hogehoge@192.168.0.1].")
 
 		assert.Equal(t, "<sip:sipurl@192.168.0.1>;tag=269050131",
 			sipFields["from"],
@@ -989,7 +994,7 @@ func TestPaseDetailURI(t *testing.T) {
 	var port string
 	var uriParams []string
 	sip := sipPlugin{}
-	cfg := defaultConfig
+	cfg := defaultConfig()
 	sip.setFromConfig(&cfg)
 
 	uri = `sip:0312341234@10.0.0.1:5060`

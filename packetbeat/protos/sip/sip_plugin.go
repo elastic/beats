@@ -19,8 +19,10 @@ package sip
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,11 +32,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
-/**
- ******************************************************************
- * sipPlugin
- ******************************************************************
- **/
 type sipPlugin struct {
 	// Configuration data.
 	ports               []int
@@ -67,35 +64,35 @@ func (sip *sipPlugin) initDetailOption() {
 	sip.parseSet = make(map[string]int)
 
 	if sip.useDefaultHeaders {
-		sip.parseSet["from"] = SipDetailNameAddr
-		sip.parseSet["to"] = SipDetailNameAddr
-		sip.parseSet["contact"] = SipDetailNameAddr
-		sip.parseSet["record-route"] = SipDetailNameAddr
-		sip.parseSet["p-asserted-identity"] = SipDetailNameAddr
-		sip.parseSet["p-preferred-identity"] = SipDetailNameAddr
+		sip.parseSet["from"] = detailNameAddr
+		sip.parseSet["to"] = detailNameAddr
+		sip.parseSet["contact"] = detailNameAddr
+		sip.parseSet["record-route"] = detailNameAddr
+		sip.parseSet["p-asserted-identity"] = detailNameAddr
+		sip.parseSet["p-preferred-identity"] = detailNameAddr
 	}
 	for _, header := range sip.headersToParseAsURI {
 		header = strings.ToLower(strings.TrimSpace(header))
-		sip.parseSet[header] = SipDetailNameAddr
+		sip.parseSet[header] = detailNameAddr
 	}
-	sip.parseSet["cseq"] = SipDetailIntMethod
-	sip.parseSet["rack"] = SipDetailIntIntMethod
+	sip.parseSet["cseq"] = detailIntMethod
+	sip.parseSet["rack"] = detailIntIntMethod
 	if sip.useDefaultHeaders {
-		sip.parseSet["rseq"] = SipDetailInt
-		sip.parseSet["content-length"] = SipDetailInt
-		sip.parseSet["max-forwards"] = SipDetailInt
-		sip.parseSet["expires"] = SipDetailInt
-		sip.parseSet["session-expires"] = SipDetailInt
-		sip.parseSet["min-se"] = SipDetailInt
+		sip.parseSet["rseq"] = detailInt
+		sip.parseSet["content-length"] = detailInt
+		sip.parseSet["max-forwards"] = detailInt
+		sip.parseSet["expires"] = detailInt
+		sip.parseSet["session-expires"] = detailInt
+		sip.parseSet["min-se"] = detailInt
 	}
 	for _, header := range sip.headersToParseAsInt {
 		header = strings.ToLower(strings.TrimSpace(header))
-		sip.parseSet[header] = SipDetailInt
+		sip.parseSet[header] = detailInt
 	}
 }
 
 // Set config values sip ports and options.
-func (sip *sipPlugin) setFromConfig(config *sipConfig) error {
+func (sip *sipPlugin) setFromConfig(config *sipConfig) {
 	sip.ports = config.Ports
 	sip.includeRawMessage = config.IncludeRawMessage
 	sip.includeHeaders = config.IncludeHeaders
@@ -104,7 +101,6 @@ func (sip *sipPlugin) setFromConfig(config *sipConfig) error {
 	sip.useDefaultHeaders = config.UseDefaultHeaders
 	sip.headersToParseAsURI = config.HeadersToParseAsURI
 	sip.headersToParseAsInt = config.HeadersToParseAsInt
-	return nil
 }
 
 // Getter : instance Ports int slice
@@ -122,32 +118,43 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 
 	timestamp := msg.ts
 	fields := common.MapStr{}
-	fields["type"] = "sip"
-	fields["unixtimenano"] = timestamp.UnixNano()
-	fields["transport"] = msg.transport.String()
+
+	fields.Put("type", "sip")
+	fields.Put("event.dataset", "sip")
+
+	fields.Put("event.kind", "event")
+	fields.Put("event.category", []string{"network"})
+	if sip.includeRawMessage {
+		fields.Put("event.original", string(msg.raw))
+	}
+
+	fields.Put("source.ip", msg.tuple.SrcIP)
+	fields.Put("source.port", msg.tuple.SrcPort)
+
+	fields.Put("destination.ip", msg.tuple.DstIP)
+	fields.Put("destination.port", msg.tuple.DstPort)
+
+	fields.Put("related.ip", []net.IP{msg.tuple.SrcIP, msg.tuple.DstIP})
+
+	fields.Put("network.transport", msg.transport.String())
 
 	sipFields := common.MapStr{}
-	fields["sip"] = sipFields
+	fields.Put("sip", sipFields)
 
-	sipFields["src"] = fmt.Sprintf("%s:%d", msg.tuple.SrcIP, msg.tuple.SrcPort)
-	sipFields["dst"] = fmt.Sprintf("%s:%d", msg.tuple.DstIP, msg.tuple.DstPort)
-
-	if sip.includeRawMessage {
-		sipFields["raw"] = string(msg.raw)
-	}
+	sipFields.Put("unixtimenano", time.Now().UnixNano())
 
 	if msg.isRequest {
-		sipFields["method"] = fmt.Sprintf("%s", msg.method)
-		sipFields["request-uri"] = fmt.Sprintf("%s", msg.requestURI)
+		sipFields.Put("method", string(msg.method))
+		sipFields.Put("request_uri", string(msg.requestURI))
 	} else {
-		sipFields["status-code"] = int(msg.statusCode)
-		sipFields["status-phrase"] = fmt.Sprintf("%s", msg.statusPhrase)
+		sipFields.Put("status.code", int(msg.statusCode))
+		sipFields.Put("status.phrase", string(msg.statusPhrase))
 	}
 
-	sipFields["from"] = fmt.Sprintf("%s", msg.from)
-	sipFields["to"] = fmt.Sprintf("%s", msg.to)
-	sipFields["cseq"] = fmt.Sprintf("%s", msg.cseq)
-	sipFields["call-id"] = fmt.Sprintf("%s", msg.callid)
+	sipFields.Put("from", string(msg.from))
+	sipFields.Put("to", string(msg.to))
+	sipFields.Put("cseq", string(msg.cseq))
+	sipFields.Put("call_id", string(msg.callid))
 
 	sipHeaders := common.MapStr{}
 	if sip.includeHeaders {
@@ -182,17 +189,17 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 		var err error
 
 		// Detail of Request-URI
-		if value, ok := sipFields["request-uri"]; ok {
+		if value, ok := sipFields["request_uri"]; ok {
 			userInfo, host, port, addrparams = sip.parseDetailURI(value.(string))
 
-			sipFields["request-uri-user"] = userInfo
+			sipFields["request_uri_user"] = userInfo
 			number, err = strconv.Atoi(strings.TrimSpace(port))
 			if err == nil {
-				sipFields["request-uri-port"] = number
+				sipFields["request_uri_port"] = number
 			}
-			sipFields["request-uri-host"] = host
+			sipFields["request_uri_host"] = host
 			if len(addrparams) > 0 {
-				sipFields["request-uri-params"] = addrparams
+				sipFields["request_uri_params"] = addrparams
 			}
 		}
 
@@ -205,7 +212,7 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 
 				if mode, ok := sip.parseSet[key]; ok {
 					switch mode {
-					case SipDetailNameAddr:
+					case detailNameAddr:
 						displayName, userInfo, host, port, addrparams, params = sip.parseDetailNameAddr(fmt.Sprintf("%s", headerS))
 
 						number, err = strconv.Atoi(port)
@@ -221,29 +228,29 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 						if err == nil {
 							newobj["port"] = number
 						}
-						if addrparams != nil && len(addrparams) > 0 {
-							newobj["uri-params"] = addrparams
+						if len(addrparams) > 0 {
+							newobj["uri_params"] = addrparams
 						}
-						if params != nil && len(params) > 0 {
+						if len(params) > 0 {
 							newobj["params"] = params
 						}
 
-					case SipDetailInt:
-						number, err = strconv.Atoi(strings.TrimSpace(fmt.Sprintf("%s", headerS)))
+					case detailInt:
+						number, err = strconv.Atoi(strings.TrimSpace(string(headerS)))
 						if err == nil {
 							newobj["number"] = number
 						}
 
-					case SipDetailIntMethod:
-						values := strings.SplitN(fmt.Sprintf("%s", headerS), " ", 2)
+					case detailIntMethod:
+						values := strings.SplitN(string(headerS), " ", 2)
 						number, err = strconv.Atoi(strings.TrimSpace(values[0]))
 						if err == nil {
 							newobj["number"] = number
 						}
 						newobj["method"] = strings.TrimSpace(values[1])
 
-					case SipDetailIntIntMethod:
-						values := strings.SplitN(fmt.Sprintf("%s", headerS), " ", 3)
+					case detailIntIntMethod:
+						values := strings.SplitN(string(headerS), " ", 3)
 						number, err = strconv.Atoi(strings.TrimSpace(values[0]))
 						if err == nil {
 							newobj["number1"] = number
@@ -333,16 +340,16 @@ func (sip *sipPlugin) ParseUDP(pkt *protos.Packet) {
 	}
 
 	switch sipMsg.getMessageStatus() {
-	case SipStatusRejected:
+	case statusRejected:
 		return
 	// In case the message was incompleted at header or body,
 	// the message was added error notes and published.
-	case SipStatusHeaderReceiving, SipStatusBodyReceiving:
+	case statusHeaderReceiving, statusBodyReceiving:
 		debugf("Incompleted message")
-		sipMsg.notes = append(sipMsg.notes, common.NetString(fmt.Sprintf("Incompleted message")))
+		sipMsg.notes = append(sipMsg.notes, common.NetString("Incompleted message"))
 
 	// In case the message received completely, publishing the message.
-	case SipStatusReceived:
+	case statusReceived:
 		err := sipMsg.parseSIPBody()
 		if err != nil {
 			sipMsg.notes = append(sipMsg.notes, common.NetString(fmt.Sprintf("%s", err)))

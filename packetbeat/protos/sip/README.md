@@ -1,17 +1,19 @@
-# SIP(Session Initiation Protocol) for packetbeat
-The SIP(Session Initiation Protocol) is a communications protocol for signaling and controlling multimedia communication sessions. SIP is used many VoIP applications at not only enterprise uses but also telecom careers.
+# SIP (Session Initiation Protocol) for packetbeat
 
-SIP is text-base protocol like HTTP. But SIP has various unique features like :
-- SIP is server-client model, but it roles may changes call by call.
-- SIP is request-response model, but server may (usualy) reply many responses for one request.
-- There many requests and responses in one call.
-- It is not know when the call will end.
+The SIP (Session Initiation Protocol) is a communications protocol for signaling and controlling multimedia communication sessions. SIP is used by many VoIP applications not only for enterprise uses but also telecom carriers.
+
+SIP is a text-based protocol like HTTP. But SIP has various unique features like :
+- SIP is server-client model, but its role may change in a per call basis.
+- SIP is request-response model, but server may (usually) reply with many responses to a single request.
+- There are many requests and responses in one call.
+- It is not known when the call will end.
 
 ## Implementation
 
-### Published for each SIP message(request or response)
-- SIP is not a one to one message with request and response. Also order to each message is not determined(a response may be sent after previous response).
-- Therefore the SIP response and SIP request is published when packetbeat received the message immidiatory.
+### Published for each SIP message (request or response)
+
+- SIP is not a one to one message with request and response. Also order to each message is not determined (a response may be sent after previous response).
+- Therefore the SIP responses and requests are published when packetbeat receives them immediately.
 - If you need all SIP messages in throughout of SIP dialog, you need to retrieve from Elasticsearch using the SIP Call-ID field etc.
 
 ### TCP
@@ -25,9 +27,9 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
   # the SIP protocol by commenting out the list of ports.
   ports: [5060]
 
-  # Contain parsed SIP headers(defualt true)
-  include_headers: true 
-  
+  # Contain parsed SIP headers(default true)
+  include_headers: true
+
   # Contain parsed SIP body(defualt true)
   include_body: true
 
@@ -108,7 +110,7 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
 ```
 
 #### example case cseq
- - input>> CSeq: 1 INVITE 
+ - input>> CSeq: 1 INVITE
  - output>
 ```
 {
@@ -131,7 +133,7 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
     "sip.request-uri-params":["transport=udp","user=phone"]
 }
 ```
- 
+
 #### example case request-uri(telephone-subscriber)
  - input>> INVITE tel:+819012341234;phone-context=+1234;vnd.company.option=foo SIP/2.0
  - output>

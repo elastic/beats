@@ -26,13 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-/**
- ******************************************************************
- * sipMessage
- *******************************************************************
- **/
-
-// SipMessage contains a single SIP message.
+// sipMessage contains a single SIP message.
 type sipMessage struct {
 	ts           time.Time          // Time when the message was received.
 	tuple        common.IPPortTuple // Source and destination addresses of packet.
@@ -117,11 +111,12 @@ func (msg sipMessage) String() string {
 					}
 				}
 			}
-			outputs += fmt.Sprintf(" }")
+			outputs += " }"
 		}
 	}
 	return outputs
 }
+
 func (msg *sipMessage) parseSIPHeader() (err error) {
 	msg.hdrStart = -1
 	msg.hdrLen = -1
@@ -219,34 +214,35 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 	fromArray, existFrom := (*headers)["from"]
 	cseqArray, existCSeq := (*headers)["cseq"]
 	callidArray, existCallID := (*headers)["call-id"]
-	maxfrowardsArray, existMaxForwards := (*headers)["max-forwards"]
-	viaArray, existVia := (*headers)["via"]
+	_, existMaxForwards := (*headers)["max-forwards"]
+	_, existVia := (*headers)["via"]
 
 	if existTo {
-		msg.to = getLastElementStrArray(toArray)
+		msg.to = getLast(toArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [To] does not exist."))
 	}
 
 	if existFrom {
-		msg.from = getLastElementStrArray(fromArray)
+		msg.from = getLast(fromArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [From] does not exist."))
 	}
 
 	if existCSeq {
-		msg.cseq = getLastElementStrArray(cseqArray)
+		msg.cseq = getLast(cseqArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [CSeq] does not exist."))
 	}
 
 	if existCallID {
-		msg.callid = getLastElementStrArray(callidArray)
+		msg.callid = getLast(callidArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [Call-ID] does not exist."))
 	}
 
 	if !existMaxForwards {
+		msg.notes = append(msg.notes, common.NetString("mandatory header [Max-Forwards] does not exist."))
 	}
 	if !existVia {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [Via] does not exist."))
@@ -255,15 +251,10 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 	// headers value update
 	msg.headers = headers
 
-	// unused
-	_ = maxfrowardsArray
-	_ = viaArray
-
 	// Content-Lenght initialized to 0
 	msg.contentlength = 0
-	contenttypeArray, existContentType := (*headers)["content-type"]
+	_, existContentType := (*headers)["content-type"]
 	contentlengthArray, existContentLength := (*headers)["content-length"]
-	_ = contenttypeArray
 
 	contentlength := 0
 
@@ -272,7 +263,7 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 		// getting content-Length with header values
 		// in case parseint missed , lenght was reset with 0
 		if existContentLength {
-			rawCntLen, errCntLen := strconv.ParseInt(string(getLastElementStrArray(contentlengthArray)), 10, 64)
+			rawCntLen, errCntLen := strconv.ParseInt(string(getLast(contentlengthArray)), 10, 64)
 			contentlength = int(rawCntLen)
 
 			// parseint error, 0 reset
@@ -391,12 +382,10 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 			// (A) and (B) are equivalent
 			if msg.raw[s] == byte(' ') || msg.raw[s] == byte('\t') {
 				if lastheader != "" {
-					lastElement := string(getLastElementStrArray((*headers)[lastheader]))
+					lastElement := string(getLast((*headers)[lastheader]))
 					// TrimSpace is delete both " " and "\t"
 					lastElement += fmt.Sprintf(" %s", strings.TrimSpace(string(msg.raw[s:e])))
 					(*headers)[lastheader][len((*headers)[lastheader])-1] = common.NetString(lastElement)
-				} else {
-					// ignore this line
 				}
 				continue
 			}
@@ -409,7 +398,7 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 					continue
 				} // This case is not exist, maybe...
 
-				lastElement := string(getLastElementStrArray((*headers)[lastheader]))
+				lastElement := string(getLast((*headers)[lastheader]))
 				separatedStrings := msg.separateCsv(lastElement)
 				for idx, element := range *separatedStrings {
 					if idx == 0 {
@@ -495,7 +484,7 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 				continue
 			} // This case is not exist, maybe...
 
-			lastElement := string(getLastElementStrArray((*headers)[lastheader]))
+			lastElement := string(getLast((*headers)[lastheader]))
 			separatedStrings := msg.separateCsv(lastElement)
 			for idx, element := range *separatedStrings {
 				if idx == 0 {
@@ -539,7 +528,7 @@ func (msg *sipMessage) parseSIPBody() (err error) {
 	// Switch the function with body content type
 	// TODO: Now, it is supported only SDP,
 	//       more SIP body application support (I planning to support SIP-I(ISUP)/Multi-part)
-	lowerCaseContentType := strings.ToLower(string(getLastElementStrArray(contenttypeArray)))
+	lowerCaseContentType := strings.ToLower(string(getLast(contenttypeArray)))
 	switch lowerCaseContentType {
 	case "application/sdp":
 		body, err := msg.parseBodySDP(msg.raw[msg.bdyStart : msg.bdyStart+msg.contentlength])
@@ -585,16 +574,16 @@ func (msg *sipMessage) parseBodySDP(rawData []byte) (body *map[string][]common.N
 
 func (msg *sipMessage) getMessageStatus() int {
 	if msg.isIncompletedHdrMsg {
-		return SipStatusHeaderReceiving
+		return statusHeaderReceiving
 	}
 	if msg.isIncompletedBdyMsg {
-		return SipStatusBodyReceiving
+		return statusBodyReceiving
 	}
 	if msg.hdrStart < 0 {
-		return SipStatusRejected
+		return statusRejected
 	}
 	if msg.contentlength < 0 {
-		return SipStatusBodyReceiving
+		return statusBodyReceiving
 	}
-	return SipStatusReceived
+	return statusReceived
 }

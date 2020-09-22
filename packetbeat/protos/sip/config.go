@@ -32,8 +32,8 @@ type sipConfig struct {
 	HeadersToParseAsInt   []string `config:"parse_as_int_for"`
 }
 
-var (
-	defaultConfig = sipConfig{
+func defaultConfig() sipConfig {
+	return sipConfig{
 		ProtocolCommon:      config.ProtocolCommon{},
 		IncludeRawMessage:   true,
 		IncludeHeaders:      true,
@@ -43,4 +43,4 @@ var (
 		HeadersToParseAsURI: []string{},
 		HeadersToParseAsInt: []string{},
 	}
-)
+}

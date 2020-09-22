@@ -28,18 +28,18 @@ import (
 )
 
 func TestConstTransportNumbers(t *testing.T) {
-	assert.Equal(t, 0, transportTCP, "Should be fixed magic number.")
-	assert.Equal(t, 1, transportUDP, "Should be fixed magic number.")
+	assert.EqualValues(t, 0, transportTCP, "Should be fixed magic number.")
+	assert.EqualValues(t, 1, transportUDP, "Should be fixed magic number.")
 }
 
 func TestConstSipPacketRecievingStatus(t *testing.T) {
-	assert.Equal(t, 0, SipStatusReceived, "Should be fixed magic number.")
-	assert.Equal(t, 1, SipStatusHeaderReceiving, "Should be fixed magic number.")
-	assert.Equal(t, 2, SipStatusBodyReceiving, "Should be fixed magic number.")
-	assert.Equal(t, 3, SipStatusRejected, "Should be fixed magic number.")
+	assert.Equal(t, 0, statusReceived, "Should be fixed magic number.")
+	assert.Equal(t, 1, statusHeaderReceiving, "Should be fixed magic number.")
+	assert.Equal(t, 2, statusBodyReceiving, "Should be fixed magic number.")
+	assert.Equal(t, 3, statusRejected, "Should be fixed magic number.")
 }
 
-func TestGetLastElementStrArray(t *testing.T) {
+func TestGetLast(t *testing.T) {
 	var array []common.NetString
 
 	array = append(array, common.NetString("test1"))
@@ -47,7 +47,7 @@ func TestGetLastElementStrArray(t *testing.T) {
 	array = append(array, common.NetString("test3"))
 	array = append(array, common.NetString("test4"))
 
-	assert.Equal(t, common.NetString("test4"), getLastElementStrArray(array), "Return last element of array")
+	assert.Equal(t, common.NetString("test4"), getLast(array), "Return last element of array")
 }
 
 func TestTypeOfTransport(t *testing.T) {

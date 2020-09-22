@@ -341,9 +341,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdrStart, "There should be -1.")
-	assert.Equal(t, 229, msg.hdrLen, "There should be -1.")
-	assert.Equal(t, 233, msg.bdyStart, "There should be -1.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be 0.")
+	assert.Equal(t, 229, msg.hdrLen, "There should be 229.")
+	assert.Equal(t, 233, msg.bdyStart, "There should be 233.")
 	assert.Equal(t, -1, msg.contentlength, "There should be -1.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 
@@ -711,7 +711,7 @@ func TestGetMessageStatus(t *testing.T) {
 	msg.contentlength = -1
 	msg.isIncompletedHdrMsg = true
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SipStatusHeaderReceiving, msg.getMessageStatus(), "There should be HEADER RECEIVING.")
+	assert.Equal(t, statusHeaderReceiving, msg.getMessageStatus(), "There should be HEADER RECEIVING.")
 
 	msg.hdrStart = 30
 	msg.hdrLen = 50
@@ -719,7 +719,7 @@ func TestGetMessageStatus(t *testing.T) {
 	msg.contentlength = -1
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = true
-	assert.Equal(t, SipStatusBodyReceiving, msg.getMessageStatus(), "There should be BODY RECEIVING.")
+	assert.Equal(t, statusBodyReceiving, msg.getMessageStatus(), "There should be BODY RECEIVING.")
 
 	msg.hdrStart = 30
 	msg.hdrLen = 50
@@ -727,7 +727,7 @@ func TestGetMessageStatus(t *testing.T) {
 	msg.contentlength = 55
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SipStatusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
+	assert.Equal(t, statusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
 
 	msg.hdrStart = 30
 	msg.hdrLen = 50
@@ -735,5 +735,5 @@ func TestGetMessageStatus(t *testing.T) {
 	msg.contentlength = 0
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SipStatusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
+	assert.Equal(t, statusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
 }

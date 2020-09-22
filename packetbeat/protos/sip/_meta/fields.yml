@@ -10,17 +10,17 @@
           description: >
             SIP Request Method
           example: INVITE
-        - name: request-uri
+        - name: request_uri
           type: keyword
           description: >
             SIP Request URI
           example: sip:hoge@example.com:5060;transport=udp
-        - name: status-code
+        - name: status.code
           type: long
           description: >
             SIP Response code, status code
           example: 200
-        - name: status-phrase
+        - name: status.phrase
           type: keyword
           description: >
             SIP Response , status phrase
@@ -35,7 +35,22 @@
           description: >
             SIP To header value
           example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
-        - name: call-id
+        - name: headers.from
+          type: keyword
+          description: >
+            SIP From header value
+          example: "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001"
+        - name: headers.to
+          type: keyword
+          description: >
+            SIP To header value
+          example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
+        - name: call_id
+          type: keyword
+          description: >
+            SIP Call-ID header value
+          example: ""
+        - name: headers.call-id
           type: keyword
           description: >
             SIP Call-ID header value
@@ -45,23 +60,50 @@
           description: >
             SIP CSeq header value
           example: 1 INVITE
+        - name: headers.max-forwards
+          type: keyword
+          description: >
+            SIP Max-Forwards header value
+          example: 1
+        - name: headers.via
+          type: keyword
+          description: >
+            SIP Via header value
+        - name: headers.cseq
+          type: keyword
+          description: >
+            SIP Cseq header value
+        - name: headers.content-length
+          type: keyword
+          description: >
+            SIP Content-length header value
+        - name: headers.content-type
+          type: keyword
+          description: >
+            SIP Content-type header value
+        - name: headers.contact
+          type: keyword
+          description: >
+            SIP Contact header value
+        - name: headers.user-agent
+          type: keyword
+          description: >
+            SIP User-agent header value
+        - name: headers.supported
+          type: keyword
+          description: >
+            SIP Supported header value
+        - name: headers.accept
+          type: keyword
+          description: >
+            SIP Supported header value
         - name: body
           type: object
           object_type: keyword
-          description: The body of the SIP message. 
-        - name: src
-          type: keyword
+          description: The body of the SIP message.
+        - name: unixtimenano
+          type: long
           description: >
-            Source IP address and port
-          example: 192.168.0.1:5060
-        - name: dst
-          type: keyword
-          description: >
-            Destination IP address and port
-          example: 192.168.0.1:5060
-    - name: unixtimenano
-      type: long
-      description: >
-        unixtime as nanosec
-      example: 1516199666016756000
+            unixtime as nanosec
+          example: 1516199666016756000
 
