@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
 - Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
+- Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
 
 *Auditbeat*
 
@@ -171,6 +172,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
 - [Autodiscover] Handle input-not-finished errors in config reload. {pull}20915[20915]
 - Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
+- Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
 
 *Auditbeat*
 
@@ -264,6 +266,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
 - Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
 - Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
+- Provide backwards compatibility for the `append` processor when Elasticsearch is less than 7.10.0. {pull}21159[21159]
 
 *Heartbeat*
 
@@ -339,10 +342,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 - Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
 - Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
+- The Kibana collector applies backoff when errored at getting usage stats {pull}20772[20772]
 - Update fields.yml in the azure module, missing metrics field. {pull}20918[20918]
 - The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
 - Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
+- Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
 - Handle missing counters in the application_pool metricset. {pull}21071[21071]
+- Fix remote_write flaky test. {pull}21173[21173]
 
 *Packetbeat*
 
@@ -360,6 +366,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 - Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
 - Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
+- Fix catchall bucket config errors by adding more validation. {issue}17572[16282] {pull}20887[16287]
 
 ==== Added
 
@@ -571,12 +578,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert httpjson to v2 input {pull}20226[20226]
 - Improve Zeek x509 module with `x509` ECS mappings {pull}20867[20867]
 - Improve Zeek SSL module with `x509` ECS mappings {pull}20927[20927]
+- Added new properties field support for event.outcome in azure module {pull}20998[20998]
 - Improve Zeek Kerberos module with `x509` ECS mappings {pull}20958[20958]
 - Improve Fortinet firewall module with `x509` ECS mappings {pull}20983[20983]
 - Improve Santa module with `x509` ECS mappings {pull}20976[20976]
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
 - Added new module for Zoom webhooks {pull}20414[20414]
 - Add type and sub_type to panw panos fileset {pull}20912[20912]
+- Always attempt community_id processor on zeek module {pull}21155[21155]
 
 *Heartbeat*
 
@@ -692,6 +701,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add state_daemonset metricset for Kubernetes Metricbeat module {pull}20649[20649]
 - Add host inventory metrics to azure compute_vm metricset. {pull}20641[20641]
 - Add host inventory metrics to googlecloud compute metricset. {pull}20391[20391]
+- Add host inventory metrics to system module. {pull}20415[20415]
 - Add billing data collection from Cost Explorer into aws billing metricset. {pull}20527[20527] {issue}20103[20103]
 - Migrate `compute_vm` metricset to a light one, map `cloud.instance.id` field. {pull}20889[20889]
 - Request prometheus endpoints to be gzipped by default {pull}20766[20766]
@@ -699,6 +709,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 
 *Packetbeat*
 

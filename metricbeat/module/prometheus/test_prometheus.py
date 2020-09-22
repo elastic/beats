@@ -65,7 +65,6 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
 
-@unittest.skip("Flaky test: https://github.com/elastic/beats/issues/20967")
 class TestRemoteWrite(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['prometheus-host-network']
