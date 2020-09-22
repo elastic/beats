@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
 // changeSymlink changes root symlink so it points to updated version
@@ -33,7 +34,7 @@ func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
 
 	bakNewPath := filepath.Join(paths.Config(), agentBakName)
 	if err := os.Symlink(newPath, bakNewPath); err != nil {
-		return err
+		return errors.New(err, errors.TypeFilesystem, "failed to update agent symlink")
 	}
 
 	// safely rotate

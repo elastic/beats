@@ -135,6 +135,10 @@ func untar(version, archivePath string) (string, error) {
 	var hash string
 	fileNamePrefix := strings.TrimSuffix(filepath.Base(archivePath), ".tar.gz") + "/" // omitting `elastic-agent-{version}-{os}-{arch}/` in filename
 
+	// go through all the content of a tar archive
+	// if elastic-agent.active.commit file is found, get commit of the version unpacked
+	// otherwise copy everything inside data directory (everything related to new version),
+	// pieces outside of data we already have and should not be overwritten as they are usually configs
 	for {
 		f, err := tr.Next()
 		if err == io.EOF {
