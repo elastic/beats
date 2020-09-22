@@ -120,9 +120,10 @@ func TestHandleMessage(t *testing.T) {
 		},
 	}
 
+	p := &s3Input{context: &channelContext{}}
 	for _, c := range casesPositive {
 		t.Run(c.title, func(t *testing.T) {
-			s3Info, err := handleSQSMessage(c.message)
+			s3Info, err := p.handleSQSMessage(c.message)
 			assert.NoError(t, err)
 			assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
 			if len(s3Info) > 0 {
@@ -155,7 +156,7 @@ func TestHandleMessage(t *testing.T) {
 
 	for _, c := range casesNegative {
 		t.Run(c.title, func(t *testing.T) {
-			s3Info, err := handleSQSMessage(c.message)
+			s3Info, err := p.handleSQSMessage(c.message)
 			assert.Error(t, err)
 			assert.Nil(t, s3Info)
 		})

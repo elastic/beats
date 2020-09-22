@@ -153,6 +153,12 @@ func (b *bucket) Unpack(s string) error {
 		return fmt.Errorf("bucket name '%s' is too short, name need to be at least %d chars long", s, min)
 	}
 
+	const bucketNamePattern = "^[a-z0-9][a-z0-9.\\-]{1,61}[a-z0-9]$"
+	var bucketRE = regexp.MustCompile(bucketNamePattern)
+	if !bucketRE.MatchString(s) {
+		return fmt.Errorf("invalid bucket name: '%s', bucket name must match pattern: '%s'", s, bucketNamePattern)
+	}
+
 	*b = bucket(s)
 	return nil
 }

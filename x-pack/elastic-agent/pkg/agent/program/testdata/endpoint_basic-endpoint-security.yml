@@ -2,6 +2,8 @@ revision: 5
 fleet:
   agent:
     id: fleet-agent-id
+  host:
+    id: host-agent-id
   api:
     access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
     kibana:

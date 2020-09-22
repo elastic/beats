@@ -143,13 +143,20 @@ The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
 [float]
 ==== `verification_mode`
 
-This option controls whether the client verifies server certificates and host
-names. Valid values are `none` and `full`. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only.
+Controls the verification of certificates. Valid values are:
 
-The default is `full`.
+ * `full`, which verifies that the provided certificate is signed by a trusted
+authority (CA) and also verifies that the server's hostname (or IP address)
+matches the names identified within the certificate.
+ * `certificate`, which verifies that the provided certificate is signed by a
+trusted authority (CA), but does not perform any hostname verification.
+ * `none`, which performs _no verification_ of the server's certificate. This
+mode disables many of the security benefits of SSL/TLS and should only be used
+after very careful consideration. It is primarily intended as a temporary
+diagnostic mechanism when attempting to resolve TLS errors; its use in
+production environments is strongly discouraged.
+
+The default value is `full`.
 
 [float]
 ==== `cipher_suites`

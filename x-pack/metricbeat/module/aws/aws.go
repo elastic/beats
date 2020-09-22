@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/iam/iamiface"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
@@ -105,25 +106,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = "us-east-1"
 	}
 
-	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, "iam", "", awsConfig))
-	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
-	output, err := req.Send(context.TODO())
-	if err != nil {
-		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
-		metricSet.AccountName = metricSet.AccountID
-	} else {
-		// When there is no account alias, account ID will be used as cloud.account.name
-		if len(output.AccountAliases) == 0 {
-			metricSet.AccountName = metricSet.AccountID
-		}
-
-		// There can be more than one aliases for each account, for now we are only
-		// collecting the first one.
-		metricSet.AccountName = output.AccountAliases[0]
-		base.Logger().Debug("AWS Credentials belong to account name: ", metricSet.AccountName)
-	}
-
 	// Get IAM account id
 	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
 		config.AWSConfig.Endpoint, "sts", "", awsConfig))
@@ -135,6 +117,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		metricSet.AccountID = *outputIdentity.Account
 		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
 	}
+
+	// Get account name/alias
+	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
+		config.AWSConfig.Endpoint, "iam", "", awsConfig))
+	metricSet.AccountName = getAccountName(svcIam, base, metricSet)
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
@@ -168,6 +155,30 @@ func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
 	return
+}
+
+func getAccountName(svc iamiface.ClientAPI, base mb.BaseMetricSet, metricSet MetricSet) string {
+	req := svc.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
+	output, err := req.Send(context.TODO())
+
+	accountName := metricSet.AccountID
+	if err != nil {
+		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
+		return accountName
+	}
+
+	// When there is no account alias, account ID will be used as cloud.account.name
+	if len(output.AccountAliases) == 0 {
+		accountName = metricSet.AccountID
+		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
+		return accountName
+	}
+
+	// There can be more than one aliases for each account, for now we are only
+	// collecting the first one.
+	accountName = output.AccountAliases[0]
+	base.Logger().Debug("AWS Credentials belong to account name: ", metricSet.AccountName)
+	return accountName
 }
 
 // StringInSlice checks if a string is already exists in list and its location

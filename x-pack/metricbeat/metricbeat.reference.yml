@@ -1729,10 +1729,18 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -1848,10 +1856,18 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -2033,10 +2049,18 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -2181,10 +2205,18 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -2458,10 +2490,18 @@ setup.kibana:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -2647,10 +2687,18 @@ logging.files:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1

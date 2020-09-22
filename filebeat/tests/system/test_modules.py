@@ -113,7 +113,7 @@ class Test(BaseTest):
 
         try:
             self.es.indices.delete(index=self.index_name)
-        except:
+        except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
@@ -234,20 +234,28 @@ def clean_keys(obj):
     # datasets for which @timestamp is removed due to date missing
     remove_timestamp = {
         "activemq.audit",
+        "barracuda.spamfirewall",
         "barracuda.waf",
         "bluecoat.director",
         "cef.log",
         "cisco.asa",
         "cisco.ios",
+        "citrix.netscaler",
+        "cyberark.corepas",
         "cylance.protect",
+        "f5.bigipafm",
         "fortinet.clientendpoint",
         "haproxy.log",
         "icinga.startup",
         "imperva.securesphere",
         "infoblox.nios",
         "iptables.log",
+        "juniper.netscreen",
         "netscout.sightline",
+        "proofpoint.emailsecurity",
         "redis.log",
+        "snort.log",
+        "symantec.endpointprotection",
         "system.auth",
         "system.syslog",
         "microsoft.defender_atp",
@@ -261,6 +269,7 @@ def clean_keys(obj):
         "gsuite.login",
         "gsuite.saml",
         "gsuite.user_accounts",
+        "zoom.webhook",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
