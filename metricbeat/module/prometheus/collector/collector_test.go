@@ -363,9 +363,32 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
-	// test with ine include and one exclude
+	// test with only one regex exclude filter
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"^http_request_duration_microseconds_e_in$"})
+	metricsToKeep = 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep++
+		}
+	}
+	assert.Equal(t, len(testFamilies)-1, metricsToKeep)
+
+	// test with only one regex exclude filter
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"^http_request_duration_microseconds_[a-e]_in$"})
+	metricsToKeep = 0
+	for _, testFamily := range testFamilies {
+		if !ms.skipFamily(testFamily) {
+			metricsToKeep++
+		}
+	}
+	assert.Equal(t, len(testFamilies)-4, metricsToKeep)
+
+	// test with one include and one exclude
 	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
+>>>>>>> bf06ea666... Add regex tests to prometheus collector tests
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
