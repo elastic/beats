@@ -26,29 +26,29 @@ import (
 
 func TestReadInput(t *testing.T) {
 	tests := []struct {
-		name   string
-		input  string
-		res    string
+		name  string
+		input string
+		res   string
 	}{
 		{
-			name:   "Question 1?",
-			input:  "\n",
-			res:    "",
+			name:  "Question 1?",
+			input: "\n",
+			res:   "",
 		},
 		{
-			name:   "Question 2?",
-			input:  "full string input\n",
-			res:    "full string input",
+			name:  "Question 2?",
+			input: "full string input\n",
+			res:   "full string input",
 		},
 		{
-			name:   "Question 3?",
-			input:  "123456789\n",
-			res:    "123456789",
+			name:  "Question 3?",
+			input: "123456789\n",
+			res:   "123456789",
 		},
 		{
-			name:   "Question 4?",
-			input:  "false\n",
-			res:    "false",
+			name:  "Question 4?",
+			input: "false\n",
+			res:   "false",
 		},
 	}
 
