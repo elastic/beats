@@ -70,9 +70,9 @@ rules:
     - netflow
     - httpjson
     - o365audit
-    - azureeventhub
+    - azure-eventhub
     - cloudfoundry
-    - googlepubsub
+    - google-pubsub
     - kafka
 
 - filter_values:
