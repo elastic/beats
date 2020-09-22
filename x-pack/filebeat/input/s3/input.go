@@ -74,10 +74,11 @@ type s3Input struct {
 }
 
 type s3Info struct {
-	name   string
-	key    string
-	region string
-	arn    string
+	name                     string
+	key                      string
+	region                   string
+	arn                      string
+	expandEventListFromField string
 }
 
 type bucket struct {
@@ -252,7 +253,7 @@ func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityT
 func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
 	defer wg.Done()
 
-	s3Infos, err := handleSQSMessage(message)
+	s3Infos, err := p.handleSQSMessage(message)
 	if err != nil {
 		p.logger.Error(errors.Wrap(err, "handleSQSMessage failed"))
 		return
@@ -352,7 +353,7 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 }
 
 // handle message
-func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
+func (p *s3Input) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	msg := sqsMessage{}
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
@@ -361,21 +362,40 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
-		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
-			// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
-			filename, err := url.QueryUnescape(record.S3.object.Key)
-			if err != nil {
-				return nil, errors.Wrapf(err, "url.QueryUnescape failed for '%s'", record.S3.object.Key)
-			}
-
-			s3Infos = append(s3Infos, s3Info{
-				region: record.AwsRegion,
-				name:   record.S3.bucket.Name,
-				key:    filename,
-				arn:    record.S3.bucket.Arn,
-			})
-		} else {
+		if record.EventSource != "aws:s3" || !strings.HasPrefix(record.EventName, "ObjectCreated:") {
 			return nil, errors.New("this SQS queue should be dedicated to s3 ObjectCreated event notifications")
+		}
+		// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
+		filename, err := url.QueryUnescape(record.S3.object.Key)
+		if err != nil {
+			return nil, errors.Wrapf(err, "url.QueryUnescape failed for '%s'", record.S3.object.Key)
+		}
+
+		if len(p.config.FileSelectors) == 0 {
+			s3Infos = append(s3Infos, s3Info{
+				region:                   record.AwsRegion,
+				name:                     record.S3.bucket.Name,
+				key:                      filename,
+				arn:                      record.S3.bucket.Arn,
+				expandEventListFromField: p.config.ExpandEventListFromField,
+			})
+			continue
+		}
+
+		for _, fs := range p.config.FileSelectors {
+			if fs.Regex == nil {
+				continue
+			}
+			if fs.Regex.MatchString(filename) {
+				s3Infos = append(s3Infos, s3Info{
+					region:                   record.AwsRegion,
+					name:                     record.S3.bucket.Name,
+					key:                      filename,
+					arn:                      record.S3.bucket.Arn,
+					expandEventListFromField: fs.ExpandEventListFromField,
+				})
+				break
+			}
 		}
 	}
 	return s3Infos, nil
@@ -456,7 +476,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 	}
 
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
-	if resp.ContentType != nil && *resp.ContentType == "application/json" || p.config.ExpandEventListFromField != "" {
+	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.expandEventListFromField != "" {
 		decoder := json.NewDecoder(reader)
 		err := p.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
@@ -537,10 +557,10 @@ func (p *s3Input) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3
 func (p *s3Input) jsonFieldsType(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
-		if p.config.ExpandEventListFromField != "" {
-			textValues, ok := f[p.config.ExpandEventListFromField]
+		if s3Info.expandEventListFromField != "" {
+			textValues, ok := f[s3Info.expandEventListFromField]
 			if !ok {
-				err := errors.Errorf("key '%s' not found", p.config.ExpandEventListFromField)
+				err := errors.Errorf("key '%s' not found", s3Info.expandEventListFromField)
 				p.logger.Error(err)
 				return offset, err
 			}
@@ -555,10 +575,10 @@ func (p *s3Input) jsonFieldsType(jsonFields interface{}, offset int, objectHash 
 			return offset, nil
 		}
 	case map[string]interface{}:
-		if p.config.ExpandEventListFromField != "" {
-			textValues, ok := f[p.config.ExpandEventListFromField]
+		if s3Info.expandEventListFromField != "" {
+			textValues, ok := f[s3Info.expandEventListFromField]
 			if !ok {
-				err := errors.Errorf("key '%s' not found", p.config.ExpandEventListFromField)
+				err := errors.Errorf("key '%s' not found", s3Info.expandEventListFromField)
 				p.logger.Error(err)
 				return offset, err
 			}
