@@ -254,7 +254,7 @@ def triggerE2ETests(String suite, String channel) {
       booleanParam(name: 'forceSkipGitChecks', value: true),
       booleanParam(name: 'forceSkipPresubmit', value: true),
       booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-      booleanParam(name: 'ELASTIC_AGENT_USE_CI_SNAPSHOTS', value: true),
+      booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
       string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'runTestsSuite', value: suite),
       string(name: 'SLACK_CHANNEL', value: channel),
