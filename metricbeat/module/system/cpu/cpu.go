@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	event := common.MapStr{"cores": cpu.NumCores}
-
+	hostFields := common.MapStr{}
 	for _, metric := range m.config.Metrics {
 		switch strings.ToLower(metric) {
 		case percentages:
@@ -95,6 +95,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			event.Put("softirq.norm.pct", normalizedPct.SoftIRQ)
 			event.Put("steal.norm.pct", normalizedPct.Steal)
 			event.Put("total.norm.pct", normalizedPct.Total)
+			hostFields.Put("host.cpu.pct", normalizedPct.Total)
 		case ticks:
 			ticks := sample.Ticks()
 			event.Put("user.ticks", ticks.User)
@@ -109,6 +110,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	r.Event(mb.Event{
+		RootFields:      hostFields,
 		MetricSetFields: event,
 	})
 

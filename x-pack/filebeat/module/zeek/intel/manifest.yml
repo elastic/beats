@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/intel.log
   - name: tags
     default: [zeek.intel]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/intel.yml
