@@ -260,7 +260,7 @@ def triggerE2ETests(String suite, String channel) {
       string(name: 'SLACK_CHANNEL', value: channel),
       string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
       string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
+      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)]),
     ],
     propagate: false,
     wait: false
