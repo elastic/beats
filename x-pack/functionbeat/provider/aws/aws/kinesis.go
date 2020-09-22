@@ -70,7 +70,7 @@ func (s *startingPosition) Unpack(str string) error {
 func (s *startingPosition) String() string {
 	v, ok := mapStartingPositionReverse[*s]
 	if !ok {
-		panic("unknown starting position: " + string(*s))
+		panic("unknown starting position: " + fmt.Sprint(*s))
 	}
 	return v
 }
@@ -93,17 +93,19 @@ func (cfg *KinesisConfig) Validate() error {
 
 // KinesisTriggerConfig configuration for the current trigger.
 type KinesisTriggerConfig struct {
-	EventSourceArn   string           `config:"event_source_arn" validate:"required"`
-	BatchSize        int              `config:"batch_size" validate:"min=100,max=10000"`
-	StartingPosition startingPosition `config:"starting_position"`
+	EventSourceArn        string           `config:"event_source_arn" validate:"required"`
+	BatchSize             int              `config:"batch_size" validate:"min=100,max=10000"`
+	StartingPosition      startingPosition `config:"starting_position"`
+	ParallelizationFactor int              `config:"parallelization_factor" validate:"min=1,max=10"`
 }
 
 // Unpack unpacks the trigger and make sure the defaults settings are correctly sets.
 func (c *KinesisTriggerConfig) Unpack(cfg *common.Config) error {
 	type tmpConfig KinesisTriggerConfig
 	config := tmpConfig{
-		BatchSize:        100,
-		StartingPosition: trimHorizonPos,
+		BatchSize:             100,
+		StartingPosition:      trimHorizonPos,
+		ParallelizationFactor: 1,
 	}
 	if err := cfg.Unpack(&config); err != nil {
 		return err
@@ -176,10 +178,11 @@ func (k *Kinesis) Template() *cloudformation.Template {
 	for _, trigger := range k.config.Triggers {
 		resourceName := prefix(k.Name() + trigger.EventSourceArn)
 		template.Resources[resourceName] = &lambda.EventSourceMapping{
-			BatchSize:        trigger.BatchSize,
-			EventSourceArn:   trigger.EventSourceArn,
-			FunctionName:     cloudformation.GetAtt(prefix(""), "Arn"),
-			StartingPosition: trigger.StartingPosition.String(),
+			BatchSize:             trigger.BatchSize,
+			ParallelizationFactor: trigger.ParallelizationFactor,
+			EventSourceArn:        trigger.EventSourceArn,
+			FunctionName:          cloudformation.GetAtt(prefix(""), "Arn"),
+			StartingPosition:      trigger.StartingPosition.String(),
 		}
 	}
 
