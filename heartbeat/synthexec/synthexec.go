@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package synthexec
 
@@ -9,11 +22,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"io"
 	"os"
 	"os/exec"
@@ -21,6 +29,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const debugSelector = "synthexec"
@@ -52,7 +66,7 @@ Outer:
 }
 
 // SuiteJob will run a single journey by name from the given suite file.
-func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr, ) jobs.Job {
+func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) jobs.Job {
 	cmd := exec.Command(
 		"node",
 		suiteFile,
@@ -198,7 +212,7 @@ func runCmd(
 
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
-func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) *SynthEvent, cb func(*SynthEvent)) error {
+func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*1024*2)   // 2MiB initial buffer
 	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
@@ -209,7 +223,11 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 			return scanner.Err()
 		}
 
-		se := transform(scanner.Bytes(), scanner.Text())
+		se, err := transform(scanner.Bytes(), scanner.Text())
+		if err != nil {
+			logp.Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			continue
+		}
 		if se != nil {
 			cb(se)
 		}
@@ -222,8 +240,8 @@ var stdoutToSynthEvent = consoleLineToSynthEvent("stdout")
 var stderrToSynthEvent = consoleLineToSynthEvent("stderr")
 
 // consoleLineToSynthEvent is a factory that can take a line from the scanner and transform it into a *SynthEvent.
-func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *SynthEvent) {
-	return func(bytes []byte, text string) (res *SynthEvent) {
+func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
+	return func(bytes []byte, text string) (res *SynthEvent, err error) {
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:      typ,
@@ -231,27 +249,28 @@ func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *S
 			Payload: map[string]interface{}{
 				"message": text,
 			},
-		}
+		}, nil
 	}
 }
 
 var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
 
-// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent.
-func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent) {
+// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
+// nil res on empty lines.
+func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	// Skip empty lines
 	if emptyStringRegexp.Match(bytes) {
-		return nil
+		return nil, nil
 	}
 
-	err := json.Unmarshal(bytes, &res)
+	res = &SynthEvent{}
+	err = json.Unmarshal(bytes, res)
 	if err != nil {
-		logp.Warn("Could not unmarshal %s from synthexec: %s", text, err)
+		return nil, err
 	}
 
 	if res.Type == "" {
-		logp.Warn("Unmarshal succeeded, but no type found for: %s", text)
-		return nil
+		return nil, fmt.Errorf("Unmarshal succeeded, but no type found for: %s", text)
 	}
 	return
 }
