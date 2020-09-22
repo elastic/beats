@@ -156,8 +156,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		nextSegmentID = lastID + 1
 	}
 
-	// If any of the initial segments are older than the read position from
-	// the state file, move them directly to the acked list where they can be
+	// If any of the initial segments are older than the current queue
+	// position, move them directly to the acked list where they can be
 	// deleted.
 	ackedSegments := []*queueSegment{}
 	readSegmentID := nextReadPosition.segmentID
@@ -166,7 +166,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		initialSegments = initialSegments[1:]
 	}
 
-	// If the next read position is older than all existing segments, advance
+	// If the queue position is older than all existing segments, advance
 	// it to the beginning of the first one.
 	if len(initialSegments) > 0 && readSegmentID < initialSegments[0].id {
 		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
