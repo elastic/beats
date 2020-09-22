@@ -1,64 +1,47 @@
 description: Pipeline for parsing F5 ASM web application firewall logs
-
-on_failure:
-- 
-  set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
-
 processors:
--
-  set:
+- set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- 
-  grok:
+- grok:
     field: message
     patterns:
     - '^<%{NONNEGINT:syslog5424_ver}>+(?:%{SYSLOGTIMESTAMP:syslog5424_ts}|-) +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{WORD:syslog5424_app}):%{GREEDYDATA:syslog5424_content}$'
--
-  grok:
+- grok:
     field: syslog5424_content
     patterns:
     - '^"%{IP:source.ip}"###"%{DATA:client.country}"###"%{DATA}"###"%{DATA:source.port}"###"%{IP:destination.ip}"###"%{DATA:destination.port}"###"%{DATA:network.protocol}"###"%{WORD:http.request.method}"###"%{DATA:url.full}"###"%{IP:source.ip}"###"%{WORD:result}"###"%{DATA:event.id}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:rule.name}"###"%{DATA}"###"%{DATA}"###"%{DATA}"###"%{DATA:request}"###"%{DATA:event.reason}"###""$'
--
-  set:
+- set:
     field: event.module
-    value: 'f5'
--
-  set:
+    value: f5
+- set:
     field: event.kind
     value: '{{syslog5424_app}}'
--
-  set:
+- set:
     field: event.category
     value: network
--
-  set:
+- set:
     field: observer.vendor
-    value: F5 Networks
--
-  set:
+    value: F5
+- set:
+    field: observer.product
+    value: ASM
+- set:
     field: observer.type
     value: firewall
--
-  set:
+- set:
     field: event.outcome
     value: success
-    if: '[''passed'',''alerted''].contains(ctx.result)'
--
-  set:
+    if: "['passed','alerted'].contains(ctx.result)"
+- set:
     field: event.outcome
     value: failure
-    if: '[''blocked''].contains(ctx.result)'
--
-  set:
+    if: "['blocked'].contains(ctx.result)"
+- set:
     field: event.outcome
     value: unknown
     if: ctx.event?.outcome == null
--
-  remove:
-    ignore_missing: true
+- remove:
     field:
     - syslog5424_content
     - syslog5424_sd
@@ -74,3 +57,8 @@ processors:
     - request
     - client.country
     - result
+    ignore_missing: true
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

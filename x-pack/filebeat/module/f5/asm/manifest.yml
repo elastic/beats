@@ -4,7 +4,7 @@ var:
 - name: syslog_host
   default: localhost
 - name: tags
-  default: [checkpoint-firewall, forwarded]
+  default: [f5-asm, forwarded]
 - name: syslog_port
   default: 9001
 - name: input
@@ -20,7 +20,5 @@ var:
 - name: pipeline
   default: ""
 
-ingest_pipeline:
-- ingest/pipeline.yml
-
+ingest_pipeline: ingest/pipeline.yml
 input: config/asm.yml
