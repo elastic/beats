@@ -214,24 +214,20 @@ def tagAndPush(name){
 
 def runE2ETestForPackages(){
   def suite = ''
-  def slackChannel = ''
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
     if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
       suite = 'all'
-      slackChannel = 'integrations'
     } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
       suite = 'all'
-      slackChannel = 'integrations'
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
       suite = 'ingest-manager'
-      slackChannel = 'ingest-management'
     } else {
       echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
       return
     }
 
-    triggerE2ETests(suite, slackChannel)
+    triggerE2ETests(suite)
   }
 }
 
@@ -244,8 +240,8 @@ def release(){
   }
 }
 
-def triggerE2ETests(String suite, String channel) {
-  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}. Build result will be sent the ${channel} Slack channel")
+def triggerE2ETests(String suite) {
+  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}.")
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
@@ -258,7 +254,6 @@ def triggerE2ETests(String suite, String channel) {
       string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'runTestsSuite', value: suite),
-      string(name: 'SLACK_CHANNEL', value: channel),
       string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
       string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
       string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
