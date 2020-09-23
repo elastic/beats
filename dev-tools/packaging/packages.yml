@@ -509,7 +509,7 @@ shared:
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi-minimal'
+      from: 'docker.elastic.co/ubi8/ubi-minimal'
 
   - &elastic_docker_spec
     extra_vars:

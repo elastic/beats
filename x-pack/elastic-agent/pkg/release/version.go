@@ -15,6 +15,10 @@ import (
 // snapshot is a flag marking build as a snapshot.
 var snapshot = ""
 
+// allowEmptyPgp is used as a debug flag and allows working
+// without valid pgp
+var allowEmptyPgp string
+
 // Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return libbeatVersion.Commit()
@@ -54,7 +58,7 @@ func Info() VersionInfo {
 	}
 }
 
-// String returns the string format for the version informaiton.
+// String returns the string format for the version information.
 func (v *VersionInfo) String() string {
 	var sb strings.Builder
 

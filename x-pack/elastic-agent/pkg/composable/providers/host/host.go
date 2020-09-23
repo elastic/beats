@@ -79,13 +79,9 @@ func (c *contextProvider) Run(comm composable.ContextProviderComm) error {
 }
 
 // ContextProviderBuilder builds the context provider.
-func ContextProviderBuilder(c *config.Config) (composable.ContextProvider, error) {
-	logger, err := logger.New("composable.providers.host")
-	if err != nil {
-		return nil, err
-	}
+func ContextProviderBuilder(log *logger.Logger, c *config.Config) (composable.ContextProvider, error) {
 	p := &contextProvider{
-		logger:  logger,
+		logger:  log,
 		fetcher: getHostInfo,
 	}
 	if c != nil {

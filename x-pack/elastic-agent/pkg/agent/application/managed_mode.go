@@ -11,8 +11,11 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/go-sysinfo"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -51,12 +54,14 @@ type Managed struct {
 	router      *router
 	srv         *server.Server
 	as          *actionStore
+	upgrader    *upgrade.Upgrader
 }
 
 func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
 	rawConfig *config.Config,
+	reexec reexecManager,
 ) (*Managed, error) {
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
@@ -113,6 +118,13 @@ func newManaged(
 			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
 	}
 
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to get system information",
+			errors.TypeUnexpected)
+	}
+
 	managedApplication := &Managed{
 		log:       log,
 		agentInfo: agentInfo,
@@ -148,7 +160,7 @@ func newManaged(
 	}
 	managedApplication.router = router
 
-	composableCtrl, err := composable.New(rawConfig)
+	composableCtrl, err := composable.New(log, rawConfig)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
@@ -160,7 +172,7 @@ func newManaged(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config), filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info())},
 		},
 		monitor,
 	)
@@ -187,6 +199,13 @@ func newManaged(
 		return nil, err
 	}
 
+	managedApplication.upgrader = upgrade.NewUpgrader(
+		cfg.Settings.DownloadConfig,
+		log,
+		[]context.CancelFunc{managedApplication.cancelCtxFn},
+		reexec,
+		acker)
+
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		&handlerPolicyChange{
@@ -203,6 +222,14 @@ func newManaged(
 			dispatcher:  router,
 			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
 			actionStore: actionStore,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionUpgrade{},
+		&handlerUpgrade{
+			upgrader: managedApplication.upgrader,
+			log:      log,
 		},
 	)
 
@@ -245,6 +272,10 @@ func (m *Managed) Start() error {
 	if m.wasUnenrolled() {
 		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
 		return nil
+	}
+
+	if err := m.upgrader.Ack(m.bgContext); err != nil {
+		m.log.Warnf("failed to ack update %v", err)
 	}
 
 	m.gateway.Start()

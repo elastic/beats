@@ -6,18 +6,19 @@
         "module": "oracle"
     },
     "metricset": {
-        "name": "tablespace"
+        "name": "tablespace",
+        "period": 10000
     },
     "oracle": {
         "tablespace": {
             "data_file": {
-                "id": 18,
-                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/sysaux01.dbf",
+                "id": 3,
+                "name": "/u02/app/oracle/oradata/ORCL/sysaux01.dbf",
                 "online_status": "ONLINE",
                 "size": {
-                    "bytes": 618659840,
+                    "bytes": 744488960,
                     "free": {
-                        "bytes": 617611264
+                        "bytes": 743440384
                     },
                     "max": {
                         "bytes": 34359721984
@@ -28,16 +29,16 @@
             "name": "SYSAUX",
             "space": {
                 "free": {
-                    "bytes": 34799616
+                    "bytes": 39124992
                 },
                 "used": {
-                    "bytes": 618659840
+                    "bytes": 744488960
                 }
             }
         }
     },
     "service": {
-        "address": "oracle://sys:Oradoc_db1@localhost:1521/ORCLPDB1.localdomain?connectionClass=\u0026poolIncrement=0\u0026poolMaxSessions=0\u0026poolMinSessions=0\u0026sysdba=1\u0026sysoper=0\u0026sysasm=0\u0026standaloneConnection=0\u0026enableEvents=0\u0026heterogeneousPool=0\u0026prelim=0",
+        "address": "localhost:32769",
         "type": "oracle"
     }
 }

@@ -38,6 +38,13 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	statistics     *DiskIOStat
 	includeDevices []string
+	prevCounters   diskCounter
+}
+
+// diskCounter stores previous disk counter values for calculating gauges in next collection
+type diskCounter struct {
+	prevDiskReadBytes  uint64
+	prevDiskWriteBytes uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -54,6 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:  base,
 		statistics:     NewDiskIOStat(),
 		includeDevices: config.IncludeDevices,
+		prevCounters:   diskCounter{},
 	}, nil
 }
 
@@ -70,6 +78,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Store the last cpu counter when finished
 	defer m.statistics.CloseSampling()
 
+	var diskReadBytes, diskWriteBytes uint64
 	for _, counters := range stats {
 		event := common.MapStr{
 			"name": counters.Name,
@@ -87,6 +96,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				"time": counters.IoTime,
 			},
 		}
+
+		// accumulate values from all interfaces
+		diskReadBytes += counters.ReadBytes
+		diskWriteBytes += counters.WriteBytes
+
 		var extraMetrics DiskIOMetric
 		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
 		if err == nil {
@@ -134,6 +148,24 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			return nil
 		}
 	}
+
+	if m.prevCounters != (diskCounter{}) {
+		// convert network metrics from counters to gauges
+		r.Event(mb.Event{
+			RootFields: common.MapStr{
+				"host": common.MapStr{
+					"disk": common.MapStr{
+						"read.bytes":  diskReadBytes - m.prevCounters.prevDiskReadBytes,
+						"write.bytes": diskWriteBytes - m.prevCounters.prevDiskWriteBytes,
+					},
+				},
+			},
+		})
+	}
+
+	// update prevCounters
+	m.prevCounters.prevDiskReadBytes = diskReadBytes
+	m.prevCounters.prevDiskWriteBytes = diskWriteBytes
 
 	return nil
 }

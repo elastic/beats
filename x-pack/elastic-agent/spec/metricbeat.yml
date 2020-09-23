@@ -87,5 +87,5 @@ rules:
     - output
     - keystore
 
-when: HasItems(%{[metricbeat.modules]}) && HasNamespace('output', 'elasticsearch',
+when: length(${metricbeat.modules}) > 0 and hasKey(${output}, 'elasticsearch',
   'redis', 'kafka', 'logstash')

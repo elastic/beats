@@ -21,8 +21,12 @@ type Application interface {
 	AgentInfo() *info.AgentInfo
 }
 
+type reexecManager interface {
+	ReExec(argOverrides ...string)
+}
+
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string) (Application, error) {
+func New(log *logger.Logger, pathConfigFile string, reexec reexecManager) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
@@ -35,13 +39,14 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig)
+	return createApplication(log, pathConfigFile, rawConfig, reexec)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
 	rawConfig *config.Config,
+	reexec reexecManager,
 ) (Application, error) {
 	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
@@ -58,7 +63,7 @@ func createApplication(
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, rawConfig)
+	return newManaged(ctx, log, rawConfig, reexec)
 }
 
 // missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
