@@ -84,7 +84,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
-		logger.Warn("Package security is disabled. Elastic Agent will not verify signatures of used artifacts.")
+		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
 	}
 
 	execPath, err := os.Executable()
