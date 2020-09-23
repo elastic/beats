@@ -12,14 +12,13 @@ processors:
       %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long}
       "(-|%{DATA:http.request.referrer})" "(-|%{DATA:user_agent.original})" %{NUMBER:nginx.ingress_controller.http.request.length:long}
       %{NUMBER:nginx.ingress_controller.http.request.time:double} \[%{DATA:nginx.ingress_controller.upstream.name}\]
-      \[%{DATA:nginx.ingress_controller.upstream.alternative_name}\] (%{UPSTREAM_ADDRESS_LIST:nginx.ingress_controller.upstream_ip_list}|-)
+      \[%{DATA:nginx.ingress_controller.upstream.alternative_name}\] (%{UPSTREAM_ADDRESS_LIST:nginx.ingress_controller.upstream_address_list}|-)
       (%{UPSTREAM_RESPONSE_LENGTH_LIST:nginx.ingress_controller.upstream.response.length_list}|-) (%{UPSTREAM_RESPONSE_TIME_LIST:nginx.ingress_controller.upstream.response.time_list}|-)
       (%{UPSTREAM_RESPONSE_STATUS_CODE_LIST:nginx.ingress_controller.upstream.response.status_code_list}|-) %{GREEDYDATA:nginx.ingress_controller.http.request.id}
     pattern_definitions:
       NGINX_HOST: (?:%{IP:destination.ip}|%{NGINX_NOTSEPARATOR:destination.domain})(:%{NUMBER:destination.port})?
       NGINX_NOTSEPARATOR: "[^\t ,:]+"
       NGINX_ADDRESS_LIST: (?:%{IP}|%{WORD})("?,?\s*(?:%{IP}|%{WORD}))*
-      UPSTREAM_ADDRESS: '%{IP:nginx.ingress_controller.upstream.ip}(:%{NUMBER:nginx.ingress_controller.upstream.port})?'
       UPSTREAM_ADDRESS_LIST: (?:%{IP}(:%{NUMBER})?)("?,?\s*(?:%{IP}(:%{NUMBER})?))*
       UPSTREAM_RESPONSE_LENGTH_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
       UPSTREAM_RESPONSE_TIME_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
@@ -38,7 +37,7 @@ processors:
     separator: '"?,?\s+'
     ignore_missing: true
 - split:
-    field: nginx.ingress_controller.upstream_ip_list
+    field: nginx.ingress_controller.upstream_address_list
     separator: '"?,?\s+'
     ignore_missing: true
 - split:
@@ -69,14 +68,14 @@ processors:
         if (ctx.nginx.ingress_controller.upstream.response.length_list.length == null) {
           return;
         }
-        int length = 0;
+        int last_length = 0;
         for (def item : ctx.nginx.ingress_controller.upstream.response.length_list) {
-          length = length + Integer.parseInt(item);
+          last_length =  Integer.parseInt(item);
         }
-        ctx.nginx.ingress_controller.upstream.response.length_total = length;
+        ctx.nginx.ingress_controller.upstream.response.length = last_length;
       }
       catch (Exception e) {
-        ctx.nginx.ingress_controller.upstream.response.length_total = null;
+        ctx.nginx.ingress_controller.upstream.response.length = null;
       }
 - script:
     if: ctx.nginx?.ingress_controller?.upstream?.response?.time_list != null && ctx.nginx.ingress_controller.upstream.response.time_list.length > 0
@@ -90,10 +89,10 @@ processors:
         for (def item : ctx.nginx.ingress_controller.upstream.response.time_list) {
           res_time = res_time + Float.parseFloat(item);
         }
-        ctx.nginx.ingress_controller.upstream.response.time_total = res_time;
+        ctx.nginx.ingress_controller.upstream.response.time = res_time;
       }
       catch (Exception e) {
-        ctx.nginx.ingress_controller.upstream.response.time_total = null;
+        ctx.nginx.ingress_controller.upstream.response.time = null;
       }
 - script:
     if: ctx.nginx?.ingress_controller?.upstream?.response?.status_code_list != null && ctx.nginx.ingress_controller.upstream.response.status_code_list.length > 0
@@ -113,15 +112,15 @@ processors:
         ctx.nginx.ingress_controller.upstream.response.time = null;
       }
 - script:
-    if: ctx.nginx?.ingress_controller?.upstream_ip_list != null && ctx.nginx.ingress_controller.upstream_ip_list.length > 0
+    if: ctx.nginx?.ingress_controller?.upstream_address_list != null && ctx.nginx.ingress_controller.upstream_address_list.length > 0
     lang: painless
     source: >-
       try {
-        if (ctx.nginx.ingress_controller.upstream_ip_list.length == null) {
+        if (ctx.nginx.ingress_controller.upstream_address_list.length == null) {
           return;
         }
         def last_upstream = "";
-        for (def item : ctx.nginx.ingress_controller.upstream_ip_list) {
+        for (def item : ctx.nginx.ingress_controller.upstream_address_list) {
           last_upstream = item;
         }
         StringTokenizer tok = new StringTokenizer(last_upstream, ":");
