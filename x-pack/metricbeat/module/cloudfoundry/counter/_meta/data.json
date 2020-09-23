@@ -2,16 +2,21 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "counter": {
-            "delta": 0,
-            "name": "sinks.dropped",
-            "total": 89547093
+            "delta": 201,
+            "name": "ingress",
+            "total": 512406486
         },
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "9adedbd0-3af3-47af-9707-99016050b123",
-            "ip": "192.168.16.54",
+            "index": "d0d52df7-be5e-44ec-b643-988dd9a85ca8",
+            "ip": "192.168.16.53",
             "job": "doppler",
             "origin": "loggregator.doppler"
+        },
+        "tags": {
+            "metric_version": "2.0",
+            "product": "Pivotal Application Service",
+            "source_id": "doppler"
         },
         "type": "counter"
     },

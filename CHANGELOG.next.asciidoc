@@ -506,6 +506,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Added experimental dataset `fortinet/fortimanager`. {pull}20820[20820]
 - Added experimental dataset `juniper/netscreen`. {pull}20820[20820]
 - Added experimental dataset `sophos/utm`. {pull}20820[20820]
+- Add Cloud Foundry tags in related events. {pull}21177[21177]
 
 *Auditbeat*
 

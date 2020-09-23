@@ -38,6 +38,12 @@
           description: >
             Cloud Foundry organization name.
 
+        - name: tags.*
+          type: object
+          object_type: keyword
+          description: >
+            Cloud Foundry tags.
+
         - name: envelope
           type: group
           fields:
@@ -65,3 +71,4 @@
               type: keyword
               description: >
                 Name of the deployment that created this event.
+>>>>>>> origin/7.x

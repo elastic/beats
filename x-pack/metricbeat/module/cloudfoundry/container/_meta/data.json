@@ -2,22 +2,26 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "app": {
-            "id": "c0874969-2811-4d80-837a-301fd485a7bf"
+            "id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
         },
         "container": {
-            "cpu.pct": 0.45456369228159,
-            "disk.bytes": 21970944,
+            "cpu.pct": 0.2808890817947714,
+            "disk.bytes": 10100736,
             "disk.quota.bytes": 1073741824,
-            "instance_index": 1,
-            "memory.bytes": 14101162,
-            "memory.quota.bytes": 67108864
+            "instance_index": 3,
+            "memory.bytes": 14486732,
+            "memory.quota.bytes": 134217728
         },
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
-            "ip": "192.168.16.31",
+            "index": "cd6c6b2c-797b-49a9-b1a2-a3b52da80965",
+            "ip": "192.168.16.32",
             "job": "diego_cell",
             "origin": "rep"
+        },
+        "tags": {
+            "product": "Pivotal Application Service",
+            "source_id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
         },
         "type": "container"
     },

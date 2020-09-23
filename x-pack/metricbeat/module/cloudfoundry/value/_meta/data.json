@@ -3,16 +3,19 @@
     "cloudfoundry": {
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "439bb519-3e68-4d08-a973-8f013f364d61",
-            "ip": "192.168.16.18",
-            "job": "cloud_controller",
-            "origin": "routing_api"
+            "index": "6f2f5d74-9375-4d82-870f-c09e6a74cf3a",
+            "ip": "192.168.16.46",
+            "job": "diego_cell",
+            "origin": "netmon"
+        },
+        "tags": {
+            "source_id": "netmon"
         },
         "type": "value",
         "value": {
             "name": "memoryStats.lastGCPauseTimeNS",
             "unit": "count",
-            "value": 77499
+            "value": 366021
         }
     },
     "service": {
