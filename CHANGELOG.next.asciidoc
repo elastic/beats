@@ -398,6 +398,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
 - Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
 - Handle missing counters in the application_pool metricset. {pull}21071[21071]
+- Fix timestamp handling in remote_write. {pull}21166[21166]
 - Fix remote_write flaky test. {pull}21173[21173]
 
 *Packetbeat*
