@@ -42,6 +42,7 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 			labels[string(k)] = v
 		}
 
+<<<<<<< HEAD
 		val := float64(metric.Value)
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
 			// join metrics with same labels in a single event
@@ -57,6 +58,16 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 				if len(labels) > 0 {
 					eventList[labelsHash].ModuleFields["labels"] = labels
 				}
+=======
+		// join metrics with same labels and same timestamp in a single event
+		labelsHash := labels.String() + metric.Timestamp.Time().String()
+		if _, ok := eventList[labelsHash]; !ok {
+			eventList[labelsHash] = mb.Event{
+				ModuleFields: common.MapStr{
+					"metrics": common.MapStr{},
+				},
+				Timestamp: metric.Timestamp.Time(),
+>>>>>>> d2a89224e9... Fix timestamp handling in remote_write (#21166)
 			}
 
 			// Not checking anything here because we create these maps some lines before
@@ -67,6 +78,16 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 			}
 			e.ModuleFields["metrics"].(common.MapStr).Update(data)
 		}
+<<<<<<< HEAD
+=======
+
+		// Not checking anything here because we create these maps some lines before
+		e := eventList[labelsHash]
+		data := common.MapStr{
+			name: val,
+		}
+		e.ModuleFields["metrics"].(common.MapStr).Update(data)
+>>>>>>> d2a89224e9... Fix timestamp handling in remote_write (#21166)
 	}
 
 	return eventList
