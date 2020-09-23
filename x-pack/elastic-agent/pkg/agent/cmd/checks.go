@@ -34,7 +34,7 @@ func preRunCheck(flags *globalFlags) func(cmd *cobra.Command, args []string) err
 		}
 
 		// get versioned path
-		smallHash := fmt.Sprintf("elastic-agent-%s", smallHash(release.Commit()))
+		smallHash := fmt.Sprintf("elastic-agent-%s", release.ShortCommit())
 		commitFilepath := filepath.Join(paths.Config(), commitFile) // use other file in the future
 		if content, err := ioutil.ReadFile(commitFilepath); err == nil {
 			smallHash = hashedDirName(content)

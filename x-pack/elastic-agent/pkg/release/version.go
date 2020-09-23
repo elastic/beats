@@ -12,6 +12,10 @@ import (
 	libbeatVersion "github.com/elastic/beats/v7/libbeat/version"
 )
 
+const (
+	hashLen = 6
+)
+
 // snapshot is a flag marking build as a snapshot.
 var snapshot = ""
 
@@ -22,6 +26,15 @@ var allowEmptyPgp string
 // Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return libbeatVersion.Commit()
+}
+
+// ShortCommit returns commit up to 6 characters.
+func ShortCommit() string {
+	hash := Commit()
+	if len(hash) > hashLen {
+		hash = hash[:hashLen]
+	}
+	return hash
 }
 
 // BuildTime returns the build time of the binaries.

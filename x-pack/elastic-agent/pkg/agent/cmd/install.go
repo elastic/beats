@@ -112,7 +112,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 
 	if kibana == "" {
-		kibana, err := c.ReadInput("Kibana URL you want to enroll this Agent into:")
+		kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
 		if err != nil {
 			return fmt.Errorf("problem reading prompt response")
 		}
@@ -122,7 +122,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	}
 	if token == "" {
-		token, err := c.ReadInput("Fleet enrollment token:")
+		token, err = c.ReadInput("Fleet enrollment token:")
 		if err != nil {
 			return fmt.Errorf("problem reading prompt response")
 		}

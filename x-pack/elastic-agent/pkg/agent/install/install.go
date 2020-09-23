@@ -60,6 +60,12 @@ func Install() error {
 		}
 	}
 
+	// post install (per platform)
+	err = postInstall()
+	if err != nil {
+		return err
+	}
+
 	// install service
 	svc, err := newService()
 	if err != nil {
