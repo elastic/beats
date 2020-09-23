@@ -8,6 +8,7 @@
 ==== Breaking changes
 
 ==== Bugfixes
+- Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
 
 ==== New features
 
