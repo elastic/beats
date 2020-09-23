@@ -26,7 +26,7 @@ func postInstall() error {
 
 	// create top-level symlink to nested binary
 	realBinary := filepath.Join(InstallPath, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()), BinaryName)
-	err = os.Symlink(binary, realBinary)
+	err = os.Symlink(realBinary, binary)
 	if err != nil {
 		return err
 	}
