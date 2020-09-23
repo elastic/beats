@@ -1,0 +1,9 @@
+- key: fireeye
+  title: "fireeye"
+  description: >
+    fireeye Module
+  fields:
+    - name: fireeye
+      type: group
+      description: >
+      fields:
