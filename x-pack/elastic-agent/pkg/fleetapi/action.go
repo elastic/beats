@@ -17,8 +17,8 @@ const (
 	ActionTypeUpgrade = "UPGRADE"
 	// ActionTypeUnenroll specifies unenroll action.
 	ActionTypeUnenroll = "UNENROLL"
-	// ActionTypeConfigChange specifies config change action.
-	ActionTypeConfigChange = "POLICY_CHANGE"
+	// ActionTypePolicyChange specifies policy change action.
+	ActionTypePolicyChange = "POLICY_CHANGE"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -169,8 +169,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 
 	for _, response := range responses {
 		switch response.ActionType {
-		case ActionTypeConfigChange:
-			action = &ActionConfigChange{
+		case ActionTypePolicyChange:
+			action = &ActionPolicyChange{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
