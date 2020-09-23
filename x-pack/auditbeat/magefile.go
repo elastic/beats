@@ -132,15 +132,14 @@ var (
 		"linux/386":      installLinux386,
 		"linux/amd64":    installLinuxAMD64,
 		"linux/arm64":    installLinuxARM64,
-		"linux/armv5":    installLinuxARMLE,
-		"linux/armv6":    installLinuxARMLE,
+		"linux/armv5":    installLinuxARMEL,
+		"linux/armv6":    installLinuxARMEL,
+		"linux/armv7":    installLinuxARMHF,
 		"linux/mips":     installLinuxMIPS,
 		"linux/mipsle":   installLinuxMIPSLE,
 		"linux/mips64le": installLinuxMIPS64LE,
 		"linux/ppc64le":  installLinuxPPC64LE,
 		"linux/s390x":    installLinuxS390X,
-
-		//"linux/armv7":    installLinuxARMHF,
 
 		//"linux/ppc64":  installLinuxPpc64,
 		//"linux/mips64": installLinuxMips64,
@@ -149,26 +148,30 @@ var (
 
 const (
 	librpmDevPkgName = "librpm-dev"
+
+	// Dependency of librpm-dev in ARM architectures, that needs to be explicitly
+	// installed to replace other conflicting packages pre-installed in the image.
+	libicuDevPkgName = "libicu-dev"
 )
 
 func installLinuxAMD64() error {
-	return installDependencies(librpmDevPkgName, "")
+	return installDependencies("", librpmDevPkgName)
 }
 
 func installLinuxARM64() error {
-	return installDependencies(librpmDevPkgName+":arm64", "arm64")
+	return installDependencies("arm64", librpmDevPkgName+":arm64")
 }
 
 func installLinuxARMHF() error {
-	return installDependencies(librpmDevPkgName+":armhf", "armhf")
+	return installDependencies("armhf", librpmDevPkgName+":armhf", libicuDevPkgName+":armhf")
 }
 
-func installLinuxARMLE() error {
-	return installDependencies(librpmDevPkgName+":armel", "armel")
+func installLinuxARMEL() error {
+	return installDependencies("armel", librpmDevPkgName+":armel", libicuDevPkgName+":armel")
 }
 
 func installLinux386() error {
-	return installDependencies(librpmDevPkgName+":i386", "i386")
+	return installDependencies("i386", librpmDevPkgName+":i386")
 }
 
 func installLinuxMIPS() error {
@@ -191,7 +194,10 @@ func installLinuxS390X() error {
 	return installDependencies(librpmDevPkgName+":s390x", "s390x")
 }
 
-func installDependencies(pkg, arch string) error {
+func installDependencies(arch string, pkgs ...string) error {
+	if len(pkgs) == 0 {
+		return nil
+	}
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
@@ -207,5 +213,6 @@ func installDependencies(pkg, arch string) error {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	args := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	return sh.Run("apt-get", args...)
 }
