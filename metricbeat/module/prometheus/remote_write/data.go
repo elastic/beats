@@ -59,9 +59,9 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 					eventList[labelsHash].ModuleFields["labels"] = labels
 				}
 			}
+
 			// Not checking anything here because we create these maps some lines before
 			e := eventList[labelsHash]
-			e.Timestamp = metric.Timestamp.Time()
 			data := common.MapStr{
 				name: val,
 			}
