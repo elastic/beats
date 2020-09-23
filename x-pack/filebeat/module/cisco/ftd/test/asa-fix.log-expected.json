@@ -41,6 +41,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.233.123.123"
@@ -91,6 +94,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -191,6 +197,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -234,6 +243,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
