@@ -129,11 +129,6 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 	return ioutil.WriteFile(markerFile, markerBytes, 0600)
 }
 
-func isSubdir(base, target string) (bool, error) {
-	relPath, err := filepath.Rel(base, target)
-	return strings.HasPrefix(relPath, ".."), err
-}
-
 func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
 }

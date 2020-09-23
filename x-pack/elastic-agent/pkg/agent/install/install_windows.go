@@ -6,7 +6,13 @@
 
 package install
 
-import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
 
 // postInstall performs post installation for Windows systems.
 func postInstall() error {
