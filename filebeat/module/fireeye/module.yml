@@ -1,0 +1,17 @@
+dashboards:
+- id: 30-fef4-11ea-924b-bb493841e1de 
+  file: Filebeat-Fireeyenx-flow.json
+
+- id: ea3c3220-ff0e-11ea-924b-bb493841e1de 
+  file: Filebeat-Fireeyenx-dns.json
+
+- id: ea3c3220-ff0e-11ea-924b-bb493841e1de
+  file: Filebeat-Fireeyenx-http.json
+ 
+- id: f41379c0-ff13-11ea-924b-bb493841e1de
+  file: Filebeat-Fireeyenx-fileinfo.json
+ 
+- id: 3cc2ada0-ff1c-11ea-924b-bb493841e1de
+  file: Filebeat-Fireeyenx-tls.json
+
+

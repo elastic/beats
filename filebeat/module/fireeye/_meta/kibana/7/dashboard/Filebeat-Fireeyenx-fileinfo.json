@@ -1,0 +1,406 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"version\":\"7.9.1\",\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":9,\"i\":\"f3d27d9c-2fea-41cc-8334-756199151a48\"},\"panelIndex\":\"f3d27d9c-2fea-41cc-8334-756199151a48\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":0,\"y\":9,\"w\":10,\"h\":17,\"i\":\"036db990-6ede-4ea7-bfba-1413f5cfeb77\"},\"panelIndex\":\"036db990-6ede-4ea7-bfba-1413f5cfeb77\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":10,\"y\":9,\"w\":10,\"h\":17,\"i\":\"01a463b9-2ac6-4537-b2b0-50c42fb64c30\"},\"panelIndex\":\"01a463b9-2ac6-4537-b2b0-50c42fb64c30\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":20,\"y\":9,\"w\":10,\"h\":17,\"i\":\"bd20ce02-ee6d-4dfb-8468-2e81ab79746a\"},\"panelIndex\":\"bd20ce02-ee6d-4dfb-8468-2e81ab79746a\",\"embeddableConfig\":{},\"panelRefName\":\"panel_3\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":30,\"y\":9,\"w\":18,\"h\":17,\"i\":\"3ebe7156-2550-4555-9240-26683d9a4eb5\"},\"panelIndex\":\"3ebe7156-2550-4555-9240-26683d9a4eb5\",\"embeddableConfig\":{},\"panelRefName\":\"panel_4\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":0,\"y\":26,\"w\":10,\"h\":18,\"i\":\"642ae04a-5b82-444c-b2fa-62906f66dd78\"},\"panelIndex\":\"642ae04a-5b82-444c-b2fa-62906f66dd78\",\"embeddableConfig\":{},\"panelRefName\":\"panel_5\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":10,\"y\":26,\"w\":11,\"h\":18,\"i\":\"ed259a98-b481-4392-b2fa-c123c902856c\"},\"panelIndex\":\"ed259a98-b481-4392-b2fa-c123c902856c\",\"embeddableConfig\":{},\"panelRefName\":\"panel_6\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":21,\"y\":26,\"w\":27,\"h\":18,\"i\":\"d6bc0358-4923-4009-a736-6ef0b1b5961f\"},\"panelIndex\":\"d6bc0358-4923-4009-a736-6ef0b1b5961f\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":0,\"y\":44,\"w\":24,\"h\":18,\"i\":\"39a9fda4-becc-4a85-b934-88d6d87c874b\"},\"panelIndex\":\"39a9fda4-becc-4a85-b934-88d6d87c874b\",\"embeddableConfig\":{},\"panelRefName\":\"panel_8\"},{\"version\":\"7.9.1\",\"gridData\":{\"x\":24,\"y\":44,\"w\":24,\"h\":18,\"i\":\"9d3ccb6d-5c28-49a1-9d0b-e8b3d7ca9633\"},\"panelIndex\":\"9d3ccb6d-5c28-49a1-9d0b-e8b3d7ca9633\",\"embeddableConfig\":{},\"panelRefName\":\"panel_9\"}]",
+        "timeRestore": false,
+        "title": "Fileinfo [Fireeye NX]",
+        "version": 1
+      },
+      "id": "f41379c0-ff13-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "6abf60d0-ff13-11ea-924b-bb493841e1de",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "a75aae10-ff17-11ea-924b-bb493841e1de",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "cbc3f810-ff17-11ea-924b-bb493841e1de",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "0957d2f0-ff18-11ea-924b-bb493841e1de",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "28936df0-ff18-11ea-924b-bb493841e1de",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "13af8440-ff14-11ea-924b-bb493841e1de",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "e3e70e90-ff18-11ea-924b-bb493841e1de",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "884d80a0-ff18-11ea-924b-bb493841e1de",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "b0666950-ff11-11ea-924b-bb493841e1de",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "acb4dd90-ff12-11ea-924b-bb493841e1de",
+          "name": "panel_9",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-09-25T10:23:58.546Z",
+      "version": "WzE2NzMsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"fileinfo\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"fileinfo\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Fileinfo Traffic Over Time [Fireeye NX]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Fileinfo Traffic Over Time [Fireeye NX]\",\"type\":\"line\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-24h\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"scaleMetricValues\":false,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}},\"schema\":\"segment\"}],\"params\":{\"type\":\"area\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":true,\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"thresholdLine\":{\"show\":false,\"value\":10,\"width\":1,\"style\":\"full\",\"color\":\"#E7664C\"},\"labels\":{}}}"
+      },
+      "id": "6abf60d0-ff13-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T09:42:24.861Z",
+      "version": "WzE0MzIsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"fileinfo\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"fileinfo\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "TX Hosts [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TX Hosts [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"source.address\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Transmitting Host\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "a75aae10-ff17-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:12:44.529Z",
+      "version": "WzE1NTcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"fileinfo\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"fileinfo\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "RX Hosts [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"RX Hosts [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"destination.address\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Receiving Host\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "cbc3f810-ff17-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:13:45.617Z",
+      "version": "WzE1NjksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"fileinfo\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"fileinfo\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "File Network Protocol [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"File Network Protocol [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"network.protocol\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"protocol\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "0957d2f0-ff18-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:15:28.927Z",
+      "version": "WzE1ODksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"fileinfo\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"fileinfo\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "File Hash [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"File Hash [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"fireeyenx.fileinfo.md5\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"file md5 hash\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "28936df0-ff18-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:16:21.326Z",
+      "version": "WzE1OTgsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "HTTP MIME Type [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"HTTP MIME Type [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"http.request.mime_type\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"MIME Type\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "13af8440-ff14-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T09:47:08.291Z",
+      "version": "WzE0NzksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "File Total Size [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"File Total Size [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"fireeyenx.fileinfo.size\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"File Size\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "e3e70e90-ff18-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:21:35.609Z",
+      "version": "WzE2NDksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "File Name [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"File Name [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"fireeyenx.fileinfo.filename\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"File name\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "884d80a0-ff18-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T10:19:01.930Z",
+      "version": "WzE2MjUsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"http\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"http\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "HTTP URL Path [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"HTTP URL Path [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"http.url.path\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "b0666950-ff11-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T09:30:02.725Z",
+      "version": "WzEyNzQsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.type\",\"negate\":false,\"params\":{\"query\":\"http\"},\"type\":\"phrase\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match_phrase\":{\"event.type\":\"http\"}}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "HTTP User Agent [Fireeye NX]",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"HTTP User Agent [Fireeye NX]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"user_agent.original\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":50,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Useragent\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"
+      },
+      "id": "acb4dd90-ff12-11ea-924b-bb493841e1de",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "d67fbb10-fe52-11ea-924b-bb493841e1de",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-09-25T09:37:06.025Z",
+      "version": "WzEzMzEsMV0="
+    }
+  ],
+  "version": "7.9.1"
+}

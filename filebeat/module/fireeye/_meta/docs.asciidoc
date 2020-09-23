@@ -1,0 +1,56 @@
+:modulename: fireeye
+:has-dashboards: true
+
+== fireeye module
+
+This is a module for the Fireeye Network Security (NX) layer7 metadata. 
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been developed against Fireeye Network Security 9.0.0.916432 , but is expected to work
+with other versions.
+
+include::../include/configuring-intro.asciidoc[]
+
+This is an example of how to use the module.
+
+----
+- module: fireeye
+  # All logs
+  nx:
+    enabled: true
+    var.input: tcp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 12345
+----
+
+
+:fileset_ex: {fileset}
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `{fileset}` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/Filebeat-Fireeyenx-flow.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
