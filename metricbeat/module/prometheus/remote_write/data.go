@@ -44,13 +44,14 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 
 		val := float64(metric.Value)
 		if !math.IsNaN(val) && !math.IsInf(val, 0) {
-			// join metrics with same labels in a single event
-			labelsHash := labels.String()
+			// join metrics with same labels and same timestamp in a single event
+			labelsHash := labels.String() + metric.Timestamp.Time().String()
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = mb.Event{
 					ModuleFields: common.MapStr{
 						"metrics": common.MapStr{},
 					},
+					Timestamp: metric.Timestamp.Time(),
 				}
 
 				// Add labels
@@ -61,7 +62,6 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 
 			// Not checking anything here because we create these maps some lines before
 			e := eventList[labelsHash]
-			e.Timestamp = metric.Timestamp.Time()
 			data := common.MapStr{
 				name: val,
 			}
