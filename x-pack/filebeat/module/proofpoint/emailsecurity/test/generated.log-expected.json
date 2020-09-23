@@ -89,6 +89,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 3391,
+        "related.hosts": [
+            "tenbyCic5882.api.home"
+        ],
         "related.ip": [
             "10.69.20.77"
         ],
@@ -247,6 +250,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 7183,
+        "related.hosts": [
+            "ommod3671.mail.domain"
+        ],
         "rsa.email.email_src": "dexeaco",
         "rsa.internal.messageid": "queued-reinject",
         "rsa.misc.client": "emaperi",
@@ -477,6 +483,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 4499,
+        "related.hosts": [
+            "ersp3536.www5.lan"
+        ],
         "rsa.db.index": "mod",
         "rsa.email.email_dst": "fugiatn",
         "rsa.internal.messageid": "queued-aglife",
@@ -666,6 +675,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 3866,
+        "related.hosts": [
+            "sit6590.lan"
+        ],
         "related.ip": [
             "10.123.143.188"
         ],
@@ -1256,6 +1268,9 @@
         "observer.product": "Email",
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
+        "related.hosts": [
+            "lors7553.api.local"
+        ],
         "rsa.internal.messageid": "dkimv_run",
         "rsa.misc.client": "uido",
         "rsa.misc.log_session_id": "tiaecon",
@@ -1473,6 +1488,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 2861,
+        "related.hosts": [
+            "str4641.domain"
+        ],
         "related.ip": [
             "10.151.31.58"
         ],
@@ -2407,6 +2425,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 3274,
+        "related.hosts": [
+            "Sedutper7794.www5.domain"
+        ],
         "related.ip": [
             "10.154.22.241"
         ],
@@ -2533,6 +2554,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
         "process.pid": 4250,
+        "related.hosts": [
+            "estla4081.corp"
+        ],
         "rsa.internal.messageid": "queued-default",
         "rsa.misc.client": "queued-default",
         "rsa.network.host_dst": "estla4081.corp",

@@ -73,6 +73,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -171,6 +174,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -269,6 +275,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -367,6 +376,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -465,6 +477,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -563,6 +578,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -661,6 +679,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -759,6 +780,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -857,6 +881,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -955,6 +982,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1053,6 +1083,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1151,6 +1184,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1249,6 +1285,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1347,6 +1386,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1445,6 +1487,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1543,6 +1588,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1641,6 +1689,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1739,6 +1790,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1837,6 +1891,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1935,6 +1992,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2033,6 +2093,9 @@
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.137.131",
@@ -2131,6 +2194,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2229,6 +2295,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2327,6 +2396,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2425,6 +2497,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2523,6 +2598,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2621,6 +2699,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2719,6 +2800,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2817,6 +2901,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2915,6 +3002,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3013,6 +3103,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3111,6 +3204,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3209,6 +3305,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3307,6 +3406,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3405,6 +3507,9 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3503,6 +3608,9 @@
         "panw.panos.threat.resource": "cdn.taboola.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -3604,6 +3712,9 @@
         "panw.panos.threat.resource": "rules.quantcount.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.192.7.152",
@@ -3705,6 +3816,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3806,6 +3920,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3907,6 +4024,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4008,6 +4128,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4109,6 +4232,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4210,6 +4336,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4311,6 +4440,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4412,6 +4544,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4513,6 +4648,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4614,6 +4752,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4715,6 +4856,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4816,6 +4960,9 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4917,6 +5064,9 @@
         "panw.panos.threat.resource": "www.googleadservices.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.98",
@@ -5015,6 +5165,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5113,6 +5266,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5211,6 +5367,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5309,6 +5468,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5407,6 +5569,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5505,6 +5670,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5603,6 +5771,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5701,6 +5872,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5799,6 +5973,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5897,6 +6074,9 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5998,6 +6178,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6099,6 +6282,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6200,6 +6386,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6301,6 +6490,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6402,6 +6594,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6503,6 +6698,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6604,6 +6802,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6705,6 +6906,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6806,6 +7010,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6907,6 +7114,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7008,6 +7218,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7109,6 +7322,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7210,6 +7426,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7311,6 +7530,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7412,6 +7634,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7513,6 +7738,9 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
