@@ -2,16 +2,15 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "app": {
-            "id": "ba41cfb8-8658-47d3-a021-2d1a6321aa42"
+            "id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
         },
         "container": {
-            "cpu.pct": 0.22287691157883535,
-            "disk.bytes": 224665600,
-            "disk.quota.bytes": 268435456,
-            "instance_index": 0,
-            "memory.bytes": 175937174,
-            "memory.quota.bytes": 536870912,
-            "timestamp": "2020-09-22T17:17:47.928768995+02:00"
+            "cpu.pct": 0.2808890817947714,
+            "disk.bytes": 10100736,
+            "disk.quota.bytes": 1073741824,
+            "instance_index": 3,
+            "memory.bytes": 14486732,
+            "memory.quota.bytes": 134217728
         },
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
@@ -22,7 +21,7 @@
         },
         "tags": {
             "product": "Pivotal Application Service",
-            "source_id": "ba41cfb8-8658-47d3-a021-2d1a6321aa42"
+            "source_id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
         },
         "type": "container"
     },

@@ -76,9 +76,6 @@ func TestEventTypeHttpAccess(t *testing.T) {
 	assert.Equal(t, common.MapStr{
 		"cloudfoundry": common.MapStr{
 			"type": "access",
-			"access": common.MapStr{
-				"timestamp": time.Unix(0, 1587469726082),
-			},
 			"envelope": common.MapStr{
 				"origin":     "origin",
 				"deployment": "deployment",
@@ -151,7 +148,6 @@ func TestEventTypeLog(t *testing.T) {
 		"cloudfoundry": common.MapStr{
 			"type": "log",
 			"log": common.MapStr{
-				"timestamp": time.Unix(0, 1587469726082),
 				"source": common.MapStr{
 					"instance": evt.SourceID(),
 					"type":     evt.SourceType(),
@@ -206,10 +202,9 @@ func TestEventCounter(t *testing.T) {
 		"cloudfoundry": common.MapStr{
 			"type": "counter",
 			"counter": common.MapStr{
-				"timestamp": time.Unix(0, 1587469726082),
-				"name":      "name",
-				"delta":     uint64(10),
-				"total":     uint64(999),
+				"name":  "name",
+				"delta": uint64(10),
+				"total": uint64(999),
 			},
 			"envelope": common.MapStr{
 				"origin":     "origin",
@@ -255,10 +250,9 @@ func TestEventValueMetric(t *testing.T) {
 		"cloudfoundry": common.MapStr{
 			"type": "value",
 			"value": common.MapStr{
-				"timestamp": time.Unix(0, 1587469726082),
-				"name":      "name",
-				"value":     10.1,
-				"unit":      "unit",
+				"name":  "name",
+				"value": 10.1,
+				"unit":  "unit",
 			},
 			"envelope": common.MapStr{
 				"origin":     "origin",
@@ -316,7 +310,6 @@ func TestEventContainerMetric(t *testing.T) {
 		"cloudfoundry": common.MapStr{
 			"type": "container",
 			"container": common.MapStr{
-				"timestamp":          time.Unix(0, 1587469726082),
 				"instance_index":     int32(1),
 				"cpu.pct":            0.2,
 				"memory.bytes":       uint64(1024),
@@ -371,8 +364,7 @@ func TestEventError(t *testing.T) {
 		"cloudfoundry": common.MapStr{
 			"type": "error",
 			"error": common.MapStr{
-				"timestamp": time.Unix(0, 1587469726082),
-				"source":    "source",
+				"source": "source",
 			},
 			"envelope": common.MapStr{
 				"origin":     "origin",

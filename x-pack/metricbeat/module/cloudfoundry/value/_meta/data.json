@@ -3,22 +3,19 @@
     "cloudfoundry": {
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
-            "ip": "192.168.16.31",
+            "index": "6f2f5d74-9375-4d82-870f-c09e6a74cf3a",
+            "ip": "192.168.16.46",
             "job": "diego_cell",
-            "origin": "rep"
+            "origin": "netmon"
         },
         "tags": {
-            "instance_id": "8895cf68-2e4f-4c50-9842-e73febd65c2d",
-            "product": "Pivotal Application Service",
-            "source_id": "rep"
+            "source_id": "netmon"
         },
         "type": "value",
         "value": {
-            "name": "memoryStats.numBytesAllocatedStack",
-            "timestamp": "2020-09-22T17:17:40.257407125+02:00",
-            "unit": "Bytes",
-            "value": 3899392
+            "name": "memoryStats.lastGCPauseTimeNS",
+            "unit": "count",
+            "value": 366021
         }
     },
     "service": {
