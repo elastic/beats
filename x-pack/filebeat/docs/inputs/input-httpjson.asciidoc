@@ -28,7 +28,7 @@ Example configurations:
   url: https://api.ipify.org/?format=json
   interval: 1m
   processors:
-    - decode_json_fields
+    - decode_json_fields:
         fields: [message]
         target: json
 ----
