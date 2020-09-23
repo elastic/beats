@@ -46,6 +46,10 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	cmd.Flags().Bool("no-restart", false, "Skip restarting the currently running daemon")
 
+	// used by install command
+	cmd.Flags().BoolP("from-install", "", false, "Set by install command to signal this was executed from install")
+	cmd.Flags().MarkHidden("from-install")
+
 	return cmd
 }
 
@@ -82,7 +86,11 @@ func buildEnrollmentFlags(cmd *cobra.Command) []string {
 }
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	warn.PrintNotGA(streams.Out)
+	fromInstall, _ := cmd.Flags().GetBool("from-install")
+	if !fromInstall {
+		warn.PrintNotGA(streams.Out)
+	}
+
 	pathConfigFile := flags.Config()
 	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
@@ -108,6 +116,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
+	if fromInstall {
+		force = true
+	}
 	if !force {
 		confirm, err := c.Confirm("This will replace your current settings. Do you want to continue?", true)
 		if err != nil {

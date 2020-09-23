@@ -132,7 +132,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	}
 
-	enrollArgs := []string{"enroll", kibana, token, "--force"}
+	enrollArgs := []string{"enroll", kibana, token, "--from-install"}
 	enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
 	enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
 	enrollCmd.Stdin = os.Stdin
