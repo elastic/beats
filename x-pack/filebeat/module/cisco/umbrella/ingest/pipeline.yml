@@ -1,0 +1,122 @@
+description: Pipeline for parsing cisco umbrella logs
+processors:
+- set:
+    field: observer.vendor
+    value: Cisco
+- set:
+    field: observer.product
+    value: Umbrella
+############
+# DNS Logs #
+############
+- csv:
+    field: message
+    target_fields:
+      - '@timestamp'
+      - policy_identity
+      - identities
+      - internal_ip
+      - external_ip
+      - action
+      - query_type
+      - response_code
+      - domain
+      - categories
+      - policy_identity_type
+      - identity_types
+      - blocked_categories
+    if: ctx?.file?.path.contains('dnslogs')
+- set:
+	  field: observer.type
+	  value: dns
+	  if: ctx?.file?.path.contains('dnslogs')
+
+###########
+# IP Logs #
+###########
+- csv:
+    field: message
+    target_fields:
+      - '@timestamp'
+      - identity
+      - source_ip
+      - source_port
+      - destination_ip
+      - destination_port
+      - categories
+    if: ctx?.file?.path.contains('iplogs')
+
+- set:
+    field: observer.type
+    value: firewall
+    if: ctx?.file?.path.contains('iplogs')
+
+##############
+# Proxy Logs #
+##############
+- csv:
+    field: message
+    target_fields:
+      - '@timestamp'
+      - identity
+      - internal_ip
+      - external_ip
+      - destination_ip
+      - content_type
+      - verdict
+      - url
+      - referer
+      - user_agent
+      - status_code
+      - request_size
+      - response_size
+      - response_body_size
+      - sha_sha256
+      - categories
+      - av_detections
+      - puas
+      - amp_disposition
+      - amp_malware_name
+      - amp_score
+      - identity_type
+      - blocked_categories
+    if: ctx?.file?.path.contains('proxylogs')
+- set:
+    field: observer.type
+    value: proxy
+    if: ctx?.file?.path.contains('proxylogs')
+
+#######################
+# Cloud Firewall Logs #
+#######################
+- csv:
+    field: message
+    target_fields:
+      - '@timestamp'
+      - origin_id
+      - identity
+      - identity_type
+      - direction
+      - ip_protocol
+      - packet_size
+      - source_ip
+      - source_port
+      - destination_ip
+      - destination_port
+      - datacenter
+      - ruleid
+      - verdict
+    if: ctx?.file?.path.contains('cloudfirewalllogs')
+- set:
+  field: observer.type
+  value: firewall
+  if: ctx?.file?.path.contains('cloudfirewalllogs')
+
+- remove:
+    field:
+    - checkpoint.client_outbound_packets
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

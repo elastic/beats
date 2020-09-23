@@ -1,0 +1,9 @@
+- name: cisco.umbrella
+  type: group
+  description: >
+    Fields for Cisco Umbrella.
+  fields:
+  - name: message_id
+    type: keyword
+    description: >
+      The Cisco ASA message identifier.
