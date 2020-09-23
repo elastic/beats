@@ -134,12 +134,13 @@ var (
 		"linux/arm64":    installLinuxARM64,
 		"linux/armv5":    installLinuxARMLE,
 		"linux/armv6":    installLinuxARMLE,
-		"linux/armv7":    installLinuxARMHF,
 		"linux/mips":     installLinuxMIPS,
 		"linux/mipsle":   installLinuxMIPSLE,
 		"linux/mips64le": installLinuxMIPS64LE,
 		"linux/ppc64le":  installLinuxPPC64LE,
 		"linux/s390x":    installLinuxS390X,
+
+		//"linux/armv7":    installLinuxARMHF,
 
 		//"linux/ppc64":  installLinuxPpc64,
 		//"linux/mips64": installLinuxMips64,
