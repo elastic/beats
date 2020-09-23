@@ -105,7 +105,7 @@ func (Dev) Build() {
 func (Dev) Package() {
 	dev := os.Getenv(devEnv)
 	defer os.Setenv(devEnv, dev)
-)
+
 	os.Setenv(devEnv, "true")
 	devtools.DevBuild = true
 	Package()
