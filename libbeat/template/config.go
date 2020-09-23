@@ -17,7 +17,27 @@
 
 package template
 
-import "github.com/elastic/beats/v7/libbeat/mapping"
+import (
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/mapping"
+)
+
+const (
+	TemplateLegacy TemplateType = iota
+	TemplateComponent
+	TemplateIndex
+)
+
+var (
+	templateTypes = map[string]TemplateType{
+		"legacy":    TemplateLegacy,
+		"component": TemplateComponent,
+		"index":     TemplateIndex,
+	}
+)
+
+type TemplateType uint8
 
 // TemplateConfig holds config information about the Elasticsearch template
 type TemplateConfig struct {
@@ -34,6 +54,8 @@ type TemplateConfig struct {
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
 	Order        int              `config:"order"`
+	Priority     int              `config:"priority"`
+	Type         TemplateType     `config:"type"`
 }
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
@@ -45,8 +67,26 @@ type TemplateSettings struct {
 // DefaultConfig for index template
 func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
-		Enabled: true,
-		Fields:  "",
-		Order:   1,
+		Enabled:  true,
+		Fields:   "",
+		Type:     TemplateLegacy,
+		Order:    1,
+		Priority: 150,
 	}
+}
+
+func (t *TemplateType) Unpack(v string) error {
+	if v == "" {
+		*t = TemplateLegacy
+		return nil
+	}
+
+	var tt TemplateType
+	var ok bool
+	if tt, ok = templateTypes[v]; !ok {
+		return fmt.Errorf("unknown index template type: %s", v)
+	}
+	*t = tt
+
+	return nil
 }

@@ -46,14 +46,16 @@ var (
 // Template holds information for the ES template.
 type Template struct {
 	sync.Mutex
-	name        string
-	pattern     string
-	beatVersion common.Version
-	beatName    string
-	esVersion   common.Version
-	config      TemplateConfig
-	migration   bool
-	order       int
+	name         string
+	pattern      string
+	beatVersion  common.Version
+	beatName     string
+	esVersion    common.Version
+	config       TemplateConfig
+	migration    bool
+	templateType TemplateType
+	order        int
+	priority     int
 }
 
 // New creates a new template instance
@@ -131,6 +133,7 @@ func New(
 		config:      config,
 		migration:   migration,
 		order:       config.Order,
+		priority:    config.Priority,
 	}, nil
 }
 
@@ -187,7 +190,6 @@ func (t *Template) LoadMinimal() (common.MapStr, error) {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	m := common.MapStr{
 		keyPattern: patterns,
-		"order":    t.order,
 		"settings": common.MapStr{
 			"index": t.config.Settings.Index,
 		},
@@ -197,6 +199,12 @@ func (t *Template) LoadMinimal() (common.MapStr, error) {
 			t.beatVersion, t.esVersion, t.beatName,
 			nil, nil,
 			common.MapStr(t.config.Settings.Source))
+	}
+
+	if t.templateType == TemplateLegacy {
+		m["order"] = t.order
+	} else if t.templateType == TemplateIndex {
+		m["priority"] = t.priority
 	}
 	return m, nil
 }
@@ -215,9 +223,8 @@ func (t *Template) GetPattern() string {
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	return common.MapStr{
+	tmpl := common.MapStr{
 		keyPattern: patterns,
-		"order":    t.order,
 		"mappings": buildMappings(
 			t.beatVersion, t.esVersion, t.beatName,
 			properties,
@@ -230,6 +237,12 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
+	if t.templateType == TemplateLegacy {
+		tmpl["order"] = t.order
+	} else if t.templateType == TemplateIndex {
+		tmpl["priority"] = t.priority
+	}
+	return tmpl
 }
 
 func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {
