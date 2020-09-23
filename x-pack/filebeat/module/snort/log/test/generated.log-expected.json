@@ -12,6 +12,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "quid2184.invalid"
+        ],
         "related.ip": [
             "10.202.72.124"
         ],
@@ -54,6 +57,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "uptatev4292.www.invalid"
+        ],
         "related.ip": [
             "10.212.11.114",
             "10.38.77.13"
@@ -100,6 +106,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tlabo6088.www.localdomain"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "itecto",
         "rsa.misc.result": "failure",
@@ -127,6 +136,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "eporroqu4200.domain"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "suntinc",
         "rsa.misc.result": "success",
@@ -153,6 +165,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "conseq557.mail.lan"
+        ],
         "related.user": [
             "aaliquaU"
         ],
@@ -193,9 +208,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "itame189.domain"
+        ],
         "related.ip": [
-            "10.182.199.231",
-            "10.24.67.250"
+            "10.24.67.250",
+            "10.182.199.231"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "oei",
@@ -238,6 +256,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "vitaedi1318.corp"
+        ],
         "related.user": [
             "temqu"
         ],
@@ -268,6 +289,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "itatione1916.www.host"
+        ],
         "related.user": [
             "oluptate"
         ],
@@ -306,9 +330,12 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.4418",
+        "related.hosts": [
+            "its7829.localhost"
+        ],
         "related.ip": [
-            "10.110.31.190",
-            "10.157.18.252"
+            "10.157.18.252",
+            "10.110.31.190"
         ],
         "rsa.crypto.sig_type": "rQu",
         "rsa.internal.messageid": "5979",
@@ -351,6 +378,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "aec3673.internal.host"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "niamq",
         "rsa.misc.result": "failure",
@@ -378,6 +408,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "inibu2292.www.invalid"
+        ],
         "related.user": [
             "isetquas"
         ],
@@ -412,6 +445,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ori1241.www.corp"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "ercit",
         "rsa.misc.result": "failure",
@@ -438,6 +474,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ueipsa748.localdomain"
+        ],
         "related.user": [
             "aparia"
         ],
@@ -470,6 +509,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "oluptat548.www5.invalid"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "dolorem",
         "rsa.misc.result": "failure",
@@ -496,6 +538,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "loremag6816.www5.lan"
+        ],
         "related.user": [
             "inrepreh"
         ],
@@ -528,6 +573,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tionemu5269.internal.localhost"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "occaec",
         "rsa.misc.result": "failure",
@@ -554,6 +602,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "onulamco7734.www.local"
+        ],
         "related.user": [
             "uptat"
         ],
@@ -586,6 +637,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "luptatem3834.lan"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "tise",
@@ -618,6 +672,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "exercita2068.api.invalid"
+        ],
         "related.ip": [
             "10.169.84.140"
         ],
@@ -651,6 +708,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "orumS757.www5.corp"
+        ],
         "related.ip": [
             "10.130.231.129"
         ],
@@ -685,6 +745,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "sedquian4212.www5.domain"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "eca",
@@ -718,6 +781,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "oinBCSed3444.api.local"
+        ],
         "related.user": [
             "smodtem"
         ],
@@ -756,6 +822,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.6724",
+        "related.hosts": [
+            "apari5002.api.test"
+        ],
         "related.ip": [
             "10.9.200.197",
             "10.182.213.195"
@@ -810,9 +879,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tper4341.lan"
+        ],
         "related.ip": [
-            "10.210.180.142",
-            "10.111.33.70"
+            "10.111.33.70",
+            "10.210.180.142"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "animi",
@@ -856,6 +928,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "antiu3533.internal.domain"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "lapari",
         "rsa.misc.result": "success",
@@ -884,6 +959,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "cidu921.internal.lan"
+        ],
         "related.ip": [
             "10.222.183.123",
             "10.165.33.19"
@@ -924,9 +1002,12 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.890",
+        "related.hosts": [
+            "unturmag6190.api.lan"
+        ],
         "related.ip": [
-            "10.238.223.171",
-            "10.52.190.18"
+            "10.52.190.18",
+            "10.238.223.171"
         ],
         "rsa.crypto.sig_type": "Finibus",
         "rsa.internal.messageid": "16539",
@@ -974,6 +1055,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.3902",
+        "related.hosts": [
+            "conseq6079.www.corp"
+        ],
         "related.ip": [
             "10.68.233.163",
             "10.160.178.109"
@@ -1018,6 +1102,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tvol3402.www.local"
+        ],
         "related.ip": [
             "10.162.109.83"
         ],
@@ -1050,6 +1137,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "xcep3783.internal.localhost"
+        ],
         "related.user": [
             "serro"
         ],
@@ -1081,6 +1171,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ciatisun7378.www5.invalid"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "riaturEx",
         "rsa.misc.result": "unknown",
@@ -1112,9 +1205,12 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.6627",
+        "related.hosts": [
+            "iqu4858.mail.invalid"
+        ],
         "related.ip": [
-            "10.116.175.84",
-            "10.213.100.153"
+            "10.213.100.153",
+            "10.116.175.84"
         ],
         "rsa.crypto.sig_type": "exercit",
         "rsa.internal.messageid": "11634",
@@ -1156,6 +1252,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ionu3320.api.localhost"
+        ],
         "related.user": [
             "estq"
         ],
@@ -1186,6 +1285,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ollitan5079.www.lan"
+        ],
         "related.user": [
             "deriti"
         ],
@@ -1218,6 +1320,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "nihilmol1849.api.local"
+        ],
         "rsa.counters.dclass_c1_str": "Number of Files",
         "rsa.internal.messageid": "connection_events",
         "rsa.misc.action": [
@@ -1247,6 +1352,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ota4562.local"
+        ],
         "related.user": [
             "epteurs"
         ],
@@ -1278,6 +1386,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "gnama5033.www5.home"
+        ],
         "related.user": [
             "ction"
         ],
@@ -1309,6 +1420,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "sum6106.www.home"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "doe",
         "rsa.misc.result": "failure",
@@ -1335,6 +1449,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "squa2763.www.lan"
+        ],
         "related.user": [
             "trude"
         ],
@@ -1375,9 +1492,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "stiae3403.internal.localhost"
+        ],
         "related.ip": [
-            "10.240.144.78",
-            "10.251.159.118"
+            "10.251.159.118",
+            "10.240.144.78"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "ostrudex",
@@ -1421,6 +1541,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "setq5996.corp"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "odi",
         "rsa.misc.result": "success",
@@ -1448,6 +1571,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "quiano3025.api.localhost"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "sequatD",
         "rsa.misc.result": "unknown",
@@ -1475,6 +1601,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "qui7797.www.host"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "umet",
         "rsa.misc.result": "failure",
@@ -1510,6 +1639,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "urau1660.www.lan"
+        ],
         "related.ip": [
             "10.201.132.114",
             "10.140.209.249"
@@ -1555,6 +1687,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "edutpers3482.www5.corp"
+        ],
         "related.user": [
             "mnisis"
         ],
@@ -1592,6 +1727,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.2633",
+        "related.hosts": [
+            "nofde7732.internal.test"
+        ],
         "related.ip": [
             "10.198.44.231",
             "10.36.122.169"
@@ -1644,9 +1782,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "evita850.localdomain"
+        ],
         "related.ip": [
-            "10.144.162.122",
-            "10.77.86.215"
+            "10.77.86.215",
+            "10.144.162.122"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "eav",
@@ -1689,6 +1830,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "aturau3002.api.corp"
+        ],
         "related.user": [
             "sci"
         ],
@@ -1720,6 +1864,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ntiumt238.internal.corp"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "odite",
@@ -1753,6 +1900,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "atu2951.test"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "pitlab",
         "rsa.misc.result": "success",
@@ -1779,6 +1929,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "uipe5295.api.localhost"
+        ],
         "related.user": [
             "mwrit"
         ],
@@ -1810,6 +1963,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tatiset5041.www5.local"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "Utenim",
@@ -1842,6 +1998,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "esse2198.mail.example"
+        ],
         "related.user": [
             "uaturvel"
         ],
@@ -1873,6 +2032,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "pitlab5165.localdomain"
+        ],
         "related.ip": [
             "10.17.172.91"
         ],
@@ -1906,6 +2068,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "uinesci6041.api.local"
+        ],
         "related.user": [
             "pers"
         ],
@@ -1944,6 +2109,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.2115",
+        "related.hosts": [
+            "uovol2459.www5.invalid"
+        ],
         "related.ip": [
             "10.60.137.215",
             "10.28.105.106"
@@ -1988,6 +2156,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ptate7215.www5.home"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "ssequa",
         "rsa.misc.result": "failure",
@@ -2015,6 +2186,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "metc7395.lan"
+        ],
         "rsa.counters.dclass_c1_str": "Number of Files",
         "rsa.internal.messageid": "connection_events",
         "rsa.misc.action": [
@@ -2051,11 +2225,14 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "Loremips5368.www5.corp"
+        ],
         "related.ip": [
-            "10.20.167.114",
             "10.49.190.163",
             "10.166.40.137",
-            "10.65.144.119"
+            "10.65.144.119",
+            "10.20.167.114"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -2095,9 +2272,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "mexer1548.www5.example"
+        ],
         "related.ip": [
-            "10.162.128.87",
-            "10.104.78.147"
+            "10.104.78.147",
+            "10.162.128.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emu",
@@ -2132,6 +2312,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "emulla6625.www5.corp"
+        ],
         "related.ip": [
             "10.237.43.87",
             "10.82.180.46"
@@ -2174,6 +2357,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.4189",
+        "related.hosts": [
+            "magn3657.api.invalid"
+        ],
         "related.ip": [
             "10.180.28.156",
             "10.234.234.205"
@@ -2221,6 +2407,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "nis3942.mail.example"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "architec",
         "rsa.misc.result": "success",
@@ -2256,9 +2445,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "upta788.invalid"
+        ],
         "related.ip": [
-            "10.40.250.209",
-            "10.166.10.187"
+            "10.166.10.187",
+            "10.40.250.209"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2302,6 +2494,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "consequu3962.api.localdomain"
+        ],
         "rsa.counters.dclass_c1_str": "Number of Files",
         "rsa.internal.messageid": "connection_events",
         "rsa.misc.action": [
@@ -2333,9 +2528,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ita7851.localhost"
+        ],
         "related.ip": [
-            "10.198.202.72",
-            "10.78.180.219"
+            "10.78.180.219",
+            "10.198.202.72"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "equaturv",
@@ -2376,6 +2574,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.2390",
+        "related.hosts": [
+            "laparia5374.api.domain"
+        ],
         "related.ip": [
             "10.147.155.100",
             "10.232.67.182"
@@ -2427,9 +2628,12 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.1034",
+        "related.hosts": [
+            "onse3711.api.domain"
+        ],
         "related.ip": [
-            "10.95.152.78",
-            "10.4.147.70"
+            "10.4.147.70",
+            "10.95.152.78"
         ],
         "rsa.crypto.sig_type": "cid",
         "rsa.internal.messageid": "9193",
@@ -2472,6 +2676,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "iac7016.api.lan"
+        ],
         "related.user": [
             "antiu"
         ],
@@ -2502,6 +2709,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tte4006.www5.test"
+        ],
         "related.user": [
             "lors"
         ],
@@ -2534,6 +2744,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "equatD1241.www5.host"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "econs",
@@ -2568,6 +2781,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "essequ121.localdomain"
+        ],
         "related.ip": [
             "10.216.14.36",
             "10.224.250.83"
@@ -2608,6 +2824,9 @@
         "observer.type": "IDS",
         "observer.vendor": "Snort",
         "observer.version": "1.6298",
+        "related.hosts": [
+            "borios1685.www.localhost"
+        ],
         "related.ip": [
             "10.231.10.63",
             "10.38.22.60"
@@ -2663,9 +2882,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "Bonoru5658.mail.invalid"
+        ],
         "related.ip": [
-            "10.46.57.181",
-            "10.29.231.11"
+            "10.29.231.11",
+            "10.46.57.181"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "remape",
@@ -2708,6 +2930,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ueipsa6797.mail.home"
+        ],
         "related.user": [
             "agnaal"
         ],
@@ -2738,6 +2963,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "iono5161.www5.localhost"
+        ],
         "related.user": [
             "ita"
         ],
@@ -2770,6 +2998,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "untut3537.domain"
+        ],
         "rsa.counters.dclass_c1_str": "Number of Files",
         "rsa.internal.messageid": "connection_events",
         "rsa.misc.action": [
@@ -2808,6 +3039,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "reetd7201.invalid"
+        ],
         "related.ip": [
             "10.135.250.25",
             "10.107.144.80"
@@ -2854,6 +3088,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "tnula4380.mail.test"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "olupta",
         "rsa.misc.result": "failure",
@@ -2880,6 +3117,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "apar2567.www.localhost"
+        ],
         "related.user": [
             "iscing"
         ],
@@ -2916,6 +3156,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "onsecte5119.www.invalid"
+        ],
         "related.ip": [
             "10.198.207.31",
             "10.5.88.183"
@@ -2952,6 +3195,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "iutali3143.host"
+        ],
         "related.user": [
             "ect"
         ],
@@ -2983,6 +3229,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "orro7466.www5.lan"
+        ],
         "related.user": [
             "issu"
         ],
@@ -3013,6 +3262,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "epre7710.www.domain"
+        ],
         "related.user": [
             "aria"
         ],
@@ -3044,6 +3296,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "nsequatu2799.www5.invalid"
+        ],
         "related.user": [
             "mape"
         ],
@@ -3076,6 +3331,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "scingel1634.api.home"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "meaq",
@@ -3109,6 +3367,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "inBCSe364.www.corp"
+        ],
         "rsa.counters.dclass_c1_str": " The number of intrusion events",
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-tsedquia",
@@ -3150,9 +3411,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "onofdeFi1149.www5.domain"
+        ],
         "related.ip": [
-            "10.154.87.98",
-            "10.186.68.87"
+            "10.186.68.87",
+            "10.154.87.98"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uptate",
@@ -3204,6 +3468,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "lumdol5252.internal.test"
+        ],
         "related.ip": [
             "10.35.59.140",
             "10.67.211.63"
@@ -3250,6 +3517,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "quianonn2762.api.localhost"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "eeufugia",
         "rsa.misc.result": "unknown",
@@ -3276,6 +3546,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "atn2219.api.invalid"
+        ],
         "related.user": [
             "radip"
         ],
@@ -3308,6 +3581,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "equu1159.internal.localhost"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "atcup",
         "rsa.misc.result": "failure",
@@ -3335,6 +3611,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "urQuisau2442.mail.invalid"
+        ],
         "related.user": [
             "uptate"
         ],
@@ -3370,9 +3649,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "cididu3187.home"
+        ],
         "related.ip": [
-            "10.179.27.185",
-            "10.14.46.141"
+            "10.14.46.141",
+            "10.179.27.185"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "llumdolo",
@@ -3406,6 +3688,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "aliqua4025.www.localdomain"
+        ],
         "related.user": [
             "deFinibu"
         ],
@@ -3439,6 +3724,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "citati1297.api.domain"
+        ],
         "related.user": [
             "emp"
         ],
@@ -3471,6 +3759,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "nreprehe2138.www5.domain"
+        ],
         "rsa.internal.messageid": "HMNOTIFY",
         "rsa.misc.event_type": "eursi",
         "rsa.misc.result": "success",
@@ -3498,6 +3789,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "idolore6589.api.localdomain"
+        ],
         "related.user": [
             "ctobea"
         ],
@@ -3538,6 +3832,9 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "erunt3957.internal.lan"
+        ],
         "related.ip": [
             "10.118.103.185",
             "10.32.195.34",
@@ -3582,9 +3879,12 @@
         "observer.product": "IDS",
         "observer.type": "IDS",
         "observer.vendor": "Snort",
+        "related.hosts": [
+            "ntNe7144.api.lan"
+        ],
         "related.ip": [
-            "10.188.88.133",
-            "10.111.130.177"
+            "10.111.130.177",
+            "10.188.88.133"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "numqu",
