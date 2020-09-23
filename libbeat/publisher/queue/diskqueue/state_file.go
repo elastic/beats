@@ -81,21 +81,13 @@ func writeQueuePositionToHandle(
 		return err
 	}
 
-	var version uint32 = 0
-	err = binary.Write(file, binary.LittleEndian, &version)
-	if err != nil {
-		return err
+	// Want to write: version (0), segment id, segment offset.
+	elems := []interface{}{uint32(0), position.segmentID, position.offset}
+	for _, elem := range elems {
+		err = binary.Write(file, binary.LittleEndian, &elem)
+		if err != nil {
+			return err
+		}
 	}
-
-	err = binary.Write(file, binary.LittleEndian, &position.segmentID)
-	if err != nil {
-		return err
-	}
-
-	err = binary.Write(file, binary.LittleEndian, &position.offset)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
