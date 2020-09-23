@@ -28,7 +28,6 @@ import (
 
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
-	g := remoteWriteEventGenerator{}
 
 	timestamp := model.Time(424242)
 	timestamp1 := model.Time(424243)
@@ -55,7 +54,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 			Timestamp: timestamp1,
 		},
 	}
-	events := g.GenerateEvents(metrics)
+	events := samplesToEvents(metrics)
 
 	expected := common.MapStr{
 		"metrics": common.MapStr{
