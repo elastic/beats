@@ -25,7 +25,8 @@ import groovy.transform.Field
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
-    BASE_DIR = 'src/github.com/elastic/beats'
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
     TERRAFORM_VERSION = "0.12.24"
@@ -788,7 +789,7 @@ pipeline {
   }
   post {
     always {
-      runbld()
+      runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
       notifyBuildResult(prComment: true)
@@ -938,7 +939,7 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: env.STAGE_NAME)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
@@ -1391,37 +1392,4 @@ def setGitConfig(){
 
 def isDockerInstalled(){
   return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
-}
-
-def junitAndStore(Map params = [:]){
-  junit(params)
-  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
-  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
-  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
-  stashedTestReports[stageName] = stageName
-}
-
-def runbld() {
-  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
-    if (stashedTestReports) {
-      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
-      deleteDir()
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      dir("${env.BASE_DIR}") {
-        // Unstash the test reports
-        stashedTestReports.each { k, v ->
-          dir(k) {
-            unstash(v)
-          }
-        }
-      }
-      sh(label: 'Process JUnit reports with runbld',
-        script: """\
-        cat >./runbld-script <<EOF
-        echo "Processing JUnit reports with runbld..."
-        EOF
-        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
-        """.stripIndent())  // stripIdent() requires '''/
-    }
-  }
 }
