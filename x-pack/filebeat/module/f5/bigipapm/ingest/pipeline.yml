@@ -57,7 +57,7 @@ processors:
         field: related.hosts
         value: '{{rsa.web.fqdn}}'
         allow_duplicates: false
-        if: ctx?.rsa?.web?.fqdn != null
+        if: ctx?.rsa?.web?.fqdn != null && ctx.rsa?.web?.fqdn != ''
 on_failure:
   - append:
         field: error.message

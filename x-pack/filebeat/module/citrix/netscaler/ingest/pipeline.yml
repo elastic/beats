@@ -57,7 +57,7 @@ processors:
         field: related.hosts
         value: '{{server.domain}}'
         allow_duplicates: false
-        if: ctx?.server?.domain != null
+        if: ctx?.server?.domain != null && ctx.server?.domain != ''
 on_failure:
   - append:
         field: error.message

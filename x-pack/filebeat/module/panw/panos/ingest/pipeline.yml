@@ -475,7 +475,7 @@ processors:
  - append:
      field: related.hosts
      value: "{{observer.hostname}}"
-     if: "ctx?.observer?.hostname != null"
+     if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
      allow_duplicates: false
 
 # Remove temporary fields.

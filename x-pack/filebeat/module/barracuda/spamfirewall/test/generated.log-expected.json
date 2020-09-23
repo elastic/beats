@@ -346,9 +346,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.206.159.177"
         ],
@@ -1148,9 +1145,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.153.108.27"
         ],
@@ -1626,9 +1620,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.153.152.219"
         ],
@@ -1833,9 +1824,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.103.69.44"
         ],
@@ -1919,9 +1907,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.145.193.93"
         ],
@@ -2034,9 +2019,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.141.225.182"
         ],
@@ -2718,9 +2700,6 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
-        "related.hosts": [
-            ""
-        ],
         "related.ip": [
             "10.157.196.101"
         ],
@@ -3176,8 +3155,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.178.30.158",
-            "10.1.6.115"
+            "10.1.6.115",
+            "10.178.30.158"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,
