@@ -27,6 +27,8 @@ pipeline {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    // enable packaging for branches on a daily basis
+    cron((isPR() || env.TAG_NAME?.trim()) ? '' : 'H 5 * * 1-5')
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
@@ -39,6 +41,7 @@ pipeline {
         beforeAgent true
         anyOf {
           triggeredBy cause: "IssueCommentCause"
+          triggeredBy 'TimerTrigger'
           expression {
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
