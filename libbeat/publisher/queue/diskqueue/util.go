@@ -65,8 +65,8 @@ func writeErrorIsRetriable(err error) bool {
 // This helper is specifically for working with the writer loop, which needs
 // to be able to retry forever at configurable intervals, but also cancel
 // immediately if the queue is closed.
-// This writer is unbuffered. In particular, it is safe to modify
-// "wrapped" in-place as long as it isn't captured by the callback.
+// This writer is unbuffered. In particular, it is safe to modify the
+// "wrapped" field in-place as long as it isn't captured by the callback.
 type callbackRetryWriter struct {
 	wrapped io.Writer
 	retry   func(error) bool

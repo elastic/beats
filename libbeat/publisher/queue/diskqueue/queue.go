@@ -98,7 +98,7 @@ func queueFactory(
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("Disk queue couldn't load user config: %w", err)
+		return nil, fmt.Errorf("disk queue couldn't load user config: %w", err)
 	}
 	settings.WriteToDiskListener = ackListener
 	return NewQueue(logger, settings)
@@ -114,7 +114,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	if settings.MaxBufferSize > 0 &&
 		settings.MaxBufferSize < settings.MaxSegmentSize*2 {
 		return nil, fmt.Errorf(
-			"Disk queue buffer size (%v) must be at least "+
+			"disk queue buffer size (%v) must be at least "+
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
@@ -122,7 +122,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
+		return nil, fmt.Errorf("couldn't create disk queue directory: %w", err)
 	}
 
 	// Load the previous queue position, if any.
@@ -141,7 +141,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		// and could also prevent us from creating new ones, so we treat this as a
 		// fatal error on startup rather than quietly providing degraded
 		// performance.
-		return nil, fmt.Errorf("Couldn't write to state file: %v", err)
+		return nil, fmt.Errorf("couldn't write to state file: %v", err)
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
