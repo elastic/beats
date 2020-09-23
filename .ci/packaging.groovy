@@ -217,9 +217,9 @@ def runE2ETestForPackages(){
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
     if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
-      suite = 'all'
+      suite = ''
     } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
-      suite = 'all'
+      suite = ''
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
       suite = 'ingest-manager'
     } else {
@@ -253,7 +253,7 @@ def triggerE2ETests(String suite) {
       booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
       string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
       string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
-      string(name: 'runTestsSuite', value: suite),
+      string(name: 'runTestsSuites', value: suite),
       string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
       string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
       string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
