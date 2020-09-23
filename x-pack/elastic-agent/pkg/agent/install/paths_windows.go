@@ -14,9 +14,7 @@ const (
 	InstallPath = `C:\Program Files\Elastic\Agent`
 
 	// SocketPath is the socket path used when installed.
-	//
-	// `\\.\pipe\elastic-agent-%x`, sha256.Sum256([]byte(`C:\Program Files\Elastic\Agent\elastic-agent.exe`))
-	SocketPath = `\\.\pipe\elastic-agent-56c56575c1f574fe48db8f56ac6db1cbcd78996a355bd2b44c71ebedd9c9a15b`
+	SocketPath = `\\.\pipe\elastic-agent-system`
 
 	// ServiceName is the service name when installed.
 	ServiceName = "Elastic Agent"
