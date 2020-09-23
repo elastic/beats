@@ -53,6 +53,16 @@ processors:
         field: destination.as.organization_name
         target_field: destination.as.organization.name
         ignore_missing: true
+  - append:
+        field: related.hosts
+        value: '{{host.name}}'
+        if: ctx.host?.name != null  && ctx.host?.name != ''
+        allow_duplicates: false
+  - append:
+        field: related.hosts
+        value: '{{host.hostname}}'
+        if: ctx.host?.hostname != null && ctx.host?.hostname != ''
+        allow_duplicates: false
 on_failure:
   - append:
         field: error.message
