@@ -21,6 +21,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
             "209.73.177.115",
             "10.105.21.199"
@@ -82,9 +85,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -145,6 +151,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "207.58.145.61"
@@ -196,6 +205,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -208,8 +220,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -246,6 +258,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google-analytics.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -307,6 +322,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "207.58.145.61"
@@ -320,8 +338,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -367,9 +385,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google-analytics.com"
+        ],
         "related.ip": [
-            "66.102.9.147",
-            "10.105.21.199"
+            "10.105.21.199",
+            "66.102.9.147"
         ],
         "related.user": [
             "badeyek"
@@ -380,8 +401,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -430,6 +451,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "207.58.145.61",
             "10.105.21.199"
@@ -443,8 +467,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -493,9 +517,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -556,6 +583,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "207.58.145.61",
             "10.105.21.199"
@@ -569,8 +599,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -607,6 +637,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -619,8 +652,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -669,6 +702,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "as.casalemedia.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "209.85.16.38"
@@ -682,8 +718,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -726,6 +762,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.bc.yahoo.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "68.142.213.132"
@@ -738,8 +777,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -785,9 +824,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "impgb.tradedoubler.com"
+        ],
         "related.ip": [
-            "217.212.240.172",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.212.240.172"
         ],
         "related.user": [
             "badeyek"
@@ -798,8 +840,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -848,9 +890,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "4.adbrite.com"
+        ],
         "related.ip": [
-            "206.169.136.22",
-            "10.105.21.199"
+            "10.105.21.199",
+            "206.169.136.22"
         ],
         "related.user": [
             "badeyek"
@@ -861,8 +906,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -899,6 +944,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -911,8 +959,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -961,9 +1009,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -974,8 +1025,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1024,9 +1075,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1037,8 +1091,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1082,9 +1136,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "4.adbrite.com"
+        ],
         "related.ip": [
-            "64.127.126.178",
-            "10.105.21.199"
+            "10.105.21.199",
+            "64.127.126.178"
         ],
         "related.user": [
             "badeyek"
@@ -1145,6 +1202,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "ff.connextra.com"
+        ],
         "related.ip": [
             "213.160.98.161",
             "10.105.21.199"
@@ -1208,6 +1268,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "dd.connextra.com"
+        ],
         "related.ip": [
             "213.160.98.160",
             "10.105.21.199"
@@ -1258,6 +1321,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1270,8 +1336,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1316,9 +1382,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "209.73.177.115"
+            "209.73.177.115",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1328,8 +1397,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1366,6 +1435,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "update.messenger.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -1378,8 +1450,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1424,6 +1496,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
@@ -1436,8 +1511,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1485,9 +1560,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1498,8 +1576,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1548,6 +1626,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218",
             "204.13.51.238"
@@ -1561,8 +1642,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -1607,6 +1688,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "216.155.194.239"
@@ -1657,6 +1741,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "rms.adobe.com"
+        ],
         "related.ip": [
             "10.105.37.58"
         ],
@@ -1669,8 +1756,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1707,6 +1794,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "images.hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1757,6 +1847,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "images.hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1769,8 +1862,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -1818,9 +1911,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
-            "10.105.47.218",
-            "204.13.51.238"
+            "204.13.51.238",
+            "10.105.47.218"
         ],
         "related.user": [
             "nazsoau"
@@ -1881,9 +1977,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1894,8 +1993,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -1940,6 +2039,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
@@ -1952,8 +2054,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1996,9 +2098,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2056,6 +2161,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -2069,8 +2177,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2115,6 +2223,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
@@ -2127,8 +2238,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2172,9 +2283,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "address.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "209.191.93.51"
+            "209.191.93.51",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2235,6 +2349,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "fxfeeds.mozilla.org"
+        ],
         "related.ip": [
             "63.245.209.21",
             "10.105.21.199"
@@ -2294,9 +2411,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.231.252"
+            "68.142.231.252",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2307,8 +2427,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -2351,9 +2471,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.194.14"
+            "68.142.194.14",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2401,6 +2524,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2412,8 +2538,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2450,6 +2576,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2499,6 +2628,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2547,6 +2679,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2558,8 +2693,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2605,9 +2740,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2618,8 +2756,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -2655,6 +2793,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2666,8 +2807,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2713,9 +2854,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2726,8 +2870,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -2772,9 +2916,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2831,6 +2978,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -2891,6 +3041,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -2942,6 +3095,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -2953,8 +3109,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2991,6 +3147,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -3049,6 +3208,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -3109,6 +3271,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -3169,9 +3334,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3229,9 +3397,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3280,6 +3451,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3330,6 +3504,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3342,8 +3519,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3380,6 +3557,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.i1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3392,8 +3572,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3439,9 +3619,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "newsrss.bbc.co.uk"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "212.58.226.33"
+            "212.58.226.33",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -3452,8 +3635,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_MISS",
-            "GET"
+            "GET",
+            "TCP_REFRESH_MISS"
         ],
         "rsa.misc.content_type": "application/xml",
         "rsa.misc.result_code": "200",
@@ -3499,6 +3682,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
             "68.142.231.252",
             "10.105.33.214"
@@ -3550,6 +3736,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.ent1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3600,6 +3789,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3612,8 +3804,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3659,6 +3851,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -3721,9 +3916,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3734,8 +3932,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3781,9 +3979,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.music.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3841,6 +4042,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.music.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -3901,9 +4105,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3914,8 +4121,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -3952,6 +4159,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "natrocket.kmip.net"
+        ],
         "related.ip": [
             "10.105.37.65"
         ],
@@ -3964,8 +4174,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -4002,6 +4212,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "natrocket.kmip.net"
+        ],
         "related.ip": [
             "10.105.37.65"
         ],
@@ -4064,9 +4277,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4124,6 +4340,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -4137,8 +4356,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4184,9 +4403,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4247,9 +4469,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.a2.yimg.com"
+        ],
         "related.ip": [
-            "213.160.98.152",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.152"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4260,8 +4485,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-shockwave-flash",
         "rsa.misc.result_code": "200",
@@ -4307,9 +4532,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4365,6 +4593,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.bc.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.213.132"
@@ -4423,9 +4654,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4480,9 +4714,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "pclick.internal.yahoo.com"
+        ],
         "related.ip": [
-            "216.109.124.55",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.109.124.55"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4530,6 +4767,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -4592,6 +4832,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.159"
@@ -4605,8 +4848,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -4655,6 +4898,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.159"
@@ -4668,8 +4914,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4714,6 +4960,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
             "209.73.177.115",
             "10.105.21.199"
@@ -4726,8 +4975,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -4776,9 +5025,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
-            "213.160.98.167",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.167"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4839,9 +5091,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4852,8 +5107,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4890,6 +5145,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -4902,8 +5160,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4952,9 +5210,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
-            "213.160.98.167",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.167"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5015,6 +5276,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "213.160.98.159",
             "10.105.33.214"
@@ -5078,6 +5342,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.167"
@@ -5091,8 +5358,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5129,6 +5396,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google.com"
+        ],
         "related.ip": [
             "10.105.37.180"
         ],
@@ -5179,6 +5449,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -5191,8 +5464,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5236,9 +5509,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "launch.adserver.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "216.109.125.112"
+            "216.109.125.112",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5249,8 +5525,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5296,6 +5572,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "uk.f250.mail.yahoo.com"
+        ],
         "related.ip": [
             "217.12.10.96",
             "10.105.21.199"
@@ -5346,6 +5625,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.live.com"
+        ],
         "related.ip": [
             "10.105.37.180"
         ],
@@ -5407,9 +5689,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "213.160.98.169"
+            "213.160.98.169",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -5458,6 +5743,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js1.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5520,6 +5808,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "213.160.98.169"
@@ -5533,8 +5824,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -5571,6 +5862,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js1.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5621,6 +5915,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5671,6 +5968,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.i1.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],

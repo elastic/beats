@@ -19,6 +19,9 @@
         "log.offset": 0,
         "process.name": "sshd",
         "process.pid": 3402,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "10.0.2.2"
         ],
@@ -53,6 +56,9 @@
         "log.offset": 152,
         "process.name": "sshd",
         "process.pid": 7483,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "192.168.33.1"
         ],
@@ -86,6 +92,9 @@
         "log.offset": 254,
         "process.name": "sshd",
         "process.pid": 3430,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "10.0.2.2"
         ],
@@ -117,6 +126,9 @@
         "log.offset": 324,
         "process.name": "sshd",
         "process.pid": 5774,
+        "related.hosts": [
+            "slave22"
+        ],
         "related.ip": [
             "116.31.116.24"
         ],
@@ -148,6 +160,9 @@
         "input.type": "log",
         "log.offset": 420,
         "process.name": "sudo",
+        "related.hosts": [
+            "localhost"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -169,6 +184,9 @@
         "log.offset": 522,
         "process.name": "sshd",
         "process.pid": 18406,
+        "related.hosts": [
+            "slave22"
+        ],
         "related.ip": [
             "123.57.245.163"
         ],
@@ -195,6 +213,9 @@
         "input.type": "log",
         "log.offset": 617,
         "process.name": "sudo",
+        "related.hosts": [
+            "localhost"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -215,6 +236,9 @@
         "input.type": "log",
         "log.offset": 736,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -247,6 +271,9 @@
         "log.offset": 861,
         "process.name": "groupadd",
         "process.pid": 6991,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "system"
     },
     {
@@ -269,6 +296,9 @@
         "log.offset": 934,
         "process.name": "useradd",
         "process.pid": 6995,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.user": [
             "apache"
         ],
