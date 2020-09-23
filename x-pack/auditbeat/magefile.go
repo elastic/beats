@@ -136,9 +136,9 @@ var (
 		"linux/armv6":    installLinuxARMEL,
 		"linux/armv7":    installLinuxARMHF,
 		"linux/mips":     installLinuxMIPS,
-		"linux/mipsle":   installLinuxMIPSLE,
-		"linux/mips64le": installLinuxMIPS64LE,
-		"linux/ppc64le":  installLinuxPPC64LE,
+		"linux/mipsle":   installLinuxMIPSEL,
+		"linux/mips64le": installLinuxMIPS64EL,
+		"linux/ppc64le":  installLinuxPPC64EL,
 		"linux/s390x":    installLinuxS390X,
 
 		//"linux/ppc64":  installLinuxPpc64,
@@ -175,23 +175,23 @@ func installLinux386() error {
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(librpmDevPkgName+":mips", "mips")
+	return installDependencies("mips", librpmDevPkgName+":mips")
 }
 
-func installLinuxMIPS64LE() error {
-	return installDependencies(librpmDevPkgName+":mips64el", "mips64el")
+func installLinuxMIPS64EL() error {
+	return installDependencies("mips64el", librpmDevPkgName+":mips64el")
 }
 
-func installLinuxMIPSLE() error {
-	return installDependencies(librpmDevPkgName+":mipsel", "mipsel")
+func installLinuxMIPSEL() error {
+	return installDependencies("mispel", librpmDevPkgName+":mipsel")
 }
 
-func installLinuxPPC64LE() error {
-	return installDependencies(librpmDevPkgName+":ppc64el", "ppc64el")
+func installLinuxPPC64EL() error {
+	return installDependencies("ppc64el", librpmDevPkgName+":ppc64el")
 }
 
 func installLinuxS390X() error {
-	return installDependencies(librpmDevPkgName+":s390x", "s390x")
+	return installDependencies("s390x", librpmDevPkgName+":s390x")
 }
 
 func installDependencies(arch string, pkgs ...string) error {
