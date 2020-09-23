@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -48,12 +49,12 @@ func TestFetchUsage(t *testing.T) {
 				w.WriteHeader(503)
 
 			case 1: // second call
-				// Make sure exclude_usage is still false since first call failed
-				require.Equal(t, "false", excludeUsage)
+				// Make sure exclude_usage is true since first call failed and it should not try again until usageCollectionBackoff time has passed
+				require.Equal(t, "true", excludeUsage)
 				w.WriteHeader(200)
 
 			case 2: // third call
-				// Make sure exclude_usage is now true since second call succeeded
+				// Make sure exclude_usage is still true
 				require.Equal(t, "true", excludeUsage)
 				w.WriteHeader(200)
 			}
@@ -75,4 +76,41 @@ func TestFetchUsage(t *testing.T) {
 
 	// Third fetch
 	mbtest.ReportingFetchV2Error(f)
+}
+
+func TestShouldCollectUsage(t *testing.T) {
+	now := time.Now()
+
+	cases := map[string]struct {
+		usageLastCollectedOn time.Time
+		usageNextCollectOn   time.Time
+		expectedResult       bool
+	}{
+		"within_usage_collection_period": {
+			usageLastCollectedOn: now.Add(-1 * usageCollectionPeriod),
+			expectedResult:       false,
+		},
+		"after_usage_collection_period_but_before_next_scheduled_collection": {
+			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
+			usageNextCollectOn:   now.Add(3 * time.Hour),
+			expectedResult:       false,
+		},
+		"after_usage_collection_period_and_after_next_scheduled_collection": {
+			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
+			usageNextCollectOn:   now.Add(-1 * time.Hour),
+			expectedResult:       true,
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			m := MetricSet{
+				usageLastCollectedOn: test.usageLastCollectedOn,
+				usageNextCollectOn:   test.usageNextCollectOn,
+			}
+
+			actualResult := m.shouldCollectUsage(now)
+			require.Equal(t, test.expectedResult, actualResult)
+		})
+	}
 }

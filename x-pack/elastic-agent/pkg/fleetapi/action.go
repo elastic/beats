@@ -12,6 +12,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+const (
+	// ActionTypeUpgrade specifies upgrade action.
+	ActionTypeUpgrade = "UPGRADE"
+	// ActionTypeUnenroll specifies unenroll action.
+	ActionTypeUnenroll = "UNENROLL"
+	// ActionTypeConfigChange specifies config change action.
+	ActionTypeConfigChange = "CONFIG_CHANGE"
+)
+
 // Action base interface for all the implemented action from the fleet API.
 type Action interface {
 	fmt.Stringer
@@ -83,6 +92,33 @@ func (a *ActionConfigChange) ID() string {
 	return a.ActionID
 }
 
+// ActionUpgrade is a request for agent to upgrade.
+type ActionUpgrade struct {
+	ActionID   string `json:"id" yaml:"id"`
+	ActionType string `json:"type" yaml:"type"`
+	Version    string `json:"version" yaml:"version"`
+	SourceURI  string `json:"source_uri" yaml:"source_uri"`
+}
+
+func (a *ActionUpgrade) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionUpgrade) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionUpgrade) ID() string {
+	return a.ActionID
+}
+
 // ActionUnenroll is a request for agent to unhook from fleet.
 type ActionUnenroll struct {
 	ActionID   string
@@ -133,7 +169,7 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 
 	for _, response := range responses {
 		switch response.ActionType {
-		case "CONFIG_CHANGE":
+		case ActionTypeConfigChange:
 			action = &ActionConfigChange{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
@@ -143,10 +179,21 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 					"fail to decode CONFIG_CHANGE action",
 					errors.TypeConfig)
 			}
-		case "UNENROLL":
+		case ActionTypeUnenroll:
 			action = &ActionUnenroll{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
+			}
+		case ActionTypeUpgrade:
+			action = &ActionUpgrade{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode UPGRADE_ACTION action",
+					errors.TypeConfig)
 			}
 		default:
 			action = &ActionUnknown{
