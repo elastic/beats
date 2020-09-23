@@ -1,6 +1,6 @@
 ---
 - job:
-    name: Beats/Release/netas-release-patch
+    name: Beats/Release/beats-release-patch
     display-name: 'Prepare Patch Release'
     description: 'Automate the steps to prepare a new Patch'
     view: Beats

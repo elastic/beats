@@ -1,6 +1,6 @@
 ---
 - job:
-    name: Beats/Release/netas-release-minor-major
+    name: Beats/Release/beats-release-minor-major
     display-name: 'Prepare Major/minor Release'
     description: 'Automate the steps to prepare a new Release branch'
     view: Beats
