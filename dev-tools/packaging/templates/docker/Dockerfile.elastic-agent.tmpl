@@ -12,6 +12,8 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
+    find {{ $beatHome }}/data -type d -exec chmod 0770 {} \; && \
+    find {{ $beatHome }}/data -type f -exec chmod 0660 {} \; && \
     rm {{ $beatBinary }} && \
     ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
     chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
@@ -21,7 +23,7 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs
+    true
 
 FROM {{ .from }}
 
@@ -68,6 +70,10 @@ COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 COPY --from=home {{ $beatHome }} {{ $beatHome }}
+
+# Elastic Agent needs group permissions in the home itself to be able to
+# create fleet.yml when running as non-root.
+RUN chmod 0770 {{ $beatHome }}
 
 RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
