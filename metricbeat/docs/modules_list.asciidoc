@@ -22,7 +22,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
 |<<metricbeat-metricset-aws-elb,elb>>   
-|<<metricbeat-metricset-aws-lambda,lambda>> beta[]  
+|<<metricbeat-metricset-aws-lambda,lambda>>   
 |<<metricbeat-metricset-aws-natgateway,natgateway>> beta[]  
 |<<metricbeat-metricset-aws-rds,rds>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
