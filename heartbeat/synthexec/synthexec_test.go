@@ -19,15 +19,12 @@ package synthexec
 
 import (
 	"testing"
-	"time"
 
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/require"
 )
 
 func TestJsonToSynthEvent(t *testing.T) {
-	zLoc, err := time.LoadLocation("UTC")
-	require.NoError(t, err)
 	tests := []struct {
 		name       string
 		line       string
@@ -52,10 +49,10 @@ func TestJsonToSynthEvent(t *testing.T) {
 		},
 		{
 			name: "a valid line",
-			line: `{"@timestamp":"2020-09-19T02:46:15.000Z","type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
+			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
 			synthEvent: &SynthEvent{
-				Timestamp: time.Date(2020, 9, 19, 2, 46, 15, 0, zLoc),
-				Type:      "step/end",
+				TimestampEpochMillis: 7165676811882692608,
+				Type:                 "step/end",
 				Journey: &Journey{
 					Name: "inline",
 					Id:   "inline",

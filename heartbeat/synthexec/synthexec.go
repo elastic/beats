@@ -67,54 +67,65 @@ Outer:
 
 // SuiteJob will run a single journey by name from the given suite file.
 func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) jobs.Job {
-	cmd := exec.Command(
-		"node",
-		suiteFile,
-		"--screenshots",
-		"--journey-name", journeyName,
-	)
+	newCmd := func() *exec.Cmd {
+		return exec.Command(
+			"node",
+			suiteFile,
+			"--screenshots",
+			"--journey-name", journeyName,
+		)
+	}
 
-	return cmdJob(ctx, cmd, nil, params)
+	return startCmdJob(ctx, newCmd, nil, params)
 }
 
-// JourneyJob returns a job tha runs the given source as a single journey.
+// JourneyJob returns a job that runs the given source as a single journey.
 func JourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
-	cmd := exec.Command(
-		"npx",
-		"@elastic/synthetics",
-		"--stdin",
-		"--screenshots",
-	)
+	newCmd := func() *exec.Cmd {
+		return exec.Command(
+			"npx",
+			"@elastic/synthetics",
+			"--stdin",
+			"--screenshots",
+		)
+	}
 
-	return cmdJob(ctx, cmd, &script, params)
+	return startCmdJob(ctx, newCmd, &script, params)
 }
 
-// cmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
+// startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func cmdJob(ctx context.Context, cmd *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
-	var j jobs.Job
-	var mpx *ExecMultiplexer
-	j = func(event *beat.Event) (conts []jobs.Job, err error) {
-		if mpx == nil { // Start the script on the first invocation of this job
-			mpx, err = runCmd(ctx, cmd, stdinStr, params)
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params)
+		if err != nil {
+			return nil, err
 		}
+		return []jobs.Job{readResultJob(ctx, mpx)}, nil
+	}
+
+}
+
+func readResultJob(ctx context.Context, mpx *ExecMultiplexer) jobs.Job {
+	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-mpx.SynthEvents():
 			if se == nil {
 				return nil, nil
 			}
-			var emptyTime time.Time
-			if se.Timestamp != emptyTime {
-				event.Timestamp = se.Timestamp
+			if se.TimestampEpochMillis != 0 {
+				event.Timestamp = time.Unix(se.TimestampEpochMillis/1000, (se.TimestampEpochMillis%1000)*1000000)
 			}
 
 			eventext.MergeEventFields(event, se.ToMap())
-			return []jobs.Job{j}, nil
+			var jobErr error
+			if se.Error != nil {
+				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
+			}
+			return []jobs.Job{readResultJob(ctx, mpx)}, jobErr
 		}
 	}
-
-	return j
 }
 
 // runCmd runs the given command, piping stdinStr if present to the command's stdin, and supplying
@@ -214,8 +225,8 @@ func runCmd(
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2)   // 2MiB initial buffer
-	scanner.Buffer(buf, 1024*1024*100) // Max 100MiB Buffer
+	buf := make([]byte, 1024*1024*2)  // 2MiB initial buffer (images can be big!)
+	scanner.Buffer(buf, 1024*1024*40) // Max 50MiB Buffer
 
 	for scanner.Scan() {
 		if scanner.Err() != nil {
@@ -244,8 +255,8 @@ func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *S
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
-			Type:      typ,
-			Timestamp: time.Now(),
+			Type:                 typ,
+			TimestampEpochMillis: time.Now().UnixNano() / 1000000,
 			Payload: map[string]interface{}{
 				"message": text,
 			},

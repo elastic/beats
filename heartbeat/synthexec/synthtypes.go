@@ -20,7 +20,6 @@ package synthexec
 import (
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -28,16 +27,18 @@ import (
 )
 
 type SynthEvent struct {
-	Type           string                 `json:"type"`
-	PackageVersion string                 `json:"package_version"`
-	Index          int                    `json:"index""`
-	Step           *Step                  `json:"step"`
-	Journey        *Journey               `json:"journey"`
-	Timestamp      time.Time              `json:"@timestamp"`
-	Payload        map[string]interface{} `json:"payload"`
-	Blob           *string                `json:"blob"`
-	Error          *SynthError            `json:"error"`
-	URL            string                 `json:"url"`
+	Type                 string                 `json:"type"`
+	PackageVersion       string                 `json:"package_version"`
+	Index                int                    `json:"index""`
+	Step                 *Step                  `json:"step"`
+	Journey              *Journey               `json:"journey"`
+	TimestampEpochMillis int64                  `json:"@timestamp"`
+	Payload              map[string]interface{} `json:"payload"`
+	Blob                 string                 `json:"blob"`
+	BlobMime             string                 `json:"blob_mime"`
+	Error                *SynthError            `json:"error"`
+	URL                  string                 `json:"url"`
+	Status               string                 `json:"status"`
 }
 
 type SynthError struct {
@@ -50,28 +51,25 @@ func (se *SynthError) String() string {
 	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
 }
 
-func (se SynthEvent) ToMap() common.MapStr {
+func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	e := common.MapStr{
-		"type":            se.Type,
-		"package_version": se.PackageVersion,
-		"index":           se.Index,
-		"payload":         se.Payload,
-		"blob":            se.Blob,
+	m = common.MapStr{
+		"synthetics": common.MapStr{
+			"type":            se.Type,
+			"package_version": se.PackageVersion,
+			"index":           se.Index,
+			"payload":         se.Payload,
+			"blob":            se.Blob,
+			"blob_mime":       se.BlobMime,
+		},
 	}
 	if se.Step != nil {
-		e.Put("step", se.Step.ToMap())
+		m.Put("synthetics.step", se.Step.ToMap())
 	}
 	if se.Journey != nil {
-		e.Put("journey", se.Journey.ToMap())
+		m.Put("synthetics.journey", se.Journey.ToMap())
 	}
-	m := common.MapStr{"synthetics": e}
-	if se.Error != nil {
-		m["error"] = common.MapStr{
-			"type":    "synthetics",
-			"message": se.Error.String(),
-		}
-	}
+
 	if se.URL != "" {
 		u, e := url.Parse(se.URL)
 		if e != nil {

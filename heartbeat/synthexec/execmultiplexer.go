@@ -32,6 +32,9 @@ func (e ExecMultiplexer) Close() {
 }
 
 func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
+	if se == nil { // we skip writing nil events, since a nil means we're done
+		return
+	}
 	se.Index = e.eventCounter.Inc()
 	e.synthEvents <- se
 }
