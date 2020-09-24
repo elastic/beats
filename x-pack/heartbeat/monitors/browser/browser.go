@@ -8,10 +8,9 @@ import (
 	"context"
 	"fmt"
 	"os/user"
-
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/synthexec"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 

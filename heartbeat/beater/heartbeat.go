@@ -21,13 +21,8 @@ import (
 	"context"
 	"fmt"
 	"time"
-
-	"github.com/elastic/beats/v7/heartbeat/synthexec"
-
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
-
 	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -166,10 +161,22 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	return nil
 }
 
+// Provide hook to define journey list discovery from x-pack
+type JourneyLister func (ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+var mainJourneyLister JourneyLister
+
+func RegisterJourneyLister(jl JourneyLister) {
+	mainJourneyLister = jl
+}
+
 func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
+	// If we are running without XPack this will be nil
+	if mainJourneyLister == nil {
+		return nil
+	}
 	for _, suite := range bt.config.SyntheticSuites {
 		logp.Warn("Listing suite", suite.Path)
-		journeyNames, err := synthexec.ListJourneys(context.TODO(), suite.Path, suite.Params)
+		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
 		if err != nil {
 			return err
 		}

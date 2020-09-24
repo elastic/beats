@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"io"
 	"os"
@@ -39,6 +40,10 @@ import (
 )
 
 const debugSelector = "synthexec"
+
+func init() {
+	beater.RegisterJourneyLister(ListJourneys)
+}
 
 // ListJourneys takes the given suite perfors a dry run, capturing the Journey names, and returns the list.
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
