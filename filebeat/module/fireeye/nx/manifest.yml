@@ -9,5 +9,5 @@ var:
     os.windows:
       - c:/programdata/example/logs/test.log*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
