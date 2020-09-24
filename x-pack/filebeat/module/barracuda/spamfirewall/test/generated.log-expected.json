@@ -46,6 +46,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "etdo"
+        ],
         "related.ip": [
             "10.173.228.223"
         ],
@@ -256,6 +259,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "tempor"
+        ],
         "related.ip": [
             "10.138.137.28"
         ],
@@ -296,6 +302,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "ari"
+        ],
         "related.ip": [
             "10.108.180.105"
         ],
@@ -422,6 +431,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "aveniam"
+        ],
         "related.ip": [
             "10.82.201.113"
         ],
@@ -484,8 +496,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.110.109.5",
-            "10.18.165.35"
+            "10.18.165.35",
+            "10.110.109.5"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,
@@ -518,6 +530,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "dolore"
+        ],
         "related.ip": [
             "10.195.109.134"
         ],
@@ -857,6 +872,10 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "hitect",
+            "lit5929.test"
+        ],
         "related.ip": [
             "10.198.6.166"
         ],
@@ -937,6 +956,10 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "equat",
+            "uptat3156.www5.test"
+        ],
         "related.ip": [
             "10.77.137.72"
         ],
@@ -980,6 +1003,10 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "vitaedi",
+            "neav6028.internal.domain"
+        ],
         "related.ip": [
             "10.128.114.77"
         ],
@@ -1225,6 +1252,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "olupta"
+        ],
         "related.ip": [
             "10.98.92.244"
         ],
@@ -1423,6 +1453,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "tquov"
+        ],
         "related.ip": [
             "10.211.93.62"
         ],
@@ -1480,6 +1513,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "qui"
+        ],
         "related.ip": [
             "10.199.182.123"
         ],
@@ -1824,6 +1860,10 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "aveni",
+            "oremagna3521.mail.home"
+        ],
         "related.ip": [
             "10.29.155.171"
         ],
@@ -2509,6 +2549,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "obeataev"
+        ],
         "related.ip": [
             "10.139.127.232"
         ],
@@ -2550,6 +2593,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "inv"
+        ],
         "related.ip": [
             "10.163.209.70"
         ],
@@ -2719,6 +2765,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "eritatis"
+        ],
         "related.ip": [
             "10.209.184.60"
         ],
@@ -2818,6 +2867,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "plic"
+        ],
         "related.ip": [
             "10.17.87.79"
         ],
@@ -2933,6 +2985,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "taedi"
+        ],
         "related.ip": [
             "10.17.98.243"
         ],
@@ -3209,6 +3264,10 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "der",
+            "piciatis2460.api.host"
+        ],
         "related.ip": [
             "10.77.182.191"
         ],
@@ -3251,6 +3310,9 @@
         "observer.product": "Spam",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
+        "related.hosts": [
+            "iame"
+        ],
         "related.ip": [
             "10.193.110.71"
         ],
