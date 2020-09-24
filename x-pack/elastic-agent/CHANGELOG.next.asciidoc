@@ -8,6 +8,7 @@
 ==== Breaking changes
 
 ==== Bugfixes
+- Thread safe sorted set {pull}21290[21290]
 
 ==== New features
 
