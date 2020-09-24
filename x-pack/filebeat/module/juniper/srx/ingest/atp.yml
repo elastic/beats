@@ -327,6 +327,20 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+###############
+## Timestamp ##
+###############
+- date:
+    if: 'ctx.juniper.srx?.timestamp != null'
+    field: juniper.srx.timestamp
+    target_field: juniper.srx.timestamp
+    formats:
+    - 'EEE MMM dd HH:mm:ss yyyy'
+    - 'EEE MMM  d HH:mm:ss yyyy'
+    on_failure:
+     - remove:
+        field:
+          - juniper.srx.timestamp
 
 #############
 ## Cleanup ##
