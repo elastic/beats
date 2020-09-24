@@ -88,12 +88,12 @@ func (c *userConfig) Validate() error {
 	// need is for a low-volume stream on a tiny device to persist between
 	// restarts, it will work fine.
 	if c.MaxSize != 0 && c.MaxSize < 10*1000*1000 {
-		return errors.New(
-			"Disk queue max_size cannot be less than 10MB")
+		return fmt.Errorf(
+			"Disk queue max_size (%d) cannot be less than 10MB", c.MaxSize)
 	}
 	if c.SegmentSize != nil && *c.SegmentSize < 1000*1000 {
-		return errors.New(
-			"Disk queue segment_size cannot be less than 1MB")
+		return fmt.Errorf(
+			"Disk queue segment_size (%d) cannot be less than 1MB", *c.SegmentSize)
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func DefaultSettings() Settings {
 func SettingsForUserConfig(config *common.Config) (Settings, error) {
 	userConfig := userConfig{}
 	if err := config.Unpack(&userConfig); err != nil {
-		return Settings{}, err
+		return Settings{}, fmt.Errorf("parsing user config: %w", err)
 	}
 	settings := DefaultSettings()
 	settings.Path = userConfig.Path
@@ -129,7 +129,6 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 		// divided by 10.
 		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10
 	}
-
 	return settings, nil
 }
 
@@ -141,7 +140,6 @@ func (settings Settings) directoryPath() string {
 	if settings.Path == "" {
 		return paths.Resolve(paths.Data, "diskqueue")
 	}
-
 	return settings.Path
 }
 

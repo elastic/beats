@@ -61,8 +61,8 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 		settings: DefaultSettings(),
 		segments: diskQueueSegments{
 			writing: []*queueSegment{
-				&queueSegment{id: 1},
-				&queueSegment{id: 2},
+				{id: 1},
+				{id: 2},
 			},
 		},
 	}
