@@ -13,10 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
-    build:
-        mage: "mage build test"
-    crosscompile: 
-        make: "make -C auditbeat crosscompile"
     arm:
         mage: "mage build test"
         platforms:             ## override default label in this specific stage.
@@ -28,6 +24,10 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
+    build:
+        mage: "mage build test"
+    crosscompile:
+        make: "make -C auditbeat crosscompile"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
