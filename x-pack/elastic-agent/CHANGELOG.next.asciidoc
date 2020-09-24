@@ -8,6 +8,8 @@
 ==== Breaking changes
 
 ==== Bugfixes
+- Copy Action store on upgrade {pull}21298[21298]
+- Include inputs in action store actions {pull}21298[21298]
 
 ==== New features
 
