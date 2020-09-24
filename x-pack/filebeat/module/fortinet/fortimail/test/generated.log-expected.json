@@ -586,6 +586,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "lamcolab3252.www.invalid"
+        ],
         "related.ip": [
             "10.179.124.125",
             "10.177.36.38"
@@ -991,8 +994,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.140.7.83",
-            "10.68.246.187"
+            "10.68.246.187",
+            "10.140.7.83"
         ],
         "rsa.email.email_dst": "gna",
         "rsa.email.email_src": "icabo",
@@ -1241,6 +1244,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "atise3421.www5.localdomain"
+        ],
         "related.ip": [
             "10.179.210.218",
             "10.73.207.70"
@@ -2640,9 +2646,12 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "mveni5084.internal.local"
+        ],
         "related.ip": [
-            "10.62.61.1",
-            "10.144.111.42"
+            "10.144.111.42",
+            "10.62.61.1"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -3081,6 +3090,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "taevitae6868.www.corp"
+        ],
         "related.ip": [
             "10.60.164.100",
             "10.161.1.146"
@@ -3178,9 +3190,12 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "tetura7106.www5.corp"
+        ],
         "related.ip": [
-            "10.44.35.57",
-            "10.93.239.216"
+            "10.93.239.216",
+            "10.44.35.57"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",
@@ -3779,8 +3794,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.201.105.58",
-            "10.251.183.113"
+            "10.251.183.113",
+            "10.201.105.58"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",

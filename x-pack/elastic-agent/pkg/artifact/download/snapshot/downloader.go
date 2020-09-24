@@ -38,7 +38,6 @@ func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
 		SourceURI:       snapshotURI,
 		TargetDirectory: config.TargetDirectory,
 		Timeout:         config.Timeout,
-		PgpFile:         config.PgpFile,
 		InstallPath:     config.InstallPath,
 		DropPath:        config.DropPath,
 	}, nil
