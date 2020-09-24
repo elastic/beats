@@ -14,6 +14,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -78,6 +79,10 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error
 		return errors.New("upgrading to same version")
 	}
 
+	if err := copyActionStore(newHash); err != nil {
+		return errors.New(err, "failed to copy action store")
+	}
+
 	if err := u.changeSymlink(ctx, newHash); err != nil {
 		rollbackInstall(newHash)
 		return err
@@ -136,4 +141,22 @@ func isSubdir(base, target string) (bool, error) {
 
 func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+}
+
+func copyActionStore(newHash string) error {
+	currentActionStorePath := info.AgentActionStoreFile()
+
+	newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
+	newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
+
+	currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
+	if os.IsNotExist(err) {
+		// nothing to copy
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(newActionStorePath, currentActionStore, 0600)
 }
