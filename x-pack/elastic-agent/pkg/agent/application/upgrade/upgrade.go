@@ -134,8 +134,6 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 	return ioutil.WriteFile(markerFile, markerBytes, 0600)
 }
 
-// change
-
 func isSubdir(base, target string) (bool, error) {
 	relPath, err := filepath.Rel(base, target)
 	return strings.HasPrefix(relPath, ".."), err
