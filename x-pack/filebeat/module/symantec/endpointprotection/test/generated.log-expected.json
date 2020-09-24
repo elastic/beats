@@ -12,6 +12,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "exe7309.internal.local"
+        ],
         "rsa.internal.event_desc": "rsitam",
         "rsa.internal.messageid": "302776834",
         "rsa.misc.event_source": "reprehe",
@@ -41,6 +44,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "llam2073.internal.localdomain",
+            "sitas4259.mail.corp"
+        ],
         "rsa.internal.event_desc": "aboreetd",
         "rsa.internal.messageid": "303235083",
         "rsa.misc.event_source": "iumto",
@@ -72,6 +79,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "olupt3702.www.localhost"
+        ],
         "rsa.internal.event_desc": "colabor",
         "rsa.internal.messageid": "302450432",
         "rsa.misc.event_source": "tectobe",
@@ -99,6 +109,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "onse254.www5.localdomain",
+            "tat6349.internal.lan"
+        ],
         "rsa.db.index": "uiineavo",
         "rsa.internal.event_desc": "Invalid log record",
         "rsa.internal.messageid": "Invalid",
@@ -146,6 +160,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "mdolore2062.mail.host"
+        ],
         "rsa.internal.event_desc": "tutla",
         "rsa.internal.messageid": "302449409",
         "rsa.misc.event_source": "den",
@@ -175,6 +192,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "nisi6901.mail.home"
+        ],
         "related.user": [
             "rem"
         ],
@@ -208,6 +228,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "dutp6197.www.test"
+        ],
         "rsa.internal.event_desc": "tconsect",
         "rsa.internal.messageid": "303235076",
         "rsa.misc.event_source": "siut",
@@ -237,6 +260,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "umSe1918.local",
+            "nBCSedut1502.www5.example"
+        ],
         "rsa.internal.event_desc": "oditautf",
         "rsa.internal.messageid": "302449410",
         "rsa.misc.event_source": "fugia",
@@ -270,6 +297,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "olupt2189.lan",
+            "temporin7150.mail.local"
+        ],
         "rsa.internal.event_desc": "rem",
         "rsa.internal.messageid": "302449169",
         "rsa.misc.event_source": "rationev",
@@ -303,6 +334,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "emq6633.domain"
+        ],
         "related.user": [
             "tinvolup"
         ],
@@ -336,6 +370,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "Except6889.www.corp"
+        ],
         "rsa.internal.event_desc": "umq",
         "rsa.internal.messageid": "302452736",
         "rsa.misc.event_source": "asper",
@@ -363,6 +400,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "quatD1370.invalid"
+        ],
         "rsa.internal.event_desc": "veniamqu",
         "rsa.internal.messageid": "302452802",
         "rsa.misc.event_source": "iruredol",
@@ -392,6 +432,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "iatqu6203.mail.corp",
+            "quaeab2653.mail.localdomain"
+        ],
         "rsa.db.index": "itat",
         "rsa.internal.event_desc": "aco",
         "rsa.internal.messageid": "303235080",
@@ -428,6 +472,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "redol124.mail.invalid"
+        ],
         "rsa.internal.event_desc": "orinrep",
         "rsa.internal.messageid": "302450688",
         "rsa.misc.event_source": "ctetu",
@@ -455,6 +502,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "enim5999.mail.localhost"
+        ],
         "rsa.internal.event_desc": "orroquis",
         "rsa.internal.messageid": "303169538",
         "rsa.misc.event_source": "iame",
@@ -484,6 +534,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "reseosqu1629.mail.lan",
+            "rsitvolu3596.www.test"
+        ],
         "rsa.internal.event_desc": "gelitsed",
         "rsa.internal.messageid": "302449410",
         "rsa.misc.event_source": "adm",
@@ -515,6 +569,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "tan3170.api.example"
+        ],
         "rsa.internal.event_desc": "dolorsi",
         "rsa.internal.messageid": "303235081",
         "rsa.misc.checksum": "dtemp",
@@ -543,6 +600,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "eseruntm4247.mail.local",
+            "magnaal5792.www5.domain"
+        ],
         "rsa.counters.dclass_c1": 7519,
         "rsa.counters.dclass_c1_str": "Number of Virus Cleaned.",
         "rsa.internal.event_desc": "Cleaned up downloaded content.",
@@ -571,6 +632,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "itatio6735.api.example"
+        ],
         "rsa.internal.event_desc": "rumSec",
         "rsa.internal.messageid": "302452801",
         "rsa.misc.event_source": "rsin",
@@ -598,6 +662,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "radip163.mail.invalid"
+        ],
         "rsa.internal.event_desc": "miurerep",
         "rsa.internal.messageid": "302449166",
         "rsa.misc.event_source": "ainc",
@@ -632,10 +699,14 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "vol866.api.domain",
+            "bore5546.www.local"
+        ],
         "related.ip": [
             "10.7.164.113",
-            "10.207.125.114",
-            "10.175.83.138"
+            "10.175.83.138",
+            "10.207.125.114"
         ],
         "related.user": [
             "remip"
@@ -679,6 +750,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "inc5923.www.test",
+            "tatemseq5797.home"
+        ],
         "rsa.internal.event_desc": "eufugi",
         "rsa.internal.messageid": "302452817",
         "rsa.misc.event_source": "oremip",
@@ -716,9 +791,13 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "enima7673.api.localhost",
+            "sequ6424.www.invalid"
+        ],
         "related.ip": [
-            "10.217.91.49",
-            "10.139.207.36"
+            "10.139.207.36",
+            "10.217.91.49"
         ],
         "related.user": [
             "lumqui"
@@ -766,6 +845,10 @@
         "observer.vendor": "Symantec",
         "process.parent.name": "mquis",
         "process.ppid": 5040,
+        "related.hosts": [
+            "tnulapa7580.www.domain",
+            "madminim6826.www.host"
+        ],
         "related.ip": [
             "10.249.243.41"
         ],
@@ -820,6 +903,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ici182.invalid",
+            "caecat4678.www.home"
+        ],
         "rsa.internal.event_desc": "rem",
         "rsa.internal.messageid": "302449415",
         "rsa.misc.event_source": "quisn",
@@ -851,6 +938,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "beat2952.internal.localhost"
+        ],
         "rsa.internal.event_desc": "iarchite",
         "rsa.internal.messageid": "302449410",
         "rsa.misc.event_source": "qua",
@@ -880,6 +970,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ured3428.www.corp",
+            "uames7663.internal.local"
+        ],
         "rsa.internal.event_desc": "taspe",
         "rsa.internal.messageid": "302776321",
         "rsa.misc.event_source": "oreeu",
@@ -911,6 +1005,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "velillum6639.www5.local"
+        ],
         "rsa.internal.event_desc": "itinvo",
         "rsa.internal.messageid": "302449153",
         "rsa.misc.event_source": "Mal",
@@ -940,6 +1037,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "dictasun3408.internal.invalid",
+            "onoru5767.internal.domain"
+        ],
         "rsa.internal.event_desc": "uam",
         "rsa.internal.messageid": "303235079",
         "rsa.misc.event_source": "dipisciv",
@@ -1002,6 +1103,11 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "uipe6805.www5.domain",
+            "atisu6579.test",
+            "tqui1142.www5.domain"
+        ],
         "related.ip": [
             "10.209.205.25",
             "10.185.64.46"
@@ -1091,9 +1197,14 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "observer.version": "1.7457",
+        "related.hosts": [
+            "udexerci6630.mail.test",
+            "isiut4530.localdomain",
+            "deomn904.www.home"
+        ],
         "related.ip": [
-            "10.35.89.51",
-            "10.202.55.203"
+            "10.202.55.203",
+            "10.35.89.51"
         ],
         "related.user": [
             "Quis"
@@ -1149,6 +1260,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "niamqui7696.mail.test",
+            "taliqu701.www.localhost"
+        ],
         "rsa.internal.event_desc": "Traffic Redirection disabled.",
         "rsa.internal.messageid": "Traffic",
         "rsa.network.alias_host": [
@@ -1181,6 +1296,10 @@
         "observer.vendor": "Symantec",
         "process.parent.name": "onnu",
         "process.ppid": 724,
+        "related.hosts": [
+            "ngelits6213.internal.test",
+            "lumd4298.mail.localdomain"
+        ],
         "related.ip": [
             "10.139.89.148"
         ],
@@ -1263,9 +1382,13 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "tuserror810.www5.corp",
+            "uptate5787.api.local"
+        ],
         "related.ip": [
-            "10.87.92.95",
-            "10.247.21.74"
+            "10.247.21.74",
+            "10.87.92.95"
         ],
         "related.user": [
             "Sedutper"
@@ -1313,6 +1436,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ruredolo7392.internal.host",
+            "mipsu3757.www5.home"
+        ],
         "rsa.db.index": "oris",
         "rsa.internal.event_desc": "labor",
         "rsa.internal.messageid": "303235080",
@@ -1365,6 +1492,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ntmo4076.lan"
+        ],
         "rsa.internal.event_desc": "doconse",
         "rsa.internal.messageid": "302449158",
         "rsa.misc.event_source": "ationula",
@@ -1414,6 +1544,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "amni48.internal.localdomain",
+            "alo6036.www5.local"
+        ],
         "rsa.internal.event_desc": "ita",
         "rsa.internal.messageid": "302710785",
         "rsa.misc.event_source": "mdolore",
@@ -1447,6 +1581,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "tenatus4129.www.local",
+            "uredo4613.home"
+        ],
         "rsa.internal.event_desc": "olupta",
         "rsa.internal.messageid": "303235082",
         "rsa.misc.event_source": "upi",
@@ -1498,6 +1636,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "mini3181.api.test"
+        ],
         "rsa.internal.event_desc": "mwrit",
         "rsa.internal.messageid": "302452819",
         "rsa.misc.event_source": "ommodoc",
@@ -1533,6 +1674,10 @@
         "observer.vendor": "Symantec",
         "observer.version": "1.3638",
         "process.name": "remap",
+        "related.hosts": [
+            "rsitam2337.mail.localdomain",
+            "iduntu7302.www.invalid"
+        ],
         "related.ip": [
             "10.8.143.229"
         ],
@@ -1557,8 +1702,8 @@
         "rsa.misc.version": "1.3638",
         "rsa.misc.virusname": "isqu",
         "rsa.network.alias_host": [
-            "rsitam2337.mail.localdomain",
-            "assit1598.www5.invalid"
+            "assit1598.www5.invalid",
+            "rsitam2337.mail.localdomain"
         ],
         "rsa.network.domain": "ema7531.api.example",
         "rsa.threat.threat_category": "isqu",
@@ -1589,6 +1734,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "equu7361.www5.localdomain"
+        ],
         "rsa.internal.event_desc": "pta",
         "rsa.internal.messageid": "302449178",
         "rsa.misc.event_source": "non",
@@ -1623,6 +1771,10 @@
         "observer.vendor": "Symantec",
         "process.parent.name": "ipsum",
         "process.ppid": 885,
+        "related.hosts": [
+            "uisno4545.www5.corp",
+            "iono5777.invalid"
+        ],
         "related.ip": [
             "10.137.5.67"
         ],
@@ -1726,6 +1878,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "adminima6097.corp",
+            "agnamali3222.example"
+        ],
         "related.ip": [
             "10.66.203.117",
             "10.92.93.236"
@@ -1777,6 +1933,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "equ2353.internal.local",
+            "eratv6521.example"
+        ],
         "rsa.internal.event_desc": "dolorsi",
         "rsa.internal.messageid": "302452807",
         "rsa.misc.event_source": "tlaboree",
@@ -1810,6 +1970,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "bori7611.invalid",
+            "iset1992.internal.example"
+        ],
         "rsa.internal.event_desc": "imadmini",
         "rsa.internal.messageid": "302776321",
         "rsa.misc.event_source": "ffic",
@@ -1860,6 +2024,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ntin2655.www.localdomain"
+        ],
         "rsa.internal.event_desc": "epo",
         "rsa.internal.messageid": "302449413",
         "rsa.misc.event_source": "itasper",
@@ -1887,6 +2054,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "siuta395.home"
+        ],
         "rsa.internal.event_desc": "iumdolor",
         "rsa.internal.messageid": "302449414",
         "rsa.misc.event_source": "fugiat",
@@ -1914,6 +2084,9 @@
         "observer.product": "oluptate",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "umdolore5014.api.lan"
+        ],
         "rsa.internal.event_desc": "Configuration Change",
         "rsa.internal.messageid": "Configuration",
         "rsa.misc.severity": "low",
@@ -1939,6 +2112,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "tisund4302.www5.local",
+            "vel1911.lan"
+        ],
         "related.ip": [
             "10.147.225.53"
         ],
@@ -2032,6 +2209,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "evelites2448.www.host",
+            "quisnost7124.api.domain"
+        ],
         "rsa.internal.event_desc": "odtem",
         "rsa.internal.messageid": "303169540",
         "rsa.misc.event_source": "uidexea",
@@ -2076,6 +2257,11 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "observer.version": "1.132",
+        "related.hosts": [
+            "iatquovo4868.test",
+            "madmi2948.internal.lan",
+            "edi6108.internal.domain"
+        ],
         "related.ip": [
             "10.72.200.11",
             "10.132.171.142"
@@ -2137,6 +2323,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "reverita794.mail.domain"
+        ],
         "related.user": [
             "nis"
         ],
@@ -2170,6 +2359,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "lillumq4387.www5.localhost"
+        ],
         "rsa.internal.event_desc": "sse",
         "rsa.internal.messageid": "302452743",
         "rsa.misc.event_source": "turExce",
@@ -2199,6 +2391,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ipi563.api.lan"
+        ],
         "related.user": [
             "anti"
         ],
@@ -2232,6 +2427,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "uptatemU1147.mail.corp",
+            "mqu3327.internal.host"
+        ],
         "rsa.internal.event_desc": "Connection reset.",
         "rsa.internal.messageid": "Connection",
         "rsa.network.alias_host": [
@@ -2260,6 +2459,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "emp42.mail.test",
+            "ecatcupi4759.internal.local"
+        ],
         "rsa.internal.event_desc": "ritati",
         "rsa.internal.messageid": "302452736",
         "rsa.misc.event_source": "tenb",
@@ -2312,6 +2515,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ipsu7538.www5.host"
+        ],
         "rsa.internal.event_desc": "squa",
         "rsa.internal.messageid": "302450944",
         "rsa.misc.event_source": "lamc",
@@ -2368,9 +2574,13 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "iusmo5734.internal.invalid",
+            "dita2048.www5.home"
+        ],
         "related.ip": [
-            "10.40.133.90",
-            "10.171.13.85"
+            "10.171.13.85",
+            "10.40.133.90"
         ],
         "related.user": [
             "bor"
@@ -2441,6 +2651,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ngelits2743.www5.host",
+            "inrepr7369.www.domain"
+        ],
         "rsa.internal.event_desc": "tatemac",
         "rsa.internal.messageid": "302452816",
         "rsa.misc.event_source": "lore",
@@ -2474,6 +2688,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "olupt717.invalid",
+            "alorum1804.mail.test"
+        ],
         "rsa.internal.event_desc": "ano",
         "rsa.internal.messageid": "302452808",
         "rsa.misc.event_source": "psum",
@@ -2507,6 +2725,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "queporr7029.internal.test"
+        ],
         "related.user": [
             "unti"
         ],
@@ -2569,9 +2790,13 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "upidat1328.internal.localhost",
+            "urExcep6087.www5.localhost"
+        ],
         "related.ip": [
-            "10.31.231.57",
-            "10.155.163.6"
+            "10.155.163.6",
+            "10.31.231.57"
         ],
         "related.user": [
             "norumetM"
@@ -2641,6 +2866,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "tesseci33.internal.example"
+        ],
         "rsa.internal.event_desc": "nost",
         "rsa.internal.messageid": "302452816",
         "rsa.misc.event_source": "met",
@@ -2668,6 +2896,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "alo7567.www5.test"
+        ],
         "rsa.internal.event_desc": "quisnos",
         "rsa.internal.messageid": "302452736",
         "rsa.misc.event_source": "proident",
@@ -2695,6 +2926,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "process.name": "sumq.exe",
+        "related.hosts": [
+            "idest4209.api.domain"
+        ],
         "rsa.internal.event_desc": "The process can not lock the process status table",
         "rsa.internal.messageid": "275",
         "rsa.misc.reference_id": "275",
@@ -2730,9 +2964,14 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "exer3621.www5.test",
+            "tisetqua6007.api.home",
+            "its1301.www.test"
+        ],
         "related.ip": [
-            "10.216.134.62",
-            "10.134.6.246"
+            "10.134.6.246",
+            "10.216.134.62"
         ],
         "related.user": [
             "ntexpl"
@@ -2789,6 +3028,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ventorev7571.www5.corp",
+            "Remote:"
+        ],
         "related.ip": [
             "10.202.96.232"
         ],
@@ -2832,6 +3075,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "umSectio5136.www.local",
+            "untexpli391.internal.domain"
+        ],
         "rsa.internal.event_desc": "ipitlabo",
         "rsa.internal.messageid": "302449156",
         "rsa.misc.event_source": "num",
@@ -2874,6 +3121,11 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "quide2790.mail.invalid",
+            "eniamqu1863.api.lan",
+            "quipex2615.www5.localhost"
+        ],
         "related.ip": [
             "10.56.95.160",
             "10.29.149.77"
@@ -2941,6 +3193,11 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ugia146.www5.corp",
+            "tionul7555.www5.lan",
+            "remipsum5485.api.local"
+        ],
         "related.ip": [
             "10.173.98.74",
             "10.70.185.238"
@@ -2998,6 +3255,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ilmoles4582.api.lan"
+        ],
         "related.user": [
             "dolor"
         ],
@@ -3031,6 +3291,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "giatquo3267.www.lan",
+            "quiado6095.mail.localhost"
+        ],
         "rsa.internal.event_desc": "Connected to Management Server",
         "rsa.internal.messageid": "Connected",
         "rsa.network.alias_host": [
@@ -3059,6 +3323,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "odite7850.internal.corp",
+            "cidun7605.www5.example"
+        ],
         "related.ip": [
             "10.201.112.171"
         ],
@@ -3111,6 +3379,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "ssitasp7492.test"
+        ],
         "rsa.internal.event_desc": "eserun",
         "rsa.internal.messageid": "302448900",
         "rsa.misc.event_source": "ssitaspe",
@@ -3140,6 +3411,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "estq2131.api.localdomain",
+            "rem6392.internal.domain"
+        ],
         "rsa.internal.event_desc": "did",
         "rsa.internal.messageid": "302452802",
         "rsa.misc.event_source": "upt",
@@ -3173,6 +3448,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "giatq7007.www.domain",
+            "upi3.www.home"
+        ],
         "rsa.internal.event_desc": "caecatc",
         "rsa.internal.messageid": "303235079",
         "rsa.misc.event_source": "iquaUt",
@@ -3207,9 +3486,13 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "itess2258.api.lan",
+            "ianonnu4387.www.domain"
+        ],
         "related.ip": [
-            "10.59.140.108",
-            "10.90.66.238"
+            "10.90.66.238",
+            "10.59.140.108"
         ],
         "related.user": [
             "nulap"
@@ -3270,6 +3553,11 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "observer.version": "1.6400",
+        "related.hosts": [
+            "epteur5858.www5.local",
+            "rin5257.www5.test",
+            "ess3012.mail.test"
+        ],
         "related.ip": [
             "10.38.136.160",
             "10.45.116.216"
@@ -3326,6 +3614,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "aed3193.api.lan"
+        ],
         "rsa.internal.event_desc": "equa",
         "rsa.internal.messageid": "302449409",
         "rsa.misc.event_source": "sunti",
@@ -3373,6 +3664,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "rumSec5271.home"
+        ],
         "rsa.internal.event_desc": "unt",
         "rsa.internal.messageid": "302449166",
         "rsa.misc.event_source": "evolupt",
@@ -3402,6 +3696,9 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "volu7499.www5.localhost"
+        ],
         "related.user": [
             "sedqui"
         ],
@@ -3437,6 +3734,10 @@
         "observer.product": "Endpoint",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
+        "related.hosts": [
+            "oNem5850.www.example",
+            "gnama2349.mail.domain"
+        ],
         "rsa.internal.event_desc": "ccusan",
         "rsa.internal.messageid": "302449409",
         "rsa.misc.event_source": "ntiu",
