@@ -96,7 +96,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile)
+	app, err := application.New(logger, pathConfigFile, rex)
 	if err != nil {
 		return err
 	}
