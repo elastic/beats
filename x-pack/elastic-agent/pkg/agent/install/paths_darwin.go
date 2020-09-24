@@ -14,7 +14,7 @@ const (
 	InstallPath = "/Library/Elastic/Agent"
 
 	// SocketPath is the socket path used when installed.
-	SocketPath = "unix:///run/elastic-agent.sock"
+	SocketPath = "unix:///var/run/elastic-agent.sock"
 
 	// ServiceName is the service name when installed.
 	ServiceName = "com.elastic.elastic-agent"
