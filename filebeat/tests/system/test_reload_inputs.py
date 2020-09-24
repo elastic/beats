@@ -250,7 +250,7 @@ class Test(BaseTest):
         assert output[0]["message"] == first_line
         assert output[1]["message"] == second_line
 
-    # 1/20 build fails
+    # 1/20 build fails https://github.com/elastic/beats/issues/21307
     @pytest.mark.flaky(reruns=1, reruns_delay=10)
     def test_reload_same_config(self):
         """
