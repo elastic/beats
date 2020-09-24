@@ -24,20 +24,20 @@ import (
 )
 
 const (
-	TemplateLegacy TemplateType = iota
-	TemplateComponent
-	TemplateIndex
+	IndexTemplateLegacy IndexTemplateType = iota
+	IndexTemplateComponent
+	IndexTemplateIndex
 )
 
 var (
-	templateTypes = map[string]TemplateType{
-		"legacy":    TemplateLegacy,
-		"component": TemplateComponent,
-		"index":     TemplateIndex,
+	templateTypes = map[string]IndexTemplateType{
+		"legacy":    IndexTemplateLegacy,
+		"component": IndexTemplateComponent,
+		"index":     IndexTemplateIndex,
 	}
 )
 
-type TemplateType uint8
+type IndexTemplateType uint8
 
 // TemplateConfig holds config information about the Elasticsearch template
 type TemplateConfig struct {
@@ -50,12 +50,12 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields mapping.Fields   `config:"append_fields"`
-	Overwrite    bool             `config:"overwrite"`
-	Settings     TemplateSettings `config:"settings"`
-	Order        int              `config:"order"`
-	Priority     int              `config:"priority"`
-	Type         TemplateType     `config:"type"`
+	AppendFields mapping.Fields    `config:"append_fields"`
+	Overwrite    bool              `config:"overwrite"`
+	Settings     TemplateSettings  `config:"settings"`
+	Order        int               `config:"order"`
+	Priority     int               `config:"priority"`
+	Type         IndexTemplateType `config:"type"`
 }
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
@@ -69,19 +69,19 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled:  true,
 		Fields:   "",
-		Type:     TemplateLegacy,
+		Type:     IndexTemplateLegacy,
 		Order:    1,
 		Priority: 150,
 	}
 }
 
-func (t *TemplateType) Unpack(v string) error {
+func (t *IndexTemplateType) Unpack(v string) error {
 	if v == "" {
-		*t = TemplateLegacy
+		*t = IndexTemplateLegacy
 		return nil
 	}
 
-	var tt TemplateType
+	var tt IndexTemplateType
 	var ok bool
 	if tt, ok = templateTypes[v]; !ok {
 		return fmt.Errorf("unknown index template type: %s", v)

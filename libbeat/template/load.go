@@ -32,10 +32,10 @@ import (
 )
 
 var (
-	templateLoaderPath = map[TemplateType]string{
-		TemplateLegacy:    "/_template/",
-		TemplateComponent: "/_component_template/",
-		TemplateIndex:     "/_index_template/",
+	templateLoaderPath = map[IndexTemplateType]string{
+		IndexTemplateLegacy:    "/_template/",
+		IndexTemplateComponent: "/_component_template/",
+		IndexTemplateIndex:     "/_index_template/",
 	}
 )
 
@@ -125,7 +125,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // loadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *ESLoader) loadTemplate(templateName string, templateType TemplateType, template map[string]interface{}) error {
+func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateType, template map[string]interface{}) error {
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
 	clientVersion := l.client.GetVersion()
 	path := templateLoaderPath[templateType] + templateName

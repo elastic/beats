@@ -53,7 +53,7 @@ type Template struct {
 	esVersion    common.Version
 	config       TemplateConfig
 	migration    bool
-	templateType TemplateType
+	templateType IndexTemplateType
 	order        int
 	priority     int
 }
@@ -201,9 +201,9 @@ func (t *Template) LoadMinimal() (common.MapStr, error) {
 			common.MapStr(t.config.Settings.Source))
 	}
 
-	if t.templateType == TemplateLegacy {
+	if t.templateType == IndexTemplateLegacy {
 		m["order"] = t.order
-	} else if t.templateType == TemplateIndex {
+	} else if t.templateType == IndexTemplateIndex {
 		m["priority"] = t.priority
 	}
 	return m, nil
@@ -237,9 +237,9 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
-	if t.templateType == TemplateLegacy {
+	if t.templateType == IndexTemplateLegacy {
 		tmpl["order"] = t.order
-	} else if t.templateType == TemplateIndex {
+	} else if t.templateType == IndexTemplateIndex {
 		tmpl["priority"] = t.priority
 	}
 	return tmpl
