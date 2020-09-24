@@ -27,7 +27,6 @@ processors:
       if (!ctx['json'].empty) {
         ctx.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
       }
-
 - script:
     lang: painless
     if: ctx?.json?.evidence != null
@@ -41,7 +40,6 @@ processors:
       if (!ctx.json['evidence'].empty) {
         ctx.json.evidence.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
       }
-
 - set:
     field: cloud.provider
     value: azure
@@ -49,18 +47,6 @@ processors:
     field: '@timestamp'
     value: '{{json.lastUpdateTime}}'
     if: ctx.json?.lastUpdateTime != null
-- rename:
-    field: json.aadTenantId
-    target_field: cloud.account.id
-    ignore_missing: true
-- rename:
-    field: json.machineId
-    target_field: cloud.instance.id
-    ignore_missing: true
-- rename:
-    field: json.title
-    target_field: message
-    ignore_missing: true
 
 #######################
 ## ECS Event Mapping ##
@@ -74,30 +60,31 @@ processors:
     value: UTC
 - set:
     field: event.action
-    value: '{{json.category}}'
-    if: ctx.json?.category != null
+    value: '{{json.alert.category}}'
+    if: ctx.json?.alert?.category != null
 - set:
     field: event.provider
-    value: defender_atp
+    value: '{{json.alert.serviceSource}}'
+    if: ctx.json?.alert?.serviceSource != null
 - set:
     field: event.created
-    value: '{{json.alertCreationTime}}'
-    if: ctx.json?.alertCreationTime != null
+    value: '{{json.createdTime}}'
+    if: ctx.json?.createdTime != null
 - append:
     field: event.category
     value: host
 - append:
     field: event.category
     value: malware
-    if: ctx.json?.category == 'Malware'
+    if: ctx.json?.determination == 'Malware'
 - append:
     field: event.category
     value: process
-    if: ctx.json?.evidence?.entityType == 'Process'
+    if: ctx.json?.entities?.entityType == 'Process'
 - append:
     field: event.type
     value: user
-    if: ctx.json?.evidence?.entityType == 'User'
+    if: ctx.json?.entities?.entityType == 'User'
 - append:
     field: event.type
     value:
@@ -109,15 +96,15 @@ processors:
     value: end
     if: ctx.json?.status == 'Resolved'
 - rename:
-    field: json.id
+    field: json.alert.alertId
     target_field: event.id
     ignore_missing: true
 - rename:
-    field: json.firstEventTime
+    field: json.alert.firstActivity
     target_field: event.start
     ignore_missing: true
 - rename:
-    field: json.lastEventTime
+    field: json.alert.lastActivity
     target_field: event.end
     ignore_missing: true
 - set:
@@ -154,9 +141,9 @@ processors:
 - set:
     field: threat.framework
     value: MITRE ATT&CK
-    if: ctx.json?.category != null
+    if: ctx.json?.alert.category != null
 - rename:
-    field: json.category
+    field: json.alert.category
     target_field: threat.technique.name
     ignore_missing: true
 - rename:
@@ -169,43 +156,43 @@ processors:
 ## ECS File Mapping ##
 ######################
 - rename:
-    field: json.evidence.fileName
+    field: json.entities.fileName
     target_field: file.name
     ignore_missing: true
 - rename:
-    field: json.evidence.sha256
+    field: json.entities.sha256
     target_field: file.hash.sha256
     ignore_missing: true
 - rename:
-    field: json.evidence.sha1
+    field: json.entities.sha1
     target_field: file.hash.sha1
     ignore_missing: true
 - rename:
-    field: json.evidence.filePath
+    field: json.entities.filePath
     target_field: file.path
     ignore_missing: true
 
-######################
+#########################
 ## ECS Process Mapping ##
-######################
+#########################
 - rename:
-    field: json.evidence.processId
+    field: json.entities.processId
     target_field: process.pid
     ignore_missing: true
 - rename:
-    field: json.evidence.processCommandLine
+    field: json.entities.processCommandLine
     target_field: process.command_line
     ignore_missing: true
 - rename:
-    field: json.evidence.processCreationTime
+    field: json.entities.processCreationTime
     target_field: process.start
     ignore_missing: true
 - rename:
-    field: json.evidence.parentProcessId
+    field: json.entities.parentProcessId
     target_field: process.parent.pid
     ignore_missing: true
 - rename:
-    field: json.evidence.parentProcessCreationTime
+    field: json.entities.parentProcessCreationTime
     target_field: process.parent.start
     ignore_missing: true
 
@@ -214,12 +201,12 @@ processors:
 ##########################
 - set:
     field: observer.product
-    value: Defender ATP
+    value: 365 Defender
 - set:
     field: observer.vendor
     value: Microsoft
 - rename:
-    field: json.detectionSource
+    field: json.serviceSource
     target_field: observer.name
     ignore_missing: true
 
@@ -227,38 +214,29 @@ processors:
 ## ECS URL Mapping ##
 #####################
 - rename:
-    field: json.evidence.url
+    field: json.entities.url
     target_field: url.full
     ignore_missing: true
-    if: ctx?.json?.evidence?.url != null
-
-######################
-## ECS Host Mapping ##
-######################
-- rename:
-    field: json.computerDnsName
-    target_field: host.hostname
-    ignore_missing: true
-- set:
-    field: host.name
-    value: '{{host.hostname}}'
-    if: ctx?.host?.hostname != null
+    if: ctx?.json?.entities?.url != null
 
 ######################
 ## ECS User Mapping ##
 ######################
 - rename:
-    field: json.relatedUser.userName
+    field: json.entities.userPrincipalName
     target_field: host.user.name
     ignore_missing: true
+    if: ctx?.entities.entityType == "User"
 - rename:
-    field: json.relatedUser.domainName
+    field: json.entities.domainName
     target_field: host.user.domain
     ignore_missing: true
+    if: ctx?.entities.entityType == "User"
 - rename:
-    field: json.evidence.userSid
+    field: json.entities.userSid
     target_field: host.user.id
     ignore_missing: true
+    if: ctx?.entities.entityType == "User"
 
 #########################
 ## ECS Related Mapping ##
@@ -282,20 +260,14 @@ processors:
 - append:
     field: related.hosts
     value: '{{host.hostname}}'
-    if: ctx.host?.hostname != null && ctx.host?.hostname != ''
+    if: ctx.host?.hostname != null
 
 #############
 ## Cleanup ##
 #############
-- remove:
-    field:
-      - json.alertCreationTime
-      - json.severity
-      - json.relatedUser
-    ignore_missing: true
 - rename:
     field: json
-    target_field: microsoft.defender_atp
+    target_field: microsoft.365_defender
     ignore_missing: true
 on_failure:
 - set:
