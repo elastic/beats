@@ -17,6 +17,17 @@ stages:
         mage: "mage build test"
     crosscompile: 
         make: "make -C auditbeat crosscompile"
+    arm:
+        mage: "mage build"
+        platforms:             ## override default label in this specific stage.
+          - "arm"
+        when:                  ## Aggregate when with the top-level one.
+            comments:
+                - "/test auditbeat for arm"
+            labels:
+                - "arm"
+            parameters:
+                - "armTest"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
