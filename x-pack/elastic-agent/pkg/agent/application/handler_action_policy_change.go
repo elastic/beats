@@ -25,8 +25,6 @@ func (h *handlerConfigChange) Handle(ctx context.Context, a action, acker fleetA
 		return fmt.Errorf("invalid type, expected ActionConfigChange and received %T", a)
 	}
 
-	rawAction := action
-
 	c, err := LoadConfig(action.Config)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
@@ -37,5 +35,5 @@ func (h *handlerConfigChange) Handle(ctx context.Context, a action, acker fleetA
 		return err
 	}
 
-	return acker.Ack(ctx, rawAction)
+	return acker.Ack(ctx, action)
 }
