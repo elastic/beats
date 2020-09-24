@@ -59,7 +59,7 @@ func Info() VersionInfo {
 }
 
 // String returns the string format for the version information.
-func (v *VersionInfo) String() string {
+func (v VersionInfo) String() string {
 	var sb strings.Builder
 
 	sb.WriteString(v.Version)

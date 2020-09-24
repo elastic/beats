@@ -33,6 +33,10 @@ type AgentECSMeta struct {
 	ID string `json:"id"`
 	// Version specifies current version of an agent.
 	Version string `json:"version"`
+	// Snapshot is a flag specifying that the agent used is a snapshot build.
+	Snapshot bool `json:"snapshot,omitempty"`
+	// BuildOriginal is an extended build information for the agent.
+	BuildOriginal string `json:"build.original"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -126,8 +130,10 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 	return &ECSMeta{
 		Elastic: &ElasticECSMeta{
 			Agent: &AgentECSMeta{
-				ID:      i.agentID,
-				Version: release.Version(),
+				ID:            i.agentID,
+				Version:       release.Version(),
+				Snapshot:      release.Snapshot(),
+				BuildOriginal: release.Info().String(),
 			},
 		},
 		Host: &HostECSMeta{
