@@ -55,6 +55,8 @@ func TestClientPublishEvent(t *testing.T) {
 }
 
 func TestClientPublishEventKerberosAware(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21295")
+
 	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
 	if err != nil {
 		t.Fatal(err)
