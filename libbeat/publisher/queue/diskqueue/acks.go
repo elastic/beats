@@ -71,8 +71,8 @@ type diskQueueACKs struct {
 
 func newDiskQueueACKs(
 	logger *logp.Logger, position queuePosition, positionFile *os.File,
-) *diskQueueACKs {
-	return &diskQueueACKs{
+) diskQueueACKs {
+	return diskQueueACKs{
 		logger:            logger,
 		nextFrameID:       0,
 		nextPosition:      position,

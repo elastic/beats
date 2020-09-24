@@ -36,11 +36,11 @@ type diskQueue struct {
 	settings Settings
 
 	// Metadata related to the segment files.
-	segments *diskQueueSegments
+	segments diskQueueSegments
 
 	// Metadata related to consumer acks / positions of the oldest remaining
 	// frame.
-	acks *diskQueueACKs
+	acks diskQueueACKs
 
 	// The queue's helper loops, each of which is run in its own goroutine.
 	readerLoop  *readerLoop
@@ -176,7 +176,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		logger:   logger,
 		settings: settings,
 
-		segments: &diskQueueSegments{
+		segments: diskQueueSegments{
 			reading:        initialSegments,
 			nextID:         nextSegmentID,
 			nextReadOffset: nextReadPosition.offset,
