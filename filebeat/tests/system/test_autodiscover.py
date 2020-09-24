@@ -1,5 +1,6 @@
-import os
+import docker
 import filebeat
+import os
 import unittest
 
 from beat.beat import INTEGRATION_TESTS
@@ -35,7 +36,11 @@ class TestAutodiscover(filebeat.BaseTest):
                 },
             )
 
+            proc = self.start_beat()
             self._test(container)
+
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
+        proc.check_kill_and_wait()
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -59,19 +64,20 @@ class TestAutodiscover(filebeat.BaseTest):
                     },
                 },
             )
-
+            proc = self.start_beat()
             self._test(container)
+
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
+        proc.check_kill_and_wait()
 
     def _test(self, container):
         with open(os.path.join(self.working_dir, f'{container.name}.log'), 'wb') as f:
             f.write(b'Busybox output 1\n')
 
-        proc = self.start_beat()
         self.wait_until(lambda: self.log_contains('Starting runner: input'))
         self.wait_until(lambda: self.output_has(lines=1))
 
         output = self.read_output_json()
-        proc.check_kill_and_wait()
 
         # Check metadata is added
         assert output[0]['message'] == 'Busybox output 1'
@@ -83,7 +89,6 @@ class TestAutodiscover(filebeat.BaseTest):
 
     @contextmanager
     def container_running(self, image_name='busybox:latest'):
-        import docker
         docker_client = docker.from_env()
         container = docker_client.containers.run(image_name, 'sleep 60', detach=True, remove=True)
         yield container
