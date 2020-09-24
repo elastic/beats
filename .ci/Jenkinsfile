@@ -73,7 +73,7 @@ pipeline {
         withGithubNotify(context: 'Lint') {
           withBeatsEnv(archive: true) {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            //cmd(label: 'make check', script: 'make check')
           }
         }
       }
