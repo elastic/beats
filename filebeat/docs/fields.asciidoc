@@ -88537,6 +88537,16 @@ type: keyword
 
 --
 
+*`juniper.srx.url`*::
++
+--
+url domain
+
+
+type: keyword
+
+--
+
 *`juniper.srx.profile`*::
 +
 --
