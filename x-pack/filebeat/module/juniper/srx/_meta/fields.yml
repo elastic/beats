@@ -11,26 +11,6 @@
       description: >
         reason
 
-    - name: source_address
-      type: ip
-      description: >
-        source address
-
-    - name: source_port
-      type: integer
-      description: >
-        source port
-
-    - name: destination_address
-      type: ip
-      description: >
-        destination address
-
-    - name: destination_port
-      type: integer
-      description: >
-        destination port
-
     - name: connection_tag
       type: keyword
       description: >
@@ -40,26 +20,6 @@
       type: keyword
       description: >
         service name
-
-    - name: nat_source_address
-      type: ip
-      description: >
-        nat source address
-
-    - name: nat_source_port
-      type: integer
-      description: >
-        nat source port
-
-    - name: nat_destination_address
-      type: ip
-      description: >
-        nat destination address
-
-    - name: nat_destination_port
-      type: integer
-      description: >
-        nat destination port
 
     - name: nat_connection_tag
       type: keyword
@@ -96,26 +56,6 @@
       description: >
         policy name
 
-    - name: source_zone_name
-      type: keyword
-      description: >
-        source zone name
-
-    - name: source_zone
-      type: keyword
-      description: >
-        source zone
-
-    - name: destination_zone_name
-      type: keyword
-      description: >
-        destination zone name
-
-    - name: destination_zone
-      type: keyword
-      description: >
-        destination zone
-
     - name: session_id_32
       type: keyword
       description: >
@@ -126,40 +66,20 @@
       description: >
         session id
 
-    - name: packets_from_client
-      type: integer
-      description: >
-        packets from client
-
     - name: outbound_packets
       type: integer
       description: >
         packets from client
-
-    - name: bytes_from_client
-      type: integer
-      description: >
-        bytes from client
 
     - name: outbound_bytes
       type: integer
       description: >
         bytes from client
 
-    - name: packets_from_server
-      type: integer
-      description: >
-        packets from server
-
     - name: inbound_packets
       type: integer
       description: >
         packets from server
-
-    - name: bytes_from_server
-      type: integer
-      description: >
-        bytes from server
 
     - name: inbound_bytes
       type: integer
@@ -191,11 +111,6 @@
       description: >
         roles
 
-    - name: packet_incoming_interface
-      type: keyword
-      description: >
-        packet incoming interface
-
     - name: encrypted
       type: keyword
       description: >
@@ -210,16 +125,6 @@
       type: keyword
       description: >
         application sub category
-
-    - name: application_risk
-      type: integer
-      description: >
-        application risk
-
-    - name: urlcategory_risk
-      type: integer
-      description: >
-        urlcategory risk
 
     - name: application_characteristics
       type: keyword
@@ -295,11 +200,6 @@
       type: keyword
       description: >
         logical system name
-
-    - name: destination_interface_name
-      type: keyword
-      description: >
-        destination interface name
 
     - name: profile_name
       type: keyword
@@ -496,11 +396,6 @@
       description: >
         ruleebase name
 
-    - name: interface_name
-      type: keyword
-      description: >
-        interface name
-
     - name: verdict_source
       type: keyword
       description: >
@@ -510,11 +405,6 @@
       type: integer
       description: >
         verdict number
-
-    - name: http_host
-      type: keyword
-      description: >
-        http host
 
     - name: file_category
       type: keyword

@@ -88097,46 +88097,6 @@ type: keyword
 
 --
 
-*`juniper.srx.source_address`*::
-+
---
-source address
-
-
-type: ip
-
---
-
-*`juniper.srx.source_port`*::
-+
---
-source port
-
-
-type: integer
-
---
-
-*`juniper.srx.destination_address`*::
-+
---
-destination address
-
-
-type: ip
-
---
-
-*`juniper.srx.destination_port`*::
-+
---
-destination port
-
-
-type: integer
-
---
-
 *`juniper.srx.connection_tag`*::
 +
 --
@@ -88154,46 +88114,6 @@ service name
 
 
 type: keyword
-
---
-
-*`juniper.srx.nat_source_address`*::
-+
---
-nat source address
-
-
-type: ip
-
---
-
-*`juniper.srx.nat_source_port`*::
-+
---
-nat source port
-
-
-type: integer
-
---
-
-*`juniper.srx.nat_destination_address`*::
-+
---
-nat destination address
-
-
-type: ip
-
---
-
-*`juniper.srx.nat_destination_port`*::
-+
---
-nat destination port
-
-
-type: integer
 
 --
 
@@ -88267,46 +88187,6 @@ type: keyword
 
 --
 
-*`juniper.srx.source_zone_name`*::
-+
---
-source zone name
-
-
-type: keyword
-
---
-
-*`juniper.srx.source_zone`*::
-+
---
-source zone
-
-
-type: keyword
-
---
-
-*`juniper.srx.destination_zone_name`*::
-+
---
-destination zone name
-
-
-type: keyword
-
---
-
-*`juniper.srx.destination_zone`*::
-+
---
-destination zone
-
-
-type: keyword
-
---
-
 *`juniper.srx.session_id_32`*::
 +
 --
@@ -88327,30 +88207,10 @@ type: keyword
 
 --
 
-*`juniper.srx.packets_from_client`*::
-+
---
-packets from client
-
-
-type: integer
-
---
-
 *`juniper.srx.outbound_packets`*::
 +
 --
 packets from client
-
-
-type: integer
-
---
-
-*`juniper.srx.bytes_from_client`*::
-+
---
-bytes from client
 
 
 type: integer
@@ -88367,30 +88227,10 @@ type: integer
 
 --
 
-*`juniper.srx.packets_from_server`*::
-+
---
-packets from server
-
-
-type: integer
-
---
-
 *`juniper.srx.inbound_packets`*::
 +
 --
 packets from server
-
-
-type: integer
-
---
-
-*`juniper.srx.bytes_from_server`*::
-+
---
-bytes from server
 
 
 type: integer
@@ -88457,16 +88297,6 @@ type: keyword
 
 --
 
-*`juniper.srx.packet_incoming_interface`*::
-+
---
-packet incoming interface
-
-
-type: keyword
-
---
-
 *`juniper.srx.encrypted`*::
 +
 --
@@ -88494,26 +88324,6 @@ application sub category
 
 
 type: keyword
-
---
-
-*`juniper.srx.application_risk`*::
-+
---
-application risk
-
-
-type: integer
-
---
-
-*`juniper.srx.urlcategory_risk`*::
-+
---
-urlcategory risk
-
-
-type: integer
 
 --
 
@@ -88667,16 +88477,6 @@ type: keyword
 
 --
 
-*`juniper.srx.destination_interface_name`*::
-+
---
-destination interface name
-
-
-type: keyword
-
---
-
 *`juniper.srx.profile_name`*::
 +
 --
@@ -88731,16 +88531,6 @@ type: integer
 +
 --
 url path
-
-
-type: keyword
-
---
-
-*`juniper.srx.url`*::
-+
---
-url domain
 
 
 type: keyword
@@ -89067,16 +88857,6 @@ type: keyword
 
 --
 
-*`juniper.srx.interface_name`*::
-+
---
-interface name
-
-
-type: keyword
-
---
-
 *`juniper.srx.verdict_source`*::
 +
 --
@@ -89094,16 +88874,6 @@ verdict number
 
 
 type: integer
-
---
-
-*`juniper.srx.http_host`*::
-+
---
-http host
-
-
-type: keyword
 
 --
 
