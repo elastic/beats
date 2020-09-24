@@ -36,10 +36,6 @@ func alwaysInclude(path string) bool {
 	return false
 }
 
-func alwaysExclude(path string) bool {
-	return true
-}
-
 func TestNonRecursive(t *testing.T) {
 	dir, err := ioutil.TempDir("", "monitor")
 	assertNoError(t, err)
@@ -306,13 +302,16 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0644))
 	}
 
-	// Make a subdir not accessible
-
-	assertNoError(t, os.Chmod(filepath.Join(outDir, "b"), 0))
+	// excludes file/dir named "b"
+	selectiveExclude := func(path string) bool {
+		r := filepath.Base(path) == "b"
+		t.Logf("path: %v, result: %v\n", path, r)
+		return r
+	}
 
 	// Setup watches on watched dir
 
-	watcher, err := New(true, alwaysExclude)
+	watcher, err := New(true, selectiveExclude)
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Start())
@@ -335,11 +334,34 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 	dest := filepath.Join(dir, "subdir")
 	assertNoError(t, os.Rename(outDir, dest))
 
-	// No event is received because all paths are excluded
-	ev, err = readTimeout(t, watcher)
-	assert.Equal(t, errReadTimeout, err)
-	if err != errReadTimeout {
-		t.Fatalf("Expected timeout, got event %+v", ev)
+	// Receive all events
+
+	var evs []fsnotify.Event
+	for {
+		// No event is received
+		ev, err := readTimeout(t, watcher)
+		if err == errReadTimeout {
+			break
+		}
+		assertNoError(t, err)
+		evs = append(evs, ev)
+	}
+
+	// Verify that events for all accessible files are received
+	// File "b/b" is missing as it is excluded
+
+	expected := map[string]fsnotify.Op{
+		dest:                       fsnotify.Create,
+		filepath.Join(dest, "a"):   fsnotify.Create,
+		filepath.Join(dest, "a/a"): fsnotify.Create,
+		filepath.Join(dest, "c"):   fsnotify.Create,
+		filepath.Join(dest, "c/c"): fsnotify.Create,
+	}
+	assert.Len(t, evs, len(expected))
+	for _, ev := range evs {
+		op, found := expected[ev.Name]
+		assert.True(t, found, ev.Name)
+		assert.Equal(t, op, ev.Op)
 	}
 }
 

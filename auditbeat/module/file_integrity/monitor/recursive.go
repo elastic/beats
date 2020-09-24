@@ -122,6 +122,10 @@ func (watcher *recursiveWatcher) close() error {
 }
 
 func (watcher *recursiveWatcher) deliver(ev fsnotify.Event) {
+	// skip watching excluded path
+	if watcher.isExcludedPath(ev.Name) {
+		return
+	}
 	for {
 		select {
 		case <-watcher.done:
@@ -154,13 +158,10 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			if event.Name == "" {
 				continue
 			}
-			if watcher.isExcludedPath(event.Name) {
-				continue
-			}
 			switch event.Op {
 			case fsnotify.Create:
 				err := watcher.addRecursive(event.Name)
-				if err != nil {
+				if err != nil && !watcher.isExcludedPath(event.Name) {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to add created path '%s'", event.Name)
 				}
 				err = watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
@@ -170,7 +171,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					})
 					return nil
 				})
-				if err != nil {
+				if err != nil && !watcher.isExcludedPath(event.Name) {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit created path '%s'", event.Name)
 				}
 
@@ -182,12 +183,12 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					})
 					return nil
 				})
-				if err != nil {
+				if err != nil && !watcher.isExcludedPath(event.Name) {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
 				}
 
 				err = watcher.tree.Remove(event.Name)
-				if err != nil {
+				if err != nil && !watcher.isExcludedPath(event.Name) {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
 				}
 
@@ -197,7 +198,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			// - Moving a dir away sends only one notification for this dir
 			case fsnotify.Rename:
 				err := watcher.tree.Remove(event.Name)
-				if err != nil {
+				if err != nil && !watcher.isExcludedPath(event.Name) {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", event.Name)
 				}
 				fallthrough
