@@ -105,7 +105,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		templateName = config.JSON.Name
 	}
 
-	if l.templateExists(templateName) && !config.Overwrite {
+	if l.templateExists(templateName, config.Type) && !config.Overwrite {
 		l.log.Infof("Template %s already exists and will not be overwritten.", templateName)
 		return nil
 	}
@@ -142,9 +142,14 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 
 // templateExists checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *ESLoader) templateExists(templateName string) bool {
+func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) bool {
 	if l.client == nil {
 		return false
+	}
+
+	if templateType == IndexTemplateComponent {
+		status, _, _ := l.client.Request("GET", "/_component_template/"+templateName, "", nil, nil)
+		return status == http.StatusOK
 	}
 
 	status, body, _ := l.client.Request("GET", "/_cat/templates/"+templateName, "", nil, nil)
