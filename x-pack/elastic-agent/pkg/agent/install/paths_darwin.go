@@ -17,7 +17,7 @@ const (
 	SocketPath = "unix:///var/run/elastic-agent.sock"
 
 	// ServiceName is the service name when installed.
-	ServiceName = "com.elastic.elastic-agent"
+	ServiceName = "co.elastic.elastic-agent"
 
 	// ShellWrapperPath is the path to the installed shell wrapper.
 	ShellWrapperPath = "/usr/local/bin/elastic-agent"
