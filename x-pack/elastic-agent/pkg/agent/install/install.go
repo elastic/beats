@@ -9,10 +9,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/otiai10/copy"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // Install installs Elastic Agent persistently on the system including creating and starting its service.
@@ -112,6 +114,11 @@ func findDirectory() (string, error) {
 		return "", err
 	}
 	sourceDir := filepath.Dir(execPath)
+	if insideData(sourceDir) {
+		// executable path is being reported as being down inside of data path
+		// move up to directories to perform the copy
+		sourceDir = filepath.Dir(filepath.Dir(sourceDir))
+	}
 	err = verifyDirectory(sourceDir)
 	if err != nil {
 		return "", err
@@ -126,4 +133,10 @@ func verifyDirectory(dir string) error {
 		return fmt.Errorf("missing %s", BinaryName)
 	}
 	return nil
+}
+
+// insideData returns true when the exePath is inside of the current Agents data path.
+func insideData(exePath string) bool {
+	expectedPath := filepath.Join("data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
+	return strings.HasSuffix(exePath, expectedPath)
 }
