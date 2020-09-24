@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     arm:
-        mage: "mage build test"
+        mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "arm"
         when:                  ## Aggregate when with the top-level one.
