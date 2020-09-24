@@ -17,6 +17,13 @@ stages:
         mage: "mage build test"
         platforms:             ## override default label in this specific stage.
           - "arm"
+        when:                  ## Aggregate when with the top-level one.
+            comments:
+                - "/test x-pack/elastic-agent for arm"
+            labels:
+                - "arm"
+            parameters:
+                - "armTest"
     build:
         mage: "mage build test"
     macos:
