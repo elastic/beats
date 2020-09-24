@@ -3,7 +3,7 @@
 
 == fireeye module
 
-This is the fireeye module.
+This is a module for the Fireeye Network Security (NX) layer7 metadata. 
 
 include::../include/what-happens.asciidoc[]
 
@@ -12,11 +12,25 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+This module has been developed against Fireeye Network Security 9.0.0.916432 , but is expected to work
+with other versions.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+This is an example of how to use the module.
+
+----
+- module: fireeye
+  # All logs
+  nx:
+    enabled: true
+    var.input: tcp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 12345
+----
+`Fireeye Network Security` Evidence Collector settings
+
+include::../images/fenxec.png[]
 
 :fileset_ex: {fileset}
 
@@ -44,3 +58,4 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 :fileset_ex!:
 
 :modulename!:
+
