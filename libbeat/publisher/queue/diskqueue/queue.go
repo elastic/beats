@@ -40,7 +40,7 @@ type diskQueue struct {
 
 	// Metadata related to consumer acks / positions of the oldest remaining
 	// frame.
-	acks diskQueueACKs
+	acks *diskQueueACKs
 
 	// The queue's helper loops, each of which is run in its own goroutine.
 	readerLoop  *readerLoop
