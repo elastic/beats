@@ -1,0 +1,70 @@
+[[elastic-agent-directory-layout]]
+= Directory layout
+
+When you install and run {agent}, it creates files in the following locations.
+
+[discrete]
+== deb and rpm
+
+These paths are set in the init script or in the systemd unit file. Make sure
+that you start the {agent} service by using the preferred operating system
+method (init scripts or `systemctl`). Otherwise the paths might be set
+incorrectly.
+
+[options="header"]
+|====
+| Description                                | Location
+| {agent} installation home                  | `/usr/share/elastic-agent`
+| {agent} binaries                           | `/usr/share/elastic-agent/bin`
+| Managed {beats} binaries                   | `/var/lib/elastic-agent/install`
+| Configuration files (standalone)           | `/etc/elastic-agent`
+| Persistent data files                      | `/var/lib/elastic-agent`
+| {agent} logs                               | `/var/lib/elastic-agent/logs`
+| {beats} logs                               | `/var/lib/elastic-agent/logs/default`
+| {elastic-endpoint} logs                    | `/opt/Elastic/Endpoint/state/log`
+|====
+
+//REVIEWERS: Should we mention any other paths, like
+// /var/lib/elastic-agent/downloads for downloads?
+
+[discrete]
+== tar.gz
+
+For the zip or tar.gz distributions, these paths are based on the location
+of the extracted binary file.
+
+[options="header"]
+|====
+| Description                       | Location
+| {agent} installation home         | `{extract.path}`
+| {agent} binaries                  | `{extract.path}`
+| Managed {beats} binaries          | `{extract.path}/data/install`
+| Configuration files (standalone)  | `{extract.path}`
+| Persistent data files             | `{extract.path}/data`
+| {agent} logs                      | `{extract.path}/data/logs`
+| {beats} logs                      | `{extract.path}/data/logs/default`
+| {elastic-endpoint} logs           | ???
+|====
+
+// REVIEWERS: Where do the Endpoint logs end up on MacOS/Linux? I couldn't find
+// them. 
+
+[discrete]
+== zip
+
+These paths are based on the location of the extracted binary file.
+
+[options="header"]
+|====
+| Description                       | Location
+| {agent} installation home         | `{extract.path}`
+| {agent} binaries                  | `{extract.path}`
+| Managed {beats} binaries          | `{extract.path}\data\install`
+| Configuration files (standalone)  | `{extract.path}`
+| Persistent data files             | `{extract.path}\data`
+| {agent} logs                      | `{extract.path}\data\logs`
+| {beats} logs                      | `{extract.path}\data\logs\default`
+| {elastic-endpoint} logs           | `C:\Program Files\Elastic\Endpoint\state\log`
+|====
+
+// REVIEWERS: Is the log path for Endpoint relative to the extract path?
