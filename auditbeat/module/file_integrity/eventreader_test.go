@@ -41,6 +41,7 @@ func init() {
 const ErrorSharingViolation syscall.Errno = 32
 
 func TestEventReader(t *testing.T) {
+	t.Skip("Flaky test: about 1/10 of bulds fails")
 	// Make dir to monitor.
 	dir, err := ioutil.TempDir("", "audit")
 	if err != nil {
@@ -240,6 +241,7 @@ func TestEventReader(t *testing.T) {
 }
 
 func TestRaces(t *testing.T) {
+	t.Skip("Flaky test: about 1/20 of bulds fails")
 	const (
 		fileMode os.FileMode = 0640
 		N                    = 100
