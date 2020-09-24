@@ -49,6 +49,15 @@ func Status() (StatusType, string) {
 func RunningInstalled() bool {
 	expected := filepath.Join(InstallPath, BinaryName)
 	execPath, _ := os.Executable()
+	execPath, _ = filepath.Abs(execPath)
+	execName := filepath.Base(execPath)
+	execDir := filepath.Dir(execPath)
+	if insideData(execDir) {
+		// executable path is being reported as being down inside of data path
+		// move up to directories to perform the comparison
+		execDir = filepath.Dir(filepath.Dir(execDir))
+		execPath = filepath.Join(execDir, execName)
+	}
 	return expected == execPath
 }
 
