@@ -45,6 +45,7 @@
         "event.duration": -1468967296,
         "event.kind": "event",
         "event.module": "azure",
+        "event.outcome": "success",
         "event.type": [
             "change"
         ],

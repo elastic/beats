@@ -340,7 +340,7 @@ shared:
       buildFrom: 'centos:7'
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
-      user: 'root'
+      user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
       'elastic-agent.yml':
@@ -509,7 +509,7 @@ shared:
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi-minimal'
+      from: 'docker.elastic.co/ubi8/ubi-minimal'
 
   - &elastic_docker_spec
     extra_vars:

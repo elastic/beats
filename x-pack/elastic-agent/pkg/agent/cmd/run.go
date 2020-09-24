@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -82,6 +83,10 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		return err
 	}
 
+	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
+		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+	}
+
 	execPath, err := os.Executable()
 	if err != nil {
 		return err
@@ -96,7 +101,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile)
+	app, err := application.New(logger, pathConfigFile, rex)
 	if err != nil {
 		return err
 	}

@@ -107,6 +107,8 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
   * `/run apm-beats-update`
 * [apm-beats-packaging][]
   * `/package` or `/packaging` will kick of a build to generate the packages for beats.
+* [apm-beats-tester][]
+  * `/beats-tester` will kick of a build to validate the generated packages.
 
 ### PR Labels
 
@@ -118,3 +120,4 @@ It's possible to configure the build on a GitHub PR by labelling the PR with the
 [beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
 [apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
 [apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/
+[apm-beats-tester]: https://beats-ci.elastic.co/job/Beats/job/beats-tester/

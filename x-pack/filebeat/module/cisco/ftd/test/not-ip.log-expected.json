@@ -35,6 +35,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "WHAT-IS-THIS-A-HOSTNAME-192.0.2.244"
+        ],
         "related.ip": [
             "203.0.113.42"
         ],
@@ -80,6 +83,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "192.168.132.46",
             "172.24.177.29"
@@ -137,6 +143,10 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "localhost",
+            "example.org"
+        ],
         "related.ip": [
             "10.10.10.1",
             "172.24.177.3"
