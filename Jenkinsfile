@@ -23,7 +23,7 @@ import groovy.transform.Field
 @Field def stashedTestReports = [:]
 
 pipeline {
-  agent { label 'ubuntu && immutable' }
+  agent { label 'ubuntu-18 && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
@@ -38,6 +38,7 @@ pipeline {
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -50,19 +51,18 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test(\\W+macos)?$)')
   }
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
-    booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
-
+    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
     booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
-
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
+    string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {
     /**
@@ -85,6 +85,10 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
+      environment {
+        // See https://github.com/elastic/beats/pull/19823
+        GOFLAGS = '-mod=readonly'
+      }
       steps {
         makeTarget(context: "Lint", target: "check")
       }
@@ -97,7 +101,7 @@ pipeline {
       failFast false
       parallel {
         stage('Elastic Agent x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -109,7 +113,6 @@ pipeline {
             mageTarget(context: "Elastic Agent x-pack Linux", directory: "x-pack/elastic-agent", target: "build test")
           }
         }
-
         stage('Elastic Agent x-pack Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -123,14 +126,13 @@ pipeline {
             mageTargetWin(context: "Elastic Agent x-pack Windows Unit test", directory: "x-pack/elastic-agent", target: "build unitTest")
           }
         }
-
         stage('Elastic Agent Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -142,9 +144,8 @@ pipeline {
             }
           }
         }
-
         stage('Filebeat oss'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -157,7 +158,7 @@ pipeline {
           }
         }
         stage('Filebeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -175,7 +176,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false" && params.macosTest
+              return env.BUILD_FILEBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -193,7 +194,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_FILEBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -231,8 +232,8 @@ pipeline {
             mageTargetWin(context: "Filebeat x-pack Windows", directory: "x-pack/filebeat", target: "build unitTest")
           }
         }
-        stage('Heartbeat'){
-          agent { label 'ubuntu && immutable' }
+        stage('Heartbeat oss'){
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -240,47 +241,43 @@ pipeline {
               return env.BUILD_HEARTBEAT != "false"
             }
           }
-          stages {
-            stage('Heartbeat oss'){
-              steps {
-                mageTarget(context: "Heartbeat oss Linux", directory: "heartbeat", target: "build test")
-              }
+          steps {
+            mageTarget(context: "Heartbeat oss Linux", directory: "heartbeat", target: "build test")
+          }
+        }
+        stage('Heartbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_HEARTBEAT != "false"
             }
-            stage('Heartbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget(context: "Heartbeat oss Mac OS X", directory: "heartbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
-            }
-            stage('Heartbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Heartbeat oss Windows Unit test", directory: "heartbeat", target: "build unitTest")
-              }
+          }
+          steps {
+            mageTarget(context: "Heartbeat oss Mac OS X", directory: "heartbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
           }
         }
+        stage('Heartbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest &&  env.BUILD_HEARTBEAT != "false"
+            }
+          }
+          steps {
+            mageTargetWin(context: "Heartbeat oss Windows Unit test", directory: "heartbeat", target: "build unitTest")
+          }
+        }
         stage('Auditbeat oss Linux'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -293,7 +290,7 @@ pipeline {
           }
         }
         stage('Auditbeat crosscompile'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -311,7 +308,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -337,7 +334,7 @@ pipeline {
           }
         }
         stage('Auditbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -355,7 +352,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_AUDITBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -376,7 +373,7 @@ pipeline {
           }
         }
         stage('Libbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -403,7 +400,7 @@ pipeline {
           }
         }
         stage('Libbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -416,7 +413,7 @@ pipeline {
           }
         }
         stage('Metricbeat OSS Unit tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -429,7 +426,7 @@ pipeline {
           }
         }
         stage('Metricbeat OSS Go Integration tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -442,7 +439,7 @@ pipeline {
           }
         }
         stage('Metricbeat OSS Python Integration tests'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -455,7 +452,7 @@ pipeline {
           }
         }
         stage('Metricbeat x-pack'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -465,7 +462,6 @@ pipeline {
           }
           stages {
             stage('Prepare cloud integration tests environments'){
-              agent { label 'ubuntu && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 startCloudTestEnv('x-pack-metricbeat', [
@@ -474,7 +470,6 @@ pipeline {
               }
             }
             stage('Metricbeat x-pack'){
-              agent { label 'ubuntu && immutable' }
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
@@ -490,7 +485,7 @@ pipeline {
           }
         }
         stage('Metricbeat crosscompile'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -508,7 +503,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false" && params.macosTest
+              return env.BUILD_METRICBEAT != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -521,7 +516,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+              return env.BUILD_METRICBEAT_XPACK != "false" && env.BUILD_ON_MACOS != 'false'
             }
           }
           steps {
@@ -559,8 +554,8 @@ pipeline {
             mageTargetWin(context: "Metricbeat x-pack Windows", directory: "x-pack/metricbeat", target: "build unitTest")
           }
         }
-        stage('Packetbeat OSS'){
-          agent { label 'ubuntu && immutable' }
+        stage('Packetbeat Linux'){
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -568,47 +563,43 @@ pipeline {
               return env.BUILD_PACKETBEAT != "false"
             }
           }
-          stages {
-            stage('Packetbeat Linux'){
-              steps {
-                mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
-              }
+          steps {
+            mageTarget(context: "Packetbeat OSS Linux", directory: "packetbeat", target: "build test")
+          }
+        }
+        stage('Packetbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_PACKETBEAT != "false"
             }
-            stage('Packetbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget(context: "Packetbeat OSS Mac OS X", directory: "packetbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
-            }
-            stage('Packetbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Packetbeat OSS Windows", directory: "packetbeat", target: "build unitTest")
-              }
+          }
+          steps {
+            mageTarget(context: "Packetbeat OSS Mac OS X", directory: "packetbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
           }
         }
+        stage('Packetbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_PACKETBEAT != "false"
+            }
+          }
+          steps {
+            mageTargetWin(context: "Packetbeat OSS Windows", directory: "packetbeat", target: "build unitTest")
+          }
+        }
         stage('dockerlogbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -616,16 +607,12 @@ pipeline {
               return env.BUILD_DOCKERLOGBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Dockerlogbeat'){
-              steps {
-                mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "build test")
-              }
-            }
+          steps {
+            mageTarget(context: "Elastic Docker Logging Driver Plugin unit tests", directory: "x-pack/dockerlogbeat", target: "build test")
           }
         }
-        stage('Winlogbeat'){
-          agent { label 'ubuntu && immutable' }
+        stage('Winlogbeat oss'){
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -633,25 +620,21 @@ pipeline {
               return env.BUILD_WINLOGBEAT != "false"
             }
           }
-          stages {
-            stage('Winlogbeat oss'){
-              steps {
-                makeTarget(context: "Winlogbeat oss crosscompile", directory: 'winlogbeat', target: "crosscompile")
-              }
+          steps {
+            makeTarget(context: "Winlogbeat oss crosscompile", directory: 'winlogbeat', target: "crosscompile")
+          }
+        }
+        stage('Winlogbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_WINLOGBEAT != "false"
             }
-            stage('Winlogbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "winlogbeat", target: "build unitTest")
-              }
-            }
+          }
+          steps {
+            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "winlogbeat", target: "build unitTest")
           }
         }
         stage('Winlogbeat Windows x-pack'){
@@ -667,8 +650,8 @@ pipeline {
             mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true)
           }
         }
-        stage('Functionbeat'){
-          agent { label 'ubuntu && immutable' }
+        stage('Functionbeat x-pack'){
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -676,50 +659,46 @@ pipeline {
               return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Functionbeat x-pack'){
-              steps {
-                mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
-                withEnv(["GO_VERSION=1.13.1"]){
-                  mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "testGCPFunctions")
-                }
-              }
-            }
-            stage('Functionbeat Mac OS X x-pack'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget(context: "Functionbeat x-pack Mac OS X", directory: "x-pack/functionbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
-            }
-            stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Functionbeat Windows Unit test", directory: "x-pack/functionbeat", target: "build unitTest")
-              }
+          steps {
+            mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "update build test")
+            withEnv(["GO_VERSION=1.13.1"]){
+              mageTarget(context: "Functionbeat x-pack Linux", directory: "x-pack/functionbeat", target: "testGCPFunctions")
             }
           }
         }
+        stage('Functionbeat Mac OS X x-pack'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_FUNCTIONBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            mageTarget(context: "Functionbeat x-pack Mac OS X", directory: "x-pack/functionbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Functionbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_FUNCTIONBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            mageTargetWin(context: "Functionbeat Windows Unit test", directory: "x-pack/functionbeat", target: "build unitTest")
+          }
+        }
         stage('Journalbeat'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -727,16 +706,12 @@ pipeline {
               return env.BUILD_JOURNALBEAT != "false"
             }
           }
-          stages {
-            stage('Journalbeat oss'){
-              steps {
-                mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build goUnitTest")
-              }
-            }
+          steps {
+            mageTarget(context: "Journalbeat Linux", directory: "journalbeat", target: "build unitTest")
           }
         }
         stage('Generators'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -757,46 +732,46 @@ pipeline {
                 makeTarget(context: "Generators Beat Linux", directory: 'generator/_templates/beat', target: "test-package")
               }
             }
-            stage('Generators Metricbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                makeTarget(context: "Generators Metricbeat Mac OS X", directory: 'generator/_templates/metricbeat', target: "test")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+        }
+        stage('Generators Metricbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_GENERATOR != "false"
             }
-            stage('Generators Beat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                makeTarget(context: "Generators Beat Mac OS X", directory: 'generator/_templates/beat', target: "test")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            makeTarget(context: "Generators Metricbeat Mac OS X", directory: 'generator/_templates/metricbeat', target: "test")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Generators Beat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ON_MACOS != 'false' && env.BUILD_GENERATOR != "false"
+            }
+          }
+          steps {
+            makeTarget(context: "Generators Beat Mac OS X", directory: 'generator/_templates/beat', target: "test")
+          }
+          post {
+            always {
+              delete()
             }
           }
         }
         stage('Kubernetes'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -945,12 +920,33 @@ def withBeatsEnv(Map args = [:], Closure body) {
         }
       } finally {
         if (archive) {
-          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
-          }
+          archiveTestOutput(testResults: '**/build/TEST*.xml', artifacts: '**/build/TEST*.out')
         }
-        reportCoverage()
+      }
+    }
+  }
+}
+
+/**
+  This method archives and report the tests output, for such, it searches in certain folders
+  to bypass some issues when working with big repositories.
+*/
+def archiveTestOutput(Map args = [:]) {
+  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    if (isUnix()) {
+      fixPermissions("${WORKSPACE}")
+    }
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    dir('build') {
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+    }
+    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+      if (folder.trim()) {
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + goos()
+        tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
   }
@@ -990,10 +986,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
           body()
         }
       } finally {
-        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
-        }
+        archiveTestOutput(testResults: "**\\build\\TEST*.xml", artifacts: "**\\build\\TEST*.out")
       }
     }
   }
@@ -1002,12 +995,15 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
 def installTools() {
   def i = 2 // Number of retries
   if(isUnix()) {
-    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
-    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
-    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
-    retry(i) { sh(label: "Install Mage", script: "make mage") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ sh(label: "Install Mage", script: "make mage") }
   } else {
-    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    // Install python3 with the specific step, even though install-tools.bat will verify if it's there anyway.
+    // TODO: as soon as python3 is installed in the CI Workers we will be able to remove the line below.
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ installTools([ [tool: 'python3', version: '3.8', exclude: 'rc'] ]) }
+    retryWithSleep(retries: i, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -1071,7 +1067,8 @@ def dumpFilteredEnvironment(){
   echo "PROCESSES: ${env.PROCESSES}"
   echo "TIMEOUT: ${env.TIMEOUT}"
   echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
-  echo "NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}"
+  echo "PYTEST_ADDOPTS: ${env.PYTEST_ADDOPTS}"
+  echo "PYTEST_OPTIONS: ${env.PYTEST_OPTIONS}"
   echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
@@ -1110,28 +1107,18 @@ def k8sTest(versions){
   }
 }
 
-def reportCoverage(){
-  catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    retry(2){
-      sh(label: 'Report to Codecov', script: '''
-        curl -sSLo codecov https://codecov.io/bash
-        for i in auditbeat filebeat heartbeat libbeat metricbeat packetbeat winlogbeat journalbeat
-        do
-          FILE="${i}/build/coverage/full.cov"
-          if [ -f "${FILE}" ]; then
-            bash codecov -f "${FILE}"
-          fi
-        done
-      ''')
-    }
-  }
-}
-
-// isChanged treats the patterns as regular expressions. In order to check if
-// any file in a directoy is modified use `^<path to dir>/.*`.
+/**
+*  isChanged treats the patterns as regular expressions. In order to check if
+*  any file in a directoy is modified use `^<path to dir>/.*`.
+*
+*  In addition, there are another two alternatives to report that there are
+*  changes, when `runAllStages` parameter is set to true or when running on a
+*  branch/tag basis.
+*/
 def isChanged(patterns){
   return (
-    params.runAllStages
+    params.runAllStages   // when runAllStages UI parameter is set to true
+    || !isPR()            // when running on a branch/tag
     || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
   )
 }
@@ -1140,6 +1127,7 @@ def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -1153,6 +1141,7 @@ def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",
@@ -1225,7 +1214,7 @@ def startCloudTestEnv(String name, environments = []) {
       try {
         for (environment in environments) {
           if (environment.cond || runAll) {
-            retry(2) {
+            retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(environment.dir)
             }
           }
@@ -1247,7 +1236,7 @@ def terraformCleanup(String stashName, String directory) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${stashName}")
-        retry(2) {
+        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
       }
@@ -1260,7 +1249,7 @@ def loadConfigEnvVars(){
   env.GO_VERSION = readFile(".go-version").trim()
 
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
   }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
@@ -1328,6 +1317,12 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Enable macOS builds when required
+  env.BUILD_ON_MACOS = (params.macosTest                  // UI Input parameter is set to true
+                        || !isPR()                        // For branches and tags
+                        || matchesPrLabel(label: 'macOS') // If `macOS` GH label (Case-Sensitive)
+                        || (env.GITHUB_COMMENT?.toLowerCase()?.contains('/test macos'))) // If `/test macos` in the GH comment (Case-Insensitive)
 }
 
 /**
@@ -1409,23 +1404,24 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
+      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}") {
-        sh(label: 'Prepare workspace context',
-           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
             unstash(v)
           }
         }
-        sh(label: 'Process JUnit reports with runbld',
-          script: '''\
-          cat >./runbld-script <<EOF
-          echo "Processing JUnit reports with runbld..."
-          EOF
-          /usr/local/bin/runbld ./runbld-script
-          '''.stripIndent())  // stripIdent() requires '''/
       }
+      sh(label: 'Process JUnit reports with runbld',
+        script: """\
+        cat >./runbld-script <<EOF
+        echo "Processing JUnit reports with runbld..."
+        EOF
+        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
+        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }

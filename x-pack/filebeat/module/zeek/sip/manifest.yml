@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/sip.log
   - name: tags
     default: [zeek.sip]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/sip.yml

@@ -5,12 +5,13 @@
 package httpjson
 
 import (
+	"errors"
+	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
 	"text/template"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -35,7 +36,7 @@ type config struct {
 	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
-	URL                  string            `config:"url" validate:"required"`
+	URL                  *URL              `config:"url" validate:"required"`
 	DateCursor           *DateCursor       `config:"date_cursor"`
 }
 
@@ -92,6 +93,21 @@ func (t *Template) Unpack(in string) error {
 	return nil
 }
 
+type URL struct {
+	*url.URL
+}
+
+func (u *URL) Unpack(in string) error {
+	parsed, err := url.Parse(in)
+	if err != nil {
+		return err
+	}
+
+	*u = URL{URL: parsed}
+
+	return nil
+}
+
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
 func (dc *DateCursor) IsEnabled() bool {
 	return dc != nil && (dc.Enabled == nil || *dc.Enabled)
@@ -121,26 +137,26 @@ func (c *config) Validate() error {
 	case "GET", "POST":
 		break
 	default:
-		return errors.Errorf("httpjson input: Invalid http_method, %s", c.HTTPMethod)
+		return fmt.Errorf("httpjson input: Invalid http_method, %s", c.HTTPMethod)
 	}
 	if c.NoHTTPBody {
 		if len(c.HTTPRequestBody) > 0 {
-			return errors.Errorf("invalid configuration: both no_http_body and http_request_body cannot be set simultaneously")
+			return errors.New("invalid configuration: both no_http_body and http_request_body cannot be set simultaneously")
 		}
 		if c.Pagination != nil && (len(c.Pagination.ExtraBodyContent) > 0 || c.Pagination.RequestField != "") {
-			return errors.Errorf("invalid configuration: both no_http_body and pagination.extra_body_content or pagination.req_field cannot be set simultaneously")
+			return errors.New("invalid configuration: both no_http_body and pagination.extra_body_content or pagination.req_field cannot be set simultaneously")
 		}
 	}
 	if c.Pagination != nil {
 		if c.Pagination.Header != nil {
 			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" || len(c.Pagination.ExtraBodyContent) > 0 {
-				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")
+				return errors.New("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")
 			}
 		}
 	}
 	if c.OAuth2.IsEnabled() {
 		if c.APIKey != "" || c.AuthenticationScheme != "" {
-			return errors.Errorf("invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously")
+			return errors.New("invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously")
 		}
 	}
 	return nil

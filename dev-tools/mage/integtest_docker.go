@@ -19,6 +19,7 @@ package mage
 
 import (
 	"fmt"
+	"go/build"
 	"io/ioutil"
 	"os"
 	"path"
@@ -94,6 +95,8 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 	dockerRepoRoot := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	dockerGoCache := filepath.Join(dockerRepoRoot, "build/docker-gocache")
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
+	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod/cache/download")
+	dockerGoPkgCache := "/gocache"
 
 	// Execute the inside of docker-compose.
 	args := []string{"-p", dockerComposeProjectName(), "run",
@@ -105,6 +108,9 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
 		"-e", "GOCACHE=" + dockerGoCache,
+		// Use the host machine's pkg cache to minimize external downloads.
+		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
+		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {

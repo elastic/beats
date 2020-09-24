@@ -67,6 +67,7 @@
         "panw.panos.destination.nat.ip": "184.51.253.152",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "22751",
         "panw.panos.network.nat.community_id": "1:D1fZ8H3SfYS5p3yDzVdiwbnGJlU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -75,7 +76,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16418,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "184.51.253.152",
@@ -170,6 +176,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24223",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -178,7 +185,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -276,6 +288,7 @@
         "panw.panos.destination.nat.ip": "17.253.3.202",
         "panw.panos.destination.nat.port": 80,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24138",
         "panw.panos.network.nat.community_id": "1:VnGCPYRgvHZCFJBmPOwtCg7/sMY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -284,7 +297,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51990,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.253.3.202",
@@ -379,6 +397,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24043",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -387,7 +406,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -485,6 +509,7 @@
         "panw.panos.destination.nat.ip": "216.58.194.99",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23003",
         "panw.panos.network.nat.community_id": "1:pvg9sIAzBs2eyqMclcdCIYEBO1Q=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -493,7 +518,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 15252,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "216.58.194.99",
@@ -588,6 +618,7 @@
         "panw.panos.destination.nat.ip": "209.234.224.22",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "23919",
         "panw.panos.network.nat.community_id": "1:u81/Ahz4HsL4LAVrUEiPkbXlX9A=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -596,7 +627,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 40763,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "209.234.224.22",
@@ -691,6 +727,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "21394",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -699,7 +736,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -794,6 +836,7 @@
         "panw.panos.destination.nat.ip": "172.217.2.238",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23698",
         "panw.panos.network.nat.community_id": "1:DoBKpBbAds/XQwbKPGjMrcuHTGo=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -802,7 +845,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52881,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.2.238",
@@ -897,6 +945,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24179",
         "panw.panos.network.nat.community_id": "1:viuINkmqZ3Q7wH9NHmhVu6rZuOs=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -905,7 +954,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 26654,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1000,6 +1054,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23933",
         "panw.panos.network.nat.community_id": "1:wR8JpmqlhC4f7BvxdzxRlKdkPiQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1008,7 +1063,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2486,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1103,6 +1163,7 @@
         "panw.panos.destination.nat.ip": "17.249.60.78",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "22662",
         "panw.panos.network.nat.community_id": "1:JuPhgq+FyomxcGW/tt851C0l4Hg=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1111,7 +1172,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42021,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.249.60.78",
@@ -1206,6 +1272,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24161",
         "panw.panos.network.nat.community_id": "1:rsDXUIQYGBC2VYTxep2/bVIc3Xs=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1214,7 +1281,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24377,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1309,6 +1381,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24107",
         "panw.panos.network.nat.community_id": "1:ewaPydF3S4wOU8oEi8ykj+ETSIY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1317,7 +1390,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 48792,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1412,6 +1490,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24063",
         "panw.panos.network.nat.community_id": "1:+6FjOLCCWY+JDxSWKn7tYpAXksA=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1420,7 +1499,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2987,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1515,6 +1599,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24145",
         "panw.panos.network.nat.community_id": "1:rR5F8eZHI1nwmznedxqG9e8vUQE=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1523,7 +1608,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6945,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1618,6 +1708,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24245",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1626,7 +1717,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1721,6 +1817,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24167",
         "panw.panos.network.nat.community_id": "1:81Mi4MwpmNYtUrc7CMJH0MPRelU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1729,7 +1826,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42208,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1824,6 +1926,7 @@
         "panw.panos.destination.nat.ip": "98.138.49.44",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24212",
         "panw.panos.network.nat.community_id": "1:FfbVY/+5Mds7zDjSs5/Yfw5bxNQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1832,7 +1935,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14660,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "98.138.49.44",
@@ -1927,6 +2035,7 @@
         "panw.panos.destination.nat.ip": "72.30.3.43",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24149",
         "panw.panos.network.nat.community_id": "1:TGvDRLypWuNWkuMsAxPzc5TSbAo=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -1935,7 +2044,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16483,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "72.30.3.43",
@@ -2030,6 +2144,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24185",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2038,7 +2153,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -2133,6 +2253,7 @@
         "panw.panos.destination.nat.ip": "172.217.9.142",
         "panw.panos.destination.nat.port": 80,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "23856",
         "panw.panos.network.nat.community_id": "1:NNgF+9vrbBFNpCI3JhUT4YWepd4=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2141,7 +2262,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5570,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2236,6 +2362,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24173",
         "panw.panos.network.nat.community_id": "1:9T+RKr8xDB21pvAf/Fihyq72sLY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2244,7 +2371,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24430,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -2342,6 +2474,7 @@
         "panw.panos.destination.nat.ip": "54.84.80.198",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24257",
         "panw.panos.network.nat.community_id": "1:k69UBIONLgCiGo9UhMOEY0pQnZ4=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2350,7 +2483,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12122,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.84.80.198",
@@ -2446,6 +2584,7 @@
         "panw.panos.destination.nat.ip": "199.167.55.52",
         "panw.panos.destination.nat.port": 4282,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24090",
         "panw.panos.network.nat.community_id": "1:07q7McJtir76GhJwAJffz+C0sNo=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2454,7 +2593,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49145,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "drop",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -2549,6 +2693,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24242",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2557,7 +2702,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "deny",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -2649,6 +2799,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24190",
         "panw.panos.network.nat.community_id": "1:JM1EdN05nKTy8Sq9WGpY15fCNJk=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2657,7 +2808,11 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33110,
         "panw.panos.source.zone": "trust",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -2749,6 +2904,7 @@
         "panw.panos.destination.nat.ip": "172.217.9.142",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23892",
         "panw.panos.network.nat.community_id": "1:3vS12CJ5QBY6RbGXOUPYKL9E0+U=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2757,7 +2913,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 9299,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "test",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2852,6 +3013,7 @@
         "panw.panos.destination.nat.ip": "151.101.2.2",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24360",
         "panw.panos.network.nat.community_id": "1:l6nFWeOSs/2aQaVCfYhfQ09l0ko=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2860,7 +3022,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 47194,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -2958,6 +3125,7 @@
         "panw.panos.destination.nat.ip": "216.58.194.66",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23952",
         "panw.panos.network.nat.community_id": "1:hVpNmZPedeB/gYRm9U4/gS+LNkQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -2966,7 +3134,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 62921,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.66",
@@ -3061,6 +3234,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24328",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3069,7 +3243,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3164,6 +3343,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24385",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3172,7 +3352,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -3267,6 +3452,7 @@
         "panw.panos.destination.nat.ip": "184.51.253.193",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24172",
         "panw.panos.network.nat.community_id": "1:zBrhHOnlJT7YZV7WXiPAQBEhScI=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3275,7 +3461,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 41958,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.253.193",
@@ -3370,6 +3561,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24131",
         "panw.panos.network.nat.community_id": "1:QjiWUuclXv+JzWhbuYDyyP+YyTk=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3378,7 +3570,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51374,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3474,6 +3671,7 @@
         "panw.panos.destination.nat.ip": "199.167.55.52",
         "panw.panos.destination.nat.port": 4282,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24393",
         "panw.panos.network.nat.community_id": "1:WSYAeVnYXY4WmfLFYEEo/atQJE8=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3482,7 +3680,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 25566,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -3580,6 +3783,7 @@
         "panw.panos.destination.nat.ip": "199.167.52.219",
         "panw.panos.destination.nat.port": 17472,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24976",
         "panw.panos.network.nat.community_id": "1:XrQuj5ypAzAqGAy0lpIvWQVVZ2E=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3588,7 +3792,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63757,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.52.219",
@@ -3686,6 +3895,7 @@
         "panw.panos.destination.nat.ip": "52.71.117.196",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24348",
         "panw.panos.network.nat.community_id": "1:EG9O/WtvoWuYwaB1MXJTgr43kac=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3694,7 +3904,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3803,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.71.117.196",
@@ -3789,6 +4004,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24046",
         "panw.panos.network.nat.community_id": "1:eI0W7/EQJgRBimA1ZM4XVOSKMqo=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3797,7 +4013,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 34994,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3892,6 +4113,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24196",
         "panw.panos.network.nat.community_id": "1:uSrPYHIl4eJpdC+J0IAMuGStuNc=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -3900,7 +4122,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38064,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3998,6 +4225,7 @@
         "panw.panos.destination.nat.ip": "35.186.194.41",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24264",
         "panw.panos.network.nat.community_id": "1:djhBHAw6H+Q9Bcz6i7V+GTrjtzA=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4006,7 +4234,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42924,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.194.41",
@@ -4100,6 +4333,7 @@
         "panw.panos.destination.nat.ip": "35.201.124.9",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24248",
         "panw.panos.network.nat.community_id": "1:hIY5A8O11VWtEfpYG2l5voTvbVQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4108,7 +4342,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58977,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.124.9",
@@ -4206,6 +4445,7 @@
         "panw.panos.destination.nat.ip": "100.24.131.237",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24268",
         "panw.panos.network.nat.community_id": "1:sXYelUOdA/EfjcKKE8M5kPe+M+c=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4214,7 +4454,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64732,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.131.237",
@@ -4309,6 +4554,7 @@
         "panw.panos.destination.nat.ip": "184.51.252.247",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24175",
         "panw.panos.network.nat.community_id": "1:D6pPzYoIWTOXxVzuweKvZYK6FVE=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4317,7 +4563,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58292,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -4415,6 +4666,7 @@
         "panw.panos.destination.nat.ip": "35.190.88.148",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24312",
         "panw.panos.network.nat.community_id": "1:VFQjrA+iaNcIu6vFJNU6ls7+4Is=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4423,7 +4675,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32209,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.190.88.148",
@@ -4521,6 +4778,7 @@
         "panw.panos.destination.nat.ip": "35.186.243.83",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24164",
         "panw.panos.network.nat.community_id": "1:Xx31zYZNYc/mjf2GOihkp6JogmA=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4529,7 +4787,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38822,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.243.83",
@@ -4624,6 +4887,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24198",
         "panw.panos.network.nat.community_id": "1:445AeHI1LAvb+ii4arRZeLAO4zM=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4632,7 +4896,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16044,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4727,6 +4996,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "trust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24184",
         "panw.panos.network.nat.community_id": "1:+5KwsEYW+tFecEENSBwHbKTvUv8=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4735,7 +5005,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 56614,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4833,6 +5108,7 @@
         "panw.panos.destination.nat.ip": "100.24.165.74",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "trust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24314",
         "panw.panos.network.nat.community_id": "1:DRqq/mx90TOYq1a5yLf562kwIvc=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4841,7 +5117,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53168,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.165.74",
@@ -4936,6 +5217,7 @@
         "panw.panos.destination.nat.ip": "184.51.252.247",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24204",
         "panw.panos.network.nat.community_id": "1:vx03vuDn4sh2/e89Lm3RoSpVIVM=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -4944,7 +5226,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28012,
         "panw.panos.source.zone": "xtrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -5038,6 +5325,7 @@
         "panw.panos.destination.nat.ip": "35.201.94.140",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "xuntrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24234",
         "panw.panos.network.nat.community_id": "1:u1uvQ3wfJoaG/nNiBhvQMHQSVlU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5046,7 +5334,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16050,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.94.140",
@@ -5138,6 +5431,7 @@
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24390",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5145,7 +5439,12 @@
         "panw.panos.source.interface": "ethernet1/2",
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5240,6 +5539,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24093",
         "panw.panos.network.nat.community_id": "1:lz0ZCL4R4wwyqmvefpkiJk7yR18=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5248,7 +5548,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5343,6 +5648,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24117",
         "panw.panos.network.nat.community_id": "1:DkOVz0BGrlh9OPZZ8+58eugW7gU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5351,7 +5657,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14247,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5446,6 +5757,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24142",
         "panw.panos.network.nat.community_id": "1:twx1eOqehbazvI0g0nkTeVynrY0=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5454,7 +5766,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33580,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5549,6 +5866,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24195",
         "panw.panos.network.nat.community_id": "1:hcgjXpi+ne3QnFDBLeskkVg4V+M=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5557,7 +5875,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13498,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5652,6 +5975,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24124",
         "panw.panos.network.nat.community_id": "1:C91XK45Q10iqwwp4XYM+Wg1Ua8A=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5660,7 +5984,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20365,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5755,6 +6084,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24153",
         "panw.panos.network.nat.community_id": "1:hsTAFtOdeb7+Ofe152B+9h69mbE=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5763,7 +6093,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61464,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5858,6 +6193,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24122",
         "panw.panos.network.nat.community_id": "1:htOXUg3QOGd0fpgLjYzQlvRMzUQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5866,7 +6202,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42877,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -5961,6 +6302,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24171",
         "panw.panos.network.nat.community_id": "1:gHWCOTtilTTqOn7fOKh7zVq45Xw=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -5969,7 +6311,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5918,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6064,6 +6411,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24069",
         "panw.panos.network.nat.community_id": "1:OGDvpe1+4KQfCsxk0I61jm0+DIc=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6072,7 +6420,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28944,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6167,6 +6520,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24282",
         "panw.panos.network.nat.community_id": "1:po/vy4RoD5WeFPgCZnduQkE47yY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6175,7 +6529,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13415,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6270,6 +6629,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24218",
         "panw.panos.network.nat.community_id": "1:wIxYOe++IxscmxBcRwrPGEIlZF4=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6278,7 +6638,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2489,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6373,6 +6738,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24200",
         "panw.panos.network.nat.community_id": "1:xN7R3QI47jVAQhgJrOAvdsu+oes=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6381,7 +6747,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49328,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6476,6 +6847,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24224",
         "panw.panos.network.nat.community_id": "1:BxuDgAhR5Rh55XOXYnYF+6GKhps=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6484,7 +6856,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 36036,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6582,6 +6959,7 @@
         "panw.panos.destination.nat.ip": "66.28.0.45",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24240",
         "panw.panos.network.nat.community_id": "1:Yv+Yq/7HK9SajeKHOV50RYQWjRU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6590,7 +6968,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33744,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "66.28.0.45",
@@ -6685,6 +7068,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24183",
         "panw.panos.network.nat.community_id": "1:MxVcaRP5Y1xyEiYiNsmO1lVcN+A=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6693,7 +7077,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 45809,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6788,6 +7177,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24211",
         "panw.panos.network.nat.community_id": "1:p8DU1xLXG63f/3s/r6ZKJcQo9u8=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6796,7 +7186,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3675,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6891,6 +7286,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24253",
         "panw.panos.network.nat.community_id": "1:bU3nBIz+M3cDoPKg8azcJgVx+8Q=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -6899,7 +7295,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5787,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6994,6 +7395,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24221",
         "panw.panos.network.nat.community_id": "1:vnb4ttnFy2i39tg89p3jkGs6eDg=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7002,7 +7404,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12342,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7097,6 +7504,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24310",
         "panw.panos.network.nat.community_id": "1:71/qcXOmOV3sXCqZ1T6JVPlE9y8=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7105,7 +7513,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 18729,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7203,6 +7616,7 @@
         "panw.panos.destination.nat.ip": "23.52.174.25",
         "panw.panos.destination.nat.port": 80,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24326",
         "panw.panos.network.nat.community_id": "1:5ECmBtgiSUvWFJAA318pVeeu5Pw=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7211,7 +7625,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57858,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.52.174.25",
@@ -7306,6 +7725,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24201",
         "panw.panos.network.nat.community_id": "1:hxrz+dYE5XEf60JMlFz6JKWD6Ek=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7314,7 +7734,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7409,6 +7834,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24130",
         "panw.panos.network.nat.community_id": "1:8cb9oPS9OJnzqGAkowgmRpiqmJU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7417,7 +7843,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6674,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7515,6 +7946,7 @@
         "panw.panos.destination.nat.ip": "54.230.5.228",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24237",
         "panw.panos.network.nat.community_id": "1:Qc2oBV7ermdHPwGTWFOi4D1TcLg=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7523,7 +7955,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37427,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.230.5.228",
@@ -7618,6 +8055,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24108",
         "panw.panos.network.nat.community_id": "1:5IHTDvzRd4yPLPdpI4ErHcRK4/w=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7626,7 +8064,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22408,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7721,6 +8164,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24247",
         "panw.panos.network.nat.community_id": "1:0s4n+/itsIbV3mUc8OnOxmZ6exs=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7729,7 +8173,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 27899,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7824,6 +8273,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24098",
         "panw.panos.network.nat.community_id": "1:+GsjKlESn/QeXwrAsS8c8EaMzi0=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7832,7 +8282,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52939,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7927,6 +8382,7 @@
         "panw.panos.destination.nat.ip": "208.83.246.20",
         "panw.panos.destination.nat.port": 123,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24263",
         "panw.panos.network.nat.community_id": "1:OSARbLstqz9D5CGo0NQuv0a9g20=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -7935,7 +8391,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42907,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.195",
             "208.83.246.20",
@@ -8029,6 +8490,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24258",
         "panw.panos.network.nat.community_id": "1:Cc+ekkpKaB3f2BPdSyd/esY/QVI=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8037,7 +8499,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19658,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -8131,6 +8598,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24155",
         "panw.panos.network.nat.community_id": "1:uPFYX4KL/wjyCp4kt+08v7myT3w=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8139,7 +8607,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64352,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8233,6 +8706,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24232",
         "panw.panos.network.nat.community_id": "1:f3vxOCmoOo/FOLV6VRqKjZ7eUVE=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8241,7 +8715,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60126,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8337,6 +8816,7 @@
         "panw.panos.destination.nat.ip": "35.185.88.112",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24330",
         "panw.panos.network.nat.community_id": "1:/rmnQ6QBbJzgkfNBrkCgvu5UHiU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8345,7 +8825,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 59771,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.185.88.112",
@@ -8440,6 +8925,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "23960",
         "panw.panos.network.nat.community_id": "1:9Ub1pskil4C0tLo85OJa61g1D0Q=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8448,7 +8934,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 35748,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8543,6 +9034,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24236",
         "panw.panos.network.nat.community_id": "1:rh7nCIUBzUAekx4F+OTwBbpRh+E=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8551,7 +9043,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63701,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8646,6 +9143,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24276",
         "panw.panos.network.nat.community_id": "1:eIIc+AXkJtZLyfNqUAVZLumaYVQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8654,7 +9152,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57872,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8752,6 +9255,7 @@
         "panw.panos.destination.nat.ip": "50.19.85.24",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24299",
         "panw.panos.network.nat.community_id": "1:Mn7w9ScywW3qjDMNsO8QsGj6BY0=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8760,7 +9264,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37581,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -8858,6 +9367,7 @@
         "panw.panos.destination.nat.ip": "50.19.85.24",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24229",
         "panw.panos.network.nat.community_id": "1:8oAG19bm5FROhazDy0CcTH+Cfqc=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8866,7 +9376,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19226,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -8964,6 +9479,7 @@
         "panw.panos.destination.nat.ip": "50.19.85.24",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24283",
         "panw.panos.network.nat.community_id": "1:ZhVElLU1QcpGayhElc2L/+Rp+xw=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -8972,7 +9488,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61721,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9067,6 +9588,7 @@
         "panw.panos.destination.nat.ip": "104.254.150.9",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24369",
         "panw.panos.network.nat.community_id": "1:aHhDlT3Bx285CJRrBykpRsei1a0=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9075,7 +9597,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10098,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "104.254.150.9",
@@ -9173,6 +9700,7 @@
         "panw.panos.destination.nat.ip": "50.19.85.24",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-rst-from-client",
         "panw.panos.flow_id": "24354",
         "panw.panos.network.nat.community_id": "1:RLfRarGPGl+PnGhB8fb+S+uTX1o=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9181,7 +9709,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 4564,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9279,6 +9812,7 @@
         "panw.panos.destination.nat.ip": "52.0.218.108",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24254",
         "panw.panos.network.nat.community_id": "1:/0iCZCsnpk+5MR4Tc26unyr/T4Q=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9287,7 +9821,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32104,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.0.218.108",
@@ -9385,6 +9924,7 @@
         "panw.panos.destination.nat.ip": "52.6.117.19",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24246",
         "panw.panos.network.nat.community_id": "1:486dmnLzuTH8P7j6jI6JsUtW2VU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9393,7 +9933,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14172,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.6.117.19",
@@ -9491,6 +10036,7 @@
         "panw.panos.destination.nat.ip": "34.238.96.22",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24343",
         "panw.panos.network.nat.community_id": "1:6LTK93w8ZdfxzSfZXzebKR6jWxo=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9499,7 +10045,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10286,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "34.238.96.22",
@@ -9597,6 +10148,7 @@
         "panw.panos.destination.nat.ip": "130.211.47.17",
         "panw.panos.destination.nat.port": 443,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "tcp-fin",
         "panw.panos.flow_id": "24262",
         "panw.panos.network.nat.community_id": "1:roV5JFl0FdQHIRUkgeZm+ZeyeCQ=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9605,7 +10157,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 30799,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "130.211.47.17",
@@ -9700,6 +10257,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24281",
         "panw.panos.network.nat.community_id": "1:5G+JVi/ClM/MfHhUL//vH/GmuaA=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9708,7 +10266,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13490,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -9803,6 +10366,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 0,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24424",
         "panw.panos.network.nat.community_id": "1:QVXHpdoObbzEeqP6DGULYxqYgAY=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9811,7 +10375,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -9906,6 +10475,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24230",
         "panw.panos.network.nat.community_id": "1:mdksC4jGw6MN7g3nGdquiqQ95vU=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -9914,7 +10484,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53751,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10009,6 +10584,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24243",
         "panw.panos.network.nat.community_id": "1:+zC2Y+UE7UqApr01oqb755Xyuf4=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -10017,7 +10593,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 21643,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10112,6 +10693,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24077",
         "panw.panos.network.nat.community_id": "1:xawqUBgLyfe1E61ObEXv4nbO590=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -10120,7 +10702,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22446,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10215,6 +10802,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24266",
         "panw.panos.network.nat.community_id": "1:PDWWOeDVqKGZ/hwjVVdCDdF6qB4=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -10223,7 +10811,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22301,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10318,6 +10911,7 @@
         "panw.panos.destination.nat.ip": "8.8.8.8",
         "panw.panos.destination.nat.port": 53,
         "panw.panos.destination.zone": "untrust",
+        "panw.panos.endreason": "aged-out",
         "panw.panos.flow_id": "24269",
         "panw.panos.network.nat.community_id": "1:yNIHAg1M08IChho9000mtg7zUOc=",
         "panw.panos.ruleset": "new_outbound_from_trust",
@@ -10326,7 +10920,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58124,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",

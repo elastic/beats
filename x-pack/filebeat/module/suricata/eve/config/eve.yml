@@ -16,7 +16,7 @@ processors:
       target: suricata.eve
   - convert:
       ignore_missing: true
-      ignore_failure: true
+      fail_on_error: false
       mode: rename
       fields:
         - {from: suricata.eve.src_ip, to: source.address}
@@ -26,7 +26,7 @@ processors:
         - {from: suricata.eve.proto, to: network.transport}
   - convert:
       ignore_missing: true
-      ignore_failure: true
+      fail_on_error: false
       mode: copy
       fields:
         - {from: source.address, to: source.ip, type: ip}
@@ -48,7 +48,7 @@ processors:
     then:
       - convert:
           ignore_missing: true
-          ignore_failure: true
+          fail_on_error: false
           mode: copy
           fields:
             - {from: suricata.eve.dns.id, to: dns.id, type: string}
@@ -57,7 +57,7 @@ processors:
       - convert:
           when.equals.dns.type: query
           ignore_missing: true
-          ignore_failure: true
+          fail_on_error: false
           mode: copy
           fields:
             - {from: suricata.eve.dns.rrname, to: dns.question.name}
@@ -69,7 +69,7 @@ processors:
         then:
           - convert:
               ignore_missing: true
-              ignore_failure: true
+              fail_on_error: false
               mode: copy
               fields:
                 - {from: suricata.eve.dns.rrname, to: dns.question.name}
@@ -384,8 +384,6 @@ processors:
         - {from: suricata.eve.tls.fingerprint, to: tls.server.hash.sha1}
         - {from: suricata.eve.tls.sni, to: tls.client.server_name}
         - {from: suricata.eve.tls.sni, to: destination.domain}
-        - {from: suricata.eve.tls.notbefore, to: tls.server.not_before}
-        - {from: suricata.eve.tls.notafter, to: tls.server.not_after}
         - {from: suricata.eve.tls.ja3s.hash, to: tls.server.ja3s}
         - {from: suricata.eve.tls.ja3.hash, to: tls.client.ja3}
         - {from: suricata.eve.tls.certificate, to: tls.server.certificate}
@@ -404,4 +402,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

@@ -1,12 +1,10 @@
 import logging
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
 from parameterized import parameterized
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +54,7 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand(["http", "tcp"])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_status(self, proto):
         """
         uWSGI module outputs an event.
@@ -75,4 +73,4 @@ class Test(metricbeat.BaseTest):
         self.common_checks(output)
 
     def get_host(self, proto):
-        return proto + "://" + self.compose_host(service="uwsgi_"+proto)
+        return proto + "://" + self.compose_host(service="uwsgi_" + proto)

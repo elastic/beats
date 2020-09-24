@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -26,7 +25,7 @@ func (h *handlerConfigChange) Handle(ctx context.Context, a action, acker fleetA
 		return fmt.Errorf("invalid type, expected ActionConfigChange and received %T", a)
 	}
 
-	c, err := config.NewConfigFrom(action.Config)
+	c, err := LoadConfig(action.Config)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}

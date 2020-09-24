@@ -2,6 +2,11 @@
   "description": "Pipeline for parsing osquery result logs",
   "processors": [
     {
+      "set":{
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    }, {
       "rename": {
         "field": "@timestamp",
         "target_field": "event.created"
@@ -200,6 +205,14 @@
             "field": "rule.name",
             "value": "{{osquery.result.name}}",
             "ignore_empty_value": true
+        }
+    },
+    {
+        "append": {
+            "field": "related.hosts",
+            "value": "{{host.hostname}}",
+            "if": "ctx?.host?.hostname != null && ctx.host?.hostname != ''",
+            "allow_duplicates": false
         }
     }
   ],

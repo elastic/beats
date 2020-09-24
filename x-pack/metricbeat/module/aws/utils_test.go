@@ -351,35 +351,45 @@ func TestFindTimestamp(t *testing.T) {
 
 func TestFindIdentifierFromARN(t *testing.T) {
 	cases := []struct {
-		resourceARN        string
-		expectedIdentifier string
+		resourceARN             string
+		expectedShortIdentifier string
+		expectedWholeIdentifier string
 	}{
 		{
 			"arn:aws:rds:eu-west-1:123456789012:db:mysql-db",
 			"mysql-db",
+			"db:mysql-db",
 		},
 		{
 			"arn:aws:ec2:us-east-1:123456789012:instance/i-123",
 			"i-123",
+			"instance/i-123",
 		},
 		{
 			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
+			"notification-topic-1",
 			"notification-topic-1",
 		},
 		{
 			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/app/ece-ui/b195d6cf21493989",
 			"app/ece-ui/b195d6cf21493989",
+			"loadbalancer/app/ece-ui/b195d6cf21493989",
 		},
 		{
 			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+			"loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 		},
 	}
 
 	for _, c := range cases {
-		identifier, err := FindIdentifierFromARN(c.resourceARN)
+		shortIdentifier, err := FindShortIdentifierFromARN(c.resourceARN)
 		assert.NoError(t, err)
-		assert.Equal(t, c.expectedIdentifier, identifier)
+		assert.Equal(t, c.expectedShortIdentifier, shortIdentifier)
+
+		wholeIdentifier, err := FindWholeIdentifierFromARN(c.resourceARN)
+		assert.NoError(t, err)
+		assert.Equal(t, c.expectedWholeIdentifier, wholeIdentifier)
 	}
 
 }
@@ -388,7 +398,7 @@ func TestGetResourcesTags(t *testing.T) {
 	mockSvc := &MockResourceGroupsTaggingClient{}
 	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(resourceTagMap))
+	assert.Equal(t, 4, len(resourceTagMap))
 
 	expectedResourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapi.Tag{
@@ -402,6 +412,26 @@ func TestGetResourcesTags(t *testing.T) {
 		},
 	}
 	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("finance"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("boo"),
+		},
+	}
+	expectedResourceTagMap["db:mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("engineering"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("foo"),
+		},
+	}
+	expectedResourceTagMap["db:mysql-db-2"] = []resourcegroupstaggingapi.Tag{
 		{
 			Key:   awssdk.String("organization"),
 			Value: awssdk.String("finance"),
