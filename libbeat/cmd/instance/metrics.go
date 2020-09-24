@@ -59,9 +59,6 @@ func setupMetrics(name string) error {
 	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
 	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
 	monitoring.NewFunc(beatMetrics, "runtime", reportRuntime, monitoring.Report)
-	if runtime.GOOS == "linux" {
-		monitoring.NewFunc(beatMetrics, "cgroup", reportBeatCgroups, monitoring.Report)
-	}
 
 	setupPlatformSpecificMetrics()
 
@@ -69,10 +66,15 @@ func setupMetrics(name string) error {
 }
 
 func setupPlatformSpecificMetrics() {
+	switch runtime.GOOS {
+	case "linux":
+		monitoring.NewFunc(beatMetrics, "cgroup", reportBeatCgroups, monitoring.Report)
+	case "windows":
+		setupWindowsHandlesMetrics()
+	}
+
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	} else {
-		setupWindowsHandlesMetrics()
 	}
 
 	setupLinuxBSDFDMetrics()
