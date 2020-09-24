@@ -32,6 +32,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func alwaysInclude(path string) bool {
+	return false
+}
+
+func alwaysExclude(path string) bool {
+	return true
+}
+
 func TestNonRecursive(t *testing.T) {
 	dir, err := ioutil.TempDir("", "monitor")
 	assertNoError(t, err)
@@ -44,7 +52,7 @@ func TestNonRecursive(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	watcher, err := New(false)
+	watcher, err := New(false, alwaysInclude)
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Add(dir))
@@ -92,7 +100,7 @@ func TestRecursive(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	watcher, err := New(true)
+	watcher, err := New(true, alwaysInclude)
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Add(dir))
@@ -147,7 +155,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 
 	// Start the watcher
 
-	watcher, err := New(true)
+	watcher, err := New(true, alwaysInclude)
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Add(dir))
@@ -208,7 +216,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	// Setup watches on watched dir
 
-	watcher, err := New(true)
+	watcher, err := New(true, alwaysInclude)
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Start())
@@ -260,6 +268,78 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 		op, found := expected[ev.Name]
 		assert.True(t, found, ev.Name)
 		assert.Equal(t, op, ev.Op)
+	}
+}
+
+func TestRecursiveExcludedPaths(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping permissions test on Windows")
+	}
+
+	// Create dir to be watched
+
+	dir, err := ioutil.TempDir("", "monitor")
+	assertNoError(t, err)
+	if runtime.GOOS == "darwin" {
+		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
+			dir = dirAlt
+		}
+	}
+	defer os.RemoveAll(dir)
+
+	// Create not watched dir
+
+	outDir, err := ioutil.TempDir("", "non-watched")
+	assertNoError(t, err)
+	if runtime.GOOS == "darwin" {
+		if dirAlt, err := filepath.EvalSymlinks(outDir); err == nil {
+			outDir = dirAlt
+		}
+	}
+	defer os.RemoveAll(outDir)
+
+	// Populate not watched subdir
+
+	for _, name := range []string{"a", "b", "c"} {
+		path := filepath.Join(outDir, name)
+		assertNoError(t, os.Mkdir(path, 0755))
+		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0644))
+	}
+
+	// Make a subdir not accessible
+
+	assertNoError(t, os.Chmod(filepath.Join(outDir, "b"), 0))
+
+	// Setup watches on watched dir
+
+	watcher, err := New(true, alwaysExclude)
+	assertNoError(t, err)
+
+	assertNoError(t, watcher.Start())
+	assertNoError(t, watcher.Add(dir))
+
+	defer func() {
+		assertNoError(t, watcher.Close())
+	}()
+
+	// No event is received
+
+	ev, err := readTimeout(t, watcher)
+	assert.Equal(t, errReadTimeout, err)
+	if err != errReadTimeout {
+		t.Fatalf("Expected timeout, got event %+v", ev)
+	}
+
+	// Move the outside directory into the watched
+
+	dest := filepath.Join(dir, "subdir")
+	assertNoError(t, os.Rename(outDir, dest))
+
+	// No event is received because all paths are excluded
+	ev, err = readTimeout(t, watcher)
+	assert.Equal(t, errReadTimeout, err)
+	if err != errReadTimeout {
+		t.Fatalf("Expected timeout, got event %+v", ev)
 	}
 }
 

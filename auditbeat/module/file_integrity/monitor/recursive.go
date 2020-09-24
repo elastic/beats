@@ -36,16 +36,19 @@ type recursiveWatcher struct {
 	addC    chan string
 	addErrC chan error
 	log     *logp.Logger
+
+	isExcludedPath func(path string) bool
 }
 
-func newRecursiveWatcher(inner *fsnotify.Watcher) *recursiveWatcher {
+func newRecursiveWatcher(inner *fsnotify.Watcher, IsExcludedPath func(path string) bool) *recursiveWatcher {
 	return &recursiveWatcher{
-		inner:   inner,
-		tree:    FileTree{},
-		eventC:  make(chan fsnotify.Event, 1),
-		addC:    make(chan string),
-		addErrC: make(chan error),
-		log:     logp.NewLogger(moduleName),
+		inner:          inner,
+		tree:           FileTree{},
+		eventC:         make(chan fsnotify.Event, 1),
+		addC:           make(chan string),
+		addErrC:        make(chan error),
+		log:            logp.NewLogger(moduleName),
+		isExcludedPath: IsExcludedPath,
 	}
 }
 
@@ -149,6 +152,9 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 				return nil
 			}
 			if event.Name == "" {
+				continue
+			}
+			if watcher.isExcludedPath(event.Name) {
 				continue
 			}
 			switch event.Op {
