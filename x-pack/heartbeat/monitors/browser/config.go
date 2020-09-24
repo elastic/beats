@@ -4,14 +4,22 @@
 
 package browser
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import (
+	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common"
+)
 
 type Config struct {
-	Script       string        `config:"script"`
-	ScriptParams common.MapStr `config:"script_params"`
+	Path        string        `config:"path"`
+	Script      string        `config:"script"`
+	Params      common.MapStr `config:"script_params"`
+	JourneyName string        `config:"journey_name"`
 }
 
 func (c *Config) Validate() error {
+	if c.Script != "" && c.Path != "" {
+		return fmt.Errorf("both path and script specified! Only one of these options may be present!")
+	}
 	return nil
 }
 

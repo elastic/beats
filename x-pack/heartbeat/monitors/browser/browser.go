@@ -34,6 +34,11 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		return nil, 0, err
 	}
 
-	j := synthexec.JourneyJob(context.TODO(), config.Script, config.ScriptParams)
+	var j jobs.Job
+	if config.Path != "" {
+		j = synthexec.SuiteJob(context.TODO(), config.Path, config.JourneyName, config.Params)
+	} else {
+		j = synthexec.JourneyJob(context.TODO(), config.Script, config.Params)
+	}
 	return []jobs.Job{j}, 1, nil
 }
