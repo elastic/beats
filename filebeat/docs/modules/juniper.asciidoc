@@ -14,6 +14,7 @@ This is a module for ingesting data from the different Juniper Products. Current
 
 - `srx` fileset: Supports Juniper SRX logs
 - `junos` fileset: Supports Juniper JUNOS logs
+- `netscreen` fileset: Supports Juniper Netscreen logs
 
 include::../include/gs-link.asciidoc[]
 
