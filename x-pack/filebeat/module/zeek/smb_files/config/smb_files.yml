@@ -57,9 +57,7 @@ processors:
         type:
           - connection
           - protocol
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:

@@ -36,6 +36,11 @@ func LoadYAML(path string, opts ...ucfg.Option) (*Config, error) {
 	return newConfigFrom(config), nil
 }
 
+// New creates a new empty config.
+func New() *Config {
+	return newConfigFrom(ucfg.New())
+}
+
 // NewConfigFrom takes a interface and read the configuration like it was YAML.
 func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
 	if len(opts) == 0 {
