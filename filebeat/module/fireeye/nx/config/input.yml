@@ -22,12 +22,234 @@ exclude_files: [".gz$"]
 processors:
     - decode_json_fields:
         fields: ["message"]
+        target: ""
         process_array: false
         max_depth: 2
-        target: "rawmsg"
 
-#processors:
-#    - add_fields:
-#        target: ''
-#        fields:
-#            ecs.version: 1.6.0
+    - rename:
+        fields:
+            - from: "rawmsg.timestamp"
+              to: "temp_ts"
+
+            - from: "rawmsg.proto"
+              to: "network.transport"
+
+            - from: "rawmsg.app_proto"
+              to: "network.protocol"
+
+            - from: "rawmsg.flow_id"
+              to: "fireeyenx.session_id"
+
+            - from: "rawmsg.event_type"
+              to: "event.type"
+
+            - from: "rawmsg.src_ip"
+              to: "source.address"
+
+            - from: "rawmsg.src_port"
+              to: "source.port"
+
+            - from: "rawmsg.dest_ip"
+              to: "destination.address"
+
+            - from: "rawmsg.dest_port"
+              to: "destination.port"
+
+            - from: "meta_sip4"
+              to: "fireeyenx.device_ip"
+
+            - from: "meta_oml"
+              to: "fireeyenx.device_oml"
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - rename:
+        when.equals.event.type: flow
+        fields:
+            - from: "rawmsg.proto_number"
+              to: "network.iana_number"
+            - from: "rawmsg.ip_tos"
+              to: "fireeyenx.ip_tos"
+            - from: "rawmsg.flow.pkts_toserver"
+              to: "source.packets"
+            - from: "rawmsg.flow.pkts_toclient"
+              to: "destination.packets"
+            - from: "rawmsg.flow.bytes_toserver"
+              to: "source.bytes"
+            - from: "rawmsg.flow.bytes_toclient"
+              to: "destination.bytes"
+            - from: "rawmsg.flow.start"
+              to: "fireeyenx.flow.starttime"
+            - from: "rawmsg.flow.end"
+              to: "fireeyenx.flow.endtime"
+            - from: "rawmsg.flow.age"
+              to: "fireeyenx.flow.age"
+            - from: "rawmsg.flow.state"
+              to: "fireeyenx.flow.state"
+            - from: "rawmsg.flow.reason"
+              to: "fireeyenx.flow.reason"
+            - from: "rawmsg.flow.alerted"
+              to: "fireeyenx.flow.altered"
+            - from: "rawmsg.tcp"
+              to: "fireeyenx.tcp"
+            - from: "rawmsg.icmp_code"
+              to: "fireeyenx.flow.icmp_code"
+            - from: "rawmsg.icmp_type"
+              to: "fireeyenx.flow.icmp_type"
+            - from: "rawmsg.response_icmp_code"
+              to: "fireeyenx.flow.response_icmp_code"
+            - from: "rawmsg.response_icmp_type"
+              to: "fireeyenx.flow.response_icmp_type"
+            - from: "rawmsg.ip_tc"
+              to: "fireeyenx.flow.ip_tc"
+
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - rename:
+        when.equals.event.type: fileinfo
+        fields:
+            - from: "rawmsg.fileinfo.filename"
+              to: "fireeyenx.fileinfo.filename"
+            - from: "rawmsg.fileinfo.magic"
+              to: "fireeyenx.fileinfo.magic"
+            - from: "rawmsg.fileinfo.md5"
+              to: "fireeyenx.fileinfo.md5"
+            - from: "rawmsg.fileinfo.size"
+              to: "fireeyenx.fileinfo.size"
+            - from: "rawmsg.fileinfo.state"
+              to: "fireeyenx.fileinfo.state"
+            - from: "rawmsg.fileinfo.stored"
+              to: "fireeyenx.fileinfo.stored"
+            - from: "rawmsg.http.hostname"
+              to: "url.domain"
+            - from: "rawmsg.http.http_content_type"
+              to: "http.request.mime_type"
+            - from: "rawmsg.http.http_method"
+              to: "http.request.method"
+            - from: "rawmsg.http.http_refer"
+              to: "http.request.referrer"
+            - from: "rawmsg.http.http_user_agent"
+              to: "http.request.user_agent"
+            - from: "rawmsg.http.length"
+              to: "http.response.bytes"
+            - from: "rawmsg.http.protocol"
+              to: "http.version"
+            - from: "rawmsg.http.status"
+              to: "http.response.status_code"
+            - from: "rawmsg.http.url"
+              to: "http.url.path"
+            - from: "rawmsg.iface"
+              to: "interface.name"
+            - from: "rawmsg.fileinfo.tx_id"
+              to: "fireeyenx.tx_id"
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - rename:
+        when.equals.event.type: http
+        fields:
+            - from: "rawmsg.http.hostname"
+              to: "url.domain"
+            - from: "rawmsg.http.http_content_type"
+              to: "http.request.mime_type"
+            - from: "rawmsg.http.http_method"
+              to: "http.request.method"
+            - from: "rawmsg.http.http_refer"
+              to: "http.request.referrer"
+            - from: "rawmsg.http.http_user_agent"
+              to: "http.request.user_agent"
+            - from: "rawmsg.http.length"
+              to: "http.response.bytes"
+            - from: "rawmsg.http.protocol"
+              to: "http.version"
+            - from: "rawmsg.http.status"
+              to: "http.response.status_code"
+            - from: "rawmsg.http.url"
+              to: "http.url.path"
+            - from: "rawmsg.iface"
+              to: "interface.name"
+            - from: "rawmsg.tx_id"
+              to: "fireeyenx.tx_id"
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - rename:
+        when.equals.event.type: dns
+        fields:
+            - from: "rawmsg.dns.id"
+              to: "dns.id"
+            - from: "rawmsg.dns.rcode"
+              to: "dns.response_code"
+            - from: "rawmsg.dns.rdata"
+              to: "dns.resolved_ip"
+            - from: "rawmsg.dns.rrname"
+              to: "dns.question.name"
+            - from: "rawmsg.dns.rrtype"
+              to: "dns.question.type"
+            - from: "rawmsg.dns.ttl"
+              to: "dns.answers.ttl"
+            - from: "rawmsg.dns.type"
+              to: "dns.type"
+            - from: "rawmsg.dns.tx_id"
+              to: "fireeyenx.tx_id"
+            - from: "rawmsg.iface"
+              to: "interface.name"
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - rename:
+        when.equals.event.type: tls
+        fields:
+            - from: "rawmsg.tls.client_ciphersuites"
+              to: "tls.client.ciphersuites"
+            - from: "rawmsg.tls.client_tls_exts"
+              to: "tls.client.tls_exts"
+            - from: "rawmsg.tls.fingerprint"
+              to: "tls.client.fingerprint"
+            - from: "rawmsg.tls.issuerdn"
+              to: "tls.client.issuer"
+            - from: "rawmsg.tls.ja3.hash"
+              to: "tls.client.ja3"
+            - from: "rawmsg.tls.ja3.string"
+              to: "tls.client.ja3_string"
+            - from: "rawmsg.tls.ja3s.hash"
+              to: "tls.client.ja3s"
+            - from: "rawmsg.tls.ja3s.string"
+              to: "tls.client.ja3s_string"
+            - from: "rawmsg.tls.notbefore"
+              to: "tls.client.not_before"
+            - from: "rawmsg.tls.notafter"
+              to: "tls.client.not_after"
+            - from: "rawmsg.tls.pubkeylength"
+              to: "tls.public_keylength"
+            - from: "rawmsg.tls.server_ciphersuite"
+              to: "tls.server.ciphersuite"
+            - from: "rawmsg.tls.server_tls_exts"
+              to: "tls.server.tls_exts"
+            - from: "rawmsg.tls.sni"
+              to: "tls.client.server_name"
+            - from: "rawmsg.tls.subject"
+              to: "tls.client.subject"
+            - from: "rawmsg.tls.version"
+              to: "tls.version"
+            - from: "rawmsg.tls.fatal_alert"
+              to: "fireeyenx.tls.fetal_alert"
+            - from: ""
+            - from: "rawmsg.iface"
+              to: "interface.name"
+
+        ignore_missing: true
+        fail_on_error: false
+
+    - add_fields:
+        target: ''
+        fields:
+            ecs.version: 1.6.0
+
+
