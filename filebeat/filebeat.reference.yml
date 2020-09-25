@@ -509,7 +509,11 @@ filebeat.inputs:
   # unmarshaling errors or when a text key is defined in the configuration but cannot
   # be used.
   #json.add_error_key: false
-
+  
+  # If this setting is set to true, Filebeat will not log JSON decoding errors
+  # By default it is set to false
+  #json.ignore_decoding_error: false
+  
   ### Multiline options
 
   # Multiline can be used for log messages spanning multiple lines. This is common
