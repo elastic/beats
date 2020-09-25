@@ -31,6 +31,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
+var (
+	templateLoaderPath = map[IndexTemplateType]string{
+		IndexTemplateLegacy:    "/_template/",
+		IndexTemplateComponent: "/_component_template/",
+		IndexTemplateIndex:     "/_index_template/",
+	}
+)
+
 //Loader interface for loading templates
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
@@ -97,7 +105,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		templateName = config.JSON.Name
 	}
 
-	if l.templateExists(templateName) && !config.Overwrite {
+	if l.templateExists(templateName, config.Type) && !config.Overwrite {
 		l.log.Infof("Template %s already exists and will not be overwritten.", templateName)
 		return nil
 	}
@@ -107,7 +115,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	if err != nil {
 		return err
 	}
-	if err := l.loadTemplate(templateName, body); err != nil {
+	if err := l.loadTemplate(templateName, config.Type, body); err != nil {
 		return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, body.StringToPrint())
 	}
 	l.log.Infof("template with name '%s' loaded.", templateName)
@@ -117,10 +125,11 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // loadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
+func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateType, template map[string]interface{}) error {
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
-	path := "/_template/" + templateName
-	params := esVersionParams(l.client.GetVersion())
+	clientVersion := l.client.GetVersion()
+	path := templateLoaderPath[templateType] + templateName
+	params := esVersionParams(clientVersion)
 	status, body, err := l.client.Request("PUT", path, "", params, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
@@ -133,9 +142,14 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 
 // templateExists checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *ESLoader) templateExists(templateName string) bool {
+func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) bool {
 	if l.client == nil {
 		return false
+	}
+
+	if templateType == IndexTemplateComponent {
+		status, _, _ := l.client.Request("GET", "/_component_template/"+templateName, "", nil, nil)
+		return status == http.StatusOK
 	}
 
 	status, body, _ := l.client.Request("GET", "/_cat/templates/"+templateName, "", nil, nil)
