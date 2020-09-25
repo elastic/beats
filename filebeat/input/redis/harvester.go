@@ -57,6 +57,7 @@ type log struct {
 	cmd       string
 	key       string
 	args      []string
+	ipAndPort	  string
 }
 
 // NewHarvester creates a new harvester with the given connection
@@ -116,7 +117,7 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args,&log.ipAndPort)
 
 		// This splits up the args into cmd, key, args.
 		argsLen := len(args)
@@ -139,6 +140,7 @@ func (h *Harvester) Run() error {
 			"duration": common.MapStr{
 				"us": log.duration,
 			},
+			"ipAndPort":        log.ipAndPort,
 		}
 
 		if log.args != nil {
