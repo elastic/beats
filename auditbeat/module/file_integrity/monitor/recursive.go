@@ -122,7 +122,7 @@ func (watcher *recursiveWatcher) close() error {
 }
 
 func (watcher *recursiveWatcher) deliver(ev fsnotify.Event) {
-	// skip watching excluded path
+	// skip deliver events for excluded path
 	if watcher.isExcludedPath(ev.Name) {
 		return
 	}

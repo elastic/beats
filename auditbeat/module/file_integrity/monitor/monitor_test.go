@@ -305,7 +305,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 	// excludes file/dir named "b"
 	selectiveExclude := func(path string) bool {
 		r := filepath.Base(path) == "b"
-		t.Logf("path: %v, result: %v\n", path, r)
+		t.Logf("path: %v, excluded: %v\n", path, r)
 		return r
 	}
 
@@ -348,7 +348,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 	}
 
 	// Verify that events for all accessible files are received
-	// File "b/b" is missing as it is excluded
+	// "b" and "b/b" are missing as they are excluded
 
 	expected := map[string]fsnotify.Op{
 		dest:                       fsnotify.Create,
