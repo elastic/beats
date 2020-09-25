@@ -1,33 +1,29 @@
 {
-    "@timestamp": "2020-02-27T18:09:35.583Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
+        "app": {
+            "id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
+        },
         "container": {
-            "instance_index": 0,
-            "cpu.pct": 0.18815706013687805,
-            "memory.bytes": 23320985,
-            "memory.quota.bytes": 134217728,
-            "disk.bytes": 186187776,
-            "timestamp": "2020-02-27T18:09:35.583Z",
-            "type": "container",
-            "disk.quota.bytes": 2122136037
+            "cpu.pct": 0.2808890817947714,
+            "disk.bytes": 10100736,
+            "disk.quota.bytes": 1073741824,
+            "instance_index": 3,
+            "memory.bytes": 14486732,
+            "memory.quota.bytes": 134217728
         },
         "envelope": {
-            "origin": "rep",
-            "deployment": "cf",
-            "ip": "10.144.0.13",
-            "job": "diego-cell",
-            "index": "3a0034ac-59ef-43e2-8b06-b14b32fe62f0"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "cd6c6b2c-797b-49a9-b1a2-a3b52da80965",
+            "ip": "192.168.16.32",
+            "job": "diego_cell",
+            "origin": "rep"
         },
-        "app": {
-            "id": "8cfc6857-3576-45a9-b1cd-890b28aa9c4a"
-        }
-    },
-    "event": {
-        "dataset": "cloudfoundry.container",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "container"
+        "tags": {
+            "product": "Pivotal Application Service",
+            "source_id": "e6bb1d20-64e1-42ff-abda-b502eb8cb2dc"
+        },
+        "type": "container"
     },
     "service": {
         "type": "cloudfoundry"

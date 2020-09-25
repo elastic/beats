@@ -1,27 +1,22 @@
 {
-    "@timestamp": "2020-02-27T18:20:48.379Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
-        "value": {
-            "unit": "",
-            "value": 5.125735912782789e-05,
-            "timestamp": "2020-02-27T18:20:48.379Z",
-            "type": "value",
-            "name": "go_memstats_gc_cpu_fraction"
-        },
         "envelope": {
-            "origin": "loggregator_forwarder_agent",
-            "deployment": "cf",
-            "ip": "10.144.0.11",
-            "job": "scheduler",
-            "index": "d6b7bb59-ac57-4ed5-a0a7-0b23e19d9f8f"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "6f2f5d74-9375-4d82-870f-c09e6a74cf3a",
+            "ip": "192.168.16.46",
+            "job": "diego_cell",
+            "origin": "netmon"
+        },
+        "tags": {
+            "source_id": "netmon"
+        },
+        "type": "value",
+        "value": {
+            "name": "memoryStats.lastGCPauseTimeNS",
+            "unit": "count",
+            "value": 366021
         }
-    },
-    "event": {
-        "dataset": "cloudfoundry.value",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "value"
     },
     "service": {
         "type": "cloudfoundry"
