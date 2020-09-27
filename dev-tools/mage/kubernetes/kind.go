@@ -65,7 +65,7 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return nil
 	}
 
-	clusterName := kubernetesPodName()
+	clusterName := kubernetesClusterName()
 	stdOut := ioutil.Discard
 	stdErr := ioutil.Discard
 	if mg.Verbose() {

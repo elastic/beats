@@ -139,8 +139,19 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `compute`, `loadbalancing`, `pubsub`, `metrics` and
+Currently, we have `billing`, `compute`, `loadbalancing`, `pubsub`, `metrics` and
 `storage` metricset in `googlecloud` module.
+
+[float]
+=== `billing`
+This metricset fetches billing metrics from https://cloud.google.com/bigquery[GCP BigQuery]
+Cloud Billing allows users to export billing data into BigQuery automatically
+throughout the day. This metricset gets access to the daily cost detail table
+periodically to export billing metrics for further analysis.
+
+The `billing` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-billing-overview.png[]
 
 [float]
 === `compute`

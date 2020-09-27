@@ -15,11 +15,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func reexec(log *logger.Logger, executable string) error {
+func reexec(log *logger.Logger, executable string, argOverrides ...string) error {
 	// force log sync, before re-exec
 	_ = log.Sync()
 
 	args := []string{filepath.Base(executable)}
 	args = append(args, os.Args[1:]...)
+	args = append(args, argOverrides...)
 	return unix.Exec(executable, args, os.Environ())
 }

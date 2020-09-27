@@ -127,6 +127,15 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
 	}
 
+	err = modifySetProcessor(esClient.GetVersion(), pipelineID, content)
+	if err != nil {
+		return fmt.Errorf("failed to modify set processor in pipeline: %v", err)
+	}
+
+	if err := modifyAppendProcessor(esClient.GetVersion(), pipelineID, content); err != nil {
+		return fmt.Errorf("failed to modify append processor in pipeline: %v", err)
+	}
+
 	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return interpretError(err, body)
@@ -231,4 +240,128 @@ func interpretError(initialErr error, body []byte) error {
 	}
 
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
+}
+
+// modifySetProcessor replaces ignore_empty_value option with an if statement
+// so ES less than 7.9 will still work
+func modifySetProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	flagVersion := common.MustNewVersion("7.9.0")
+	if !esVersion.LessThan(flagVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	for _, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["set"].(map[string]interface{}); ok {
+			_, ok := options["ignore_empty_value"].(bool)
+			if !ok {
+				// don't have ignore_empty_value nothing to do
+				continue
+			}
+
+			logp.Debug("modules", "In pipeline %q removing unsupported 'ignore_empty_value' in set processor", pipelineID)
+			delete(options, "ignore_empty_value")
+
+			_, ok = options["if"].(string)
+			if ok {
+				// assume if check is sufficient
+				continue
+			}
+			val, ok := options["value"].(string)
+			if !ok {
+				continue
+			}
+
+			newIf := strings.TrimLeft(val, "{ ")
+			newIf = strings.TrimRight(newIf, "} ")
+			newIf = strings.ReplaceAll(newIf, ".", "?.")
+			newIf = "ctx?." + newIf + " != null"
+
+			logp.Debug("modules", "In pipeline %q adding if %s to replace 'ignore_empty_value' in set processor", pipelineID, newIf)
+			options["if"] = newIf
+		}
+	}
+	return nil
+}
+
+// modifyAppendProcessor replaces allow_duplicates option with an if statement
+// so ES less than 7.10 will still work
+func modifyAppendProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	flagVersion := common.MustNewVersion("7.10.0")
+	if !esVersion.LessThan(flagVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	for _, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["append"].(map[string]interface{}); ok {
+			allow, ok := options["allow_duplicates"].(bool)
+			if !ok {
+				// don't have allow_duplicates, nothing to do
+				continue
+			}
+
+			logp.Debug("modules", "In pipeline %q removing unsupported 'allow_duplicates' in append processor", pipelineID)
+			delete(options, "allow_duplicates")
+			if allow {
+				// it was set to true, nothing else to do after removing the option
+				continue
+			}
+
+			currIf, _ := options["if"].(string)
+			if strings.Contains(strings.ToLower(currIf), "contains") {
+				// if it has a contains statement, we assume it is checking for duplicates already
+				continue
+			}
+			field, ok := options["field"].(string)
+			if !ok {
+				continue
+			}
+			val, ok := options["value"].(string)
+			if !ok {
+				continue
+			}
+
+			field = strings.ReplaceAll(field, ".", "?.")
+
+			val = strings.TrimLeft(val, "{ ")
+			val = strings.TrimRight(val, "} ")
+			val = strings.ReplaceAll(val, ".", "?.")
+
+			if currIf == "" {
+				// if there is not a previous if we add a value sanity check
+				currIf = fmt.Sprintf("ctx?.%s != null", val)
+			}
+
+			newIf := fmt.Sprintf("%s && ((ctx?.%s instanceof List && !ctx?.%s.contains(ctx?.%s)) || ctx?.%s != ctx?.%s)", currIf, field, field, val, field, val)
+
+			logp.Debug("modules", "In pipeline %q adding if %s to replace 'allow_duplicates: false' in append processor", pipelineID, newIf)
+			options["if"] = newIf
+		}
+	}
+	return nil
 }
