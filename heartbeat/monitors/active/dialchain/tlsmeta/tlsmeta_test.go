@@ -25,8 +25,13 @@ import (
 	"math/big"
 	"testing"
 	"time"
+	"math"
+	"fmt"
 
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/require"
@@ -34,6 +39,33 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+func CertPreExpiryChecks(expected_expiry time.Time) isdef.IsDef {
+	return isdef.Is("is now", func(path llpath.Path, v interface{}) *llresult.Results {
+		actual_expiry_time, ok := v.(int64)
+
+		if !ok {
+			return llresult.SimpleResult(
+				path,
+				false,
+				fmt.Sprintf("Value %#v is not of type int64", v),
+			)
+		}
+
+		now := time.Now()
+		expected_expiry_time := time.Time(expected_expiry).Sub(now).Milliseconds()
+
+		if math.Abs(float64(actual_expiry_time - expected_expiry_time)) < 1000.0 {
+			return llresult.ValidResult(path)
+		}
+
+		return llresult.SimpleResult(
+			path,
+			false,
+			fmt.Sprintf("Value %#v is not withing one second from current Unix time %#v", v, now),
+		)
+	})
+}
 
 // Tests for the non-cert fields
 func TestAddTLSMetadata(t *testing.T) {
@@ -131,7 +163,7 @@ func TestAddCertMetadata(t *testing.T) {
 				},
 				"not_after":            certNotAfter,
 				"not_before":           certNotBefore,
-				"days_to_expiry":       int64(time.Until(certNotAfter) / (24 * time.Hour)),
+				"time_to_expiry":       CertPreExpiryChecks(certNotAfter),
 				"serial_number":        "26610543540289562361990401194",
 				"signature_algorithm":  "SHA256-RSA",
 				"public_key_algorithm": "RSA",

@@ -99,10 +99,10 @@
                 description: Time at which the certificate is first considered valid.
                 example: 2019-08-16 01:40:25+00:00
                 default_field: false
-              - name: days_to_expiry
+              - name: time_to_expiry
                 type: long
-                description: Number of days remaining for the server's certificate to get expired.
-                example: 30
+                description: Number of milliseconds remaining for the server's certificate to get expired.
+                example: 3600000
                 default_field: false
               - name: public_key_algorithm
                 type: keyword

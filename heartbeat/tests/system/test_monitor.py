@@ -2,6 +2,8 @@ import os
 import unittest
 from datetime import datetime
 
+from pytest import approx
+
 from heartbeat import BaseTest, CERTIFICATES_PATH
 from parameterized import parameterized
 
@@ -260,9 +262,9 @@ class TestHTTPS(BaseTest):
             output["tls.server.x509.not_after"].replace("Z", ""))
         current_date = datetime.fromisoformat(
             output["@timestamp"].replace("Z", ""))
-        days_to_expiry = output["tls.server.x509.days_to_expiry"]
+        time_to_expiry = output["tls.server.x509.time_to_expiry"]
 
-        assert days_to_expiry == (expiration_date - current_date).days
+        assert time_to_expiry == approx((expiration_date - current_date).total_seconds() * 1000)
 
     def render_http_config(self, urls):
         self.render_config_template(
