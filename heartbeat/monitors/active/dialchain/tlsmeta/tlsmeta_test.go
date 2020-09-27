@@ -22,11 +22,11 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
+	"math"
 	"math/big"
 	"testing"
 	"time"
-	"math"
-	"fmt"
 
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -55,7 +55,7 @@ func CertPreExpiryChecks(expected_expiry time.Time) isdef.IsDef {
 		now := time.Now()
 		expected_expiry_time := time.Time(expected_expiry).Sub(now).Milliseconds()
 
-		if math.Abs(float64(actual_expiry_time - expected_expiry_time)) < 1000.0 {
+		if math.Abs(float64(actual_expiry_time-expected_expiry_time)) < 1000.0 {
 			return llresult.ValidResult(path)
 		}
 
