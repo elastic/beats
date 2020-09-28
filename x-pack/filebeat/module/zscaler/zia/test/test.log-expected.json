@@ -17,6 +17,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "<hostname>"
+        ],
         "related.user": [
             "<username>"
         ],
