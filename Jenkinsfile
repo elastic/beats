@@ -230,10 +230,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
     testResults = '**/build/TEST*.xml'
     artifacts = '**/build/TEST*.out'
   } else {
+    // NOTE: to support Windows 7 32 bits the arch in the mingw context path is required.
+    def mingwArch =  is32bit() ? '32' : '64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
