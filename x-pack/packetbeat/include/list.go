@@ -6,6 +6,4 @@
 
 package include
 
-import (
-	// Import packages that need to register themselves.
-)
+// Import packages that need to register themselves.
