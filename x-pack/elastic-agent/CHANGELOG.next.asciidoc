@@ -10,6 +10,7 @@
 - Docker container is not run as root by default. {pull}21213[21213]
 
 ==== Bugfixes
+- Thread safe sorted set {pull}21290[21290]
 - Copy Action store on upgrade {pull}21298[21298]
 - Include inputs in action store actions {pull}21298[21298]
 

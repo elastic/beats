@@ -23,21 +23,25 @@ stages:
         make: "make -C generator/_templates/metricbeat test"
         platforms:             ## override default label in this specific stage.
           - "macosx"
-        when:                  ## Aggregate when with the top-level one.
+        when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"
             labels:
                 - "macOS"
             parameters:
                 - "macosTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
     macos-beat:
         make: "make -C generator/_templates/beat test"
         platforms:             ## override default label in this specific stage.
             - "macosx"
-        when:                  ## Aggregate when with the top-level one.
+        when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"
             labels:
                 - "macOS"
             parameters:
                 - "macosTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
