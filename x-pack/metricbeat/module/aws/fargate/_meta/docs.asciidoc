@@ -1,0 +1,2 @@
+This aws `fargate` metricset collects metrics from querying
+`${ECS_CONTAINER_METADATA_URI_V4}/task/stats` endpoint.

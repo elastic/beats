@@ -2997,6 +2997,12 @@ type: long
 --
 
 [float]
+=== fargate
+
+`fargate` contains runtime CPU metrics from fargate task metadata.
+
+
+[float]
 === lambda
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.

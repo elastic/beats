@@ -1,0 +1,5 @@
+- name: fargate
+  type: group
+  release: experimental
+  description: >
+    `fargate` contains runtime CPU metrics from fargate task metadata.
