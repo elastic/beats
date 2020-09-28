@@ -665,7 +665,7 @@ Elasticsearch.
 See the <<securing-communication-elasticsearch,secure communication with {es}>> guide
 or <<configuration-ssl,SSL configuration reference>> for more information.
 
-===== `kebreros`
+===== `kerberos`
 
 Configuration options for Kerberos authentication.
 
