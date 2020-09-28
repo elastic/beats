@@ -40,7 +40,7 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(Update)
-	unittest.RegisterPythonTestDeps(fieldsYML, Dashboards)
+	unittest.RegisterPythonTestDeps(packetbeat.FieldsYML, Dashboards)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 }
