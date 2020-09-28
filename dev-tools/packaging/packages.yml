@@ -340,7 +340,7 @@ shared:
       buildFrom: 'centos:7'
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
-      user: 'root'
+      user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
       'elastic-agent.yml':

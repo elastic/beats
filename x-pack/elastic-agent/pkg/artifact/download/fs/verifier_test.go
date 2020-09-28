@@ -59,7 +59,7 @@ func TestFetchVerify(t *testing.T) {
 	assert.NoError(t, err)
 
 	downloader := NewDownloader(config)
-	verifier, err := NewVerifier(config)
+	verifier, err := NewVerifier(config, true, nil)
 	assert.NoError(t, err)
 
 	// first download verify should fail:
@@ -157,7 +157,7 @@ func TestVerify(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testVerifier, err := NewVerifier(config)
+	testVerifier, err := NewVerifier(config, true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

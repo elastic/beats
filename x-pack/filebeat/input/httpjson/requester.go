@@ -12,6 +12,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -214,7 +215,7 @@ func (r *requester) processEventArray(publisher stateless.Publisher, events []in
 	for _, t := range events {
 		switch v := t.(type) {
 		case map[string]interface{}:
-			for _, e := range r.splitEvent(v) {
+			for _, e := range splitEvent(r.splitEventsBy, v) {
 				last = e
 				d, err := json.Marshal(e)
 				if err != nil {
@@ -229,15 +230,23 @@ func (r *requester) processEventArray(publisher stateless.Publisher, events []in
 	return last, nil
 }
 
-func (r *requester) splitEvent(event map[string]interface{}) []map[string]interface{} {
+func splitEvent(splitKey string, event map[string]interface{}) []map[string]interface{} {
 	m := common.MapStr(event)
 
-	hasSplitKey, _ := m.HasKey(r.splitEventsBy)
-	if r.splitEventsBy == "" || !hasSplitKey {
+	// NOTE: this notation is only used internally, not meant to be documented
+	// and will be removed in the next release
+	keys := strings.SplitN(splitKey, "..", 2)
+	if len(keys) < 2 {
+		// we append an empty key to force the recursive call
+		keys = append(keys, "")
+	}
+
+	hasSplitKey, _ := m.HasKey(keys[0])
+	if keys[0] == "" || !hasSplitKey {
 		return []map[string]interface{}{event}
 	}
 
-	splitOnIfc, _ := m.GetValue(r.splitEventsBy)
+	splitOnIfc, _ := m.GetValue(keys[0])
 	splitOn, ok := splitOnIfc.([]interface{})
 	// if not an array or is empty, we do nothing
 	if !ok || len(splitOn) == 0 {
@@ -252,12 +261,14 @@ func (r *requester) splitEvent(event map[string]interface{}) []map[string]interf
 			return []map[string]interface{}{event}
 		}
 
-		mm := m.Clone()
-		if _, err := mm.Put(r.splitEventsBy, s); err != nil {
-			return []map[string]interface{}{event}
+		// call splitEvent recursively for each part
+		for _, nestedSplit := range splitEvent(keys[1], s) {
+			mm := m.Clone()
+			if _, err := mm.Put(keys[0], nestedSplit); err != nil {
+				return []map[string]interface{}{event}
+			}
+			events = append(events, mm)
 		}
-
-		events = append(events, mm)
 	}
 
 	return events
