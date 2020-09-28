@@ -21,22 +21,22 @@ func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
 	// create symlink to elastic-agent-{hash}
 	hashedDir := fmt.Sprintf("%s-%s", agentName, newHash)
 
-	agentBakName := agentName + ".prev"
+	agentPrevName := agentName + ".prev"
 	symlinkPath := filepath.Join(paths.Top(), agentName)
 	newPath := filepath.Join(paths.Top(), "data", hashedDir, agentName)
 
 	// handle windows suffixes
 	if runtime.GOOS == "windows" {
-		agentBakName = agentName + ".exe.prev" //.bak is already used
+		agentPrevName = agentName + ".exe.prev"
 		symlinkPath += ".exe"
 		newPath += ".exe"
 	}
 
-	bakNewPath := filepath.Join(paths.Top(), agentBakName)
-	if err := os.Symlink(newPath, bakNewPath); err != nil {
+	prevNewPath := filepath.Join(paths.Top(), agentPrevName)
+	if err := os.Symlink(newPath, prevNewPath); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to update agent symlink")
 	}
 
 	// safely rotate
-	return file.SafeFileRotate(symlinkPath, bakNewPath)
+	return file.SafeFileRotate(symlinkPath, prevNewPath)
 }

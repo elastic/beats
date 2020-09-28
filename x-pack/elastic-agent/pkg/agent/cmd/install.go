@@ -56,7 +56,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
-			confirm, err := c.Confirm("Continuing will re-install Elastic Agent over the current installation. Do you want to continue?", true)
+			confirm, err := c.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("Error: problem reading prompt response")
 			}
@@ -66,7 +66,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	} else {
 		if !force {
-			confirm, err := c.Confirm("Elastic Agent will be installed onto your system and will run as a service. Do you want to continue?", true)
+			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("Error: problem reading prompt response")
 			}

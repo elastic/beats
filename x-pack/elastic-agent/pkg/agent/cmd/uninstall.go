@@ -55,7 +55,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
-			confirm, err := c.Confirm("Continuing will uninstall the broken Elastic Agent. Do you want to continue?", true)
+			confirm, err := c.Confirm(fmt.Sprintf("Continuing will uninstall the broken Elastic Agent at %s. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -65,7 +65,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	} else {
 		if !force {
-			confirm, err := c.Confirm("Elastic Agent will be uninstalled from your system. Do you want to continue?", true)
+			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be uninstalled from your system at %s. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
