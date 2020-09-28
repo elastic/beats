@@ -33,9 +33,7 @@ func init() {
 }
 
 // Update updates the generated files.
-func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, includeList)
-}
+func Update() {}
 
 // Build builds the Beat binary.
 func Build() error {
@@ -88,21 +86,6 @@ func Package() {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
-}
-
-// Fields generates fields.yml and fields.go files for the Beat.
-func Fields() {
-	packetbeat.Fields()
-}
-
-// Dashboards collects all the dashboards and generates index patterns.
-func Dashboards() error {
-	return devtools.KibanaDashboards(devtools.OSSBeatDir("protos"))
-}
-
-// Config generates both the short and reference configs.
-func Config() {
-	mg.Deps(configYML, devtools.GenerateDirModulesD)
 }
 
 func configYML() error {
