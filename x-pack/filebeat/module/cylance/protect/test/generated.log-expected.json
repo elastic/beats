@@ -12,6 +12,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "nostrud4819.mail.test"
+        ],
         "rsa.identity.firstname": "uii",
         "rsa.identity.lastname": "umexe",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -44,6 +47,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "volup208.invalid"
+        ],
         "rsa.identity.firstname": "luptat",
         "rsa.identity.lastname": "isiutal",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -75,6 +81,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "eius6159.www5.localhost"
+        ],
         "rsa.db.index": "temvel",
         "rsa.identity.firstname": "lupt",
         "rsa.identity.lastname": "tia",
@@ -106,6 +115,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ratvolup497.www.corp"
+        ],
         "rsa.db.index": "ommodic",
         "rsa.identity.firstname": "mipsu",
         "rsa.identity.lastname": "consec",
@@ -137,6 +149,9 @@
         "observer.product": "taliqu",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "tatno5625.api.local"
+        ],
         "rsa.identity.firstname": "tur",
         "rsa.identity.lastname": "aperi",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -170,6 +185,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "maveniam1399.mail.lan"
+        ],
         "related.ip": [
             "10.124.61.119"
         ],
@@ -211,6 +229,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "nimadmin6499.local"
+        ],
         "rsa.db.index": "lorem",
         "rsa.identity.firstname": "urerep",
         "rsa.identity.lastname": "aquaeab",
@@ -242,6 +263,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "suntinc4934.www5.test"
+        ],
         "rsa.identity.firstname": "dmi",
         "rsa.identity.lastname": "olab",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -277,6 +301,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.2344",
+        "related.hosts": [
+            "reetdolo2451.www.example"
+        ],
         "related.user": [
             "usan"
         ],
@@ -310,6 +337,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "uis7612.www5.domain"
+        ],
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
@@ -337,6 +367,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "admi3749.api.lan"
+        ],
         "rsa.db.index": "nimadmin",
         "rsa.identity.firstname": "iqui",
         "rsa.identity.lastname": "etc",
@@ -371,6 +404,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.5383",
+        "related.hosts": [
+            "rudexerc703.internal.host"
+        ],
         "related.user": [
             "isaute"
         ],
@@ -444,6 +480,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "estqu1709.internal.example"
+        ],
         "related.ip": [
             "10.64.70.5"
         ],
@@ -484,6 +523,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "xeac7155.www.localdomain"
+        ],
         "related.ip": [
             "10.143.239.210"
         ],
@@ -527,6 +569,9 @@
         "observer.vendor": "Cylance",
         "process.name": "aliqu.exe",
         "process.pid": 2289,
+        "related.hosts": [
+            "maccusa5126.api.domain"
+        ],
         "related.ip": [
             "10.32.143.134"
         ],
@@ -570,6 +615,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "llu4718.localhost"
+        ],
         "rsa.db.index": "psaquae",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -629,6 +677,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "eaq908.api.home"
+        ],
         "rsa.db.index": "equat",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -661,6 +712,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.4129",
+        "related.hosts": [
+            "mcolab379.internal.home"
+        ],
         "related.user": [
             "fdeFi"
         ],
@@ -733,6 +787,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "sciun4694.api.lan"
+        ],
         "rsa.db.index": "enderit",
         "rsa.identity.firstname": "idata",
         "rsa.identity.lastname": "rumwritt",
@@ -764,6 +821,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "mni7200.mail.localdomain"
+        ],
         "rsa.db.index": "uisau",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -821,6 +881,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.3212",
+        "related.hosts": [
+            "ntoccae1705.internal.invalid"
+        ],
         "related.user": [
             "aperiame"
         ],
@@ -854,6 +917,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "etconsec6708.internal.invalid"
+        ],
         "rsa.db.index": "mquame",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1502030000,
@@ -884,6 +950,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "Sedutp7428.internal.home"
+        ],
         "rsa.db.index": "iquipe",
         "rsa.identity.firstname": "upida",
         "rsa.identity.lastname": "tvolupt",
@@ -916,6 +985,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ati4639.www5.home"
+        ],
         "rsa.identity.firstname": "con",
         "rsa.identity.lastname": "nisist",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -947,6 +1019,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "torever662.www5.home"
+        ],
         "rsa.db.index": "The Device: pexe was auto assigned to the Zone: IP Address: 10.70.168.240",
         "rsa.identity.firstname": "amcol",
         "rsa.identity.lastname": "adeser",
@@ -978,6 +1053,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "emeumfug4387.internal.lan"
+        ],
         "rsa.identity.firstname": "ccaeca",
         "rsa.identity.lastname": "niamq",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1010,6 +1088,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "rumwrit764.www5.local"
+        ],
         "rsa.db.index": "miu",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1804020000,
@@ -1072,6 +1153,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "oremi1485.api.localhost"
+        ],
         "rsa.identity.firstname": "atisund",
         "rsa.identity.lastname": "xea",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1104,6 +1188,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "periam126.api.host"
+        ],
         "rsa.crypto.sig_type": "rExc",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -1135,6 +1222,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "tate6578.api.localdomain"
+        ],
         "related.ip": [
             "10.252.165.146"
         ],
@@ -1175,6 +1265,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "midestl1919.host"
+        ],
         "related.ip": [
             "10.124.88.222"
         ],
@@ -1215,6 +1308,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "eiusmod3517.internal.invalid"
+        ],
         "rsa.identity.firstname": "dol",
         "rsa.identity.lastname": "sciun",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1248,6 +1344,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ntexpl3889.www.home"
+        ],
         "related.ip": [
             "10.156.34.19"
         ],
@@ -1290,6 +1389,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ntium4450.www5.localdomain"
+        ],
         "related.ip": [
             "10.22.94.10"
         ],
@@ -1330,6 +1432,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "erspi5757.local"
+        ],
         "rsa.db.index": "undeomni",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1401060000,
@@ -1424,6 +1529,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "magnid3343.home"
+        ],
         "rsa.db.index": "obea",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -1454,6 +1562,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "asperna7623.www.home"
+        ],
         "rsa.identity.firstname": "onproide",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -1486,6 +1597,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.3421",
+        "related.hosts": [
+            "undeom845.www5.example"
+        ],
         "related.user": [
             "tassita"
         ],
@@ -1548,6 +1662,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ons5050.mail.test"
+        ],
         "related.ip": [
             "10.48.209.115"
         ],
@@ -1588,6 +1705,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "oloreeu7597.mail.home"
+        ],
         "related.ip": [
             "10.7.99.47"
         ],
@@ -1628,6 +1748,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ueip5847.api.test"
+        ],
         "rsa.crypto.sig_type": "Nemoenim",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1804010000,
@@ -1660,6 +1783,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.989",
+        "related.hosts": [
+            "uid3520.www.home"
+        ],
         "related.user": [
             "ici"
         ],
@@ -1745,6 +1871,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "teir7585.www5.localdomain"
+        ],
         "rsa.identity.firstname": "scip",
         "rsa.identity.lastname": "Finibus",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1831,6 +1960,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "serrorsi1096.www5.localdomain"
+        ],
         "rsa.db.index": "The Device: reetdo was auto assigned to the Zone: IP Address: Fake Devices",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -1860,6 +1992,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "prehen4807.mail.invalid"
+        ],
         "rsa.db.index": "meum",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1600000000,
@@ -1890,6 +2025,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "sit1400.www.lan"
+        ],
         "rsa.db.index": "ntsunti",
         "rsa.identity.firstname": "uid",
         "rsa.identity.lastname": "idatat",
@@ -1922,6 +2060,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "sectetu7182.localdomain"
+        ],
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1804010000,
         "rsa.investigations.event_cat_name": "Network.Devices.Additions",
@@ -1949,6 +2090,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "officiad4982.www5.domain"
+        ],
         "rsa.identity.firstname": "etdolore",
         "rsa.identity.lastname": "magnaa",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -1980,6 +2124,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "consequa1486.internal.localdomain"
+        ],
         "rsa.crypto.sig_type": "quaeratv",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2010,6 +2157,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "its6443.mail.example"
+        ],
         "related.ip": [
             "10.139.80.71"
         ],
@@ -2053,6 +2203,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "tconsec7604.corp"
+        ],
         "related.ip": [
             "10.223.246.244"
         ],
@@ -2092,6 +2245,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "tuser2694.internal.invalid"
+        ],
         "rsa.identity.firstname": "natus",
         "rsa.identity.lastname": "boreet",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2124,6 +2280,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "gnaaliq5240.api.test"
+        ],
         "rsa.crypto.sig_type": "ratvo",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2153,6 +2312,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "illum2625.test"
+        ],
         "rsa.crypto.sig_type": "iaeconse",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1401060000,
@@ -2182,6 +2344,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "nulamc5617.mail.host"
+        ],
         "related.ip": [
             "10.134.137.205"
         ],
@@ -2221,6 +2386,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "tatem4713.internal.host"
+        ],
         "rsa.db.index": "usci",
         "rsa.identity.firstname": "lupta",
         "rsa.identity.lastname": "ura",
@@ -2254,6 +2422,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ugits5961.www5.local"
+        ],
         "related.ip": [
             "10.91.2.225"
         ],
@@ -2297,6 +2468,9 @@
         "observer.vendor": "Cylance",
         "process.name": "nimadmi.exe",
         "process.pid": 601,
+        "related.hosts": [
+            "prehende5460.mail.localdomain"
+        ],
         "related.ip": [
             "10.191.99.14"
         ],
@@ -2340,6 +2514,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "velites1745.api.corp"
+        ],
         "rsa.db.index": "lor",
         "rsa.identity.firstname": "naaliq",
         "rsa.identity.lastname": "plica",
@@ -2373,6 +2550,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "Duis583.api.local"
+        ],
         "rsa.crypto.sig_type": "dminim",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1401060000,
@@ -2404,6 +2584,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.2478",
+        "related.hosts": [
+            "velitess2401.www.lan"
+        ],
         "rsa.db.index": "dolo",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2434,6 +2617,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "sequines3991.mail.local"
+        ],
         "rsa.identity.firstname": "sequines",
         "rsa.identity.lastname": "minimve",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2470,6 +2656,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "iatquo2815.mail.host"
+        ],
         "related.ip": [
             "10.181.215.164"
         ],
@@ -2537,6 +2726,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "issusci7005.mail.host"
+        ],
         "rsa.db.index": "tiumtot",
         "rsa.identity.firstname": "ecillumd",
         "rsa.identity.lastname": "iumto",
@@ -2571,6 +2763,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "umq7428.invalid"
+        ],
         "related.ip": [
             "10.164.59.219"
         ],
@@ -2639,6 +2834,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "epteurs5503.www5.home"
+        ],
         "related.ip": [
             "10.1.193.187"
         ],
@@ -2707,6 +2905,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "omnisis5339.www5.local"
+        ],
         "rsa.db.index": "deom, Device Id: tiumdo, Policy Name: rautod",
         "rsa.internal.messageid": "CylancePROTECT",
         "rsa.investigations.event_cat": 1901000000,
@@ -2737,6 +2938,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "ction491.www5.local"
+        ],
         "rsa.identity.firstname": "imveniam",
         "rsa.identity.lastname": "sunte",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2769,6 +2973,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "undeom7847.api.corp"
+        ],
         "related.ip": [
             "10.146.228.234"
         ],
@@ -2810,6 +3017,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "dolo6230.mail.invalid"
+        ],
         "related.ip": [
             "10.59.232.97"
         ],
@@ -2845,6 +3055,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "nvolup6280.api.home"
+        ],
         "rsa.identity.firstname": "dantium",
         "rsa.identity.lastname": "ors",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -2877,6 +3090,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "urautodi3892.www5.example"
+        ],
         "rsa.db.index": "nibu",
         "rsa.identity.firstname": "mdolo",
         "rsa.identity.lastname": "nof",
@@ -2952,6 +3168,9 @@
         "observer.vendor": "Cylance",
         "process.name": "oluptat.exe",
         "process.pid": 4608,
+        "related.hosts": [
+            "uraut3756.www5.test"
+        ],
         "related.ip": [
             "10.127.30.119"
         ],
@@ -2995,6 +3214,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "squ2213.www.test"
+        ],
         "rsa.db.index": "rExce",
         "rsa.identity.firstname": "rinc",
         "rsa.identity.lastname": "tno",
@@ -3056,6 +3278,9 @@
         "observer.vendor": "Cylance",
         "process.name": "ngelitse.exe",
         "process.pid": 4190,
+        "related.hosts": [
+            "umet5891.api.localdomain"
+        ],
         "related.ip": [
             "10.8.150.213"
         ],
@@ -3099,6 +3324,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "umquam5574.internal.test"
+        ],
         "related.ip": [
             "10.108.59.10"
         ],
@@ -3134,6 +3362,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "volupt6822.api.invalid"
+        ],
         "rsa.identity.firstname": "qui",
         "rsa.identity.lastname": "epteurs",
         "rsa.internal.messageid": "CylancePROTECT",
@@ -3224,6 +3455,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
         "observer.version": "1.3237",
+        "related.hosts": [
+            "amvol4075.mail.localhost"
+        ],
         "related.user": [
             "pta"
         ],
@@ -3257,6 +3491,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "asi4651.api.test"
+        ],
         "rsa.db.index": "ssecill",
         "rsa.identity.firstname": "officiad",
         "rsa.identity.lastname": "veniam",
@@ -3288,6 +3525,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "perna6751.internal.home"
+        ],
         "related.ip": [
             "10.138.85.233"
         ],
@@ -3323,6 +3563,9 @@
         "observer.product": "Protect",
         "observer.type": "Anti-Virus",
         "observer.vendor": "Cylance",
+        "related.hosts": [
+            "evolupta7790.internal.local"
+        ],
         "rsa.db.index": "rehe",
         "rsa.identity.firstname": "tam",
         "rsa.identity.lastname": "deser",

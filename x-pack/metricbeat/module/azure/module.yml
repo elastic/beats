@@ -5,3 +5,4 @@ metricsets:
  - container_service
  - database_account
  - compute_vm
+ - compute_vm_scaleset

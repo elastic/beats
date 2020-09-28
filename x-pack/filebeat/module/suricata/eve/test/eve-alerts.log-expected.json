@@ -41,6 +41,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -118,6 +121,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -195,6 +201,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -272,6 +281,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -349,6 +361,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -426,6 +441,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -503,6 +521,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -580,6 +601,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -657,6 +681,9 @@
         "network.packets": 11,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -734,6 +761,9 @@
         "network.packets": 126,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -811,6 +841,9 @@
         "network.packets": 185,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -888,6 +921,9 @@
         "network.packets": 377,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -965,6 +1001,9 @@
         "network.packets": 131,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1042,6 +1081,9 @@
         "network.packets": 210,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1119,6 +1161,9 @@
         "network.packets": 412,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1196,6 +1241,9 @@
         "network.packets": 504,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1273,6 +1321,9 @@
         "network.packets": 916,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1350,6 +1401,9 @@
         "network.packets": 921,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1426,6 +1480,9 @@
         "network.packets": 1503,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1502,6 +1559,9 @@
         "network.packets": 1654,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"

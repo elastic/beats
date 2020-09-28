@@ -12,6 +12,9 @@
         "log.offset": 0,
         "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
         "process.name": "sudo",
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "system"
     },
     {
@@ -27,6 +30,9 @@
         "log.offset": 118,
         "message": "user nobody logged out.",
         "process.name": "pam",
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "system"
     }
 ]

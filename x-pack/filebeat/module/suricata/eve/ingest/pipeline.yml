@@ -333,6 +333,11 @@ processors:
       field: file.x509.not_before
       value: '{{tls.server.not_before}}'
       ignore_empty_value: true
+  - append:
+      field: related.hosts
+      value: '{{url.domain}}'
+      if: ctx.url?.domain != null && ctx.url?.domain != ''
+      allow_duplicates: false
   - remove:
       field:
         - suricata.eve.app_proto

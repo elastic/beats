@@ -130,6 +130,9 @@
         "network.community_id": "1:gjMiDGtS5SVvdwzjjQdAKGBrDA4=",
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "192.168.86.28"
+        ],
         "related.ip": [
             "192.168.86.85",
             "192.168.86.28"
@@ -182,6 +185,9 @@
         "network.community_id": "1:XhhAO/Twj86+bD+1fV8FnpLIEDs=",
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "192.168.86.28"
+        ],
         "related.ip": [
             "192.168.86.28",
             "192.168.86.85"
