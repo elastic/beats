@@ -1,6 +1,7 @@
 import argparse
 from collections import OrderedDict
 import os
+import re
 
 import yaml
 
@@ -20,11 +21,24 @@ def document_fields(output, section, sections, path):
         output.write("[float]\n")
 
     if "description" in section:
-        if "anchor" in section:
+        if "anchor" in section and section["name"] == "ECS":
             output.write("== {} fields\n\n".format(section["name"]))
+            output.write("""
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
+""")
+        elif "anchor" in section:
+            output.write("== {} fields\n\n".format(section["name"]))
+            output.write("{}\n\n".format(section["description"]))
         else:
             output.write("=== {}\n\n".format(section["name"]))
-        output.write("{}\n\n".format(section["description"]))
+            output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
         return
@@ -69,6 +83,14 @@ def document_field(output, field, field_path):
         output.write("required: {}\n\n".format(field["required"]))
     if "path" in field:
         output.write("alias to: {}\n\n".format(field["path"]))
+
+    # For Apm-Server docs only
+    # Assign an ECS badge for fields containing "overwrite"
+    if beat_title == "Apm-Server":
+        if "overwrite" in field:
+            # And it's not a Kubernetes field
+            if re.match("^kubernetes.*", field["field_path"]) is None:
+                output.write("{yes-icon} {ecs-ref}[ECS] field.\n\n")
 
     if "index" in field:
         if not field["index"]:
