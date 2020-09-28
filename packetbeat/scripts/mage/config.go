@@ -55,7 +55,8 @@ func ConfigFileParams() devtools.ConfigFileParams {
 
 // Fields generates fields.yml and fields.go files for the Beat.
 func Fields() {
-	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo, FieldsYML)
+	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo)
+	mg.Deps(FieldsYML)
 }
 
 // libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
