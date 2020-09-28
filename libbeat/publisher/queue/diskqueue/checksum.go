@@ -15,19 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package includes
+package diskqueue
 
 import (
-	// import queue types
-	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/kafka"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
-	_ "github.com/elastic/beats/v7/libbeat/outputs/redis"
-	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
-	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/spool"
+	"encoding/binary"
+	"hash/crc32"
 )
+
+// Computes the checksum that should be written / read in a frame footer
+// based on the raw content of that frame (excluding header / footer).
+func computeChecksum(data []byte) uint32 {
+	hash := crc32.NewIEEE()
+	frameLength := uint32(len(data) + frameMetadataSize)
+	binary.Write(hash, binary.LittleEndian, &frameLength)
+	hash.Write(data)
+	return hash.Sum32()
+}
