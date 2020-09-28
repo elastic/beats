@@ -809,6 +809,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Sanitize `event.host`. {pull}21022[21022]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
+- Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
 
 *Packetbeat*
 
