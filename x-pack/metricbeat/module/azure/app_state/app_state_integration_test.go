@@ -5,7 +5,7 @@
 // +build integration
 // +build azure
 
-package container_registry
+package app_state
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/app_insights"
 )
 
 func TestFetchMetricset(t *testing.T) {
