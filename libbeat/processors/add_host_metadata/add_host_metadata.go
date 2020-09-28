@@ -161,12 +161,29 @@ func skipAddingHostMetadata(event *beat.Event) bool {
 		return false
 	}
 
-	hostFieldsMap := hostFields.(common.MapStr)
-	// or if "name" is the only field, don't skip
-	hasName, _ := hostFieldsMap.HasKey("name")
-	if hasName && len(hostFieldsMap) == 1 {
+	switch m := hostFields.(type) {
+	case common.MapStr:
+		// if "name" is the only field, don't skip
+		hasName, _ := m.HasKey("name")
+		if hasName && len(m) == 1 {
+			return false
+		}
+		return true
+	case map[string]interface{}:
+		hostMapStr := common.MapStr(m)
+		// if "name" is the only field, don't skip
+		hasName, _ := hostMapStr.HasKey("name")
+		if hasName && len(m) == 1 {
+			return false
+		}
+		return true
+	case map[string]string:
+		// if "name" is the only field, don't skip
+		if m["name"] != "" && len(m) == 1 {
+			return false
+		}
+		return true
+	default:
 		return false
 	}
-
-	return true
 }

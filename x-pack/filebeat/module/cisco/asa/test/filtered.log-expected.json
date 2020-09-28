@@ -20,8 +20,15 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 0,
+        "observer.hostname": "beats",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -58,8 +65,16 @@
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "eth0",
+        "observer.hostname": "beats",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "related.ip": [
             "10.13.12.11",
             "192.168.33.12"
