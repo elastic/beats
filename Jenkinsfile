@@ -107,15 +107,9 @@ pipeline {
                 mapParallelTasks["${k}"] = v
               }
             }
+            // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
+            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.*')
             parallel(mapParallelTasks)
-          }
-        }
-      }
-      post {
-        always {
-          dir("${BASE_DIR}"){
-            // Archive the markdown files that contain the build reasons
-            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.md')
           }
         }
       }
