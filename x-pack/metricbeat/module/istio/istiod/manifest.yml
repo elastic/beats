@@ -1,0 +1,6 @@
+default: false
+input:
+  module: prometheus
+  metricset: collector
+  defaults:
+    metrics_path: /metrics
