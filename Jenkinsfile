@@ -107,9 +107,7 @@ pipeline {
                 mapParallelTasks["${k}"] = v
               }
             }
-            // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
-            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.*')
-            // TODO: Add a comment with the build reason (this is required to be implemented in the shared library)
+            notifyBuildReason()
             parallel(mapParallelTasks)
           }
         }
@@ -538,6 +536,17 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
   } else {
     return false
+  }
+}
+
+/**
+* Notify the build reason.
+*/
+def notifyBuildReason() {
+  // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
+  archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.*')
+  if (isPR()) {
+    echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
   }
 }
 
