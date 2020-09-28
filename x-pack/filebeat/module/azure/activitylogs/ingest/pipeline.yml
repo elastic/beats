@@ -1,5 +1,8 @@
 description: Pipeline for parsing azure activity logs.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: azure
     target_field: azure-eventhub
@@ -71,7 +74,12 @@ processors:
     field: azure.activitylogs.result_type
     target_field: event.outcome
     type: string
-    if: "ctx?.azure?.activitylogs?.resultType != null && ctx.azure.activitylogs.resultType instanceof String && (ctx.azure.activitylogs.resultType.toLowerCase() == 'success' || ctx.azure.activitylogs.resultType.toLowerCase() == 'failure')"
+    if: "ctx?.azure?.activitylogs?.result_type != null && ctx.azure.activitylogs.result_type instanceof String && (ctx.azure.activitylogs.result_type.toLowerCase() == 'success' || ctx.azure.activitylogs.result_type.toLowerCase() == 'failure')"
+- convert:
+    field: azure.activitylogs.properties.result
+    target_field: event.outcome
+    type: string
+    if: "ctx?.event?.outcome == null && ctx?.azure?.activitylogs?.properties?.result != null && ctx?.azure?.activitylogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.activitylogs?.properties?.result)"
 - rename:
     field: azure.activitylogs.operationName
     target_field: azure.activitylogs.operation_name

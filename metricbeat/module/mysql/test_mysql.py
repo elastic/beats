@@ -1,10 +1,8 @@
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 MYSQL_FIELDS = metricbeat.COMMON_FIELDS + ["mysql"]
 
@@ -18,7 +16,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['mysql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MySQL module outputs an event.

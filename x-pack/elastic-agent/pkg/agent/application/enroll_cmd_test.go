@@ -54,7 +54,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -108,7 +107,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -170,7 +168,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -200,6 +197,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -230,7 +228,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -260,6 +257,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -304,6 +302,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-token",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",

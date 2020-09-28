@@ -1,5 +1,5 @@
 [[python-beats]]
-== Python in Beats
+=== Python in Beats
 
 Python is used for Beats development, it is the language used to implement
 system tests and some other tools. Python dependencies are managed by the use of
@@ -9,7 +9,7 @@ https://docs.python.org/3/library/venv.html[venv].
 Beats development requires Python >= {python}.
 
 [[installing-python]]
-=== Installing Python and venv
+==== Installing Python and venv
 
 Python uses to be installed in many operating systems. If it is not installed in
 your system you can follow the instructions available in https://www.python.org/downloads/
@@ -32,7 +32,7 @@ sudo apt-get install python3.7 python3.7-venv
 It is recommended to use Python >= {python}.
 
 [[python-virtual-environments]]
-=== Working with virtual environments
+==== Working with virtual environments
 
 All `make` and `mage` targets manage their own virtual environments in a transparent
 way, so for the most common operations required when contributing to beats,
@@ -52,20 +52,20 @@ of these virtual environments:
   is created by `make` or `mage` targets when needed.  
 
 Virtual environments can also be used without `make` or `mage`, this is usual
-for example when running individual system tests with `nosetests`. There are two
+for example when running individual system tests with `pytest`. There are two
 ways to run commands from the virtual environment:
 
 * "Activating" the virtual environment in your current terminal running
   `source ./build/python-env/bin/activate`. Virtual environment can be
   deactivated by running `deactivate`.
 * Directly running commands from the virtual environment path. For example
-  `nosetests` can be executed as `./build/python-env/bin/nosetests`.
+  `pytest` can be executed as `./build/python-env/bin/pytest`.
 
 To recreate a virtual environment, remove its directory. All virtual
 environments are also removed with `make clean`.
 
 [[python-older-versions]]
-=== Working with older versions
+==== Working with older versions
 
 Older versions of Beats were not compatible with Python 3, if you need to
 temporary work on one of these versions of Beats, and you don't want to remove

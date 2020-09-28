@@ -1,13 +1,8 @@
-You can monitor your estimated AWS charges by using Amazon CloudWatch. When you
-enable the monitoring of estimated charges for your AWS account, the estimated
-charges are calculated and sent several times daily to CloudWatch as metric data.
+You can monitor your estimated AWS charges by using Amazon CloudWatch and Cost
+Explorer.
 
-Billing metric data is stored in the US East (N. Virginia) Region and represents
-worldwide charges. This data includes the estimated charges for every service in
-AWS that you use, in addition to the estimated overall total of your AWS charges.
-
-This aws `billing` metricset collects these Cloudwatch metrics for monitoring
-purposes.
+This aws `billing` metricset collects metrics both from Cloudwatch and cost
+explorer for monitoring purposes.
 
 [float]
 === AWS Permissions
@@ -19,6 +14,7 @@ cloudwatch:ListMetrics
 tag:getResources
 sts:GetCallerIdentity
 iam:ListAccountAliases
+ce:GetCostAndUsage
 ----
 
 [float]
@@ -33,18 +29,28 @@ image::./images/metricbeat-aws-billing-overview.png[]
 [source,yaml]
 ----
 - module: aws
-  period: 12h
+  period: 24h
   metricsets:
     - billing
-  # This module uses the aws cloudwatch metricset, all
-  # the options for this metricset are also available here.
+  credential_profile_name: elastic-beats
+  cost_explorer_config:
+    group_by_dimension_keys:
+      - "AZ"
+      - "INSTANCE_TYPE"
+      - "SERVICE"
+    group_by_tag_keys:
+      - "aws:createdBy"
 ----
 
 [float]
-=== Metrics
-|===
-|Metric Name|Statistic Method
-|EstimatedCharges | Maximum
-|===
+=== Metricset-specific configuration notes
+When querying AWS Cost Explorer API, you can group AWS costs using up to two
+different groups, either dimensions, tag keys, or both. Right now we support
+group by type dimension and type tag with separate config parameters:
 
-Supported dimensions for billing metrics: Currency and ServiceName.
+* *group_by_dimension_keys*: A list of keys used in Cost Explorer to group by
+dimensions. Valid values are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME,
+LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TAGS, TENANCY, and
+USAGE_TYPE.
+
+* *group_by_tag_keys*: A list of keys used in Cost Explorer to group by tags.

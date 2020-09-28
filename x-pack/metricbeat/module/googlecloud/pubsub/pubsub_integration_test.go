@@ -11,9 +11,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
 )
 
 func TestData(t *testing.T) {
@@ -34,7 +35,7 @@ func TestData(t *testing.T) {
 		{"googlecloud.pubsub.topic", "./_meta/data_topic.json"},
 	}
 
-	config := stackdriver.GetConfigForTest(t, "pubsub")
+	config := metrics.GetConfigForTest(t, "pubsub")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

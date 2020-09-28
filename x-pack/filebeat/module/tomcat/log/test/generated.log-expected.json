@@ -14,6 +14,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/illumqui/ventore.html?min=ite#utl",
+            "mail.example.net",
+            "example.com"
+        ],
         "related.ip": [
             "10.251.224.219"
         ],
@@ -45,7 +50,7 @@
         "url.domain": "example.com",
         "url.query": "amremap",
         "user.name": "rci",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -68,6 +73,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.net/mdolo/mqui.htm?sumdo=litesse#orev",
+            "mail.example.com",
+            "www5.example.net"
+        ],
         "related.ip": [
             "10.196.153.12"
         ],
@@ -121,6 +131,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/tetur/idolor.html?ntex=eius#luptat",
+            "www.example.com",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.156.194.38"
         ],
@@ -177,6 +192,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.org/nci/ofdeFin.gif?amco=exe#iatu",
+            "mail.example.com",
+            "www5.example.org"
+        ],
         "related.ip": [
             "10.196.118.192"
         ],
@@ -208,7 +228,7 @@
         "url.domain": "www5.example.org",
         "url.query": "con",
         "user.name": "tur",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -231,6 +251,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/aqui/radipis.jpg?llumd=enatuse#magn",
+            "internal.example.net",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.246.209.145"
         ],
@@ -285,6 +310,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/omnis/antium.txt?lupta=iusmodt#doloreeu",
+            "www5.example.org",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.114.191.225"
         ],
@@ -340,6 +370,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.net/uidolore/niamqu.gif?iat=tevelit#nsequat",
+            "api.example.com",
+            "www5.example.net"
+        ],
         "related.ip": [
             "10.38.77.13"
         ],
@@ -397,6 +432,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/idexea/riat.txt?tvol=moll#tatione",
+            "mail.example.org",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.11.201.109"
         ],
@@ -453,6 +493,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.org/toccae/tatno.gif?taliqu=temUten#ccusan",
+            "example.org",
+            "api.example.org"
+        ],
         "related.ip": [
             "10.182.166.181"
         ],
@@ -507,6 +552,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/atuse/ddoeiu.gif?idolore=onse#liq",
+            "internal.example.com",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.185.126.247"
         ],
@@ -560,6 +610,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/idestla/Nemoeni.htm?taed=lup#remeumf",
+            "mail.example.net",
+            "example.com"
+        ],
         "related.ip": [
             "10.72.114.23"
         ],
@@ -617,6 +672,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/nimadmin/ditautfu.html?lpa=entsu#dun",
+            "internal.example.net",
+            "example.net"
+        ],
         "related.ip": [
             "10.129.241.147"
         ],
@@ -674,6 +734,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/ono/stru.jpg?emaperi=tame#tinvol",
+            "internal.example.net",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.185.101.76"
         ],
@@ -730,6 +795,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/tion/eataev.htm?uiineavo=tisetq#irati",
+            "www.example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.57.170.140"
         ],
@@ -784,6 +854,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/isno/taliq.htm?nnu=dolo#Loremip",
+            "internal.example.net",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.33.153.47"
         ],
@@ -839,6 +914,10 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.net/mdolore/rQuisau.gif?iavolu=den#tutla",
+            "internal.example.net"
+        ],
         "related.ip": [
             "10.116.104.101"
         ],
@@ -872,7 +951,7 @@
         "url.domain": "internal.example.net",
         "url.query": "iades",
         "user.name": "tat",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -895,6 +974,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/oidentsu/atiset.jpg?ntor=lpaqui#sitame",
+            "example.com",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.202.194.67"
         ],
@@ -950,6 +1034,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/etconse/tincu.txt?lit=asun#estia",
+            "www.example.com",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.153.111.103"
         ],
@@ -1006,6 +1095,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.org/eriamea/amre.htm?magni=pisciv#iquidex",
+            "internal.example.net",
+            "www5.example.org"
+        ],
         "related.ip": [
             "10.52.186.29"
         ],
@@ -1061,6 +1155,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/iutali/fdeFi.jpg?liquide=etdol#uela",
+            "example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.209.182.237"
         ],
@@ -1118,6 +1217,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/itatione/isnis.html?oluptate=issus#osamn",
+            "api.example.org",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.63.194.87"
         ],
@@ -1174,6 +1278,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/emvel/tmollita.htm?numqua=veni#eveli",
+            "www5.example.org",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.62.191.18"
         ],
@@ -1228,6 +1337,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/nisi/dant.txt?ecte=tinvolu#iurer",
+            "example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.238.164.29"
         ],
@@ -1282,6 +1396,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/sintocc/tlabor.txt?tDuisaut=oinBC#quameius",
+            "example.com",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.155.230.17"
         ],
@@ -1313,7 +1432,7 @@
         "url.domain": "internal.example.com",
         "url.query": "tet",
         "user.name": "ionevo",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1337,6 +1456,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/officiad/itam.html?madmi=tur#roi",
+            "mail.example.net",
+            "example.net"
+        ],
         "related.ip": [
             "10.102.229.102"
         ],
@@ -1370,7 +1494,7 @@
         "url.domain": "example.net",
         "url.query": "orem",
         "user.name": "tenbyCi",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1394,6 +1518,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.org/tor/qui.txt?eavolup=fugiatn#docon",
+            "www5.example.org",
+            "mail.example.org"
+        ],
         "related.ip": [
             "10.194.14.7"
         ],
@@ -1450,6 +1579,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.net/roid/inibusB.jpg?Nemoenim=squirati#Sedutp",
+            "example.com",
+            "api.example.net"
+        ],
         "related.ip": [
             "10.99.0.226"
         ],
@@ -1504,6 +1638,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/str/idolore.txt?eetdolo=cteturad#untut",
+            "api.example.org",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.107.174.213"
         ],
@@ -1559,6 +1698,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.org/iscinge/ofdeFini.jpg?molli=velitse#oditem",
+            "www.example.org",
+            "mail.example.org"
+        ],
         "related.ip": [
             "10.84.25.23"
         ],
@@ -1615,6 +1759,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/epre/tobeata.html?quia=iduntu#idestlab",
+            "api.example.com",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.193.143.108"
         ],
@@ -1670,6 +1819,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/mexe/its.htm?ice=oles#edic",
+            "example.org",
+            "example.com"
+        ],
         "related.ip": [
             "10.190.51.22"
         ],
@@ -1703,7 +1857,7 @@
         "url.domain": "example.com",
         "url.query": "tutlab",
         "user.name": "siut",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1727,6 +1881,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.com/velitess/naali.htm?nre=veli#volupta",
+            "www5.example.com",
+            "www.example.com"
+        ],
         "related.ip": [
             "10.194.90.130"
         ],
@@ -1779,6 +1938,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/xeacomm/cinge.txt?apariat=vitaedi#lorsita",
+            "internal.example.com",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.10.213.83"
         ],
@@ -1834,6 +1998,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.org/texpli/exeacom.jpg?rita=esseci#tametcon",
+            "mail.example.net",
+            "api.example.org"
+        ],
         "related.ip": [
             "10.52.125.9"
         ],
@@ -1890,6 +2059,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.net/ibusBon/ven.gif?nsequat=doloreme#dun",
+            "www5.example.org",
+            "api.example.net"
+        ],
         "related.ip": [
             "10.19.17.202"
         ],
@@ -1921,7 +2095,7 @@
         "url.domain": "api.example.net",
         "url.query": "tincu",
         "user.name": "mve",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -1945,6 +2119,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.org/oconsequ/edquiac.gif?preh=ercit#etMal",
+            "api.example.com",
+            "mail.example.org"
+        ],
         "related.ip": [
             "10.195.64.5"
         ],
@@ -1978,7 +2157,7 @@
         "url.domain": "mail.example.org",
         "url.query": "rsita",
         "user.name": "uat",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2002,6 +2181,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.com/llamc/nte.htm?utali=porinc#tetur",
+            "mail.example.com",
+            "internal.example.com"
+        ],
         "related.ip": [
             "10.209.77.194"
         ],
@@ -2058,6 +2242,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/ites/isetq.gif?nisiut=tur#avolupt",
+            "mail.example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.168.6.90"
         ],
@@ -2112,6 +2301,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/acommod/itsedd.html?admin=stenatu#inibu",
+            "api.example.org",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.89.137.238"
         ],
@@ -2143,7 +2337,7 @@
         "url.domain": "mail.example.com",
         "url.query": "uptatemU",
         "user.name": "ore",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -2166,6 +2360,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.org/Nequepor/eirure.htm?idid=tesse#sequat",
+            "www5.example.net",
+            "example.org"
+        ],
         "related.ip": [
             "10.246.61.213"
         ],
@@ -2221,6 +2420,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/tanimi/rumSecti.jpg?emporain=ntiumto#umetMalo",
+            "www5.example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.117.44.138"
         ],
@@ -2277,6 +2481,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/temUt/ptassita.gif?uamnihi=risnis#uov",
+            "www.example.net",
+            "example.net"
+        ],
         "related.ip": [
             "10.69.30.196"
         ],
@@ -2329,6 +2538,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.com/dictasun/abore.txt?modocon=ipsu#ntNeq",
+            "example.org",
+            "api.example.com"
+        ],
         "related.ip": [
             "10.135.91.88"
         ],
@@ -2360,7 +2574,7 @@
         "url.domain": "api.example.com",
         "url.query": "urExce",
         "user.name": "eporroq",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2384,6 +2598,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/Sedutpe/prehen.html?rcit=aecatcup#olabor",
+            "api.example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.81.45.174"
         ],
@@ -2417,7 +2636,7 @@
         "url.domain": "example.net",
         "url.query": "erun",
         "user.name": "fugitse",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2440,6 +2659,10 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/umetMal/asper.htm?metcons=itasper#uae",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.87.179.233"
         ],
@@ -2494,6 +2717,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.net/mquisn/queips.gif?emUte=molestia#quir",
+            "example.com",
+            "api.example.net"
+        ],
         "related.ip": [
             "10.198.57.130"
         ],
@@ -2548,6 +2776,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/yCic/nder.jpg?itanim=nesciun#saqu",
+            "www.example.org",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.218.0.197"
         ],
@@ -2579,7 +2812,7 @@
         "url.domain": "www.example.net",
         "url.query": "quasiar",
         "user.name": "econs",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; POCOPHONE F1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2603,6 +2836,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/ecatcupi/uamei.html?nreprehe=onse#olorem",
+            "example.com",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.123.199.198"
         ],
@@ -2660,6 +2898,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.net/ection/roquisqu.html?ceroinB=nim#utaliqu",
+            "example.org",
+            "internal.example.net"
+        ],
         "related.ip": [
             "10.29.119.245"
         ],
@@ -2693,7 +2936,7 @@
         "url.domain": "internal.example.net",
         "url.query": "taliqui",
         "user.name": "leumiur",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 YaBrowser/20.3.0.2221 Yowser/2.5 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.15.6",
@@ -2717,6 +2960,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/iutali/itat.txt?Finibus=radi#xeacom",
+            "www.example.org",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.130.175.17"
         ],
@@ -2750,7 +2998,7 @@
         "url.domain": "mail.example.net",
         "url.query": "atnulapa",
         "user.name": "quaU",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; U307AS) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2773,6 +3021,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/lmolesti/apariatu.htm?moe=msequ#uat",
+            "internal.example.org",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.166.90.130"
         ],
@@ -2828,6 +3081,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.org/ratv/alorum.jpg?tali=BCS#qui",
+            "internal.example.org",
+            "api.example.org"
+        ],
         "related.ip": [
             "10.248.111.207"
         ],
@@ -2861,7 +3119,7 @@
         "url.domain": "api.example.org",
         "url.query": "incidid",
         "user.name": "tiumto",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -2884,6 +3142,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.net/gitse/ugitse.jpg?tvolup=tdolore#ventore",
+            "api.example.net",
+            "internal.example.net"
+        ],
         "related.ip": [
             "10.185.37.32"
         ],
@@ -2938,6 +3201,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.org/pisc/urEx.html?rautod=olest#eataev",
+            "internal.example.com",
+            "example.org"
+        ],
         "related.ip": [
             "10.5.194.202"
         ],
@@ -2969,7 +3237,7 @@
         "url.domain": "example.org",
         "url.query": "atem",
         "user.name": "ntmo",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -2993,6 +3261,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/aconse/prehe.gif?diduntu=eiusmod#itation",
+            "www.example.org",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.183.34.1"
         ],
@@ -3049,6 +3322,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/reetdolo/rationev.html?reetdol=uelauda#ema",
+            "internal.example.com",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.101.163.40"
         ],
@@ -3104,6 +3382,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/mUteni/quira.htm?ore=tation#loinve",
+            "internal.example.com",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.216.188.152"
         ],
@@ -3160,6 +3443,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.org/setquas/minim.gif?tutlabor=reseosq#gna",
+            "mail.example.net",
+            "www5.example.org"
+        ],
         "related.ip": [
             "10.94.140.77"
         ],
@@ -3212,6 +3500,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.com/laudanti/umiurer.txt?rsitvolu=mnisi#usmo",
+            "mail.example.org",
+            "www.example.com"
+        ],
         "related.ip": [
             "10.223.205.204"
         ],
@@ -3267,6 +3560,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.org/ici/nisiuta.jpg?itae=dtempo#atnula",
+            "example.com",
+            "mail.example.org"
+        ],
         "related.ip": [
             "10.85.137.156"
         ],
@@ -3324,6 +3622,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/eseruntm/lpaquiof.html?magnaal=uscip#umS",
+            "www5.example.net",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.12.54.142"
         ],
@@ -3380,6 +3683,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/labori/porai.gif?utali=sed#xeac",
+            "internal.example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.158.6.52"
         ],
@@ -3435,6 +3743,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.org/orissu/fic.gif?ese=mmodoco#amni",
+            "example.com",
+            "www5.example.org"
+        ],
         "related.ip": [
             "10.195.160.182"
         ],
@@ -3491,6 +3804,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/iuntNeq/eddoei.jpg?sseq=eriam#pernat",
+            "example.net",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.20.68.117"
         ],
@@ -3546,6 +3864,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/tanimid/onpr.gif?gelitse=oremqu#idex",
+            "www5.example.org",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.94.136.235"
         ],
@@ -3603,6 +3926,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/ntorever/pisciv.gif?eritq=rehen#ipsamvol",
+            "example.com",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.152.11.26"
         ],
@@ -3656,6 +3984,10 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/quu/xeac.htm?abor=oreverit#scip",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.82.118.95"
         ],
@@ -3689,7 +4021,7 @@
         "url.domain": "www5.example.com",
         "url.query": "Utenimad",
         "user.name": "ptate",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -3712,6 +4044,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/mini/Loremip.html?tur=atnonpr#ita",
+            "www5.example.net",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.187.152.213"
         ],
@@ -3743,7 +4080,7 @@
         "url.domain": "www.example.net",
         "url.query": "aqui",
         "user.name": "ventor",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -3767,6 +4104,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/duntutla/lamco.txt?isci=Dui#reetdo",
+            "internal.example.net",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.98.71.45"
         ],
@@ -3823,6 +4165,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.net/tev/nre.html?occaeca=eturadip#ent",
+            "www5.example.org",
+            "www5.example.net"
+        ],
         "related.ip": [
             "10.86.123.33"
         ],
@@ -3877,6 +4224,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.net/uamnih/nseq.txt?uidolo=umdolore#dmi",
+            "api.example.net",
+            "www5.example.net"
+        ],
         "related.ip": [
             "10.6.112.183"
         ],
@@ -3908,7 +4260,7 @@
         "url.domain": "www5.example.net",
         "url.query": "oremip",
         "user.name": "oluptat",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "LM-V350",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 10; LM-V350) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
         "user_agent.os.full": "Android 10",
@@ -3932,6 +4284,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/umdolor/isiu.html?mmodi=snostr#eniamqu",
+            "www5.example.org",
+            "example.net"
+        ],
         "related.ip": [
             "10.227.156.143"
         ],
@@ -3985,6 +4342,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.org/ibusBo/untincu.jpg?lesti=sintocca#mipsumqu",
+            "example.net",
+            "example.org"
+        ],
         "related.ip": [
             "10.124.129.248"
         ],
@@ -4042,6 +4404,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.org/magnaa/sumquiad.gif?oluptate=Duisa#consequa",
+            "www5.example.net",
+            "www5.example.org"
+        ],
         "related.ip": [
             "10.173.125.112"
         ],
@@ -4098,6 +4465,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/evolup/rvelil.gif?eavolup=ipsumq#evit",
+            "api.example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.37.156.140"
         ],
@@ -4150,6 +4522,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/oremip/its.jpg?iavol=natuserr#ostrudex",
+            "www5.example.org",
+            "example.com"
+        ],
         "related.ip": [
             "10.121.225.135"
         ],
@@ -4181,7 +4558,7 @@
         "url.domain": "example.com",
         "url.query": "miurere",
         "user.name": "cin",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4204,6 +4581,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/animid/upta.jpg?onnumqua=quioff#iuntN",
+            "mail.example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.123.68.56"
         ],
@@ -4259,6 +4641,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.net/itesse/expl.html?prehende=lup#tpers",
+            "mail.example.net",
+            "api.example.net"
+        ],
         "related.ip": [
             "10.63.56.164"
         ],
@@ -4316,6 +4703,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/deritinv/evelite.html?iav=odico#rsint",
+            "example.com",
+            "example.net"
+        ],
         "related.ip": [
             "10.62.10.137"
         ],
@@ -4373,6 +4765,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.org/tseddoei/teursint.htm?remagnaa=lamcolab#ceroinB",
+            "api.example.net",
+            "example.org"
+        ],
         "related.ip": [
             "10.89.154.115"
         ],
@@ -4429,6 +4826,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www5.example.com/ciad/ugiatqu.gif?turveli=isciv#natus",
+            "api.example.org",
+            "www5.example.com"
+        ],
         "related.ip": [
             "10.122.252.130"
         ],
@@ -4460,7 +4862,7 @@
         "url.domain": "www5.example.com",
         "url.query": "luptasnu",
         "user.name": "mmo",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",
@@ -4483,6 +4885,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.com/olore/ntutlab.htm?ameaquei=gnama#esciun",
+            "www.example.net",
+            "api.example.com"
+        ],
         "related.ip": [
             "10.195.152.53"
         ],
@@ -4534,6 +4941,10 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/rvelil/adese.htm?incidi=aedictas#rumetMa",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.9.255.204"
         ],
@@ -4591,6 +5002,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/oremi/ectobeat.gif?oreeu=uasiarch#Malor",
+            "internal.example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.214.235.133"
         ],
@@ -4648,6 +5064,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.com/orsitam/tiset.jpg?ati=rauto#doloreeu",
+            "api.example.org",
+            "api.example.com"
+        ],
         "related.ip": [
             "10.5.134.204"
         ],
@@ -4704,6 +5125,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.org/rep/mveni.txt?utpers=num#ctetura",
+            "internal.example.com",
+            "example.org"
+        ],
         "related.ip": [
             "10.144.111.42"
         ],
@@ -4758,6 +5184,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.net/adm/snostr.jpg?tec=itaspe#con",
+            "www.example.com",
+            "example.net"
+        ],
         "related.ip": [
             "10.122.0.80"
         ],
@@ -4813,6 +5244,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.com/ccusant/epteurs.htm?oidentsu=oditau#onsec",
+            "www.example.net",
+            "mail.example.com"
+        ],
         "related.ip": [
             "10.165.33.19"
         ],
@@ -4870,6 +5306,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.org/onemul/trudexe.txt?ura=oreeufug#Quisa",
+            "internal.example.org",
+            "mail.example.org"
+        ],
         "related.ip": [
             "10.87.92.17"
         ],
@@ -4926,6 +5367,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/lorese/olupta.jpg?onsec=idestl#litani",
+            "internal.example.org",
+            "example.com"
+        ],
         "related.ip": [
             "10.51.52.203"
         ],
@@ -4981,6 +5427,10 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.net/llitani/uscipit.html?etcons=etco#iuntN",
+            "internal.example.net"
+        ],
         "related.ip": [
             "10.0.211.86"
         ],
@@ -5037,6 +5487,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://mail.example.net/ptat/mipsu.htm?eturadip=amquaera#rsitamet",
+            "example.net",
+            "mail.example.net"
+        ],
         "related.ip": [
             "10.106.34.244"
         ],
@@ -5091,6 +5546,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/quae/periam.html?emoenimi=iquipex#mqu",
+            "example.net",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.191.210.188"
         ],
@@ -5145,6 +5605,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.com/bori/dipi.gif?utf=dolor#dexe",
+            "www.example.org",
+            "www.example.com"
+        ],
         "related.ip": [
             "10.2.38.49"
         ],
@@ -5196,6 +5661,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/iat/tqui.gif?utaliqui=emse#emqui",
+            "mail.example.com",
+            "example.com"
+        ],
         "related.ip": [
             "10.66.92.90"
         ],
@@ -5253,6 +5723,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
+            "mail.example.com",
+            "example.com"
+        ],
         "related.ip": [
             "10.97.108.108"
         ],
@@ -5310,6 +5785,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://api.example.net/uiaco/aliqu.txt?udexerci=uae#imveni",
+            "www5.example.org",
+            "api.example.net"
+        ],
         "related.ip": [
             "10.147.147.248"
         ],
@@ -5343,7 +5823,7 @@
         "url.domain": "api.example.net",
         "url.query": "aborio",
         "user.name": "uira",
-        "user_agent.device.name": "Generic Tablet",
+        "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; Notepad_K10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Safari/537.36",
         "user_agent.os.full": "Android 9",
@@ -5367,6 +5847,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.org/roinBCSe/eetdolor.html?tla=iaconseq#sed",
+            "api.example.com",
+            "www.example.org"
+        ],
         "related.ip": [
             "10.152.190.61"
         ],
@@ -5424,6 +5909,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://www.example.net/tvolu/imve.txt?gnaaliq=quam#deriti",
+            "api.example.org",
+            "www.example.net"
+        ],
         "related.ip": [
             "10.129.232.105"
         ],
@@ -5480,6 +5970,11 @@
         "observer.product": "TomCat",
         "observer.type": "Web",
         "observer.vendor": "Apache",
+        "related.hosts": [
+            "https://internal.example.org/teturadi/radipi.gif?upidatat=mod#niamqui",
+            "api.example.net",
+            "internal.example.org"
+        ],
         "related.ip": [
             "10.12.173.112"
         ],
@@ -5511,7 +6006,7 @@
         "url.domain": "internal.example.org",
         "url.query": "nidol",
         "user.name": "mco",
-        "user_agent.device.name": "Generic Smartphone",
+        "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
         "user_agent.os.full": "Android 9",

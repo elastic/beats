@@ -2,66 +2,71 @@
 [role="xpack"]
 = Run {agent}
 
-experimental[]
+beta[]
 
 {agent} runs in two modes: standalone or fleet. The two modes differ in how you
-configure and manage the Agent.
+configure and manage the agent.
 
-[float]
+[discrete]
 [[fleet-mode]]
 == Run in {fleet} mode
 
-With _fleet mode_, you manage {agent} remotely. The Agent uses a trusted {kib}
-instance to retrieve configurations and report Agent events. This trusted {kib}
+With _fleet mode_, you manage {agent} remotely. The agent uses a trusted {kib}
+instance to retrieve configurations and report agent events. This trusted {kib}
 instance must have {ingest-manager} and {fleet} enabled.
 
 To create a trusted communication channel between {agent} and {kib}, enroll the
-Agent to {fleet}.
+agent to {fleet}.
 
 To enroll an {agent} to {fleet}:
 
-. Stop the Agent, if it's already running.
+. Stop {agent}, if it's already running.
 
-. Go the **{fleet}** tab in {ingest-manager}, and click **Enroll new agent** to
-generate a token. See <<ingest-management-getting-started>> for detailed steps.
-
-. Enroll the Agent:
+. In {ingest-manager}, click **Settings** and change the defaults, if necessary.
+For self-managed installations, set the URLs for {es} and {kib}, including
+the http ports, then save your changes.
 +
-[source,shell]
-----
-./elastic-agent enroll http://localhost:5601 $token
-----
+[role="screenshot"]
+image::images/kibana-ingest-manager-settings.png[{ingest-manager} settings]
+
+. Select **{fleet}**, then click **Add agent** to get an enrollment token. See
+<<ingest-management-getting-started>> for detailed steps.
+
+. Change to the directory where {agent} is installed, and enroll the agent to
+{fleet}:
 +
-Where `$token` is an enrollment token acquired from {fleet}.
+--
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/enroll-widget.asciidoc[]
+--
 
-To start {agent}, run:
-[source,shell]
-----
-./elastic-agent run
-----
+. Run the agent:
++
+--
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-widget.asciidoc[]
+--
 
-[float]
+[discrete]
 [[standalone-mode]]
 == Run in standalone mode (default)
 
-With _standalone mode_, you manually configure and manage the Agent locally.
-Each Agent is configured to be in standalone mode by default after installation.
+With _standalone mode_, you manually configure and manage {agent} locally on the
+system where the agent is installed. {agent} is configured to run in standalone
+mode by default unless you enroll it in {fleet}. 
 
 If {agent} is installed as an auto-starting service, it will run automatically
 when you restart your system.
 
 To start {agent} manually, run:
 
-[source,shell]
-----
-./elastic-agent run
-----
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-standalone-widget.asciidoc[]
 
-If no configuration file is specified, {agent} uses the default configuration,
-`elastic-agent.yml`, which is located in the same directory as {agent}. Specify
-the `-c` flag to use a different configuration file.
+Use the `-c` flag to specify the configuration file. If no configuration file is
+specified, {agent} uses the default configuration, `elastic-agent.yml`, which is
+located in the same directory as {agent}.
 
 For configuration options, see <<elastic-agent-configuration>>.
 
 //<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>
 
+// Add Javascript and CSS for tabbed panels
+include::tab-widgets/code.asciidoc[]

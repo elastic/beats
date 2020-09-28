@@ -1,0 +1,43 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+http_method: GET
+http_headers: {"Content-Type": "application/json"}
+interval: {{ .interval }}
+json_objects_array: value
+split_events_by: evidence
+url: {{ .url }}
+
+oauth2: {{ .oauth2 | tojson }}
+oauth2.provider: azure
+oauth2.azure.resource: https://api.securitycenter.windows.com/
+http_headers: {{ .http_headers | tojson }}
+date_cursor.field: lastUpdateTime
+date_cursor.url_field: '$filter'
+date_cursor.value_template: {{ .date_cursor.value_template }}
+date_cursor.initial_interval: 5m
+date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
+
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{ .tags | tojson }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: json
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.6.0

@@ -3,6 +3,8 @@ name: Endpoint Host
 fleet:
   agent:
     id: fleet-agent-id
+  host:
+    id: host-agent-id
   access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
   kibana:
     protocol: https
@@ -20,12 +22,13 @@ outputs:
 
 inputs:
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22

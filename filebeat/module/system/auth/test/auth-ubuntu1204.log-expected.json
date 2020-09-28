@@ -11,6 +11,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -23,6 +26,9 @@
         "input.type": "log",
         "log.offset": 81,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -44,6 +50,9 @@
         "log.offset": 464,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -57,6 +66,9 @@
         "log.offset": 570,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -71,6 +83,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -83,6 +98,9 @@
         "input.type": "log",
         "log.offset": 736,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -104,6 +122,9 @@
         "log.offset": 1121,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -117,6 +138,9 @@
         "log.offset": 1227,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -131,6 +155,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -143,6 +170,9 @@
         "input.type": "log",
         "log.offset": 1393,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -164,6 +194,9 @@
         "log.offset": 1776,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -177,6 +210,9 @@
         "log.offset": 1882,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -191,6 +227,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -203,6 +242,9 @@
         "input.type": "log",
         "log.offset": 2048,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -224,6 +266,9 @@
         "log.offset": 2426,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -237,6 +282,9 @@
         "log.offset": 2532,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -251,6 +299,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -263,6 +314,9 @@
         "input.type": "log",
         "log.offset": 2698,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -284,6 +338,9 @@
         "log.offset": 3083,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -297,6 +354,9 @@
         "log.offset": 3189,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -311,6 +371,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -336,6 +399,9 @@
         "input.type": "log",
         "log.offset": 3414,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -357,6 +423,9 @@
         "log.offset": 3977,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -370,6 +439,9 @@
         "log.offset": 4083,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -384,6 +456,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -396,6 +471,9 @@
         "input.type": "log",
         "log.offset": 4249,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -417,6 +495,9 @@
         "log.offset": 4632,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -430,6 +511,9 @@
         "log.offset": 4738,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -444,6 +528,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -456,6 +543,9 @@
         "input.type": "log",
         "log.offset": 4904,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -477,6 +567,9 @@
         "log.offset": 5289,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -490,6 +583,9 @@
         "log.offset": 5395,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -504,6 +600,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -516,6 +615,9 @@
         "input.type": "log",
         "log.offset": 5561,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -537,6 +639,9 @@
         "log.offset": 5942,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -550,6 +655,9 @@
         "log.offset": 6048,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -564,6 +672,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -576,6 +687,9 @@
         "input.type": "log",
         "log.offset": 6214,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -597,6 +711,9 @@
         "log.offset": 6597,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -610,6 +727,9 @@
         "log.offset": 6703,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -624,6 +744,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -636,6 +759,9 @@
         "input.type": "log",
         "log.offset": 6869,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -657,6 +783,9 @@
         "log.offset": 7254,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -670,6 +799,9 @@
         "log.offset": 7360,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -684,6 +816,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -696,6 +831,9 @@
         "input.type": "log",
         "log.offset": 7526,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -717,6 +855,9 @@
         "log.offset": 7911,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -730,6 +871,9 @@
         "log.offset": 8017,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -744,6 +888,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -756,6 +903,9 @@
         "input.type": "log",
         "log.offset": 8183,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -777,6 +927,9 @@
         "log.offset": 8564,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -790,6 +943,9 @@
         "log.offset": 8670,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -804,6 +960,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -816,6 +975,9 @@
         "input.type": "log",
         "log.offset": 8836,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -837,6 +999,9 @@
         "log.offset": 9215,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -850,6 +1015,9 @@
         "log.offset": 9321,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -864,6 +1032,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -876,6 +1047,9 @@
         "input.type": "log",
         "log.offset": 9487,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -897,6 +1071,9 @@
         "log.offset": 9869,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -910,6 +1087,9 @@
         "log.offset": 9975,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -922,6 +1102,9 @@
         "input.type": "log",
         "log.offset": 10060,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -943,6 +1126,9 @@
         "log.offset": 11099,
         "message": " vagrant : (command continued) '/etc/metricbeat/metricbeat.yml)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -956,6 +1142,9 @@
         "log.offset": 11195,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -969,6 +1158,9 @@
         "log.offset": 11301,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -983,6 +1175,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -997,6 +1192,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1009,6 +1207,9 @@
         "input.type": "log",
         "log.offset": 11548,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1030,6 +1231,9 @@
         "log.offset": 11928,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1043,6 +1247,9 @@
         "log.offset": 12034,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1057,6 +1264,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1069,6 +1279,9 @@
         "input.type": "log",
         "log.offset": 12200,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1090,6 +1303,9 @@
         "log.offset": 12583,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1103,6 +1319,9 @@
         "log.offset": 12689,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1117,6 +1336,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1129,6 +1351,9 @@
         "input.type": "log",
         "log.offset": 12855,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1150,6 +1375,9 @@
         "log.offset": 13241,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1163,6 +1391,9 @@
         "log.offset": 13347,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1177,6 +1408,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1189,6 +1423,9 @@
         "input.type": "log",
         "log.offset": 13513,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1210,6 +1447,9 @@
         "log.offset": 13898,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1223,6 +1463,9 @@
         "log.offset": 14004,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1237,6 +1480,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1249,6 +1495,9 @@
         "input.type": "log",
         "log.offset": 14170,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1270,6 +1519,9 @@
         "log.offset": 14549,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1283,6 +1535,9 @@
         "log.offset": 14655,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1297,6 +1552,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1309,6 +1567,9 @@
         "input.type": "log",
         "log.offset": 14821,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1330,6 +1591,9 @@
         "log.offset": 15203,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1343,6 +1607,9 @@
         "log.offset": 15309,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1357,6 +1624,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1369,6 +1639,9 @@
         "input.type": "log",
         "log.offset": 15475,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1390,6 +1663,9 @@
         "log.offset": 15860,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1403,6 +1679,9 @@
         "log.offset": 15966,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1417,6 +1696,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1429,6 +1711,9 @@
         "input.type": "log",
         "log.offset": 16132,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],
@@ -1450,6 +1735,9 @@
         "log.offset": 16517,
         "message": "pam_unix(sudo:session): session opened for user root by vagrant(uid=1000)",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1463,6 +1751,9 @@
         "log.offset": 16623,
         "message": "pam_unix(sudo:session): session closed for user root",
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1477,6 +1768,9 @@
         "message": "subsystem request for sftp by user vagrant",
         "process.name": "sshd",
         "process.pid": 8317,
+        "related.hosts": [
+            "precise32"
+        ],
         "service.type": "system"
     },
     {
@@ -1489,6 +1783,9 @@
         "input.type": "log",
         "log.offset": 16789,
         "process.name": "sudo",
+        "related.hosts": [
+            "precise32"
+        ],
         "related.user": [
             "vagrant"
         ],

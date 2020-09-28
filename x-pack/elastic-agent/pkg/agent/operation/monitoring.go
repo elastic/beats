@@ -6,9 +6,11 @@ package operation
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -16,12 +18,11 @@ import (
 )
 
 const (
-	monitoringName          = "FLEET_MONITORING"
-	outputKey               = "output"
-	monitoringEnabledSubkey = "enabled"
-	logsProcessName         = "filebeat"
-	metricsProcessName      = "metricbeat"
-	artifactPrefix          = "beats"
+	monitoringName     = "FLEET_MONITORING"
+	outputKey          = "output"
+	logsProcessName    = "filebeat"
+	metricsProcessName = "metricbeat"
+	artifactPrefix     = "beats"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -174,37 +175,78 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 }
 
 func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
-	paths := o.getLogFilePaths()
-	if len(paths) == 0 {
-		return nil, false
-	}
-
-	result := map[string]interface{}{
-		"filebeat": map[string]interface{}{
-			"inputs": []interface{}{
-				map[string]interface{}{
-					"type": "log",
-					"multiline": map[string]interface{}{
-						"pattern": "^[0-9]{4}",
-						"negate":  true,
-						"match":   "after",
+	inputs := []interface{}{
+		map[string]interface{}{
+			"type": "log",
+			"json": map[string]interface{}{
+				"keys_under_root": true,
+				"overwrite_keys":  true,
+				"message_key":     "message",
+			},
+			"paths": []string{
+				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+			},
+			"index": "logs-elastic.agent-default",
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "logs",
+							"dataset":   "elastic.agent",
+							"namespace": "default",
+						},
 					},
-					"paths": paths,
-					"index": "logs-agent-default",
-					"processors": []map[string]interface{}{
-						{
-							"add_fields": map[string]interface{}{
-								"target": "dataset",
-								"fields": map[string]interface{}{
-									"type":      "logs",
-									"name":      "agent",
-									"namespace": "default",
-								},
-							},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": "elastic.agent",
 						},
 					},
 				},
 			},
+		},
+	}
+	logPaths := o.getLogFilePaths()
+	if len(logPaths) > 0 {
+		for name, paths := range logPaths {
+			inputs = append(inputs, map[string]interface{}{
+				"type": "log",
+				"json": map[string]interface{}{
+					"keys_under_root": true,
+					"overwrite_keys":  true,
+					"message_key":     "message",
+				},
+				"paths": paths,
+				"index": fmt.Sprintf("logs-elastic.agent.%s-default", name),
+				"processors": []map[string]interface{}{
+					{
+						"add_fields": map[string]interface{}{
+							"target": "data_stream",
+							"fields": map[string]interface{}{
+								"type":      "logs",
+								"dataset":   fmt.Sprintf("elastic.agent.%s", name),
+								"namespace": "default",
+							},
+						},
+					},
+					{
+						"add_fields": map[string]interface{}{
+							"target": "event",
+							"fields": map[string]interface{}{
+								"dataset": fmt.Sprintf("elastic.agent.%s", name),
+							},
+						},
+					},
+				},
+			})
+		}
+	}
+	result := map[string]interface{}{
+		"filebeat": map[string]interface{}{
+			"inputs": inputs,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,
@@ -221,30 +263,39 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	if len(hosts) == 0 {
 		return nil, false
 	}
-
-	result := map[string]interface{}{
-		"metricbeat": map[string]interface{}{
-			"modules": []interface{}{
-				map[string]interface{}{
-					"module":     "beat",
-					"metricsets": []string{"stats", "state"},
-					"period":     "10s",
-					"hosts":      hosts,
-					"index":      "metrics-agent-default",
-					"processors": []map[string]interface{}{
-						{
-							"add_fields": map[string]interface{}{
-								"target": "dataset",
-								"fields": map[string]interface{}{
-									"type":      "metrics",
-									"name":      "agent",
-									"namespace": "default",
-								},
-							},
+	var modules []interface{}
+	for name, endpoints := range hosts {
+		modules = append(modules, map[string]interface{}{
+			"module":     "beat",
+			"metricsets": []string{"stats", "state"},
+			"period":     "10s",
+			"hosts":      endpoints,
+			"index":      fmt.Sprintf("metrics-elastic.agent.%s-default", name),
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "metrics",
+							"dataset":   fmt.Sprintf("elastic.agent.%s", name),
+							"namespace": "default",
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": fmt.Sprintf("elastic.agent.%s", name),
 						},
 					},
 				},
 			},
+		})
+	}
+	result := map[string]interface{}{
+		"metricbeat": map[string]interface{}{
+			"modules": modules,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,
@@ -256,8 +307,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	return result, true
 }
 
-func (o *Operator) getLogFilePaths() []string {
-	var paths []string
+func (o *Operator) getLogFilePaths() map[string][]string {
+	paths := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -265,15 +316,15 @@ func (o *Operator) getLogFilePaths() []string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
 		if logPath != "" {
-			paths = append(paths, logPath)
+			paths[a.Name()] = append(paths[a.Name()], logPath)
 		}
 	}
 
 	return paths
 }
 
-func (o *Operator) getMetricbeatEndpoints() []string {
-	var endpoints []string
+func (o *Operator) getMetricbeatEndpoints() map[string][]string {
+	endpoints := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -281,7 +332,7 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	for _, a := range o.apps {
 		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints = append(endpoints, metricEndpoint)
+			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
 

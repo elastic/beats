@@ -21,13 +21,13 @@
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-  firepass:
+  bigipafm:
     enabled: true
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
     # var.syslog_host: localhost
-    # var.syslog_port: 9509
+    # var.syslog_port: 9528
 
     # Set paths for the log files when file input is used.
     # var.paths:

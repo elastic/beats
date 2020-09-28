@@ -61,6 +61,11 @@
               description: >
                 Post-NAT destination port.
 
+    - name: endreason
+      type: keyword
+      description: >
+        The reason a session terminated.
+
     - name: network
       type: group
       description: >
@@ -131,3 +136,9 @@
       type: keyword
       description: >-
         Action taken for the session.
+    - name: type
+      description: >-
+        Specifies the type of the log
+    - name: sub_type
+      description: >-
+        Specifies the sub type of the log
