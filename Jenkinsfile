@@ -544,7 +544,7 @@ def isDockerInstalled(){
 */
 def notifyBuildReason() {
   // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
-  archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.*')
+  archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
   if (isPR()) {
     echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
   }
