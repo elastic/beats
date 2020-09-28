@@ -1,4 +1,5 @@
 import json
+import metricbeat
 import os
 import semver
 import sys
@@ -6,10 +7,6 @@ import unittest
 import urllib.error
 import urllib.parse
 import urllib.request
-from nose.plugins.skip import SkipTest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):
@@ -27,12 +24,12 @@ class Test(metricbeat.BaseTest):
 
         if env == "2x" or env == "5x":
             # Skip for 5.x and 2.x tests as Kibana endpoint not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         version = self.get_version()
         if semver.compare(version, "6.4.0") == -1:
             # Skip for Kibana versions < 6.4.0 as Kibana endpoint not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template(modules=[{
             "name": "kibana",

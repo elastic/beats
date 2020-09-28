@@ -5,10 +5,10 @@
 :type: awscloudwatch
 
 [id="{beatname_lc}-input-{type}"]
-=== awscloudwatch input
+=== AWS CloudWatch input
 
 ++++
-<titleabbrev>awscloudwatch</titleabbrev>
+<titleabbrev>AWS CloudWatch</titleabbrev>
 ++++
 
 beta[]
@@ -112,8 +112,5 @@ logs:FilterLogEvents
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
-
-[id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 :type!:

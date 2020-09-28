@@ -1,0 +1,45 @@
+{{ if eq .input "file" }}
+
+type: log
+paths:
+  {{ range $i, $path := .paths }}
+- {{$path}}
+  {{ end }}
+exclude_files: [".gz$"]
+
+{{ else }}
+
+type: {{.input}}
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+fields_under_root: true
+fields:
+    observer:
+        vendor: "Squid"
+        product: "Proxy"
+        type: "Proxies"
+
+processors:
+- script:
+    lang: javascript
+    params:
+      ecs: true
+      rsa: {{.rsa_fields}}
+      tz_offset: {{.tz_offset}}
+      keep_raw: {{.keep_raw_fields}}
+      debug: {{.debug}}
+    files:
+    - ${path.home}/module/squid/log/config/liblogparser.js
+    - ${path.home}/module/squid/log/config/pipeline.js
+{{ if .community_id }}
+- community_id: ~
+{{ end }}
+- add_fields:
+    target: ''
+    fields:
+        ecs.version: 1.6.0

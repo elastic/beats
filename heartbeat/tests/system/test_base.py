@@ -4,10 +4,10 @@ import unittest
 from heartbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
-import nose.tools
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_base(self):
         """
@@ -134,7 +134,7 @@ class Test(BaseTest):
         heartbeat_proc.check_kill_and_wait()
 
         doc = self.read_output()[0]
-        self.assertDictContainsSubset(expected, doc)
+        assert expected.items() <= doc.items()
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -180,7 +180,7 @@ class Test(BaseTest):
             heartbeat_proc.check_kill_and_wait()
 
         for output in self.read_output():
-            nose.tools.assert_equal(
+            self.assertEqual(
                 output["event.dataset"],
                 "uptime",
                 "Check for event.dataset in {} failed".format(output)

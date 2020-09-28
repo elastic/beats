@@ -1,0 +1,48 @@
+# Use SSL settings for HTTPS.
+#ssl.enabled: true
+
+# Controls the verification of certificates. Valid values are:
+# * full, which verifies that the provided certificate is signed by a trusted
+# authority (CA) and also verifies that the server's hostname (or IP address)
+# matches the names identified within the certificate.
+# * certificate, which verifies that the provided certificate is signed by a
+# trusted authority (CA), but does not perform any hostname verification.
+#  * none, which performs no verification of the server's certificate. This
+# mode disables many of the security benefits of SSL/TLS and should only be used
+# after very careful consideration. It is primarily intended as a temporary
+# diagnostic mechanism when attempting to resolve TLS errors; its use in
+# production environments is strongly discouraged.
+# The default value is full.
+#ssl.verification_mode: full
+
+# List of supported/valid TLS versions. By default all TLS versions from 1.1
+# up to 1.3 are enabled.
+#ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
+
+# List of root certificates for HTTPS server verifications
+#ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+# Certificate for SSL client authentication
+#ssl.certificate: "/etc/pki/client/cert.pem"
+
+# Client certificate key
+#ssl.key: "/etc/pki/client/cert.key"
+
+# Optional passphrase for decrypting the certificate key.
+#ssl.key_passphrase: ''
+
+# Configure cipher suites to be used for SSL connections
+#ssl.cipher_suites: []
+
+# Configure curve types for ECDHE-based cipher suites
+#ssl.curve_types: []
+
+# Configure what types of renegotiation are supported. Valid options are
+# never, once, and freely. Default is never.
+#ssl.renegotiation: never
+
+# Configure a pin that can be used to do extra validation of the verified certificate chain,
+# this allow you to ensure that a specific certificate is used to validate the chain of trust.
+#
+# The pin is a base64 encoded string of the SHA-256 fingerprint.
+#ssl.ca_sha256: ""

@@ -60,16 +60,17 @@ func init() {
 
 // Input contains the input and its config
 type Input struct {
-	cfg           *common.Config
-	config        config
-	states        *file.States
-	harvesters    *harvester.Registry
-	outlet        channel.Outleter
-	stateOutlet   channel.Outleter
-	done          chan struct{}
-	numHarvesters atomic.Uint32
-	meta          map[string]string
-	stopOnce      sync.Once
+	cfg                 *common.Config
+	config              config
+	states              *file.States
+	harvesters          *harvester.Registry
+	outlet              channel.Outleter
+	stateOutlet         channel.Outleter
+	done                chan struct{}
+	numHarvesters       atomic.Uint32
+	meta                map[string]string
+	stopOnce            sync.Once
+	fileStateIdentifier file.StateIdentifier
 }
 
 // NewInput instantiates a new Log
@@ -85,7 +86,7 @@ func NewInput(
 		}
 	}
 
-	inputConfig := defaultConfig
+	inputConfig := defaultConfig()
 
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err
@@ -99,6 +100,11 @@ func NewInput(
 
 	if len(inputConfig.Paths) == 0 {
 		return nil, fmt.Errorf("each input must have at least one path defined")
+	}
+
+	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize file identity generator: %+v", err)
 	}
 
 	// Note: underlying output.
@@ -125,14 +131,15 @@ func NewInput(
 	}
 
 	p := &Input{
-		config:      inputConfig,
-		cfg:         cfg,
-		harvesters:  harvester.NewRegistry(),
-		outlet:      out,
-		stateOutlet: stateOut,
-		states:      file.NewStates(),
-		done:        context.Done,
-		meta:        meta,
+		config:              inputConfig,
+		cfg:                 cfg,
+		harvesters:          harvester.NewRegistry(),
+		outlet:              out,
+		stateOutlet:         stateOut,
+		states:              file.NewStates(),
+		done:                context.Done,
+		meta:                meta,
+		fileStateIdentifier: identifier,
 	}
 
 	// Create empty harvester to check if configs are fine
@@ -168,7 +175,16 @@ func (p *Input) loadStates(states []file.State) error {
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
 			if !state.Finished {
-				return fmt.Errorf("Can only start an input when all related states are finished: %+v", state)
+				return &common.ErrInputNotFinished{State: state.String()}
+			}
+
+			// Convert state to current identifier if different
+			// and remove outdated state
+			newId, identifierName := p.fileStateIdentifier.GenerateID(state)
+			if state.IdentifierName != identifierName {
+				state.PrevId = state.Id
+				state.Id = newId
+				state.IdentifierName = identifierName
 			}
 
 			// Update input states and send new states to registry
@@ -225,10 +241,14 @@ func (p *Input) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source, p.config.Type, p.meta)
-				if !newState.FileStateOS.IsSame(state.FileStateOS) {
+				newState := file.NewState(stat, state.Source, p.config.Type, p.meta, p.fileStateIdentifier)
+				if state.IdentifierName != newState.IdentifierName {
+					logp.Debug("input", "file_identity configuration for file has changed from %s to %s, generating new id", state.IdentifierName, newState.IdentifierName)
+					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
+				}
+				if !state.IsEqual(&newState) {
 					p.removeState(state)
-					logp.Debug("input", "Remove state for file as file removed or renamed: %s", state.Source)
+					logp.Debug("input", "Remove state of file as its identity has changed: %s", state.Source)
 				}
 			}
 		}
@@ -418,7 +438,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	}
 	logp.Debug("input", "Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
-	newState := file.NewState(info, absolutePath, p.config.Type, p.meta)
+	newState := file.NewState(info, absolutePath, p.config.Type, p.meta, p.fileStateIdentifier)
 	return newState, nil
 }
 
@@ -476,11 +496,11 @@ func (p *Input) scan() {
 		}
 
 		// Load last state
-		lastState := p.states.FindPrevious(newState)
+		isNewState := p.states.IsNew(newState)
 
 		// Ignores all files which fall under ignore_older
 		if p.isIgnoreOlder(newState) {
-			err := p.handleIgnoreOlder(lastState, newState)
+			err := p.handleIgnoreOlder(isNewState, newState)
 			if err != nil {
 				logp.Err("Updating ignore_older state error: %s", err)
 			}
@@ -488,7 +508,7 @@ func (p *Input) scan() {
 		}
 
 		// Decides if previous state exists
-		if lastState.IsEmpty() {
+		if isNewState {
 			logp.Debug("input", "Start harvester for new file: %s", newState.Source)
 			err := p.startHarvester(newState, 0)
 			if err == errHarvesterLimit {
@@ -499,6 +519,7 @@ func (p *Input) scan() {
 				logp.Err(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
+			lastState := p.states.FindPrevious(newState)
 			p.harvestExistingFile(newState, lastState)
 		}
 	}
@@ -566,10 +587,11 @@ func (p *Input) harvestExistingFile(newState file.State, oldState file.State) {
 
 // handleIgnoreOlder handles states which fall under ignore older
 // Based on the state information it is decided if the state information has to be updated or not
-func (p *Input) handleIgnoreOlder(lastState, newState file.State) error {
+func (p *Input) handleIgnoreOlder(isNewState bool, newState file.State) error {
 	logp.Debug("input", "Ignore file because ignore_older reached: %s", newState.Source)
 
-	if !lastState.IsEmpty() {
+	if !isNewState {
+		lastState := p.states.FindPrevious(newState)
 		if !lastState.Finished {
 			logp.Info("File is falling under ignore_older before harvesting is finished. Adjust your close_* settings: %s", newState.Source)
 		}
@@ -711,8 +733,26 @@ func (p *Input) updateState(state file.State) error {
 		state.Meta = nil
 	}
 
+	err := p.doUpdate(state)
+	if err != nil {
+		return err
+	}
+
+	if state.PrevId != "" {
+		stateToRemove := file.State{Id: state.PrevId, TTL: 0, Finished: true, Meta: nil}
+		err := p.doUpdate(stateToRemove)
+		if err != nil {
+			return fmt.Errorf("failed to remove outdated states based on prev_id: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *Input) doUpdate(state file.State) error {
 	// Update first internal state
 	p.states.Update(state)
+
 	ok := p.outlet.OnEvent(beat.Event{
 		Private: state,
 	})
@@ -720,7 +760,6 @@ func (p *Input) updateState(state file.State) error {
 		logp.Info("input outlet closed")
 		return errors.New("input outlet closed")
 	}
-
 	return nil
 }
 

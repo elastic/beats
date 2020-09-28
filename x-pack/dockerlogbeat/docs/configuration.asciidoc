@@ -76,6 +76,11 @@ indices. For example: +"dockerlogs-%{+yyyy.MM.dd}"+.
 
 3+|*Advanced:*
 
+|`name`
+|`testbeat`
+| A custom value that will be inserted into the document as `agent.name`.
+If not set, it will be the hostname of Docker host.
+
 |`backoff_init`
 |`1s`
 |The number of seconds to wait before trying to reconnect to {es} after

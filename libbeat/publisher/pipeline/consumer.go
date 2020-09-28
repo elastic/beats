@@ -67,13 +67,14 @@ func newEventConsumer(
 	queue queue.Queue,
 	ctx *batchContext,
 ) *eventConsumer {
+	consumer := queue.Consumer()
 	c := &eventConsumer{
 		logger: log,
 		sig:    make(chan consumerSignal, 3),
 		out:    nil,
 
 		queue:    queue,
-		consumer: queue.Consumer(),
+		consumer: consumer,
 		ctx:      ctx,
 	}
 
@@ -82,7 +83,7 @@ func newEventConsumer(
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		c.loop(c.consumer)
+		c.loop(consumer)
 	}()
 	return c
 }

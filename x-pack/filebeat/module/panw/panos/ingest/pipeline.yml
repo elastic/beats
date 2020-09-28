@@ -1,5 +1,8 @@
 description: "Pipeline for Palo Alto Networks PAN-OS Logs"
 processors:
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
 
 # keep message as log.original.
  - rename:
@@ -131,72 +134,72 @@ processors:
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "trust"'
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
  - set:
      field: network.direction
      value: internal
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "trust"'
  - set:
      field: network.direction
      value: external
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ((ctx?.panw?.panos?.source?.zone != "trust" && ctx?.panw?.panos?.source?.zone != "untrust") || (ctx?.panw?.panos?.destination?.zone != "trust" && ctx?.panw?.panos?.destination?.zone != "untrust"))'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ((ctx?.panw?.panos?.source?.zone != "trust" && ctx?.panw?.panos?.source?.zone != "untrust") || (ctx?.panw?.panos?.destination?.zone != "trust" && ctx?.panw?.panos?.destination?.zone != "untrust"))'
 
 # Set network.direction from threat direction (Threat logs).
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && (ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
 
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && (ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
 
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?._temp_?.message_type == "THREAT" && ctx?.network?.direction == null'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && ctx?.network?.direction == null'
 
 # Set network.type for TRAFFIC.
  - set:
      field: network.type
      value: 'ipv4'
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
  - set:
      field: network.type
      value: 'ipv6'
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
 
   # Set event.category depending on log type.
  - set:
      field: event.kind
      value: event
-     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
  - append:
      field: event.category
      value:
        - network_traffic
        - network
-     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
  - set:
      field: event.kind
      value: alert
-     if: 'ctx?._temp_?.message_type == "THREAT"'
+     if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.category
      value:
        - security_threat
        - intrusion_detection
        - network
-     if: 'ctx?._temp_?.message_type == "THREAT"'
+     if: 'ctx?.panw?.panos?.type == "THREAT"'
  - append:
      field: event.type
      value: allowed
@@ -214,89 +217,89 @@ processors:
  - set:
      field: event.action
      value: flow_started
-     if: 'ctx?._temp_?.message_subtype == "start"'
+     if: 'ctx?.panw?.panos?.sub_type == "start"'
  - append:
      field: event.type
      value:
        - start
        - connection
-     if: 'ctx?._temp_?.message_subtype == "start"'
+     if: 'ctx?.panw?.panos?.sub_type == "start"'
  - set:
      field: event.action
      value: flow_terminated
-     if: 'ctx?._temp_?.message_subtype == "end"'
+     if: 'ctx?.panw?.panos?.sub_type == "end"'
  - append:
      field: event.type
      value:
        - end
        - connection
-     if: 'ctx?._temp_?.message_subtype == "end"'
+     if: 'ctx?.panw?.panos?.sub_type == "end"'
  - set:
      field: event.action
      value: flow_dropped
-     if: 'ctx?._temp_?.message_subtype == "drop"'
+     if: 'ctx?.panw?.panos?.sub_type == "drop"'
  - append:
      field: event.type
      value:
        - denied
        - connection
-     if: 'ctx?._temp_?.message_subtype == "drop"'
+     if: 'ctx?.panw?.panos?.sub_type == "drop"'
  - set:
      field: event.action
      value: flow_denied
-     if: 'ctx?._temp_?.message_subtype == "deny"'
+     if: 'ctx?.panw?.panos?.sub_type == "deny"'
  - append:
      field: event.type
      value:
        - denied
        - connection
-     if: 'ctx?._temp_?.message_subtype == "deny"'
+     if: 'ctx?.panw?.panos?.sub_type == "deny"'
 
 # event.action for threat logs.
  - set:
      field: event.action
      value: data_match
-     if: 'ctx?._temp_?.message_subtype == "data"'
+     if: 'ctx?.panw?.panos?.sub_type == "data"'
  - set:
      field: event.action
      value: file_match
-     if: 'ctx?._temp_?.message_subtype == "file"'
+     if: 'ctx?.panw?.panos?.sub_type == "file"'
  - set:
      field: event.action
      value: flood_detected
-     if: 'ctx?._temp_?.message_subtype == "flood"'
+     if: 'ctx?.panw?.panos?.sub_type == "flood"'
  - set:
      field: event.action
      value: packet_attack
-     if: 'ctx?._temp_?.message_subtype == "packet"'
+     if: 'ctx?.panw?.panos?.sub_type == "packet"'
  - set:
      field: event.action
      value: scan_detected
-     if: 'ctx?._temp_?.message_subtype == "scan"'
+     if: 'ctx?.panw?.panos?.sub_type == "scan"'
  - set:
      field: event.action
      value: spyware_detected
-     if: 'ctx?._temp_?.message_subtype == "spyware"'
+     if: 'ctx?.panw?.panos?.sub_type == "spyware"'
  - set:
      field: event.action
      value: url_filtering
-     if: 'ctx?._temp_?.message_subtype == "url"'
+     if: 'ctx?.panw?.panos?.sub_type == "url"'
  - set:
      field: event.action
      value: virus_detected
-     if: 'ctx?._temp_?.message_subtype == "virus"'
+     if: 'ctx?.panw?.panos?.sub_type == "virus"'
  - set:
      field: event.action
      value: exploit_detected
-     if: 'ctx?._temp_?.message_subtype == "vulnerability"'
+     if: 'ctx?.panw?.panos?.sub_type == "vulnerability"'
  - set:
      field: event.action
-     value: wildfire_veredict
-     if: 'ctx?._temp_?.message_subtype == "wildfire"'
+     value: wildfire_verdict
+     if: 'ctx?.panw?.panos?.sub_type == "wildfire"'
  - set:
      field: event.action
      value: wildfire_virus_detected
-     if: 'ctx?._temp_?.message_subtype == "wildfire-virus"'
+     if: 'ctx?.panw?.panos?.sub_type == "wildfire-virus"'
 
 
 # Set numeric log.level from event.severity.
@@ -468,6 +471,12 @@ processors:
      field: related.hash
      value: "{{panw.panos.file.hash}}"
      if: "ctx?.panw?.panos?.file?.hash != null"
+
+ - append:
+     field: related.hosts
+     value: "{{observer.hostname}}"
+     if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
+     allow_duplicates: false
 
 # Remove temporary fields.
  - remove:
