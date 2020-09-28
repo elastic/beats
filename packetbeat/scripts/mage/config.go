@@ -19,6 +19,7 @@ package mage
 
 import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/magefile/mage/mg"
 )
 
 const (
@@ -49,4 +50,28 @@ func ConfigFileParams() devtools.ConfigFileParams {
 		"device": device,
 	}
 	return p
+}
+
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo, fieldsYML)
+}
+
+// libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and packetbeat's common fields.
+func libbeatAndPacketbeatCommonFieldsGo() error {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return devtools.GenerateAllInOneFieldsGo()
+}
+
+// protosFieldsGo generates a fields.go for each protocol.
+func protosFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo(devtools.OSSBeatDir("protos"))
+}
+
+// fieldsYML generates the fields.yml file containing all fields.
+func fieldsYML() error {
+	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("protos"))
 }

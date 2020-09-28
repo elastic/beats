@@ -1,0 +1,17 @@
+packetbeat:
+  flows:
+    timeout: 10s
+    period: 10s
+    keep_null: false
+  protocols:
+    - type: amqp
+      ports: [5672]
+output:
+  elasticsearch:
+    hosts:
+      - 127.0.0.1:9200
+      - 127.0.0.1:9300
+    username: elastic
+    password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=

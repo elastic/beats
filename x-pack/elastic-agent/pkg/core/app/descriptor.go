@@ -114,6 +114,8 @@ func directory(binaryName, version string, config *artifact.Config) string {
 
 func isKnownBeat(name string) bool {
 	switch name {
+	case "packetbeat":
+		fallthrough
 	case "filebeat":
 		fallthrough
 	case "metricbeat":

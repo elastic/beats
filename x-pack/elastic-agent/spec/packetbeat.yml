@@ -1,0 +1,68 @@
+name: Packetbeat
+cmd: packetbeat
+args:
+  [
+    "-E",
+    "setup.ilm.enabled=false",
+    "-E",
+    "setup.template.enabled=false",
+    "-E",
+    "management.mode=x-pack-fleet",
+    "-E",
+    "management.enabled=true",
+    "-E",
+    "logging.level=debug",
+  ]
+artifact: beats/packetbeat
+rules:
+  - fix_stream: {}
+  - filter_values_with_regexp:
+      key: type
+      re: ^network/(flow|(protocols/.+))$
+      selector: inputs
+
+  - filter_values:
+      selector: inputs
+      key: enabled
+      values:
+        - true
+
+  - copy_first:
+      from: inputs
+      selectors: [timeout, period, keep_null]
+      to: flows
+      key: type
+      values:
+        - network/flow
+
+  - filter_values_with_regexp:
+      key: type
+      re: ^network/protocols/.+$
+      selector: inputs
+
+  - map:
+      path: inputs
+      rules:
+        - translate_with_regexp:
+            path: type
+            re: ^network/protocols/(?P<type>.+)$
+            with: $type
+        - remove_key:
+            key: data_stream.namespace
+
+  - rename:
+      from: inputs
+      to: protocols
+
+  - select_into:
+      selectors: [protocols, flows]
+      path: packetbeat
+
+  - filter:
+      selectors:
+        - packetbeat
+        - output
+
+when:
+  length(${packetbeat}) > 0 and (length(${packetbeat.protocols}) > 0 or hasKey(${packetbeat}, 'flows')) and hasKey(${output}, 'elasticsearch',
+  'redis', 'kafka', 'logstash')

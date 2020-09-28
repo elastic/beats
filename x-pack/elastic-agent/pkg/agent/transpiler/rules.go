@@ -49,6 +49,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "select_into"
 		case *CopyRule:
 			name = "copy"
+		case *CopyFirstRule:
+			name = "copy_first"
 		case *CopyToListRule:
 			name = "copy_to_list"
 		case *CopyAllToListRule:
@@ -130,6 +132,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &SelectIntoRule{}
 		case "copy":
 			r = &CopyRule{}
+		case "copy_first":
+			r = &CopyFirstRule{}
 		case "copy_to_list":
 			r = &CopyToListRule{}
 		case "copy_all_to_list":
@@ -782,6 +786,90 @@ func (r CopyRule) Apply(ast *AST) error {
 
 	if err := Insert(ast, node, r.To); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// CopyFirstRule take a from Selector that must be a list and a destination selector and will insert
+// the first matching node to the destination, will return an errors if the types are incompatible.
+type CopyFirstRule struct {
+	From      Selector
+	To        Selector
+	Selectors []Selector
+	Key       Selector
+	Values    []interface{}
+}
+
+// CopyFirst creates a copy first rule.
+func CopyFirst(from, to, key Selector, values ...interface{}) *CopyFirstRule {
+	return &CopyFirstRule{From: from, To: to, Key: key, Values: values}
+}
+
+// Apply copy a part of a tree into a new destination.
+func (r CopyFirstRule) Apply(ast *AST) error {
+	node, ok := Lookup(ast, r.From)
+	// Skip map  when node is not found.
+	if !ok {
+		return nil
+	}
+
+	n, ok := node.(*Key)
+	if !ok {
+		return fmt.Errorf(
+			"cannot iterate over node, invalid type expected 'Key' received '%T'",
+			node,
+		)
+	}
+
+	l, ok := n.Value().(*List)
+	if !ok {
+		return fmt.Errorf(
+			"cannot iterate over node, invalid type expected 'List' received '%T'",
+			node,
+		)
+	}
+
+	values := l.Value().([]Node)
+
+	for idx := 0; idx < len(values); idx++ {
+		item := values[idx]
+		newRoot := &AST{root: item}
+
+		newAST, ok := Lookup(newRoot, r.Key)
+		if !ok {
+			continue
+		}
+
+		// filter values
+		n, ok := newAST.(*Key)
+		if !ok {
+			return fmt.Errorf("cannot filter on value, invalid type expected 'Key' received '%T'", newAST)
+		}
+
+		if n.name != r.Key {
+			continue
+		}
+
+		found := false
+		for _, v := range r.Values {
+			if v == n.value.(Node).Value() {
+				found = true
+			}
+		}
+
+		if found {
+			target := &Dict{}
+			for _, selector := range r.Selectors {
+				lookupNode, ok := Lookup(newRoot, selector)
+				if !ok {
+					continue
+				}
+
+				target.value = append(target.value, lookupNode.Clone())
+			}
+			return Insert(ast, target, r.To)
+		}
 	}
 
 	return nil

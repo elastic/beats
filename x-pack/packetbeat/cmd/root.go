@@ -7,6 +7,9 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/packetbeat/cmd"
 	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	// Register the includes.
+	_ "github.com/elastic/beats/v7/x-pack/packetbeat/include"
 )
 
 // Name of this beat.
