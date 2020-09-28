@@ -301,17 +301,20 @@ func (p *addProcessMetadata) String() string {
 }
 
 func (p *processMetadata) toMap() common.MapStr {
-	return common.MapStr{
-		"process": common.MapStr{
-			"name":       p.name,
-			"title":      p.title,
-			"executable": p.exe,
-			"args":       p.args,
-			"env":        p.env,
-			"pid":        p.pid,
-			"ppid":       p.ppid,
-			"start_time": p.startTime,
-			"username":   p.username,
-		},
+	m := common.MapStr{
+		"name":       p.name,
+		"title":      p.title,
+		"executable": p.exe,
+		"args":       p.args,
+		"env":        p.env,
+		"pid":        p.pid,
+		"ppid":       p.ppid,
+		"start_time": p.startTime,
 	}
+
+	if p.username != "" {
+		m.Put("username", p.username)
+	}
+
+	return common.MapStr{"process": m}
 }
