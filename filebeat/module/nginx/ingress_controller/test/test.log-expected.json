@@ -51,7 +51,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -108,7 +108,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -165,7 +165,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -222,7 +222,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -351,7 +351,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
         "user_agent.original": "Wget/1.20.3 (darwin18.6.0)",
         "user_agent.version": "1.20.3"
