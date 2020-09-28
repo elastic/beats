@@ -17,29 +17,28 @@ processors:
 - script:
     lang: painless
     if: ctx?.json != null
-    params:
-      values:
-        - null
-        - ""
-        - "-"
-        - "N/A"
     source: |
-      if (!ctx['json'].empty) {
-        ctx.json.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
       }
-- script:
-    lang: painless
-    if: ctx?.json?.evidence != null
-    params:
-      values:
-        - null
-        - ""
-        - "-"
-        - "N/A"
-    source: |
-      if (!ctx.json['evidence'].empty) {
-        ctx.json.evidence.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
       }
+      handleMap(ctx);
+
 - set:
     field: cloud.provider
     value: azure
@@ -60,12 +59,12 @@ processors:
     value: UTC
 - set:
     field: event.action
-    value: '{{json.alert.category}}'
-    if: ctx.json?.alert?.category != null
+    value: '{{json.alerts.category}}'
+    if: ctx.json?.alerts?.category != null
 - set:
     field: event.provider
-    value: '{{json.alert.serviceSource}}'
-    if: ctx.json?.alert?.serviceSource != null
+    value: '{{json.alerts.serviceSource}}'
+    if: ctx.json?.alerts?.serviceSource != null
 - set:
     field: event.created
     value: '{{json.createdTime}}'
@@ -96,15 +95,15 @@ processors:
     value: end
     if: ctx.json?.status == 'Resolved'
 - rename:
-    field: json.alert.alertId
+    field: json.alerts.alertId
     target_field: event.id
     ignore_missing: true
 - rename:
-    field: json.alert.firstActivity
+    field: json.alerts.firstActivity
     target_field: event.start
     ignore_missing: true
 - rename:
-    field: json.alert.lastActivity
+    field: json.alerts.lastActivity
     target_field: event.end
     ignore_missing: true
 - set:
@@ -141,16 +140,16 @@ processors:
 - set:
     field: threat.framework
     value: MITRE ATT&CK
-    if: ctx.json?.alert.category != null
+    if: ctx.json?.alerts?.category != null
 - rename:
-    field: json.alert.category
+    field: json.alerts.category
     target_field: threat.technique.name
     ignore_missing: true
 - rename:
-    field: json.description
+    field: json.alerts.description
     target_field: rule.description
     ignore_missing: true
-    if: (ctx.json?.description).length() < 1020
+    if: ctx.json?.alerts?.description.length() < 1020
 
 ######################
 ## ECS File Mapping ##
@@ -226,25 +225,25 @@ processors:
     field: json.entities.userPrincipalName
     target_field: host.user.name
     ignore_missing: true
-    if: ctx?.entities.entityType == "User"
+    if: ctx?.entities?.entityType == "User"
 - rename:
     field: json.entities.domainName
     target_field: host.user.domain
     ignore_missing: true
-    if: ctx?.entities.entityType == "User"
+    if: ctx?.entities?.entityType == "User"
 - rename:
     field: json.entities.userSid
     target_field: host.user.id
     ignore_missing: true
-    if: ctx?.entities.entityType == "User"
+    if: ctx?.entities?.entityType == "User"
 
 #########################
 ## ECS Related Mapping ##
 #########################
 - append:
     field: related.ip
-    value: '{{json.evidence.ipAddress}}'
-    if: ctx.json?.evidence?.ipAddress != null
+    value: '{{json.entities.ipAddress}}'
+    if: ctx.json?.entities?.ipAddress != null
 - append:
     field: related.user
     value: '{{host.user.name}}'
@@ -265,6 +264,12 @@ processors:
 #############
 ## Cleanup ##
 #############
+- remove:
+    ignore_missing: true
+    field:
+      - json.createdTime
+      - json.severity
+      - json.lastUpdateTime
 - rename:
     field: json
     target_field: microsoft.365_defender

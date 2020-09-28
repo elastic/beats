@@ -5,87 +5,52 @@
   description: >
     Module for ingesting Microsoft Defender ATP.
   fields:
-    - name: lastUpdateTime
-      type: date
-      description: >
-        The date and time (in UTC) the alert was last updated.
-
-    - name: resolvedTime
-      type: date
-      description: >
-        The date and time in which the status of the alert was changed to 'Resolved'.
-
     - name: incidentId
       type: keyword
       description: >
-        The Incident ID of the Alert.
-
-    - name: investigationId
+        Unique identifier to represent the incident.
+    - name: redirectIncidentId
       type: keyword
       description: >
-        The Investigation ID related to the Alert.
-
+        Only populated in case an incident is being grouped together with another incident, as part of the incident processing logic.
+    - name: incidentName
+      type: keyword
+      description: >
+        Name of the Incident
+    - name: determination
+      type: keyword
+      description: >
+        Specifies the determination of the incident. The property values are: NotAvailable, Apt, Malware, SecurityPersonnel, SecurityTesting, UnwantedSoftware, Other.
     - name: investigationState
       type: keyword
       description: >
         The current state of the Investigation.
-
     - name: assignedTo
       type: keyword
       description: >
         Owner of the alert.
-
+    - name: tags
+      type: keyword
+      description: >
+        Array of custom tags associated with an incident, for example to flag a group of incidents with a common characteristic.
     - name: status
       type: keyword
       description: >
         Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
-
     - name: classification
       type: keyword
       description: >
         Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
-
-    - name: determination
-      type: keyword
+    - name: alerts
+      type: flattened
       description: >
-        Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
-
-    - name: threatFamilyName
-      type: keyword
+        The alert object related to the investigation.
+    - name: devices
+      type: flattened
       description: >
-        Threat family.
-
-    - name: rbacGroupName
-      type: keyword
+        The devices related to the investigation.
+    - name: entities
+      type: flattened
       description: >
-        User group related to the alert
+        The entities related to the investigation.
 
-    - name: evidence.domainName
-      type: keyword
-      description: >
-        Domain name related to the alert
-
-    - name: evidence.ipAddress
-      type: ip
-      description: >
-        IP address involved in the alert
-
-    - name: evidence.aadUserId
-      type: keyword
-      description: >
-        ID of the user involved in the alert
-
-    - name: evidence.accountName
-      type: keyword
-      description: >
-        Username of the user involved in the alert
-
-    - name: evidence.entityType
-      type: keyword
-      description: >
-        The type of evidence
-
-    - name: evidence.userPrincipalName
-      type: keyword
-      description: >
-        Principal name of the user involved in the alert
