@@ -1,40 +1,60 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2020-09-29T15:22:09.295Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0",
+        "_id": "513b3LHqScGf9uKoMvJ2vA:9kDCSqOSQRqY9Fwu8tQLSQ:.kibana_1:0:p"
     },
     "elasticsearch": {
-        "cluster": {
-            "id": "91RpCx2xSQ21pVPTZfDK0Q",
-            "name": "elasticsearch",
-            "state": {
-                "id": "MBE4XrQOSf6ScXRTuCO1Pw"
-            }
+        "node": {
+            "name": "9kDCSqOSQRqY9Fwu8tQLSQ"
         },
         "index": {
-            "name": "heartbeat-7.0.0-alpha1-2018.08.27"
-        },
-        "node": {
-            "name": "Z4hBonPxQVW9qPKEHpwWCg"
+            "name": ".kibana_1"
         },
         "shard": {
-            "number": 0,
+            "relocating_node": {},
+            "state": "STARTED",
             "primary": true,
-            "relocating_node": {
-                "name": null
-            },
-            "state": "STARTED"
+            "number": 0,
+            "source_node": {
+                "uuid": "9kDCSqOSQRqY9Fwu8tQLSQ",
+                "name": "f70ae4a30b48"
+            }
+        },
+        "cluster": {
+            "id": "giRKn5pZQ0afY0YrRiXdxQ",
+            "name": "docker-cluster",
+            "state": {
+                "id": "513b3LHqScGf9uKoMvJ2vA"
+            }
         }
     },
-    "metricset": {
-        "host": "127.0.0.1:9200",
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "7dcc82b6-934e-4d88-8e3d-1e36fa4dd8da",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d"
+    },
+    "event": {
+        "dataset": "elasticsearch.shard",
         "module": "elasticsearch",
+        "duration": 9945379
+    },
+    "metricset": {
         "name": "shard",
-        "namespace": "elasticsearch.shard",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "type": "elasticsearch",
+        "address": "localhost:9200"
     }
 }
