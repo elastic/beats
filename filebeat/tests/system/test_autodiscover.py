@@ -1,7 +1,6 @@
 import docker
 import filebeat
 import os
-import pytest
 import unittest
 
 from beat.beat import INTEGRATION_TESTS
