@@ -46,10 +46,10 @@ func TestAck(t *testing.T) {
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			action := &ActionConfigChange{
+			action := &ActionPolicyChange{
 				ActionID:   "my-id",
-				ActionType: "CONFIG_CHANGE",
-				Config: map[string]interface{}{
+				ActionType: "POLICY_CHANGE",
+				Policy: map[string]interface{}{
 					"id": "config_id",
 				},
 			}
