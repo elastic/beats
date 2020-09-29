@@ -1,0 +1,116 @@
+{
+  "_index": "filebeat-8.0.0-fireeye-2020.09.29",
+  "_type": "_doc",
+  "_id": "o5eH2HQBpCtV8m7qC5wZ",
+  "_score": 1,
+  "_source": {
+    "agent": {
+      "name": "logstash",
+      "id": "cd98c34e-a103-4116-becf-57a599f40b5e",
+      "type": "filebeat",
+      "ephemeral_id": "24280cbd-bdb9-4252-ab7d-77079668ae3e",
+      "version": "8.0.0"
+    },
+    "fireeyenx": {
+      "device_ip": "192.168.1.99",
+      "device_oml": 480,
+      "ip_tos": 0,
+      "session_id": 1643674613400745,
+      "flow": {
+        "reason": "timeout",
+        "endtime": "2020-09-29T06:17:40.659265+0000",
+        "state": "established",
+        "starttime": "2020-09-29T06:17:25.541865+0000",
+        "age": 15,
+        "altered": false
+      }
+    },
+    "meta_cbname": "fireeye-7e0de1",
+    "log": {
+      "source": {
+        "address": "192.168.1.99:54956"
+      }
+    },
+    "destination": {
+      "geo": {
+        "continent_name": "North America",
+        "country_iso_code": "US",
+        "location": {
+          "lon": -97.822,
+          "lat": 37.751
+        }
+      },
+      "as": {
+        "number": 15169,
+        "organization": {
+          "name": "Google LLC"
+        }
+      },
+      "address": "74.125.130.95",
+      "port": 443,
+      "bytes": 2507,
+      "packets": 5
+    },
+    "source": {
+      "address": "192.168.1.164",
+      "port": 51334,
+      "bytes": 3298,
+      "packets": 6
+    },
+    "message": "{\"rawmsg\":\"{\\\"timestamp\\\":\\\"2020-09-29T06:22:42.000095+0000\\\",\\\"flow_id\\\":1643674613400745,\\\"event_type\\\":\\\"flow\\\",\\\"src_ip\\\":\\\"192.168.1.164\\\",\\\"src_port\\\":51334,\\\"dest_ip\\\":\\\"74.125.130.95\\\",\\\"dest_port\\\":443,\\\"proto\\\":\\\"UDP\\\",\\\"proto_number\\\":17,\\\"ip_tos\\\":0,\\\"app_proto\\\":\\\"failed\\\",\\\"flow\\\":{\\\"pkts_toserver\\\":6,\\\"pkts_toclient\\\":5,\\\"bytes_toserver\\\":3298,\\\"bytes_toclient\\\":2507,\\\"start\\\":\\\"2020-09-29T06:17:25.541865+0000\\\",\\\"end\\\":\\\"2020-09-29T06:17:40.659265+0000\\\",\\\"age\\\":15,\\\"state\\\":\\\"established\\\",\\\"reason\\\":\\\"timeout\\\",\\\"alerted\\\":false}}\\n\",\"meta_sip4\":\"192.168.1.99\",\"meta_oml\":480,\"deviceid\":\"860665216674\",\"meta_cbname\":\"fireeye-7e0de1\"}",
+    "fileset": {
+      "name": "nx"
+    },
+    "deviceid": "860665216674",
+    "rawmsg": {
+      "flow": {}
+    },
+    "network": {
+      "protocol": "failed",
+      "transport": "UDP",
+      "iana_number": 17
+    },
+    "input": {
+      "type": "tcp"
+    },
+    "@timestamp": "2020-09-29T06:22:42.000Z",
+    "ecs": {
+      "version": "1.6.0"
+    },
+    "service": {
+      "type": "fireeye"
+    },
+    "host": {
+      "hostname": "logstash",
+      "os": {
+        "kernel": "3.10.0-1062.18.1.el7.x86_64",
+        "codename": "Core",
+        "name": "CentOS Linux",
+        "family": "redhat",
+        "version": "7 (Core)",
+        "platform": "centos"
+      },
+      "containerized": false,
+      "ip": [
+        "192.168.1.12",
+        "fe80::d6ba:ce58:5df8:45d1"
+      ],
+      "name": "logstash",
+      "id": "e652e9f80f5c4b0386b6a622b7365553",
+      "mac": [
+        "00:0c:29:df:d1:36"
+      ],
+      "architecture": "x86_64"
+    },
+    "event": {
+      "module": "fireeye",
+      "type": "flow",
+      "dataset": "fireeye.nx"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2020-09-29T06:22:42.000Z"
+    ]
+  }
+}
