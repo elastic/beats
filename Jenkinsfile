@@ -112,6 +112,8 @@ pipeline {
   }
   post {
     always {
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
