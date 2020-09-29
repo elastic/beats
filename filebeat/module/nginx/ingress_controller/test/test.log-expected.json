@@ -1073,7 +1073,7 @@
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42?address=delhi+technological+university",
-        "user_agent.device.name": "Mac",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
         "user_agent.original": "python-requests/2.22.0",
         "user_agent.version": "2.22"
