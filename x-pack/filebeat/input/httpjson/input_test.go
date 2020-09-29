@@ -23,7 +23,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
-func TestHTTPJSONInput(t *testing.T) {
+func TestStatelessHTTPJSONInput(t *testing.T) {
 	testCases := []struct {
 		name        string
 		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -224,20 +224,23 @@ func TestHTTPJSONInput(t *testing.T) {
 
 			cfg := common.MustNewConfigFrom(tc.baseConfig)
 
-			input, err := configure(cfg)
+			conf := newDefaultConfig()
+			assert.NoError(t, cfg.Unpack(&conf))
+
+			input, err := newStatelessInput(conf)
 
 			assert.NoError(t, err)
-			assert.Equal(t, "httpjson", input.Name())
+			assert.Equal(t, "httpjson-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
-			pub := beattest.NewChanClient(len(tc.expected))
-			t.Cleanup(func() { _ = pub.Close() })
+			chanClient := beattest.NewChanClient(len(tc.expected))
+			t.Cleanup(func() { _ = chanClient.Close() })
 
 			ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
-			g.Go(func() error { return input.Run(ctx, pub) })
+			g.Go(func() error { return input.Run(ctx, chanClient) })
 
 			timeout := time.NewTimer(5 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })
@@ -249,7 +252,7 @@ func TestHTTPJSONInput(t *testing.T) {
 				case <-timeout.C:
 					t.Errorf("timed out waiting for %d events", len(tc.expected))
 					return
-				case got := <-pub.Channel:
+				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
 					assert.JSONEq(t, tc.expected[receivedCount], val.(string))
