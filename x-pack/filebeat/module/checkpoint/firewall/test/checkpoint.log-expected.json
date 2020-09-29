@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-03-29T13:19:20Z",
+        "@timestamp": "2020-03-29T13:19:20.000Z",
         "checkpoint.sys_message": "The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
@@ -27,7 +27,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:20Z",
+        "@timestamp": "2020-03-29T13:19:20.000Z",
         "checkpoint.sys_message": "The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
@@ -54,7 +54,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:21Z",
+        "@timestamp": "2020-03-29T13:19:21.000Z",
         "checkpoint.sys_message": "installed Standard",
         "event.category": [
             "network"
@@ -81,7 +81,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -135,7 +135,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -202,7 +202,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -256,7 +256,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -320,7 +320,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -374,7 +374,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -438,7 +438,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -492,7 +492,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -556,7 +556,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -610,7 +610,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -674,7 +674,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -728,7 +728,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -792,7 +792,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -846,7 +846,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -910,7 +910,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -964,7 +964,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1028,7 +1028,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1082,7 +1082,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1146,7 +1146,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1200,7 +1200,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1264,7 +1264,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1318,7 +1318,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1382,7 +1382,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1436,7 +1436,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1500,7 +1500,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1554,7 +1554,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1618,7 +1618,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1672,7 +1672,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1736,7 +1736,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1790,7 +1790,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1854,7 +1854,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -1908,7 +1908,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -1972,7 +1972,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2026,7 +2026,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2090,7 +2090,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2144,7 +2144,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:22Z",
+        "@timestamp": "2020-03-29T13:19:22.000Z",
         "checkpoint.additional_info": "Access Control Policy : Standard",
         "checkpoint.audit_status": "Success",
         "checkpoint.machine": "192.168.1.117",
@@ -2192,7 +2192,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:19:23Z",
+        "@timestamp": "2020-03-29T13:19:23.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2256,7 +2256,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:26Z",
+        "@timestamp": "2020-03-29T13:20:26.000Z",
         "checkpoint.blade_name": "Anti Bot & Anti Virus",
         "checkpoint.information": "policy installation for blade Anti Bot & Anti Virus completed successfully",
         "event.category": [
@@ -2283,7 +2283,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2350,7 +2350,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2404,7 +2404,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2458,7 +2458,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2512,7 +2512,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2576,7 +2576,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2630,7 +2630,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2694,7 +2694,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2748,7 +2748,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2812,7 +2812,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2866,7 +2866,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -2930,7 +2930,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -2984,7 +2984,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3048,7 +3048,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3102,7 +3102,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3166,7 +3166,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:28Z",
+        "@timestamp": "2020-03-29T13:20:28.000Z",
         "checkpoint.additional_info": "Threat Prevention Policy : Standard",
         "checkpoint.audit_status": "Success",
         "checkpoint.machine": "192.168.1.117",
@@ -3214,7 +3214,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3268,7 +3268,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3332,7 +3332,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3386,7 +3386,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:29Z",
+        "@timestamp": "2020-03-29T13:20:29.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3450,7 +3450,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3504,7 +3504,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3568,7 +3568,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3622,7 +3622,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3686,7 +3686,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3740,7 +3740,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:30Z",
+        "@timestamp": "2020-03-29T13:20:30.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3804,7 +3804,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -3868,7 +3868,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3922,7 +3922,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -3976,7 +3976,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4040,7 +4040,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4094,7 +4094,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:31Z",
+        "@timestamp": "2020-03-29T13:20:31.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4158,7 +4158,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:46Z",
+        "@timestamp": "2020-03-29T13:20:46.000Z",
         "checkpoint.sys_message": "The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
@@ -4185,7 +4185,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:46Z",
+        "@timestamp": "2020-03-29T13:20:46.000Z",
         "checkpoint.sys_message": "The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
@@ -4212,7 +4212,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:46Z",
+        "@timestamp": "2020-03-29T13:20:46.000Z",
         "checkpoint.sys_message": "installed Standard",
         "event.category": [
             "network"
@@ -4239,7 +4239,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4306,7 +4306,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4360,7 +4360,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4414,7 +4414,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4478,7 +4478,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4532,7 +4532,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4596,7 +4596,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4650,7 +4650,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4714,7 +4714,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4768,7 +4768,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:47Z",
+        "@timestamp": "2020-03-29T13:20:47.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4832,7 +4832,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -4886,7 +4886,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -4950,7 +4950,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5004,7 +5004,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -5068,7 +5068,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5122,7 +5122,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -5186,7 +5186,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5240,7 +5240,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -5304,7 +5304,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5358,7 +5358,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -5422,7 +5422,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5476,7 +5476,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:48Z",
+        "@timestamp": "2020-03-29T13:20:48.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
@@ -5540,7 +5540,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:49Z",
+        "@timestamp": "2020-03-29T13:20:49.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.parent_rule": "0",
@@ -5594,7 +5594,7 @@
         ]
     },
     {
-        "@timestamp": "2020-03-29T13:20:49Z",
+        "@timestamp": "2020-03-29T13:20:49.000Z",
         "checkpoint.logid": "0",
         "checkpoint.match_id": "1",
         "checkpoint.nat_addtnl_rulenum": "0",
