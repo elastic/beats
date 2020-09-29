@@ -12,8 +12,6 @@ class TestAutodiscover(filebeat.BaseTest):
     """
     Test filebeat autodiscover
     """
-    # 1/20 build fails https://github.com/elastic/beats/issues/21305
-    @pytest.mark.flaky(reruns=1, reruns_delay=10)
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
@@ -45,8 +43,6 @@ class TestAutodiscover(filebeat.BaseTest):
         self.wait_until(lambda: self.log_contains('Stopping runner: input'))
         proc.check_kill_and_wait()
 
-    # 16/20 build fails https://github.com/elastic/beats/issues/21306
-    @pytest.mark.flaky(reruns=16, reruns_delay=10)
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
