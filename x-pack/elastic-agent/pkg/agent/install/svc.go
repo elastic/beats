@@ -15,9 +15,7 @@ const (
 	ServiceDisplayName = "Elastic Agent"
 
 	// ServiceDescription is the description for the service.
-	ServiceDescription = `
-Elastic Agent is a unified agent to observe, monitor and protect your system.
-`
+	ServiceDescription = "Elastic Agent is a unified agent to observe, monitor and protect your system."
 )
 
 // ExecutablePath returns the path for the installed Agents executable.
