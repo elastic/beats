@@ -330,6 +330,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
+- Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 
 *Functionbeat*
 
