@@ -86,16 +86,13 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 		return nil, err
 	}
 
+	// reader is closed by this function
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to read configuration %s for the agent", agentConfigFile),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, agentConfigFile))
-	}
-
-	if err := reader.Close(); err != nil {
-		return nil, err
 	}
 
 	configMap, err := cfg.ToMapStr()
@@ -130,15 +127,12 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 		return err
 	}
 
+	// reader is closed by this function
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("fail to read configuration %s for the agent", agentConfigFile),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, agentConfigFile))
-	}
-
-	if err := reader.Close(); err != nil {
-		return err
 	}
 
 	configMap := make(map[string]interface{})

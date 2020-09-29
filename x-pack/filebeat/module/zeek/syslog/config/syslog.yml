@@ -53,9 +53,7 @@ processors:
       target: event
       fields:
         kind: event
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:

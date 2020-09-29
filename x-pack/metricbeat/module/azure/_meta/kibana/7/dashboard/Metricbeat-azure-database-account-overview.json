@@ -438,7 +438,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "cloud.instance.name",
+                "fieldName": "azure.resource.name",
                 "id": "1584710535722",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Resource",

@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/syslog.log
   - name: tags
     default: [zeek.syslog]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/syslog.yml

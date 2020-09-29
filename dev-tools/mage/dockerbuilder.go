@@ -102,6 +102,9 @@ func (b *dockerBuilder) copyFiles() error {
 	for _, f := range b.Files {
 		target := filepath.Join(b.beatDir, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return errors.Wrapf(err, "failed to copy from %s to %s", f.Source, target)
 		}
 	}
@@ -148,19 +151,14 @@ func isDockerFile(path string) bool {
 }
 
 func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
-	// has specific dockerfile
-	dockerfile := fmt.Sprintf("Dockerfile.%s.tmpl", b.imageName)
-	_, err := os.Stat(filepath.Join(templatesDir, dockerfile))
-	if err != nil {
-		// specific missing fallback to generic
-		dockerfile = "Dockerfile.tmpl"
+	dockerfile := "Dockerfile.tmpl"
+	if f, found := b.ExtraVars["dockerfile"]; found {
+		dockerfile = f
 	}
 
-	entrypoint := fmt.Sprintf("docker-entrypoint.%s.tmpl", b.imageName)
-	_, err = os.Stat(filepath.Join(templatesDir, entrypoint))
-	if err != nil {
-		// specific missing fallback to generic
-		entrypoint = "docker-entrypoint.tmpl"
+	entrypoint := "docker-entrypoint.tmpl"
+	if e, found := b.ExtraVars["docker_entrypoint"]; found {
+		entrypoint = e
 	}
 
 	type fileExpansion struct {
@@ -173,7 +171,7 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 			".tmpl",
 		)
 		path := filepath.Join(templatesDir, file.source)
-		err = b.ExpandFile(path, target, data)
+		err := b.ExpandFile(path, target, data)
 		if err != nil {
 			return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
 		}

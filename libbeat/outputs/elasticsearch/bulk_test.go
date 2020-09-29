@@ -83,7 +83,7 @@ func TestESNoErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
 	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 	assert.Equal(t, "", msg)
 }
@@ -92,7 +92,7 @@ func TestES1StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
 	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
 	assert.Equal(t, `"test error"`, msg)
 }
@@ -101,7 +101,7 @@ func TestES2StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
 	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
 	assert.Equal(t, `{"reason": "test_error"}`, msg)
 }
@@ -120,7 +120,7 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
     }`)
 	code, _, err := readStatusItem(response)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
 }
 

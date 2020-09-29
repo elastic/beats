@@ -424,9 +424,6 @@ var sysmon = (function () {
 
             evt.Put(path, value);
             evt.AppendTo("related.hash", value);
-
-            // TODO: remove in 8.0, see (https://github.com/elastic/beats/issues/18364).
-            evt.Put("hash." + key, value);
         });
     };
 

@@ -105,7 +105,7 @@ class Test(BaseTest):
 
         try:
             self.es.indices.delete(index=self.index_name)
-        except:
+        except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
@@ -161,8 +161,12 @@ class Test(BaseTest):
             assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
                 module, obj["event"]["module"])
 
-            assert "error" not in obj, "not error expected but got: {}".format(
-                obj)
+            # All modules must include a set processor that adds the time that
+            # the event was ingested to Elasticsearch
+            assert "ingested" in obj["event"], "missing event.ingested timestamp"
+
+            assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
@@ -214,7 +218,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
@@ -222,23 +226,42 @@ def clean_keys(obj):
     # datasets for which @timestamp is removed due to date missing
     remove_timestamp = {
         "activemq.audit",
+        "barracuda.spamfirewall",
         "barracuda.waf",
         "bluecoat.director",
         "cef.log",
         "cisco.asa",
         "cisco.ios",
-        "f5.firepass",
+        "citrix.netscaler",
+        "cyberark.corepas",
+        "cylance.protect",
+        "f5.bigipafm",
         "fortinet.clientendpoint",
         "haproxy.log",
         "icinga.startup",
         "imperva.securesphere",
         "infoblox.nios",
         "iptables.log",
+        "juniper.netscreen",
         "netscout.sightline",
-        "rapid7.nexpose",
+        "proofpoint.emailsecurity",
         "redis.log",
+        "snort.log",
+        "symantec.endpointprotection",
         "system.auth",
         "system.syslog",
+        "microsoft.defender_atp",
+        "crowdstrike.falcon_endpoint",
+        "crowdstrike.falcon_audit",
+        "gsuite.admin",
+        "gsuite.config",
+        "gsuite.drive",
+        "gsuite.groups",
+        "gsuite.ingest",
+        "gsuite.login",
+        "gsuite.saml",
+        "gsuite.user_accounts",
+        "zoom.webhook",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
@@ -275,14 +298,6 @@ def clean_keys(obj):
     if obj["event.dataset"] == "aws.vpcflow":
         if "event.end" not in obj:
             delete_key(obj, "@timestamp")
-
-    # Remove event.ingested from testing, as it will never be the same.
-    if obj["event.dataset"] == "microsoft.defender_atp":
-        delete_key(obj, "event.ingested")
-        delete_key(obj, "@timestamp")
-
-    if obj["event.module"] == "gsuite":
-        delete_key(obj, "event.ingested")
 
 
 def delete_key(obj, key):

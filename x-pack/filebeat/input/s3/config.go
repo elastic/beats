@@ -6,17 +6,26 @@ package s3
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type config struct {
-	QueueURL                 string              `config:"queue_url" validate:"nonzero,required"`
-	VisibilityTimeout        time.Duration       `config:"visibility_timeout"`
-	AwsConfig                awscommon.ConfigAWS `config:",inline"`
-	ExpandEventListFromField string              `config:"expand_event_list_from_field"`
-	APITimeout               time.Duration       `config:"api_timeout"`
+	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
+	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
+	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
+	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
+	APITimeout                time.Duration       `config:"api_timeout"`
+	FileSelectors             []FileSelectorCfg   `config:"file_selectors"`
+}
+
+// FileSelectorCfg defines type and configuration of FileSelectors
+type FileSelectorCfg struct {
+	RegexString              string         `config:"regex"`
+	Regex                    *regexp.Regexp `config:",ignore"`
+	ExpandEventListFromField string         `config:"expand_event_list_from_field"`
 }
 
 func defaultConfig() config {
@@ -34,6 +43,13 @@ func (c *config) Validate() error {
 	if c.APITimeout < 0 || c.APITimeout > c.VisibilityTimeout/2 {
 		return fmt.Errorf("api timeout %v needs to be larger than"+
 			" 0s and smaller than half of the visibility timeout", c.APITimeout)
+	}
+	for i := range c.FileSelectors {
+		r, err := regexp.Compile(c.FileSelectors[i].RegexString)
+		if err != nil {
+			return err
+		}
+		c.FileSelectors[i].Regex = r
 	}
 	return nil
 }

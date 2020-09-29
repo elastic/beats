@@ -7,9 +7,7 @@ import shutil
 import stat
 import time
 import unittest
-
 from filebeat import BaseTest
-from nose.plugins.skip import SkipTest
 
 
 # Additional tests: to be implemented
@@ -63,10 +61,8 @@ class Test(BaseTest):
         logfile_abs_path = os.path.abspath(testfile_path)
         record = self.get_registry_entry_by_path(logfile_abs_path)
 
-        self.assertDictContainsSubset({
-            "source": logfile_abs_path,
-            "offset": iterations * line_len,
-        }, record)
+        self.assertEqual(logfile_abs_path, record.get('source'))
+        self.assertEqual(iterations * line_len, record.get('offset'))
         self.assertTrue("FileStateOS" in record)
         self.assertTrue("meta" not in record)
         file_state_os = record["FileStateOS"]
@@ -84,10 +80,8 @@ class Test(BaseTest):
             self.assertTrue("device" in file_state_os)
         else:
             stat = os.stat(logfile_abs_path)
-            self.assertDictContainsSubset({
-                "inode": stat.st_ino,
-                "device": stat.st_dev,
-            }, file_state_os)
+            self.assertEqual(stat.st_ino, file_state_os.get('inode'))
+            self.assertEqual(stat.st_dev, file_state_os.get('device'))
 
     def test_registrar_files(self):
         """
@@ -163,7 +157,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry"
         registry_path = os.path.join(registry_home, "filebeat")
@@ -197,7 +191,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry"
         registry_path = os.path.join(registry_home, "filebeat")
@@ -232,7 +226,7 @@ class Test(BaseTest):
         if os.name == "nt":
             # This test is currently skipped on windows because file permission
             # configuration isn't implemented on Windows yet
-            raise SkipTest
+            raise unittest.SkipTest
 
         registry_home = "a/b/c/registry_x"
         registry_path = os.path.join(registry_home, "filebeat")
@@ -349,7 +343,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.check_kill_and_wait()
 
-        assert self.has_registry(data_path=self.working_dir+"/datapath")
+        assert self.has_registry(data_path=self.working_dir + "/datapath")
 
     def test_rotating_file_inode(self):
         """
@@ -363,7 +357,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"
@@ -453,7 +447,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"
@@ -527,7 +521,7 @@ class Test(BaseTest):
         )
 
         if os.name == "nt":
-            raise SkipTest
+            raise unittest.SkipTest
 
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/input"
@@ -772,7 +766,8 @@ class Test(BaseTest):
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
-    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin", 'flaky test https://github.com/elastic/beats/issues/8102')
+    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin",
+                     'flaky test https://github.com/elastic/beats/issues/8102')
     def test_clean_inactive(self):
         """
         Checks that states are properly removed after clean_inactive
@@ -932,8 +927,8 @@ class Test(BaseTest):
             ignore_older="2000ms",
         )
 
-        init_files = ["test"+str(i)+".log" for i in range(3)]
-        restart_files = ["test"+str(i+3)+".log" for i in range(1)]
+        init_files = ["test" + str(i) + ".log" for i in range(3)]
+        restart_files = ["test" + str(i + 3) + ".log" for i in range(1)]
 
         for name in init_files:
             self.input_logs.write(name, "Hello World\n")
@@ -1320,10 +1315,8 @@ class Test(BaseTest):
         logfile_abs_path = os.path.abspath(testfile_path1)
         record = self.get_registry_entry_by_path(logfile_abs_path)
 
-        self.assertDictContainsSubset({
-            "source": logfile_abs_path,
-            "offset": iterations * (len("hello world") + len(os.linesep)),
-        }, record)
+        self.assertEqual(logfile_abs_path, record.get('source'))
+        self.assertEqual(iterations * (len("hello world") + len(os.linesep)), record.get('offset'))
         self.assertTrue("FileStateOS" in record)
         file_state_os = record["FileStateOS"]
 
@@ -1340,10 +1333,8 @@ class Test(BaseTest):
             self.assertTrue("device" in file_state_os)
         else:
             stat = os.stat(logfile_abs_path)
-            self.assertDictContainsSubset({
-                "inode": stat.st_ino,
-                "device": stat.st_dev,
-            }, file_state_os)
+            self.assertEqual(stat.st_ino, file_state_os.get('inode'))
+            self.assertEqual(stat.st_dev, file_state_os.get('device'))
 
     def test_registrar_meta(self):
         """
