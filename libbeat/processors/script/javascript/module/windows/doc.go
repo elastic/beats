@@ -18,4 +18,4 @@
 // Package winlogbeat registers the winlogbeat module with the javascript script
 // processor. The module has utilities specific to Winlogbeat like parsing
 // Windows command lines.
-package winlogbeat
+package windows

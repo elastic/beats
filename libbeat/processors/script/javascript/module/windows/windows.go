@@ -17,7 +17,7 @@
 
 // +build windows
 
-package winlogbeat
+package windows
 
 import (
 	"syscall"
@@ -74,9 +74,11 @@ func Require(vm *goja.Runtime, module *goja.Object) {
 
 // Enable adds path to the given runtime.
 func Enable(runtime *goja.Runtime) {
+	runtime.Set("windows", require.Require(runtime, "windows"))
 	runtime.Set("winlogbeat", require.Require(runtime, "winlogbeat"))
 }
 
 func init() {
+	require.RegisterNativeModule("windows", Require)
 	require.RegisterNativeModule("winlogbeat", Require)
 }
