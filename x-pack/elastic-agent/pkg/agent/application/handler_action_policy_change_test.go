@@ -36,13 +36,13 @@ func TestPolicyChange(t *testing.T) {
 		emitter := &mockEmitter{}
 
 		conf := map[string]interface{}{"hello": "world"}
-		action := &fleetapi.ActionConfigChange{
+		action := &fleetapi.ActionPolicyChange{
 			ActionID:   "abc123",
-			ActionType: "CONFIG_CHANGE",
-			Config:     conf,
+			ActionType: "POLICY_CHANGE",
+			Policy:     conf,
 		}
 
-		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.NoError(t, err)
@@ -54,13 +54,13 @@ func TestPolicyChange(t *testing.T) {
 		emitter := &mockEmitter{err: mockErr}
 
 		conf := map[string]interface{}{"hello": "world"}
-		action := &fleetapi.ActionConfigChange{
+		action := &fleetapi.ActionPolicyChange{
 			ActionID:   "abc123",
-			ActionType: "CONFIG_CHANGE",
-			Config:     conf,
+			ActionType: "POLICY_CHANGE",
+			Policy:     conf,
 		}
 
-		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.Error(t, err)
@@ -77,13 +77,13 @@ func TestPolicyAcked(t *testing.T) {
 
 		config := map[string]interface{}{"hello": "world"}
 		actionID := "abc123"
-		action := &fleetapi.ActionConfigChange{
+		action := &fleetapi.ActionPolicyChange{
 			ActionID:   actionID,
-			ActionType: "CONFIG_CHANGE",
-			Config:     config,
+			ActionType: "POLICY_CHANGE",
+			Policy:     config,
 		}
 
-		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.Error(t, err)
@@ -99,13 +99,13 @@ func TestPolicyAcked(t *testing.T) {
 
 		config := map[string]interface{}{"hello": "world"}
 		actionID := "abc123"
-		action := &fleetapi.ActionConfigChange{
+		action := &fleetapi.ActionPolicyChange{
 			ActionID:   actionID,
-			ActionType: "CONFIG_CHANGE",
-			Config:     config,
+			ActionType: "POLICY_CHANGE",
+			Policy:     config,
 		}
 
-		handler := &handlerConfigChange{log: log, emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.NoError(t, err)
