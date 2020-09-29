@@ -129,6 +129,14 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 		// divided by 10.
 		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10
 	}
+
+	if userConfig.ReadAheadLimit != nil {
+		settings.ReadAheadLimit = *userConfig.ReadAheadLimit
+	}
+	if userConfig.WriteAheadLimit != nil {
+		settings.WriteAheadLimit = *userConfig.WriteAheadLimit
+	}
+
 	return settings, nil
 }
 
