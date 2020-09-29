@@ -26,6 +26,9 @@ import (
 const (
 	pluginName   = "o365audit"
 	fieldsPrefix = pluginName
+
+	// How long to retry when a fatal error is encountered in the input.
+	failureRetryInterval = time.Minute * 5
 )
 
 type o365input struct {
@@ -108,6 +111,34 @@ func (inp *o365input) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
+	for ctx.Cancelation.Err() == nil {
+		err := inp.runOnce(ctx, src, cursor, publisher)
+		if err == nil {
+			break
+		}
+		if ctx.Cancelation.Err() != err && err != context.Canceled {
+			msg := common.MapStr{}
+			msg.Put("error.message", err.Error())
+			msg.Put("event.kind", "pipeline_error")
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    msg,
+			}
+			publisher.Publish(event, nil)
+			ctx.Logger.Errorf("Input failed: %v", err)
+			ctx.Logger.Infof("Restarting in %v", failureRetryInterval)
+			time.Sleep(failureRetryInterval)
+		}
+	}
+	return nil
+}
+
+func (inp *o365input) runOnce(
+	ctx v2.Context,
+	src cursor.Source,
+	cursor cursor.Cursor,
+	publisher cursor.Publisher,
+) error {
 	stream := src.(*stream)
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
@@ -156,18 +187,7 @@ func (inp *o365input) Run(
 	}
 
 	log.Infow("Start fetching events", "cursor", start)
-	err = poller.Run(action)
-	if err != nil && ctx.Cancelation.Err() != err && err != context.Canceled {
-		msg := common.MapStr{}
-		msg.Put("error.message", err.Error())
-		msg.Put("event.kind", "pipeline_error")
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields:    msg,
-		}
-		publisher.Publish(event, nil)
-	}
-	return err
+	return poller.Run(action)
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duration) checkpoint {
