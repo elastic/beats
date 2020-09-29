@@ -124,8 +124,7 @@ var dup23 = lookup({
 	key: dup15,
 });
 
-var hdr1 = // "Pattern{Constant('date='), Field(hdate,true), Constant(' time='), Field(htime,true), Constant(' devname='), Field(hdevice,true), Constant(' device_id='), Field(hfld1,true), Constant(' log_id='), Field(id,true), Constant(' type='), Field(hfld2,true), Constant(' subtype='), Field(hfld3,true), Constant(' pri='), Field(hseverity,true), Constant(' '), Field(payload,false)}"
-match("HEADER#0:0001", "message", "date=%{hdate->} time=%{htime->} devname=%{hdevice->} device_id=%{hfld1->} log_id=%{id->} type=%{hfld2->} subtype=%{hfld3->} pri=%{hseverity->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "date=%{hdate->} time=%{htime->} devname=%{hdevice->} device_id=%{hfld1->} log_id=%{id->} type=%{hfld2->} subtype=%{hfld3->} pri=%{hseverity->} %{payload}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.messageid",
@@ -137,26 +136,22 @@ match("HEADER#0:0001", "message", "date=%{hdate->} time=%{htime->} devname=%{hde
 	}),
 ]));
 
-var hdr2 = // "Pattern{Constant('logver='), Field(hfld1,true), Constant(' date='), Field(hdate,true), Constant(' time='), Field(htime,true), Constant(' log_id='), Field(id,true), Constant(' '), Field(payload,false)}"
-match("HEADER#1:0002", "message", "logver=%{hfld1->} date=%{hdate->} time=%{htime->} log_id=%{id->} %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "logver=%{hfld1->} date=%{hdate->} time=%{htime->} log_id=%{id->} %{payload}", processor_chain([
 	setc("header_id","0002"),
 	dup1,
 ]));
 
-var hdr3 = // "Pattern{Constant('date='), Field(hdate,true), Constant(' time='), Field(htime,true), Constant(' logver='), Field(fld1,true), Constant(' '), Field(payload,false)}"
-match("HEADER#2:0003", "message", "date=%{hdate->} time=%{htime->} logver=%{fld1->} %{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "date=%{hdate->} time=%{htime->} logver=%{fld1->} %{payload}", processor_chain([
 	setc("header_id","0003"),
 	dup1,
 ]));
 
-var hdr4 = // "Pattern{Constant('logver='), Field(hfld1,true), Constant(' dtime='), Field(hdatetime,true), Constant(' devid='), Field(hfld2,true), Constant(' devname='), Field(hdevice,true), Constant(' '), Field(payload,false)}"
-match("HEADER#3:0004", "message", "logver=%{hfld1->} dtime=%{hdatetime->} devid=%{hfld2->} devname=%{hdevice->} %{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0004", "message", "logver=%{hfld1->} dtime=%{hdatetime->} devid=%{hfld2->} devname=%{hdevice->} %{payload}", processor_chain([
 	setc("header_id","0004"),
 	dup2,
 ]));
 
-var hdr5 = // "Pattern{Constant('logver='), Field(hfld1,true), Constant(' devname="'), Field(hdevice,false), Constant('" devid="'), Field(hfld2,false), Constant('" '), Field(payload,false)}"
-match("HEADER#4:0005", "message", "logver=%{hfld1->} devname=\"%{hdevice}\" devid=\"%{hfld2}\" %{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0005", "message", "logver=%{hfld1->} devname=\"%{hdevice}\" devid=\"%{hfld2}\" %{payload}", processor_chain([
 	setc("header_id","0005"),
 	dup2,
 ]));
@@ -169,8 +164,7 @@ var select1 = linear_select([
 	hdr5,
 ]);
 
-var part1 = // "Pattern{Constant('user='), Field(fld1,true), Constant(' adom='), Field(domain,true), Constant(' user='), Field(username,true), Constant(' ui='), Field(fld2,true), Constant(' action='), Field(action,true), Constant(' status='), Field(event_state,true), Constant(' msg="'), Field(event_description,false), Constant('"')}"
-match("MESSAGE#0:fortinetmgr:01", "nwparser.payload", "user=%{fld1->} adom=%{domain->} user=%{username->} ui=%{fld2->} action=%{action->} status=%{event_state->} msg=\"%{event_description}\"", processor_chain([
+var part1 = match("MESSAGE#0:fortinetmgr:01", "nwparser.payload", "user=%{fld1->} adom=%{domain->} user=%{username->} ui=%{fld2->} action=%{action->} status=%{event_state->} msg=\"%{event_description}\"", processor_chain([
 	dup3,
 	dup4,
 	dup5,
@@ -183,8 +177,7 @@ match("MESSAGE#0:fortinetmgr:01", "nwparser.payload", "user=%{fld1->} adom=%{dom
 
 var msg1 = msg("fortinetmgr:01", part1);
 
-var part2 = // "Pattern{Constant('user='), Field(username,true), Constant(' adom='), Field(domain,true), Constant(' msg="'), Field(event_description,false), Constant('"')}"
-match("MESSAGE#1:fortinetmgr", "nwparser.payload", "user=%{username->} adom=%{domain->} msg=\"%{event_description}\"", processor_chain([
+var part2 = match("MESSAGE#1:fortinetmgr", "nwparser.payload", "user=%{username->} adom=%{domain->} msg=\"%{event_description}\"", processor_chain([
 	dup3,
 	dup4,
 	dup5,
@@ -197,42 +190,33 @@ match("MESSAGE#1:fortinetmgr", "nwparser.payload", "user=%{username->} adom=%{do
 
 var msg2 = msg("fortinetmgr", part2);
 
-var part3 = // "Pattern{Constant('user="'), Field(username,false), Constant('" userfrom='), Field(fld7,true), Constant(' msg="'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/0", "nwparser.payload", "user=\"%{username}\" userfrom=%{fld7->} msg=\"%{p0}");
+var part3 = match("MESSAGE#2:fortinetmgr:04/0", "nwparser.payload", "user=\"%{username}\" userfrom=%{fld7->} msg=\"%{p0}");
 
-var part4 = // "Pattern{Constant('User'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/1_0", "nwparser.p0", "User%{p0}");
+var part4 = match("MESSAGE#2:fortinetmgr:04/1_0", "nwparser.p0", "User%{p0}");
 
-var part5 = // "Pattern{Constant('user'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/1_1", "nwparser.p0", "user%{p0}");
+var part5 = match("MESSAGE#2:fortinetmgr:04/1_1", "nwparser.p0", "user%{p0}");
 
 var select2 = linear_select([
 	part4,
 	part5,
 ]);
 
-var part6 = // "Pattern{Field(,false), Constant('''), Field(fld3,false), Constant('' with profile ''), Field(fld4,false), Constant('' '), Field(fld5,true), Constant(' from '), Field(fld6,false), Constant('('), Field(hostip,false), Constant(')'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/2", "nwparser.p0", "%{}'%{fld3}' with profile '%{fld4}' %{fld5->} from %{fld6}(%{hostip})%{p0}");
+var part6 = match("MESSAGE#2:fortinetmgr:04/2", "nwparser.p0", "%{}'%{fld3}' with profile '%{fld4}' %{fld5->} from %{fld6}(%{hostip})%{p0}");
 
-var part7 = // "Pattern{Constant('."'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/3_0", "nwparser.p0", ".\"%{p0}");
+var part7 = match("MESSAGE#2:fortinetmgr:04/3_0", "nwparser.p0", ".\"%{p0}");
 
-var part8 = // "Pattern{Constant('"'), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/3_1", "nwparser.p0", "\"%{p0}");
+var part8 = match("MESSAGE#2:fortinetmgr:04/3_1", "nwparser.p0", "\"%{p0}");
 
 var select3 = linear_select([
 	part7,
 	part8,
 ]);
 
-var part9 = // "Pattern{Field(,false), Constant('adminprof='), Field(p0,false)}"
-match("MESSAGE#2:fortinetmgr:04/4", "nwparser.p0", "%{}adminprof=%{p0}");
+var part9 = match("MESSAGE#2:fortinetmgr:04/4", "nwparser.p0", "%{}adminprof=%{p0}");
 
-var part10 = // "Pattern{Field(fld2,true), Constant(' sid='), Field(sid,true), Constant(' user_type="'), Field(profile,false), Constant('"')}"
-match("MESSAGE#2:fortinetmgr:04/5_0", "nwparser.p0", "%{fld2->} sid=%{sid->} user_type=\"%{profile}\"");
+var part10 = match("MESSAGE#2:fortinetmgr:04/5_0", "nwparser.p0", "%{fld2->} sid=%{sid->} user_type=\"%{profile}\"");
 
-var part11 = // "Pattern{Field(fld2,false)}"
-match_copy("MESSAGE#2:fortinetmgr:04/5_1", "nwparser.p0", "fld2");
+var part11 = match_copy("MESSAGE#2:fortinetmgr:04/5_1", "nwparser.p0", "fld2");
 
 var select4 = linear_select([
 	part10,
@@ -268,8 +252,7 @@ var all1 = all_match({
 
 var msg3 = msg("fortinetmgr:04", all1);
 
-var part12 = // "Pattern{Constant('user='), Field(username,true), Constant(' userfrom='), Field(fld4,true), Constant(' msg="'), Field(event_description,false), Constant('" adminprof='), Field(fld2,false)}"
-match("MESSAGE#3:fortinetmgr:02", "nwparser.payload", "user=%{username->} userfrom=%{fld4->} msg=\"%{event_description}\" adminprof=%{fld2}", processor_chain([
+var part12 = match("MESSAGE#3:fortinetmgr:02", "nwparser.payload", "user=%{username->} userfrom=%{fld4->} msg=\"%{event_description}\" adminprof=%{fld2}", processor_chain([
 	dup3,
 	dup4,
 	dup5,
@@ -282,8 +265,7 @@ match("MESSAGE#3:fortinetmgr:02", "nwparser.payload", "user=%{username->} userfr
 
 var msg4 = msg("fortinetmgr:02", part12);
 
-var part13 = // "Pattern{Constant('user="'), Field(username,false), Constant('" msg="Login from ssh:'), Field(fld1,true), Constant(' for '), Field(fld2,true), Constant(' from '), Field(saddr,true), Constant(' port '), Field(sport,false), Constant('" remote_ip="'), Field(daddr,false), Constant('" remote_port='), Field(dport,true), Constant(' valid='), Field(fld3,true), Constant(' authmsg="'), Field(result,false), Constant('" extrainfo='), Field(fld5,false)}"
-match("MESSAGE#4:fortinetmgr:03", "nwparser.payload", "user=\"%{username}\" msg=\"Login from ssh:%{fld1->} for %{fld2->} from %{saddr->} port %{sport}\" remote_ip=\"%{daddr}\" remote_port=%{dport->} valid=%{fld3->} authmsg=\"%{result}\" extrainfo=%{fld5}", processor_chain([
+var part13 = match("MESSAGE#4:fortinetmgr:03", "nwparser.payload", "user=\"%{username}\" msg=\"Login from ssh:%{fld1->} for %{fld2->} from %{saddr->} port %{sport}\" remote_ip=\"%{daddr}\" remote_port=%{dport->} valid=%{fld3->} authmsg=\"%{result}\" extrainfo=%{fld5}", processor_chain([
 	dup11,
 	dup4,
 	dup5,
@@ -302,22 +284,18 @@ match("MESSAGE#4:fortinetmgr:03", "nwparser.payload", "user=\"%{username}\" msg=
 
 var msg5 = msg("fortinetmgr:03", part13);
 
-var part14 = // "Pattern{Constant('user="'), Field(username,false), Constant('" userfrom="'), Field(fld1,false), Constant('"msg="'), Field(p0,false)}"
-match("MESSAGE#5:fortinetmgr:05/0", "nwparser.payload", "user=\"%{username}\" userfrom=\"%{fld1}\"msg=\"%{p0}");
+var part14 = match("MESSAGE#5:fortinetmgr:05/0", "nwparser.payload", "user=\"%{username}\" userfrom=\"%{fld1}\"msg=\"%{p0}");
 
-var part15 = // "Pattern{Constant('dev='), Field(fld2,false), Constant(',vdom='), Field(fld3,false), Constant(',type='), Field(fld4,false), Constant(',key='), Field(fld5,false), Constant(',act='), Field(action,false), Constant(',pkgname='), Field(fld7,false), Constant(',allowaccess='), Field(fld8,false), Constant('"'), Field(p0,false)}"
-match("MESSAGE#5:fortinetmgr:05/1_0", "nwparser.p0", "dev=%{fld2},vdom=%{fld3},type=%{fld4},key=%{fld5},act=%{action},pkgname=%{fld7},allowaccess=%{fld8}\"%{p0}");
+var part15 = match("MESSAGE#5:fortinetmgr:05/1_0", "nwparser.p0", "dev=%{fld2},vdom=%{fld3},type=%{fld4},key=%{fld5},act=%{action},pkgname=%{fld7},allowaccess=%{fld8}\"%{p0}");
 
-var part16 = // "Pattern{Field(event_description,false), Constant('"'), Field(p0,false)}"
-match("MESSAGE#5:fortinetmgr:05/1_1", "nwparser.p0", "%{event_description}\"%{p0}");
+var part16 = match("MESSAGE#5:fortinetmgr:05/1_1", "nwparser.p0", "%{event_description}\"%{p0}");
 
 var select5 = linear_select([
 	part15,
 	part16,
 ]);
 
-var part17 = // "Pattern{Field(domain,false), Constant('" adom="')}"
-match("MESSAGE#5:fortinetmgr:05/2", "nwparser.p0", "%{domain}\" adom=\"");
+var part17 = match("MESSAGE#5:fortinetmgr:05/2", "nwparser.p0", "%{domain}\" adom=\"");
 
 var all2 = all_match({
 	processors: [
