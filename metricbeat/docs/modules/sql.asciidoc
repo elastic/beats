@@ -43,7 +43,7 @@ each row.
 [float]
 === Example: capture Innodb-related metrics
 
-This `sql.yml` configuration shows how to capture  Innodb-related metrics that
+This `sql.yml` configuration shows how to capture Innodb-related metrics that
 result from the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL
 database:
 
@@ -415,4 +415,3 @@ The following metricsets are available:
 * <<metricbeat-metricset-sql-query,query>>
 
 include::sql/query.asciidoc[]
-
