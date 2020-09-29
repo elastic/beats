@@ -13,12 +13,12 @@ import (
 )
 
 type config struct {
-	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
-	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
-	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
-	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
-	APITimeout                time.Duration       `config:"api_timeout"`
-	FileSelectors             []FileSelectorCfg   `config:"file_selectors"`
+	QueueURL                 string              `config:"queue_url" validate:"nonzero,required"`
+	VisibilityTimeout        time.Duration       `config:"visibility_timeout"`
+	AwsConfig                awscommon.ConfigAWS `config:",inline"`
+	ExpandEventListFromField string              `config:"expand_event_list_from_field"`
+	APITimeout               time.Duration       `config:"api_timeout"`
+	FileSelectors            []FileSelectorCfg   `config:"file_selectors"`
 }
 
 // FileSelectorCfg defines type and configuration of FileSelectors

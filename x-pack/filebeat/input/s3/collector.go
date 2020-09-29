@@ -45,10 +45,10 @@ type s3Collector struct {
 }
 
 type s3Info struct {
-	name   string
-	key    string
-	region string
-	arn    string
+	name                     string
+	key                      string
+	region                   string
+	arn                      string
 	expandEventListFromField string
 }
 

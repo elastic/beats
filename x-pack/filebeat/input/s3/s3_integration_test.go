@@ -151,29 +151,13 @@ func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, 
 	return oldMessageHandles
 }
 
-func (input *s3Collector) deleteAllMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI) error {
-	var messageReceiptHandles []string
-	init := true
-	for init || len(messageReceiptHandles) > 0 {
-		init = false
-		messageReceiptHandles = collectOldMessages(t, queueURL, visibilityTimeout, svcSQS)
-		for _, receiptHandle := range messageReceiptHandles {
-			err := input.deleteMessage(queueURL, receiptHandle, svcSQS)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func defaultTestConfig() *common.Config {
 	return common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": os.Getenv("QUEUE_URL"),
 	})
 }
 
-func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3Collector, receiver *eventReceiver)) {
+func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, *eventReceiver) {
 	plugin := Plugin()
 	inp, err := plugin.Manager.Create(cfg)
 	if err != nil {
@@ -186,6 +170,7 @@ func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3C
 	client := pubtest.NewChanClient(0)
 	receiver := &eventReceiver{client.Channel}
 	pipeline := pubtest.ConstClient(client)
+
 	collector, err := inp.(*s3Input).createCollector(v2.Context{
 		Logger:      logp.NewLogger("test"),
 		Cancelation: ctx,
@@ -194,6 +179,34 @@ func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3C
 		t.Fatal(err)
 	}
 
+	if mock {
+		svcS3 := &MockS3Client{}
+		svcSQS := &MockSQSClient{}
+		collector.sqs = svcSQS
+		collector.s3 = svcS3
+		return collector, receiver
+	}
+
+	config := getConfigForTest(t)
+	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+	if err != nil {
+		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
+	}
+
+	s3BucketRegion := os.Getenv("S3_BUCKET_REGION")
+	if s3BucketRegion == "" {
+		t.Log("S3_BUCKET_REGION is not set, default to us-west-1")
+		s3BucketRegion = "us-west-1"
+	}
+	awsConfig.Region = s3BucketRegion
+	awsConfig = awsConfig.Copy()
+	collector.sqs = sqs.New(awsConfig)
+	collector.s3 = s3.New(awsConfig)
+	return collector, receiver
+}
+
+func runTest(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3Collector, receiver *eventReceiver)) {
+	collector, receiver := setupCollector(t, cfg, mock)
 	run(t, collector, receiver)
 }
 
@@ -214,39 +227,14 @@ func (r *eventReceiver) waitForEvents(n int) ([]beat.Event, bool) {
 }
 
 func TestS3Input(t *testing.T) {
-	inputConfig := defaultTestConfig()
-	config := getConfigForTest(t)
-
-	runTest(t, inputConfig, func(t *testing.T, input *s3Collector, receiver *eventReceiver) {
-		awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
-		if err != nil {
-			t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
-		}
-
-		s3BucketRegion := os.Getenv("S3_BUCKET_REGION")
-		if s3BucketRegion == "" {
-			t.Log("S3_BUCKET_REGION is not set, default to us-west-1")
-			s3BucketRegion = "us-west-1"
-		}
-		awsConfig.Region = s3BucketRegion
-		awsConfig = awsConfig.Copy()
-		svcSQS := sqs.New(awsConfig)
-		input.sqs = svcSQS
-
-		// remove old messages from SQS
-		err = input.deleteAllMessages(t, config.QueueURL, int64(config.VisibilityTimeout.Seconds()), svcSQS)
-		if err != nil {
-			t.Fatalf("failed to delete message: %v", err.Error())
-		}
-
+	runTest(t, defaultTestConfig(), false, func(t *testing.T, collector *s3Collector, receiver *eventReceiver) {
 		// upload a sample log file for testing
 		s3BucketNameEnv := os.Getenv("S3_BUCKET_NAME")
 		if s3BucketNameEnv == "" {
 			t.Fatal("failed to get S3_BUCKET_NAME")
 		}
 
-		svcS3 := s3.New(awsConfig)
-		uploadSampleLogFile(t, s3BucketNameEnv, svcS3)
+		uploadSampleLogFile(t, s3BucketNameEnv, collector.s3)
 		t.Log("sleeping 30 seconds for uploading sample log file")
 		time.Sleep(30 * time.Second)
 		t.Log("done sleeping")
@@ -255,7 +243,7 @@ func TestS3Input(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			input.run()
+			collector.run()
 		}()
 
 		event := <-receiver.ch
@@ -272,7 +260,7 @@ func TestS3Input(t *testing.T) {
 		assert.Equal(t, "logline1\n", message)
 
 		// delete sample log file from S3 bucket
-		deleteSampleLogFile(t, s3BucketNameEnv, svcS3)
+		deleteSampleLogFile(t, s3BucketNameEnv, collector.s3)
 	})
 }
 
@@ -328,17 +316,12 @@ func TestMockS3Input(t *testing.T) {
 		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
 	})
 
-	runTest(t, cfg, func(t *testing.T, input *s3Collector, receiver *eventReceiver) {
-		svcS3 := &MockS3Client{}
-		svcSQS := &MockSQSClient{}
-		input.sqs = svcSQS
-		input.s3 = svcS3
-
+	runTest(t, cfg, true, func(t *testing.T, collector *s3Collector, receiver *eventReceiver) {
 		wg := sync.WaitGroup{}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			input.run()
+			collector.run()
 		}()
 
 		event := <-receiver.ch
