@@ -97,7 +97,7 @@ type ActionUpgrade struct {
 	ActionID   string `json:"id" yaml:"id"`
 	ActionType string `json:"type" yaml:"type"`
 	Version    string `json:"version" yaml:"version"`
-	SourceURI  string `json:"source_uri" yaml:"source_uri"`
+	SourceURI  string `json:"source_uri,omitempty" yaml:"source_uri,omitempty"`
 }
 
 func (a *ActionUpgrade) String() string {

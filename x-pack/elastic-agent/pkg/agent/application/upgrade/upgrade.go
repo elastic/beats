@@ -61,12 +61,17 @@ func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []contex
 
 // Upgrade upgrades running agent
 func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error {
-	archivePath, err := u.downloadArtifact(ctx, a.Version, a.SourceURI)
+	sourceURI, err := u.sourceURI(a.Version, a.SourceURI)
 	if err != nil {
 		return err
 	}
 
-	newHash, err := u.unpack(ctx, a.Version, a.SourceURI, archivePath)
+	archivePath, err := u.downloadArtifact(ctx, a.Version, sourceURI)
+	if err != nil {
+		return err
+	}
+
+	newHash, err := u.unpack(ctx, a.Version, archivePath)
 	if err != nil {
 		return err
 	}
@@ -132,6 +137,16 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 	}
 
 	return ioutil.WriteFile(markerFile, markerBytes, 0600)
+}
+func (u *Upgrader) sourceURI(version, retrievedURI string) (string, error) {
+	if strings.HasSuffix(version, "-SNAPSHOT") && retrievedURI == "" {
+		return "", errors.New("snapshot upgrade requires source uri", errors.TypeConfig)
+	}
+	if retrievedURI != "" {
+		return retrievedURI, nil
+	}
+
+	return u.settings.SourceURI, nil
 }
 
 func isSubdir(base, target string) (bool, error) {
