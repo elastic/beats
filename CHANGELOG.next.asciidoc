@@ -682,6 +682,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Added new module for Zoom webhooks {pull}20414[20414]
 - Add type and sub_type to panw panos fileset {pull}20912[20912]
 - Always attempt community_id processor on zeek module {pull}21155[21155]
+- Add related.hosts ecs field to all modules {pull}21160[21160]
 
 *Heartbeat*
 
