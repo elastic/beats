@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,6 +41,7 @@ const (
 	buildDir       = "build"
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
+	devEnv         = "DEV"
 	configFile     = "elastic-agent.yml"
 	agentDropPath  = "AGENT_DROP_PATH"
 )
@@ -345,7 +347,7 @@ func commitID() string {
 
 // Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(Config, BuildSpec, BuildPGP, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -370,12 +372,22 @@ func ControlProto() error {
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
-	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/elastic-agent/pkg/agent/program/supported.go
 	goF := filepath.Join("dev-tools", "cmd", "buildspec", "buildspec.go")
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
 	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
+}
+
+func BuildPGP() error {
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildpgp/build_pgp.go --in x-pack/agent/spec/GPG-KEY-elasticsearch --out x-pack/elastic-agent/pkg/release/pgp.go
+	goF := filepath.Join("dev-tools", "cmd", "buildpgp", "build_pgp.go")
+	in := "GPG-KEY-elasticsearch"
+	out := filepath.Join("pkg", "release", "pgp.go")
+
+	fmt.Printf(">> BuildPGP from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -594,6 +606,12 @@ func buildVars() map[string]string {
 
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
+		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+		}
+	}
 
 	return vars
 }
