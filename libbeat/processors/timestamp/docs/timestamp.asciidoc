@@ -50,7 +50,7 @@ If a layout does not contain a year then the current year in the specified
 
 Here is an example that parses the `start_time` field and writes the result
 to the `@timestamp` field then deletes the `start_time` field. When the
-processor is loaded it will immediately validate that the two `test` timestamps
+processor is loaded, it will immediately validate that the two `test` timestamps
 parse with this configuration.
 
 [source,yaml]
