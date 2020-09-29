@@ -108,20 +108,37 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		return []jobs.Job{readResultJob(ctx, mpx)}, nil
+		return []jobs.Job{readResultsJob(ctx, mpx, readResultsState{})}, nil
 	}
 
 }
 
-func readResultJob(ctx context.Context, mpx *ExecMultiplexer) jobs.Job {
+type readResultsState struct {
+	journeyComplete bool
+	stepCount int
+}
+
+// readResultsJob creates adapts the output of an ExecMultiplexer into a Job, that uses continuations
+// to read all output.
+func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResultsState) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-mpx.SynthEvents():
+			// No more events? In this case this is the summary event
 			if se == nil {
-				return nil, nil
+				if state.journeyComplete {
+					return nil, nil
+				}
+				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
 			}
 			if se.TimestampEpochMillis != 0 {
 				event.Timestamp = time.Unix(se.TimestampEpochMillis/1000, (se.TimestampEpochMillis%1000)*1000000)
+			}
+			switch se.Type {
+			case "journey/end":
+				state.journeyComplete = true
+			case "step/end":
+				state.stepCount++
 			}
 
 			eventext.MergeEventFields(event, se.ToMap())
@@ -129,7 +146,7 @@ func readResultJob(ctx context.Context, mpx *ExecMultiplexer) jobs.Job {
 			if se.Error != nil {
 				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
 			}
-			return []jobs.Job{readResultJob(ctx, mpx)}, jobErr
+			return []jobs.Job{readResultsJob(ctx, mpx, journeyComplete)}, jobErr
 		}
 	}
 }
@@ -253,16 +270,16 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	return nil
 }
 
-var stdoutToSynthEvent = consoleLineToSynthEvent("stdout")
-var stderrToSynthEvent = consoleLineToSynthEvent("stderr")
+var stdoutToSynthEvent = lineToSynthEventFactory("stdout")
+var stderrToSynthEvent = lineToSynthEventFactory("stderr")
 
-// consoleLineToSynthEvent is a factory that can take a line from the scanner and transform it into a *SynthEvent.
-func consoleLineToSynthEvent(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
+// lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
+func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
-			TimestampEpochMillis: time.Now().UnixNano() / 1000000,
+			TimestampEpochMillis: time.Now().UnixNano() / int64(time.Millisecond),
 			Payload: map[string]interface{}{
 				"message": text,
 			},

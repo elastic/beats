@@ -24,6 +24,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestRunCmd(t *testing.T) {
+
+}
+
+func TestLineToSynthEventFactory(t *testing.T) {
+	testType := "mytype"
+	testText := "sometext"
+	f := lineToSynthEventFactory(testType)
+	res, err := f([]byte(testText), testText)
+	require.NoError(t, err)
+	require.NotNil(t, res)
+	require.Equal(t, testType, res.Type)
+	require.Equal(t, testText, res.Payload["message"])
+	require.Greater(t, res.TimestampEpochMillis, int64(0))
+}
+
 func TestJsonToSynthEvent(t *testing.T) {
 	tests := []struct {
 		name       string
