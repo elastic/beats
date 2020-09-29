@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 - Change network.direction values to ECS recommended values (inbound, outbound). {issue}12445[12445] {pull}20695[20695]
+- Docker container needs to be explicitly run as user root for auditing. {pull}21202[21202]
 
 *Filebeat*
 
@@ -678,6 +679,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve Suricata Eve module with `x509` ECS mappings {pull}20973[20973]
 - Added new module for Zoom webhooks {pull}20414[20414]
 - Add type and sub_type to panw panos fileset {pull}20912[20912]
+- Always attempt community_id processor on zeek module {pull}21155[21155]
 
 *Heartbeat*
 

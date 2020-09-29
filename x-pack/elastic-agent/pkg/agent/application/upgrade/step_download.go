@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
@@ -18,7 +19,8 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		settings.SourceURI = sourceURI
 	}
 
-	verifier, err := downloader.NewVerifier(u.log, &settings)
+	allowEmptyPgp, pgp := release.PGP()
+	verifier, err := downloader.NewVerifier(u.log, &settings, allowEmptyPgp, pgp)
 	if err != nil {
 		return "", errors.New(err, "initiating verifier")
 	}
