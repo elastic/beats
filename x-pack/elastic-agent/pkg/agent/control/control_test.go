@@ -20,7 +20,7 @@ import (
 )
 
 func TestServerClient_Version(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil)
+	srv := server.New(newErrorLogger(t), nil, nil)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()

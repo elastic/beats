@@ -62,6 +62,7 @@ func newManaged(
 	log *logger.Logger,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	uc upgraderControl,
 ) (*Managed, error) {
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
@@ -207,6 +208,7 @@ func newManaged(
 		reexec,
 		acker,
 		combinedReporter)
+	uc.SetUpgrader(managedApplication.upgrader)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
