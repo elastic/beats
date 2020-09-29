@@ -610,6 +610,7 @@ func buildVars() map[string]string {
 	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
 		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
 			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowUpgrade"] = "true"
 		}
 	}
 
