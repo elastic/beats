@@ -107,15 +107,8 @@ pipeline {
                 mapParallelTasks["${k}"] = v
               }
             }
+            notifyBuildReason()
             parallel(mapParallelTasks)
-          }
-        }
-      }
-      post {
-        always {
-          dir("${BASE_DIR}"){
-            // Archive the markdown files that contain the build reasons
-            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.md')
           }
         }
       }
@@ -123,6 +116,8 @@ pipeline {
   }
   post {
     always {
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
@@ -543,6 +538,17 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
   } else {
     return false
+  }
+}
+
+/**
+* Notify the build reason.
+*/
+def notifyBuildReason() {
+  // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
+  archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
+  if (isPR()) {
+    echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
   }
 }
 

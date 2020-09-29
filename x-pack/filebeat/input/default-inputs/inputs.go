@@ -27,7 +27,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 	return []v2.Plugin{
 		cloudfoundry.Plugin(),
 		http_endpoint.Plugin(),
-		httpjson.Plugin(),
+		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
 	}
 }
