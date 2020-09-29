@@ -81,11 +81,34 @@ type Format mg.Namespace
 // Demo runs agent out of container.
 type Demo mg.Namespace
 
+// Dev runs package and build for dev purposes.
+type Dev mg.Namespace
+
 // Env returns information about the environment.
 func (Prepare) Env() {
 	mg.Deps(Mkdir("build"), Build.GenerateConfig)
 	RunGo("version")
 	RunGo("env")
+}
+
+// Build builds the agent binary with DEV flag set.
+func (Dev) Build() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	mg.Deps(Build.All)
+}
+
+// Package packages the agent binary with DEV flag set.
+func (Dev) Package() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	Package()
 }
 
 // InstallGoLicenser install go-licenser to check license of the files.
@@ -313,7 +336,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithRootUserContainer())
+	return devtools.TestPackages()
 }
 
 // RunGo runs go command and output the feedback to the stdout and the stderr.
