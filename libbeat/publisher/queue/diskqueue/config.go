@@ -106,8 +106,8 @@ func DefaultSettings() Settings {
 		MaxSegmentSize: 100 * (1 << 20), // 100MiB
 		MaxBufferSize:  (1 << 30),       // 1GiB
 
-		ReadAheadLimit:  256,
-		WriteAheadLimit: 1024,
+		ReadAheadLimit:  512,
+		WriteAheadLimit: 2048,
 	}
 }
 
