@@ -288,7 +288,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				// When ACK done, message will be deleted. Or when message is
 				// not s3 ObjectCreated event related(handleSQSMessage function
 				// failed), it will be removed as well.
-				p.logger.Debug("Deleting message from SQS: ", message.MessageId)
+				p.logger.Debug("Deleting message from SQS: ", *message.MessageId)
 				// only delete sqs message when errC is closed with no error
 				err := p.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
