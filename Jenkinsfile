@@ -115,7 +115,7 @@ pipeline {
                 }
               }
               notifyBuildReason()
-              parallel(mapParallelTasks)
+              //parallel(mapParallelTasks)
             }
           }
         }
