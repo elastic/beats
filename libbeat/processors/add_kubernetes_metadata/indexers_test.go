@@ -142,6 +142,8 @@ func TestContainerIndexer(t *testing.T) {
 	ns := "testns"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
+	containerImage := "containerimage"
+	initContainerImage := "initcontainerimage"
 	initContainer := "initcontainer"
 	nodeName := "testnode"
 
@@ -183,6 +185,7 @@ func TestContainerIndexer(t *testing.T) {
 	pod.Status.ContainerStatuses = []*kubernetes.PodContainerStatus{
 		{
 			Name:        &container,
+			Image:       &containerImage,
 			ContainerID: &container1,
 		},
 	}
@@ -190,6 +193,7 @@ func TestContainerIndexer(t *testing.T) {
 	pod.Status.InitContainerStatuses = []*kubernetes.PodContainerStatus{
 		{
 			Name:        &initContainer,
+			Image:       &initContainerImage,
 			ContainerID: &container2,
 		},
 	}
@@ -205,12 +209,14 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 
 	expected["container"] = common.MapStr{
-		"name": container,
+		"name":  container,
+		"image": containerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	expected["container"] = common.MapStr{
-		"name": initContainer,
+		"name":  initContainer,
+		"image": initContainerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
@@ -349,6 +355,7 @@ func TestIpPortIndexer(t *testing.T) {
 	ns := "testns"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
+	containerImage := "containerimage"
 	ip := "1.2.3.4"
 	port := int32(80)
 	pod := kubernetes.Pod{
@@ -397,7 +404,8 @@ func TestIpPortIndexer(t *testing.T) {
 
 	pod.Spec.Containers = []*v1.Container{
 		{
-			Name: &container,
+			Name:  &container,
+			Image: &containerImage,
 			Ports: []*v1.ContainerPort{
 				{
 					Name:          &container,
@@ -421,6 +429,6 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
-	expected["container"] = common.MapStr{"name": container}
+	expected["container"] = common.MapStr{"name": container, "image": containerImage}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
