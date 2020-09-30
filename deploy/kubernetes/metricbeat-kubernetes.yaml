@@ -36,11 +36,11 @@ data:
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
-                    # Uncomment this to get k8s events:
-                    #- event
                 - module: kubernetes
                   metricsets:
                     - apiserver
+                    # Uncomment this to get k8s events:
+                    #- event
                   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   ssl.certificate_authorities:
