@@ -152,7 +152,7 @@ func StreamChecker(log *logger.Logger, ast *transpiler.AST) error {
 
 // The only two requirement are that it has only characters allowed in an Elasticsearch index name
 // Index names must meet the following criteria:
-//	   Not longer than 100 bytes
+//     Not longer than 100 bytes
 //     Lowercase only
 //     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
 func matchesNamespaceContraints(namespace string) bool {
@@ -161,21 +161,11 @@ func matchesNamespaceContraints(namespace string) bool {
 		return false
 	}
 
-	// Lowercase only
-	if strings.ToLower(namespace) != namespace {
-		return false
-	}
-
-	// Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-	if strings.ContainsAny(namespace, "\\/*?\"<>| ,#:") {
-		return false
-	}
-
-	return true
+	return isCharactersetValid(namespace)
 }
 
 // matchesTypeConstraints fails for following rules. As type is first element of resulting index prefix restrictions need to be applied.
-//	   Not longer than 20 bytes
+//     Not longer than 20 bytes
 //     Lowercase only
 //     Cannot start with -, _, +
 //     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
@@ -185,22 +175,15 @@ func matchesTypeConstraints(dsType string) bool {
 		return false
 	}
 
-	if strings.ToLower(dsType) != dsType {
-		return false
-	}
-
 	if strings.HasPrefix(dsType, "-") || strings.HasPrefix(dsType, "_") || strings.HasPrefix(dsType, "+") {
 		return false
 	}
 
-	if strings.ContainsAny(dsType, "\\/*?\"<>| ,#:") {
-		return false
-	}
-	return true
+	return isCharactersetValid(dsType)
 }
 
 // matchesDatasetConstraints fails for following rules
-//	   Not longer than 100 bytes
+//     Not longer than 100 bytes
 //     Lowercase only
 //     Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
 func matchesDatasetConstraints(dataset string) bool {
@@ -209,12 +192,17 @@ func matchesDatasetConstraints(dataset string) bool {
 		return false
 	}
 
-	if strings.ToLower(dataset) != dataset {
+	return isCharactersetValid(dataset)
+}
+
+func isCharactersetValid(input string) bool {
+	if strings.ToLower(input) != input {
 		return false
 	}
 
-	if strings.ContainsAny(dataset, "\\/*?\"<>| ,#:") {
+	if strings.ContainsAny(input, "\\/*?\"<>| ,#:") {
 		return false
 	}
+
 	return true
 }
