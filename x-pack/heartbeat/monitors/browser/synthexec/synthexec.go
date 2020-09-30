@@ -146,7 +146,7 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			if se.Error != nil {
 				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
 			}
-			return []jobs.Job{readResultsJob(ctx, mpx, journeyComplete)}, jobErr
+			return []jobs.Job{readResultsJob(ctx, mpx, state)}, jobErr
 		}
 	}
 }
