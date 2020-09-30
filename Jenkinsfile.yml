@@ -40,6 +40,8 @@ changeset:
 
 disabled:
     when:
-        skip-ci-build-label: true   ## Skip the GitHub Pull Request builds if skip-ci-build label has been assigned to the PR
+        labels:      ## Skip the GitHub Pull Request builds if any of the given GitHub labels match with the assigned labels in the PR.
+            - skip-ci
+            - skip-ci-build
         ## TODO: This will allow to configure what to do based on the PR configuration
         draft: true  ## Skip the GitHub Pull Request builds with Draft PRs.
