@@ -217,11 +217,13 @@ data:
         - state_replicaset
         - state_pod
         - state_container
-        # Uncomment this to get k8s events:
-        #- event
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
+    # Uncomment this to get k8s events:
+    #- module: kubernetes
+    #  metricsets:
+    #    - event
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
 apiVersion: apps/v1beta1
