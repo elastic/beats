@@ -43,8 +43,6 @@ data:
         - state_container
         - state_cronjob
         - state_resourcequota
-        # Uncomment this to get k8s events:
-        #- event
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
@@ -56,3 +54,7 @@ data:
     #  ssl.certificate_authorities:
     #    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     #  period: 30s
+    # Uncomment this to get k8s events:
+    #- module: kubernetes
+    #  metricsets:
+    #    - event
