@@ -8,6 +8,44 @@
       type: keyword
       description: >
         Index name.
+    - name: primaries
+      type: group
+      fields:
+        - name: store.size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: docs.count
+          type: long
+          description: >
+            TODO
+        - name: segments.count
+          type: long
+          description: >
+            TODO
+        - name: refresh.total_time_in_millis
+          type: long
+          description: >
+            TODO
+        - name: merges.total_size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: indexing
+          type: group
+          fields:
+            - name: index_total
+              type: long
+              description: >
+                TODO
+            - name: index_time_in_millis
+              type: long
+              description: >
+                TODO
+            - name: throttle_time_in_millis
+              type: long
+              description: >
+                TODO
     - name: total
       type: group
       fields:
@@ -33,4 +71,105 @@
           format: bytes
           description: >
             Total number of memory used by the segments in bytes.
+        - name: store.size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: store.size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: query_cache.memory_size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: fielddata.memory_size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: request_cache.memory_size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: merges.total_size_in_bytes
+          type: long
+          description: >
+            TODO
+        - name: refresh.total_time_in_millis
+          type: long
+          description: >
+            TODO
+        - name: segments
+          type: group
+          fields:
+            - name: memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: terms_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: points_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: count
+              type: long
+              description: >
+                TODO
+            - name: doc_values_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: norms_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: stored_fields_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: fixed_bit_set_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: term_vectors_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: version_map_memory_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: index_writer_memory_in_bytes
+              type: long
+              description: >
+                TODO
+        - name: search
+          type: group
+          fields:
+            - name: query_total
+              type: long
+              description: >
+                TODO
+            - name: query_time_in_millis
+              type: long
+              description: >
+                TODO
+        - name: indexing
+          type: group
+          fields:
+            - name: index_total
+              type: long
+              description: >
+                TODO
+            - name: index_time_in_millis
+              type: long
+              description: >
+                TODO
+            - name: throttle_time_in_millis
+              type: long
+              description: >
+                TODO
 

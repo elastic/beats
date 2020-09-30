@@ -17642,6 +17642,292 @@ alias to: elasticsearch.node.name
 --
 
 
+*`index_stats.index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.name
+
+--
+
+
+*`index_stats.primaries.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.store.size_in_bytes
+
+--
+
+*`index_stats.primaries.docs.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.docs.count
+
+--
+
+*`index_stats.primaries.segments.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.segments.count
+
+--
+
+*`index_stats.primaries.refresh.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.refresh.total_time_in_millis
+
+--
+
+*`index_stats.primaries.merges.total_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.merges.total_size_in_bytes
+
+--
+
+
+*`index_stats.primaries.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.index_total
+
+--
+
+*`index_stats.primaries.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.index_time.ms
+
+--
+
+*`index_stats.primaries.indexing.throttle_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.primaries.indexing.throttle_time.ms
+
+--
+
+
+*`index_stats.total.query_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.query_cache.memory_size_in_bytes
+
+--
+
+*`index_stats.total.fielddata.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.fielddata.memory_size_in_bytes
+
+--
+
+*`index_stats.total.request_cache.memory_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.request_cache.memory_size_in_bytes
+
+--
+
+*`index_stats.total.merges.total_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.merges.total_size_in_bytes
+
+--
+
+*`index_stats.total.refresh.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.refresh.total_time_in_millis
+
+--
+
+*`index_stats.total.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.store.size.bytes
+
+--
+
+
+*`index_stats.total.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.index_total
+
+--
+
+*`index_stats.total.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.index_time_in_millis
+
+--
+
+*`index_stats.total.indexing.throttle_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.indexing.throttle_time_in_millis
+
+--
+
+
+*`index_stats.total.search.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.search.query_total
+
+--
+
+*`index_stats.total.search.query_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.search.query_time_in_millis
+
+--
+
+
+*`index_stats.total.segments.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.memory_in_bytes
+
+--
+
+*`index_stats.total.segments.terms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.terms_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.points_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.points_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.count
+
+--
+
+*`index_stats.total.segments.doc_values_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.doc_values_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.norms_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.norms_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.stored_fields_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.stored_fields_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.term_vectors_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.term_vectors_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.version_map_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.version_map_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.index_writer_memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+
+--
+
+
 
 
 *`node_stats.fs.total.available_in_bytes`*::
@@ -18189,6 +18475,7 @@ alias to: elasticsearch.index.summary.total.indexing.index.count
 [float]
 === elasticsearch
 
+TODO
 
 
 
@@ -18516,6 +18803,88 @@ type: keyword
 --
 
 
+*`elasticsearch.index.primaries.store.size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.docs.count`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.segments.count`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.refresh.total_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.merges.total_size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`elasticsearch.index.primaries.indexing.index_total`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.indexing.index_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.primaries.indexing.throttle_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
 *`elasticsearch.index.total.docs.count`*::
 +
 --
@@ -18567,6 +18936,239 @@ Total number of memory used by the segments in bytes.
 type: long
 
 format: bytes
+
+--
+
+*`elasticsearch.index.total.store.size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.store.size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.query_cache.memory_size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.fielddata.memory_size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.request_cache.memory_size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.merges.total_size_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.refresh.total_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`elasticsearch.index.total.segments.memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.terms_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.points_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.count`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.doc_values_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.norms_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.stored_fields_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.term_vectors_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.version_map_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.segments.index_writer_memory_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`elasticsearch.index.total.search.query_total`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.search.query_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`elasticsearch.index.total.indexing.index_total`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.indexing.index_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`elasticsearch.index.total.indexing.throttle_time_in_millis`*::
++
+--
+TODO
+
+
+type: long
 
 --
 
