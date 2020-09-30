@@ -27,3 +27,4 @@
 - Add support for dynamic inputs with providers and `{{variable|"default"}}` substitution. {pull}20839[20839]
 - Add support for EQL based condition on inputs {pull}20994[20994]
 - Send `fleet.host.id` to Endpoint Security {pull}21042[21042]
+- Add `install` and `uninstall` subcommands {pull}21206[21206]
