@@ -39,13 +39,15 @@ data:
                 - module: kubernetes
                   metricsets:
                     - apiserver
-                    # Uncomment this to get k8s events:
-                    #- event
                   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   ssl.certificate_authorities:
                     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                   period: 30s
+                # Uncomment this to get k8s events:
+                #- module: kubernetes
+                #  metricsets:
+                #    - event
         # To enable hints based autodiscover uncomment this:
         #- type: kubernetes
         #  node: ${NODE_NAME}
