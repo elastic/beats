@@ -76,11 +76,6 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error
 	}
 
 	sourceURI, err := u.sourceURI(a.Version, a.SourceURI)
-	archivePath, err := u.downloadArtifact(ctx, a.Version, a.SourceURI)
-	if err != nil {
-		return err
-	}
-
 	archivePath, err := u.downloadArtifact(ctx, a.Version, sourceURI)
 	if err != nil {
 		return err
