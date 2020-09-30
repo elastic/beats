@@ -37,6 +37,7 @@ PyYAML==5.3.1
 redis==2.10.6
 requests==2.20.0
 semver==2.8.1
+setuptools==47.3.2
 six==1.15.0
 stomp.py==4.1.22
 termcolor==1.1.0
