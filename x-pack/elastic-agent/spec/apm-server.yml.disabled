@@ -13,4 +13,4 @@ rules:
       selectors:
         - inputs
         - output
-when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'kafka', 'logstash')
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
