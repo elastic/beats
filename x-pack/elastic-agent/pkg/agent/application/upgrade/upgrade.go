@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -32,11 +33,12 @@ const (
 
 // Upgrader performs an upgrade
 type Upgrader struct {
-	settings *artifact.Config
-	log      *logger.Logger
-	closers  []context.CancelFunc
-	reexec   reexecManager
-	acker    acker
+	settings   *artifact.Config
+	log        *logger.Logger
+	closers    []context.CancelFunc
+	reexec     reexecManager
+	acker      acker
+	upgradable bool
 }
 
 type reexecManager interface {
@@ -51,17 +53,30 @@ type acker interface {
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
 func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker) *Upgrader {
 	return &Upgrader{
-		settings: settings,
-		log:      log,
-		closers:  closers,
-		reexec:   reexec,
-		acker:    a,
+		settings:   settings,
+		log:        log,
+		closers:    closers,
+		reexec:     reexec,
+		acker:      a,
+		upgradable: getUpgradable(),
 	}
+}
+
+// Upgradable returns true if the Elastic Agent can be upgraded.
+func (u *Upgrader) Upgradable() bool {
+	return u.upgradable
 }
 
 // Upgrade upgrades running agent
 func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error {
+	if !u.upgradable {
+		return fmt.Errorf(
+			"cannot be upgraded; must be installed with install sub-command and " +
+				"running under control of the systems supervisor")
+	}
+
 	sourceURI, err := u.sourceURI(a.Version, a.SourceURI)
+	archivePath, err := u.downloadArtifact(ctx, a.Version, a.SourceURI)
 	if err != nil {
 		return err
 	}
@@ -149,13 +164,14 @@ func (u *Upgrader) sourceURI(version, retrievedURI string) (string, error) {
 	return u.settings.SourceURI, nil
 }
 
-func isSubdir(base, target string) (bool, error) {
-	relPath, err := filepath.Rel(base, target)
-	return strings.HasPrefix(relPath, ".."), err
-}
-
 func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+}
+
+func getUpgradable() bool {
+	// only upgradable if running from Agent installer and running under the
+	// control of the system supervisor (or built specifically with upgrading enabled)
+	return release.Upgradable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
 }
 
 func copyActionStore(newHash string) error {
