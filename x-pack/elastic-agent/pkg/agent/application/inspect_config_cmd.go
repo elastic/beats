@@ -106,13 +106,13 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 	}
 
 	for _, c := range as.Actions() {
-		cfgChange, ok := c.(*fleetapi.ActionConfigChange)
+		cfgChange, ok := c.(*fleetapi.ActionPolicyChange)
 		if !ok {
 			continue
 		}
 
 		fmt.Println("Action ID:", cfgChange.ID())
-		return cfgChange.Config, nil
+		return cfgChange.Policy, nil
 	}
 	return nil, nil
 }
