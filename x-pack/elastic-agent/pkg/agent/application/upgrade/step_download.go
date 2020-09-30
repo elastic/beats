@@ -18,6 +18,8 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	settings := *u.settings
 	if sourceURI != "" {
 		if strings.HasPrefix(sourceURI, "file://") {
+			// update the DropPath so the fs.Downloader can download from this
+			// path instead of looking into the installed downloads directory
 			settings.DropPath = strings.TrimPrefix(sourceURI, "file://")
 		} else {
 			settings.SourceURI = sourceURI
