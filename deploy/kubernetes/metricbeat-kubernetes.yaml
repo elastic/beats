@@ -104,7 +104,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.8.11
+        image: docker.elastic.co/beats/metricbeat:6.8.12
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -217,11 +217,13 @@ data:
         - state_replicaset
         - state_pod
         - state_container
-        # Uncomment this to get k8s events:
-        #- event
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
+    # Uncomment this to get k8s events:
+    #- module: kubernetes
+    #  metricsets:
+    #    - event
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
 apiVersion: apps/v1beta1
@@ -242,7 +244,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.8.11
+        image: docker.elastic.co/beats/metricbeat:6.8.12
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
