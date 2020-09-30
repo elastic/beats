@@ -51,6 +51,6 @@ func upgradeCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if err != nil {
 		return errors.New(err, "Failed trigger upgrade of daemon")
 	}
-	fmt.Fprintf(streams.Out, "Upgrade triggered to version %s, Elastic Agent is currently restarting", version)
+	fmt.Fprintf(streams.Out, "Upgrade triggered to version %s, Elastic Agent is currently restarting\n", version)
 	return nil
 }
