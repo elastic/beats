@@ -60,11 +60,11 @@ func commandLineToArgvW(in string) ([]string, error) {
 	return args, nil
 }
 
-// Require registers the winlogbeat module that has utilities specific to
-// Winlogbeat like parsing Windows command lines. It can be accessed using:
+// Require registers the windows module that has utilities specific to
+// Windows like parsing Windows command lines. It can be accessed using:
 //
 //    // javascript
-//    var winlogbeat = require('winlogbeat');
+//    var windows = require('windows');
 //
 func Require(vm *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
