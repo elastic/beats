@@ -298,6 +298,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
 - Handle multiple upstreams in ingress-controller. {pull}21215[21215]
 - Provide backwards compatibility for the `append` processor when Elasticsearch is less than 7.10.0. {pull}21159[21159]
+- Fix checkpoint module when logs contain time field. {pull}20567[20567]
 
 *Heartbeat*
 
