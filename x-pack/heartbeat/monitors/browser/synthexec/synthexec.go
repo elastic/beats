@@ -115,6 +115,8 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 
 type readResultsState struct {
 	journeyComplete bool
+	errorCount int
+	lastError error
 	stepCount int
 }
 
@@ -127,7 +129,7 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			// No more events? In this case this is the summary event
 			if se == nil {
 				if state.journeyComplete {
-					return nil, nil
+					return nil, state.lastError
 				}
 				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
 			}
@@ -145,6 +147,8 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			var jobErr error
 			if se.Error != nil {
 				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
+				state.errorCount++
+				state.lastError = jobErr
 			}
 			return []jobs.Job{readResultsJob(ctx, mpx, state)}, jobErr
 		}
