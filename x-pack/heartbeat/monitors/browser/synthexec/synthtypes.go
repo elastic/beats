@@ -59,9 +59,13 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 			"package_version": se.PackageVersion,
 			"index":           se.Index,
 			"payload":         se.Payload,
-			"blob":            se.Blob,
-			"blob_mime":       se.BlobMime,
 		},
+	}
+	if se.Blob != "" {
+		m.Put("synthetics.blob", se.Blob)
+	}
+	if se.BlobMime != "" {
+		m.Put("synthetics.blob_mime", se.BlobMime)
 	}
 	if se.Step != nil {
 		m.Put("synthetics.step", se.Step.ToMap())
