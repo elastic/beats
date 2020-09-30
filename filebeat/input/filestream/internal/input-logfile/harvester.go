@@ -63,10 +63,12 @@ func (hg *HarvesterGroup) Run(ctx input.Context, s Source) error {
 
 	resource, err := hg.manager.lock(ctx, s.Name())
 	if err != nil {
+		cancelHarvester()
 		return err
 	}
 
 	if _, ok := hg.readers[s.Name()]; ok {
+		cancelHarvester()
 		log.Debug("A harvester is already running for file")
 		return nil
 	}
@@ -79,17 +81,19 @@ func (hg *HarvesterGroup) Run(ctx input.Context, s Source) error {
 		ACKHandler: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
+		cancelHarvester()
 		return err
 	}
 
 	cursor := makeCursor(hg.store, resource)
 	publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
-	go func() {
+	go func(cancel context.CancelFunc) {
 		defer client.Close()
 		defer log.Debug("Stopped harvester for file")
-		defer cancelHarvester()
+		defer cancel()
 		defer releaseResource(resource)
+		defer delete(hg.readers, s.Name())
 
 		defer func() {
 			if v := recover(); v != nil {
@@ -102,7 +106,7 @@ func (hg *HarvesterGroup) Run(ctx input.Context, s Source) error {
 		if err != nil {
 			log.Errorf("Harvester stopped: %v", err)
 		}
-	}()
+	}(cancelHarvester)
 	return nil
 }
 
