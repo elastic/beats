@@ -404,7 +404,7 @@ func TestIpPortIndexer(t *testing.T) {
 
 	pod.Spec.Containers = []*v1.Container{
 		{
-			Name: &container,
+			Name:  &container,
 			Image: &containerImage,
 			Ports: []*v1.ContainerPort{
 				{
