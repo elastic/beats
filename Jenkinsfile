@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/slackComment') _
 
 import groovy.transform.Field
 /**
