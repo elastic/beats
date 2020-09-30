@@ -35,7 +35,7 @@ type AgentECSMeta struct {
 	// Version specifies current version of an agent.
 	Version string `json:"version"`
 	// Snapshot is a flag specifying that the agent used is a snapshot build.
-	Snapshot bool `json:"snapshot,omitempty"`
+	Snapshot bool `json:"snapshot"`
 	// BuildOriginal is an extended build information for the agent.
 	BuildOriginal string `json:"build.original"`
 	// Upgradable is a flag specifying if it is possible for agent to be upgraded.
