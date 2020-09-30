@@ -22,7 +22,10 @@ PyYAML==4.2b1
 Pillow==7.0.0
 redis==2.10.6
 requests==2.20.0
-six==1.11.0
+semver==2.8.1
+setuptools==47.3.2
+six==1.15.0
+stomp.py==4.1.22
 termcolor==1.1.0
 texttable==0.9.1
 urllib3==1.24.2
