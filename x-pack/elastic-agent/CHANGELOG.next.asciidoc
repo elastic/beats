@@ -7,7 +7,13 @@
 
 ==== Breaking changes
 
+- Docker container is not run as root by default. {pull}21213[21213]
+
 ==== Bugfixes
+- Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
+- Thread safe sorted set {pull}21290[21290]
+- Copy Action store on upgrade {pull}21298[21298]
+- Include inputs in action store actions {pull}21298[21298]
 
 ==== New features
 
@@ -21,3 +27,4 @@
 - Add support for dynamic inputs with providers and `{{variable|"default"}}` substitution. {pull}20839[20839]
 - Add support for EQL based condition on inputs {pull}20994[20994]
 - Send `fleet.host.id` to Endpoint Security {pull}21042[21042]
+- Add `install` and `uninstall` subcommands {pull}21206[21206]
