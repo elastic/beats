@@ -11,10 +11,17 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 )
 
 // Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
+	// when installed the control address is fixed
+	if install.RunningInstalled() {
+		return install.SocketPath
+	}
+
+	// not install, adjust the path based on data path
 	data := paths.Data()
 	// entire string cannot be longer than 107 characters, this forces the
 	// length to always be 88 characters (but unique per data path)

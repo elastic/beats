@@ -207,8 +207,8 @@ func newManaged(
 		acker)
 
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{
 			log:     log,
 			emitter: emit,
 		},

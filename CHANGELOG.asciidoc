@@ -3,6 +3,47 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.9.2]]
+=== Beats version 7.9.2
+https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
+- Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
+
+*Filebeat*
+
+- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
+- Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
+- Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
+
+*Metricbeat*
+
+- The Kibana collector applies backoff when errored at getting usage stats {pull}20772[20772]
+- The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
+- Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
+- Handle missing counters in the application_pool metricset. {pull}21071[21071]
+
+*Functionbeat*
+
+- Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
+- Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add container ECS fields in kubernetes metadata. {pull}20984[20984]
+
 [[release-notes-7.9.1]]
 === Beats version 7.9.1
 https://github.com/elastic/beats/compare/v7.9.0...v7.9.1[View commits]
