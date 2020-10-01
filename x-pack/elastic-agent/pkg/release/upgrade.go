@@ -4,7 +4,7 @@
 
 package release
 
-// Upgradable return true when release is built specifically for upgrading.
-func Upgradable() bool {
+// Upgradeable return true when release is built specifically for upgrading.
+func Upgradeable() bool {
 	return allowUpgrade == "true"
 }

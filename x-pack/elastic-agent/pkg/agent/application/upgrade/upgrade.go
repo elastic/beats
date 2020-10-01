@@ -33,12 +33,12 @@ const (
 
 // Upgrader performs an upgrade
 type Upgrader struct {
-	settings   *artifact.Config
-	log        *logger.Logger
-	closers    []context.CancelFunc
-	reexec     reexecManager
-	acker      acker
-	upgradable bool
+	settings    *artifact.Config
+	log         *logger.Logger
+	closers     []context.CancelFunc
+	reexec      reexecManager
+	acker       acker
+	upgradeable bool
 }
 
 type reexecManager interface {
@@ -53,23 +53,23 @@ type acker interface {
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
 func NewUpgrader(settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker) *Upgrader {
 	return &Upgrader{
-		settings:   settings,
-		log:        log,
-		closers:    closers,
-		reexec:     reexec,
-		acker:      a,
-		upgradable: getUpgradable(),
+		settings:    settings,
+		log:         log,
+		closers:     closers,
+		reexec:      reexec,
+		acker:       a,
+		upgradeable: getUpgradable(),
 	}
 }
 
-// Upgradable returns true if the Elastic Agent can be upgraded.
-func (u *Upgrader) Upgradable() bool {
-	return u.upgradable
+// Upgradeable returns true if the Elastic Agent can be upgraded.
+func (u *Upgrader) Upgradeable() bool {
+	return u.upgradeable
 }
 
 // Upgrade upgrades running agent
 func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) error {
-	if !u.upgradable {
+	if !u.upgradeable {
 		return fmt.Errorf(
 			"cannot be upgraded; must be installed with install sub-command and " +
 				"running under control of the systems supervisor")
@@ -153,9 +153,9 @@ func rollbackInstall(hash string) {
 }
 
 func getUpgradable() bool {
-	// only upgradable if running from Agent installer and running under the
+	// only upgradeable if running from Agent installer and running under the
 	// control of the system supervisor (or built specifically with upgrading enabled)
-	return release.Upgradable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
+	return release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
 }
 
 func copyActionStore(newHash string) error {
