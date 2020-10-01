@@ -14,6 +14,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// Override global beats data dir to avoid creating directories in the working copy.
 	tmpdir, err := ioutil.TempDir("", "beats-data-dir")
 	if err != nil {
 		fmt.Printf("Failed to create temporal data directory: %v\n", err)
