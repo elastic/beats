@@ -51,6 +51,14 @@ func (se *SynthError) String() string {
 	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
 }
 
+func (se *SynthError) toMap() (common.MapStr) {
+	return common.MapStr{
+		"name": se.Name,
+		"message": se.Message,
+		"stack": se.Stack,
+	}
+}
+
 func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
 	m = common.MapStr{
@@ -72,6 +80,9 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 	}
 	if se.Journey != nil {
 		m.Put("synthetics.journey", se.Journey.ToMap())
+	}
+	if se.Error != nil {
+		m.Put("synthetics.error", se.Error.toMap())
 	}
 
 	if se.URL != "" {
