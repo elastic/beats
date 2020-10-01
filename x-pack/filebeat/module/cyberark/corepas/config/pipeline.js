@@ -93,146 +93,99 @@ var dup29 = setc("ec_activity","Disable");
 
 var dup30 = setc("eventcategory","1401050200");
 
-var dup31 = // "Pattern{Constant('Version='), Field(p0,false)}"
-match("MESSAGE#568:300:02/0", "nwparser.payload", "Version=%{p0}");
+var dup31 = match("MESSAGE#568:300:02/0", "nwparser.payload", "Version=%{p0}");
 
-var dup32 = // "Pattern{Constant('"'), Field(version,false), Constant('";Message='), Field(p0,false)}"
-match("MESSAGE#568:300:02/1_0", "nwparser.p0", "\"%{version}\";Message=%{p0}");
+var dup32 = match("MESSAGE#568:300:02/1_0", "nwparser.p0", "\"%{version}\";Message=%{p0}");
 
-var dup33 = // "Pattern{Field(version,false), Constant(';Message='), Field(p0,false)}"
-match("MESSAGE#568:300:02/1_1", "nwparser.p0", "%{version};Message=%{p0}");
+var dup33 = match("MESSAGE#568:300:02/1_1", "nwparser.p0", "%{version};Message=%{p0}");
 
-var dup34 = // "Pattern{Constant('"'), Field(action,false), Constant('";Issuer='), Field(p0,false)}"
-match("MESSAGE#568:300:02/2_0", "nwparser.p0", "\"%{action}\";Issuer=%{p0}");
+var dup34 = match("MESSAGE#568:300:02/2_0", "nwparser.p0", "\"%{action}\";Issuer=%{p0}");
 
-var dup35 = // "Pattern{Field(action,false), Constant(';Issuer='), Field(p0,false)}"
-match("MESSAGE#568:300:02/2_1", "nwparser.p0", "%{action};Issuer=%{p0}");
+var dup35 = match("MESSAGE#568:300:02/2_1", "nwparser.p0", "%{action};Issuer=%{p0}");
 
-var dup36 = // "Pattern{Constant('"'), Field(username,false), Constant('";Station='), Field(p0,false)}"
-match("MESSAGE#568:300:02/3_0", "nwparser.p0", "\"%{username}\";Station=%{p0}");
+var dup36 = match("MESSAGE#568:300:02/3_0", "nwparser.p0", "\"%{username}\";Station=%{p0}");
 
-var dup37 = // "Pattern{Field(username,false), Constant(';Station='), Field(p0,false)}"
-match("MESSAGE#568:300:02/3_1", "nwparser.p0", "%{username};Station=%{p0}");
+var dup37 = match("MESSAGE#568:300:02/3_1", "nwparser.p0", "%{username};Station=%{p0}");
 
-var dup38 = // "Pattern{Constant('"'), Field(hostip,false), Constant('";File='), Field(p0,false)}"
-match("MESSAGE#568:300:02/4_0", "nwparser.p0", "\"%{hostip}\";File=%{p0}");
+var dup38 = match("MESSAGE#568:300:02/4_0", "nwparser.p0", "\"%{hostip}\";File=%{p0}");
 
-var dup39 = // "Pattern{Field(hostip,false), Constant(';File='), Field(p0,false)}"
-match("MESSAGE#568:300:02/4_1", "nwparser.p0", "%{hostip};File=%{p0}");
+var dup39 = match("MESSAGE#568:300:02/4_1", "nwparser.p0", "%{hostip};File=%{p0}");
 
-var dup40 = // "Pattern{Constant('"'), Field(filename,false), Constant('";Safe='), Field(p0,false)}"
-match("MESSAGE#568:300:02/5_0", "nwparser.p0", "\"%{filename}\";Safe=%{p0}");
+var dup40 = match("MESSAGE#568:300:02/5_0", "nwparser.p0", "\"%{filename}\";Safe=%{p0}");
 
-var dup41 = // "Pattern{Field(filename,false), Constant(';Safe='), Field(p0,false)}"
-match("MESSAGE#568:300:02/5_1", "nwparser.p0", "%{filename};Safe=%{p0}");
+var dup41 = match("MESSAGE#568:300:02/5_1", "nwparser.p0", "%{filename};Safe=%{p0}");
 
-var dup42 = // "Pattern{Constant('"'), Field(group_object,false), Constant('";Location='), Field(p0,false)}"
-match("MESSAGE#568:300:02/6_0", "nwparser.p0", "\"%{group_object}\";Location=%{p0}");
+var dup42 = match("MESSAGE#568:300:02/6_0", "nwparser.p0", "\"%{group_object}\";Location=%{p0}");
 
-var dup43 = // "Pattern{Field(group_object,false), Constant(';Location='), Field(p0,false)}"
-match("MESSAGE#568:300:02/6_1", "nwparser.p0", "%{group_object};Location=%{p0}");
+var dup43 = match("MESSAGE#568:300:02/6_1", "nwparser.p0", "%{group_object};Location=%{p0}");
 
-var dup44 = // "Pattern{Constant('"'), Field(directory,false), Constant('";Category='), Field(p0,false)}"
-match("MESSAGE#568:300:02/7_0", "nwparser.p0", "\"%{directory}\";Category=%{p0}");
+var dup44 = match("MESSAGE#568:300:02/7_0", "nwparser.p0", "\"%{directory}\";Category=%{p0}");
 
-var dup45 = // "Pattern{Field(directory,false), Constant(';Category='), Field(p0,false)}"
-match("MESSAGE#568:300:02/7_1", "nwparser.p0", "%{directory};Category=%{p0}");
+var dup45 = match("MESSAGE#568:300:02/7_1", "nwparser.p0", "%{directory};Category=%{p0}");
 
-var dup46 = // "Pattern{Constant('"'), Field(category,false), Constant('";RequestId='), Field(p0,false)}"
-match("MESSAGE#568:300:02/8_0", "nwparser.p0", "\"%{category}\";RequestId=%{p0}");
+var dup46 = match("MESSAGE#568:300:02/8_0", "nwparser.p0", "\"%{category}\";RequestId=%{p0}");
 
-var dup47 = // "Pattern{Field(category,false), Constant(';RequestId='), Field(p0,false)}"
-match("MESSAGE#568:300:02/8_1", "nwparser.p0", "%{category};RequestId=%{p0}");
+var dup47 = match("MESSAGE#568:300:02/8_1", "nwparser.p0", "%{category};RequestId=%{p0}");
 
-var dup48 = // "Pattern{Constant('"'), Field(id1,false), Constant('";Reason='), Field(p0,false)}"
-match("MESSAGE#568:300:02/9_0", "nwparser.p0", "\"%{id1}\";Reason=%{p0}");
+var dup48 = match("MESSAGE#568:300:02/9_0", "nwparser.p0", "\"%{id1}\";Reason=%{p0}");
 
-var dup49 = // "Pattern{Field(id1,false), Constant(';Reason='), Field(p0,false)}"
-match("MESSAGE#568:300:02/9_1", "nwparser.p0", "%{id1};Reason=%{p0}");
+var dup49 = match("MESSAGE#568:300:02/9_1", "nwparser.p0", "%{id1};Reason=%{p0}");
 
-var dup50 = // "Pattern{Constant('"'), Field(event_description,false), Constant('";Severity='), Field(p0,false)}"
-match("MESSAGE#568:300:02/10_0", "nwparser.p0", "\"%{event_description}\";Severity=%{p0}");
+var dup50 = match("MESSAGE#568:300:02/10_0", "nwparser.p0", "\"%{event_description}\";Severity=%{p0}");
 
-var dup51 = // "Pattern{Field(event_description,false), Constant(';Severity='), Field(p0,false)}"
-match("MESSAGE#568:300:02/10_1", "nwparser.p0", "%{event_description};Severity=%{p0}");
+var dup51 = match("MESSAGE#568:300:02/10_1", "nwparser.p0", "%{event_description};Severity=%{p0}");
 
-var dup52 = // "Pattern{Constant('"'), Field(severity,false), Constant('";SourceUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/11_0", "nwparser.p0", "\"%{severity}\";SourceUser=%{p0}");
+var dup52 = match("MESSAGE#568:300:02/11_0", "nwparser.p0", "\"%{severity}\";SourceUser=%{p0}");
 
-var dup53 = // "Pattern{Field(severity,false), Constant(';SourceUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/11_1", "nwparser.p0", "%{severity};SourceUser=%{p0}");
+var dup53 = match("MESSAGE#568:300:02/11_1", "nwparser.p0", "%{severity};SourceUser=%{p0}");
 
-var dup54 = // "Pattern{Constant('"'), Field(group,false), Constant('";TargetUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/12_0", "nwparser.p0", "\"%{group}\";TargetUser=%{p0}");
+var dup54 = match("MESSAGE#568:300:02/12_0", "nwparser.p0", "\"%{group}\";TargetUser=%{p0}");
 
-var dup55 = // "Pattern{Field(group,false), Constant(';TargetUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/12_1", "nwparser.p0", "%{group};TargetUser=%{p0}");
+var dup55 = match("MESSAGE#568:300:02/12_1", "nwparser.p0", "%{group};TargetUser=%{p0}");
 
-var dup56 = // "Pattern{Constant('"'), Field(uid,false), Constant('";GatewayStation='), Field(p0,false)}"
-match("MESSAGE#568:300:02/13_0", "nwparser.p0", "\"%{uid}\";GatewayStation=%{p0}");
+var dup56 = match("MESSAGE#568:300:02/13_0", "nwparser.p0", "\"%{uid}\";GatewayStation=%{p0}");
 
-var dup57 = // "Pattern{Field(uid,false), Constant(';GatewayStation='), Field(p0,false)}"
-match("MESSAGE#568:300:02/13_1", "nwparser.p0", "%{uid};GatewayStation=%{p0}");
+var dup57 = match("MESSAGE#568:300:02/13_1", "nwparser.p0", "%{uid};GatewayStation=%{p0}");
 
-var dup58 = // "Pattern{Constant('"'), Field(saddr,false), Constant('";TicketID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/14_0", "nwparser.p0", "\"%{saddr}\";TicketID=%{p0}");
+var dup58 = match("MESSAGE#568:300:02/14_0", "nwparser.p0", "\"%{saddr}\";TicketID=%{p0}");
 
-var dup59 = // "Pattern{Field(saddr,false), Constant(';TicketID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/14_1", "nwparser.p0", "%{saddr};TicketID=%{p0}");
+var dup59 = match("MESSAGE#568:300:02/14_1", "nwparser.p0", "%{saddr};TicketID=%{p0}");
 
-var dup60 = // "Pattern{Constant('"'), Field(operation_id,false), Constant('";PolicyID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/15_0", "nwparser.p0", "\"%{operation_id}\";PolicyID=%{p0}");
+var dup60 = match("MESSAGE#568:300:02/15_0", "nwparser.p0", "\"%{operation_id}\";PolicyID=%{p0}");
 
-var dup61 = // "Pattern{Field(operation_id,false), Constant(';PolicyID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/15_1", "nwparser.p0", "%{operation_id};PolicyID=%{p0}");
+var dup61 = match("MESSAGE#568:300:02/15_1", "nwparser.p0", "%{operation_id};PolicyID=%{p0}");
 
-var dup62 = // "Pattern{Constant('"'), Field(policyname,false), Constant('";UserName='), Field(p0,false)}"
-match("MESSAGE#568:300:02/16_0", "nwparser.p0", "\"%{policyname}\";UserName=%{p0}");
+var dup62 = match("MESSAGE#568:300:02/16_0", "nwparser.p0", "\"%{policyname}\";UserName=%{p0}");
 
-var dup63 = // "Pattern{Field(policyname,false), Constant(';UserName='), Field(p0,false)}"
-match("MESSAGE#568:300:02/16_1", "nwparser.p0", "%{policyname};UserName=%{p0}");
+var dup63 = match("MESSAGE#568:300:02/16_1", "nwparser.p0", "%{policyname};UserName=%{p0}");
 
-var dup64 = // "Pattern{Constant('"'), Field(fld11,false), Constant('";LogonDomain='), Field(p0,false)}"
-match("MESSAGE#568:300:02/17_0", "nwparser.p0", "\"%{fld11}\";LogonDomain=%{p0}");
+var dup64 = match("MESSAGE#568:300:02/17_0", "nwparser.p0", "\"%{fld11}\";LogonDomain=%{p0}");
 
-var dup65 = // "Pattern{Field(fld11,false), Constant(';LogonDomain='), Field(p0,false)}"
-match("MESSAGE#568:300:02/17_1", "nwparser.p0", "%{fld11};LogonDomain=%{p0}");
+var dup65 = match("MESSAGE#568:300:02/17_1", "nwparser.p0", "%{fld11};LogonDomain=%{p0}");
 
-var dup66 = // "Pattern{Constant('"'), Field(domain,false), Constant('";Address='), Field(p0,false)}"
-match("MESSAGE#568:300:02/18_0", "nwparser.p0", "\"%{domain}\";Address=%{p0}");
+var dup66 = match("MESSAGE#568:300:02/18_0", "nwparser.p0", "\"%{domain}\";Address=%{p0}");
 
-var dup67 = // "Pattern{Field(domain,false), Constant(';Address='), Field(p0,false)}"
-match("MESSAGE#568:300:02/18_1", "nwparser.p0", "%{domain};Address=%{p0}");
+var dup67 = match("MESSAGE#568:300:02/18_1", "nwparser.p0", "%{domain};Address=%{p0}");
 
-var dup68 = // "Pattern{Constant('"'), Field(fld14,false), Constant('";CPMStatus='), Field(p0,false)}"
-match("MESSAGE#568:300:02/19_0", "nwparser.p0", "\"%{fld14}\";CPMStatus=%{p0}");
+var dup68 = match("MESSAGE#568:300:02/19_0", "nwparser.p0", "\"%{fld14}\";CPMStatus=%{p0}");
 
-var dup69 = // "Pattern{Field(fld14,false), Constant(';CPMStatus='), Field(p0,false)}"
-match("MESSAGE#568:300:02/19_1", "nwparser.p0", "%{fld14};CPMStatus=%{p0}");
+var dup69 = match("MESSAGE#568:300:02/19_1", "nwparser.p0", "%{fld14};CPMStatus=%{p0}");
 
-var dup70 = // "Pattern{Constant('"'), Field(disposition,false), Constant('";Port='), Field(p0,false)}"
-match("MESSAGE#568:300:02/20_0", "nwparser.p0", "\"%{disposition}\";Port=%{p0}");
+var dup70 = match("MESSAGE#568:300:02/20_0", "nwparser.p0", "\"%{disposition}\";Port=%{p0}");
 
-var dup71 = // "Pattern{Field(disposition,false), Constant(';Port='), Field(p0,false)}"
-match("MESSAGE#568:300:02/20_1", "nwparser.p0", "%{disposition};Port=%{p0}");
+var dup71 = match("MESSAGE#568:300:02/20_1", "nwparser.p0", "%{disposition};Port=%{p0}");
 
-var dup72 = // "Pattern{Constant('"'), Field(dport,false), Constant('";Database='), Field(p0,false)}"
-match("MESSAGE#568:300:02/21_0", "nwparser.p0", "\"%{dport}\";Database=%{p0}");
+var dup72 = match("MESSAGE#568:300:02/21_0", "nwparser.p0", "\"%{dport}\";Database=%{p0}");
 
-var dup73 = // "Pattern{Field(dport,false), Constant(';Database='), Field(p0,false)}"
-match("MESSAGE#568:300:02/21_1", "nwparser.p0", "%{dport};Database=%{p0}");
+var dup73 = match("MESSAGE#568:300:02/21_1", "nwparser.p0", "%{dport};Database=%{p0}");
 
-var dup74 = // "Pattern{Constant('"'), Field(db_name,false), Constant('";DeviceType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/22_0", "nwparser.p0", "\"%{db_name}\";DeviceType=%{p0}");
+var dup74 = match("MESSAGE#568:300:02/22_0", "nwparser.p0", "\"%{db_name}\";DeviceType=%{p0}");
 
-var dup75 = // "Pattern{Field(db_name,false), Constant(';DeviceType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/22_1", "nwparser.p0", "%{db_name};DeviceType=%{p0}");
+var dup75 = match("MESSAGE#568:300:02/22_1", "nwparser.p0", "%{db_name};DeviceType=%{p0}");
 
-var dup76 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";ExtraDetails="ApplicationType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"ApplicationType=%{p0}");
+var dup76 = match("MESSAGE#568:300:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"ApplicationType=%{p0}");
 
-var dup77 = // "Pattern{Field(obj_type,false), Constant(';ExtraDetails="ApplicationType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"ApplicationType=%{p0}");
+var dup77 = match("MESSAGE#568:300:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"ApplicationType=%{p0}");
 
 var dup78 = setc("eventcategory","1502000000");
 
@@ -248,203 +201,137 @@ var dup83 = setc("eventcategory","1501000000");
 
 var dup84 = setc("eventcategory","1206000000");
 
-var dup85 = // "Pattern{Constant('"'), Field(version,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/1_0", "nwparser.p0", "\"%{version}\";%{p0}");
+var dup85 = match("MESSAGE#621:411/1_0", "nwparser.p0", "\"%{version}\";%{p0}");
 
-var dup86 = // "Pattern{Field(version,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/1_1", "nwparser.p0", "%{version};%{p0}");
+var dup86 = match("MESSAGE#621:411/1_1", "nwparser.p0", "%{version};%{p0}");
 
-var dup87 = // "Pattern{Constant('Message='), Field(p0,false)}"
-match("MESSAGE#621:411/2", "nwparser.p0", "Message=%{p0}");
+var dup87 = match("MESSAGE#621:411/2", "nwparser.p0", "Message=%{p0}");
 
-var dup88 = // "Pattern{Constant('"'), Field(action,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/3_0", "nwparser.p0", "\"%{action}\";%{p0}");
+var dup88 = match("MESSAGE#621:411/3_0", "nwparser.p0", "\"%{action}\";%{p0}");
 
-var dup89 = // "Pattern{Field(action,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/3_1", "nwparser.p0", "%{action};%{p0}");
+var dup89 = match("MESSAGE#621:411/3_1", "nwparser.p0", "%{action};%{p0}");
 
-var dup90 = // "Pattern{Constant('Issuer='), Field(p0,false)}"
-match("MESSAGE#621:411/4", "nwparser.p0", "Issuer=%{p0}");
+var dup90 = match("MESSAGE#621:411/4", "nwparser.p0", "Issuer=%{p0}");
 
-var dup91 = // "Pattern{Constant('"'), Field(username,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/5_0", "nwparser.p0", "\"%{username}\";%{p0}");
+var dup91 = match("MESSAGE#621:411/5_0", "nwparser.p0", "\"%{username}\";%{p0}");
 
-var dup92 = // "Pattern{Field(username,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/5_1", "nwparser.p0", "%{username};%{p0}");
+var dup92 = match("MESSAGE#621:411/5_1", "nwparser.p0", "%{username};%{p0}");
 
-var dup93 = // "Pattern{Constant('Station='), Field(p0,false)}"
-match("MESSAGE#621:411/6", "nwparser.p0", "Station=%{p0}");
+var dup93 = match("MESSAGE#621:411/6", "nwparser.p0", "Station=%{p0}");
 
-var dup94 = // "Pattern{Constant('"'), Field(hostip,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/7_0", "nwparser.p0", "\"%{hostip}\";%{p0}");
+var dup94 = match("MESSAGE#621:411/7_0", "nwparser.p0", "\"%{hostip}\";%{p0}");
 
-var dup95 = // "Pattern{Field(hostip,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/7_1", "nwparser.p0", "%{hostip};%{p0}");
+var dup95 = match("MESSAGE#621:411/7_1", "nwparser.p0", "%{hostip};%{p0}");
 
-var dup96 = // "Pattern{Constant('File='), Field(p0,false)}"
-match("MESSAGE#621:411/8", "nwparser.p0", "File=%{p0}");
+var dup96 = match("MESSAGE#621:411/8", "nwparser.p0", "File=%{p0}");
 
-var dup97 = // "Pattern{Constant('"'), Field(filename,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/9_0", "nwparser.p0", "\"%{filename}\";%{p0}");
+var dup97 = match("MESSAGE#621:411/9_0", "nwparser.p0", "\"%{filename}\";%{p0}");
 
-var dup98 = // "Pattern{Field(filename,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/9_1", "nwparser.p0", "%{filename};%{p0}");
+var dup98 = match("MESSAGE#621:411/9_1", "nwparser.p0", "%{filename};%{p0}");
 
-var dup99 = // "Pattern{Constant('Safe='), Field(p0,false)}"
-match("MESSAGE#621:411/10", "nwparser.p0", "Safe=%{p0}");
+var dup99 = match("MESSAGE#621:411/10", "nwparser.p0", "Safe=%{p0}");
 
-var dup100 = // "Pattern{Constant('"'), Field(group_object,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/11_0", "nwparser.p0", "\"%{group_object}\";%{p0}");
+var dup100 = match("MESSAGE#621:411/11_0", "nwparser.p0", "\"%{group_object}\";%{p0}");
 
-var dup101 = // "Pattern{Field(group_object,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/11_1", "nwparser.p0", "%{group_object};%{p0}");
+var dup101 = match("MESSAGE#621:411/11_1", "nwparser.p0", "%{group_object};%{p0}");
 
-var dup102 = // "Pattern{Constant('Location='), Field(p0,false)}"
-match("MESSAGE#621:411/12", "nwparser.p0", "Location=%{p0}");
+var dup102 = match("MESSAGE#621:411/12", "nwparser.p0", "Location=%{p0}");
 
-var dup103 = // "Pattern{Constant('"'), Field(directory,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/13_0", "nwparser.p0", "\"%{directory}\";%{p0}");
+var dup103 = match("MESSAGE#621:411/13_0", "nwparser.p0", "\"%{directory}\";%{p0}");
 
-var dup104 = // "Pattern{Field(directory,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/13_1", "nwparser.p0", "%{directory};%{p0}");
+var dup104 = match("MESSAGE#621:411/13_1", "nwparser.p0", "%{directory};%{p0}");
 
-var dup105 = // "Pattern{Constant('Category='), Field(p0,false)}"
-match("MESSAGE#621:411/14", "nwparser.p0", "Category=%{p0}");
+var dup105 = match("MESSAGE#621:411/14", "nwparser.p0", "Category=%{p0}");
 
-var dup106 = // "Pattern{Constant('"'), Field(category,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/15_0", "nwparser.p0", "\"%{category}\";%{p0}");
+var dup106 = match("MESSAGE#621:411/15_0", "nwparser.p0", "\"%{category}\";%{p0}");
 
-var dup107 = // "Pattern{Field(category,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/15_1", "nwparser.p0", "%{category};%{p0}");
+var dup107 = match("MESSAGE#621:411/15_1", "nwparser.p0", "%{category};%{p0}");
 
-var dup108 = // "Pattern{Constant('RequestId='), Field(p0,false)}"
-match("MESSAGE#621:411/16", "nwparser.p0", "RequestId=%{p0}");
+var dup108 = match("MESSAGE#621:411/16", "nwparser.p0", "RequestId=%{p0}");
 
-var dup109 = // "Pattern{Constant('"'), Field(id1,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/17_0", "nwparser.p0", "\"%{id1}\";%{p0}");
+var dup109 = match("MESSAGE#621:411/17_0", "nwparser.p0", "\"%{id1}\";%{p0}");
 
-var dup110 = // "Pattern{Field(id1,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/17_1", "nwparser.p0", "%{id1};%{p0}");
+var dup110 = match("MESSAGE#621:411/17_1", "nwparser.p0", "%{id1};%{p0}");
 
-var dup111 = // "Pattern{Constant('Reason='), Field(p0,false)}"
-match("MESSAGE#621:411/18", "nwparser.p0", "Reason=%{p0}");
+var dup111 = match("MESSAGE#621:411/18", "nwparser.p0", "Reason=%{p0}");
 
-var dup112 = // "Pattern{Constant('"'), Field(event_description,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/19_0", "nwparser.p0", "\"%{event_description}\";%{p0}");
+var dup112 = match("MESSAGE#621:411/19_0", "nwparser.p0", "\"%{event_description}\";%{p0}");
 
-var dup113 = // "Pattern{Field(event_description,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/19_1", "nwparser.p0", "%{event_description};%{p0}");
+var dup113 = match("MESSAGE#621:411/19_1", "nwparser.p0", "%{event_description};%{p0}");
 
-var dup114 = // "Pattern{Constant('Severity='), Field(p0,false)}"
-match("MESSAGE#621:411/20", "nwparser.p0", "Severity=%{p0}");
+var dup114 = match("MESSAGE#621:411/20", "nwparser.p0", "Severity=%{p0}");
 
-var dup115 = // "Pattern{Constant('"'), Field(severity,false), Constant('";SourceUser="'), Field(group,false), Constant('";TargetUser="'), Field(uid,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/21_0", "nwparser.p0", "\"%{severity}\";SourceUser=\"%{group}\";TargetUser=\"%{uid}\";%{p0}");
+var dup115 = match("MESSAGE#621:411/21_0", "nwparser.p0", "\"%{severity}\";SourceUser=\"%{group}\";TargetUser=\"%{uid}\";%{p0}");
 
-var dup116 = // "Pattern{Field(severity,false), Constant(';SourceUser='), Field(group,false), Constant(';TargetUser='), Field(uid,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/21_1", "nwparser.p0", "%{severity};SourceUser=%{group};TargetUser=%{uid};%{p0}");
+var dup116 = match("MESSAGE#621:411/21_1", "nwparser.p0", "%{severity};SourceUser=%{group};TargetUser=%{uid};%{p0}");
 
-var dup117 = // "Pattern{Constant('"'), Field(severity,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/21_2", "nwparser.p0", "\"%{severity}\";%{p0}");
+var dup117 = match("MESSAGE#621:411/21_2", "nwparser.p0", "\"%{severity}\";%{p0}");
 
-var dup118 = // "Pattern{Field(severity,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/21_3", "nwparser.p0", "%{severity};%{p0}");
+var dup118 = match("MESSAGE#621:411/21_3", "nwparser.p0", "%{severity};%{p0}");
 
-var dup119 = // "Pattern{Constant('GatewayStation='), Field(p0,false)}"
-match("MESSAGE#621:411/22", "nwparser.p0", "GatewayStation=%{p0}");
+var dup119 = match("MESSAGE#621:411/22", "nwparser.p0", "GatewayStation=%{p0}");
 
-var dup120 = // "Pattern{Constant('"'), Field(saddr,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/23_0", "nwparser.p0", "\"%{saddr}\";%{p0}");
+var dup120 = match("MESSAGE#621:411/23_0", "nwparser.p0", "\"%{saddr}\";%{p0}");
 
-var dup121 = // "Pattern{Field(saddr,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/23_1", "nwparser.p0", "%{saddr};%{p0}");
+var dup121 = match("MESSAGE#621:411/23_1", "nwparser.p0", "%{saddr};%{p0}");
 
-var dup122 = // "Pattern{Constant('TicketID='), Field(p0,false)}"
-match("MESSAGE#621:411/24", "nwparser.p0", "TicketID=%{p0}");
+var dup122 = match("MESSAGE#621:411/24", "nwparser.p0", "TicketID=%{p0}");
 
-var dup123 = // "Pattern{Constant('"'), Field(operation_id,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/25_0", "nwparser.p0", "\"%{operation_id}\";%{p0}");
+var dup123 = match("MESSAGE#621:411/25_0", "nwparser.p0", "\"%{operation_id}\";%{p0}");
 
-var dup124 = // "Pattern{Field(operation_id,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/25_1", "nwparser.p0", "%{operation_id};%{p0}");
+var dup124 = match("MESSAGE#621:411/25_1", "nwparser.p0", "%{operation_id};%{p0}");
 
-var dup125 = // "Pattern{Constant('PolicyID='), Field(p0,false)}"
-match("MESSAGE#621:411/26", "nwparser.p0", "PolicyID=%{p0}");
+var dup125 = match("MESSAGE#621:411/26", "nwparser.p0", "PolicyID=%{p0}");
 
-var dup126 = // "Pattern{Constant('"'), Field(policyname,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/27_0", "nwparser.p0", "\"%{policyname}\";%{p0}");
+var dup126 = match("MESSAGE#621:411/27_0", "nwparser.p0", "\"%{policyname}\";%{p0}");
 
-var dup127 = // "Pattern{Field(policyname,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/27_1", "nwparser.p0", "%{policyname};%{p0}");
+var dup127 = match("MESSAGE#621:411/27_1", "nwparser.p0", "%{policyname};%{p0}");
 
-var dup128 = // "Pattern{Constant('UserName='), Field(p0,false)}"
-match("MESSAGE#621:411/28", "nwparser.p0", "UserName=%{p0}");
+var dup128 = match("MESSAGE#621:411/28", "nwparser.p0", "UserName=%{p0}");
 
-var dup129 = // "Pattern{Constant('"'), Field(c_username,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/29_0", "nwparser.p0", "\"%{c_username}\";%{p0}");
+var dup129 = match("MESSAGE#621:411/29_0", "nwparser.p0", "\"%{c_username}\";%{p0}");
 
-var dup130 = // "Pattern{Field(c_username,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/29_1", "nwparser.p0", "%{c_username};%{p0}");
+var dup130 = match("MESSAGE#621:411/29_1", "nwparser.p0", "%{c_username};%{p0}");
 
-var dup131 = // "Pattern{Constant('LogonDomain='), Field(p0,false)}"
-match("MESSAGE#621:411/30", "nwparser.p0", "LogonDomain=%{p0}");
+var dup131 = match("MESSAGE#621:411/30", "nwparser.p0", "LogonDomain=%{p0}");
 
-var dup132 = // "Pattern{Constant('"'), Field(domain,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/31_0", "nwparser.p0", "\"%{domain}\";%{p0}");
+var dup132 = match("MESSAGE#621:411/31_0", "nwparser.p0", "\"%{domain}\";%{p0}");
 
-var dup133 = // "Pattern{Field(domain,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/31_1", "nwparser.p0", "%{domain};%{p0}");
+var dup133 = match("MESSAGE#621:411/31_1", "nwparser.p0", "%{domain};%{p0}");
 
-var dup134 = // "Pattern{Constant('Address='), Field(p0,false)}"
-match("MESSAGE#621:411/32", "nwparser.p0", "Address=%{p0}");
+var dup134 = match("MESSAGE#621:411/32", "nwparser.p0", "Address=%{p0}");
 
-var dup135 = // "Pattern{Constant('"'), Field(dhost,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/33_0", "nwparser.p0", "\"%{dhost}\";%{p0}");
+var dup135 = match("MESSAGE#621:411/33_0", "nwparser.p0", "\"%{dhost}\";%{p0}");
 
-var dup136 = // "Pattern{Field(dhost,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/33_1", "nwparser.p0", "%{dhost};%{p0}");
+var dup136 = match("MESSAGE#621:411/33_1", "nwparser.p0", "%{dhost};%{p0}");
 
-var dup137 = // "Pattern{Constant('CPMStatus='), Field(p0,false)}"
-match("MESSAGE#621:411/34", "nwparser.p0", "CPMStatus=%{p0}");
+var dup137 = match("MESSAGE#621:411/34", "nwparser.p0", "CPMStatus=%{p0}");
 
-var dup138 = // "Pattern{Constant('"'), Field(disposition,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/35_0", "nwparser.p0", "\"%{disposition}\";%{p0}");
+var dup138 = match("MESSAGE#621:411/35_0", "nwparser.p0", "\"%{disposition}\";%{p0}");
 
-var dup139 = // "Pattern{Field(disposition,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/35_1", "nwparser.p0", "%{disposition};%{p0}");
+var dup139 = match("MESSAGE#621:411/35_1", "nwparser.p0", "%{disposition};%{p0}");
 
-var dup140 = // "Pattern{Constant('Port='), Field(p0,false)}"
-match("MESSAGE#621:411/36", "nwparser.p0", "Port=%{p0}");
+var dup140 = match("MESSAGE#621:411/36", "nwparser.p0", "Port=%{p0}");
 
-var dup141 = // "Pattern{Constant('"'), Field(dport,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/37_0", "nwparser.p0", "\"%{dport}\";%{p0}");
+var dup141 = match("MESSAGE#621:411/37_0", "nwparser.p0", "\"%{dport}\";%{p0}");
 
-var dup142 = // "Pattern{Field(dport,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/37_1", "nwparser.p0", "%{dport};%{p0}");
+var dup142 = match("MESSAGE#621:411/37_1", "nwparser.p0", "%{dport};%{p0}");
 
-var dup143 = // "Pattern{Constant('Database='), Field(p0,false)}"
-match("MESSAGE#621:411/38", "nwparser.p0", "Database=%{p0}");
+var dup143 = match("MESSAGE#621:411/38", "nwparser.p0", "Database=%{p0}");
 
-var dup144 = // "Pattern{Constant('"'), Field(db_name,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/39_0", "nwparser.p0", "\"%{db_name}\";%{p0}");
+var dup144 = match("MESSAGE#621:411/39_0", "nwparser.p0", "\"%{db_name}\";%{p0}");
 
-var dup145 = // "Pattern{Field(db_name,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/39_1", "nwparser.p0", "%{db_name};%{p0}");
+var dup145 = match("MESSAGE#621:411/39_1", "nwparser.p0", "%{db_name};%{p0}");
 
-var dup146 = // "Pattern{Constant('DeviceType='), Field(p0,false)}"
-match("MESSAGE#621:411/40", "nwparser.p0", "DeviceType=%{p0}");
+var dup146 = match("MESSAGE#621:411/40", "nwparser.p0", "DeviceType=%{p0}");
 
-var dup147 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/41_0", "nwparser.p0", "\"%{obj_type}\";%{p0}");
+var dup147 = match("MESSAGE#621:411/41_0", "nwparser.p0", "\"%{obj_type}\";%{p0}");
 
-var dup148 = // "Pattern{Field(obj_type,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/41_1", "nwparser.p0", "%{obj_type};%{p0}");
+var dup148 = match("MESSAGE#621:411/41_1", "nwparser.p0", "%{obj_type};%{p0}");
 
-var dup149 = // "Pattern{Constant('ExtraDetails='), Field(p0,false)}"
-match("MESSAGE#621:411/42", "nwparser.p0", "ExtraDetails=%{p0}");
+var dup149 = match("MESSAGE#621:411/42", "nwparser.p0", "ExtraDetails=%{p0}");
 
-var dup150 = // "Pattern{Field(info,false), Constant(';')}"
-match("MESSAGE#621:411/43_1", "nwparser.p0", "%{info};");
+var dup150 = match("MESSAGE#621:411/43_1", "nwparser.p0", "%{info};");
 
 var dup151 = tagval("MESSAGE#0:1:01", "nwparser.payload", tvm, {
 	"Address": "dhost",
@@ -477,8 +364,7 @@ var dup151 = tagval("MESSAGE#0:1:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup152 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#1:1", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup152 = match("MESSAGE#1:1", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup1,
 	dup2,
 ]));
@@ -514,8 +400,7 @@ var dup153 = tagval("MESSAGE#2:2:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup154 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#3:2", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup154 = match("MESSAGE#3:2", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup4,
 	dup2,
 ]));
@@ -555,8 +440,7 @@ var dup155 = tagval("MESSAGE#6:4:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup156 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#7:4", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup156 = match("MESSAGE#7:4", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup5,
 	dup6,
 	dup7,
@@ -599,8 +483,7 @@ var dup157 = tagval("MESSAGE#20:13:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup158 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#21:13", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup158 = match("MESSAGE#21:13", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup16,
 	dup17,
@@ -639,8 +522,7 @@ var dup159 = tagval("MESSAGE#26:16:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup160 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#27:16", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup160 = match("MESSAGE#27:16", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup19,
 	dup2,
 ]));
@@ -676,8 +558,7 @@ var dup161 = tagval("MESSAGE#30:18:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup162 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#31:18", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup162 = match("MESSAGE#31:18", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup2,
 ]));
@@ -713,8 +594,7 @@ var dup163 = tagval("MESSAGE#38:22:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup164 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#39:22", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup164 = match("MESSAGE#39:22", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup21,
 	dup2,
 ]));
@@ -750,8 +630,7 @@ var dup165 = tagval("MESSAGE#70:38:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup166 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#71:38", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup166 = match("MESSAGE#71:38", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup23,
 	dup2,
 ]));
@@ -787,8 +666,7 @@ var dup167 = tagval("MESSAGE#116:61:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup168 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#117:61", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup168 = match("MESSAGE#117:61", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup20,
 	dup2,
 ]));
@@ -824,8 +702,7 @@ var dup169 = tagval("MESSAGE#126:66:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup170 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#127:66", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup170 = match("MESSAGE#127:66", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup26,
 	dup2,
 ]));
@@ -1011,8 +888,7 @@ var dup195 = tagval("MESSAGE#591:317:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup196 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#592:317", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup196 = match("MESSAGE#592:317", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup79,
 	dup80,
 	dup81,
@@ -1050,8 +926,7 @@ var dup197 = tagval("MESSAGE#595:355:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup198 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#596:355", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup198 = match("MESSAGE#596:355", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup82,
 	dup2,
 ]));
@@ -1087,14 +962,12 @@ var dup199 = tagval("MESSAGE#599:357:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var dup200 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#600:357", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var dup200 = match("MESSAGE#600:357", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup83,
 	dup2,
 ]));
 
-var dup201 = // "Pattern{Constant('Version='), Field(version,false), Constant(';Message='), Field(action,false), Constant(';Issuer='), Field(username,false), Constant(';Station='), Field(hostip,false), Constant(';File='), Field(filename,false), Constant(';Safe='), Field(group_object,false), Constant(';Location='), Field(directory,false), Constant(';Category='), Field(category,false), Constant(';RequestId='), Field(id1,false), Constant(';Reason='), Field(event_description,false), Constant(';Severity='), Field(severity,false), Constant(';GatewayStation='), Field(saddr,false), Constant(';TicketID='), Field(operation_id,false), Constant(';PolicyID='), Field(policyname,false), Constant(';UserName='), Field(c_username,false), Constant(';LogonDomain='), Field(domain,false), Constant(';Address='), Field(dhost,false), Constant(';CPMStatus='), Field(disposition,false), Constant(';Port="'), Field(dport,false), Constant('";Database='), Field(db_name,false), Constant(';DeviceType='), Field(obj_type,false), Constant(';ExtraDetails='), Field(info,false), Constant(';')}"
-match("MESSAGE#617:372", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=%{directory};Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info};", processor_chain([
+var dup201 = match("MESSAGE#617:372", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=%{directory};Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info};", processor_chain([
 	dup4,
 	dup2,
 	dup3,
@@ -1207,8 +1080,7 @@ var dup222 = linear_select([
 	dup148,
 ]);
 
-var hdr1 = // "Pattern{Field(hmonth,true), Constant(' '), Field(hday,true), Constant(' '), Field(htime,true), Constant(' '), Field(hproduct,true), Constant(' ProductName="'), Field(hdevice,false), Constant('",ProductAccount="'), Field(hfld1,false), Constant('",ProductProcess="'), Field(process,false), Constant('",EventId="'), Field(messageid,false), Constant('", '), Field(p0,false)}"
-match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hproduct->} ProductName=\"%{hdevice}\",ProductAccount=\"%{hfld1}\",ProductProcess=\"%{process}\",EventId=\"%{messageid}\", %{p0}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hproduct->} ProductName=\"%{hdevice}\",ProductAccount=\"%{hfld1}\",ProductProcess=\"%{process}\",EventId=\"%{messageid}\", %{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -1227,8 +1099,7 @@ match("HEADER#0:0001", "message", "%{hmonth->} %{hday->} %{htime->} %{hproduct->
 	}),
 ]));
 
-var hdr2 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hdatetime,true), Constant(' '), Field(hproduct,true), Constant(' ProductName="'), Field(hdevice,false), Constant('",ProductAccount="'), Field(hfld4,false), Constant('",ProductProcess="'), Field(process,false), Constant('",EventId="'), Field(messageid,false), Constant('", '), Field(p0,false)}"
-match("HEADER#1:0005", "message", "%{hfld1->} %{hdatetime->} %{hproduct->} ProductName=\"%{hdevice}\",ProductAccount=\"%{hfld4}\",ProductProcess=\"%{process}\",EventId=\"%{messageid}\", %{p0}", processor_chain([
+var hdr2 = match("HEADER#1:0005", "message", "%{hfld1->} %{hdatetime->} %{hproduct->} ProductName=\"%{hdevice}\",ProductAccount=\"%{hfld4}\",ProductProcess=\"%{process}\",EventId=\"%{messageid}\", %{p0}", processor_chain([
 	setc("header_id","0005"),
 	call({
 		dest: "nwparser.payload",
@@ -1247,23 +1118,19 @@ match("HEADER#1:0005", "message", "%{hfld1->} %{hdatetime->} %{hproduct->} Produ
 	}),
 ]));
 
-var hdr3 = // "Pattern{Field(hmonth,true), Constant(' '), Field(hday,true), Constant(' '), Field(htime,true), Constant(' '), Field(hproduct,true), Constant(' %CYBERARK: MessageID="'), Field(messageid,false), Constant('";'), Field(payload,false)}"
-match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hproduct->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0002", "message", "%{hmonth->} %{hday->} %{htime->} %{hproduct->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
 	setc("header_id","0002"),
 ]));
 
-var hdr4 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hdatetime,true), Constant(' '), Field(hostname,true), Constant(' %CYBERARK: MessageID="'), Field(messageid,false), Constant('";'), Field(payload,false)}"
-match("HEADER#3:0003", "message", "%{hfld1->} %{hdatetime->} %{hostname->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0003", "message", "%{hfld1->} %{hdatetime->} %{hostname->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
 	setc("header_id","0003"),
 ]));
 
-var hdr5 = // "Pattern{Constant('%CYBERARK: MessageID="'), Field(messageid,false), Constant('";'), Field(payload,false)}"
-match("HEADER#4:0004", "message", "%CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0004", "message", "%CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
 	setc("header_id","0004"),
 ]));
 
-var hdr6 = // "Pattern{Field(hdatetime,true), Constant(' '), Field(hostname,true), Constant(' %CYBERARK: MessageID="'), Field(messageid,false), Constant('";'), Field(payload,false)}"
-match("HEADER#5:0006", "message", "%{hdatetime->} %{hostname->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0006", "message", "%{hdatetime->} %{hostname->} %CYBERARK: MessageID=\"%{messageid}\";%{payload}", processor_chain([
 	setc("header_id","0006"),
 ]));
 
@@ -1349,8 +1216,7 @@ var part1 = tagval("MESSAGE#8:7:01", "nwparser.payload", tvm, {
 
 var msg9 = msg("7:01", part1);
 
-var part2 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#9:7", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part2 = match("MESSAGE#9:7", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup10,
 	dup6,
 	dup7,
@@ -1403,8 +1269,7 @@ var part3 = tagval("MESSAGE#10:8:01", "nwparser.payload", tvm, {
 
 var msg11 = msg("8:01", part3);
 
-var part4 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#11:8", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part4 = match("MESSAGE#11:8", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup12,
 	dup6,
 	dup13,
@@ -1455,8 +1320,7 @@ var part5 = tagval("MESSAGE#12:9:01", "nwparser.payload", tvm, {
 
 var msg13 = msg("9:01", part5);
 
-var part6 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#13:9", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part6 = match("MESSAGE#13:9", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup1,
 	dup14,
 	dup9,
@@ -1550,8 +1414,7 @@ var part7 = tagval("MESSAGE#24:15:01", "nwparser.payload", tvm, {
 
 var msg25 = msg("15:01", part7);
 
-var part8 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#25:15", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part8 = match("MESSAGE#25:15", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup18,
 	dup9,
@@ -1627,8 +1490,7 @@ var part9 = tagval("MESSAGE#32:19:01", "nwparser.payload", tvm, {
 
 var msg33 = msg("19:01", part9);
 
-var part10 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#33:19", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part10 = match("MESSAGE#33:19", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup20,
 	dup16,
 	dup11,
@@ -1676,8 +1538,7 @@ var part11 = tagval("MESSAGE#34:20:01", "nwparser.payload", tvm, {
 
 var msg35 = msg("20:01", part11);
 
-var part12 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#35:20", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part12 = match("MESSAGE#35:20", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup19,
 	dup16,
 	dup2,
@@ -1725,8 +1586,7 @@ var part13 = tagval("MESSAGE#36:21:01", "nwparser.payload", tvm, {
 
 var msg37 = msg("21:01", part13);
 
-var part14 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#37:21", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part14 = match("MESSAGE#37:21", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup16,
 	dup9,
@@ -1782,8 +1642,7 @@ var part15 = tagval("MESSAGE#40:23:01", "nwparser.payload", tvm, {
 
 var msg41 = msg("23:01", part15);
 
-var part16 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#41:23", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part16 = match("MESSAGE#41:23", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup22,
 	dup2,
 ]));
@@ -2576,8 +2435,7 @@ var part18 = tagval("MESSAGE#200:103:01", "nwparser.payload", tvm, {
 
 var msg201 = msg("103:01", part18);
 
-var part19 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#201:103", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part19 = match("MESSAGE#201:103", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup27,
 	dup6,
 	dup7,
@@ -2628,8 +2486,7 @@ var part20 = tagval("MESSAGE#202:104:01", "nwparser.payload", tvm, {
 
 var msg203 = msg("104:01", part20);
 
-var part21 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#203:104", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part21 = match("MESSAGE#203:104", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup27,
 	dup6,
 	dup29,
@@ -2928,8 +2785,7 @@ var part22 = tagval("MESSAGE#260:134:01", "nwparser.payload", tvm, {
 
 var msg261 = msg("134:01", part22);
 
-var part23 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#261:134", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part23 = match("MESSAGE#261:134", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup30,
 	dup2,
 ]));
@@ -4318,8 +4174,7 @@ var select285 = linear_select([
 	msg568,
 ]);
 
-var part24 = // "Pattern{Field(application,false), Constant(';DstHost='), Field(dhost,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld10,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';User='), Field(c_username,false), Constant(';"')}"
-match("MESSAGE#568:300:02/24", "nwparser.p0", "%{application};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld10};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
+var part24 = match("MESSAGE#568:300:02/24", "nwparser.p0", "%{application};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld10};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
 
 var all1 = all_match({
 	processors: [
@@ -4410,8 +4265,7 @@ var select287 = linear_select([
 	msg573,
 ]);
 
-var part26 = // "Pattern{Field(application,false), Constant(';DstHost='), Field(dhost,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld12,false), Constant(';SessionDuration='), Field(duration_string,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';User='), Field(c_username,false), Constant(';"')}"
-match("MESSAGE#573:302:02/24", "nwparser.p0", "%{application};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld12};SessionDuration=%{duration_string};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
+var part26 = match("MESSAGE#573:302:02/24", "nwparser.p0", "%{application};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld12};SessionDuration=%{duration_string};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
 
 var all2 = all_match({
 	processors: [
@@ -4470,19 +4324,16 @@ var select289 = linear_select([
 	msg578,
 ]);
 
-var part27 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";ExtraDetails="DstHost='), Field(p0,false)}"
-match("MESSAGE#578:304:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"DstHost=%{p0}");
+var part27 = match("MESSAGE#578:304:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"DstHost=%{p0}");
 
-var part28 = // "Pattern{Field(obj_type,false), Constant(';ExtraDetails="DstHost='), Field(p0,false)}"
-match("MESSAGE#578:304:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"DstHost=%{p0}");
+var part28 = match("MESSAGE#578:304:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"DstHost=%{p0}");
 
 var select290 = linear_select([
 	part27,
 	part28,
 ]);
 
-var part29 = // "Pattern{Field(dhost,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld10,false), Constant(';SessionDuration='), Field(duration_string,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';User='), Field(c_username,false), Constant(';"')}"
-match("MESSAGE#578:304:02/24", "nwparser.p0", "%{dhost};Protocol=%{protocol};PSMID=%{fld10};SessionDuration=%{duration_string};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
+var part29 = match("MESSAGE#578:304:02/24", "nwparser.p0", "%{dhost};Protocol=%{protocol};PSMID=%{fld10};SessionDuration=%{duration_string};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};\"");
 
 var all3 = all_match({
 	processors: [
@@ -4592,8 +4443,7 @@ var part30 = tagval("MESSAGE#587:308:01", "nwparser.payload", tvm, {
 
 var msg588 = msg("308:01", part30);
 
-var part31 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#588:308", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part31 = match("MESSAGE#588:308", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup78,
 	dup2,
 ]));
@@ -4642,8 +4492,7 @@ var part32 = tagval("MESSAGE#589:309:01", "nwparser.payload", tvm, {
 
 var msg590 = msg("309:01", part32);
 
-var part33 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#590:309", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part33 = match("MESSAGE#590:309", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup10,
 	dup6,
 	dup7,
@@ -4746,8 +4595,7 @@ var part34 = tagval("MESSAGE#603:190:01", "nwparser.payload", tvm, {
 
 var msg604 = msg("190:01", part34);
 
-var part35 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#604:190", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part35 = match("MESSAGE#604:190", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup84,
 	dup2,
 ]));
@@ -4819,30 +4667,25 @@ var msg619 = msg("374", dup201);
 
 var msg620 = msg("376", dup201);
 
-var part36 = // "Pattern{Constant('"'), Field(fld89,false), Constant('";LogonDomain='), Field(p0,false)}"
-match("MESSAGE#620:411:01/17_0", "nwparser.p0", "\"%{fld89}\";LogonDomain=%{p0}");
+var part36 = match("MESSAGE#620:411:01/17_0", "nwparser.p0", "\"%{fld89}\";LogonDomain=%{p0}");
 
-var part37 = // "Pattern{Field(fld89,false), Constant(';LogonDomain='), Field(p0,false)}"
-match("MESSAGE#620:411:01/17_1", "nwparser.p0", "%{fld89};LogonDomain=%{p0}");
+var part37 = match("MESSAGE#620:411:01/17_1", "nwparser.p0", "%{fld89};LogonDomain=%{p0}");
 
 var select310 = linear_select([
 	part36,
 	part37,
 ]);
 
-var part38 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";ExtraDetails="Command='), Field(p0,false)}"
-match("MESSAGE#620:411:01/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"Command=%{p0}");
+var part38 = match("MESSAGE#620:411:01/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"Command=%{p0}");
 
-var part39 = // "Pattern{Field(obj_type,false), Constant(';ExtraDetails="Command='), Field(p0,false)}"
-match("MESSAGE#620:411:01/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"Command=%{p0}");
+var part39 = match("MESSAGE#620:411:01/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"Command=%{p0}");
 
 var select311 = linear_select([
 	part38,
 	part39,
 ]);
 
-var part40 = // "Pattern{Field(param,false), Constant(';ConnectionComponentId='), Field(fld67,false), Constant(';DstHost='), Field(dhost,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld11,false), Constant(';RDPOffset='), Field(fld12,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';User='), Field(c_username,false), Constant(';VIDOffset='), Field(fld13,false), Constant(';')}"
-match("MESSAGE#620:411:01/24", "nwparser.p0", "%{param};ConnectionComponentId=%{fld67};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld11};RDPOffset=%{fld12};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};VIDOffset=%{fld13};");
+var part40 = match("MESSAGE#620:411:01/24", "nwparser.p0", "%{param};ConnectionComponentId=%{fld67};DstHost=%{dhost};Protocol=%{protocol};PSMID=%{fld11};RDPOffset=%{fld12};SessionID=%{sessionid};SrcHost=%{shost};User=%{c_username};VIDOffset=%{fld13};");
 
 var all4 = all_match({
 	processors: [
@@ -4882,8 +4725,7 @@ var all4 = all_match({
 
 var msg621 = msg("411:01", all4);
 
-var part41 = // "Pattern{Constant('"Command='), Field(param,false), Constant(';ConnectionComponentId='), Field(fld1,false), Constant(';DstHost='), Field(fld2,false), Constant(';ProcessId='), Field(process_id,false), Constant(';ProcessName='), Field(process,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld3,false), Constant(';RDPOffset='), Field(fld4,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';User='), Field(fld5,false), Constant(';VIDOffset='), Field(fld6,false), Constant(';"')}"
-match("MESSAGE#621:411/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};ProcessId=%{process_id};ProcessName=%{process};Protocol=%{protocol};PSMID=%{fld3};RDPOffset=%{fld4};SessionID=%{sessionid};SrcHost=%{shost};User=%{fld5};VIDOffset=%{fld6};\"");
+var part41 = match("MESSAGE#621:411/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};ProcessId=%{process_id};ProcessName=%{process};Protocol=%{protocol};PSMID=%{fld3};RDPOffset=%{fld4};SessionID=%{sessionid};SrcHost=%{shost};User=%{fld5};VIDOffset=%{fld6};\"");
 
 var select312 = linear_select([
 	part41,
@@ -4951,8 +4793,7 @@ var select313 = linear_select([
 	msg622,
 ]);
 
-var part42 = // "Pattern{Constant('Version='), Field(version,false), Constant(';Message='), Field(action,false), Constant(';Issuer='), Field(username,false), Constant(';Station='), Field(hostip,false), Constant(';File='), Field(filename,false), Constant(';Safe='), Field(group_object,false), Constant(';Location="'), Field(directory,false), Constant('";Category='), Field(category,false), Constant(';RequestId='), Field(id1,false), Constant(';Reason='), Field(event_description,false), Constant(';Severity='), Field(severity,false), Constant(';GatewayStation='), Field(saddr,false), Constant(';TicketID='), Field(operation_id,false), Constant(';PolicyID='), Field(policyname,false), Constant(';UserName='), Field(c_username,false), Constant(';LogonDomain='), Field(domain,false), Constant(';Address='), Field(dhost,false), Constant(';CPMStatus='), Field(disposition,false), Constant(';Port="'), Field(dport,false), Constant('";Database='), Field(db_name,false), Constant(';DeviceType='), Field(obj_type,false), Constant(';ExtraDetails='), Field(info,false)}"
-match("MESSAGE#622:385", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=\"%{directory}\";Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info}", processor_chain([
+var part42 = match("MESSAGE#622:385", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=\"%{directory}\";Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info}", processor_chain([
 	dup4,
 	dup2,
 	dup3,
@@ -4960,8 +4801,7 @@ match("MESSAGE#622:385", "nwparser.payload", "Version=%{version};Message=%{actio
 
 var msg623 = msg("385", part42);
 
-var part43 = // "Pattern{Constant('"Command='), Field(param,false), Constant(';ConnectionComponentId='), Field(fld1,false), Constant(';DstHost='), Field(fld2,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld3,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';SSHOffset='), Field(fld4,false), Constant(';User='), Field(fld5,false), Constant(';VIDOffset='), Field(fld6,false), Constant(';"')}"
-match("MESSAGE#623:361/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};Protocol=%{protocol};PSMID=%{fld3};SessionID=%{sessionid};SrcHost=%{shost};SSHOffset=%{fld4};User=%{fld5};VIDOffset=%{fld6};\"");
+var part43 = match("MESSAGE#623:361/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};Protocol=%{protocol};PSMID=%{fld3};SessionID=%{sessionid};SrcHost=%{shost};SSHOffset=%{fld4};User=%{fld5};VIDOffset=%{fld6};\"");
 
 var select314 = linear_select([
 	part43,
@@ -5024,8 +4864,7 @@ var all6 = all_match({
 
 var msg624 = msg("361", all6);
 
-var part44 = // "Pattern{Constant('"Command='), Field(param,false), Constant(';ConnectionComponentId='), Field(fld1,false), Constant(';DstHost='), Field(fld2,false), Constant(';Protocol='), Field(protocol,false), Constant(';PSMID='), Field(fld3,false), Constant(';SessionID='), Field(sessionid,false), Constant(';SrcHost='), Field(shost,false), Constant(';TXTOffset='), Field(fld4,false), Constant(';User='), Field(fld5,false), Constant(';VIDOffset='), Field(fld6,false), Constant(';"')}"
-match("MESSAGE#624:412/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};Protocol=%{protocol};PSMID=%{fld3};SessionID=%{sessionid};SrcHost=%{shost};TXTOffset=%{fld4};User=%{fld5};VIDOffset=%{fld6};\"");
+var part44 = match("MESSAGE#624:412/43_0", "nwparser.p0", "\"Command=%{param};ConnectionComponentId=%{fld1};DstHost=%{fld2};Protocol=%{protocol};PSMID=%{fld3};SessionID=%{sessionid};SrcHost=%{shost};TXTOffset=%{fld4};User=%{fld5};VIDOffset=%{fld6};\"");
 
 var select315 = linear_select([
 	part44,
@@ -5426,344 +5265,231 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part45 = // "Pattern{Constant('Version='), Field(p0,false)}"
-match("MESSAGE#568:300:02/0", "nwparser.payload", "Version=%{p0}");
+var part45 = match("MESSAGE#568:300:02/0", "nwparser.payload", "Version=%{p0}");
 
-var part46 = // "Pattern{Constant('"'), Field(version,false), Constant('";Message='), Field(p0,false)}"
-match("MESSAGE#568:300:02/1_0", "nwparser.p0", "\"%{version}\";Message=%{p0}");
+var part46 = match("MESSAGE#568:300:02/1_0", "nwparser.p0", "\"%{version}\";Message=%{p0}");
 
-var part47 = // "Pattern{Field(version,false), Constant(';Message='), Field(p0,false)}"
-match("MESSAGE#568:300:02/1_1", "nwparser.p0", "%{version};Message=%{p0}");
+var part47 = match("MESSAGE#568:300:02/1_1", "nwparser.p0", "%{version};Message=%{p0}");
 
-var part48 = // "Pattern{Constant('"'), Field(action,false), Constant('";Issuer='), Field(p0,false)}"
-match("MESSAGE#568:300:02/2_0", "nwparser.p0", "\"%{action}\";Issuer=%{p0}");
+var part48 = match("MESSAGE#568:300:02/2_0", "nwparser.p0", "\"%{action}\";Issuer=%{p0}");
 
-var part49 = // "Pattern{Field(action,false), Constant(';Issuer='), Field(p0,false)}"
-match("MESSAGE#568:300:02/2_1", "nwparser.p0", "%{action};Issuer=%{p0}");
+var part49 = match("MESSAGE#568:300:02/2_1", "nwparser.p0", "%{action};Issuer=%{p0}");
 
-var part50 = // "Pattern{Constant('"'), Field(username,false), Constant('";Station='), Field(p0,false)}"
-match("MESSAGE#568:300:02/3_0", "nwparser.p0", "\"%{username}\";Station=%{p0}");
+var part50 = match("MESSAGE#568:300:02/3_0", "nwparser.p0", "\"%{username}\";Station=%{p0}");
 
-var part51 = // "Pattern{Field(username,false), Constant(';Station='), Field(p0,false)}"
-match("MESSAGE#568:300:02/3_1", "nwparser.p0", "%{username};Station=%{p0}");
+var part51 = match("MESSAGE#568:300:02/3_1", "nwparser.p0", "%{username};Station=%{p0}");
 
-var part52 = // "Pattern{Constant('"'), Field(hostip,false), Constant('";File='), Field(p0,false)}"
-match("MESSAGE#568:300:02/4_0", "nwparser.p0", "\"%{hostip}\";File=%{p0}");
+var part52 = match("MESSAGE#568:300:02/4_0", "nwparser.p0", "\"%{hostip}\";File=%{p0}");
 
-var part53 = // "Pattern{Field(hostip,false), Constant(';File='), Field(p0,false)}"
-match("MESSAGE#568:300:02/4_1", "nwparser.p0", "%{hostip};File=%{p0}");
+var part53 = match("MESSAGE#568:300:02/4_1", "nwparser.p0", "%{hostip};File=%{p0}");
 
-var part54 = // "Pattern{Constant('"'), Field(filename,false), Constant('";Safe='), Field(p0,false)}"
-match("MESSAGE#568:300:02/5_0", "nwparser.p0", "\"%{filename}\";Safe=%{p0}");
+var part54 = match("MESSAGE#568:300:02/5_0", "nwparser.p0", "\"%{filename}\";Safe=%{p0}");
 
-var part55 = // "Pattern{Field(filename,false), Constant(';Safe='), Field(p0,false)}"
-match("MESSAGE#568:300:02/5_1", "nwparser.p0", "%{filename};Safe=%{p0}");
+var part55 = match("MESSAGE#568:300:02/5_1", "nwparser.p0", "%{filename};Safe=%{p0}");
 
-var part56 = // "Pattern{Constant('"'), Field(group_object,false), Constant('";Location='), Field(p0,false)}"
-match("MESSAGE#568:300:02/6_0", "nwparser.p0", "\"%{group_object}\";Location=%{p0}");
+var part56 = match("MESSAGE#568:300:02/6_0", "nwparser.p0", "\"%{group_object}\";Location=%{p0}");
 
-var part57 = // "Pattern{Field(group_object,false), Constant(';Location='), Field(p0,false)}"
-match("MESSAGE#568:300:02/6_1", "nwparser.p0", "%{group_object};Location=%{p0}");
+var part57 = match("MESSAGE#568:300:02/6_1", "nwparser.p0", "%{group_object};Location=%{p0}");
 
-var part58 = // "Pattern{Constant('"'), Field(directory,false), Constant('";Category='), Field(p0,false)}"
-match("MESSAGE#568:300:02/7_0", "nwparser.p0", "\"%{directory}\";Category=%{p0}");
+var part58 = match("MESSAGE#568:300:02/7_0", "nwparser.p0", "\"%{directory}\";Category=%{p0}");
 
-var part59 = // "Pattern{Field(directory,false), Constant(';Category='), Field(p0,false)}"
-match("MESSAGE#568:300:02/7_1", "nwparser.p0", "%{directory};Category=%{p0}");
+var part59 = match("MESSAGE#568:300:02/7_1", "nwparser.p0", "%{directory};Category=%{p0}");
 
-var part60 = // "Pattern{Constant('"'), Field(category,false), Constant('";RequestId='), Field(p0,false)}"
-match("MESSAGE#568:300:02/8_0", "nwparser.p0", "\"%{category}\";RequestId=%{p0}");
+var part60 = match("MESSAGE#568:300:02/8_0", "nwparser.p0", "\"%{category}\";RequestId=%{p0}");
 
-var part61 = // "Pattern{Field(category,false), Constant(';RequestId='), Field(p0,false)}"
-match("MESSAGE#568:300:02/8_1", "nwparser.p0", "%{category};RequestId=%{p0}");
+var part61 = match("MESSAGE#568:300:02/8_1", "nwparser.p0", "%{category};RequestId=%{p0}");
 
-var part62 = // "Pattern{Constant('"'), Field(id1,false), Constant('";Reason='), Field(p0,false)}"
-match("MESSAGE#568:300:02/9_0", "nwparser.p0", "\"%{id1}\";Reason=%{p0}");
+var part62 = match("MESSAGE#568:300:02/9_0", "nwparser.p0", "\"%{id1}\";Reason=%{p0}");
 
-var part63 = // "Pattern{Field(id1,false), Constant(';Reason='), Field(p0,false)}"
-match("MESSAGE#568:300:02/9_1", "nwparser.p0", "%{id1};Reason=%{p0}");
+var part63 = match("MESSAGE#568:300:02/9_1", "nwparser.p0", "%{id1};Reason=%{p0}");
 
-var part64 = // "Pattern{Constant('"'), Field(event_description,false), Constant('";Severity='), Field(p0,false)}"
-match("MESSAGE#568:300:02/10_0", "nwparser.p0", "\"%{event_description}\";Severity=%{p0}");
+var part64 = match("MESSAGE#568:300:02/10_0", "nwparser.p0", "\"%{event_description}\";Severity=%{p0}");
 
-var part65 = // "Pattern{Field(event_description,false), Constant(';Severity='), Field(p0,false)}"
-match("MESSAGE#568:300:02/10_1", "nwparser.p0", "%{event_description};Severity=%{p0}");
+var part65 = match("MESSAGE#568:300:02/10_1", "nwparser.p0", "%{event_description};Severity=%{p0}");
 
-var part66 = // "Pattern{Constant('"'), Field(severity,false), Constant('";SourceUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/11_0", "nwparser.p0", "\"%{severity}\";SourceUser=%{p0}");
+var part66 = match("MESSAGE#568:300:02/11_0", "nwparser.p0", "\"%{severity}\";SourceUser=%{p0}");
 
-var part67 = // "Pattern{Field(severity,false), Constant(';SourceUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/11_1", "nwparser.p0", "%{severity};SourceUser=%{p0}");
+var part67 = match("MESSAGE#568:300:02/11_1", "nwparser.p0", "%{severity};SourceUser=%{p0}");
 
-var part68 = // "Pattern{Constant('"'), Field(group,false), Constant('";TargetUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/12_0", "nwparser.p0", "\"%{group}\";TargetUser=%{p0}");
+var part68 = match("MESSAGE#568:300:02/12_0", "nwparser.p0", "\"%{group}\";TargetUser=%{p0}");
 
-var part69 = // "Pattern{Field(group,false), Constant(';TargetUser='), Field(p0,false)}"
-match("MESSAGE#568:300:02/12_1", "nwparser.p0", "%{group};TargetUser=%{p0}");
+var part69 = match("MESSAGE#568:300:02/12_1", "nwparser.p0", "%{group};TargetUser=%{p0}");
 
-var part70 = // "Pattern{Constant('"'), Field(uid,false), Constant('";GatewayStation='), Field(p0,false)}"
-match("MESSAGE#568:300:02/13_0", "nwparser.p0", "\"%{uid}\";GatewayStation=%{p0}");
+var part70 = match("MESSAGE#568:300:02/13_0", "nwparser.p0", "\"%{uid}\";GatewayStation=%{p0}");
 
-var part71 = // "Pattern{Field(uid,false), Constant(';GatewayStation='), Field(p0,false)}"
-match("MESSAGE#568:300:02/13_1", "nwparser.p0", "%{uid};GatewayStation=%{p0}");
+var part71 = match("MESSAGE#568:300:02/13_1", "nwparser.p0", "%{uid};GatewayStation=%{p0}");
 
-var part72 = // "Pattern{Constant('"'), Field(saddr,false), Constant('";TicketID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/14_0", "nwparser.p0", "\"%{saddr}\";TicketID=%{p0}");
+var part72 = match("MESSAGE#568:300:02/14_0", "nwparser.p0", "\"%{saddr}\";TicketID=%{p0}");
 
-var part73 = // "Pattern{Field(saddr,false), Constant(';TicketID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/14_1", "nwparser.p0", "%{saddr};TicketID=%{p0}");
+var part73 = match("MESSAGE#568:300:02/14_1", "nwparser.p0", "%{saddr};TicketID=%{p0}");
 
-var part74 = // "Pattern{Constant('"'), Field(operation_id,false), Constant('";PolicyID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/15_0", "nwparser.p0", "\"%{operation_id}\";PolicyID=%{p0}");
+var part74 = match("MESSAGE#568:300:02/15_0", "nwparser.p0", "\"%{operation_id}\";PolicyID=%{p0}");
 
-var part75 = // "Pattern{Field(operation_id,false), Constant(';PolicyID='), Field(p0,false)}"
-match("MESSAGE#568:300:02/15_1", "nwparser.p0", "%{operation_id};PolicyID=%{p0}");
+var part75 = match("MESSAGE#568:300:02/15_1", "nwparser.p0", "%{operation_id};PolicyID=%{p0}");
 
-var part76 = // "Pattern{Constant('"'), Field(policyname,false), Constant('";UserName='), Field(p0,false)}"
-match("MESSAGE#568:300:02/16_0", "nwparser.p0", "\"%{policyname}\";UserName=%{p0}");
+var part76 = match("MESSAGE#568:300:02/16_0", "nwparser.p0", "\"%{policyname}\";UserName=%{p0}");
 
-var part77 = // "Pattern{Field(policyname,false), Constant(';UserName='), Field(p0,false)}"
-match("MESSAGE#568:300:02/16_1", "nwparser.p0", "%{policyname};UserName=%{p0}");
+var part77 = match("MESSAGE#568:300:02/16_1", "nwparser.p0", "%{policyname};UserName=%{p0}");
 
-var part78 = // "Pattern{Constant('"'), Field(fld11,false), Constant('";LogonDomain='), Field(p0,false)}"
-match("MESSAGE#568:300:02/17_0", "nwparser.p0", "\"%{fld11}\";LogonDomain=%{p0}");
+var part78 = match("MESSAGE#568:300:02/17_0", "nwparser.p0", "\"%{fld11}\";LogonDomain=%{p0}");
 
-var part79 = // "Pattern{Field(fld11,false), Constant(';LogonDomain='), Field(p0,false)}"
-match("MESSAGE#568:300:02/17_1", "nwparser.p0", "%{fld11};LogonDomain=%{p0}");
+var part79 = match("MESSAGE#568:300:02/17_1", "nwparser.p0", "%{fld11};LogonDomain=%{p0}");
 
-var part80 = // "Pattern{Constant('"'), Field(domain,false), Constant('";Address='), Field(p0,false)}"
-match("MESSAGE#568:300:02/18_0", "nwparser.p0", "\"%{domain}\";Address=%{p0}");
+var part80 = match("MESSAGE#568:300:02/18_0", "nwparser.p0", "\"%{domain}\";Address=%{p0}");
 
-var part81 = // "Pattern{Field(domain,false), Constant(';Address='), Field(p0,false)}"
-match("MESSAGE#568:300:02/18_1", "nwparser.p0", "%{domain};Address=%{p0}");
+var part81 = match("MESSAGE#568:300:02/18_1", "nwparser.p0", "%{domain};Address=%{p0}");
 
-var part82 = // "Pattern{Constant('"'), Field(fld14,false), Constant('";CPMStatus='), Field(p0,false)}"
-match("MESSAGE#568:300:02/19_0", "nwparser.p0", "\"%{fld14}\";CPMStatus=%{p0}");
+var part82 = match("MESSAGE#568:300:02/19_0", "nwparser.p0", "\"%{fld14}\";CPMStatus=%{p0}");
 
-var part83 = // "Pattern{Field(fld14,false), Constant(';CPMStatus='), Field(p0,false)}"
-match("MESSAGE#568:300:02/19_1", "nwparser.p0", "%{fld14};CPMStatus=%{p0}");
+var part83 = match("MESSAGE#568:300:02/19_1", "nwparser.p0", "%{fld14};CPMStatus=%{p0}");
 
-var part84 = // "Pattern{Constant('"'), Field(disposition,false), Constant('";Port='), Field(p0,false)}"
-match("MESSAGE#568:300:02/20_0", "nwparser.p0", "\"%{disposition}\";Port=%{p0}");
+var part84 = match("MESSAGE#568:300:02/20_0", "nwparser.p0", "\"%{disposition}\";Port=%{p0}");
 
-var part85 = // "Pattern{Field(disposition,false), Constant(';Port='), Field(p0,false)}"
-match("MESSAGE#568:300:02/20_1", "nwparser.p0", "%{disposition};Port=%{p0}");
+var part85 = match("MESSAGE#568:300:02/20_1", "nwparser.p0", "%{disposition};Port=%{p0}");
 
-var part86 = // "Pattern{Constant('"'), Field(dport,false), Constant('";Database='), Field(p0,false)}"
-match("MESSAGE#568:300:02/21_0", "nwparser.p0", "\"%{dport}\";Database=%{p0}");
+var part86 = match("MESSAGE#568:300:02/21_0", "nwparser.p0", "\"%{dport}\";Database=%{p0}");
 
-var part87 = // "Pattern{Field(dport,false), Constant(';Database='), Field(p0,false)}"
-match("MESSAGE#568:300:02/21_1", "nwparser.p0", "%{dport};Database=%{p0}");
+var part87 = match("MESSAGE#568:300:02/21_1", "nwparser.p0", "%{dport};Database=%{p0}");
 
-var part88 = // "Pattern{Constant('"'), Field(db_name,false), Constant('";DeviceType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/22_0", "nwparser.p0", "\"%{db_name}\";DeviceType=%{p0}");
+var part88 = match("MESSAGE#568:300:02/22_0", "nwparser.p0", "\"%{db_name}\";DeviceType=%{p0}");
 
-var part89 = // "Pattern{Field(db_name,false), Constant(';DeviceType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/22_1", "nwparser.p0", "%{db_name};DeviceType=%{p0}");
+var part89 = match("MESSAGE#568:300:02/22_1", "nwparser.p0", "%{db_name};DeviceType=%{p0}");
 
-var part90 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";ExtraDetails="ApplicationType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"ApplicationType=%{p0}");
+var part90 = match("MESSAGE#568:300:02/23_0", "nwparser.p0", "\"%{obj_type}\";ExtraDetails=\"ApplicationType=%{p0}");
 
-var part91 = // "Pattern{Field(obj_type,false), Constant(';ExtraDetails="ApplicationType='), Field(p0,false)}"
-match("MESSAGE#568:300:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"ApplicationType=%{p0}");
+var part91 = match("MESSAGE#568:300:02/23_1", "nwparser.p0", "%{obj_type};ExtraDetails=\"ApplicationType=%{p0}");
 
-var part92 = // "Pattern{Constant('"'), Field(version,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/1_0", "nwparser.p0", "\"%{version}\";%{p0}");
+var part92 = match("MESSAGE#621:411/1_0", "nwparser.p0", "\"%{version}\";%{p0}");
 
-var part93 = // "Pattern{Field(version,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/1_1", "nwparser.p0", "%{version};%{p0}");
+var part93 = match("MESSAGE#621:411/1_1", "nwparser.p0", "%{version};%{p0}");
 
-var part94 = // "Pattern{Constant('Message='), Field(p0,false)}"
-match("MESSAGE#621:411/2", "nwparser.p0", "Message=%{p0}");
+var part94 = match("MESSAGE#621:411/2", "nwparser.p0", "Message=%{p0}");
 
-var part95 = // "Pattern{Constant('"'), Field(action,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/3_0", "nwparser.p0", "\"%{action}\";%{p0}");
+var part95 = match("MESSAGE#621:411/3_0", "nwparser.p0", "\"%{action}\";%{p0}");
 
-var part96 = // "Pattern{Field(action,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/3_1", "nwparser.p0", "%{action};%{p0}");
+var part96 = match("MESSAGE#621:411/3_1", "nwparser.p0", "%{action};%{p0}");
 
-var part97 = // "Pattern{Constant('Issuer='), Field(p0,false)}"
-match("MESSAGE#621:411/4", "nwparser.p0", "Issuer=%{p0}");
+var part97 = match("MESSAGE#621:411/4", "nwparser.p0", "Issuer=%{p0}");
 
-var part98 = // "Pattern{Constant('"'), Field(username,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/5_0", "nwparser.p0", "\"%{username}\";%{p0}");
+var part98 = match("MESSAGE#621:411/5_0", "nwparser.p0", "\"%{username}\";%{p0}");
 
-var part99 = // "Pattern{Field(username,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/5_1", "nwparser.p0", "%{username};%{p0}");
+var part99 = match("MESSAGE#621:411/5_1", "nwparser.p0", "%{username};%{p0}");
 
-var part100 = // "Pattern{Constant('Station='), Field(p0,false)}"
-match("MESSAGE#621:411/6", "nwparser.p0", "Station=%{p0}");
+var part100 = match("MESSAGE#621:411/6", "nwparser.p0", "Station=%{p0}");
 
-var part101 = // "Pattern{Constant('"'), Field(hostip,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/7_0", "nwparser.p0", "\"%{hostip}\";%{p0}");
+var part101 = match("MESSAGE#621:411/7_0", "nwparser.p0", "\"%{hostip}\";%{p0}");
 
-var part102 = // "Pattern{Field(hostip,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/7_1", "nwparser.p0", "%{hostip};%{p0}");
+var part102 = match("MESSAGE#621:411/7_1", "nwparser.p0", "%{hostip};%{p0}");
 
-var part103 = // "Pattern{Constant('File='), Field(p0,false)}"
-match("MESSAGE#621:411/8", "nwparser.p0", "File=%{p0}");
+var part103 = match("MESSAGE#621:411/8", "nwparser.p0", "File=%{p0}");
 
-var part104 = // "Pattern{Constant('"'), Field(filename,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/9_0", "nwparser.p0", "\"%{filename}\";%{p0}");
+var part104 = match("MESSAGE#621:411/9_0", "nwparser.p0", "\"%{filename}\";%{p0}");
 
-var part105 = // "Pattern{Field(filename,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/9_1", "nwparser.p0", "%{filename};%{p0}");
+var part105 = match("MESSAGE#621:411/9_1", "nwparser.p0", "%{filename};%{p0}");
 
-var part106 = // "Pattern{Constant('Safe='), Field(p0,false)}"
-match("MESSAGE#621:411/10", "nwparser.p0", "Safe=%{p0}");
+var part106 = match("MESSAGE#621:411/10", "nwparser.p0", "Safe=%{p0}");
 
-var part107 = // "Pattern{Constant('"'), Field(group_object,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/11_0", "nwparser.p0", "\"%{group_object}\";%{p0}");
+var part107 = match("MESSAGE#621:411/11_0", "nwparser.p0", "\"%{group_object}\";%{p0}");
 
-var part108 = // "Pattern{Field(group_object,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/11_1", "nwparser.p0", "%{group_object};%{p0}");
+var part108 = match("MESSAGE#621:411/11_1", "nwparser.p0", "%{group_object};%{p0}");
 
-var part109 = // "Pattern{Constant('Location='), Field(p0,false)}"
-match("MESSAGE#621:411/12", "nwparser.p0", "Location=%{p0}");
+var part109 = match("MESSAGE#621:411/12", "nwparser.p0", "Location=%{p0}");
 
-var part110 = // "Pattern{Constant('"'), Field(directory,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/13_0", "nwparser.p0", "\"%{directory}\";%{p0}");
+var part110 = match("MESSAGE#621:411/13_0", "nwparser.p0", "\"%{directory}\";%{p0}");
 
-var part111 = // "Pattern{Field(directory,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/13_1", "nwparser.p0", "%{directory};%{p0}");
+var part111 = match("MESSAGE#621:411/13_1", "nwparser.p0", "%{directory};%{p0}");
 
-var part112 = // "Pattern{Constant('Category='), Field(p0,false)}"
-match("MESSAGE#621:411/14", "nwparser.p0", "Category=%{p0}");
+var part112 = match("MESSAGE#621:411/14", "nwparser.p0", "Category=%{p0}");
 
-var part113 = // "Pattern{Constant('"'), Field(category,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/15_0", "nwparser.p0", "\"%{category}\";%{p0}");
+var part113 = match("MESSAGE#621:411/15_0", "nwparser.p0", "\"%{category}\";%{p0}");
 
-var part114 = // "Pattern{Field(category,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/15_1", "nwparser.p0", "%{category};%{p0}");
+var part114 = match("MESSAGE#621:411/15_1", "nwparser.p0", "%{category};%{p0}");
 
-var part115 = // "Pattern{Constant('RequestId='), Field(p0,false)}"
-match("MESSAGE#621:411/16", "nwparser.p0", "RequestId=%{p0}");
+var part115 = match("MESSAGE#621:411/16", "nwparser.p0", "RequestId=%{p0}");
 
-var part116 = // "Pattern{Constant('"'), Field(id1,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/17_0", "nwparser.p0", "\"%{id1}\";%{p0}");
+var part116 = match("MESSAGE#621:411/17_0", "nwparser.p0", "\"%{id1}\";%{p0}");
 
-var part117 = // "Pattern{Field(id1,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/17_1", "nwparser.p0", "%{id1};%{p0}");
+var part117 = match("MESSAGE#621:411/17_1", "nwparser.p0", "%{id1};%{p0}");
 
-var part118 = // "Pattern{Constant('Reason='), Field(p0,false)}"
-match("MESSAGE#621:411/18", "nwparser.p0", "Reason=%{p0}");
+var part118 = match("MESSAGE#621:411/18", "nwparser.p0", "Reason=%{p0}");
 
-var part119 = // "Pattern{Constant('"'), Field(event_description,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/19_0", "nwparser.p0", "\"%{event_description}\";%{p0}");
+var part119 = match("MESSAGE#621:411/19_0", "nwparser.p0", "\"%{event_description}\";%{p0}");
 
-var part120 = // "Pattern{Field(event_description,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/19_1", "nwparser.p0", "%{event_description};%{p0}");
+var part120 = match("MESSAGE#621:411/19_1", "nwparser.p0", "%{event_description};%{p0}");
 
-var part121 = // "Pattern{Constant('Severity='), Field(p0,false)}"
-match("MESSAGE#621:411/20", "nwparser.p0", "Severity=%{p0}");
+var part121 = match("MESSAGE#621:411/20", "nwparser.p0", "Severity=%{p0}");
 
-var part122 = // "Pattern{Constant('"'), Field(severity,false), Constant('";SourceUser="'), Field(group,false), Constant('";TargetUser="'), Field(uid,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/21_0", "nwparser.p0", "\"%{severity}\";SourceUser=\"%{group}\";TargetUser=\"%{uid}\";%{p0}");
+var part122 = match("MESSAGE#621:411/21_0", "nwparser.p0", "\"%{severity}\";SourceUser=\"%{group}\";TargetUser=\"%{uid}\";%{p0}");
 
-var part123 = // "Pattern{Field(severity,false), Constant(';SourceUser='), Field(group,false), Constant(';TargetUser='), Field(uid,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/21_1", "nwparser.p0", "%{severity};SourceUser=%{group};TargetUser=%{uid};%{p0}");
+var part123 = match("MESSAGE#621:411/21_1", "nwparser.p0", "%{severity};SourceUser=%{group};TargetUser=%{uid};%{p0}");
 
-var part124 = // "Pattern{Constant('"'), Field(severity,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/21_2", "nwparser.p0", "\"%{severity}\";%{p0}");
+var part124 = match("MESSAGE#621:411/21_2", "nwparser.p0", "\"%{severity}\";%{p0}");
 
-var part125 = // "Pattern{Field(severity,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/21_3", "nwparser.p0", "%{severity};%{p0}");
+var part125 = match("MESSAGE#621:411/21_3", "nwparser.p0", "%{severity};%{p0}");
 
-var part126 = // "Pattern{Constant('GatewayStation='), Field(p0,false)}"
-match("MESSAGE#621:411/22", "nwparser.p0", "GatewayStation=%{p0}");
+var part126 = match("MESSAGE#621:411/22", "nwparser.p0", "GatewayStation=%{p0}");
 
-var part127 = // "Pattern{Constant('"'), Field(saddr,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/23_0", "nwparser.p0", "\"%{saddr}\";%{p0}");
+var part127 = match("MESSAGE#621:411/23_0", "nwparser.p0", "\"%{saddr}\";%{p0}");
 
-var part128 = // "Pattern{Field(saddr,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/23_1", "nwparser.p0", "%{saddr};%{p0}");
+var part128 = match("MESSAGE#621:411/23_1", "nwparser.p0", "%{saddr};%{p0}");
 
-var part129 = // "Pattern{Constant('TicketID='), Field(p0,false)}"
-match("MESSAGE#621:411/24", "nwparser.p0", "TicketID=%{p0}");
+var part129 = match("MESSAGE#621:411/24", "nwparser.p0", "TicketID=%{p0}");
 
-var part130 = // "Pattern{Constant('"'), Field(operation_id,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/25_0", "nwparser.p0", "\"%{operation_id}\";%{p0}");
+var part130 = match("MESSAGE#621:411/25_0", "nwparser.p0", "\"%{operation_id}\";%{p0}");
 
-var part131 = // "Pattern{Field(operation_id,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/25_1", "nwparser.p0", "%{operation_id};%{p0}");
+var part131 = match("MESSAGE#621:411/25_1", "nwparser.p0", "%{operation_id};%{p0}");
 
-var part132 = // "Pattern{Constant('PolicyID='), Field(p0,false)}"
-match("MESSAGE#621:411/26", "nwparser.p0", "PolicyID=%{p0}");
+var part132 = match("MESSAGE#621:411/26", "nwparser.p0", "PolicyID=%{p0}");
 
-var part133 = // "Pattern{Constant('"'), Field(policyname,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/27_0", "nwparser.p0", "\"%{policyname}\";%{p0}");
+var part133 = match("MESSAGE#621:411/27_0", "nwparser.p0", "\"%{policyname}\";%{p0}");
 
-var part134 = // "Pattern{Field(policyname,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/27_1", "nwparser.p0", "%{policyname};%{p0}");
+var part134 = match("MESSAGE#621:411/27_1", "nwparser.p0", "%{policyname};%{p0}");
 
-var part135 = // "Pattern{Constant('UserName='), Field(p0,false)}"
-match("MESSAGE#621:411/28", "nwparser.p0", "UserName=%{p0}");
+var part135 = match("MESSAGE#621:411/28", "nwparser.p0", "UserName=%{p0}");
 
-var part136 = // "Pattern{Constant('"'), Field(c_username,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/29_0", "nwparser.p0", "\"%{c_username}\";%{p0}");
+var part136 = match("MESSAGE#621:411/29_0", "nwparser.p0", "\"%{c_username}\";%{p0}");
 
-var part137 = // "Pattern{Field(c_username,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/29_1", "nwparser.p0", "%{c_username};%{p0}");
+var part137 = match("MESSAGE#621:411/29_1", "nwparser.p0", "%{c_username};%{p0}");
 
-var part138 = // "Pattern{Constant('LogonDomain='), Field(p0,false)}"
-match("MESSAGE#621:411/30", "nwparser.p0", "LogonDomain=%{p0}");
+var part138 = match("MESSAGE#621:411/30", "nwparser.p0", "LogonDomain=%{p0}");
 
-var part139 = // "Pattern{Constant('"'), Field(domain,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/31_0", "nwparser.p0", "\"%{domain}\";%{p0}");
+var part139 = match("MESSAGE#621:411/31_0", "nwparser.p0", "\"%{domain}\";%{p0}");
 
-var part140 = // "Pattern{Field(domain,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/31_1", "nwparser.p0", "%{domain};%{p0}");
+var part140 = match("MESSAGE#621:411/31_1", "nwparser.p0", "%{domain};%{p0}");
 
-var part141 = // "Pattern{Constant('Address='), Field(p0,false)}"
-match("MESSAGE#621:411/32", "nwparser.p0", "Address=%{p0}");
+var part141 = match("MESSAGE#621:411/32", "nwparser.p0", "Address=%{p0}");
 
-var part142 = // "Pattern{Constant('"'), Field(dhost,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/33_0", "nwparser.p0", "\"%{dhost}\";%{p0}");
+var part142 = match("MESSAGE#621:411/33_0", "nwparser.p0", "\"%{dhost}\";%{p0}");
 
-var part143 = // "Pattern{Field(dhost,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/33_1", "nwparser.p0", "%{dhost};%{p0}");
+var part143 = match("MESSAGE#621:411/33_1", "nwparser.p0", "%{dhost};%{p0}");
 
-var part144 = // "Pattern{Constant('CPMStatus='), Field(p0,false)}"
-match("MESSAGE#621:411/34", "nwparser.p0", "CPMStatus=%{p0}");
+var part144 = match("MESSAGE#621:411/34", "nwparser.p0", "CPMStatus=%{p0}");
 
-var part145 = // "Pattern{Constant('"'), Field(disposition,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/35_0", "nwparser.p0", "\"%{disposition}\";%{p0}");
+var part145 = match("MESSAGE#621:411/35_0", "nwparser.p0", "\"%{disposition}\";%{p0}");
 
-var part146 = // "Pattern{Field(disposition,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/35_1", "nwparser.p0", "%{disposition};%{p0}");
+var part146 = match("MESSAGE#621:411/35_1", "nwparser.p0", "%{disposition};%{p0}");
 
-var part147 = // "Pattern{Constant('Port='), Field(p0,false)}"
-match("MESSAGE#621:411/36", "nwparser.p0", "Port=%{p0}");
+var part147 = match("MESSAGE#621:411/36", "nwparser.p0", "Port=%{p0}");
 
-var part148 = // "Pattern{Constant('"'), Field(dport,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/37_0", "nwparser.p0", "\"%{dport}\";%{p0}");
+var part148 = match("MESSAGE#621:411/37_0", "nwparser.p0", "\"%{dport}\";%{p0}");
 
-var part149 = // "Pattern{Field(dport,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/37_1", "nwparser.p0", "%{dport};%{p0}");
+var part149 = match("MESSAGE#621:411/37_1", "nwparser.p0", "%{dport};%{p0}");
 
-var part150 = // "Pattern{Constant('Database='), Field(p0,false)}"
-match("MESSAGE#621:411/38", "nwparser.p0", "Database=%{p0}");
+var part150 = match("MESSAGE#621:411/38", "nwparser.p0", "Database=%{p0}");
 
-var part151 = // "Pattern{Constant('"'), Field(db_name,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/39_0", "nwparser.p0", "\"%{db_name}\";%{p0}");
+var part151 = match("MESSAGE#621:411/39_0", "nwparser.p0", "\"%{db_name}\";%{p0}");
 
-var part152 = // "Pattern{Field(db_name,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/39_1", "nwparser.p0", "%{db_name};%{p0}");
+var part152 = match("MESSAGE#621:411/39_1", "nwparser.p0", "%{db_name};%{p0}");
 
-var part153 = // "Pattern{Constant('DeviceType='), Field(p0,false)}"
-match("MESSAGE#621:411/40", "nwparser.p0", "DeviceType=%{p0}");
+var part153 = match("MESSAGE#621:411/40", "nwparser.p0", "DeviceType=%{p0}");
 
-var part154 = // "Pattern{Constant('"'), Field(obj_type,false), Constant('";'), Field(p0,false)}"
-match("MESSAGE#621:411/41_0", "nwparser.p0", "\"%{obj_type}\";%{p0}");
+var part154 = match("MESSAGE#621:411/41_0", "nwparser.p0", "\"%{obj_type}\";%{p0}");
 
-var part155 = // "Pattern{Field(obj_type,false), Constant(';'), Field(p0,false)}"
-match("MESSAGE#621:411/41_1", "nwparser.p0", "%{obj_type};%{p0}");
+var part155 = match("MESSAGE#621:411/41_1", "nwparser.p0", "%{obj_type};%{p0}");
 
-var part156 = // "Pattern{Constant('ExtraDetails='), Field(p0,false)}"
-match("MESSAGE#621:411/42", "nwparser.p0", "ExtraDetails=%{p0}");
+var part156 = match("MESSAGE#621:411/42", "nwparser.p0", "ExtraDetails=%{p0}");
 
-var part157 = // "Pattern{Field(info,false), Constant(';')}"
-match("MESSAGE#621:411/43_1", "nwparser.p0", "%{info};");
+var part157 = match("MESSAGE#621:411/43_1", "nwparser.p0", "%{info};");
 
 var part158 = tagval("MESSAGE#0:1:01", "nwparser.payload", tvm, {
 	"Address": "dhost",
@@ -5796,8 +5522,7 @@ var part158 = tagval("MESSAGE#0:1:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part159 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#1:1", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part159 = match("MESSAGE#1:1", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup1,
 	dup2,
 ]));
@@ -5833,8 +5558,7 @@ var part160 = tagval("MESSAGE#2:2:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part161 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#3:2", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part161 = match("MESSAGE#3:2", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup4,
 	dup2,
 ]));
@@ -5874,8 +5598,7 @@ var part162 = tagval("MESSAGE#6:4:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part163 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#7:4", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part163 = match("MESSAGE#7:4", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup5,
 	dup6,
 	dup7,
@@ -5918,8 +5641,7 @@ var part164 = tagval("MESSAGE#20:13:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part165 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#21:13", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part165 = match("MESSAGE#21:13", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup16,
 	dup17,
@@ -5958,8 +5680,7 @@ var part166 = tagval("MESSAGE#26:16:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part167 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#27:16", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part167 = match("MESSAGE#27:16", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup19,
 	dup2,
 ]));
@@ -5995,8 +5716,7 @@ var part168 = tagval("MESSAGE#30:18:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part169 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#31:18", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part169 = match("MESSAGE#31:18", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup15,
 	dup2,
 ]));
@@ -6032,8 +5752,7 @@ var part170 = tagval("MESSAGE#38:22:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part171 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#39:22", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part171 = match("MESSAGE#39:22", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup21,
 	dup2,
 ]));
@@ -6069,8 +5788,7 @@ var part172 = tagval("MESSAGE#70:38:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part173 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#71:38", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part173 = match("MESSAGE#71:38", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup23,
 	dup2,
 ]));
@@ -6106,8 +5824,7 @@ var part174 = tagval("MESSAGE#116:61:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part175 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#117:61", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part175 = match("MESSAGE#117:61", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup20,
 	dup2,
 ]));
@@ -6143,8 +5860,7 @@ var part176 = tagval("MESSAGE#126:66:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part177 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#127:66", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part177 = match("MESSAGE#127:66", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup26,
 	dup2,
 ]));
@@ -6330,8 +6046,7 @@ var part179 = tagval("MESSAGE#591:317:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part180 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#592:317", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part180 = match("MESSAGE#592:317", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup79,
 	dup80,
 	dup81,
@@ -6369,8 +6084,7 @@ var part181 = tagval("MESSAGE#595:355:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part182 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#596:355", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part182 = match("MESSAGE#596:355", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup82,
 	dup2,
 ]));
@@ -6406,14 +6120,12 @@ var part183 = tagval("MESSAGE#599:357:01", "nwparser.payload", tvm, {
 	dup3,
 ]));
 
-var part184 = // "Pattern{Field(product,true), Constant(' '), Field(version,false), Constant('",ProductAccount="'), Field(service_account,false), Constant('",ProductProcess="'), Field(fld2,false), Constant('",EventId="'), Field(id,false), Constant('",EventClass="'), Field(fld3,false), Constant('",EventSeverity="'), Field(severity,false), Constant('",EventMessage="'), Field(action,false), Constant('",ActingUserName="'), Field(username,false), Constant('",ActingAddress="'), Field(hostip,false), Constant('",ActionSourceUser="'), Field(fld4,false), Constant('",ActionTargetUser="'), Field(c_username,false), Constant('",ActionObject="'), Field(filename,false), Constant('",ActionSafe="'), Field(group_object,false), Constant('",ActionLocation="'), Field(directory,false), Constant('",ActionCategory="'), Field(category,false), Constant('",ActionRequestId="'), Field(id1,false), Constant('",ActionReason="'), Field(event_description,false), Constant('",ActionExtraDetails="'), Field(info,false), Constant('"')}"
-match("MESSAGE#600:357", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
+var part184 = match("MESSAGE#600:357", "nwparser.payload", "%{product->} %{version}\",ProductAccount=\"%{service_account}\",ProductProcess=\"%{fld2}\",EventId=\"%{id}\",EventClass=\"%{fld3}\",EventSeverity=\"%{severity}\",EventMessage=\"%{action}\",ActingUserName=\"%{username}\",ActingAddress=\"%{hostip}\",ActionSourceUser=\"%{fld4}\",ActionTargetUser=\"%{c_username}\",ActionObject=\"%{filename}\",ActionSafe=\"%{group_object}\",ActionLocation=\"%{directory}\",ActionCategory=\"%{category}\",ActionRequestId=\"%{id1}\",ActionReason=\"%{event_description}\",ActionExtraDetails=\"%{info}\"", processor_chain([
 	dup83,
 	dup2,
 ]));
 
-var part185 = // "Pattern{Constant('Version='), Field(version,false), Constant(';Message='), Field(action,false), Constant(';Issuer='), Field(username,false), Constant(';Station='), Field(hostip,false), Constant(';File='), Field(filename,false), Constant(';Safe='), Field(group_object,false), Constant(';Location='), Field(directory,false), Constant(';Category='), Field(category,false), Constant(';RequestId='), Field(id1,false), Constant(';Reason='), Field(event_description,false), Constant(';Severity='), Field(severity,false), Constant(';GatewayStation='), Field(saddr,false), Constant(';TicketID='), Field(operation_id,false), Constant(';PolicyID='), Field(policyname,false), Constant(';UserName='), Field(c_username,false), Constant(';LogonDomain='), Field(domain,false), Constant(';Address='), Field(dhost,false), Constant(';CPMStatus='), Field(disposition,false), Constant(';Port="'), Field(dport,false), Constant('";Database='), Field(db_name,false), Constant(';DeviceType='), Field(obj_type,false), Constant(';ExtraDetails='), Field(info,false), Constant(';')}"
-match("MESSAGE#617:372", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=%{directory};Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info};", processor_chain([
+var part185 = match("MESSAGE#617:372", "nwparser.payload", "Version=%{version};Message=%{action};Issuer=%{username};Station=%{hostip};File=%{filename};Safe=%{group_object};Location=%{directory};Category=%{category};RequestId=%{id1};Reason=%{event_description};Severity=%{severity};GatewayStation=%{saddr};TicketID=%{operation_id};PolicyID=%{policyname};UserName=%{c_username};LogonDomain=%{domain};Address=%{dhost};CPMStatus=%{disposition};Port=\"%{dport}\";Database=%{db_name};DeviceType=%{obj_type};ExtraDetails=%{info};", processor_chain([
 	dup4,
 	dup2,
 	dup3,

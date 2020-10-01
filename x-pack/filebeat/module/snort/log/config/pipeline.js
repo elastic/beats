@@ -46,44 +46,31 @@ var map_getEventLegacyCategoryName = {
 
 var dup1 = setc("messageid","FTD_events");
 
-var dup2 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#2:00010/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var dup2 = match("HEADER#2:00010/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
-var dup3 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" [Impact: '), Field(p0,false)}"
-match("HEADER#2:00010/1_0", "nwparser.p0", "\"%{hfld10}\" [Impact: %{p0}");
+var dup3 = match("HEADER#2:00010/1_0", "nwparser.p0", "\"%{hfld10}\" [Impact: %{p0}");
 
-var dup4 = // "Pattern{Field(hfld10,true), Constant(' [Impact: '), Field(p0,false)}"
-match("HEADER#2:00010/1_1", "nwparser.p0", "%{hfld10->} [Impact: %{p0}");
+var dup4 = match("HEADER#2:00010/1_1", "nwparser.p0", "%{hfld10->} [Impact: %{p0}");
 
-var dup5 = // "Pattern{Field(result,false), Constant('] From '), Field(hfld11,true), Constant(' at '), Field(fld9,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#3:00011/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var dup5 = match("HEADER#3:00011/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
-var dup6 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" [Classification: '), Field(p0,false)}"
-match("HEADER#4:00012/1_0", "nwparser.p0", "\"%{hfld10}\" [Classification: %{p0}");
+var dup6 = match("HEADER#4:00012/1_0", "nwparser.p0", "\"%{hfld10}\" [Classification: %{p0}");
 
-var dup7 = // "Pattern{Field(hfld10,true), Constant(' [Classification: '), Field(p0,false)}"
-match("HEADER#4:00012/1_1", "nwparser.p0", "%{hfld10->} [Classification: %{p0}");
+var dup7 = match("HEADER#4:00012/1_1", "nwparser.p0", "%{hfld10->} [Classification: %{p0}");
 
-var dup8 = // "Pattern{Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#4:00012/2", "nwparser.p0", "%{sigtype}] [Priority: %{payload}");
+var dup8 = match("HEADER#4:00012/2", "nwparser.p0", "%{sigtype}] [Priority: %{payload}");
 
-var dup9 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" ['), Field(p0,false)}"
-match("HEADER#5:00013/1_0", "nwparser.p0", "\"%{hfld10}\" [%{p0}");
+var dup9 = match("HEADER#5:00013/1_0", "nwparser.p0", "\"%{hfld10}\" [%{p0}");
 
-var dup10 = // "Pattern{Field(hfld10,true), Constant(' ['), Field(p0,false)}"
-match("HEADER#5:00013/1_1", "nwparser.p0", "%{hfld10->} [%{p0}");
+var dup10 = match("HEADER#5:00013/1_1", "nwparser.p0", "%{hfld10->} [%{p0}");
 
-var dup11 = // "Pattern{Field(info,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#5:00013/2", "nwparser.p0", "%{info}] [Priority: %{payload}");
+var dup11 = match("HEADER#5:00013/2", "nwparser.p0", "%{info}] [Priority: %{payload}");
 
-var dup12 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' snort['), Field(hpid,false), Constant(']: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#7:00020/0", "message", "%{month->} %{day->} %{time->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var dup12 = match("HEADER#7:00020/0", "message", "%{month->} %{day->} %{time->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
-var dup13 = // "Pattern{Field(result,false), Constant('] From '), Field(group_object,false), Constant('/'), Field(hfld11,true), Constant(' at '), Field(fld9,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#7:00020/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var dup13 = match("HEADER#7:00020/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
-var dup14 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' snort: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#11:00030/0", "message", "%{month->} %{day->} %{time->} snort: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var dup14 = match("HEADER#11:00030/0", "message", "%{month->} %{day->} %{time->} snort: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
 var dup15 = call({
 	dest: "nwparser.payload",
@@ -135,11 +122,9 @@ var dup19 = call({
 	],
 });
 
-var dup20 = // "Pattern{Constant('at'), Field(p0,false)}"
-match("HEADER#26:0011/1_1", "nwparser.p0", "at%{p0}");
+var dup20 = match("HEADER#26:0011/1_1", "nwparser.p0", "at%{p0}");
 
-var dup21 = // "Pattern{Field(,true), Constant(' '), Field(p0,false)}"
-match("HEADER#26:0011/2", "nwparser.p0", "%{} %{p0}");
+var dup21 = match("HEADER#26:0011/2", "nwparser.p0", "%{} %{p0}");
 
 var dup22 = call({
 	dest: "nwparser.messageid",
@@ -171,19 +156,15 @@ var dup24 = setc("messageid","HMNOTIFY");
 
 var dup25 = setc("messageid","SystemSettings");
 
-var dup26 = // "Pattern{Constant('['), Field(hpid,false), Constant(']: ['), Field(p0,false)}"
-match("HEADER#41:0024/1_0", "nwparser.p0", "[%{hpid}]: [%{p0}");
+var dup26 = match("HEADER#41:0024/1_0", "nwparser.p0", "[%{hpid}]: [%{p0}");
 
-var dup27 = // "Pattern{Constant(': ['), Field(p0,false)}"
-match("HEADER#41:0024/1_1", "nwparser.p0", ": [%{p0}");
+var dup27 = match("HEADER#41:0024/1_1", "nwparser.p0", ": [%{p0}");
 
-var dup28 = // "Pattern{Constant(']'), Field(hversion,false), Constant(':'), Field(hfld2,false), Constant(':'), Field(hevent_source,true), Constant(' '), Field(payload,false)}"
-match("HEADER#41:0024/2", "nwparser.p0", "]%{hversion}:%{hfld2}:%{hevent_source->} %{payload}");
+var dup28 = match("HEADER#41:0024/2", "nwparser.p0", "]%{hversion}:%{hfld2}:%{hevent_source->} %{payload}");
 
 var dup29 = setc("messageid","Snort_AlertLog");
 
-var dup30 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(hfld2,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#43:0023/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{hfld2}:%{hversion}] %{p0}");
+var dup30 = match("HEADER#43:0023/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{hfld2}:%{hversion}] %{p0}");
 
 var dup31 = date_time({
 	dest: "event_time",
@@ -195,38 +176,27 @@ var dup31 = date_time({
 
 var dup32 = setf("msg","$MSG");
 
-var dup33 = // "Pattern{Field(threat_val,true), Constant(' ]:alert {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_0", "nwparser.payload", "%{threat_val->} ]:alert {%{p0}");
+var dup33 = match("MESSAGE#1:0/0_0", "nwparser.payload", "%{threat_val->} ]:alert {%{p0}");
 
-var dup34 = // "Pattern{Field(threat_val,true), Constant(' ]: '), Field(fld1,true), Constant(' {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_1", "nwparser.payload", "%{threat_val->} ]: %{fld1->} {%{p0}");
+var dup34 = match("MESSAGE#1:0/0_1", "nwparser.payload", "%{threat_val->} ]: %{fld1->} {%{p0}");
 
-var dup35 = // "Pattern{Field(threat_val,false), Constant(']: {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_2", "nwparser.payload", "%{threat_val}]: {%{p0}");
+var dup35 = match("MESSAGE#1:0/0_2", "nwparser.payload", "%{threat_val}]: {%{p0}");
 
-var dup36 = // "Pattern{Field(threat_val,true), Constant(' ] {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_3", "nwparser.payload", "%{threat_val->} ] {%{p0}");
+var dup36 = match("MESSAGE#1:0/0_3", "nwparser.payload", "%{threat_val->} ] {%{p0}");
 
-var dup37 = // "Pattern{Field(protocol,false), Constant('} '), Field(p0,false)}"
-match("MESSAGE#1:0/1", "nwparser.p0", "%{protocol}} %{p0}");
+var dup37 = match("MESSAGE#1:0/1", "nwparser.p0", "%{protocol}} %{p0}");
 
-var dup38 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,true), Constant(' ('), Field(location_src,false), Constant(') -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src}) -> %{p0}");
+var dup38 = match("MESSAGE#1:0/2_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src}) -> %{p0}");
 
-var dup39 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_1", "nwparser.p0", "%{saddr}:%{sport->} -> %{p0}");
+var dup39 = match("MESSAGE#1:0/2_1", "nwparser.p0", "%{saddr}:%{sport->} -> %{p0}");
 
-var dup40 = // "Pattern{Field(saddr,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_2", "nwparser.p0", "%{saddr->} -> %{p0}");
+var dup40 = match("MESSAGE#1:0/2_2", "nwparser.p0", "%{saddr->} -> %{p0}");
 
-var dup41 = // "Pattern{Field(daddr,false), Constant(':'), Field(dport,true), Constant(' ('), Field(location_dst,false), Constant(')')}"
-match("MESSAGE#1:0/3_0", "nwparser.p0", "%{daddr}:%{dport->} (%{location_dst})");
+var dup41 = match("MESSAGE#1:0/3_0", "nwparser.p0", "%{daddr}:%{dport->} (%{location_dst})");
 
-var dup42 = // "Pattern{Field(daddr,false), Constant(':'), Field(dport,false)}"
-match("MESSAGE#1:0/3_1", "nwparser.p0", "%{daddr}:%{dport}");
+var dup42 = match("MESSAGE#1:0/3_1", "nwparser.p0", "%{daddr}:%{dport}");
 
-var dup43 = // "Pattern{Field(daddr,false)}"
-match_copy("MESSAGE#1:0/3_2", "nwparser.p0", "daddr");
+var dup43 = match_copy("MESSAGE#1:0/3_2", "nwparser.p0", "daddr");
 
 var dup44 = setc("eventcategory","1003030000");
 
@@ -266,17 +236,13 @@ var dup56 = date_time({
 	],
 });
 
-var dup57 = // "Pattern{Field(context,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#2:0:01/0", "nwparser.payload", "%{context->} %{p0}");
+var dup57 = match("MESSAGE#2:0:01/0", "nwparser.payload", "%{context->} %{p0}");
 
-var dup58 = // "Pattern{Constant('<<'), Field(interface,false), Constant('> '), Field(p0,false)}"
-match("MESSAGE#2:0:01/1_0", "nwparser.p0", "\u003c\u003c%{interface}> %{p0}");
+var dup58 = match("MESSAGE#2:0:01/1_0", "nwparser.p0", "\u003c\u003c%{interface}> %{p0}");
 
-var dup59 = // "Pattern{Field(p0,false)}"
-match_copy("MESSAGE#2:0:01/1_1", "nwparser.p0", "p0");
+var dup59 = match_copy("MESSAGE#2:0:01/1_1", "nwparser.p0", "p0");
 
-var dup60 = // "Pattern{Constant('{'), Field(protocol,false), Constant('} '), Field(p0,false)}"
-match("MESSAGE#2:0:01/2", "nwparser.p0", "{%{protocol}} %{p0}");
+var dup60 = match("MESSAGE#2:0:01/2", "nwparser.p0", "{%{protocol}} %{p0}");
 
 var dup61 = setc("eventcategory","1103000000");
 
@@ -288,17 +254,13 @@ var dup64 = setc("eventcategory","1002000000");
 
 var dup65 = setc("eventcategory","1001020200");
 
-var dup66 = // "Pattern{Field(threat_val,true), Constant(' ]'), Field(p0,false)}"
-match("MESSAGE#33:10/0", "nwparser.payload", "%{threat_val->} ]%{p0}");
+var dup66 = match("MESSAGE#33:10/0", "nwparser.payload", "%{threat_val->} ]%{p0}");
 
-var dup67 = // "Pattern{Constant(' <<'), Field(interface,false), Constant('> '), Field(p0,false)}"
-match("MESSAGE#33:10/1_0", "nwparser.p0", " \u003c\u003c%{interface}> %{p0}");
+var dup67 = match("MESSAGE#33:10/1_0", "nwparser.p0", " \u003c\u003c%{interface}> %{p0}");
 
-var dup68 = // "Pattern{Constant(': '), Field(p0,false)}"
-match("MESSAGE#33:10/1_1", "nwparser.p0", ": %{p0}");
+var dup68 = match("MESSAGE#33:10/1_1", "nwparser.p0", ": %{p0}");
 
-var dup69 = // "Pattern{Constant(' '), Field(p0,false)}"
-match("MESSAGE#33:10/1_2", "nwparser.p0", " %{p0}");
+var dup69 = match("MESSAGE#33:10/1_2", "nwparser.p0", " %{p0}");
 
 var dup70 = setc("eventcategory","1001020100");
 
@@ -310,8 +272,7 @@ var dup73 = setc("ec_activity","Detect");
 
 var dup74 = setc("ec_theme","TEV");
 
-var dup75 = // "Pattern{Field(context,true), Constant(' <<'), Field(interface,false), Constant('> '), Field(protocol,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#80:103:01/0", "nwparser.payload", "%{context->} \u003c\u003c%{interface}> %{protocol->} %{p0}");
+var dup75 = match("MESSAGE#80:103:01/0", "nwparser.payload", "%{context->} \u003c\u003c%{interface}> %{protocol->} %{p0}");
 
 var dup76 = setf("signame","context");
 
@@ -387,17 +348,13 @@ var dup111 = setc("eventcategory","1001020307");
 
 var dup112 = setc("eventcategory","1401060000");
 
-var dup113 = // "Pattern{Field(threat_val,true), Constant(' ]:alert '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_0", "nwparser.payload", "%{threat_val->} ]:alert %{p0}");
+var dup113 = match("MESSAGE#5535:3086/0_0", "nwparser.payload", "%{threat_val->} ]:alert %{p0}");
 
-var dup114 = // "Pattern{Field(threat_val,false), Constant(']: '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_1", "nwparser.payload", "%{threat_val}]: %{p0}");
+var dup114 = match("MESSAGE#5535:3086/0_1", "nwparser.payload", "%{threat_val}]: %{p0}");
 
-var dup115 = // "Pattern{Field(threat_val,true), Constant(' ] '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_2", "nwparser.payload", "%{threat_val->} ] %{p0}");
+var dup115 = match("MESSAGE#5535:3086/0_2", "nwparser.payload", "%{threat_val->} ] %{p0}");
 
-var dup116 = // "Pattern{Constant(''), Field(p0,false)}"
-match("MESSAGE#5535:3086/1", "nwparser.p0", "%{p0}");
+var dup116 = match("MESSAGE#5535:3086/1", "nwparser.p0", "%{p0}");
 
 var dup117 = setc("eventcategory","1003050000");
 
@@ -413,14 +370,11 @@ var dup122 = setc("eventcategory","1603090000");
 
 var dup123 = setc("eventcategory","1003040000");
 
-var dup124 = // "Pattern{Constant(':alert '), Field(p0,false)}"
-match("MESSAGE#30119:28015/1_1", "nwparser.p0", ":alert %{p0}");
+var dup124 = match("MESSAGE#30119:28015/1_1", "nwparser.p0", ":alert %{p0}");
 
-var dup125 = // "Pattern{Constant(''), Field(saddr,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#36377:34596/3_1", "nwparser.p0", "%{saddr->} -> %{p0}");
+var dup125 = match("MESSAGE#36377:34596/3_1", "nwparser.p0", "%{saddr->} -> %{p0}");
 
-var dup126 = // "Pattern{Constant(''), Field(daddr,false)}"
-match("MESSAGE#36377:34596/4_1", "nwparser.p0", "%{daddr}");
+var dup126 = match("MESSAGE#36377:34596/4_1", "nwparser.p0", "%{daddr}");
 
 var dup127 = setc("eventcategory","1605000000");
 
@@ -434,25 +388,19 @@ var dup129 = date_time({
 	],
 });
 
-var dup130 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' MAC: '), Field(smacaddr,true), Constant(' TTL '), Field(p0,false)}"
-match("MESSAGE#38458:MAC_Information_Change/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} MAC: %{smacaddr->} TTL %{p0}");
+var dup130 = match("MESSAGE#38458:MAC_Information_Change/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} MAC: %{smacaddr->} TTL %{p0}");
 
-var dup131 = // "Pattern{Field(sinterface,true), Constant(' ('), Field(protocol,true), Constant(' detected)')}"
-match("MESSAGE#38458:MAC_Information_Change/1_0", "nwparser.p0", "%{sinterface->} (%{protocol->} detected)");
+var dup131 = match("MESSAGE#38458:MAC_Information_Change/1_0", "nwparser.p0", "%{sinterface->} (%{protocol->} detected)");
 
-var dup132 = // "Pattern{Field(sinterface,false)}"
-match_copy("MESSAGE#38458:MAC_Information_Change/1_1", "nwparser.p0", "sinterface");
+var dup132 = match_copy("MESSAGE#38458:MAC_Information_Change/1_1", "nwparser.p0", "sinterface");
 
-var dup133 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> '), Field(p0,false)}"
-match("MESSAGE#38461:New_Host/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> %{p0}");
+var dup133 = match("MESSAGE#38461:New_Host/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> %{p0}");
 
-var dup134 = // "Pattern{Field(protocol,false)}"
-match_copy("MESSAGE#38462:New_Network_Protocol/2", "nwparser.p0", "protocol");
+var dup134 = match_copy("MESSAGE#38462:New_Network_Protocol/2", "nwparser.p0", "protocol");
 
 var dup135 = setc("eventcategory","1605020000");
 
-var dup136 = // "Pattern{Field(protocol,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38468:TCP_Service_Information_Update/1_0", "nwparser.p0", "%{protocol->} Confidence: %{result}");
+var dup136 = match("MESSAGE#38468:TCP_Service_Information_Update/1_0", "nwparser.p0", "%{protocol->} Confidence: %{result}");
 
 var dup137 = setc("ec_subject","User");
 
@@ -470,19 +418,15 @@ var dup143 = setf("hostip","hfld2");
 
 var dup144 = setc("ec_activity","Logoff");
 
-var dup145 = // "Pattern{Constant('>'), Field(p0,false)}"
-match("MESSAGE#38495:SystemSettings:09/1_0", "nwparser.p0", ">%{p0}");
+var dup145 = match("MESSAGE#38495:SystemSettings:09/1_0", "nwparser.p0", ">%{p0}");
 
 var dup146 = setc("category","Session Expiration");
 
-var dup147 = // "Pattern{Field(fld1,false), Constant(']['), Field(policyname,false), Constant('] Connection Type: '), Field(event_state,false), Constant(', User: '), Field(username,false), Constant(', Client: '), Field(application,false), Constant(', Application Protocol: '), Field(protocol,false), Constant(', Web App: '), Field(application,false), Constant(', Access Control Rule Name: '), Field(rulename,false), Constant(', Access Control Rule Action: '), Field(action,false), Constant(', Access Control Rule Reasons: '), Field(result,false), Constant(', URL Category: '), Field(category,false), Constant(', URL Reputation: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/0", "nwparser.payload", "%{fld1}][%{policyname}] Connection Type: %{event_state}, User: %{username}, Client: %{application}, Application Protocol: %{protocol}, Web App: %{application}, Access Control Rule Name: %{rulename}, Access Control Rule Action: %{action}, Access Control Rule Reasons: %{result}, URL Category: %{category}, URL Reputation: %{p0}");
+var dup147 = match("MESSAGE#38514:Primary_Detection_Engine/0", "nwparser.payload", "%{fld1}][%{policyname}] Connection Type: %{event_state}, User: %{username}, Client: %{application}, Application Protocol: %{protocol}, Web App: %{application}, Access Control Rule Name: %{rulename}, Access Control Rule Action: %{action}, Access Control Rule Reasons: %{result}, URL Category: %{category}, URL Reputation: %{p0}");
 
-var dup148 = // "Pattern{Constant('Risk unknown, URL: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/1_0", "nwparser.p0", "Risk unknown, URL: %{p0}");
+var dup148 = match("MESSAGE#38514:Primary_Detection_Engine/1_0", "nwparser.p0", "Risk unknown, URL: %{p0}");
 
-var dup149 = // "Pattern{Field(reputation_num,false), Constant(', URL: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/1_1", "nwparser.p0", "%{reputation_num}, URL: %{p0}");
+var dup149 = match("MESSAGE#38514:Primary_Detection_Engine/1_1", "nwparser.p0", "%{reputation_num}, URL: %{p0}");
 
 var dup150 = setc("eventcategory","1801000000");
 
@@ -490,20 +434,15 @@ var dup151 = setc("dclass_counter1_string","Number of File Events");
 
 var dup152 = setc("dclass_counter2_string","Number of IPS Events");
 
-var dup153 = // "Pattern{Constant('-*> '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/1_0", "nwparser.p0", "-*> %{p0}");
+var dup153 = match("MESSAGE#38521:Network_Based_Retrospective/1_0", "nwparser.p0", "-*> %{p0}");
 
-var dup154 = // "Pattern{Constant('> '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/1_1", "nwparser.p0", "> %{p0}");
+var dup154 = match("MESSAGE#38521:Network_Based_Retrospective/1_1", "nwparser.p0", "> %{p0}");
 
-var dup155 = // "Pattern{Constant('From "'), Field(sensor,false), Constant('" at '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/1_0", "nwparser.p0", "From \"%{sensor}\" at %{p0}");
+var dup155 = match("MESSAGE#38522:Network_Based_Retrospective:01/1_0", "nwparser.p0", "From \"%{sensor}\" at %{p0}");
 
-var dup156 = // "Pattern{Constant('at '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/1_1", "nwparser.p0", "at %{p0}");
+var dup156 = match("MESSAGE#38522:Network_Based_Retrospective:01/1_1", "nwparser.p0", "at %{p0}");
 
-var dup157 = // "Pattern{Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/2", "nwparser.p0", "%{fld6->} %{event_time_string->} UTC %{p0}");
+var dup157 = match("MESSAGE#38522:Network_Based_Retrospective:01/2", "nwparser.p0", "%{fld6->} %{event_time_string->} UTC %{p0}");
 
 var dup158 = date_time({
 	dest: "event_time",
@@ -513,11 +452,9 @@ var dup158 = date_time({
 	],
 });
 
-var dup159 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' '), Field(network_service,false)}"
-match("MESSAGE#38528:Client_Update/4", "nwparser.p0", "IP Address: %{saddr->} %{network_service}");
+var dup159 = match("MESSAGE#38528:Client_Update/4", "nwparser.p0", "IP Address: %{saddr->} %{network_service}");
 
-var dup160 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(p0,false)}"
-match("MESSAGE#38530:UDP_Server_Information_Update/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
+var dup160 = match("MESSAGE#38530:UDP_Server_Information_Update/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
 
 var dup161 = date_time({
 	dest: "event_time",
@@ -564,8 +501,7 @@ var dup169 = linear_select([
 	dup10,
 ]);
 
-var dup170 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' '), Field(msgIdPart3,true), Constant(' '), Field(p0,false)}"
-match("HEADER#26:0011/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{p0}", processor_chain([
+var dup170 = match("HEADER#26:0011/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{p0}", processor_chain([
 	dup19,
 ]));
 
@@ -637,8 +573,7 @@ var dup182 = linear_select([
 	dup132,
 ]);
 
-var dup183 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' OS: '), Field(version,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{version->} Confidence: %{result}", processor_chain([
+var dup183 = match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{version->} Confidence: %{result}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -646,8 +581,7 @@ match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} Fr
 	dup129,
 ]));
 
-var dup184 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(protocol,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38467:TCP_Service_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result}", processor_chain([
+var dup184 = match("MESSAGE#38467:TCP_Service_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -660,8 +594,7 @@ var dup185 = linear_select([
 	dup134,
 ]);
 
-var dup186 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' '), Field(product,false)}"
-match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} %{product}", processor_chain([
+var dup186 = match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} %{product}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -669,8 +602,7 @@ match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} 
 	dup129,
 ]));
 
-var dup187 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,false)}"
-match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport}", processor_chain([
+var dup187 = match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -678,8 +610,7 @@ match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"
 	dup129,
 ]));
 
-var dup188 = // "Pattern{Field(context,true), Constant(' From '), Field(sensor,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,false)}"
-match("MESSAGE#38475:TCP_Port_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr}", processor_chain([
+var dup188 = match("MESSAGE#38475:TCP_Port_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -4814,34 +4745,28 @@ var dup356 = all_match({
 	]),
 });
 
-var hdr1 = // "Pattern{Field(hyear,false), Constant('-'), Field(hmonth,false), Constant('-'), Field(day,false), Constant('T'), Field(time,false), Constant('Z %FTD-'), Field(fld2,false), Constant('-'), Field(hfld3,false), Constant(':'), Field(payload,false)}"
-match("HEADER#0:0055", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %FTD-%{fld2}-%{hfld3}:%{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0055", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %FTD-%{fld2}-%{hfld3}:%{payload}", processor_chain([
 	setc("header_id","0055"),
 	dup1,
 ]));
 
-var hdr2 = // "Pattern{Field(hyear,false), Constant('-'), Field(hmonth,false), Constant('-'), Field(day,false), Constant('T'), Field(time,false), Constant('Z '), Field(hostname,true), Constant(' '), Field(fld1,true), Constant(' %NGIPS-'), Field(severity,false), Constant('-'), Field(hfld3,false), Constant(':'), Field(payload,false)}"
-match("HEADER#1:0056", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %{hostname->} %{fld1->} %NGIPS-%{severity}-%{hfld3}:%{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0056", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %{hostname->} %{fld1->} %NGIPS-%{severity}-%{hfld3}:%{payload}", processor_chain([
 	setc("header_id","0056"),
 	setc("messageid","NGIPS_events"),
 ]));
 
-var part1 = // "Pattern{Field(result,false), Constant('] From '), Field(p0,false)}"
-match("HEADER#2:00010/2", "nwparser.p0", "%{result}] From %{p0}");
+var part1 = match("HEADER#2:00010/2", "nwparser.p0", "%{result}] From %{p0}");
 
-var part2 = // "Pattern{Constant('"'), Field(group_object,false), Constant('/'), Field(hfld11,false), Constant('" at '), Field(p0,false)}"
-match("HEADER#2:00010/3_0", "nwparser.p0", "\"%{group_object}/%{hfld11}\" at %{p0}");
+var part2 = match("HEADER#2:00010/3_0", "nwparser.p0", "\"%{group_object}/%{hfld11}\" at %{p0}");
 
-var part3 = // "Pattern{Field(group_object,false), Constant('/'), Field(hfld11,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#2:00010/3_1", "nwparser.p0", "%{group_object}/%{hfld11->} at %{p0}");
+var part3 = match("HEADER#2:00010/3_1", "nwparser.p0", "%{group_object}/%{hfld11->} at %{p0}");
 
 var select1 = linear_select([
 	part2,
 	part3,
 ]);
 
-var part4 = // "Pattern{Field(fld9,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#2:00010/4", "nwparser.p0", "%{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var part4 = match("HEADER#2:00010/4", "nwparser.p0", "%{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
 var all1 = all_match({
 	processors: [
@@ -4889,8 +4814,7 @@ var all4 = all_match({
 	]),
 });
 
-var hdr3 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': '), Field(hfld2,false), Constant(':'), Field(hfld3,true), Constant(' at '), Field(hfld4,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant(']'), Field(payload,false)}"
-match("HEADER#6:0015", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: %{hfld2}:%{hfld3->} at %{hfld4}: [%{hevent_source}:%{messageid}:%{hversion}]%{payload}", processor_chain([
+var hdr3 = match("HEADER#6:0015", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: %{hfld2}:%{hfld3->} at %{hfld4}: [%{hevent_source}:%{messageid}:%{hversion}]%{payload}", processor_chain([
 	setc("header_id","0015"),
 ]));
 
@@ -4982,8 +4906,7 @@ var all12 = all_match({
 	]),
 });
 
-var hdr4 = // "Pattern{Constant('snort['), Field(hpid,false), Constant(']: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#15:0030/0", "message", "snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var hdr4 = match("HEADER#15:0030/0", "message", "snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
 var all13 = all_match({
 	processors: [
@@ -4996,64 +4919,53 @@ var all13 = all_match({
 	]),
 });
 
-var hdr5 = // "Pattern{Constant('snort['), Field(hpid,false), Constant(']: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(payload,false)}"
-match("HEADER#16:0004", "message", "snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
+var hdr5 = match("HEADER#16:0004", "message", "snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
 	setc("header_id","0004"),
 ]));
 
-var hdr6 = // "Pattern{Constant('snort: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(payload,false)}"
-match("HEADER#17:0005", "message", "snort: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
+var hdr6 = match("HEADER#17:0005", "message", "snort: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
 	setc("header_id","0005"),
 ]));
 
-var hdr7 = // "Pattern{Constant('snort['), Field(hpid,false), Constant(']: '), Field(messageid,false), Constant(': '), Field(payload,false)}"
-match("HEADER#18:0018", "message", "snort[%{hpid}]: %{messageid}: %{payload}", processor_chain([
+var hdr7 = match("HEADER#18:0018", "message", "snort[%{hpid}]: %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0018"),
 ]));
 
-var hdr8 = // "Pattern{Constant('snort: '), Field(messageid,false), Constant(': '), Field(payload,false)}"
-match("HEADER#19:0006", "message", "snort: %{messageid}: %{payload}", processor_chain([
+var hdr8 = match("HEADER#19:0006", "message", "snort: %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0006"),
 ]));
 
-var hdr9 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' snort['), Field(hpid,false), Constant(']: '), Field(messageid,true), Constant(' '), Field(p0,false)}"
-match("HEADER#20:0007", "message", "%{month->} %{day->} %{time->} %{host->} snort[%{hpid}]: %{messageid->} %{p0}", processor_chain([
+var hdr9 = match("HEADER#20:0007", "message", "%{month->} %{day->} %{time->} %{host->} snort[%{hpid}]: %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0007"),
 	dup15,
 ]));
 
-var hdr10 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' snort['), Field(hpid,false), Constant(']: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(payload,false)}"
-match("HEADER#21:0008", "message", "%{month->} %{day->} %{time->} %{host->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
+var hdr10 = match("HEADER#21:0008", "message", "%{month->} %{day->} %{time->} %{host->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
 	setc("header_id","0008"),
 ]));
 
-var hdr11 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(hostname,true), Constant(' '), Field(hfld1,false), Constant(': [Primary Detection Engine ('), Field(hfld10,false), Constant(')]['), Field(policyname,false), Constant(']['), Field(hfld2,false), Constant(':'), Field(id,false), Constant(':'), Field(hfld3,false), Constant(']'), Field(payload,false)}"
-match("HEADER#22:0046", "message", "%{month->} %{day->} %{time->} %{hostname->} %{hfld1}: [Primary Detection Engine (%{hfld10})][%{policyname}][%{hfld2}:%{id}:%{hfld3}]%{payload}", processor_chain([
+var hdr11 = match("HEADER#22:0046", "message", "%{month->} %{day->} %{time->} %{hostname->} %{hfld1}: [Primary Detection Engine (%{hfld10})][%{policyname}][%{hfld2}:%{id}:%{hfld3}]%{payload}", processor_chain([
 	setc("header_id","0046"),
 	dup16,
 ]));
 
-var hdr12 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hpid,false), Constant(']['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(payload,false)}"
-match("HEADER#23:0009", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hpid}][%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
+var hdr12 = match("HEADER#23:0009", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hpid}][%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
 	setc("header_id","0009"),
 ]));
 
-var hdr13 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hfld2,true), Constant(' '), Field(hfld3,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld5,false), Constant(': '), Field(hfld6,false), Constant(': '), Field(hfld7,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' From '), Field(hsensor,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#24:0022", "message", "%{hfld1->} %{hfld2->} %{hfld3->} %{host->} %{hfld5}: %{hfld6}: %{hfld7}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} From %{hsensor->} at %{p0}", processor_chain([
+var hdr13 = match("HEADER#24:0022", "message", "%{hfld1->} %{hfld2->} %{hfld3->} %{host->} %{hfld5}: %{hfld6}: %{hfld7}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} From %{hsensor->} at %{p0}", processor_chain([
 	setc("header_id","0022"),
 	dup17,
 	dup18,
 ]));
 
-var hdr14 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' From '), Field(hsensor,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#25:0010", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} From %{hsensor->} at %{p0}", processor_chain([
+var hdr14 = match("HEADER#25:0010", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} From %{hsensor->} at %{p0}", processor_chain([
 	setc("header_id","0010"),
 	dup17,
 	dup18,
 ]));
 
-var part5 = // "Pattern{Constant('From '), Field(hsensor,true), Constant(' at'), Field(p0,false)}"
-match("HEADER#26:0011/1_0", "nwparser.p0", "From %{hsensor->} at%{p0}");
+var part5 = match("HEADER#26:0011/1_0", "nwparser.p0", "From %{hsensor->} at%{p0}");
 
 var select2 = linear_select([
 	part5,
@@ -5072,8 +4984,7 @@ var all14 = all_match({
 	]),
 });
 
-var part6 = // "Pattern{Field(fld10,true), Constant(' From '), Field(hsensor,true), Constant(' at'), Field(p0,false)}"
-match("HEADER#27:0014/1_0", "nwparser.p0", "%{fld10->} From %{hsensor->} at%{p0}");
+var part6 = match("HEADER#27:0014/1_0", "nwparser.p0", "%{fld10->} From %{hsensor->} at%{p0}");
 
 var select3 = linear_select([
 	part6,
@@ -5092,8 +5003,7 @@ var all15 = all_match({
 	]),
 });
 
-var hdr15 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' '), Field(msgIdPart3,true), Constant(' '), Field(msgIdPart4,true), Constant(' From '), Field(hsensor,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#28:0012", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{msgIdPart4->} From %{hsensor->} at %{p0}", processor_chain([
+var hdr15 = match("HEADER#28:0012", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{msgIdPart4->} From %{hsensor->} at %{p0}", processor_chain([
 	setc("header_id","0012"),
 	dup23,
 	call({
@@ -5115,8 +5025,7 @@ match("HEADER#28:0012", "message", "%{month->} %{day->} %{time->} %{host->} %{hf
 	}),
 ]));
 
-var hdr16 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' '), Field(msgIdPart3,true), Constant(' '), Field(msgIdPart4,true), Constant(' '), Field(hfld12,true), Constant(' From '), Field(hsensor,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#29:0016", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{msgIdPart4->} %{hfld12->} From %{hsensor->} at %{p0}", processor_chain([
+var hdr16 = match("HEADER#29:0016", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{msgIdPart4->} %{hfld12->} From %{hsensor->} at %{p0}", processor_chain([
 	setc("header_id","0016"),
 	dup23,
 	call({
@@ -5140,72 +5049,60 @@ match("HEADER#29:0016", "message", "%{month->} %{day->} %{time->} %{host->} %{hf
 	}),
 ]));
 
-var hdr17 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' snort: '), Field(messageid,false), Constant(':'), Field(payload,false)}"
-match("HEADER#30:0013", "message", "%{month->} %{day->} %{time->} %{host->} snort: %{messageid}:%{payload}", processor_chain([
+var hdr17 = match("HEADER#30:0013", "message", "%{month->} %{day->} %{time->} %{host->} snort: %{messageid}:%{payload}", processor_chain([
 	setc("header_id","0013"),
 ]));
 
-var hdr18 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(fld,false), Constant(': HMNOTIFY: '), Field(payload,false)}"
-match("HEADER#31:0020", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: HMNOTIFY: %{payload}", processor_chain([
+var hdr18 = match("HEADER#31:0020", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: HMNOTIFY: %{payload}", processor_chain([
 	setc("header_id","0020"),
 	dup24,
 ]));
 
-var hdr19 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' : HMNOTIFY: '), Field(payload,false)}"
-match("HEADER#32:0035", "message", "%{month->} %{day->} %{time->} %{host->} : HMNOTIFY: %{payload}", processor_chain([
+var hdr19 = match("HEADER#32:0035", "message", "%{month->} %{day->} %{time->} %{host->} : HMNOTIFY: %{payload}", processor_chain([
 	setc("header_id","0035"),
 	dup24,
 ]));
 
-var hdr20 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(fld,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(hsigid,false), Constant(':'), Field(hversion,false), Constant('] "'), Field(messageid,true), Constant(' '), Field(p0,false)}"
-match("HEADER#33:0017", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: [%{hevent_source}:%{hsigid}:%{hversion}] \"%{messageid->} %{p0}", processor_chain([
+var hdr20 = match("HEADER#33:0017", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: [%{hevent_source}:%{hsigid}:%{hversion}] \"%{messageid->} %{p0}", processor_chain([
 	setc("header_id","0017"),
 	dup15,
 ]));
 
-var hdr21 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(fld,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(hsigid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(messageid,true), Constant(' '), Field(p0,false)}"
-match("HEADER#34:0019", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: [%{hevent_source}:%{hsigid}:%{hversion}] %{messageid->} %{p0}", processor_chain([
+var hdr21 = match("HEADER#34:0019", "message", "%{month->} %{day->} %{time->} %{host->} %{fld}: [%{hevent_source}:%{hsigid}:%{hversion}] %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0019"),
 	dup15,
 ]));
 
-var hdr22 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(hostname,true), Constant(' '), Field(hfld1,false), Constant(': [Primary Detection Engine'), Field(payload,false)}"
-match("HEADER#35:0041", "message", "%{month->} %{day->} %{time->} %{hostname->} %{hfld1}: [Primary Detection Engine%{payload}", processor_chain([
+var hdr22 = match("HEADER#35:0041", "message", "%{month->} %{day->} %{time->} %{hostname->} %{hfld1}: [Primary Detection Engine%{payload}", processor_chain([
 	setc("header_id","0041"),
 	dup16,
 ]));
 
-var hdr23 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': Protocol: '), Field(hprotocol,false), Constant(', '), Field(payload,false)}"
-match("HEADER#36:0045", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: Protocol: %{hprotocol}, %{payload}", processor_chain([
+var hdr23 = match("HEADER#36:0045", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: Protocol: %{hprotocol}, %{payload}", processor_chain([
 	setc("header_id","0045"),
 	setc("messageid","connection_events"),
 ]));
 
-var hdr24 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(hfld1,false), Constant(': '), Field(hfld4,true), Constant(' '), Field(host,false), Constant(': '), Field(hfld3,false), Constant('@'), Field(hfld2,false), Constant(', '), Field(payload,false)}"
-match("HEADER#37:0042", "message", "%{month->} %{day->} %{time->} %{hfld1}: %{hfld4->} %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
+var hdr24 = match("HEADER#37:0042", "message", "%{month->} %{day->} %{time->} %{hfld1}: %{hfld4->} %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
 	setc("header_id","0042"),
 	dup25,
 ]));
 
-var hdr25 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hfld5,false), Constant('] '), Field(host,false), Constant(': '), Field(hfld3,false), Constant('@'), Field(hfld2,false), Constant(', '), Field(payload,false)}"
-match("HEADER#38:00212", "message", "%{month->} %{day->} %{time->} %{hfld1}: [%{hfld5}] %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
+var hdr25 = match("HEADER#38:00212", "message", "%{month->} %{day->} %{time->} %{hfld1}: [%{hfld5}] %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
 	setc("header_id","00212"),
 	dup25,
 ]));
 
-var hdr26 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(hfld1,false), Constant(': '), Field(host,false), Constant(': '), Field(hfld3,false), Constant('@'), Field(hfld2,false), Constant(', '), Field(payload,false)}"
-match("HEADER#39:0021", "message", "%{month->} %{day->} %{time->} %{hfld1}: %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
+var hdr26 = match("HEADER#39:0021", "message", "%{month->} %{day->} %{time->} %{hfld1}: %{host}: %{hfld3}@%{hfld2}, %{payload}", processor_chain([
 	setc("header_id","0021"),
 	dup25,
 ]));
 
-var hdr27 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(payload,false)}"
-match("HEADER#40:0029", "message", "%{month->} %{day->} %{time->} %{host}: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
+var hdr27 = match("HEADER#40:0029", "message", "%{month->} %{day->} %{time->} %{host}: [%{hevent_source}:%{messageid}:%{hversion}] %{payload}", processor_chain([
 	setc("header_id","0029"),
 ]));
 
-var hdr28 = // "Pattern{Constant('snort'), Field(p0,false)}"
-match("HEADER#41:0024/0", "message", "snort%{p0}");
+var hdr28 = match("HEADER#41:0024/0", "message", "snort%{p0}");
 
 var all16 = all_match({
 	processors: [
@@ -5219,8 +5116,7 @@ var all16 = all_match({
 	]),
 });
 
-var hdr29 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' snort'), Field(p0,false)}"
-match("HEADER#42:0025/0", "message", "%{month->} %{day->} %{time->} snort%{p0}");
+var hdr29 = match("HEADER#42:0025/0", "message", "%{month->} %{day->} %{time->} snort%{p0}");
 
 var all17 = all_match({
 	processors: [
@@ -5234,8 +5130,7 @@ var all17 = all_match({
 	]),
 });
 
-var part7 = // "Pattern{Field(result,false), Constant('] From '), Field(group_object,false), Constant('/'), Field(hfld11,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#43:0023/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var part7 = match("HEADER#43:0023/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
 var all18 = all_match({
 	processors: [
@@ -5249,8 +5144,7 @@ var all18 = all_match({
 	]),
 });
 
-var part8 = // "Pattern{Field(result,false), Constant('] From '), Field(hfld11,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#44:0026/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var part8 = match("HEADER#44:0026/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
 var all19 = all_match({
 	processors: [
@@ -5288,8 +5182,7 @@ var all21 = all_match({
 	]),
 });
 
-var hdr30 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': Sha256:'), Field(hfld2,true), Constant(' Disposition: Malware'), Field(p0,false)}"
-match("HEADER#47:0040", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: Sha256:%{hfld2->} Disposition: Malware%{p0}", processor_chain([
+var hdr30 = match("HEADER#47:0040", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: Sha256:%{hfld2->} Disposition: Malware%{p0}", processor_chain([
 	setc("header_id","0040"),
 	setc("messageid","MALWARE"),
 	call({
@@ -5303,8 +5196,7 @@ match("HEADER#47:0040", "message", "%{month->} %{day->} %{time->} %{host->} %{hf
 	}),
 ]));
 
-var hdr31 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' '), Field(msgIdPart3,true), Constant(' From '), Field(hsensor,true), Constant(' at '), Field(p0,false)}"
-match("HEADER#48:0043", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} From %{hsensor->} at %{p0}", processor_chain([
+var hdr31 = match("HEADER#48:0043", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} From %{hsensor->} at %{p0}", processor_chain([
 	setc("header_id","0043"),
 	dup22,
 	call({
@@ -5324,27 +5216,22 @@ match("HEADER#48:0043", "message", "%{month->} %{day->} %{time->} %{host->} %{hf
 	}),
 ]));
 
-var hdr32 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(messageid,false), Constant('['), Field(process_id,false), Constant(']: '), Field(payload,false)}"
-match("HEADER#49:0044", "message", "%{month->} %{day->} %{time->} %{host->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
+var hdr32 = match("HEADER#49:0044", "message", "%{month->} %{day->} %{time->} %{host->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0044"),
 ]));
 
-var hdr33 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(hyear,true), Constant(' '), Field(time,true), Constant(' '), Field(p0,false)}"
-match("HEADER#50:0057/0", "message", "%{month->} %{day->} %{hyear->} %{time->} %{p0}");
+var hdr33 = match("HEADER#50:0057/0", "message", "%{month->} %{day->} %{hyear->} %{time->} %{p0}");
 
-var part9 = // "Pattern{Field(hostname,false), Constant(': %FTD-'), Field(p0,false)}"
-match("HEADER#50:0057/1_0", "nwparser.p0", "%{hostname}: %FTD-%{p0}");
+var part9 = match("HEADER#50:0057/1_0", "nwparser.p0", "%{hostname}: %FTD-%{p0}");
 
-var part10 = // "Pattern{Field(hostname,true), Constant(' %FTD-'), Field(p0,false)}"
-match("HEADER#50:0057/1_1", "nwparser.p0", "%{hostname->} %FTD-%{p0}");
+var part10 = match("HEADER#50:0057/1_1", "nwparser.p0", "%{hostname->} %FTD-%{p0}");
 
 var select4 = linear_select([
 	part9,
 	part10,
 ]);
 
-var part11 = // "Pattern{Field(fld2,false), Constant('-'), Field(hfld3,false), Constant(':'), Field(payload,false)}"
-match("HEADER#50:0057/2", "nwparser.p0", "%{fld2}-%{hfld3}:%{payload}");
+var part11 = match("HEADER#50:0057/2", "nwparser.p0", "%{fld2}-%{hfld3}:%{payload}");
 
 var all22 = all_match({
 	processors: [
@@ -5358,8 +5245,7 @@ var all22 = all_match({
 	]),
 });
 
-var hdr34 = // "Pattern{Field(hyear,false), Constant('-'), Field(hmonth,false), Constant('-'), Field(day,false), Constant('T'), Field(time,false), Constant('Z '), Field(hostname,true), Constant(' %FTD-'), Field(fld2,false), Constant('-'), Field(hfld3,false), Constant(':'), Field(payload,false)}"
-match("HEADER#51:0058", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %{hostname->} %FTD-%{fld2}-%{hfld3}:%{payload}", processor_chain([
+var hdr34 = match("HEADER#51:0058", "message", "%{hyear}-%{hmonth}-%{day}T%{time}Z %{hostname->} %FTD-%{fld2}-%{hfld3}:%{payload}", processor_chain([
 	setc("header_id","0058"),
 	dup1,
 ]));
@@ -5419,8 +5305,7 @@ var select5 = linear_select([
 	hdr34,
 ]);
 
-var part12 = // "Pattern{Field(event_type,true), Constant(' (Sensor '), Field(sensor,false), Constant('): Severity:'), Field(severity,false), Constant(': '), Field(result,false)}"
-match("MESSAGE#0:HMNOTIFY", "nwparser.payload", "%{event_type->} (Sensor %{sensor}): Severity:%{severity}: %{result}", processor_chain([
+var part12 = match("MESSAGE#0:HMNOTIFY", "nwparser.payload", "%{event_type->} (Sensor %{sensor}): Severity:%{severity}: %{result}", processor_chain([
 	setc("eventcategory","1604000000"),
 	dup31,
 	dup32,
@@ -95633,17 +95518,13 @@ var all66 = all_match({
 
 var msg38452 = msg("snort-sid-template", all66);
 
-var part13 = // "Pattern{Constant('PORTSCAN DETECTED from '), Field(p0,false)}"
-match("MESSAGE#38452:spp_portscan/0", "nwparser.payload", "PORTSCAN DETECTED from %{p0}");
+var part13 = match("MESSAGE#38452:spp_portscan/0", "nwparser.payload", "PORTSCAN DETECTED from %{p0}");
 
-var part14 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,true), Constant(' ('), Field(location_src,false), Constant(')(THRESHOLD '), Field(p0,false)}"
-match("MESSAGE#38452:spp_portscan/1_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src})(THRESHOLD %{p0}");
+var part14 = match("MESSAGE#38452:spp_portscan/1_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src})(THRESHOLD %{p0}");
 
-var part15 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,false), Constant('(THRESHOLD '), Field(p0,false)}"
-match("MESSAGE#38452:spp_portscan/1_1", "nwparser.p0", "%{saddr}:%{sport}(THRESHOLD %{p0}");
+var part15 = match("MESSAGE#38452:spp_portscan/1_1", "nwparser.p0", "%{saddr}:%{sport}(THRESHOLD %{p0}");
 
-var part16 = // "Pattern{Field(saddr,false), Constant('(THRESHOLD '), Field(p0,false)}"
-match("MESSAGE#38452:spp_portscan/1_2", "nwparser.p0", "%{saddr}(THRESHOLD %{p0}");
+var part16 = match("MESSAGE#38452:spp_portscan/1_2", "nwparser.p0", "%{saddr}(THRESHOLD %{p0}");
 
 var select2444 = linear_select([
 	part14,
@@ -95651,8 +95532,7 @@ var select2444 = linear_select([
 	part16,
 ]);
 
-var part17 = // "Pattern{Field(dclass_counter1,true), Constant(' connections exceeded in '), Field(duration,true), Constant(' seconds)')}"
-match("MESSAGE#38452:spp_portscan/2", "nwparser.p0", "%{dclass_counter1->} connections exceeded in %{duration->} seconds)");
+var part17 = match("MESSAGE#38452:spp_portscan/2", "nwparser.p0", "%{dclass_counter1->} connections exceeded in %{duration->} seconds)");
 
 var all67 = all_match({
 	processors: [
@@ -95676,8 +95556,7 @@ var all67 = all_match({
 
 var msg38453 = msg("spp_portscan", all67);
 
-var part18 = // "Pattern{Constant('portscan status from '), Field(saddr,false), Constant(': '), Field(dclass_counter1,true), Constant(' connections across '), Field(fld1,true), Constant(' hosts: '), Field(fld2,false), Constant(', '), Field(fld3,false)}"
-match("MESSAGE#38453:spp_portscan:01", "nwparser.payload", "portscan status from %{saddr}: %{dclass_counter1->} connections across %{fld1->} hosts: %{fld2}, %{fld3}", processor_chain([
+var part18 = match("MESSAGE#38453:spp_portscan:01", "nwparser.payload", "portscan status from %{saddr}: %{dclass_counter1->} connections across %{fld1->} hosts: %{fld2}, %{fld3}", processor_chain([
 	dup61,
 	dup31,
 	dup32,
@@ -95692,8 +95571,7 @@ match("MESSAGE#38453:spp_portscan:01", "nwparser.payload", "portscan status from
 
 var msg38454 = msg("spp_portscan:01", part18);
 
-var part19 = // "Pattern{Constant('End of portscan from '), Field(saddr,false), Constant(': TOTAL time('), Field(fld1,false), Constant(') hosts('), Field(fld2,false), Constant(') '), Field(fld3,true), Constant(' '), Field(fld4,false)}"
-match("MESSAGE#38454:spp_portscan:02", "nwparser.payload", "End of portscan from %{saddr}: TOTAL time(%{fld1}) hosts(%{fld2}) %{fld3->} %{fld4}", processor_chain([
+var part19 = match("MESSAGE#38454:spp_portscan:02", "nwparser.payload", "End of portscan from %{saddr}: TOTAL time(%{fld1}) hosts(%{fld2}) %{fld3->} %{fld4}", processor_chain([
 	dup61,
 	dup31,
 	dup32,
@@ -95716,8 +95594,7 @@ var select2445 = linear_select([
 	msg38456,
 ]);
 
-var part20 = // "Pattern{Constant('Portscan detected from '), Field(saddr,true), Constant(' Talker('), Field(fld1,false), Constant(') Scanner('), Field(fld2,false), Constant(')')}"
-match("MESSAGE#38456:Portscan", "nwparser.payload", "Portscan detected from %{saddr->} Talker(%{fld1}) Scanner(%{fld2})", processor_chain([
+var part20 = match("MESSAGE#38456:Portscan", "nwparser.payload", "Portscan detected from %{saddr->} Talker(%{fld1}) Scanner(%{fld2})", processor_chain([
 	dup61,
 	dup31,
 	dup32,
@@ -95725,8 +95602,7 @@ match("MESSAGE#38456:Portscan", "nwparser.payload", "Portscan detected from %{sa
 
 var msg38457 = msg("Portscan", part20);
 
-var part21 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Hops: '), Field(result,false)}"
-match("MESSAGE#38457:Hops_Change", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Hops: %{result}", processor_chain([
+var part21 = match("MESSAGE#38457:Hops_Change", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Hops: %{result}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -95740,8 +95616,7 @@ var msg38459 = msg("MAC_Information_Change", dup354);
 
 var msg38460 = msg("Additional_MAC_Detected_for", dup354);
 
-var part22 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' NETBIOS Name: '), Field(result,false)}"
-match("MESSAGE#38460:NETBIOS_Name_Change", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} NETBIOS Name: %{result}", processor_chain([
+var part22 = match("MESSAGE#38460:NETBIOS_Name_Change", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} NETBIOS Name: %{result}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -95751,19 +95626,16 @@ match("MESSAGE#38460:NETBIOS_Name_Change", "nwparser.payload", "%{context->} Fro
 
 var msg38461 = msg("NETBIOS_Name_Change", part22);
 
-var part23 = // "Pattern{Constant('MAC Address: '), Field(smacaddr,true), Constant(' Host Type: '), Field(p0,false)}"
-match("MESSAGE#38461:New_Host/1_0", "nwparser.p0", "MAC Address: %{smacaddr->} Host Type: %{p0}");
+var part23 = match("MESSAGE#38461:New_Host/1_0", "nwparser.p0", "MAC Address: %{smacaddr->} Host Type: %{p0}");
 
-var part24 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Host Type: '), Field(p0,false)}"
-match("MESSAGE#38461:New_Host/1_1", "nwparser.p0", "IP Address: %{saddr->} Host Type: %{p0}");
+var part24 = match("MESSAGE#38461:New_Host/1_1", "nwparser.p0", "IP Address: %{saddr->} Host Type: %{p0}");
 
 var select2446 = linear_select([
 	part23,
 	part24,
 ]);
 
-var part25 = // "Pattern{Field(fld7,false)}"
-match_copy("MESSAGE#38461:New_Host/2", "nwparser.p0", "fld7");
+var part25 = match_copy("MESSAGE#38461:New_Host/2", "nwparser.p0", "fld7");
 
 var all68 = all_match({
 	processors: [
@@ -95782,11 +95654,9 @@ var all68 = all_match({
 
 var msg38462 = msg("New_Host", all68);
 
-var part26 = // "Pattern{Constant('MAC Address: '), Field(smacaddr,true), Constant(' Network Protocol: '), Field(p0,false)}"
-match("MESSAGE#38462:New_Network_Protocol/1_0", "nwparser.p0", "MAC Address: %{smacaddr->} Network Protocol: %{p0}");
+var part26 = match("MESSAGE#38462:New_Network_Protocol/1_0", "nwparser.p0", "MAC Address: %{smacaddr->} Network Protocol: %{p0}");
 
-var part27 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Network Protocol: '), Field(p0,false)}"
-match("MESSAGE#38462:New_Network_Protocol/1_1", "nwparser.p0", "IP Address: %{saddr->} Network Protocol: %{p0}");
+var part27 = match("MESSAGE#38462:New_Network_Protocol/1_1", "nwparser.p0", "IP Address: %{saddr->} Network Protocol: %{p0}");
 
 var select2447 = linear_select([
 	part26,
@@ -95810,8 +95680,7 @@ var all69 = all_match({
 
 var msg38463 = msg("New_Network_Protocol", all69);
 
-var part28 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(protocol,false)}"
-match("MESSAGE#38463:New_UDP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{protocol}", processor_chain([
+var part28 = match("MESSAGE#38463:New_UDP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{protocol}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95821,8 +95690,7 @@ match("MESSAGE#38463:New_UDP_Service", "nwparser.payload", "%{context->} From \"
 
 var msg38464 = msg("New_UDP_Service", part28);
 
-var part29 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Transport Protocol: '), Field(protocol,false)}"
-match("MESSAGE#38464:New_Transport_Protocol", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Transport Protocol: %{protocol}", processor_chain([
+var part29 = match("MESSAGE#38464:New_Transport_Protocol", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Transport Protocol: %{protocol}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95838,8 +95706,7 @@ var msg38467 = msg("OS_Information_Update", dup183);
 
 var msg38468 = msg("TCP_Service_Confidence_Update", dup184);
 
-var part30 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(p0,false)}"
-match("MESSAGE#38468:TCP_Service_Information_Update/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
+var part30 = match("MESSAGE#38468:TCP_Service_Information_Update/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
 
 var all70 = all_match({
 	processors: [
@@ -95857,8 +95724,7 @@ var all70 = all_match({
 
 var msg38469 = msg("TCP_Service_Information_Update", all70);
 
-var part31 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> MAC Address: '), Field(saddr,true), Constant(' VLAN ID: '), Field(sport,true), Constant(' Type: '), Field(protocol,true), Constant(' Priority: '), Field(threat_val,false)}"
-match("MESSAGE#38469:VLAN_Tag_Information_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> MAC Address: %{saddr->} VLAN ID: %{sport->} Type: %{protocol->} Priority: %{threat_val}", processor_chain([
+var part31 = match("MESSAGE#38469:VLAN_Tag_Information_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> MAC Address: %{saddr->} VLAN ID: %{sport->} Type: %{protocol->} Priority: %{threat_val}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95869,14 +95735,11 @@ match("MESSAGE#38469:VLAN_Tag_Information_Update", "nwparser.payload", "%{contex
 
 var msg38470 = msg("VLAN_Tag_Information_Update", part31);
 
-var part32 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' OS: '), Field(p0,false)}"
-match("MESSAGE#38470:New_OS/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{p0}");
+var part32 = match("MESSAGE#38470:New_OS/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{p0}");
 
-var part33 = // "Pattern{Field(os,true), Constant(' Device Info: '), Field(fld7,false)}"
-match("MESSAGE#38470:New_OS/1_0", "nwparser.p0", "%{os->} Device Info: %{fld7}");
+var part33 = match("MESSAGE#38470:New_OS/1_0", "nwparser.p0", "%{os->} Device Info: %{fld7}");
 
-var part34 = // "Pattern{Field(os,false)}"
-match_copy("MESSAGE#38470:New_OS/1_1", "nwparser.p0", "os");
+var part34 = match_copy("MESSAGE#38470:New_OS/1_1", "nwparser.p0", "os");
 
 var select2448 = linear_select([
 	part33,
@@ -95909,8 +95772,7 @@ var msg38475 = msg("TCP_Port_Closed", dup187);
 
 var msg38476 = msg("TCP_Port_Timeout", dup188);
 
-var part35 = // "Pattern{Field(context,true), Constant(' From '), Field(sensor,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' web browser '), Field(application,false)}"
-match("MESSAGE#38476:Client_Application_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} web browser %{application}", processor_chain([
+var part35 = match("MESSAGE#38476:Client_Application_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} web browser %{application}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95922,8 +95784,7 @@ var msg38477 = msg("Client_Application_Timeout", part35);
 
 var msg38478 = msg("Host_Timeout", dup188);
 
-var part36 = // "Pattern{Field(context,true), Constant(' From '), Field(sensor,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' OS'), Field(os,false)}"
-match("MESSAGE#38478:Identity_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS%{os}", processor_chain([
+var part36 = match("MESSAGE#38478:Identity_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS%{os}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95933,22 +95794,18 @@ match("MESSAGE#38478:Identity_Timeout", "nwparser.payload", "%{context->} From %
 
 var msg38479 = msg("Identity_Timeout", part36);
 
-var part37 = // "Pattern{Field(context,true), Constant(' From '), Field(sensor,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Serv'), Field(p0,false)}"
-match("MESSAGE#38479:Identity_Timeout:01/0", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Serv%{p0}");
+var part37 = match("MESSAGE#38479:Identity_Timeout:01/0", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Serv%{p0}");
 
-var part38 = // "Pattern{Constant('ice'), Field(p0,false)}"
-match("MESSAGE#38479:Identity_Timeout:01/1_0", "nwparser.p0", "ice%{p0}");
+var part38 = match("MESSAGE#38479:Identity_Timeout:01/1_0", "nwparser.p0", "ice%{p0}");
 
-var part39 = // "Pattern{Constant('er'), Field(p0,false)}"
-match("MESSAGE#38479:Identity_Timeout:01/1_1", "nwparser.p0", "er%{p0}");
+var part39 = match("MESSAGE#38479:Identity_Timeout:01/1_1", "nwparser.p0", "er%{p0}");
 
 var select2449 = linear_select([
 	part38,
 	part39,
 ]);
 
-var part40 = // "Pattern{Field(,false), Constant('port: '), Field(sport,false), Constant('/'), Field(protocol,true), Constant(' '), Field(network_service,false)}"
-match("MESSAGE#38479:Identity_Timeout:01/2", "nwparser.p0", "%{}port: %{sport}/%{protocol->} %{network_service}");
+var part40 = match("MESSAGE#38479:Identity_Timeout:01/2", "nwparser.p0", "%{}port: %{sport}/%{protocol->} %{network_service}");
 
 var all72 = all_match({
 	processors: [
@@ -95976,8 +95833,7 @@ var msg38481 = msg("UDP_Port_Timeout", dup188);
 
 var msg38482 = msg("UDP_Service_Confidence_Update", dup184);
 
-var part41 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(protocol,true), Constant(' Confidence: '), Field(result,true), Constant(' Subtypes: '), Field(fld1,false)}"
-match("MESSAGE#38482:UDP_Service_Information_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result->} Subtypes: %{fld1}", processor_chain([
+var part41 = match("MESSAGE#38482:UDP_Service_Information_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result->} Subtypes: %{fld1}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -95994,17 +95850,13 @@ var select2451 = linear_select([
 	msg38484,
 ]);
 
-var part42 = // "Pattern{Field(context,true), Constant(' ['), Field(p0,false)}"
-match("MESSAGE#38484:EmergingThreats/0", "nwparser.payload", "%{context->} [%{p0}");
+var part42 = match("MESSAGE#38484:EmergingThreats/0", "nwparser.payload", "%{context->} [%{p0}");
 
-var part43 = // "Pattern{Constant('Impact: '), Field(result,false), Constant('] From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(p0,false)}"
-match("MESSAGE#38484:EmergingThreats/1_0", "nwparser.p0", "Impact: %{result}] From \"%{sensor}\" at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{p0}");
+var part43 = match("MESSAGE#38484:EmergingThreats/1_0", "nwparser.p0", "Impact: %{result}] From \"%{sensor}\" at %{fld6->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{p0}");
 
-var part44 = // "Pattern{Constant('Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(p0,false)}"
-match("MESSAGE#38484:EmergingThreats/1_1", "nwparser.p0", "Classification: %{sigtype}] [Priority: %{p0}");
+var part44 = match("MESSAGE#38484:EmergingThreats/1_1", "nwparser.p0", "Classification: %{sigtype}] [Priority: %{p0}");
 
-var part45 = // "Pattern{Field(info,false), Constant('] [Priority: '), Field(p0,false)}"
-match("MESSAGE#38484:EmergingThreats/1_2", "nwparser.p0", "%{info}] [Priority: %{p0}");
+var part45 = match("MESSAGE#38484:EmergingThreats/1_2", "nwparser.p0", "%{info}] [Priority: %{p0}");
 
 var select2452 = linear_select([
 	part43,
@@ -96012,8 +95864,7 @@ var select2452 = linear_select([
 	part45,
 ]);
 
-var part46 = // "Pattern{Field(threat_val,true), Constant(' ]'), Field(p0,false)}"
-match("MESSAGE#38484:EmergingThreats/2", "nwparser.p0", "%{threat_val->} ]%{p0}");
+var part46 = match("MESSAGE#38484:EmergingThreats/2", "nwparser.p0", "%{threat_val->} ]%{p0}");
 
 var all73 = all_match({
 	processors: [
@@ -96043,8 +95894,7 @@ var all73 = all_match({
 
 var msg38485 = msg("EmergingThreats", all73);
 
-var part47 = // "Pattern{Constant('Pruned session from cache that was using '), Field(bytes,true), Constant(' bytes ('), Field(result,false), Constant('). '), Field(saddr,true), Constant(' '), Field(fld1,true), Constant(' --> '), Field(daddr,true), Constant(' '), Field(fld2,true), Constant(' ('), Field(fld3,false), Constant(') : '), Field(info,false)}"
-match("MESSAGE#38485:S5", "nwparser.payload", "Pruned session from cache that was using %{bytes->} bytes (%{result}). %{saddr->} %{fld1->} --> %{daddr->} %{fld2->} (%{fld3}) : %{info}", processor_chain([
+var part47 = match("MESSAGE#38485:S5", "nwparser.payload", "Pruned session from cache that was using %{bytes->} bytes (%{result}). %{saddr->} %{fld1->} --> %{daddr->} %{fld2->} (%{fld3}) : %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96052,8 +95902,7 @@ match("MESSAGE#38485:S5", "nwparser.payload", "Pruned session from cache that wa
 
 var msg38486 = msg("S5", part47);
 
-var part48 = // "Pattern{Constant('Session exceeded configured max bytes to queue '), Field(fld4,true), Constant(' using '), Field(bytes,true), Constant(' bytes ('), Field(result,false), Constant('). '), Field(saddr,true), Constant(' '), Field(fld1,true), Constant(' --> '), Field(daddr,true), Constant(' '), Field(fld2,true), Constant(' ('), Field(fld3,false), Constant(') : '), Field(info,false)}"
-match("MESSAGE#38486:S5:01", "nwparser.payload", "Session exceeded configured max bytes to queue %{fld4->} using %{bytes->} bytes (%{result}). %{saddr->} %{fld1->} --> %{daddr->} %{fld2->} (%{fld3}) : %{info}", processor_chain([
+var part48 = match("MESSAGE#38486:S5:01", "nwparser.payload", "Session exceeded configured max bytes to queue %{fld4->} using %{bytes->} bytes (%{result}). %{saddr->} %{fld1->} --> %{daddr->} %{fld2->} (%{fld3}) : %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96066,8 +95915,7 @@ var select2453 = linear_select([
 	msg38487,
 ]);
 
-var part49 = // "Pattern{Constant('Login, Login Success'), Field(,false)}"
-match("MESSAGE#38487:SystemSettings:01", "nwparser.payload", "Login, Login Success%{}", processor_chain([
+var part49 = match("MESSAGE#38487:SystemSettings:01", "nwparser.payload", "Login, Login Success%{}", processor_chain([
 	dup112,
 	dup31,
 	dup32,
@@ -96083,8 +95931,7 @@ match("MESSAGE#38487:SystemSettings:01", "nwparser.payload", "Login, Login Succe
 
 var msg38488 = msg("SystemSettings:01", part49);
 
-var part50 = // "Pattern{Constant('Logout, Logout Success'), Field(,false)}"
-match("MESSAGE#38488:SystemSettings:02", "nwparser.payload", "Logout, Logout Success%{}", processor_chain([
+var part50 = match("MESSAGE#38488:SystemSettings:02", "nwparser.payload", "Logout, Logout Success%{}", processor_chain([
 	setc("eventcategory","1802000000"),
 	dup31,
 	dup32,
@@ -96100,8 +95947,7 @@ match("MESSAGE#38488:SystemSettings:02", "nwparser.payload", "Logout, Logout Suc
 
 var msg38489 = msg("SystemSettings:02", part50);
 
-var part51 = // "Pattern{Constant('System > '), Field(info,false)}"
-match("MESSAGE#38489:SystemSettings:03", "nwparser.payload", "System > %{info}", processor_chain([
+var part51 = match("MESSAGE#38489:SystemSettings:03", "nwparser.payload", "System > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96114,8 +95960,7 @@ match("MESSAGE#38489:SystemSettings:03", "nwparser.payload", "System > %{info}",
 
 var msg38490 = msg("SystemSettings:03", part51);
 
-var part52 = // "Pattern{Constant('Policies > '), Field(info,false)}"
-match("MESSAGE#38490:SystemSettings:04", "nwparser.payload", "Policies > %{info}", processor_chain([
+var part52 = match("MESSAGE#38490:SystemSettings:04", "nwparser.payload", "Policies > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96128,8 +95973,7 @@ match("MESSAGE#38490:SystemSettings:04", "nwparser.payload", "Policies > %{info}
 
 var msg38491 = msg("SystemSettings:04", part52);
 
-var part53 = // "Pattern{Constant('Object > '), Field(info,false)}"
-match("MESSAGE#38491:SystemSettings:05", "nwparser.payload", "Object > %{info}", processor_chain([
+var part53 = match("MESSAGE#38491:SystemSettings:05", "nwparser.payload", "Object > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96141,8 +95985,7 @@ match("MESSAGE#38491:SystemSettings:05", "nwparser.payload", "Object > %{info}",
 
 var msg38492 = msg("SystemSettings:05", part53);
 
-var part54 = // "Pattern{Constant('Overview > '), Field(info,false)}"
-match("MESSAGE#38492:SystemSettings:06", "nwparser.payload", "Overview > %{info}", processor_chain([
+var part54 = match("MESSAGE#38492:SystemSettings:06", "nwparser.payload", "Overview > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96154,8 +95997,7 @@ match("MESSAGE#38492:SystemSettings:06", "nwparser.payload", "Overview > %{info}
 
 var msg38493 = msg("SystemSettings:06", part54);
 
-var part55 = // "Pattern{Constant('Task Queue, '), Field(info,false)}"
-match("MESSAGE#38493:SystemSettings:07", "nwparser.payload", "Task Queue, %{info}", processor_chain([
+var part55 = match("MESSAGE#38493:SystemSettings:07", "nwparser.payload", "Task Queue, %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96168,8 +96010,7 @@ match("MESSAGE#38493:SystemSettings:07", "nwparser.payload", "Task Queue, %{info
 
 var msg38494 = msg("SystemSettings:07", part55);
 
-var part56 = // "Pattern{Constant('Intrusion Policy > '), Field(info,false)}"
-match("MESSAGE#38494:SystemSettings:08", "nwparser.payload", "Intrusion Policy > %{info}", processor_chain([
+var part56 = match("MESSAGE#38494:SystemSettings:08", "nwparser.payload", "Intrusion Policy > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96182,19 +96023,16 @@ match("MESSAGE#38494:SystemSettings:08", "nwparser.payload", "Intrusion Policy >
 
 var msg38495 = msg("SystemSettings:08", part56);
 
-var part57 = // "Pattern{Constant('Analysis & Reporting '), Field(p0,false)}"
-match("MESSAGE#38495:SystemSettings:09/0", "nwparser.payload", "Analysis \u0026 Reporting %{p0}");
+var part57 = match("MESSAGE#38495:SystemSettings:09/0", "nwparser.payload", "Analysis \u0026 Reporting %{p0}");
 
-var part58 = // "Pattern{Constant(','), Field(p0,false)}"
-match("MESSAGE#38495:SystemSettings:09/1_1", "nwparser.p0", ",%{p0}");
+var part58 = match("MESSAGE#38495:SystemSettings:09/1_1", "nwparser.p0", ",%{p0}");
 
 var select2454 = linear_select([
 	dup145,
 	part58,
 ]);
 
-var part59 = // "Pattern{Field(,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#38495:SystemSettings:09/2", "nwparser.p0", "%{} %{info}");
+var part59 = match("MESSAGE#38495:SystemSettings:09/2", "nwparser.p0", "%{} %{info}");
 
 var all74 = all_match({
 	processors: [
@@ -96216,8 +96054,7 @@ var all74 = all_match({
 
 var msg38496 = msg("SystemSettings:09", all74);
 
-var part60 = // "Pattern{Constant('Heartbeat, '), Field(info,false)}"
-match("MESSAGE#38496:SystemSettings:10", "nwparser.payload", "Heartbeat, %{info}", processor_chain([
+var part60 = match("MESSAGE#38496:SystemSettings:10", "nwparser.payload", "Heartbeat, %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96230,8 +96067,7 @@ match("MESSAGE#38496:SystemSettings:10", "nwparser.payload", "Heartbeat, %{info}
 
 var msg38497 = msg("SystemSettings:10", part60);
 
-var part61 = // "Pattern{Constant('FailD, '), Field(info,false)}"
-match("MESSAGE#38497:SystemSettings:11", "nwparser.payload", "FailD, %{info}", processor_chain([
+var part61 = match("MESSAGE#38497:SystemSettings:11", "nwparser.payload", "FailD, %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96243,8 +96079,7 @@ match("MESSAGE#38497:SystemSettings:11", "nwparser.payload", "FailD, %{info}", p
 
 var msg38498 = msg("SystemSettings:11", part61);
 
-var part62 = // "Pattern{Constant('Health > '), Field(info,false)}"
-match("MESSAGE#38498:SystemSettings:12", "nwparser.payload", "Health > %{info}", processor_chain([
+var part62 = match("MESSAGE#38498:SystemSettings:12", "nwparser.payload", "Health > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96257,8 +96092,7 @@ match("MESSAGE#38498:SystemSettings:12", "nwparser.payload", "Health > %{info}",
 
 var msg38499 = msg("SystemSettings:12", part62);
 
-var part63 = // "Pattern{Constant('Session Expiration, '), Field(info,false)}"
-match("MESSAGE#38499:SystemSettings:13", "nwparser.payload", "Session Expiration, %{info}", processor_chain([
+var part63 = match("MESSAGE#38499:SystemSettings:13", "nwparser.payload", "Session Expiration, %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96271,8 +96105,7 @@ match("MESSAGE#38499:SystemSettings:13", "nwparser.payload", "Session Expiration
 
 var msg38500 = msg("SystemSettings:13", part63);
 
-var part64 = // "Pattern{Constant('Analysis '), Field(info,false)}"
-match("MESSAGE#38500:SystemSettings:14", "nwparser.payload", "Analysis %{info}", processor_chain([
+var part64 = match("MESSAGE#38500:SystemSettings:14", "nwparser.payload", "Analysis %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96285,8 +96118,7 @@ match("MESSAGE#38500:SystemSettings:14", "nwparser.payload", "Analysis %{info}",
 
 var msg38501 = msg("SystemSettings:14", part64);
 
-var part65 = // "Pattern{Constant('Devices '), Field(info,false)}"
-match("MESSAGE#38501:SystemSettings:15", "nwparser.payload", "Devices %{info}", processor_chain([
+var part65 = match("MESSAGE#38501:SystemSettings:15", "nwparser.payload", "Devices %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96299,8 +96131,7 @@ match("MESSAGE#38501:SystemSettings:15", "nwparser.payload", "Devices %{info}", 
 
 var msg38502 = msg("SystemSettings:15", part65);
 
-var part66 = // "Pattern{Constant('Intrusion Events,'), Field(info,false)}"
-match("MESSAGE#38502:SystemSettings:16", "nwparser.payload", "Intrusion Events,%{info}", processor_chain([
+var part66 = match("MESSAGE#38502:SystemSettings:16", "nwparser.payload", "Intrusion Events,%{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96313,8 +96144,7 @@ match("MESSAGE#38502:SystemSettings:16", "nwparser.payload", "Intrusion Events,%
 
 var msg38503 = msg("SystemSettings:16", part66);
 
-var part67 = // "Pattern{Constant('Login, Login Failed'), Field(,false)}"
-match("MESSAGE#38503:SystemSettings:17", "nwparser.payload", "Login, Login Failed%{}", processor_chain([
+var part67 = match("MESSAGE#38503:SystemSettings:17", "nwparser.payload", "Login, Login Failed%{}", processor_chain([
 	dup91,
 	dup31,
 	dup137,
@@ -96331,8 +96161,7 @@ match("MESSAGE#38503:SystemSettings:17", "nwparser.payload", "Login, Login Faile
 
 var msg38504 = msg("SystemSettings:17", part67);
 
-var part68 = // "Pattern{Constant('Command Line,'), Field(info,false)}"
-match("MESSAGE#38504:SystemSettings:18", "nwparser.payload", "Command Line,%{info}", processor_chain([
+var part68 = match("MESSAGE#38504:SystemSettings:18", "nwparser.payload", "Command Line,%{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96344,8 +96173,7 @@ match("MESSAGE#38504:SystemSettings:18", "nwparser.payload", "Command Line,%{inf
 
 var msg38505 = msg("SystemSettings:18", part68);
 
-var part69 = // "Pattern{Constant('Access Control Policy > '), Field(info,false)}"
-match("MESSAGE#38505:SystemSettings:19", "nwparser.payload", "Access Control Policy > %{info}", processor_chain([
+var part69 = match("MESSAGE#38505:SystemSettings:19", "nwparser.payload", "Access Control Policy > %{info}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96357,8 +96185,7 @@ match("MESSAGE#38505:SystemSettings:19", "nwparser.payload", "Access Control Pol
 
 var msg38506 = msg("SystemSettings:19", part69);
 
-var part70 = // "Pattern{Field(info,false)}"
-match_copy("MESSAGE#38506:SystemSettings:20", "nwparser.payload", "info", processor_chain([
+var part70 = match_copy("MESSAGE#38506:SystemSettings:20", "nwparser.payload", "info", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -96407,8 +96234,7 @@ var msg38513 = msg("2101867", dup192);
 
 var msg38514 = msg("2101918", dup192);
 
-var part71 = // "Pattern{Field(url,false), Constant(', Interface Ingress: '), Field(dinterface,false), Constant(', Interface Egress: '), Field(sinterface,false), Constant(', Security Zone Ingress: '), Field(dst_zone,false), Constant(', Security Zone Egress: '), Field(src_zone,false), Constant(', Security Intelligence Matching IP: '), Field(fld4,false), Constant(', Security Intelligence Category: '), Field(fld5,false), Constant(', Client Version: '), Field(version,false), Constant(', Number of File Events: '), Field(dclass_counter1,false), Constant(', Number of IPS Events: '), Field(dclass_counter2,false), Constant(', TCP Flags: '), Field(fld6,false), Constant(', NetBIOS Domain: '), Field(domain_id,false), Constant(', Initiator Packets: '), Field(fld7,false), Constant(', Responder Packets: '), Field(fld8,false), Constant(', Initiator Bytes: '), Field(rbytes,false), Constant(', Responder Bytes: '), Field(sbytes,false), Constant(', Context: '), Field(context,false), Constant(', SSL Rule Name: '), Field(fld9,false), Constant(', SSL Flow Status: '), Field(fld10,false), Constant(', SSL Cipher Suite: '), Field(fld11,false), Constant(', SSL Certificate: '), Field(fld12,false), Constant(', SSL Subject CN: '), Field(fld13,false), Constant(', SSL Subject Country: '), Field(fld14,false), Constant(', SSL Subject OU: '), Field(fld15,false), Constant(', SSL Subject Org: '), Field(fld16,false), Constant(', SSL Issuer CN: '), Field(fld17,false), Constant(', SSL Issuer Country: '), Field(fld18,false), Constant(', SSL Issuer OU: '), Field(fld19,false), Constant(', SSL Issuer Org: '), Field(fld20,false), Constant(', SSL Valid Start Date: '), Field(fld21,false), Constant(', SSL Valid End Date: '), Field(fld22,false), Constant(', SSL Version: '), Field(fld23,false), Constant(', SSL Server Certificate Status: '), Field(fld24,false), Constant(', SSL Actual Action: '), Field(fld25,false), Constant(', SSL Expected Action: '), Field(fld26,false), Constant(', SSL Server Name: '), Field(fld27,false), Constant(', SSL URL Category: '), Field(fld28,false), Constant(', SSL Session ID: '), Field(fld29,false), Constant(', SSL Ticket Id: '), Field(fld30,false), Constant(', {'), Field(protocol,false), Constant('} '), Field(saddr,true), Constant(' -> '), Field(daddr,false), Constant(', type:'), Field(event_type,false), Constant(', code:'), Field(event_description,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{sbytes}, Context: %{context}, SSL Rule Name: %{fld9}, SSL Flow Status: %{fld10}, SSL Cipher Suite: %{fld11}, SSL Certificate: %{fld12}, SSL Subject CN: %{fld13}, SSL Subject Country: %{fld14}, SSL Subject OU: %{fld15}, SSL Subject Org: %{fld16}, SSL Issuer CN: %{fld17}, SSL Issuer Country: %{fld18}, SSL Issuer OU: %{fld19}, SSL Issuer Org: %{fld20}, SSL Valid Start Date: %{fld21}, SSL Valid End Date: %{fld22}, SSL Version: %{fld23}, SSL Server Certificate Status: %{fld24}, SSL Actual Action: %{fld25}, SSL Expected Action: %{fld26}, SSL Server Name: %{fld27}, SSL URL Category: %{fld28}, SSL Session ID: %{fld29}, SSL Ticket Id: %{fld30}, {%{protocol}} %{saddr->} -> %{daddr}, type:%{event_type}, code:%{event_description}");
+var part71 = match("MESSAGE#38514:Primary_Detection_Engine/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{sbytes}, Context: %{context}, SSL Rule Name: %{fld9}, SSL Flow Status: %{fld10}, SSL Cipher Suite: %{fld11}, SSL Certificate: %{fld12}, SSL Subject CN: %{fld13}, SSL Subject Country: %{fld14}, SSL Subject OU: %{fld15}, SSL Subject Org: %{fld16}, SSL Issuer CN: %{fld17}, SSL Issuer Country: %{fld18}, SSL Issuer OU: %{fld19}, SSL Issuer Org: %{fld20}, SSL Valid Start Date: %{fld21}, SSL Valid End Date: %{fld22}, SSL Version: %{fld23}, SSL Server Certificate Status: %{fld24}, SSL Actual Action: %{fld25}, SSL Expected Action: %{fld26}, SSL Server Name: %{fld27}, SSL URL Category: %{fld28}, SSL Session ID: %{fld29}, SSL Ticket Id: %{fld30}, {%{protocol}} %{saddr->} -> %{daddr}, type:%{event_type}, code:%{event_description}");
 
 var all75 = all_match({
 	processors: [
@@ -96428,8 +96254,7 @@ var all75 = all_match({
 
 var msg38515 = msg("Primary_Detection_Engine", all75);
 
-var part72 = // "Pattern{Field(url,false), Constant(', Interface Ingress: '), Field(dinterface,false), Constant(', Interface Egress: '), Field(sinterface,false), Constant(', Security Zone Ingress: '), Field(dst_zone,false), Constant(', Security Zone Egress: '), Field(src_zone,false), Constant(', Security Intelligence Matching IP: '), Field(fld4,false), Constant(', Security Intelligence Category: '), Field(fld5,false), Constant(', Client Version: '), Field(version,false), Constant(', Number of File Events: '), Field(dclass_counter1,false), Constant(', Number of IPS Events: '), Field(dclass_counter2,false), Constant(', TCP Flags: '), Field(fld6,false), Constant(', NetBIOS Domain: '), Field(domain_id,false), Constant(', Initiator Packets: '), Field(fld7,false), Constant(', Responder Packets: '), Field(fld8,false), Constant(', Initiator Bytes: '), Field(rbytes,false), Constant(', Responder Bytes: '), Field(sbytes,false), Constant(', Context: '), Field(context,false), Constant(', SSL Rule Name: '), Field(fld9,false), Constant(', SSL Flow Status: '), Field(fld10,false), Constant(', SSL Cipher Suite: '), Field(fld11,false), Constant(', SSL Certificate: '), Field(fld12,false), Constant(', SSL Subject CN: '), Field(fld13,false), Constant(', SSL Subject Country: '), Field(fld14,false), Constant(', SSL Subject OU: '), Field(fld15,false), Constant(', SSL Subject Org: '), Field(fld16,false), Constant(', SSL Issuer CN: '), Field(fld17,false), Constant(', SSL Issuer Country: '), Field(fld18,false), Constant(', SSL Issuer OU: '), Field(fld19,false), Constant(', SSL Issuer Org: '), Field(fld20,false), Constant(', SSL Valid Start Date: '), Field(fld21,false), Constant(', SSL Valid End Date: '), Field(fld22,false), Constant(', SSL Version: '), Field(fld23,false), Constant(', SSL Server Certificate Status: '), Field(fld24,false), Constant(', SSL Actual Action: '), Field(fld25,false), Constant(', SSL Expected Action: '), Field(fld26,false), Constant(', SSL Server Name: '), Field(fld27,false), Constant(', SSL URL Category: '), Field(fld28,false), Constant(', SSL Session ID: '), Field(fld29,false), Constant(', SSL Ticket Id: '), Field(fld30,false), Constant(', {'), Field(protocol,false), Constant('} '), Field(p0,false)}"
-match("MESSAGE#38515:Primary_Detection_Engine:01/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{sbytes}, Context: %{context}, SSL Rule Name: %{fld9}, SSL Flow Status: %{fld10}, SSL Cipher Suite: %{fld11}, SSL Certificate: %{fld12}, SSL Subject CN: %{fld13}, SSL Subject Country: %{fld14}, SSL Subject OU: %{fld15}, SSL Subject Org: %{fld16}, SSL Issuer CN: %{fld17}, SSL Issuer Country: %{fld18}, SSL Issuer OU: %{fld19}, SSL Issuer Org: %{fld20}, SSL Valid Start Date: %{fld21}, SSL Valid End Date: %{fld22}, SSL Version: %{fld23}, SSL Server Certificate Status: %{fld24}, SSL Actual Action: %{fld25}, SSL Expected Action: %{fld26}, SSL Server Name: %{fld27}, SSL URL Category: %{fld28}, SSL Session ID: %{fld29}, SSL Ticket Id: %{fld30}, {%{protocol}} %{p0}");
+var part72 = match("MESSAGE#38515:Primary_Detection_Engine:01/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{sbytes}, Context: %{context}, SSL Rule Name: %{fld9}, SSL Flow Status: %{fld10}, SSL Cipher Suite: %{fld11}, SSL Certificate: %{fld12}, SSL Subject CN: %{fld13}, SSL Subject Country: %{fld14}, SSL Subject OU: %{fld15}, SSL Subject Org: %{fld16}, SSL Issuer CN: %{fld17}, SSL Issuer Country: %{fld18}, SSL Issuer OU: %{fld19}, SSL Issuer Org: %{fld20}, SSL Valid Start Date: %{fld21}, SSL Valid End Date: %{fld22}, SSL Version: %{fld23}, SSL Server Certificate Status: %{fld24}, SSL Actual Action: %{fld25}, SSL Expected Action: %{fld26}, SSL Server Name: %{fld27}, SSL URL Category: %{fld28}, SSL Session ID: %{fld29}, SSL Ticket Id: %{fld30}, {%{protocol}} %{p0}");
 
 var all76 = all_match({
 	processors: [
@@ -96451,14 +96276,11 @@ var all76 = all_match({
 
 var msg38516 = msg("Primary_Detection_Engine:01", all76);
 
-var part73 = // "Pattern{Field(url,false), Constant(', Interface Ingress: '), Field(dinterface,false), Constant(', Interface Egress: '), Field(sinterface,false), Constant(', Security Zone Ingress: '), Field(dst_zone,false), Constant(', Security Zone Egress: '), Field(src_zone,false), Constant(', Security Intelligence Matching IP: '), Field(fld4,false), Constant(', Security Intelligence Category: '), Field(fld5,false), Constant(', Client Version: '), Field(version,false), Constant(', Number of File Events: '), Field(dclass_counter1,false), Constant(', Number of IPS Events: '), Field(dclass_counter2,false), Constant(', TCP Flags: '), Field(fld6,false), Constant(', NetBIOS Domain: '), Field(domain_id,false), Constant(', Initiator Packets: '), Field(fld7,false), Constant(', Responder Packets: '), Field(fld8,false), Constant(', Initiator Bytes: '), Field(rbytes,false), Constant(', Responder Bytes: '), Field(p0,false)}"
-match("MESSAGE#38516:Primary_Detection_Engine:02/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{p0}");
+var part73 = match("MESSAGE#38516:Primary_Detection_Engine:02/2", "nwparser.p0", "%{url}, Interface Ingress: %{dinterface}, Interface Egress: %{sinterface}, Security Zone Ingress: %{dst_zone}, Security Zone Egress: %{src_zone}, Security Intelligence Matching IP: %{fld4}, Security Intelligence Category: %{fld5}, Client Version: %{version}, Number of File Events: %{dclass_counter1}, Number of IPS Events: %{dclass_counter2}, TCP Flags: %{fld6}, NetBIOS Domain: %{domain_id}, Initiator Packets: %{fld7}, Responder Packets: %{fld8}, Initiator Bytes: %{rbytes}, Responder Bytes: %{p0}");
 
-var part74 = // "Pattern{Field(sbytes,false), Constant(', Context: '), Field(context,true), Constant(' {'), Field(p0,false)}"
-match("MESSAGE#38516:Primary_Detection_Engine:02/3_0", "nwparser.p0", "%{sbytes}, Context: %{context->} {%{p0}");
+var part74 = match("MESSAGE#38516:Primary_Detection_Engine:02/3_0", "nwparser.p0", "%{sbytes}, Context: %{context->} {%{p0}");
 
-var part75 = // "Pattern{Field(sbytes,true), Constant(' {'), Field(p0,false)}"
-match("MESSAGE#38516:Primary_Detection_Engine:02/3_1", "nwparser.p0", "%{sbytes->} {%{p0}");
+var part75 = match("MESSAGE#38516:Primary_Detection_Engine:02/3_1", "nwparser.p0", "%{sbytes->} {%{p0}");
 
 var select2456 = linear_select([
 	part74,
@@ -96487,8 +96309,7 @@ var all77 = all_match({
 
 var msg38517 = msg("Primary_Detection_Engine:02", all77);
 
-var part76 = // "Pattern{Constant('"'), Field(context,false), Constant('" [Classification:'), Field(sigtype,false), Constant('] User:'), Field(username,false), Constant(', Application:'), Field(application,false), Constant(', Client:'), Field(fld12,false), Constant(', App Protocol:'), Field(fld14,false), Constant(', Interface Ingress:'), Field(dinterface,false), Constant(', Interface Egress:'), Field(sinterface,false), Constant(', Security Zone Ingress:'), Field(dst_zone,false), Constant(', Security Zone Egress:'), Field(src_zone,false), Constant(', Context:'), Field(fld13,false), Constant(', SSL Flow Status:'), Field(fld1,false), Constant(', SSL Actual Action:'), Field(fld22,false), Constant(', SSL Certificate:'), Field(fld3,false), Constant(', SSL Subject CN:'), Field(fld4,false), Constant(', SSL Subject Country:'), Field(fld5,false), Constant(', SSL Subject OU:'), Field(fld6,false), Constant(', SSL Subject Org:'), Field(fld7,false), Constant(', SSL Issuer CN:'), Field(fld8,false), Constant(', SSL Issuer Country:'), Field(fld9,false), Constant(', SSL Issuer OU:'), Field(fld10,false), Constant(', SSL Issuer Org:'), Field(fld11,false), Constant(', SSL Valid Start Date:'), Field(fld12,false), Constant(', SSL Valid End Date:'), Field(fld13,false), Constant(', [Priority:'), Field(threat_val,false), Constant('] {'), Field(protocol,false), Constant('}'), Field(saddr,false), Constant(':'), Field(sport,false), Constant('->'), Field(daddr,false), Constant(':'), Field(dport,false)}"
-match("MESSAGE#38517:Primary_Detection_Engine:03", "nwparser.payload", "\"%{context}\" [Classification:%{sigtype}] User:%{username}, Application:%{application}, Client:%{fld12}, App Protocol:%{fld14}, Interface Ingress:%{dinterface}, Interface Egress:%{sinterface}, Security Zone Ingress:%{dst_zone}, Security Zone Egress:%{src_zone}, Context:%{fld13}, SSL Flow Status:%{fld1}, SSL Actual Action:%{fld22}, SSL Certificate:%{fld3}, SSL Subject CN:%{fld4}, SSL Subject Country:%{fld5}, SSL Subject OU:%{fld6}, SSL Subject Org:%{fld7}, SSL Issuer CN:%{fld8}, SSL Issuer Country:%{fld9}, SSL Issuer OU:%{fld10}, SSL Issuer Org:%{fld11}, SSL Valid Start Date:%{fld12}, SSL Valid End Date:%{fld13}, [Priority:%{threat_val}] {%{protocol}}%{saddr}:%{sport}->%{daddr}:%{dport}", processor_chain([
+var part76 = match("MESSAGE#38517:Primary_Detection_Engine:03", "nwparser.payload", "\"%{context}\" [Classification:%{sigtype}] User:%{username}, Application:%{application}, Client:%{fld12}, App Protocol:%{fld14}, Interface Ingress:%{dinterface}, Interface Egress:%{sinterface}, Security Zone Ingress:%{dst_zone}, Security Zone Egress:%{src_zone}, Context:%{fld13}, SSL Flow Status:%{fld1}, SSL Actual Action:%{fld22}, SSL Certificate:%{fld3}, SSL Subject CN:%{fld4}, SSL Subject Country:%{fld5}, SSL Subject OU:%{fld6}, SSL Subject Org:%{fld7}, SSL Issuer CN:%{fld8}, SSL Issuer Country:%{fld9}, SSL Issuer OU:%{fld10}, SSL Issuer Org:%{fld11}, SSL Valid Start Date:%{fld12}, SSL Valid End Date:%{fld13}, [Priority:%{threat_val}] {%{protocol}}%{saddr}:%{sport}->%{daddr}:%{dport}", processor_chain([
 	dup44,
 	dup31,
 	dup32,
@@ -96507,8 +96328,7 @@ var select2457 = linear_select([
 	msg38518,
 ]);
 
-var part77 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC > Sha256: '), Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(saddr,false), Constant('>'), Field(daddr,false)}"
-match("MESSAGE#38518:Network_Based_Malware", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC > Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}>%{daddr}", processor_chain([
+var part77 = match("MESSAGE#38518:Network_Based_Malware", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC > Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}>%{daddr}", processor_chain([
 	dup100,
 	dup31,
 	dup129,
@@ -96518,19 +96338,16 @@ match("MESSAGE#38518:Network_Based_Malware", "nwparser.payload", "%{context->} F
 
 var msg38519 = msg("Network_Based_Malware", part77);
 
-var part78 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -'), Field(p0,false)}"
-match("MESSAGE#38519:Network_Based_Malware:01/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -%{p0}");
+var part78 = match("MESSAGE#38519:Network_Based_Malware:01/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -%{p0}");
 
-var part79 = // "Pattern{Constant('*>'), Field(p0,false)}"
-match("MESSAGE#38519:Network_Based_Malware:01/1_0", "nwparser.p0", "*>%{p0}");
+var part79 = match("MESSAGE#38519:Network_Based_Malware:01/1_0", "nwparser.p0", "*>%{p0}");
 
 var select2458 = linear_select([
 	part79,
 	dup145,
 ]);
 
-var part80 = // "Pattern{Field(,true), Constant(' '), Field(space,false), Constant('Sha256: '), Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(daddr,false), Constant('<<-'), Field(saddr,false)}"
-match("MESSAGE#38519:Network_Based_Malware:01/2", "nwparser.p0", "%{} %{space}Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}");
+var part80 = match("MESSAGE#38519:Network_Based_Malware:01/2", "nwparser.p0", "%{} %{space}Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}");
 
 var all78 = all_match({
 	processors: [
@@ -96549,8 +96366,7 @@ var all78 = all_match({
 
 var msg38520 = msg("Network_Based_Malware:01", all78);
 
-var part81 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> Sha256: '), Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(saddr,false), Constant('->'), Field(daddr,false)}"
-match("MESSAGE#38520:Network_Based_Malware:02", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}->%{daddr}", processor_chain([
+var part81 = match("MESSAGE#38520:Network_Based_Malware:02", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}->%{daddr}", processor_chain([
 	dup100,
 	dup31,
 	dup129,
@@ -96566,17 +96382,13 @@ var select2459 = linear_select([
 	msg38521,
 ]);
 
-var part82 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC %{p0}");
+var part82 = match("MESSAGE#38521:Network_Based_Retrospective/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC %{p0}");
 
-var part83 = // "Pattern{Constant('Sha256: '), Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/2", "nwparser.p0", "Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{p0}");
+var part83 = match("MESSAGE#38521:Network_Based_Retrospective/2", "nwparser.p0", "Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{p0}");
 
-var part84 = // "Pattern{Field(saddr,false), Constant('->'), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/3_0", "nwparser.p0", "%{saddr}->%{p0}");
+var part84 = match("MESSAGE#38521:Network_Based_Retrospective/3_0", "nwparser.p0", "%{saddr}->%{p0}");
 
-var part85 = // "Pattern{Field(saddr,false), Constant('>'), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/3_1", "nwparser.p0", "%{saddr}>%{p0}");
+var part85 = match("MESSAGE#38521:Network_Based_Retrospective/3_1", "nwparser.p0", "%{saddr}>%{p0}");
 
 var select2460 = linear_select([
 	part84,
@@ -96602,14 +96414,11 @@ var all79 = all_match({
 
 var msg38522 = msg("Network_Based_Retrospective", all79);
 
-var part86 = // "Pattern{Constant('Sha256: '), Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/4", "nwparser.p0", "Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{p0}");
+var part86 = match("MESSAGE#38522:Network_Based_Retrospective:01/4", "nwparser.p0", "Sha256: %{checksum->} Disposition: %{disposition->} Threat name: %{p0}");
 
-var part87 = // "Pattern{Field(threat_name,true), Constant(' IP Addresses: '), Field(daddr,false), Constant('<<-'), Field(saddr,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/5_0", "nwparser.p0", "%{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}");
+var part87 = match("MESSAGE#38522:Network_Based_Retrospective:01/5_0", "nwparser.p0", "%{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}");
 
-var part88 = // "Pattern{Field(threat_name,false)}"
-match_copy("MESSAGE#38522:Network_Based_Retrospective:01/5_1", "nwparser.p0", "threat_name");
+var part88 = match_copy("MESSAGE#38522:Network_Based_Retrospective:01/5_1", "nwparser.p0", "threat_name");
 
 var select2461 = linear_select([
 	part87,
@@ -96641,8 +96450,7 @@ var select2462 = linear_select([
 	msg38523,
 ]);
 
-var part89 = // "Pattern{Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(daddr,false), Constant('<<-'), Field(saddr,false)}"
-match("MESSAGE#38523:MALWARE:02", "nwparser.payload", "%{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}", processor_chain([
+var part89 = match("MESSAGE#38523:MALWARE:02", "nwparser.payload", "%{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{daddr}\u003c\u003c-%{saddr}", processor_chain([
 	dup100,
 	dup32,
 	dup47,
@@ -96651,8 +96459,7 @@ match("MESSAGE#38523:MALWARE:02", "nwparser.payload", "%{checksum->} Disposition
 
 var msg38524 = msg("MALWARE:02", part89);
 
-var part90 = // "Pattern{Field(checksum,true), Constant(' Disposition: '), Field(disposition,true), Constant(' Threat name: '), Field(threat_name,true), Constant(' IP Addresses: '), Field(saddr,false), Constant('->'), Field(daddr,false)}"
-match("MESSAGE#38524:MALWARE:01", "nwparser.payload", "%{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}->%{daddr}", processor_chain([
+var part90 = match("MESSAGE#38524:MALWARE:01", "nwparser.payload", "%{checksum->} Disposition: %{disposition->} Threat name: %{threat_name->} IP Addresses: %{saddr}->%{daddr}", processor_chain([
 	dup100,
 	dup32,
 	dup47,
@@ -96661,8 +96468,7 @@ match("MESSAGE#38524:MALWARE:01", "nwparser.payload", "%{checksum->} Disposition
 
 var msg38525 = msg("MALWARE:01", part90);
 
-var part91 = // "Pattern{Field(threat_val,false)}"
-match_copy("MESSAGE#38537:MALWARE", "nwparser.payload", "threat_val", processor_chain([
+var part91 = match_copy("MESSAGE#38537:MALWARE", "nwparser.payload", "threat_val", processor_chain([
 	dup71,
 	dup31,
 	dup45,
@@ -96704,14 +96510,11 @@ var all81 = all_match({
 
 var msg38527 = msg("Snort_AlertLog", all81);
 
-var part92 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Port: '), Field(p0,false)}"
-match("MESSAGE#38526:New_TCP_Port/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{p0}");
+var part92 = match("MESSAGE#38526:New_TCP_Port/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{p0}");
 
-var part93 = // "Pattern{Field(sport,true), Constant(' Service: '), Field(protocol,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38526:New_TCP_Port/5_0", "nwparser.p0", "%{sport->} Service: %{protocol->} Confidence: %{result}");
+var part93 = match("MESSAGE#38526:New_TCP_Port/5_0", "nwparser.p0", "%{sport->} Service: %{protocol->} Confidence: %{result}");
 
-var part94 = // "Pattern{Field(sport,false)}"
-match_copy("MESSAGE#38526:New_TCP_Port/5_1", "nwparser.p0", "sport");
+var part94 = match_copy("MESSAGE#38526:New_TCP_Port/5_1", "nwparser.p0", "sport");
 
 var select2464 = linear_select([
 	part93,
@@ -96737,8 +96540,7 @@ var all82 = all_match({
 
 var msg38528 = msg("New_TCP_Port", all82);
 
-var part95 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,false)}"
-match("MESSAGE#38527:New_UDP_Port/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport}");
+var part95 = match("MESSAGE#38527:New_UDP_Port/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport}");
 
 var all83 = all_match({
 	processors: [
@@ -96766,8 +96568,7 @@ var msg38532 = msg("UDP_Server_Information_Update", dup356);
 
 var msg38533 = msg("TCP_Server_Information_Update", dup356);
 
-var part96 = // "Pattern{Constant('From '), Field(sensor,true), Constant(' at '), Field(p0,false)}"
-match("MESSAGE#38532:Client_Timeout/1_1", "nwparser.p0", "From %{sensor->} at %{p0}");
+var part96 = match("MESSAGE#38532:Client_Timeout/1_1", "nwparser.p0", "From %{sensor->} at %{p0}");
 
 var select2465 = linear_select([
 	dup155,
@@ -96793,8 +96594,7 @@ var all84 = all_match({
 
 var msg38534 = msg("Client_Timeout", all84);
 
-var part97 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Category: '), Field(category,true), Constant(' Event Type: '), Field(event_type,false)}"
-match("MESSAGE#38533:Host_IOC_Set/4", "nwparser.p0", "IP Address: %{saddr->} Category: %{category->} Event Type: %{event_type}");
+var part97 = match("MESSAGE#38533:Host_IOC_Set/4", "nwparser.p0", "IP Address: %{saddr->} Category: %{category->} Event Type: %{event_type}");
 
 var all85 = all_match({
 	processors: [
@@ -96814,8 +96614,7 @@ var all85 = all_match({
 
 var msg38535 = msg("Host_IOC_Set", all85);
 
-var part98 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Host Type: '), Field(fld10,false)}"
-match("MESSAGE#38534:Host_Type_Changed/4", "nwparser.p0", "IP Address: %{saddr->} Host Type: %{fld10}");
+var part98 = match("MESSAGE#38534:Host_Type_Changed/4", "nwparser.p0", "IP Address: %{saddr->} Host Type: %{fld10}");
 
 var all86 = all_match({
 	processors: [
@@ -96835,8 +96634,7 @@ var all86 = all_match({
 
 var msg38536 = msg("Host_Type_Changed", all86);
 
-var part99 = // "Pattern{Constant('Login Success'), Field(,false)}"
-match("MESSAGE#38535:Login", "nwparser.payload", "Login Success%{}", processor_chain([
+var part99 = match("MESSAGE#38535:Login", "nwparser.payload", "Login Success%{}", processor_chain([
 	dup112,
 	dup31,
 	dup32,
@@ -96849,8 +96647,7 @@ match("MESSAGE#38535:Login", "nwparser.payload", "Login Success%{}", processor_c
 
 var msg38537 = msg("Login", part99);
 
-var part100 = // "Pattern{Constant('Logout Success'), Field(,false)}"
-match("MESSAGE#38536:Logout", "nwparser.payload", "Logout Success%{}", processor_chain([
+var part100 = match("MESSAGE#38536:Logout", "nwparser.payload", "Logout Success%{}", processor_chain([
 	setc("eventcategory","1401070000"),
 	dup31,
 	dup32,
@@ -96957,8 +96754,7 @@ var part101 = tagval("MESSAGE#38538:connection_events", "nwparser.payload", tvm,
 
 var msg38539 = msg("connection_events", part101);
 
-var part102 = // "Pattern{Constant('SrcIP: '), Field(daddr,false), Constant(', DstIP: '), Field(saddr,false), Constant(', SrcPort: '), Field(dport,false), Constant(', DstPort: '), Field(sport,false), Constant(', Protocol: '), Field(protocol,false), Constant(', FileDirection: Download, FileAction: '), Field(action,false), Constant(', FileSHA256: '), Field(checksum,false), Constant(', SHA_Disposition: '), Field(disposition,false), Constant(', SperoDisposition: '), Field(info,false), Constant(', ThreatName: '), Field(threat_name,false), Constant(', ThreatScore: '), Field(fld1,false), Constant(', FileName: '), Field(filename,false), Constant(', FileType: '), Field(filetype,false), Constant(', FileSize: '), Field(filename_size,false), Constant(', ApplicationProtocol: '), Field(protocol,false), Constant(', Client: '), Field(application,false), Constant(', User: '), Field(username,false), Constant(', FirstPacketSecond: '), Field(fld21,false), Constant(', FilePolicy: '), Field(policyname,false), Constant(', FileSandboxStatus: '), Field(result,false), Constant(', URI: '), Field(url,false)}"
-match("MESSAGE#38539:FTD_events_01", "nwparser.payload", "SrcIP: %{daddr}, DstIP: %{saddr}, SrcPort: %{dport}, DstPort: %{sport}, Protocol: %{protocol}, FileDirection: Download, FileAction: %{action}, FileSHA256: %{checksum}, SHA_Disposition: %{disposition}, SperoDisposition: %{info}, ThreatName: %{threat_name}, ThreatScore: %{fld1}, FileName: %{filename}, FileType: %{filetype}, FileSize: %{filename_size}, ApplicationProtocol: %{protocol}, Client: %{application}, User: %{username}, FirstPacketSecond: %{fld21}, FilePolicy: %{policyname}, FileSandboxStatus: %{result}, URI: %{url}", processor_chain([
+var part102 = match("MESSAGE#38539:FTD_events_01", "nwparser.payload", "SrcIP: %{daddr}, DstIP: %{saddr}, SrcPort: %{dport}, DstPort: %{sport}, Protocol: %{protocol}, FileDirection: Download, FileAction: %{action}, FileSHA256: %{checksum}, SHA_Disposition: %{disposition}, SperoDisposition: %{info}, ThreatName: %{threat_name}, ThreatScore: %{fld1}, FileName: %{filename}, FileType: %{filetype}, FileSize: %{filename_size}, ApplicationProtocol: %{protocol}, Client: %{application}, User: %{username}, FirstPacketSecond: %{fld21}, FilePolicy: %{policyname}, FileSandboxStatus: %{result}, URI: %{url}", processor_chain([
 	dup150,
 	dup161,
 	dup162,
@@ -96970,8 +96766,7 @@ match("MESSAGE#38539:FTD_events_01", "nwparser.payload", "SrcIP: %{daddr}, DstIP
 
 var msg38540 = msg("FTD_events_01", part102);
 
-var part103 = // "Pattern{Constant('SrcIP: '), Field(saddr,false), Constant(', DstIP: '), Field(daddr,false), Constant(', SrcPort: '), Field(sport,false), Constant(', DstPort: '), Field(dport,false), Constant(', Protocol: '), Field(protocol,false), Constant(', FileDirection: Upload, FileAction: '), Field(action,false), Constant(', FileSHA256: '), Field(checksum,false), Constant(', SHA_Disposition: '), Field(disposition,false), Constant(', SperoDisposition: '), Field(info,false), Constant(', ThreatName: '), Field(threat_name,false), Constant(', ThreatScore: '), Field(fld1,false), Constant(', FileName: '), Field(filename,false), Constant(', FileType: '), Field(filetype,false), Constant(', FileSize: '), Field(filename_size,false), Constant(', ApplicationProtocol: '), Field(protocol,false), Constant(', Client: '), Field(application,false), Constant(', User: '), Field(username,false), Constant(', FirstPacketSecond: '), Field(fld21,false), Constant(', FilePolicy: '), Field(policyname,false), Constant(', FileSandboxStatus: '), Field(result,false), Constant(', URI: '), Field(url,false)}"
-match("MESSAGE#38540:FTD_events_02", "nwparser.payload", "SrcIP: %{saddr}, DstIP: %{daddr}, SrcPort: %{sport}, DstPort: %{dport}, Protocol: %{protocol}, FileDirection: Upload, FileAction: %{action}, FileSHA256: %{checksum}, SHA_Disposition: %{disposition}, SperoDisposition: %{info}, ThreatName: %{threat_name}, ThreatScore: %{fld1}, FileName: %{filename}, FileType: %{filetype}, FileSize: %{filename_size}, ApplicationProtocol: %{protocol}, Client: %{application}, User: %{username}, FirstPacketSecond: %{fld21}, FilePolicy: %{policyname}, FileSandboxStatus: %{result}, URI: %{url}", processor_chain([
+var part103 = match("MESSAGE#38540:FTD_events_02", "nwparser.payload", "SrcIP: %{saddr}, DstIP: %{daddr}, SrcPort: %{sport}, DstPort: %{dport}, Protocol: %{protocol}, FileDirection: Upload, FileAction: %{action}, FileSHA256: %{checksum}, SHA_Disposition: %{disposition}, SperoDisposition: %{info}, ThreatName: %{threat_name}, ThreatScore: %{fld1}, FileName: %{filename}, FileType: %{filetype}, FileSize: %{filename_size}, ApplicationProtocol: %{protocol}, Client: %{application}, User: %{username}, FirstPacketSecond: %{fld21}, FilePolicy: %{policyname}, FileSandboxStatus: %{result}, URI: %{url}", processor_chain([
 	dup150,
 	dup161,
 	dup162,
@@ -96983,8 +96778,7 @@ match("MESSAGE#38540:FTD_events_02", "nwparser.payload", "SrcIP: %{saddr}, DstIP
 
 var msg38541 = msg("FTD_events_02", part103);
 
-var part104 = // "Pattern{Constant('User ''), Field(username,false), Constant('' executed the ''), Field(fld1,false), Constant('' command.')}"
-match("MESSAGE#38541:FTD_events_03", "nwparser.payload", "User '%{username}' executed the '%{fld1}' command.", processor_chain([
+var part104 = match("MESSAGE#38541:FTD_events_03", "nwparser.payload", "User '%{username}' executed the '%{fld1}' command.", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -96993,8 +96787,7 @@ match("MESSAGE#38541:FTD_events_03", "nwparser.payload", "User '%{username}' exe
 
 var msg38542 = msg("FTD_events_03", part104);
 
-var part105 = // "Pattern{Constant('User ''), Field(username,false), Constant('', running ''), Field(application,false), Constant('' from IP'), Field(hostip,false), Constant(', executed ''), Field(fld1,false), Constant(''')}"
-match("MESSAGE#38542:FTD_events_04", "nwparser.payload", "User '%{username}', running '%{application}' from IP%{hostip}, executed '%{fld1}'", processor_chain([
+var part105 = match("MESSAGE#38542:FTD_events_04", "nwparser.payload", "User '%{username}', running '%{application}' from IP%{hostip}, executed '%{fld1}'", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -97003,8 +96796,7 @@ match("MESSAGE#38542:FTD_events_04", "nwparser.payload", "User '%{username}', ru
 
 var msg38543 = msg("FTD_events_04", part105);
 
-var part106 = // "Pattern{Field(dclass_counter1,false), Constant('in use,'), Field(fld2,false), Constant('most used')}"
-match("MESSAGE#38543:FTD_events_05", "nwparser.payload", "%{dclass_counter1}in use,%{fld2}most used", processor_chain([
+var part106 = match("MESSAGE#38543:FTD_events_05", "nwparser.payload", "%{dclass_counter1}in use,%{fld2}most used", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -97014,8 +96806,7 @@ match("MESSAGE#38543:FTD_events_05", "nwparser.payload", "%{dclass_counter1}in u
 
 var msg38544 = msg("FTD_events_05", part106);
 
-var part107 = // "Pattern{Constant('Offloaded TCP Flow for connection'), Field(connectionid,false), Constant('from'), Field(dinterface,false), Constant(':'), Field(daddr,false), Constant('/'), Field(dport,false), Constant('('), Field(dtransaddr,false), Constant('/'), Field(dtransport,false), Constant(') to'), Field(sinterface,false), Constant(':'), Field(saddr,false), Constant('/'), Field(sport,false), Constant('('), Field(stransaddr,false), Constant('/'), Field(stransport,false), Constant(')')}"
-match("MESSAGE#38544:FTD_events_06", "nwparser.payload", "Offloaded TCP Flow for connection%{connectionid}from%{dinterface}:%{daddr}/%{dport}(%{dtransaddr}/%{dtransport}) to%{sinterface}:%{saddr}/%{sport}(%{stransaddr}/%{stransport})", processor_chain([
+var part107 = match("MESSAGE#38544:FTD_events_06", "nwparser.payload", "Offloaded TCP Flow for connection%{connectionid}from%{dinterface}:%{daddr}/%{dport}(%{dtransaddr}/%{dtransport}) to%{sinterface}:%{saddr}/%{sport}(%{stransaddr}/%{stransport})", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -97025,8 +96816,7 @@ match("MESSAGE#38544:FTD_events_06", "nwparser.payload", "Offloaded TCP Flow for
 
 var msg38545 = msg("FTD_events_06", part107);
 
-var part108 = // "Pattern{Constant('Failed to locate egress interface for '), Field(protocol,true), Constant(' from '), Field(sinterface,false), Constant(':'), Field(saddr,false), Constant('/'), Field(sport,true), Constant(' to '), Field(daddr,false), Constant('/'), Field(dport,false)}"
-match("MESSAGE#38545:FTD_events_07", "nwparser.payload", "Failed to locate egress interface for %{protocol->} from %{sinterface}:%{saddr}/%{sport->} to %{daddr}/%{dport}", processor_chain([
+var part108 = match("MESSAGE#38545:FTD_events_07", "nwparser.payload", "Failed to locate egress interface for %{protocol->} from %{sinterface}:%{saddr}/%{sport->} to %{daddr}/%{dport}", processor_chain([
 	setc("eventcategory","1801010000"),
 	dup162,
 	dup32,
@@ -97036,8 +96826,7 @@ match("MESSAGE#38545:FTD_events_07", "nwparser.payload", "Failed to locate egres
 
 var msg38546 = msg("FTD_events_07", part108);
 
-var part109 = // "Pattern{Constant('TCP Flow is no longer offloaded for connection '), Field(connectionid,true), Constant(' from '), Field(dinterface,false), Constant(':'), Field(daddr,false), Constant('/'), Field(dport,true), Constant(' ('), Field(dtransaddr,false), Constant('/'), Field(dtransport,false), Constant(') to '), Field(sinterface,false), Constant(':'), Field(saddr,false), Constant('/'), Field(sport,true), Constant(' ('), Field(stransaddr,false), Constant('/'), Field(stransport,false), Constant(')')}"
-match("MESSAGE#38546:FTD_events_08", "nwparser.payload", "TCP Flow is no longer offloaded for connection %{connectionid->} from %{dinterface}:%{daddr}/%{dport->} (%{dtransaddr}/%{dtransport}) to %{sinterface}:%{saddr}/%{sport->} (%{stransaddr}/%{stransport})", processor_chain([
+var part109 = match("MESSAGE#38546:FTD_events_08", "nwparser.payload", "TCP Flow is no longer offloaded for connection %{connectionid->} from %{dinterface}:%{daddr}/%{dport->} (%{dtransaddr}/%{dtransport}) to %{sinterface}:%{saddr}/%{sport->} (%{stransaddr}/%{stransport})", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -97047,8 +96836,7 @@ match("MESSAGE#38546:FTD_events_08", "nwparser.payload", "TCP Flow is no longer 
 
 var msg38547 = msg("FTD_events_08", part109);
 
-var part110 = // "Pattern{Constant('CLOCK: System clock set, source: '), Field(event_source,false), Constant(', IP: '), Field(hostip,false), Constant(', before: '), Field(change_old,false), Constant(', after: '), Field(change_new,false)}"
-match("MESSAGE#38547:FTD_events_09", "nwparser.payload", "CLOCK: System clock set, source: %{event_source}, IP: %{hostip}, before: %{change_old}, after: %{change_new}", processor_chain([
+var part110 = match("MESSAGE#38547:FTD_events_09", "nwparser.payload", "CLOCK: System clock set, source: %{event_source}, IP: %{hostip}, before: %{change_old}, after: %{change_new}", processor_chain([
 	dup150,
 	dup162,
 	dup32,
@@ -97148,19 +96936,16 @@ var select2466 = linear_select([
 	msg38549,
 ]);
 
-var part112 = // "Pattern{Constant('AccessControlRuleAction:'), Field(action,false), Constant(', AccessControlRuleReason:'), Field(result,false), Constant(', SrcIP:'), Field(saddr,false), Constant(', DstIP:'), Field(daddr,false), Constant(', SrcPort:'), Field(sport,false), Constant(', DstPort:'), Field(dport,false), Constant(', Protocol: '), Field(protocol,false), Constant(', IngressInterface: '), Field(dinterface,false), Constant(', IngressZone:'), Field(dst_zone,false), Constant(', ACPolicy:'), Field(fld44,false), Constant(', AccessControlRuleName:'), Field(rulename,false), Constant(', Prefilter Policy:'), Field(fld2,false), Constant(', User:'), Field(fld48,false), Constant(', Client:'), Field(application,false), Constant(', ApplicationProtocol:'), Field(protocol,false), Constant(', InitiatorPackets:'), Field(fld14,false), Constant(', ResponderPackets:'), Field(fld13,false), Constant(', InitiatorBytes:'), Field(sbytes,false), Constant(', ResponderBytes:'), Field(rbytes,false), Constant(', NAPPolicy:'), Field(policyname,false), Constant(', DNSQuery:'), Field(hostname,false), Constant(', DNSRecordType: a host address,'), Field(p0,false)}"
-match("MESSAGE#38549:NGIPS_events_01/0", "nwparser.payload", "AccessControlRuleAction:%{action}, AccessControlRuleReason:%{result}, SrcIP:%{saddr}, DstIP:%{daddr}, SrcPort:%{sport}, DstPort:%{dport}, Protocol: %{protocol}, IngressInterface: %{dinterface}, IngressZone:%{dst_zone}, ACPolicy:%{fld44}, AccessControlRuleName:%{rulename}, Prefilter Policy:%{fld2}, User:%{fld48}, Client:%{application}, ApplicationProtocol:%{protocol}, InitiatorPackets:%{fld14}, ResponderPackets:%{fld13}, InitiatorBytes:%{sbytes}, ResponderBytes:%{rbytes}, NAPPolicy:%{policyname}, DNSQuery:%{hostname}, DNSRecordType: a host address,%{p0}");
+var part112 = match("MESSAGE#38549:NGIPS_events_01/0", "nwparser.payload", "AccessControlRuleAction:%{action}, AccessControlRuleReason:%{result}, SrcIP:%{saddr}, DstIP:%{daddr}, SrcPort:%{sport}, DstPort:%{dport}, Protocol: %{protocol}, IngressInterface: %{dinterface}, IngressZone:%{dst_zone}, ACPolicy:%{fld44}, AccessControlRuleName:%{rulename}, Prefilter Policy:%{fld2}, User:%{fld48}, Client:%{application}, ApplicationProtocol:%{protocol}, InitiatorPackets:%{fld14}, ResponderPackets:%{fld13}, InitiatorBytes:%{sbytes}, ResponderBytes:%{rbytes}, NAPPolicy:%{policyname}, DNSQuery:%{hostname}, DNSRecordType: a host address,%{p0}");
 
-var part113 = // "Pattern{Constant(' DNS_TTL: '), Field(fld7,false), Constant(','), Field(p0,false)}"
-match("MESSAGE#38549:NGIPS_events_01/1_0", "nwparser.p0", " DNS_TTL: %{fld7},%{p0}");
+var part113 = match("MESSAGE#38549:NGIPS_events_01/1_0", "nwparser.p0", " DNS_TTL: %{fld7},%{p0}");
 
 var select2467 = linear_select([
 	part113,
 	dup59,
 ]);
 
-var part114 = // "Pattern{Field(,false), Constant('DNSSICategory:'), Field(category,false)}"
-match("MESSAGE#38549:NGIPS_events_01/2", "nwparser.p0", "%{}DNSSICategory:%{category}");
+var part114 = match("MESSAGE#38549:NGIPS_events_01/2", "nwparser.p0", "%{}DNSSICategory:%{category}");
 
 var all87 = all_match({
 	processors: [
@@ -133327,194 +133112,131 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var hdr35 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#2:00010/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var hdr35 = match("HEADER#2:00010/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
-var part116 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" [Impact: '), Field(p0,false)}"
-match("HEADER#2:00010/1_0", "nwparser.p0", "\"%{hfld10}\" [Impact: %{p0}");
+var part116 = match("HEADER#2:00010/1_0", "nwparser.p0", "\"%{hfld10}\" [Impact: %{p0}");
 
-var part117 = // "Pattern{Field(hfld10,true), Constant(' [Impact: '), Field(p0,false)}"
-match("HEADER#2:00010/1_1", "nwparser.p0", "%{hfld10->} [Impact: %{p0}");
+var part117 = match("HEADER#2:00010/1_1", "nwparser.p0", "%{hfld10->} [Impact: %{p0}");
 
-var part118 = // "Pattern{Field(result,false), Constant('] From '), Field(hfld11,true), Constant(' at '), Field(fld9,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#3:00011/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var part118 = match("HEADER#3:00011/2", "nwparser.p0", "%{result}] From %{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
-var part119 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" [Classification: '), Field(p0,false)}"
-match("HEADER#4:00012/1_0", "nwparser.p0", "\"%{hfld10}\" [Classification: %{p0}");
+var part119 = match("HEADER#4:00012/1_0", "nwparser.p0", "\"%{hfld10}\" [Classification: %{p0}");
 
-var part120 = // "Pattern{Field(hfld10,true), Constant(' [Classification: '), Field(p0,false)}"
-match("HEADER#4:00012/1_1", "nwparser.p0", "%{hfld10->} [Classification: %{p0}");
+var part120 = match("HEADER#4:00012/1_1", "nwparser.p0", "%{hfld10->} [Classification: %{p0}");
 
-var part121 = // "Pattern{Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#4:00012/2", "nwparser.p0", "%{sigtype}] [Priority: %{payload}");
+var part121 = match("HEADER#4:00012/2", "nwparser.p0", "%{sigtype}] [Priority: %{payload}");
 
-var part122 = // "Pattern{Constant('"'), Field(hfld10,false), Constant('" ['), Field(p0,false)}"
-match("HEADER#5:00013/1_0", "nwparser.p0", "\"%{hfld10}\" [%{p0}");
+var part122 = match("HEADER#5:00013/1_0", "nwparser.p0", "\"%{hfld10}\" [%{p0}");
 
-var part123 = // "Pattern{Field(hfld10,true), Constant(' ['), Field(p0,false)}"
-match("HEADER#5:00013/1_1", "nwparser.p0", "%{hfld10->} [%{p0}");
+var part123 = match("HEADER#5:00013/1_1", "nwparser.p0", "%{hfld10->} [%{p0}");
 
-var part124 = // "Pattern{Field(info,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#5:00013/2", "nwparser.p0", "%{info}] [Priority: %{payload}");
+var part124 = match("HEADER#5:00013/2", "nwparser.p0", "%{info}] [Priority: %{payload}");
 
-var hdr36 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' snort['), Field(hpid,false), Constant(']: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#7:00020/0", "message", "%{month->} %{day->} %{time->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var hdr36 = match("HEADER#7:00020/0", "message", "%{month->} %{day->} %{time->} snort[%{hpid}]: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
-var part125 = // "Pattern{Field(result,false), Constant('] From '), Field(group_object,false), Constant('/'), Field(hfld11,true), Constant(' at '), Field(fld9,true), Constant(' '), Field(event_time_string,true), Constant(' [Classification: '), Field(sigtype,false), Constant('] [Priority: '), Field(payload,false)}"
-match("HEADER#7:00020/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
+var part125 = match("HEADER#7:00020/2", "nwparser.p0", "%{result}] From %{group_object}/%{hfld11->} at %{fld9->} %{event_time_string->} [Classification: %{sigtype}] [Priority: %{payload}");
 
-var hdr37 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' snort: ['), Field(hevent_source,false), Constant(':'), Field(messageid,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#11:00030/0", "message", "%{month->} %{day->} %{time->} snort: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
+var hdr37 = match("HEADER#11:00030/0", "message", "%{month->} %{day->} %{time->} snort: [%{hevent_source}:%{messageid}:%{hversion}] %{p0}");
 
-var part126 = // "Pattern{Constant('at'), Field(p0,false)}"
-match("HEADER#26:0011/1_1", "nwparser.p0", "at%{p0}");
+var part126 = match("HEADER#26:0011/1_1", "nwparser.p0", "at%{p0}");
 
-var part127 = // "Pattern{Field(,true), Constant(' '), Field(p0,false)}"
-match("HEADER#26:0011/2", "nwparser.p0", "%{} %{p0}");
+var part127 = match("HEADER#26:0011/2", "nwparser.p0", "%{} %{p0}");
 
-var part128 = // "Pattern{Constant('['), Field(hpid,false), Constant(']: ['), Field(p0,false)}"
-match("HEADER#41:0024/1_0", "nwparser.p0", "[%{hpid}]: [%{p0}");
+var part128 = match("HEADER#41:0024/1_0", "nwparser.p0", "[%{hpid}]: [%{p0}");
 
-var part129 = // "Pattern{Constant(': ['), Field(p0,false)}"
-match("HEADER#41:0024/1_1", "nwparser.p0", ": [%{p0}");
+var part129 = match("HEADER#41:0024/1_1", "nwparser.p0", ": [%{p0}");
 
-var part130 = // "Pattern{Constant(']'), Field(hversion,false), Constant(':'), Field(hfld2,false), Constant(':'), Field(hevent_source,true), Constant(' '), Field(payload,false)}"
-match("HEADER#41:0024/2", "nwparser.p0", "]%{hversion}:%{hfld2}:%{hevent_source->} %{payload}");
+var part130 = match("HEADER#41:0024/2", "nwparser.p0", "]%{hversion}:%{hfld2}:%{hevent_source->} %{payload}");
 
-var hdr38 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': ['), Field(hevent_source,false), Constant(':'), Field(hfld2,false), Constant(':'), Field(hversion,false), Constant('] '), Field(p0,false)}"
-match("HEADER#43:0023/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{hfld2}:%{hversion}] %{p0}");
+var hdr38 = match("HEADER#43:0023/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: [%{hevent_source}:%{hfld2}:%{hversion}] %{p0}");
 
-var part131 = // "Pattern{Field(threat_val,true), Constant(' ]:alert {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_0", "nwparser.payload", "%{threat_val->} ]:alert {%{p0}");
+var part131 = match("MESSAGE#1:0/0_0", "nwparser.payload", "%{threat_val->} ]:alert {%{p0}");
 
-var part132 = // "Pattern{Field(threat_val,true), Constant(' ]: '), Field(fld1,true), Constant(' {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_1", "nwparser.payload", "%{threat_val->} ]: %{fld1->} {%{p0}");
+var part132 = match("MESSAGE#1:0/0_1", "nwparser.payload", "%{threat_val->} ]: %{fld1->} {%{p0}");
 
-var part133 = // "Pattern{Field(threat_val,false), Constant(']: {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_2", "nwparser.payload", "%{threat_val}]: {%{p0}");
+var part133 = match("MESSAGE#1:0/0_2", "nwparser.payload", "%{threat_val}]: {%{p0}");
 
-var part134 = // "Pattern{Field(threat_val,true), Constant(' ] {'), Field(p0,false)}"
-match("MESSAGE#1:0/0_3", "nwparser.payload", "%{threat_val->} ] {%{p0}");
+var part134 = match("MESSAGE#1:0/0_3", "nwparser.payload", "%{threat_val->} ] {%{p0}");
 
-var part135 = // "Pattern{Field(protocol,false), Constant('} '), Field(p0,false)}"
-match("MESSAGE#1:0/1", "nwparser.p0", "%{protocol}} %{p0}");
+var part135 = match("MESSAGE#1:0/1", "nwparser.p0", "%{protocol}} %{p0}");
 
-var part136 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,true), Constant(' ('), Field(location_src,false), Constant(') -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src}) -> %{p0}");
+var part136 = match("MESSAGE#1:0/2_0", "nwparser.p0", "%{saddr}:%{sport->} (%{location_src}) -> %{p0}");
 
-var part137 = // "Pattern{Field(saddr,false), Constant(':'), Field(sport,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_1", "nwparser.p0", "%{saddr}:%{sport->} -> %{p0}");
+var part137 = match("MESSAGE#1:0/2_1", "nwparser.p0", "%{saddr}:%{sport->} -> %{p0}");
 
-var part138 = // "Pattern{Field(saddr,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#1:0/2_2", "nwparser.p0", "%{saddr->} -> %{p0}");
+var part138 = match("MESSAGE#1:0/2_2", "nwparser.p0", "%{saddr->} -> %{p0}");
 
-var part139 = // "Pattern{Field(daddr,false), Constant(':'), Field(dport,true), Constant(' ('), Field(location_dst,false), Constant(')')}"
-match("MESSAGE#1:0/3_0", "nwparser.p0", "%{daddr}:%{dport->} (%{location_dst})");
+var part139 = match("MESSAGE#1:0/3_0", "nwparser.p0", "%{daddr}:%{dport->} (%{location_dst})");
 
-var part140 = // "Pattern{Field(daddr,false), Constant(':'), Field(dport,false)}"
-match("MESSAGE#1:0/3_1", "nwparser.p0", "%{daddr}:%{dport}");
+var part140 = match("MESSAGE#1:0/3_1", "nwparser.p0", "%{daddr}:%{dport}");
 
-var part141 = // "Pattern{Field(daddr,false)}"
-match_copy("MESSAGE#1:0/3_2", "nwparser.p0", "daddr");
+var part141 = match_copy("MESSAGE#1:0/3_2", "nwparser.p0", "daddr");
 
-var part142 = // "Pattern{Field(context,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#2:0:01/0", "nwparser.payload", "%{context->} %{p0}");
+var part142 = match("MESSAGE#2:0:01/0", "nwparser.payload", "%{context->} %{p0}");
 
-var part143 = // "Pattern{Constant('<<'), Field(interface,false), Constant('> '), Field(p0,false)}"
-match("MESSAGE#2:0:01/1_0", "nwparser.p0", "\u003c\u003c%{interface}> %{p0}");
+var part143 = match("MESSAGE#2:0:01/1_0", "nwparser.p0", "\u003c\u003c%{interface}> %{p0}");
 
-var part144 = // "Pattern{Field(p0,false)}"
-match_copy("MESSAGE#2:0:01/1_1", "nwparser.p0", "p0");
+var part144 = match_copy("MESSAGE#2:0:01/1_1", "nwparser.p0", "p0");
 
-var part145 = // "Pattern{Constant('{'), Field(protocol,false), Constant('} '), Field(p0,false)}"
-match("MESSAGE#2:0:01/2", "nwparser.p0", "{%{protocol}} %{p0}");
+var part145 = match("MESSAGE#2:0:01/2", "nwparser.p0", "{%{protocol}} %{p0}");
 
-var part146 = // "Pattern{Field(threat_val,true), Constant(' ]'), Field(p0,false)}"
-match("MESSAGE#33:10/0", "nwparser.payload", "%{threat_val->} ]%{p0}");
+var part146 = match("MESSAGE#33:10/0", "nwparser.payload", "%{threat_val->} ]%{p0}");
 
-var part147 = // "Pattern{Constant(' <<'), Field(interface,false), Constant('> '), Field(p0,false)}"
-match("MESSAGE#33:10/1_0", "nwparser.p0", " \u003c\u003c%{interface}> %{p0}");
+var part147 = match("MESSAGE#33:10/1_0", "nwparser.p0", " \u003c\u003c%{interface}> %{p0}");
 
-var part148 = // "Pattern{Constant(': '), Field(p0,false)}"
-match("MESSAGE#33:10/1_1", "nwparser.p0", ": %{p0}");
+var part148 = match("MESSAGE#33:10/1_1", "nwparser.p0", ": %{p0}");
 
-var part149 = // "Pattern{Constant(' '), Field(p0,false)}"
-match("MESSAGE#33:10/1_2", "nwparser.p0", " %{p0}");
+var part149 = match("MESSAGE#33:10/1_2", "nwparser.p0", " %{p0}");
 
-var part150 = // "Pattern{Field(context,true), Constant(' <<'), Field(interface,false), Constant('> '), Field(protocol,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#80:103:01/0", "nwparser.payload", "%{context->} \u003c\u003c%{interface}> %{protocol->} %{p0}");
+var part150 = match("MESSAGE#80:103:01/0", "nwparser.payload", "%{context->} \u003c\u003c%{interface}> %{protocol->} %{p0}");
 
-var part151 = // "Pattern{Field(threat_val,true), Constant(' ]:alert '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_0", "nwparser.payload", "%{threat_val->} ]:alert %{p0}");
+var part151 = match("MESSAGE#5535:3086/0_0", "nwparser.payload", "%{threat_val->} ]:alert %{p0}");
 
-var part152 = // "Pattern{Field(threat_val,false), Constant(']: '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_1", "nwparser.payload", "%{threat_val}]: %{p0}");
+var part152 = match("MESSAGE#5535:3086/0_1", "nwparser.payload", "%{threat_val}]: %{p0}");
 
-var part153 = // "Pattern{Field(threat_val,true), Constant(' ] '), Field(p0,false)}"
-match("MESSAGE#5535:3086/0_2", "nwparser.payload", "%{threat_val->} ] %{p0}");
+var part153 = match("MESSAGE#5535:3086/0_2", "nwparser.payload", "%{threat_val->} ] %{p0}");
 
-var part154 = // "Pattern{Constant(''), Field(p0,false)}"
-match("MESSAGE#5535:3086/1", "nwparser.p0", "%{p0}");
+var part154 = match("MESSAGE#5535:3086/1", "nwparser.p0", "%{p0}");
 
-var part155 = // "Pattern{Constant(':alert '), Field(p0,false)}"
-match("MESSAGE#30119:28015/1_1", "nwparser.p0", ":alert %{p0}");
+var part155 = match("MESSAGE#30119:28015/1_1", "nwparser.p0", ":alert %{p0}");
 
-var part156 = // "Pattern{Constant(''), Field(saddr,true), Constant(' -> '), Field(p0,false)}"
-match("MESSAGE#36377:34596/3_1", "nwparser.p0", "%{saddr->} -> %{p0}");
+var part156 = match("MESSAGE#36377:34596/3_1", "nwparser.p0", "%{saddr->} -> %{p0}");
 
-var part157 = // "Pattern{Constant(''), Field(daddr,false)}"
-match("MESSAGE#36377:34596/4_1", "nwparser.p0", "%{daddr}");
+var part157 = match("MESSAGE#36377:34596/4_1", "nwparser.p0", "%{daddr}");
 
-var part158 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' MAC: '), Field(smacaddr,true), Constant(' TTL '), Field(p0,false)}"
-match("MESSAGE#38458:MAC_Information_Change/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} MAC: %{smacaddr->} TTL %{p0}");
+var part158 = match("MESSAGE#38458:MAC_Information_Change/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} MAC: %{smacaddr->} TTL %{p0}");
 
-var part159 = // "Pattern{Field(sinterface,true), Constant(' ('), Field(protocol,true), Constant(' detected)')}"
-match("MESSAGE#38458:MAC_Information_Change/1_0", "nwparser.p0", "%{sinterface->} (%{protocol->} detected)");
+var part159 = match("MESSAGE#38458:MAC_Information_Change/1_0", "nwparser.p0", "%{sinterface->} (%{protocol->} detected)");
 
-var part160 = // "Pattern{Field(sinterface,false)}"
-match_copy("MESSAGE#38458:MAC_Information_Change/1_1", "nwparser.p0", "sinterface");
+var part160 = match_copy("MESSAGE#38458:MAC_Information_Change/1_1", "nwparser.p0", "sinterface");
 
-var part161 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> '), Field(p0,false)}"
-match("MESSAGE#38461:New_Host/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> %{p0}");
+var part161 = match("MESSAGE#38461:New_Host/0", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> %{p0}");
 
-var part162 = // "Pattern{Field(protocol,false)}"
-match_copy("MESSAGE#38462:New_Network_Protocol/2", "nwparser.p0", "protocol");
+var part162 = match_copy("MESSAGE#38462:New_Network_Protocol/2", "nwparser.p0", "protocol");
 
-var part163 = // "Pattern{Field(protocol,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38468:TCP_Service_Information_Update/1_0", "nwparser.p0", "%{protocol->} Confidence: %{result}");
+var part163 = match("MESSAGE#38468:TCP_Service_Information_Update/1_0", "nwparser.p0", "%{protocol->} Confidence: %{result}");
 
-var part164 = // "Pattern{Constant('>'), Field(p0,false)}"
-match("MESSAGE#38495:SystemSettings:09/1_0", "nwparser.p0", ">%{p0}");
+var part164 = match("MESSAGE#38495:SystemSettings:09/1_0", "nwparser.p0", ">%{p0}");
 
-var part165 = // "Pattern{Field(fld1,false), Constant(']['), Field(policyname,false), Constant('] Connection Type: '), Field(event_state,false), Constant(', User: '), Field(username,false), Constant(', Client: '), Field(application,false), Constant(', Application Protocol: '), Field(protocol,false), Constant(', Web App: '), Field(application,false), Constant(', Access Control Rule Name: '), Field(rulename,false), Constant(', Access Control Rule Action: '), Field(action,false), Constant(', Access Control Rule Reasons: '), Field(result,false), Constant(', URL Category: '), Field(category,false), Constant(', URL Reputation: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/0", "nwparser.payload", "%{fld1}][%{policyname}] Connection Type: %{event_state}, User: %{username}, Client: %{application}, Application Protocol: %{protocol}, Web App: %{application}, Access Control Rule Name: %{rulename}, Access Control Rule Action: %{action}, Access Control Rule Reasons: %{result}, URL Category: %{category}, URL Reputation: %{p0}");
+var part165 = match("MESSAGE#38514:Primary_Detection_Engine/0", "nwparser.payload", "%{fld1}][%{policyname}] Connection Type: %{event_state}, User: %{username}, Client: %{application}, Application Protocol: %{protocol}, Web App: %{application}, Access Control Rule Name: %{rulename}, Access Control Rule Action: %{action}, Access Control Rule Reasons: %{result}, URL Category: %{category}, URL Reputation: %{p0}");
 
-var part166 = // "Pattern{Constant('Risk unknown, URL: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/1_0", "nwparser.p0", "Risk unknown, URL: %{p0}");
+var part166 = match("MESSAGE#38514:Primary_Detection_Engine/1_0", "nwparser.p0", "Risk unknown, URL: %{p0}");
 
-var part167 = // "Pattern{Field(reputation_num,false), Constant(', URL: '), Field(p0,false)}"
-match("MESSAGE#38514:Primary_Detection_Engine/1_1", "nwparser.p0", "%{reputation_num}, URL: %{p0}");
+var part167 = match("MESSAGE#38514:Primary_Detection_Engine/1_1", "nwparser.p0", "%{reputation_num}, URL: %{p0}");
 
-var part168 = // "Pattern{Constant('-*> '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/1_0", "nwparser.p0", "-*> %{p0}");
+var part168 = match("MESSAGE#38521:Network_Based_Retrospective/1_0", "nwparser.p0", "-*> %{p0}");
 
-var part169 = // "Pattern{Constant('> '), Field(p0,false)}"
-match("MESSAGE#38521:Network_Based_Retrospective/1_1", "nwparser.p0", "> %{p0}");
+var part169 = match("MESSAGE#38521:Network_Based_Retrospective/1_1", "nwparser.p0", "> %{p0}");
 
-var part170 = // "Pattern{Constant('From "'), Field(sensor,false), Constant('" at '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/1_0", "nwparser.p0", "From \"%{sensor}\" at %{p0}");
+var part170 = match("MESSAGE#38522:Network_Based_Retrospective:01/1_0", "nwparser.p0", "From \"%{sensor}\" at %{p0}");
 
-var part171 = // "Pattern{Constant('at '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/1_1", "nwparser.p0", "at %{p0}");
+var part171 = match("MESSAGE#38522:Network_Based_Retrospective:01/1_1", "nwparser.p0", "at %{p0}");
 
-var part172 = // "Pattern{Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC '), Field(p0,false)}"
-match("MESSAGE#38522:Network_Based_Retrospective:01/2", "nwparser.p0", "%{fld6->} %{event_time_string->} UTC %{p0}");
+var part172 = match("MESSAGE#38522:Network_Based_Retrospective:01/2", "nwparser.p0", "%{fld6->} %{event_time_string->} UTC %{p0}");
 
-var part173 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' '), Field(network_service,false)}"
-match("MESSAGE#38528:Client_Update/4", "nwparser.p0", "IP Address: %{saddr->} %{network_service}");
+var part173 = match("MESSAGE#38528:Client_Update/4", "nwparser.p0", "IP Address: %{saddr->} %{network_service}");
 
-var part174 = // "Pattern{Constant('IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(p0,false)}"
-match("MESSAGE#38530:UDP_Server_Information_Update/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
+var part174 = match("MESSAGE#38530:UDP_Server_Information_Update/4", "nwparser.p0", "IP Address: %{saddr->} Port: %{sport->} Service: %{p0}");
 
 var select2469 = linear_select([
 	dup3,
@@ -133531,8 +133253,7 @@ var select2471 = linear_select([
 	dup10,
 ]);
 
-var hdr39 = // "Pattern{Field(month,true), Constant(' '), Field(day,true), Constant(' '), Field(time,true), Constant(' '), Field(host,true), Constant(' '), Field(hfld1,false), Constant(': <<*- '), Field(msgIdPart1,true), Constant(' '), Field(msgIdPart2,true), Constant(' '), Field(msgIdPart3,true), Constant(' '), Field(p0,false)}"
-match("HEADER#26:0011/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{p0}", processor_chain([
+var hdr39 = match("HEADER#26:0011/0", "message", "%{month->} %{day->} %{time->} %{host->} %{hfld1}: \u003c\u003c*- %{msgIdPart1->} %{msgIdPart2->} %{msgIdPart3->} %{p0}", processor_chain([
 	dup19,
 ]));
 
@@ -133604,8 +133325,7 @@ var select2483 = linear_select([
 	dup132,
 ]);
 
-var part175 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' OS: '), Field(version,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{version->} Confidence: %{result}", processor_chain([
+var part175 = match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} OS: %{version->} Confidence: %{result}", processor_chain([
 	dup127,
 	dup31,
 	dup32,
@@ -133613,8 +133333,7 @@ match("MESSAGE#38465:OS_Confidence_Update", "nwparser.payload", "%{context->} Fr
 	dup129,
 ]));
 
-var part176 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,true), Constant(' Service: '), Field(protocol,true), Constant(' Confidence: '), Field(result,false)}"
-match("MESSAGE#38467:TCP_Service_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result}", processor_chain([
+var part176 = match("MESSAGE#38467:TCP_Service_Confidence_Update", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport->} Service: %{protocol->} Confidence: %{result}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -133627,8 +133346,7 @@ var select2484 = linear_select([
 	dup134,
 ]);
 
-var part177 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' '), Field(product,false)}"
-match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} %{product}", processor_chain([
+var part177 = match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} %{product}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -133636,8 +133354,7 @@ match("MESSAGE#38471:New_Client_Application", "nwparser.payload", "%{context->} 
 	dup129,
 ]));
 
-var part178 = // "Pattern{Field(context,true), Constant(' From "'), Field(sensor,false), Constant('" at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,true), Constant(' Port: '), Field(sport,false)}"
-match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport}", processor_chain([
+var part178 = match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"%{sensor}\" at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr->} Port: %{sport}", processor_chain([
 	dup135,
 	dup31,
 	dup32,
@@ -133645,8 +133362,7 @@ match("MESSAGE#38473:New_TCP_Service", "nwparser.payload", "%{context->} From \"
 	dup129,
 ]));
 
-var part179 = // "Pattern{Field(context,true), Constant(' From '), Field(sensor,true), Constant(' at '), Field(fld6,true), Constant(' '), Field(event_time_string,true), Constant(' UTC -*> IP Address: '), Field(saddr,false)}"
-match("MESSAGE#38475:TCP_Port_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr}", processor_chain([
+var part179 = match("MESSAGE#38475:TCP_Port_Timeout", "nwparser.payload", "%{context->} From %{sensor->} at %{fld6->} %{event_time_string->} UTC -*> IP Address: %{saddr}", processor_chain([
 	dup135,
 	dup31,
 	dup32,

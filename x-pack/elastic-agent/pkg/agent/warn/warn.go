@@ -21,4 +21,5 @@ func LogNotGA(log *logger.Logger) {
 // PrintNotGA writes to the received writer that the Agent is not GA.
 func PrintNotGA(output io.Writer) {
 	fmt.Fprintln(output, message)
+	fmt.Fprintln(output)
 }
