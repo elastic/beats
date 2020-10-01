@@ -97,6 +97,7 @@ var (
 func (c *s3Collector) run() {
 	defer c.logger.Infof("s3 input worker for '%v' has stopped.", c.config.QueueURL)
 	c.logger.Infof("s3 input worker has started. with queueURL: %v", c.config.QueueURL)
+	fmt.Println("c.cancellation.Err() = ", c.cancellation.Err())
 	for c.cancellation.Err() == nil {
 		// receive messages from sqs
 		output, err := c.receiveMessage(c.sqs, c.visibilityTimeout)
@@ -109,6 +110,7 @@ func (c *s3Collector) run() {
 			continue
 		}
 
+		fmt.Println("output= ", output)
 		if output == nil || len(output.Messages) == 0 {
 			c.logger.Debug("no message received from SQS:", c.config.QueueURL)
 			continue
@@ -255,7 +257,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 			return nil, errors.Wrapf(err, "url.QueryUnescape failed for '%s'", record.S3.object.Key)
 		}
 
-		if len(p.config.FileSelectors) == 0 {
+		if len(c.config.FileSelectors) == 0 {
 			s3Infos = append(s3Infos, s3Info{
 				region:                   record.AwsRegion,
 				name:                     record.S3.bucket.Name,

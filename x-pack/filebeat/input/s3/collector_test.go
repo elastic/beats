@@ -120,7 +120,7 @@ func TestHandleMessage(t *testing.T) {
 		},
 	}
 
-	p := &s3Collector{}
+	p := &s3Collector{config: &config{}}
 	for _, c := range casesPositive {
 		t.Run(c.title, func(t *testing.T) {
 			s3Info, err := p.handleSQSMessage(c.message)

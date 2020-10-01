@@ -55,8 +55,6 @@ func (inp *s3Input) Test(ctx v2.TestContext) error {
 	if err != nil {
 		return errors.Wrap(err, "getAWSCredentials failed")
 	}
-
-	// XXX: more connection checks?
 	return nil
 }
 
@@ -72,7 +70,6 @@ func (inp *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
-	// XXX: any fields we want to add to the logger
 	log := ctx.Logger.With("queue_url", inp.config.QueueURL)
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -82,7 +79,6 @@ func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3
 	if err != nil {
 		return nil, err
 	}
-	defer client.Close()
 
 	regionName, err := getRegionFromQueueURL(inp.config.QueueURL)
 	if err != nil {
@@ -92,10 +88,10 @@ func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3
 	}
 
 	awsConfig, err := awscommon.GetAWSCredentials(inp.config.AwsConfig)
-	awsConfig.Region = regionName
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
+	awsConfig.Region = regionName
 
 	visibilityTimeout := int64(inp.config.VisibilityTimeout.Seconds())
 	log.Infof("visibility timeout is set to %v seconds", visibilityTimeout)

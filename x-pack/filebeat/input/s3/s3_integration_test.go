@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build aws
-
 package s3
 
 import (
@@ -18,10 +15,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 
@@ -78,103 +73,35 @@ func getConfigForTest(t *testing.T) config {
 	return config
 }
 
-func uploadSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAPI) {
-	t.Helper()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Fatalf("Failed to open file %v", filePath)
-	}
-	defer file.Close()
-
-	s3PutObjectInput := s3.PutObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(filepath.Base(filePath)),
-		Body:   file,
-	}
-	req := svcS3.PutObjectRequest(&s3PutObjectInput)
-	output, err := req.Send(ctx)
-	if err != nil {
-		t.Fatalf("failed to put object into s3 bucket: %v", output)
-	}
-}
-
-func deleteSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAPI) {
-	t.Helper()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Fatalf("Failed to open file %v", filePath)
-	}
-	defer file.Close()
-
-	s3PutObjectInput := s3.DeleteObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(filepath.Base(filePath)),
-	}
-	req := svcS3.DeleteObjectRequest(&s3PutObjectInput)
-	_, err = req.Send(ctx)
-	if err != nil {
-		t.Fatal("failed to delete object from s3 bucket", err)
-	}
-}
-
-func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI) []string {
-	t.Helper()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	// receive messages from sqs
-	req := svcSQS.ReceiveMessageRequest(
-		&sqs.ReceiveMessageInput{
-			QueueUrl:              &queueURL,
-			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   &maxNumberOfMessage,
-			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       &waitTimeSecond,
-		})
-
-	output, err := req.Send(ctx)
-	if err != nil {
-		t.Fatalf("failed to receive message from SQS: %v", output)
-	}
-
-	var oldMessageHandles []string
-	for _, message := range output.Messages {
-		oldMessageHandles = append(oldMessageHandles, *message.ReceiptHandle)
-	}
-
-	return oldMessageHandles
-}
-
 func defaultTestConfig() *common.Config {
 	return common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": os.Getenv("QUEUE_URL"),
 	})
 }
 
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("s3_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
+}
+
 func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, *eventReceiver) {
-	plugin := Plugin()
-	inp, err := plugin.Manager.Create(cfg)
+	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx, cancel := newV2Context()
+	t.Cleanup(cancel)
 
 	client := pubtest.NewChanClient(0)
 	receiver := &eventReceiver{client.Channel}
 	pipeline := pubtest.ConstClient(client)
 
-	collector, err := inp.(*s3Input).createCollector(v2.Context{
-		Logger:      logp.NewLogger("test"),
-		Cancelation: ctx,
-	}, pipeline)
+	collector, err := inp.(*s3Input).createCollector(ctx, pipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -234,11 +161,6 @@ func TestS3Input(t *testing.T) {
 			t.Fatal("failed to get S3_BUCKET_NAME")
 		}
 
-		uploadSampleLogFile(t, s3BucketNameEnv, collector.s3)
-		t.Log("sleeping 30 seconds for uploading sample log file")
-		time.Sleep(30 * time.Second)
-		t.Log("done sleeping")
-
 		wg := sync.WaitGroup{}
 		wg.Add(1)
 		go func() {
@@ -258,9 +180,6 @@ func TestS3Input(t *testing.T) {
 		message, err := event.GetValue("message")
 		assert.NoError(t, err)
 		assert.Equal(t, "logline1\n", message)
-
-		// delete sample log file from S3 bucket
-		deleteSampleLogFile(t, s3BucketNameEnv, collector.s3)
 	})
 }
 
@@ -317,11 +236,18 @@ func TestMockS3Input(t *testing.T) {
 	})
 
 	runTest(t, cfg, true, func(t *testing.T, collector *s3Collector, receiver *eventReceiver) {
+		defer collector.cancellation.Done()
+		defer collector.publisher.Close()
+
+		output, err := collector.receiveMessage(collector.sqs, collector.visibilityTimeout)
+		assert.NoError(t, err)
+
 		wg := sync.WaitGroup{}
 		wg.Add(1)
 		go func() {
-			defer wg.Done()
-			collector.run()
+			errC := make(chan error)
+			defer close(errC)
+			collector.processMessage(collector.s3, output.Messages[0], &wg, errC)
 		}()
 
 		event := <-receiver.ch
