@@ -32,7 +32,7 @@ type SynthEvent struct {
 	Index                int                    `json:"index""`
 	Step                 *Step                  `json:"step"`
 	Journey              *Journey               `json:"journey"`
-	TimestampEpochMillis int64                  `json:"@timestamp"`
+	TimestampEpochMillis float64                `json:"@timestamp"`
 	Payload              map[string]interface{} `json:"payload"`
 	Blob                 string                 `json:"blob"`
 	BlobMime             string                 `json:"blob_mime"`

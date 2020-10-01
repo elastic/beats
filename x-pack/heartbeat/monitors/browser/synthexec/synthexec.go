@@ -134,7 +134,7 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
 			}
 			if se.TimestampEpochMillis != 0 {
-				event.Timestamp = time.Unix(se.TimestampEpochMillis/1000, (se.TimestampEpochMillis%1000)*1000000)
+				event.Timestamp = time.Unix(int64(se.TimestampEpochMillis/1000), (int64(se.TimestampEpochMillis) % 1000)*1000000)
 			}
 			switch se.Type {
 			case "journey/end":
@@ -283,7 +283,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
-			TimestampEpochMillis: time.Now().UnixNano() / int64(time.Millisecond),
+			TimestampEpochMillis: float64(time.Now().UnixNano() / int64(time.Millisecond)),
 			Payload: map[string]interface{}{
 				"message": text,
 			},
