@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-virustotal-livehunt-Dashboard
+  file: Filebeat-virustotal-livehunt.json

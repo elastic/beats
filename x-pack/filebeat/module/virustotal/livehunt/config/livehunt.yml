@@ -1,0 +1,199 @@
+#spellchecker: disable
+{{ if eq .input "httpjson" }}
+type: httpjson
+url: https://www.virustotal.com/api/v3/intelligence/hunting_notification_files?limit={{ .limit }}
+http_method: GET
+http_headers:
+  x-apikey: {{ .api_key }}
+json_objects_array: data
+interval: 1m
+{{ end }}
+
+{{ if eq .input "kafka" }}
+type: kafka
+hosts:
+{{ range $i, $broker := .kafka_brokers }}
+  - {{ $broker }}
+{{ end }}
+topics:
+{{ range $i, $topic := .kafka_topics }}
+  - {{ $topic }}
+{{ end }}
+group_id: "{{ .kafka_groupid }}"
+{{ end }}
+
+processors:
+  - rename:
+      fields:
+        - {from: message, to: event.original}
+
+  - decode_json_fields:
+      fields: [event.original]
+      target: "virustotal"
+      document_id: context_attributes.notification_id
+
+  - add_fields:
+      target: event
+      fields:
+        kind: alert
+        category: file
+        type: info
+
+  - script:
+      lang: javascript
+      id: vt_reference
+      params:
+        vt_fileinfo_url: "{{ .vt_fileinfo_url }}"
+      source: >
+        var params = {vt_fileinfo_url: "https://www.virustotal.com/gui/file/"};
+        function register(scriptParams) {
+            params = scriptParams;
+        }
+        function process(event) {
+            var file_id = event.Get("virustotal.id");
+            event.Put("event.reference", params.vt_fileinfo_url + file_id );
+        }
+
+  - rename:
+      ignore_missing: True
+      fields:
+        # Common file.* info
+        - {from: virustotal.attributes.names,  to: file.name}
+        - {from: virustotal.attributes.size,   to: file.size}
+        - {from: virustotal.attributes.md5,    to: file.hash.md5}
+        - {from: virustotal.attributes.sha1,   to: file.hash.sha1}
+        - {from: virustotal.attributes.sha256, to: file.hash.sha256}
+        - {from: virustotal.attributes.ssdeep, to: file.hash.ssdeep}
+
+        # Notification Info
+        - {from: virustotal.context_attributes.notification_snippet, to: virustotal.notification.snippet}
+        - {from: virustotal.context_attributes.notification_tags,    to: virustotal.notification.tags}
+        - {from: virustotal.context_attributes.notification_date,    to: virustotal.notification.date}
+        - {from: virustotal.context_attributes.rule_name,            to: rule.name}
+        - {from: virustotal.context_attributes.ruleset_name,         to: rule.ruleset}
+        - {from: virustotal.context_attributes.ruleset_id,           to: rule.ruleset_id}
+        - {from: virustotal.context_attributes.rule_tags,            to: rule.tags}
+        - {from: virustotal.context_attributes.match_in_subfile, to: rule.match_in_subfile}
+
+        # Exiftool data
+        - {from: virustotal.attributes.exiftool, to: virustotal.exiftool}
+
+        # Analysis
+        - {from: virustotal.attributes.last_analysis_stats,   to: virustotal.analysis.stats}
+        - {from: virustotal.attributes.last_analysis_date,    to: virustotal.analysis.date}
+
+        # Sigma analysis
+        - {from: virustotal.attributes.sigma_analysis_stats,   to: virustotal.sigma_analysis_stats}
+        - {from: virustotal.attributes.sigma_analysis_summary, to: virustotal.sigma_analysis}
+
+        # Submission Info
+        - {from: virustotal.attributes.first_submission_date, to: virustotal.submission.first_submitted}
+        - {from: virustotal.attributes.last_submission_date, to: virustotal.submission.last_submitted}
+        - {from: virustotal.attributes.times_submitted, to: virustotal.submission.submission_count}
+        - {from: virustotal.attributes.unique_sources, to: virustotal.submission.unique_sources}
+        - {from: virustotal.context_attributes.notification_source_key, to: virustotal.submission.source.key}
+        - {from: virustotal.context_attributes.notification_source_country, to: virustotal.submission.source.geo.country_iso_code}
+
+        # Other attributes
+        - {from: virustotal.attributes.tags,   to: virustotal.tags}
+        - {from: virustotal.attributes.magic, to: virustotal.magic}
+        - {from: virustotal.attributes.capabilities_tags, to: virustotal.capabilities}
+        - {from: virustotal.attributes.downloadable, to: virustotal.downloadable}
+        - {from: virustotal.attributes.vhash, to: virustotal.hash.vhash}
+        - {from: virustotal.attributes.creation_date, to: virustotal.creation_date}
+        - {from: virustotal.attributes.last_modification_date, to: virustotal.last_modified}
+        - {from: virustotal.attributes.crowdsourced_yara_results, to: virustotal.community.yara_results}
+        - {from: virustotal.attributes.total_votes, to: virustotal.community.total_votes}
+        - {from: virustotal.attributes.reputation, to: virustotal.community.reputation}
+        - {from: virustotal.attributes.trid, to: virustotal.trid}
+        - {from: virustotal.attributes.bytehero_info, to: virustotal.bytehero_info}
+        - {from: virustotal.attributes.type_description, to: virustotal.type_description}
+        - {from: virustotal.attributes.type_tag, to: virustotal.type_tag}
+
+        # Android data
+        - {from: virustotal.attributes.androguard, to: virustotal.androguard}
+
+
+  - script:
+      lang: javascript
+      id: virustotal-livehunt
+      file: ${path.home}/module/virustotal/livehunt/config/virustotal-analysis.js
+
+  - drop_fields:
+      ignore_missing: True
+      fields:
+        - virustotal.type
+        - virustotal.meaningful_name
+        - virustotal.attributes.creation_date
+        - virustotal.attributes.meaningful_name
+        - virustotal.links
+
+  # - drop_fields:
+  #     ignore_missing: True
+  #     fields:
+  #       - rule.tags
+  #     when:
+  #       or:
+  #         - equals:
+  #             rule.tags: []
+  #         - equals:
+  #             rule.tags: ""
+
+  - if:
+      has_fields: ["virustotal.attributes.elf_info"]
+    then:
+      - rename:
+          ignore_missing: True
+          fields:
+            # ELF data
+            - {from: virustotal.attributes.elf_info,      to: file.elf}
+            - {from: file.elf.header.obj_version,         to: file.elf.header.object_version}
+            - {from: file.elf.header.hdr_version,         to: file.elf.header.version}
+            - {from: file.elf.header.num_prog_headers,    to: file.elf.number_program_headers}
+            - {from: file.elf.header.num_section_headers, to: file.elf.number_section_headers}
+            - {from: virustotal.attributes.telfhash,      to: file.elf.telfhash}
+            - {from: file.elf.section_list,               to: file.elf.sections}
+            - {from: file.elf.import_list,                to: file.elf.imports}
+            - {from: file.elf.export_list,                to: file.elf.exports}
+            - {from: virustotal.creation_date,            to: file.elf.creation_date}
+
+            # Flattened-typed ELF fields
+            - {from: file.elf.segment_list,     to: file.elf.flattened.segment_list}
+
+      - script:
+          lang: javascript
+          id: virustotal-pe
+          file: ${path.home}/module/virustotal/livehunt/config/virustotal-elf.js
+
+  - if:
+      has_fields: ["virustotal.attributes.pe_info"]
+    then:
+      - rename:
+          ignore_missing: True
+          fields:
+            # PE data
+            - {from: virustotal.attributes.pe_info,  to: file.pe}
+            - {from: virustotal.attributes.authentihash, to: file.pe.authentihash}
+            - {from: file.pe.timestamp, to: file.pe.compile_timestamp}
+            - {from: virustotal.attributes.signature_info.product, to: file.pe.product}
+            - {from: virustotal.attributes.signature_info.copyright, to: file.pe.company}
+            - {from: virustotal.attributes.signature_info.comments, to: file.pe.comments}
+            - {from: virustotal.attributes.signature_info.description, to: file.pe.description}
+            - {from: "virustotal.attributes.signature_info.file version", to: file.pe.file_version}
+            - {from: virustotal.attributes.packers, to: virustotal.packers}
+            - {from: virustotal.creation_date, to: file.pe.creation_date}
+            - {from: virustotal.attributes.main_icon, to: file.pe.main_icon.hash}
+            - {from: file.pe.main_icon.hash.raw_md5, to: file.pe.main_icon.hash.md5}
+
+            # Flattened fields
+            - {from: file.pe.sections,         to: file.pe.flattened.sections}
+            - {from: file.pe.resource_langs,   to: file.pe.flattened.resource_languages}
+            - {from: file.pe.resource_types,   to: file.pe.flattened.resource_types}
+            - {from: file.pe.resource_details, to: file.pe.flattened.resource_details}
+            - {from: file.pe.import_list,      to: file.pe.flattened.import_list}
+            - {from: file.pe.debug,            to: file.pe.flattened.debug}
+
+      - script:
+          lang: javascript
+          id: virustotal-pe
+          file: ${path.home}/module/virustotal/livehunt/config/virustotal-pe.js
