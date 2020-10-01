@@ -163,4 +163,12 @@
               type: text
             - name: id
               type: keyword
-
+        - name: error
+          type: group
+          fields:
+            - name: name
+              type: keyword
+            - name: message
+              type: text
+            - name: stack
+              type: text
