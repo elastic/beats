@@ -40,9 +40,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func CertPreExpiryChecks(expected_expiry time.Time) isdef.IsDef {
+func CertPreExpiryChecks(expectedExpiry time.Time) isdef.IsDef {
 	return isdef.Is("is now", func(path llpath.Path, v interface{}) *llresult.Results {
-		actual_expiry_time, ok := v.(int64)
+		actualExpiryTime, ok := v.(int64)
 
 		if !ok {
 			return llresult.SimpleResult(
@@ -53,9 +53,9 @@ func CertPreExpiryChecks(expected_expiry time.Time) isdef.IsDef {
 		}
 
 		now := time.Now()
-		expected_expiry_time := time.Time(expected_expiry).Sub(now).Milliseconds()
+		expectedExpiryTime := time.Time(expectedExpiry).Sub(now).Milliseconds()
 
-		if math.Abs(float64(actual_expiry_time-expected_expiry_time)) < 1000.0 {
+		if math.Abs(float64(actualExpiryTime-expectedExpiryTime)) < 1000.0 {
 			return llresult.ValidResult(path)
 		}
 
