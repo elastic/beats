@@ -1,0 +1,77 @@
+# spellchecker: disable
+description: Pipeline for normalizing VirusTotal Live Hunt notifications
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+
+- date:
+    field: virustotal.notification.date
+    formats:
+    - UNIX
+
+- date:
+    field: virustotal.notification.date
+    target_field: virustotal.notification.date
+    formats:
+    - UNIX
+
+- date:
+    field: virustotal.analysis.date
+    target_field: virustotal.analysis.date
+    formats:
+    - UNIX
+
+- date:
+    field: file.pe.creation_date
+    target_field: file.pe.creation_date
+    ignore_failure: True
+    formats:
+    - UNIX
+
+- date:
+    field: file.elf.creation_date
+    target_field: file.elf.creation_date
+    ignore_failure: True
+    formats:
+    - UNIX
+
+- date:
+    field: virustotal.submission.first_submitted
+    target_field: virustotal.submission.first_submitted
+    formats:
+    - UNIX
+
+- date:
+    field: virustotal.submission.last_submitted
+    target_field: virustotal.submission.last_submitted
+    formats:
+    - UNIX
+
+- date:
+    field: virustotal.last_modified
+    target_field: virustotal.last_modified
+    formats:
+    - UNIX
+
+- date:
+    field: file.pe.compile_timestamp
+    target_field: file.pe.compile_timestamp
+    ignore_failure: True
+    formats:
+    - UNIX
+
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'
+
+# - date:
+#     field: virustotal.analysis_date
+#     target_field: virustotal.analysis_date
+#     formats:
+#     - UNIX_MS
+#     if: ctx.virustotal.analysis_date != null

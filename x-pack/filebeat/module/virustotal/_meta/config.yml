@@ -1,0 +1,8 @@
+- module: virustotal
+  # All logs
+  livehunt:
+    enabled: true
+    # Set the VirusTotal private API key
+    var.apikey: ""
+    # Set retrieval limit, maximum 40, default 10
+    var.limit: 10

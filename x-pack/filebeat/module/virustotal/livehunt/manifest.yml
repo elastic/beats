@@ -1,0 +1,32 @@
+#spellchecker: disable
+module_version: 1.0
+var:
+    # Options are httpjson or kafka
+  - name: input
+    default: httpjson
+
+  - name: vt_fileinfo_url
+    default: "https://www.virustotal.com/gui/file/"
+
+  - name: api_key
+    default: ""
+
+  # Maximum 40
+  - name: limit
+    default: 10
+
+  # If consuming raw events from Kafka
+  - name: kafka_brokers
+    default:
+      - 127.0.0.1:9092
+
+  - name: kafka_topics
+    default:
+      - virustotal.livehunt
+
+  - name: kafka_groupid
+    default: filebeat
+
+input: config/livehunt.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
