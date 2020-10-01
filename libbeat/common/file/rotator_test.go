@@ -18,6 +18,7 @@
 package file_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -212,6 +213,38 @@ func TestRotateOnStartup(t *testing.T) {
 
 	WriteMsg(t, r)
 	AssertDirContents(t, dir, logname, logname+".1")
+}
+
+func TestFileRotatorPermissions(t *testing.T) {
+	logp.TestingSetup()
+
+	dir, err := ioutil.TempDir("", "file_rotator")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	filename := filepath.Join(dir, "sample.log")
+	r, err := file.NewFileRotator(filename,
+		file.MaxBackups(2),
+		file.Permissions(os.FileMode(0644)),
+		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	WriteMsg(t, r)
+	AssertDirContents(t, dir, "sample.log")
+
+	fileinfo, err := os.Stat(filepath.Join(dir, "sample.log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fileperm := fmt.Sprintf("%o", fileinfo.Mode().Perm())
+	assert.EqualValues(t, fileperm, "644")
 }
 
 func CreateFile(t *testing.T, filename string) {
