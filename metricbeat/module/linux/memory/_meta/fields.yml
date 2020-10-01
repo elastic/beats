@@ -1,0 +1,78 @@
+- name: memory
+  type: group
+  release: beta
+  description: >
+    Linux memory data
+  fields:
+    - name: page_stats
+      type: group
+      description: memory page statistics
+      fields:
+        - name: pgscan_kswapd.pages
+          type: long
+          format: number
+          description: pages scanned by kswapd
+        - name: pgscan_direct.pages
+          type: long
+          format: number
+          description: pages scanned directly
+        - name: pgfree.pages
+          type: long
+          format: number
+          description: pages freed by the system
+        - name: pgsteal_kswapd.pages
+          type: long
+          format: number
+          description: number of pages reclaimed by kswapd
+        - name: pgsteal_direct.pages
+          type: long
+          format: number
+          description: number of pages reclaimed directly
+        - name: direct_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+        - name: kswapd_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+    - name: hugepages
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to huge pages usage on the system.
+      fields:
+        - name: total
+          type: long
+          format: number
+          description: >
+            Number of huge pages in the pool.
+        - name: used.bytes
+          type: long
+          format: bytes
+          description: >
+            Memory used in allocated huge pages.
+        - name: used.pct
+          type: long
+          format: percent
+          description: >
+            Percentage of huge pages used.
+        - name: free
+          type: long
+          format: number
+          description: >
+            Number of available huge pages in the pool.
+        - name: reserved
+          type: long
+          format: number
+          description: >
+            Number of reserved but not allocated huge pages in the pool.
+        - name: surplus
+          type: long
+          format: number
+          description: >
+            Number of overcommited huge pages.
+        - name: default_size
+          type: long
+          format: bytes
+          description: >
+            Default size for huge pages.

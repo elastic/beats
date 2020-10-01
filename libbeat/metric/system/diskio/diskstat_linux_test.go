@@ -27,53 +27,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	sigar "github.com/elastic/gosigar"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
-func Test_Get_CLK_TCK(t *testing.T) {
+func Test_GetCLKTCK(t *testing.T) {
 	//usually the tick is 100
-	assert.Equal(t, uint32(100), Get_CLK_TCK())
-}
-
-func TestDataNameFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
-	defer func() {
-		system.HostFS = oldFS
-	}()
-
-	conf := map[string]interface{}{
-		"module":                 "system",
-		"metricsets":             []string{"diskio"},
-		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
-	}
-
-	f := mbtest.NewReportingMetricSetV2Error(t, conf)
-	data, errs := mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
-	assert.Equal(t, 3, len(data))
-}
-
-func TestDataEmptyFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
-	defer func() {
-		system.HostFS = oldFS
-	}()
-
-	conf := map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"diskio"},
-	}
-
-	f := mbtest.NewReportingMetricSetV2Error(t, conf)
-	data, errs := mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
-	assert.Equal(t, 10, len(data))
+	assert.Equal(t, uint32(100), GetCLKTCK())
 }
 
 func TestDiskIOStat_CalIOStatistics(t *testing.T) {
@@ -85,9 +43,9 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 		Name:       "iostat",
 	}
 
-	stat := &DiskIOStat{
+	stat := &IOStat{
 		lastDiskIOCounters: map[string]disk.IOCountersStat{
-			"iostat": disk.IOCountersStat{
+			"iostat": {
 				ReadCount:  3,
 				WriteCount: 5,
 				ReadTime:   7,
@@ -95,17 +53,17 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 				Name:       "iostat",
 			},
 		},
-		lastCpu: sigar.Cpu{Idle: 100},
-		curCpu:  sigar.Cpu{Idle: 1},
+		lastCPU: sigar.Cpu{Idle: 100},
+		curCPU:  sigar.Cpu{Idle: 1},
 	}
 
-	expected := DiskIOMetric{
+	expected := IOMetric{
 		AvgAwaitTime:      24.0 / 22.0,
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}
-	var got DiskIOMetric
-	err := stat.CalIOStatistics(&got, counter)
+
+	got, err := stat.CalcIOStatistics(counter)
 	if err != nil {
 		t.Fatal(err)
 	}
