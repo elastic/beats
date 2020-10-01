@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 )
 
 // Program represents a program that must be started or must run.
@@ -78,12 +78,12 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 			return nil, ErrMissingWhen
 		}
 
-		expression, err := boolexp.New(spec.When, methodsEnv(specificAST))
+		expression, err := eql.New(spec.When)
 		if err != nil {
 			return nil, err
 		}
 
-		ok, err := expression.Eval(&varStoreAST{ast: specificAST})
+		ok, err := expression.Eval(specificAST)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +131,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 	// Recreates multiple configuration grouped by the name of the outputs.
 	// Each configuration will be started into his own operator with the same name as the output.
-	grouped := make(map[string]map[string]interface{})
+	grouped := make(map[string]*outputType)
 
 	m, ok := normMap[outputsKey]
 	if !ok {
@@ -164,13 +164,21 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 		delete(outputsOptions, typeKey)
 
+		enabled, err := isEnabled(outputsOptions)
+		if err != nil {
+			return nil, err
+		}
+
 		// Propagate global configuration to each individual configuration.
 		clone := cloneMap(normMap)
 		delete(clone, outputsKey)
 		clone[outputKey] = map[string]interface{}{n: v}
 		clone[inputsKey] = make([]map[string]interface{}, 0)
 
-		grouped[k] = clone
+		grouped[k] = &outputType{
+			enabled: enabled,
+			config:  clone,
+		}
 	}
 
 	s, ok := normMap[inputsKey]
@@ -199,21 +207,24 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 			return nil, fmt.Errorf("unknown configuration output with name %s", targetName)
 		}
 
-		streams := config[inputsKey].([]map[string]interface{})
+		streams := config.config[inputsKey].([]map[string]interface{})
 		streams = append(streams, stream)
 
-		config[inputsKey] = streams
+		config.config[inputsKey] = streams
 		grouped[targetName] = config
 	}
 
 	transpiled := make(map[string]*transpiler.AST)
 
 	for name, group := range grouped {
-		if len(group[inputsKey].([]map[string]interface{})) == 0 {
+		if !group.enabled {
+			continue
+		}
+		if len(group.config[inputsKey].([]map[string]interface{})) == 0 {
 			continue
 		}
 
-		ast, err := transpiler.NewAST(group)
+		ast, err := transpiler.NewAST(group.config)
 		if err != nil {
 			return nil, errors.New(err, "fail to generate configuration for output name %s", name)
 		}
@@ -222,6 +233,22 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 	}
 
 	return transpiled, nil
+}
+
+func isEnabled(m map[string]interface{}) (bool, error) {
+	const (
+		enabledKey = "enabled"
+	)
+
+	enabled, ok := m[enabledKey]
+	if !ok {
+		return true, nil
+	}
+	switch e := enabled.(type) {
+	case bool:
+		return e, nil
+	}
+	return false, fmt.Errorf("invalid type received for enabled %T and expecting a boolean", enabled)
 }
 
 func findOutputName(m map[string]interface{}) string {
@@ -250,4 +277,9 @@ func cloneMap(m map[string]interface{}) map[string]interface{} {
 	}
 
 	return newMap
+}
+
+type outputType struct {
+	enabled bool
+	config  map[string]interface{}
 }

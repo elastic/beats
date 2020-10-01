@@ -36,8 +36,6 @@ data:
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
-                    # Uncomment this to get k8s events:
-                    #- event
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -46,6 +44,10 @@ data:
                   ssl.certificate_authorities:
                     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                   period: 30s
+                # Uncomment this to get k8s events:
+                #- module: kubernetes
+                #  metricsets:
+                #    - event
         # To enable hints based autodiscover uncomment this:
         #- type: kubernetes
         #  node: ${NODE_NAME}

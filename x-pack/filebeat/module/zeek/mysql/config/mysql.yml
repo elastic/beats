@@ -68,9 +68,7 @@ processors:
           target: event
           fields:
             outcome: failure
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:

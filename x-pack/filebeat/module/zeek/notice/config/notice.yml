@@ -100,9 +100,7 @@ processors:
           - intrusion_detection
         type:
           - info
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:
