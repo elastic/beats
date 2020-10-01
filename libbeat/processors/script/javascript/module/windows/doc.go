@@ -15,14 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package module
-
-import (
-	// Register javascript modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/console"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/net"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/path"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/windows"
-)
+// Package windows registers the windows module with the javascript script
+// processor. The module has utilities specific to Windows like parsing
+// Windows command lines.
+package windows

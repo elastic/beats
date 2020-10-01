@@ -15,14 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package module
+package input_logfile
 
 import (
-	// Register javascript modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/console"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/net"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/path"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/windows"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 )
+
+// Prospector is responsible for starting, stopping harvesters
+// based on the retrieved information about the configured paths.
+// It also updates the statestore with the meta data of the running harvesters.
+type Prospector interface {
+	// Run starts the event loop and handles the incoming events
+	// either by starting/stopping a harvester, or updating the statestore.
+	Run(input.Context, *statestore.Store, *HarvesterGroup)
+	// Test checks if the Prospector is able to run the configuration
+	// specified by the user.
+	Test() error
+}
