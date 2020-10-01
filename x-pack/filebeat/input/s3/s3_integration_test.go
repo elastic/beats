@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+// +build aws
+
 package s3
 
 import (
@@ -88,7 +91,7 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, *eventReceiver) {
+func setupInput(t *testing.T, cfg *common.Config) (*s3Collector, chan beat.Event) {
 	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -98,14 +101,16 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	t.Cleanup(cancel)
 
 	client := pubtest.NewChanClient(0)
-	receiver := &eventReceiver{client.Channel}
 	pipeline := pubtest.ConstClient(client)
-
 	collector, err := inp.(*s3Input).createCollector(ctx, pipeline)
 	if err != nil {
 		t.Fatal(err)
 	}
+	return collector, client.Channel
+}
 
+func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, chan beat.Event) {
+	collector, receiver := setupInput(t, cfg)
 	if mock {
 		svcS3 := &MockS3Client{}
 		svcSQS := &MockSQSClient{}
@@ -132,7 +137,7 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	return collector, receiver
 }
 
-func runTest(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3Collector, receiver *eventReceiver)) {
+func runTest(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3Collector, receiver chan beat.Event)) {
 	collector, receiver := setupCollector(t, cfg, mock)
 	run(t, collector, receiver)
 }
@@ -141,20 +146,8 @@ type eventReceiver struct {
 	ch chan beat.Event
 }
 
-func (r *eventReceiver) waitForEvents(n int) ([]beat.Event, bool) {
-	buf := make([]beat.Event, 0, n)
-	for event := range r.ch {
-		buf = append(buf, event)
-		n--
-		if n == 0 {
-			return buf, true
-		}
-	}
-	return buf, false
-}
-
 func TestS3Input(t *testing.T) {
-	runTest(t, defaultTestConfig(), false, func(t *testing.T, collector *s3Collector, receiver *eventReceiver) {
+	runTest(t, defaultTestConfig(), false, func(t *testing.T, collector *s3Collector, receiver chan beat.Event) {
 		// upload a sample log file for testing
 		s3BucketNameEnv := os.Getenv("S3_BUCKET_NAME")
 		if s3BucketNameEnv == "" {
@@ -168,7 +161,7 @@ func TestS3Input(t *testing.T) {
 			collector.run()
 		}()
 
-		event := <-receiver.ch
+		event := <-receiver
 		bucketName, err := event.GetValue("aws.s3.bucket.name")
 		assert.NoError(t, err)
 		assert.Equal(t, s3BucketNameEnv, bucketName)
@@ -235,7 +228,7 @@ func TestMockS3Input(t *testing.T) {
 		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
 	})
 
-	runTest(t, cfg, true, func(t *testing.T, collector *s3Collector, receiver *eventReceiver) {
+	runTest(t, cfg, true, func(t *testing.T, collector *s3Collector, receiver chan beat.Event) {
 		defer collector.cancellation.Done()
 		defer collector.publisher.Close()
 
@@ -250,7 +243,7 @@ func TestMockS3Input(t *testing.T) {
 			collector.processMessage(collector.s3, output.Messages[0], &wg, errC)
 		}()
 
-		event := <-receiver.ch
+		event := <-receiver
 		bucketName, err := event.GetValue("aws.s3.bucket.name")
 		assert.NoError(t, err)
 		assert.Equal(t, "test-s3-ks-2", bucketName)
