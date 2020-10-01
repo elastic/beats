@@ -415,3 +415,4 @@ The following metricsets are available:
 * <<metricbeat-metricset-sql-query,query>>
 
 include::sql/query.asciidoc[]
+
