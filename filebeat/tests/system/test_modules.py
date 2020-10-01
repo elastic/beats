@@ -131,7 +131,7 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
 
         output_path = os.path.join(self.working_dir)
-        # Runs inside a with loop to ensure file is closed afterwards
+        # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
             output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
@@ -148,16 +148,12 @@ class Test(BaseTest):
                              stdout=output,
                              stderr=subprocess.STDOUT,
                              bufsize=0).wait()
-            output.close()
 
         # List of errors to check in filebeat output logs
         errors = ["Error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
         contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
         assert contains_error is False, "Error found in log:{}".format(error_line)
-
-        # Ensure file is actually closed to ensure large amount of file handlers is not spawning
-        assert output.closed is True
 
         # Make sure index exists
         self.wait_until(lambda: self.es.indices.exists(self.index_name))
