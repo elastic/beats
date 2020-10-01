@@ -46,6 +46,10 @@ processors:
     field: '@timestamp'
     value: '{{json.lastUpdateTime}}'
     if: ctx.json?.lastUpdateTime != null
+- rename:
+    field: json.alerts.title
+    target_field: message
+    ignore_missing: true
 
 #######################
 ## ECS Event Mapping ##
@@ -155,19 +159,19 @@ processors:
 ## ECS File Mapping ##
 ######################
 - rename:
-    field: json.entities.fileName
+    field: json.alerts.entities.fileName
     target_field: file.name
     ignore_missing: true
 - rename:
-    field: json.entities.sha256
+    field: json.alerts.entities.sha256
     target_field: file.hash.sha256
     ignore_missing: true
 - rename:
-    field: json.entities.sha1
+    field: json.alerts.entities.sha1
     target_field: file.hash.sha1
     ignore_missing: true
 - rename:
-    field: json.entities.filePath
+    field: json.alerts.entities.filePath
     target_field: file.path
     ignore_missing: true
 
@@ -175,23 +179,23 @@ processors:
 ## ECS Process Mapping ##
 #########################
 - rename:
-    field: json.entities.processId
+    field: json.alerts.entities.processId
     target_field: process.pid
     ignore_missing: true
 - rename:
-    field: json.entities.processCommandLine
+    field: json.alerts.entities.processCommandLine
     target_field: process.command_line
     ignore_missing: true
 - rename:
-    field: json.entities.processCreationTime
+    field: json.alerts.entities.processCreationTime
     target_field: process.start
     ignore_missing: true
 - rename:
-    field: json.entities.parentProcessId
+    field: json.alerts.entities.parentProcessId
     target_field: process.parent.pid
     ignore_missing: true
 - rename:
-    field: json.entities.parentProcessCreationTime
+    field: json.alerts.entities.parentProcessCreationTime
     target_field: process.parent.start
     ignore_missing: true
 
@@ -205,7 +209,7 @@ processors:
     field: observer.vendor
     value: Microsoft
 - rename:
-    field: json.serviceSource
+    field: json.alerts.serviceSource
     target_field: observer.name
     ignore_missing: true
 
@@ -213,7 +217,7 @@ processors:
 ## ECS URL Mapping ##
 #####################
 - rename:
-    field: json.entities.url
+    field: json.alerts.entities.url
     target_field: url.full
     ignore_missing: true
     if: ctx?.json?.entities?.url != null
@@ -222,27 +226,24 @@ processors:
 ## ECS User Mapping ##
 ######################
 - rename:
-    field: json.entities.userPrincipalName
+    field: json.alerts.entities.userPrincipalName
     target_field: host.user.name
     ignore_missing: true
-    if: ctx?.entities?.entityType == "User"
 - rename:
-    field: json.entities.domainName
+    field: json.alerts.entities.domainName
     target_field: host.user.domain
     ignore_missing: true
-    if: ctx?.entities?.entityType == "User"
 - rename:
-    field: json.entities.userSid
+    field: json.alerts.entities.aadUserId
     target_field: host.user.id
     ignore_missing: true
-    if: ctx?.entities?.entityType == "User"
 
 #########################
 ## ECS Related Mapping ##
 #########################
 - append:
     field: related.ip
-    value: '{{json.entities.ipAddress}}'
+    value: '{{json.alerts.entities.ipAddress}}'
     if: ctx.json?.entities?.ipAddress != null
 - append:
     field: related.user
@@ -272,7 +273,7 @@ processors:
       - json.lastUpdateTime
 - rename:
     field: json
-    target_field: microsoft.365_defender
+    target_field: microsoft.m365_defender
     ignore_missing: true
 on_failure:
 - set:
