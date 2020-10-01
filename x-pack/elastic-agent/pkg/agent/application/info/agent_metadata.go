@@ -38,8 +38,8 @@ type AgentECSMeta struct {
 	Snapshot bool `json:"snapshot"`
 	// BuildOriginal is an extended build information for the agent.
 	BuildOriginal string `json:"build.original"`
-	// Upgradable is a flag specifying if it is possible for agent to be upgraded.
-	Upgradable bool `json:"upgradable"`
+	// Upgradeable is a flag specifying if it is possible for agent to be upgraded.
+	Upgradeable bool `json:"upgradeable"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -137,9 +137,9 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				Version:       release.Version(),
 				Snapshot:      release.Snapshot(),
 				BuildOriginal: release.Info().String(),
-				// only upgradable if running from Agent installer and running under the
+				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
-				Upgradable: release.Upgradable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
+				Upgradeable: release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
 			},
 		},
 		Host: &HostECSMeta{
