@@ -47,8 +47,8 @@ processors:
     value: azure
 - set:
     field: '@timestamp'
-    value: '{{json.lastUpdateTime}}'
-    if: ctx.json?.lastUpdateTime != null
+    value: '{{json.alertUpdateTime}}'
+    if: ctx.json?.alertUpdateTime != null
 - rename:
     field: json.aadTenantId
     target_field: cloud.account.id
@@ -283,6 +283,7 @@ processors:
     field: related.hosts
     value: '{{host.hostname}}'
     if: ctx.host?.hostname != null && ctx.host?.hostname != ''
+    allow_duplicates: false
 
 #############
 ## Cleanup ##
