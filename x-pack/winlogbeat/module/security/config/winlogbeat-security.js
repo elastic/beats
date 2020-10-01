@@ -5,7 +5,7 @@
 var security = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
 
     // Logon Types
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-audit-logon-events
@@ -1669,7 +1669,7 @@ var security = (function () {
             if (!cl) {
                 return;
             }
-            evt.Put("process.args", winlogbeat.splitCommandLine(cl));
+            evt.Put("process.args", windows.splitCommandLine(cl));
             evt.Put("process.command_line", cl);
         })
         .Build();

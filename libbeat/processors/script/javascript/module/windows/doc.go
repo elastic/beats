@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package winlogbeat registers the winlogbeat module with the javascript script
-// processor. The module has utilities specific to Winlogbeat like parsing
+// Package windows registers the windows module with the javascript script
+// processor. The module has utilities specific to Windows like parsing
 // Windows command lines.
-package winlogbeat
+package windows
