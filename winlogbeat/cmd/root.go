@@ -30,7 +30,6 @@ import (
 	// Import processors and supporting modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 const (
