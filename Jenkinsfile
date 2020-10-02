@@ -103,7 +103,6 @@ pipeline {
           script {
             def mapParallelTasks = [:]
             def content = readYaml(file: 'Jenkinsfile.yml')
-            println content
             if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
               error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
             } else {
