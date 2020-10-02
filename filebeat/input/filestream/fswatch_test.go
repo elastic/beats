@@ -21,7 +21,6 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -55,7 +54,7 @@ func TestFileScanner(t *testing.T) {
 				filepath.Join("testdata", "included_file"),
 			},
 			excludedFiles: []match.Matcher{
-				mustExcludedFile(filepath.Join("testdata", "excluded_file")),
+				match.MustCompile("excluded_file"),
 			},
 			expectedFiles: []string{
 				mustAbsPath(filepath.Join("testdata", "included_file")),
@@ -277,11 +276,4 @@ func mustDuration(durStr string) time.Duration {
 		panic(err)
 	}
 	return dur
-}
-
-func mustExcludedFile(path string) []match.Matcher {
-	if runtime.OS == "windows" {
-		path = strings.Replace(`\`, `\\`, path)
-	}
-	return match.MustCompile(path)
 }
