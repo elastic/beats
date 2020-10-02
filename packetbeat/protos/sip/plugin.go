@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -61,6 +62,8 @@ func New(
 	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
+	cfgwarn.Beta("packetbeat SIP protocol is used")
+
 	p := &plugin{}
 	config := defaultConfig
 	if !testMode {
