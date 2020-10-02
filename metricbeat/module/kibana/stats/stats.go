@@ -19,6 +19,7 @@ package stats
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"strconv"
 	"strings"
 	"time"
@@ -54,6 +55,7 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
+	//helper               *helper.HTTP
 	statsHTTP            *helper.HTTP
 	settingsHTTP         *helper.HTTP
 	usageLastCollectedOn time.Time
@@ -78,26 +80,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err := m.init()
 	if err != nil {
-		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
 	now := time.Now()
 
-	err = m.fetchStats(r, now)
-	if err != nil {
-		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
-		}
+	if err = m.fetchStats(r, now); err != nil {
 		return err
 	}
 
-	if m.XPackEnabled {
-		m.fetchSettings(r, now)
+	if err = m.fetchSettings(r); err != nil {
+		return errors.Wrap(err, "error trying to get settings data from Kibana")
 	}
 
 	return nil
@@ -119,29 +112,23 @@ func (m *MetricSet) init() error {
 		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
-	if m.XPackEnabled {
-		// Use legacy API response so we can passthru usage as-is
-		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
+
+	isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+	if !isSettingsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
 	}
 
-	var settingsHTTP *helper.HTTP
-	if m.XPackEnabled {
-		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
-		if !isSettingsAPIAvailable {
-			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
-		}
-
-		settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
-		if err != nil {
-			return err
-		}
-
-		// HACK! We need to do this because there might be a basepath involved, so we
-		// only search/replace the actual API paths
-		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
-		settingsHTTP.SetURI(settingsURI)
+	settingsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
 	}
+
+	// HACK! We need to do this because there might be a basepath involved, so we
+	// only search/replace the actual API paths
+	settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
+	settingsHTTP.SetURI(settingsURI)
+	//}
 
 	m.statsHTTP = statsHTTP
 	m.settingsHTTP = settingsHTTP
@@ -178,36 +165,22 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 		}
 	}
 
-	if m.XPackEnabled {
-		intervalMs := m.calculateIntervalMs()
-		err = eventMappingStatsXPack(r, intervalMs, now, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventMapping(r, content)
-	}
-
-	return nil
+	return eventMapping(r, content)
 }
 
-func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
+func (m *MetricSet) fetchSettings(r mb.ReporterV2) error {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		m.Logger().Error(err)
-		return
+		return err
 	}
 
-	intervalMs := m.calculateIntervalMs()
-	err = eventMappingSettingsXPack(r, intervalMs, now, content)
-	if err != nil {
-		m.Logger().Error(err)
-		return
+	if err = settingsDataParser(r, content); err != nil {
+		return err
 	}
+
+
+
+	return nil
 }
 
 func (m *MetricSet) calculateIntervalMs() int64 {
