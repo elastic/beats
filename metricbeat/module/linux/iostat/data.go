@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux windows
-
 package iostat
 
 import (
