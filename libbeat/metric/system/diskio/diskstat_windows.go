@@ -38,7 +38,7 @@ func (stat *IOStat) OpenSampling() error {
 
 // CalcIOStatistics stub for linux implementation.
 func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, error) {
-	return errors.New("iostat is not implement for Windows")
+	return IOMetric{}, errors.New("iostat is not implement for Windows")
 }
 
 // CloseSampling stub for linux implementation.

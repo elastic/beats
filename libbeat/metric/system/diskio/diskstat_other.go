@@ -26,7 +26,7 @@ import (
 
 // NewDiskIOStat :init DiskIOStat object.
 func NewDiskIOStat() *IOStat {
-	return &DiskIOStat{
+	return &IOStat{
 		lastDiskIOCounters: map[string]disk.IOCountersStat{},
 	}
 }
@@ -38,7 +38,7 @@ func (stat *IOStat) OpenSampling() error {
 
 // CalcIOStatistics stub for linux implementation.
 func (stat *IOStat) CalcIOStatistics(rcounter disk.IOCountersStat) (IOMetric, error) {
-	return errors.New("not implemented out of linux")
+	return IOMetric{}, errors.New("not implemented out of linux")
 }
 
 // CloseSampling stub for linux implementation.
