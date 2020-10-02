@@ -513,6 +513,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Added experimental dataset `juniper/netscreen`. {pull}20820[20820]
 - Added experimental dataset `sophos/utm`. {pull}20820[20820]
 - Add Cloud Foundry tags in related events. {pull}21177[21177]
+- Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
 
 *Auditbeat*
 
