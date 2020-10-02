@@ -19,7 +19,7 @@ input:
         interval: "P5M"
         top: 5
       - id: ["exceptions/count", "exceptions/browser", "exceptions/server"]
-        segment: "exception/type"
+        segment: ["exception/type", "cloud/roleName"]
         aggregation: ["sum"]
         interval: "P5M"
       - id: ["performanceCounters/memoryAvailableBytes", "performanceCounters/processCpuPercentageTotal", "performanceCounters/processCpuPercentage", "performanceCounters/processIOBytesPerSecond",

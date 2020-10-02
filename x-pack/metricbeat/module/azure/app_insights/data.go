@@ -23,7 +23,7 @@ const aggsRegex = "_(?:sum|count|unique|avg|min|max)$"
 // segmentNames list is used to filter out the dimension from the api response. Based on the body format it is not possible to detect what was the segment selected
 var segmentNames = []string{
 	"request_source", "request_name", "request_url_host", "request_url_path", "request_success", "request_result_code", "request_performance_bucket", "operation_name", "operation_synthetic", "operation_synthetic_source", "user_authenticated", "application_version", "client_type", "client_model",
-	"client_os", "client_city", "client_state_or_province", "client_country_or_region", "client_browser", "cloud_role_name", "cloud_role_instance", "custom_dimensions__m_s_processedb_by_metric_extractors", "custom_dimensions_developer_mode",
+	"client_os", "client_city", "client_state_or_province", "client_country_or_region", "client_browser", "cloud_role_name", "cloud_role_instance", "custom_dimensions__ms_processedb_by_metric_extractors", "custom_dimensions_developer_mode",
 	"page_view_name", "page_view_url_path", "page_view_url_host", "page_view_performance_bucket", "custom_dimensions_ibiza_session_id", "custom_dimensions_part_instance", "browser_timing_name", "browser_timing_url_host", "browser_timing_url_path", "browser_timing_performance_bucket",
 	"trace_severity_level", "type", "custom_dimensions_agent_session", "custom_dimensions_agent_version", "custom_dimensions_machine_name", "custom_dimensions_running_mode", "custom_dimensions_source", "custom_dimensions_agent_assembly_version", "custom_dimensions_agent_process_session",
 	"custom_dimensions_hashed_machine_name",
@@ -32,9 +32,9 @@ var segmentNames = []string{
 	"custom_dimensions_running_session", "custom_dimensions_problem_id", "custom_dimensions_snapshot_context", "custom_dimensions_snapshot_version", "custom_dimensions_duration", "custom_dimensions_snapshot_id", "custom_dimensions_stamp_id", "custom_dimensions_de_optimization_id",
 	"custom_dimensions_method", "custom_dimensions_parent_process_id", "custom_dimensions_section", "custom_dimensions_configuration", "custom_dimensions_dump_folder", "custom_dimensions_reason", "custom_dimensions_extension_version", "custom_dimensions_site_name",
 	"availability_result_name", "availability_result_location", "availability_result_success", "custom_dimensions_full_test_result_available", "exception_problem_id", "exception_handled_at", "exception_type", "exception_assembly", "exception_method", "custom_dimensions_custom_perf_counter",
-	"exception_severity_level", "custom_dimensions_url", "custom_dimensions_ai.snapshot_stampid", "custom_dimensions_ai.snapshot_id", "custom_dimensions_ai.snapshot_version", "custom_dimensions_ai.snapshot_planid", "custom_dimensions__m_s_example", "custom_dimensions_s_a_origin_app_id",
-	"custom_dimensions_base_sdk_target_framework", "custom_dimensions_runtime_framework", "custom_dimensions__m_s_aggregation_interval_ms", "custom_dimensions_problem_id", "custom_dimensions_operation_name", "custom_dimensions_request_success", "custom_dimensions__MS.MetricId",
-	"custom_dimensions_dependency_success", "custom_dimensions__m_s_is_autocollected", "custom_dimensions_dependency_type", "performance_counter_name", "performance_counter_category", "performance_counter_counter", "performance_counter_instance", "custom_dimensions_counter_instance_name",
+	"exception_severity_level", "custom_dimensions_url", "custom_dimensions_ai.snapshot_stampid", "custom_dimensions_ai.snapshot_id", "custom_dimensions_ai.snapshot_version", "custom_dimensions_ai.snapshot_planid", "custom_dimensions__ms_example", "custom_dimensions_sa_origin_app_id",
+	"custom_dimensions_base_sdk_target_framework", "custom_dimensions_runtime_framework", "custom_dimensions__ms_aggregation_interval_ms", "custom_dimensions_problem_id", "custom_dimensions_operation_name", "custom_dimensions_request_success", "custom_dimensions__ms_metric_id",
+	"custom_dimensions_dependency_success", "custom_dimensions__ms_is_autocollected", "custom_dimensions_dependency_type", "performance_counter_name", "performance_counter_category", "performance_counter_counter", "performance_counter_instance", "custom_dimensions_counter_instance_name",
 }
 
 type MetricValue struct {
@@ -50,8 +50,10 @@ func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue
 	var mapped []MetricValue
 	for _, item := range *metricValues.Value {
 		metricValue := MetricValue{
-			Start: item.Body.Value.Start,
-			End:   item.Body.Value.End,
+			Start:       item.Body.Value.Start,
+			End:         item.Body.Value.End,
+			Value:       map[string]interface{}{},
+			SegmentName: map[string]string{},
 		}
 		metricValue.Interval = fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)
 		if item.Body != nil && item.Body.Value != nil {
@@ -179,11 +181,12 @@ func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, appl
 
 func createEvent(start *date.Time, end *date.Time, applicationId string, namespace string, metricList common.MapStr) mb.Event {
 	event := mb.Event{
-		ModuleFields: common.MapStr{},
-		MetricSetFields: common.MapStr{
-			"start_date":     start,
-			"end_date":       end,
+		ModuleFields: common.MapStr{
 			"application_id": applicationId,
+		},
+		MetricSetFields: common.MapStr{
+			"start_date": start,
+			"end_date":   end,
 		},
 		Timestamp: end.Time,
 	}

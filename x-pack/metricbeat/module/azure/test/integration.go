@@ -40,3 +40,15 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 		"subscription_id":       subId,
 	}
 }
+
+// GetConfig function gets azure credentials for integration tests.
+func GetConfigForInsights(t *testing.T, metricSetName string) map[string]interface{} {
+	t.Helper()
+	return map[string]interface{}{
+		"module":         "azure",
+		"period":         "24h",
+		"metricsets":     []string{metricSetName},
+		"application_id": "",
+		"api_key":        "",
+	}
+}

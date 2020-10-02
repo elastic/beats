@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build azure
-
 package app_state
 
 import (
@@ -21,7 +18,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config := test.GetConfig(t, "app_state")
+	config := test.GetConfigForInsights(t, "app_state")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
@@ -32,7 +29,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config := test.GetConfig(t, "app_state")
+	config := test.GetConfigForInsights(t, "app_state")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

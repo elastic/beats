@@ -56,3 +56,15 @@ func TestEventMapping(t *testing.T) {
 	}
 
 }
+
+func TestCleanMetricNames(t *testing.T) {
+	ex := "customDimensions/ExecutingAssemblyFileVersion"
+	result := cleanMetricNames(ex)
+	assert.Equal(t, result, "custom_dimensions_executing_assembly_file_version")
+	ex = "customDimensions/_MS.AggregationIntervalMs"
+	result = cleanMetricNames(ex)
+	assert.Equal(t, result, "custom_dimensions__ms_aggregation_interval_ms")
+	ex = "customDimensions/_MS.IsAutocollected"
+	result = cleanMetricNames(ex)
+	assert.Equal(t, result, "custom_dimensions__ms_is_autocollected")
+}
