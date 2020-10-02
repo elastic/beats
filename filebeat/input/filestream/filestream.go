@@ -151,6 +151,8 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 
 func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 	timer := time.NewTimer(f.closeAfterInterval)
+	defer timer.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -163,12 +165,21 @@ func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 }
 
 func (f *logFile) closeIfInactive(ctx unison.Canceler) {
-	// TODO it can be optimized
-	for ctx.Err() == nil {
-		age := time.Since(f.lastTimeRead)
-		if age > f.closeInactive {
-			f.cancelReading()
+	// This can be made configureble if users need a more flexible
+	// cheking for inactive files.
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
 			return
+		case <-ticker.C:
+			age := time.Since(f.lastTimeRead)
+			if age > f.closeInactive {
+				f.cancelReading()
+				return
+			}
 		}
 	}
 }
