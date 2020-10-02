@@ -28,3 +28,4 @@
 - Add support for EQL based condition on inputs {pull}20994[20994]
 - Send `fleet.host.id` to Endpoint Security {pull}21042[21042]
 - Add `install` and `uninstall` subcommands {pull}21206[21206]
+- Use new form of fleet API paths {pull}21478[21478]
