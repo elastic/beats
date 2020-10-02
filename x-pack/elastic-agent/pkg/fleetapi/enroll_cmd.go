@@ -71,7 +71,7 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 // EnrollRequest is the data required to enroll the elastic-agent into Fleet.
 //
 // Example:
-// POST /api/ingest_manager/fleet/agents/enroll
+// POST /api/fleet/agents/enroll
 // {
 // 	"type": "PERMANENT",
 //   "metadata": {
@@ -168,7 +168,7 @@ type EnrollCmd struct {
 
 // Execute enroll the Agent in the Fleet.
 func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollResponse, error) {
-	const p = "/api/ingest_manager/fleet/agents/enroll"
+	const p = "/api/fleet/agents/enroll"
 	const key = "Authorization"
 	const prefix = "ApiKey "
 
