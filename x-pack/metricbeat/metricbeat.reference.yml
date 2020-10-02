@@ -1108,6 +1108,16 @@ metricbeat.modules:
   # Store counter rates instead of original cumulative counters (experimental, default: false)
   #rate_counters: true
 
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
   #use_types: true
@@ -1119,17 +1129,6 @@ metricbeat.modules:
   #types_patterns:
   #  counter_patterns: []
   #  histogram_patterns: []
-
-
-# Metrics sent by a Prometheus server using remote_write option
-#- module: prometheus
-#  metricsets: ["remote_write"]
-#  host: "localhost"
-#  port: "9201"
-
-  # Secure settings for the server using TLS/SSL:
-  #ssl.certificate: "/etc/pki/server/cert.pem"
-  #ssl.key: "/etc/pki/server/cert.key"
 
 # Metrics that will be collected using a PromQL
 #- module: prometheus
@@ -2384,6 +2383,11 @@ output.elasticsearch:
 
 # Set to false to disable template loading.
 #setup.template.enabled: true
+
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default metricbeat uses the legacy index templates.
+#setup.template.type: legacy
 
 # Template name. By default the template name is "metricbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
