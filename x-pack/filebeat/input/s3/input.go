@@ -5,9 +5,10 @@
 package s3
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/pkg/errors"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -53,7 +54,7 @@ func (inp *s3Input) Name() string { return inputName }
 func (inp *s3Input) Test(ctx v2.TestContext) error {
 	_, err := awscommon.GetAWSCredentials(inp.config.AwsConfig)
 	if err != nil {
-		return errors.Wrap(err, "getAWSCredentials failed")
+		return fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
 	return nil
 }
@@ -89,7 +90,7 @@ func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3
 
 	awsConfig, err := awscommon.GetAWSCredentials(inp.config.AwsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "getAWSCredentials failed")
+		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
 	awsConfig.Region = regionName
 
