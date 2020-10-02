@@ -1466,9 +1466,9 @@ func TestInsertTags(t *testing.T) {
 	tagValue3 := "dev"
 
 	events := map[string]mb.Event{}
-	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
-	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
-	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{

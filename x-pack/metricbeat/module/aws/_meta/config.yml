@@ -4,6 +4,7 @@
     - elb
     - natgateway
     - rds
+    - s3_request
     - transitgateway
     - usage
     - vpn
@@ -44,4 +45,3 @@
   period: 24h
   metricsets:
     - s3_daily_storage
-    - s3_request
