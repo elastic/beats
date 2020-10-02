@@ -32,6 +32,8 @@ import (
 )
 
 func TestFileScanner(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21489")
+
 	testCases := map[string]struct {
 		paths         []string
 		excludedFiles []match.Matcher
@@ -113,6 +115,8 @@ func TestFileScanner(t *testing.T) {
 }
 
 func TestFileWatchNewDeleteModified(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21489")
+
 	oldTs := time.Now()
 	newTs := oldTs.Add(5 * time.Second)
 	testCases := map[string]struct {
