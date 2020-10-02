@@ -24,6 +24,10 @@
       - name: uri.original
         type: keyword
         description: The original URI.
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: uri.scheme
         type: keyword
         description: The URI scheme.
@@ -54,11 +58,19 @@
       - name: supported
         type: keyword
         description: Supported methods.
-      - name: user_agent
+      - name: user_agent.original
         type: keyword
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: private.uri.original
         type: keyword
         description: Private original URI.
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: private.uri.scheme
         type: keyword
         description: Private URI scheme.
@@ -101,6 +113,10 @@
       - name: to.uri.original
         type: keyword
         description: ""
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: to.uri.scheme
         type: keyword
         description: ""
@@ -122,6 +138,10 @@
       - name: from.uri.original
         type: keyword
         description: ""
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: from.uri.scheme
         type: keyword
         description: ""
@@ -143,6 +163,10 @@
       - name: contact.uri.original
         type: keyword
         description: ""
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: contact.uri.scheme
         type: keyword
         description: ""
@@ -176,6 +200,10 @@
       - name: auth.uri.original
         type: keyword
         description: ""
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: auth.uri.scheme
         type: keyword
         description: ""

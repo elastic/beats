@@ -19,7 +19,9 @@ package sip
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -168,26 +170,7 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
 	pbf.SetSource(src)
 	pbf.SetDestination(dst)
 
-	pbf.Event.Kind = "event"
-	pbf.Event.Category = []string{"network", "protocol"}
-
-	pbf.Event.Type = []string{"info"}
-	pbf.Event.Outcome = func() string {
-		if status == common.OK_STATUS {
-			return "success"
-		}
-		return "failure"
-	}()
-	pbf.Event.Dataset = "sip"
-	if p.keepOriginal {
-		pbf.Event.Original = string(pkt.Payload)
-	}
-	pbf.Event.Sequence = int64(sipFields.CseqCode)
-
-	// TODO: Get these values from body
-	pbf.Event.Start = m.ts
-	pbf.Event.End = m.ts
-	//
+	p.populateEventFields(m, pbf, sipFields)
 
 	_ = pb.MarshalStruct(evt.Fields, "sip", sipFields)
 
@@ -272,6 +255,41 @@ func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
 	if p.parseAuthorization {
 		populateAuthFields(m, fields)
 	}
+}
+
+func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, sipFields ProtocolFields) {
+	pbf.Event.Kind = "event"
+	pbf.Event.Type = []string{"info"}
+	pbf.Event.Dataset = "sip"
+	pbf.Event.Sequence = int64(sipFields.CseqCode)
+
+	// TODO: Get these values from body
+	pbf.Event.Start = m.ts
+	pbf.Event.End = m.ts
+	//
+
+	if p.keepOriginal {
+		pbf.Event.Original = string(m.rawData)
+	}
+
+	pbf.Event.Category = []string{"network", "protocol"}
+	if _, found := m.headers["authorization"]; found {
+		pbf.Event.Category = append(pbf.Event.Category, "authorization")
+	}
+
+	pbf.Event.Action = func() string {
+		if !m.isRequest {
+			return "sip_response"
+		}
+		return fmt.Sprintf("sip_%s", strings.ToLower(string(m.method)))
+	}()
+
+	pbf.Event.Outcome = func() string {
+		if m.statusCode < 400 {
+			return "success"
+		}
+		return "failure"
+	}()
 }
 
 func populateViaFields(m *message, fields *ProtocolFields) {

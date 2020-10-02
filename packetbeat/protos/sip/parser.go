@@ -66,6 +66,7 @@ type message struct {
 	firstLine  []byte
 	rawHeaders []byte
 	body       []byte
+	rawData    []byte
 }
 
 type version struct {
@@ -125,6 +126,7 @@ func (parser *parser) parse(pi *parsingInfo) (*message, error) {
 		ts:           pi.pkt.Ts,
 		ipPortTuple:  pi.pkt.Tuple,
 		cmdlineTuple: procs.ProcWatcher.FindProcessesTupleTCP(&pi.pkt.Tuple),
+		rawData:      pi.data,
 	}
 	for pi.parseOffset < len(pi.data) {
 		switch pi.state {

@@ -44,7 +44,7 @@ type ProtocolFields struct {
 	ContentType       common.NetString `ecs:"content_type"`
 	MaxForwards       int              `ecs:"max_forwards"`
 	Supported         []string         `ecs:"supported"`
-	UserAgentOriginal common.NetString `ecs:"user_agent"`
+	UserAgentOriginal common.NetString `ecs:"user_agent.original"`
 
 	PrivateURIOriginal common.NetString `ecs:"private.uri.original"`
 	PrivateURIScheme   common.NetString `ecs:"private.uri.scheme"`

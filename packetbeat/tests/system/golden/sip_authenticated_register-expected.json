@@ -6,9 +6,11 @@
         "client.port": 5060,
         "destination.ip": "212.242.33.35",
         "destination.port": 5060,
+        "event.action": "sip_register",
         "event.category": [
             "network",
-            "protocol"
+            "protocol",
+            "authorization"
         ],
         "event.dataset": "sip",
         "event.duration": 0,
@@ -49,7 +51,7 @@
         "sip.uri.host": "sip.cybercity.dk",
         "sip.uri.original": "sip:sip.cybercity.dk",
         "sip.uri.scheme": "sip",
-        "sip.user_agent": "Nero SIPPS IP Phone Version 2.0.51.16",
+        "sip.user_agent.original": "Nero SIPPS IP Phone Version 2.0.51.16",
         "sip.version": "2.0",
         "source.ip": "192.168.1.2",
         "source.port": 5060,
@@ -63,6 +65,7 @@
         "client.port": 5060,
         "destination.ip": "192.168.1.2",
         "destination.port": 5060,
+        "event.action": "sip_response",
         "event.category": [
             "network",
             "protocol"

@@ -11749,6 +11749,13 @@ type: keyword
 
 --
 
+*`sip.uri.original.text`*::
++
+--
+type: text
+
+--
+
 *`sip.uri.scheme`*::
 +
 --
@@ -11842,10 +11849,17 @@ type: keyword
 
 --
 
-*`sip.user_agent`*::
+*`sip.user_agent.original`*::
 +
 --
 type: keyword
+
+--
+
+*`sip.user_agent.original.text`*::
++
+--
+type: text
 
 --
 
@@ -11855,6 +11869,13 @@ type: keyword
 Private original URI.
 
 type: keyword
+
+--
+
+*`sip.private.uri.original.text`*::
++
+--
+type: text
 
 --
 
@@ -11984,6 +12005,13 @@ type: keyword
 
 --
 
+*`sip.to.uri.original.text`*::
++
+--
+type: text
+
+--
+
 *`sip.to.uri.scheme`*::
 +
 --
@@ -12047,6 +12075,13 @@ type: keyword
 
 --
 
+*`sip.from.uri.original.text`*::
++
+--
+type: text
+
+--
+
 *`sip.from.uri.scheme`*::
 +
 --
@@ -12107,6 +12142,13 @@ type: keyword
 
 
 type: keyword
+
+--
+
+*`sip.contact.uri.original.text`*::
++
+--
+type: text
 
 --
 
@@ -12206,6 +12248,13 @@ type: keyword
 
 
 type: keyword
+
+--
+
+*`sip.auth.uri.original.text`*::
++
+--
+type: text
 
 --
 

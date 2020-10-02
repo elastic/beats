@@ -6,6 +6,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
+        "event.action": "sip_invite",
         "event.category": [
             "network",
             "protocol"
@@ -70,6 +71,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
+        "event.action": "sip_response",
         "event.category": [
             "network",
             "protocol"
@@ -114,7 +116,7 @@
         "sip.to.uri.scheme": "sip",
         "sip.to.uri.username": "test",
         "sip.type": "response",
-        "sip.user_agent": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
+        "sip.user_agent.original": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
         "sip.version": "2.0",
         "source.ip": "10.0.2.15",
         "source.port": 5060,
@@ -128,6 +130,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
+        "event.action": "sip_ack",
         "event.category": [
             "network",
             "protocol"
@@ -191,6 +194,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
+        "event.action": "sip_bye",
         "event.category": [
             "network",
             "protocol"
@@ -261,7 +265,7 @@
         "sip.uri.port": 5060,
         "sip.uri.scheme": "sip",
         "sip.uri.username": "sipp",
-        "sip.user_agent": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
+        "sip.user_agent.original": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
         "sip.version": "2.0",
         "source.ip": "10.0.2.15",
         "source.port": 5060,
@@ -275,6 +279,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
+        "event.action": "sip_invite",
         "event.category": [
             "network",
             "protocol"
@@ -339,6 +344,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
+        "event.action": "sip_response",
         "event.category": [
             "network",
             "protocol"
@@ -383,7 +389,7 @@
         "sip.to.uri.scheme": "sip",
         "sip.to.uri.username": "test",
         "sip.type": "response",
-        "sip.user_agent": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
+        "sip.user_agent.original": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
         "sip.version": "2.0",
         "source.ip": "10.0.2.15",
         "source.port": 5060,
@@ -397,6 +403,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
+        "event.action": "sip_ack",
         "event.category": [
             "network",
             "protocol"
@@ -460,6 +467,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
+        "event.action": "sip_bye",
         "event.category": [
             "network",
             "protocol"
@@ -530,7 +538,7 @@
         "sip.uri.port": 5060,
         "sip.uri.scheme": "sip",
         "sip.uri.username": "sipp",
-        "sip.user_agent": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
+        "sip.user_agent.original": "FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit",
         "sip.version": "2.0",
         "source.ip": "10.0.2.15",
         "source.port": 5060,
