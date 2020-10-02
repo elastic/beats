@@ -31,6 +31,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+var (
+	excludedFilePath = filepath.Join("testdata", "excluded_file")
+	includedFilePath = filepath.Join("testdata", "included_file")
+	directoryPath    = filepath.Join("testdata", "unharvestable_dir")
+)
+
 func TestFileScanner(t *testing.T) {
 	testCases := map[string]struct {
 		paths         []string
@@ -39,34 +45,29 @@ func TestFileScanner(t *testing.T) {
 		expectedFiles []string
 	}{
 		"select all files": {
-			paths: []string{
-				filepath.Join("testdata", "excluded_file"),
-				filepath.Join("testdata", "included_file"),
-			},
+			paths: []string{excludedFilePath, includedFilePath},
 			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "excluded_file")),
-				mustAbsPath(filepath.Join("testdata", "included_file")),
+				mustAbsPath(excludedFilePath),
+				mustAbsPath(includedFilePath),
 			},
 		},
 		"skip excluded files": {
-			paths: []string{
-				filepath.Join("testdata", "excluded_file"),
-				filepath.Join("testdata", "included_file"),
-			},
+			paths: []string{excludedFilePath, includedFilePath},
 			excludedFiles: []match.Matcher{
 				match.MustCompile("excluded_file"),
 			},
 			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "included_file")),
+				mustAbsPath(includedFilePath),
 			},
 		},
 		"skip directories": {
-			paths: []string{
-				filepath.Join("testdata", "unharvestable_dir"),
-			},
+			paths:         []string{directoryPath},
 			expectedFiles: []string{},
 		},
 	}
+
+	setupFilesForScannerTest(t)
+	defer removeFilesOfScannerTest(t)
 
 	for name, test := range testCases {
 		test := test
@@ -86,9 +87,48 @@ func TestFileScanner(t *testing.T) {
 			for p, _ := range files {
 				paths = append(paths, p)
 			}
-			assert.Equal(t, test.expectedFiles, paths, "Expected: %v Got: %v", test.expectedFiles, paths)
+			assert.True(t, checkIfSameContents(test.expectedFiles, paths))
 		})
 	}
+}
+
+func setupFilesForScannerTest(t *testing.T) {
+	err := os.MkdirAll(directoryPath, 0750)
+	if err != nil {
+		t.Fatal(t)
+	}
+
+	for _, path := range []string{excludedFilePath, includedFilePath} {
+		f, err := os.Create(path)
+		if err != nil {
+			t.Fatalf("file %s, error %v", path, err)
+		}
+		f.Close()
+	}
+}
+
+func removeFilesOfScannerTest(t *testing.T) {
+	err := os.RemoveAll("testdata")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// only handles sets
+func checkIfSameContents(one, other []string) bool {
+	if len(one) != len(other) {
+		return false
+	}
+
+	mustFind := len(one)
+	for _, oneElem := range one {
+		for _, otherElem := range other {
+			if oneElem == otherElem {
+				mustFind--
+			}
+		}
+	}
+	return mustFind == 0
 }
 
 func TestFileWatchNewDeleteModified(t *testing.T) {
@@ -193,8 +233,8 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 }
 
 func TestFileWatcherRenamedFile(t *testing.T) {
-	testPath := mustAbsPath(filepath.Join("testdata", "first_name"))
-	renamedPath := mustAbsPath(filepath.Join("testdata", "renamed"))
+	testPath := mustAbsPath("first_name")
+	renamedPath := mustAbsPath("renamed")
 
 	f, err := os.Create(testPath)
 	if err != nil {
