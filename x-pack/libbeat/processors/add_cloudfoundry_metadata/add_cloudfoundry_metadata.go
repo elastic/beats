@@ -93,6 +93,9 @@ func (d *addCloudFoundryMetadata) String() string {
 
 // Close closes the underlying client and releases its resources.
 func (d *addCloudFoundryMetadata) Close() error {
+	if d.client == nil {
+		return nil
+	}
 	err := d.client.Close()
 	if err != nil {
 		return errors.Wrap(err, "closing client")
