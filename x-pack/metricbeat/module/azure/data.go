@@ -82,7 +82,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 						event, metricList = createEvent(timestamp, defaultMetric, resource, groupDimValues)
 						if client.Config.AddCloudMetadata {
 							vm = client.GetVMForMetaData(&resource, groupDimValues)
-							addCloudVMMetadata(&event, vm)
+							addCloudVMMetadata(&event, vm, resource.Subscription)
 						}
 					}
 				}
@@ -90,7 +90,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 				event, metricList = createEvent(timestamp, defaultMetric, resource, groupTimeValues)
 				if client.Config.AddCloudMetadata {
 					vm = client.GetVMForMetaData(&resource, groupTimeValues)
-					addCloudVMMetadata(&event, vm)
+					addCloudVMMetadata(&event, vm, resource.Subscription)
 				}
 			}
 			if client.Config.DefaultResourceType == "" {
