@@ -339,26 +339,6 @@ processors:
     if: "ctx?.client?.packets != null && ctx?.server?.packets != null"
     ignore_failure: true
 
-#########################
-## ECS Related Mapping ##
-#########################
-- append:
-    if: 'ctx?.source?.ip != null'
-    field: related.ip
-    value: '{{source.ip}}'
-- append:
-    if: 'ctx?.destination?.ip != null'
-    field: related.ip
-    value: '{{destination.ip}}'
-- append:
-    if: 'ctx?.source?.nat?.ip != null'
-    field: related.ip
-    value: '{{source.nat.ip}}'
-- append:
-    if: 'ctx?.destination?.nat?.ip != null'
-    field: related.ip
-    value: '{{destination.nat.ip}}'
-
 #############
 ## Cleanup ##
 #############

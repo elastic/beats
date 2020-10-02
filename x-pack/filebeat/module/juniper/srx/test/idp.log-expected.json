@@ -61,6 +61,12 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.11.11.1",
+            "187.188.188.10",
+            "0.0.0.0",
+            "3.3.10.11"
+        ],
         "rule.id": "3",
         "rule.name": "IPS",
         "server.bytes": 0,
@@ -143,6 +149,12 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.11.11.1",
+            "187.188.188.10",
+            "0.0.0.0",
+            "3.3.10.11"
+        ],
         "rule.id": "3",
         "rule.name": "IPS",
         "server.bytes": 0,
@@ -223,6 +235,12 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "183.78.180.27",
+            "118.127.111.1",
+            "0.0.0.0",
+            "172.19.13.11"
+        ],
         "rule.id": "9",
         "rule.name": "IPS",
         "server.bytes": 0,
@@ -302,6 +320,12 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "183.78.180.27",
+            "118.127.30.11",
+            "0.0.0.0",
+            "172.16.1.10"
+        ],
         "rule.id": "9",
         "rule.name": "IPS",
         "server.bytes": 0,
@@ -361,6 +385,9 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "172.27.14.203"
+        ],
         "rule.id": "1",
         "rule.name": "DDOS",
         "server.ip": "172.27.14.203",
@@ -424,6 +451,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "192.168.14.214",
+            "172.27.14.203"
+        ],
         "rule.id": "1",
         "server.ip": "172.27.14.203",
         "server.port": 80,
@@ -488,6 +519,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "193.168.14.214",
+            "172.30.20.201"
+        ],
         "rule.id": "1",
         "server.ip": "172.30.20.201",
         "server.port": 80,

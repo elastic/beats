@@ -42,6 +42,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "www.baidu.com"
+        ],
+        "related.ip": [
+            "192.168.1.100",
+            "103.235.46.39"
+        ],
         "server.ip": "103.235.46.39",
         "server.port": 80,
         "service.type": "juniper",
@@ -94,6 +101,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "www.checkpoint.com"
+        ],
+        "related.ip": [
+            "10.10.10.50",
+            "216.200.241.66"
+        ],
         "server.ip": "216.200.241.66",
         "server.port": 80,
         "service.type": "juniper",
@@ -144,6 +158,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "EICAR-Test-File"
+        ],
+        "related.ip": [
+            "188.40.238.250",
+            "10.1.1.103"
+        ],
         "server.ip": "10.1.1.103",
         "server.port": 47095,
         "service.type": "juniper",
@@ -195,6 +216,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "74.125.155.147",
+            "10.1.1.103"
+        ],
         "server.ip": "10.1.1.103",
         "server.port": 33578,
         "service.type": "juniper",
@@ -243,6 +268,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.2.1.101",
+            "10.1.1.103"
+        ],
         "server.ip": "10.1.1.103",
         "server.port": 51727,
         "service.type": "juniper",
@@ -288,6 +317,9 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.10.10.1"
+        ],
         "service.type": "juniper",
         "source.ip": "10.10.10.1",
         "source.user.name": "user01",
@@ -336,6 +368,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "192.0.2.3",
+            "198.51.100.2"
+        ],
         "server.ip": "198.51.100.2",
         "server.port": 80,
         "service.type": "juniper",
@@ -390,6 +426,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "www.baidu.com"
+        ],
+        "related.ip": [
+            "192.168.1.100",
+            "103.235.46.39"
+        ],
         "server.ip": "103.235.46.39",
         "server.port": 80,
         "service.type": "juniper",
@@ -440,6 +483,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "EICAR-Test-File"
+        ],
+        "related.ip": [
+            "188.40.238.250",
+            "10.1.1.103"
+        ],
         "server.ip": "10.1.1.103",
         "server.port": 47095,
         "service.type": "juniper",
@@ -502,6 +552,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "datawrapper.dwcdn.net"
+        ],
+        "related.ip": [
+            "10.1.1.100",
+            "104.26.15.142"
+        ],
         "server.ip": "104.26.15.142",
         "server.port": 443,
         "service.type": "juniper",
@@ -561,6 +618,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "dsp.adfarm1.adition.com"
+        ],
+        "related.ip": [
+            "10.1.1.100",
+            "85.114.159.93"
+        ],
         "server.ip": "85.114.159.93",
         "server.port": 443,
         "service.type": "juniper",
@@ -610,6 +674,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "23.209.86.45",
+            "10.1.1.100"
+        ],
         "server.ip": "10.1.1.100",
         "server.port": 58954,
         "service.type": "juniper",

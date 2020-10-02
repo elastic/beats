@@ -44,6 +44,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "5.196.121.161",
+            "10.10.0.10"
+        ],
         "server.ip": "10.10.0.10",
         "server.port": 24039,
         "service.type": "juniper",
@@ -108,6 +112,13 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.hosts": [
+            "dummy_host"
+        ],
+        "related.ip": [
+            "1.1.1.1",
+            "10.0.0.1"
+        ],
         "server.ip": "10.0.0.1",
         "server.port": 80,
         "service.type": "juniper",

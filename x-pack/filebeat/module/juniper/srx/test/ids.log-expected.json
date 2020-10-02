@@ -43,6 +43,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "113.113.17.17",
+            "40.177.177.1"
+        ],
         "server.ip": "40.177.177.1",
         "server.port": 1433,
         "service.type": "juniper",
@@ -99,6 +103,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "2000:0000:0000:0000:0000:0000:0000:0002",
+            "2001:0000:0000:0000:0000:0000:0000:0002"
+        ],
         "server.ip": "2001:0000:0000:0000:0000:0000:0000:0002",
         "server.port": 139,
         "service.type": "juniper",
@@ -153,6 +161,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "1.1.1.2",
+            "2.2.2.2"
+        ],
         "server.ip": "2.2.2.2",
         "server.port": 50010,
         "service.type": "juniper",
@@ -215,6 +227,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "111.1.1.3",
+            "3.4.2.2"
+        ],
         "server.ip": "3.4.2.2",
         "server.port": 53,
         "service.type": "juniper",
@@ -278,6 +294,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "111.1.1.3",
+            "3.4.2.2"
+        ],
         "server.ip": "3.4.2.2",
         "service.type": "juniper",
         "source.as.number": 56041,
@@ -339,6 +359,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "111.1.1.3",
+            "3.4.2.2"
+        ],
         "server.ip": "3.4.2.2",
         "service.type": "juniper",
         "source.as.number": 56041,
@@ -393,6 +417,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "1212::12",
+            "1111::11"
+        ],
         "server.ip": "1111::11",
         "service.type": "juniper",
         "source.ip": "1212::12",
@@ -442,6 +470,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "12.12.12.1",
+            "11.11.11.1"
+        ],
         "server.ip": "11.11.11.1",
         "service.type": "juniper",
         "source.as.number": 32328,
@@ -498,6 +530,9 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "2.2.2.2"
+        ],
         "server.ip": "2.2.2.2",
         "service.type": "juniper",
         "tags": [
@@ -539,6 +574,9 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "111.1.1.3"
+        ],
         "service.type": "juniper",
         "source.as.number": 56041,
         "source.as.organization.name": "China Mobile communications corporation",
@@ -593,6 +631,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.1.1.100",
+            "10.1.1.1"
+        ],
         "server.ip": "10.1.1.1",
         "server.port": 10778,
         "service.type": "juniper",
@@ -640,6 +682,10 @@
         "observer.product": "SRX",
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
+        "related.ip": [
+            "10.1.1.100",
+            "10.1.1.1"
+        ],
         "server.ip": "10.1.1.1",
         "server.port": 7,
         "service.type": "juniper",
