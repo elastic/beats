@@ -11689,249 +11689,676 @@ If the Redis command has resulted in an error, this field contains the error mes
 SIP-specific event fields.
 
 
+[float]
+=== sip
+
+Information about SIP traffic.
+
+
+*`sip.code`*::
++
+--
+Response status code.
+
+type: keyword
+
+--
 
 *`sip.method`*::
 +
 --
-SIP Request Method
-
-
-type: keyword
-
-example: INVITE
-
---
-
-*`sip.request_uri`*::
-+
---
-SIP Request URI
-
+Request method.
 
 type: keyword
 
-example: sip:hoge@example.com:5060;transport=udp
-
 --
 
-*`sip.status.code`*::
+*`sip.status`*::
 +
 --
-SIP Response code, status code
-
-
-type: long
-
-example: 200
-
---
-
-*`sip.status.phrase`*::
-+
---
-SIP Response , status phrase
-
+Response status phrase.
 
 type: keyword
 
-example: OK
-
 --
 
-*`sip.from`*::
+*`sip.type`*::
 +
 --
-SIP From header value
-
+Either request or response.
 
 type: keyword
 
-example: "sipp" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001
-
 --
 
-*`sip.to`*::
+*`sip.version`*::
 +
 --
-SIP To header value
-
+SIP protocol version.
 
 type: keyword
 
-example: "sut" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012
-
 --
 
-*`sip.headers.from`*::
+*`sip.uri.original`*::
 +
 --
-SIP From header value
-
+The original URI.
 
 type: keyword
 
-example: "sipp" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001
-
 --
 
-*`sip.headers.to`*::
+*`sip.uri.scheme`*::
 +
 --
-SIP To header value
-
+The URI scheme.
 
 type: keyword
 
-example: "sut" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012
+--
+
+*`sip.uri.username`*::
++
+--
+The URI user name.
+
+type: keyword
+
+--
+
+*`sip.uri.host`*::
++
+--
+The URI host.
+
+type: keyword
+
+--
+
+*`sip.uri.port`*::
++
+--
+The URI port.
+
+type: keyword
+
+--
+
+*`sip.accept`*::
++
+--
+Accept header value.
+
+type: keyword
+
+--
+
+*`sip.allow`*::
++
+--
+Allowed methods.
+
+type: keyword
 
 --
 
 *`sip.call_id`*::
 +
 --
-SIP Call-ID header value
-
-
-type: keyword
-
-example: 
-
---
-
-*`sip.headers.call-id`*::
-+
---
-SIP Call-ID header value
-
-
-type: keyword
-
-example: 
-
---
-
-*`sip.cseq`*::
-+
---
-SIP CSeq header value
-
-
-type: keyword
-
-example: 1 INVITE
-
---
-
-*`sip.headers.max-forwards`*::
-+
---
-SIP Max-Forwards header value
-
-
-type: keyword
-
-example: 1
-
---
-
-*`sip.headers.via`*::
-+
---
-SIP Via header value
-
+Call ID.
 
 type: keyword
 
 --
 
-*`sip.headers.cseq`*::
+*`sip.content_length`*::
 +
 --
-SIP Cseq header value
-
-
-type: keyword
-
---
-
-*`sip.headers.content-length`*::
-+
---
-SIP Content-length header value
-
-
-type: keyword
-
---
-
-*`sip.headers.content-type`*::
-+
---
-SIP Content-type header value
-
-
-type: keyword
-
---
-
-*`sip.headers.contact`*::
-+
---
-SIP Contact header value
-
-
-type: keyword
-
---
-
-*`sip.headers.user-agent`*::
-+
---
-SIP User-agent header value
-
-
-type: keyword
-
---
-
-*`sip.headers.supported`*::
-+
---
-SIP Supported header value
-
-
-type: keyword
-
---
-
-*`sip.headers.accept`*::
-+
---
-SIP Supported header value
-
-
-type: keyword
-
---
-
-*`sip.body`*::
-+
---
-The body of the SIP message.
-
-type: object
-
---
-
-*`sip.unixtimenano`*::
-+
---
-unixtime as nanosec
-
-
 type: long
 
-example: 1516199666016756000
+--
+
+*`sip.content_type`*::
++
+--
+type: keyword
+
+--
+
+*`sip.max_forwards`*::
++
+--
+type: long
+
+--
+
+*`sip.supported`*::
++
+--
+Supported methods.
+
+type: keyword
+
+--
+
+*`sip.user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`sip.private.uri.original`*::
++
+--
+Private original URI.
+
+type: keyword
+
+--
+
+*`sip.private.uri.scheme`*::
++
+--
+Private URI scheme.
+
+type: keyword
+
+--
+
+*`sip.private.uri.username`*::
++
+--
+Private URI user name.
+
+type: keyword
+
+--
+
+*`sip.private.uri.host`*::
++
+--
+Private URI host.
+
+type: keyword
+
+--
+
+*`sip.private.uri.port`*::
++
+--
+Private URI port.
+
+type: keyword
+
+--
+
+*`sip.cseq.code`*::
++
+--
+Sequence code.
+
+type: keyword
+
+--
+
+*`sip.cseq.method`*::
++
+--
+Sequence method.
+
+type: keyword
+
+--
+
+*`sip.via.transport`*::
++
+--
+Via header transport.
+
+type: keyword
+
+--
+
+*`sip.via.sent_by.address`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.via.sent_by.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.via.received.address`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.via.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.via.branch`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.display_info`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.uri.original`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.uri.scheme`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.uri.username`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.uri.host`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.uri.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.to.tag`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.display_info`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.uri.original`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.uri.scheme`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.uri.username`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.uri.host`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.uri.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.from.tag`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.display_info`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.uri.original`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.uri.scheme`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.uri.username`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.uri.host`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.uri.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.transport`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.line`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.expires`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.contact.q`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.scheme`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.realm`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.uri.original`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.uri.scheme`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.uri.host`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.auth.uri.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.version`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.username`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.session_id`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.version`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.ip`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.session.name`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.connection.info`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.connection.address`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.start`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.stop`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.media.description`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.media.port`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.media.format`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`sip.sdp.media.attributes`*::
++
+--
+
+
+type: keyword
 
 --
 

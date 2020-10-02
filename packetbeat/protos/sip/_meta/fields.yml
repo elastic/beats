@@ -4,106 +4,226 @@
   fields:
     - name: sip
       type: group
+      description: Information about SIP traffic.
       fields:
-        - name: method
-          type: keyword
-          description: >
-            SIP Request Method
-          example: INVITE
-        - name: request_uri
-          type: keyword
-          description: >
-            SIP Request URI
-          example: sip:hoge@example.com:5060;transport=udp
-        - name: status.code
-          type: long
-          description: >
-            SIP Response code, status code
-          example: 200
-        - name: status.phrase
-          type: keyword
-          description: >
-            SIP Response , status phrase
-          example: OK
-        - name: from
-          type: keyword
-          description: >
-            SIP From header value
-          example: "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001"
-        - name: to
-          type: keyword
-          description: >
-            SIP To header value
-          example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
-        - name: headers.from
-          type: keyword
-          description: >
-            SIP From header value
-          example: "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001"
-        - name: headers.to
-          type: keyword
-          description: >
-            SIP To header value
-          example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
-        - name: call_id
-          type: keyword
-          description: >
-            SIP Call-ID header value
-          example: ""
-        - name: headers.call-id
-          type: keyword
-          description: >
-            SIP Call-ID header value
-          example: ""
-        - name: cseq
-          type: keyword
-          description: >
-            SIP CSeq header value
-          example: 1 INVITE
-        - name: headers.max-forwards
-          type: keyword
-          description: >
-            SIP Max-Forwards header value
-          example: 1
-        - name: headers.via
-          type: keyword
-          description: >
-            SIP Via header value
-        - name: headers.cseq
-          type: keyword
-          description: >
-            SIP Cseq header value
-        - name: headers.content-length
-          type: keyword
-          description: >
-            SIP Content-length header value
-        - name: headers.content-type
-          type: keyword
-          description: >
-            SIP Content-type header value
-        - name: headers.contact
-          type: keyword
-          description: >
-            SIP Contact header value
-        - name: headers.user-agent
-          type: keyword
-          description: >
-            SIP User-agent header value
-        - name: headers.supported
-          type: keyword
-          description: >
-            SIP Supported header value
-        - name: headers.accept
-          type: keyword
-          description: >
-            SIP Supported header value
-        - name: body
-          type: object
-          object_type: keyword
-          description: The body of the SIP message.
-        - name: unixtimenano
-          type: long
-          description: >
-            unixtime as nanosec
-          example: 1516199666016756000
-
+      - name: code
+        type: keyword
+        description: Response status code.
+      - name: method
+        type: keyword
+        description: Request method.
+      - name: status
+        type: keyword
+        description: Response status phrase.
+      - name: type
+        type: keyword
+        description: Either request or response.
+      - name: version
+        type: keyword
+        description: SIP protocol version.
+      - name: uri.original
+        type: keyword
+        description: The original URI.
+      - name: uri.scheme
+        type: keyword
+        description: The URI scheme.
+      - name: uri.username
+        type: keyword
+        description: The URI user name.
+      - name: uri.host
+        type: keyword
+        description: The URI host.
+      - name: uri.port
+        type: keyword
+        description: The URI port.
+      - name: accept
+        type: keyword
+        description: Accept header value.
+      - name: allow
+        type: keyword
+        description: Allowed methods.
+      - name: call_id
+        type: keyword
+        description: Call ID.
+      - name: content_length
+        type: long
+      - name: content_type
+        type: keyword
+      - name: max_forwards
+        type: long
+      - name: supported
+        type: keyword
+        description: Supported methods.
+      - name: user_agent
+        type: keyword
+      - name: private.uri.original
+        type: keyword
+        description: Private original URI.
+      - name: private.uri.scheme
+        type: keyword
+        description: Private URI scheme.
+      - name: private.uri.username
+        type: keyword
+        description: Private URI user name.
+      - name: private.uri.host
+        type: keyword
+        description: Private URI host.
+      - name: private.uri.port
+        type: keyword
+        description: Private URI port.
+      - name: cseq.code
+        type: keyword
+        description: Sequence code.
+      - name: cseq.method
+        type: keyword
+        description: Sequence method.
+      - name: via.transport
+        type: keyword
+        description: Via header transport.
+      - name: via.sent_by.address
+        type: keyword
+        description: ""
+      - name: via.sent_by.port
+        type: keyword
+        description: ""
+      - name: via.received.address
+        type: keyword
+        description: ""
+      - name: via.port
+        type: keyword
+        description: ""
+      - name: via.branch
+        type: keyword
+        description: ""
+      - name: to.display_info
+        type: keyword
+        description: ""
+      - name: to.uri.original
+        type: keyword
+        description: ""
+      - name: to.uri.scheme
+        type: keyword
+        description: ""
+      - name: to.uri.username
+        type: keyword
+        description: ""
+      - name: to.uri.host
+        type: keyword
+        description: ""
+      - name: to.uri.port
+        type: keyword
+        description: ""
+      - name: to.tag
+        type: keyword
+        description: ""
+      - name: from.display_info
+        type: keyword
+        description: ""
+      - name: from.uri.original
+        type: keyword
+        description: ""
+      - name: from.uri.scheme
+        type: keyword
+        description: ""
+      - name: from.uri.username
+        type: keyword
+        description: ""
+      - name: from.uri.host
+        type: keyword
+        description: ""
+      - name: from.uri.port
+        type: keyword
+        description: ""
+      - name: from.tag
+        type: keyword
+        description: ""
+      - name: contact.display_info
+        type: keyword
+        description: ""
+      - name: contact.uri.original
+        type: keyword
+        description: ""
+      - name: contact.uri.scheme
+        type: keyword
+        description: ""
+      - name: contact.uri.username
+        type: keyword
+        description: ""
+      - name: contact.uri.host
+        type: keyword
+        description: ""
+      - name: contact.uri.port
+        type: keyword
+        description: ""
+      - name: contact.transport
+        type: keyword
+        description: ""
+      - name: contact.line
+        type: keyword
+        description: ""
+      - name: contact.expires
+        type: keyword
+        description: ""
+      - name: contact.q
+        type: keyword
+        description: ""
+      - name: auth.scheme
+        type: keyword
+        description: ""
+      - name: auth.realm
+        type: keyword
+        description: ""
+      - name: auth.uri.original
+        type: keyword
+        description: ""
+      - name: auth.uri.scheme
+        type: keyword
+        description: ""
+      - name: auth.uri.host
+        type: keyword
+        description: ""
+      - name: auth.uri.port
+        type: keyword
+        description: ""
+      - name: sdp.version
+        type: keyword
+        description: ""
+      - name: sdp.owner.username
+        type: keyword
+        description: ""
+      - name: sdp.owner.session_id
+        type: keyword
+        description: ""
+      - name: sdp.owner.version
+        type: keyword
+        description: ""
+      - name: sdp.owner.ip
+        type: keyword
+        description: ""
+      - name: sdp.session.name
+        type: keyword
+        description: ""
+      - name: sdp.connection.info
+        type: keyword
+        description: ""
+      - name: sdp.connection.address
+        type: keyword
+        description: ""
+      - name: sdp.start
+        type: keyword
+        description: ""
+      - name: sdp.stop
+        type: keyword
+        description: ""
+      - name: sdp.media.description
+        type: keyword
+        description: ""
+      - name: sdp.media.port
+        type: keyword
+        description: ""
+      - name: sdp.media.format
+        type: keyword
+        description: ""
+      - name: sdp.media.attributes
+        type: keyword
+        description: ""

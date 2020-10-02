@@ -18,29 +18,24 @@
 package sip
 
 import (
-	"github.com/elastic/beats/v7/packetbeat/config"
+	cfg "github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-type sipConfig struct {
-	config.ProtocolCommon `config:",inline"`
-	IncludeRawMessage     bool     `config:"include_raw"`
-	IncludeHeaders        bool     `config:"include_headers"`
-	IncludeBody           bool     `config:"include_body"`
-	ParseDetail           bool     `config:"parse_detail"`
-	UseDefaultHeaders     bool     `config:"use_default_headers"`
-	HeadersToParseAsURI   []string `config:"parse_as_uri_for"`
-	HeadersToParseAsInt   []string `config:"parse_as_int_for"`
+type config struct {
+	cfg.ProtocolCommon `config:",inline"`
+	ParseAuthorization bool `config:"parse_authorization"`
+	ParseBody          bool `config:"parse_body"`
+	KeepOriginal       bool `config:"keep_original"`
 }
 
-func defaultConfig() sipConfig {
-	return sipConfig{
-		ProtocolCommon:      config.ProtocolCommon{},
-		IncludeRawMessage:   true,
-		IncludeHeaders:      true,
-		IncludeBody:         true,
-		ParseDetail:         false,
-		UseDefaultHeaders:   true,
-		HeadersToParseAsURI: []string{},
-		HeadersToParseAsInt: []string{},
+var (
+	defaultConfig = config{
+		ProtocolCommon: cfg.ProtocolCommon{
+			TransactionTimeout: protos.DefaultTransactionExpiration,
+		},
+		ParseAuthorization: true,
+		ParseBody:          true,
+		KeepOriginal:       true,
 	}
-}
+)
