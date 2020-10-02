@@ -17,7 +17,7 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "arm"
-        when:                  ## AOverride the top-level when.
+        when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/libbeat for arm"
             labels:
