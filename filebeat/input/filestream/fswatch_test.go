@@ -239,7 +239,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 
 	go w.watch(ctx)
 	evt := w.Event()
-	evt.FileInfo = nil // This part is unrelevant to the test
+	evt.Info = nil // This part is unrelevant to the test
 	assert.Equal(t, loginp.FSEvent{Op: loginp.OpRename, OldPath: testPath, NewPath: renamedPath}, evt, "Got event: %v", evt)
 }
 
