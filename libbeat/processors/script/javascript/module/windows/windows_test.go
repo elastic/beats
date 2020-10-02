@@ -17,7 +17,7 @@
 
 // +build windows
 
-package winlogbeat
+package windows
 
 import (
 	"testing"

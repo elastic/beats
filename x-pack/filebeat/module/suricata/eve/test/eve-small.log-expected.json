@@ -415,6 +415,7 @@
         "destination.domain": "p33-btmmdns.icloud.com",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.142.164.13",

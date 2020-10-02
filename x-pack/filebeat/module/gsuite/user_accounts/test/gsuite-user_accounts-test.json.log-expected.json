@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "2sv_disable",
         "event.category": [
             "iam"
@@ -34,6 +33,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -48,7 +48,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "2sv_enroll",
         "event.category": [
             "iam"
@@ -82,6 +81,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -96,7 +96,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "password_edit",
         "event.category": [
             "iam"
@@ -130,6 +129,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -144,7 +144,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "recovery_email_edit",
         "event.category": [
             "iam"
@@ -178,6 +177,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -192,7 +192,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "recovery_phone_edit",
         "event.category": [
             "iam"
@@ -226,6 +225,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -240,7 +240,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "recovery_secret_qa_edit",
         "event.category": [
             "iam"
@@ -274,6 +273,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -288,7 +288,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "titanium_enroll",
         "event.category": [
             "iam"
@@ -322,6 +321,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -336,7 +336,6 @@
         ]
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "titanium_unenroll",
         "event.category": [
             "iam"
@@ -370,6 +369,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",

@@ -48,6 +48,7 @@
         "source.geo.city_name": "Barcelona",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 41.3891,
         "source.geo.location.lon": 2.1611,
         "source.geo.region_iso_code": "ES-B",
