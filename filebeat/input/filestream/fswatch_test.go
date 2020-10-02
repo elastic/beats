@@ -60,27 +60,6 @@ func TestFileScanner(t *testing.T) {
 				mustAbsPath(filepath.Join("testdata", "included_file")),
 			},
 		},
-		// covers test_input.py/test_skip_symlinks
-		"skip symlinks": {
-			paths: []string{
-				filepath.Join("testdata", "symlink_to_included_file"),
-				filepath.Join("testdata", "included_file"),
-			},
-			symlinks: false,
-			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "included_file")),
-			},
-		},
-		"return a file once if symlinks are enabled": {
-			paths: []string{
-				filepath.Join("testdata", "symlink_to_included_file"),
-				filepath.Join("testdata", "included_file"),
-			},
-			symlinks: true,
-			expectedFiles: []string{
-				mustAbsPath(filepath.Join("testdata", "included_file")),
-			},
-		},
 		"skip directories": {
 			paths: []string{
 				filepath.Join("testdata", "unharvestable_dir"),
