@@ -26,7 +26,6 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 )
 
 var (
@@ -125,11 +124,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
-	event := mb.Event{
-		ModuleFields: common.MapStr{},
-		RootFields:   common.MapStr{},
-	}
-	event.RootFields.Put("service.name2", kibana.ModuleName)
+	event := mb.Event{ModuleFields: common.MapStr{}}
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
@@ -209,12 +204,12 @@ func settingsDataParser(r mb.ReporterV2, content []byte) error {
 
 	res, err := schema.Apply(data)
 	if err != nil {
-		return  err
+		return err
 	}
 
 	r.Event(mb.Event{
-		ModuleFields:      res,
-		MetricSetFields:   nil,
+		ModuleFields:    res,
+		MetricSetFields: nil,
 	})
 
 	return nil

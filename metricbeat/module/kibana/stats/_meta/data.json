@@ -129,8 +129,7 @@
         "id": "0b55ab2a-5fdc-4097-9a46-a3d35e2c1dbf",
         "version": "8.0.0",
         "address": "localhost:5601",
-        "type": "kibana",
-        "name2": "kibana"
+        "type": "kibana"
     },
     "ecs": {
         "version": "1.5.0"
