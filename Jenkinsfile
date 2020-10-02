@@ -105,10 +105,7 @@ pipeline {
             def content = readYaml(file: 'Jenkinsfile.yml')
             println content
             if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-              def message = 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-              warnError(message) {
-                error message
-              }
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
             } else {
               content['projects'].each { projectName ->
                 generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
@@ -116,7 +113,7 @@ pipeline {
                 }
               }
               notifyBuildReason()
-              //parallel(mapParallelTasks)
+              parallel(mapParallelTasks)
             }
           }
         }
