@@ -14,7 +14,7 @@ set -eo pipefail
 
 function setup(){
   curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
-  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/setup \
+ curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/agents/setup \
     -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true' \
     -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
