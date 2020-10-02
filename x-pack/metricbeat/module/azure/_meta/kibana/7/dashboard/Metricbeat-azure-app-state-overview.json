@@ -326,7 +326,7 @@
             }
           }
         },
-        "title": "[Metricbeat Azure] App State Filters",
+        "title": "App State Filters [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -397,7 +397,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "[Metricbeat Azure] App State Filters",
+          "title": "App State Filters [Metricbeat Azure]",
           "type": "input_control_vis"
         }
       },
@@ -556,7 +556,7 @@
             "preferredSeriesType": "area_stacked"
           }
         },
-        "title": "[Metricbeat Azure] App state Exceptions",
+        "title": "App state Exceptions [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "1064f9a0-04a5-11eb-8034-63f2039e9d3f",
@@ -674,7 +674,7 @@
             "preferredSeriesType": "area"
           }
         },
-        "title": "[Metricbeat Azure] App state Memory",
+        "title": "App state Memory [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "76cc1d70-04a7-11eb-8034-63f2039e9d3f",
@@ -736,7 +736,7 @@
             "layerId": "82e648a8-6d9a-4ae0-9449-b802ce1ac723"
           }
         },
-        "title": "[Metricbeat Azure] App state Unique users",
+        "title": "App state Unique users [Metricbeat Azure]",
         "visualizationType": "lnsMetric"
       },
       "id": "a89c8fd0-03ec-11eb-8034-63f2039e9d3f",
@@ -798,7 +798,7 @@
             "layerId": "82e648a8-6d9a-4ae0-9449-b802ce1ac723"
           }
         },
-        "title": "[Metricbeat Azure] App state Unique authenticated users",
+        "title": "App state Unique authenticated users [Metricbeat Azure]",
         "visualizationType": "lnsMetric"
       },
       "id": "cb5ec410-03ed-11eb-8034-63f2039e9d3f",
@@ -860,7 +860,7 @@
             "layerId": "82e648a8-6d9a-4ae0-9449-b802ce1ac723"
           }
         },
-        "title": "[Metricbeat Azure] App state Unique sessions",
+        "title": "App state Unique sessions [Metricbeat Azure]",
         "visualizationType": "lnsMetric"
       },
       "id": "0df175c0-03ee-11eb-8034-63f2039e9d3f",
@@ -981,7 +981,7 @@
             "preferredSeriesType": "area"
           }
         },
-        "title": "[Metricbeat Azure] App state Requests ",
+        "title": "App state Requests [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "f0678020-04a2-11eb-8034-63f2039e9d3f",
@@ -1114,7 +1114,7 @@
             "preferredSeriesType": "bar"
           }
         },
-        "title": "[Metricbeat Azure] App state Browser Send/Receive Duration",
+        "title": "App state Browser Send/Receive Duration [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "e2704140-04a3-11eb-8034-63f2039e9d3f",
@@ -1234,7 +1234,7 @@
             "preferredSeriesType": "bar"
           }
         },
-        "title": "[Metricbeat Azure] App state Browser Networking/Processing Duration",
+        "title": "App state Browser Networking/Processing Duration [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "0e74dee0-04a4-11eb-8034-63f2039e9d3f",
@@ -1371,7 +1371,7 @@
             "preferredSeriesType": "area"
           }
         },
-        "title": "[Metricbeat Azure] App state Process CPU usage",
+        "title": "App state Process CPU usage [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "cfa361a0-04a8-11eb-8034-63f2039e9d3f",
@@ -1489,7 +1489,7 @@
             "preferredSeriesType": "area"
           }
         },
-        "title": "[Metricbeat Azure] App state Process Private Bytes",
+        "title": "App state Process Private Bytes [Metricbeat Azure]",
         "visualizationType": "lnsXY"
       },
       "id": "2b54b2c0-04a8-11eb-8034-63f2039e9d3f",
