@@ -16,12 +16,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
+	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -30,6 +29,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -231,13 +231,12 @@ func TestMockS3Input(t *testing.T) {
 		output, err := collector.receiveMessage(collector.sqs, collector.visibilityTimeout)
 		assert.NoError(t, err)
 
-		wg := sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
-			errC := make(chan error)
-			defer close(errC)
-			collector.processMessage(collector.s3, output.Messages[0], &wg, errC)
-		}()
+		var grp unison.MultiErrGroup
+		errC := make(chan error)
+		defer close(errC)
+		grp.Go(func() (err error) {
+			return collector.processMessage(collector.s3, output.Messages[0], errC)
+		})
 
 		event := <-receiver
 		bucketName, err := event.GetValue("aws.s3.bucket.name")

@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/go-concert/unison"
 )
 
 type s3Collector struct {
@@ -118,27 +119,29 @@ func (c *s3Collector) run() {
 }
 
 func (c *s3Collector) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
-	var wg sync.WaitGroup
+	var grp unison.MultiErrGroup
 	numMessages := len(messages)
 	c.logger.Debugf("Processing %v messages", numMessages)
-	wg.Add(numMessages * 2)
 
 	// process messages received from sqs
 	for i := range messages {
+		i := i
 		errC := make(chan error)
-		go c.processMessage(svcS3, messages[i], &wg, errC)
-		go c.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, &wg, errC)
+		grp.Go(func() (err error) {
+			return c.processMessage(svcS3, messages[i], errC)
+		})
+		grp.Go(func() (err error) {
+			return c.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
+		})
 	}
-	wg.Wait()
+	grp.Wait()
 }
 
-func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
-	defer wg.Done()
-
+func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, errC chan error) error {
 	s3Infos, err := c.handleSQSMessage(message)
 	if err != nil {
 		c.logger.Error(fmt.Errorf("handleSQSMessage failed: %w", err))
-		return
+		return err
 	}
 	c.logger.Debugf("handleSQSMessage succeed and returned %v sets of S3 log info", len(s3Infos))
 
@@ -147,17 +150,17 @@ func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Messag
 	if err != nil {
 		err = fmt.Errorf("handleS3Objects failed: %w", err)
 		c.logger.Error(err)
-		return
+		return err
 	}
 	c.logger.Debugf("handleS3Objects succeed")
+	return nil
 }
 
-func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, wg *sync.WaitGroup, errC chan error) {
-	defer wg.Done()
+func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) error {
 	for {
 		select {
 		case <-c.cancellation.Done():
-			return
+			return nil
 		case err := <-errC:
 			if err != nil {
 				c.logger.Warn("Processing message failed, updating visibility timeout")
@@ -177,7 +180,7 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 					c.logger.Error(fmt.Errorf("deleteMessages failed: %w", err))
 				}
 			}
-			return
+			return err
 		case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 			c.logger.Warn("Half of the set visibilityTimeout passed, visibility timeout needs to be updated")
 			// If half of the set visibilityTimeout passed and this is
@@ -187,6 +190,7 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
 			}
 			c.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
+			return err
 		}
 	}
 }
