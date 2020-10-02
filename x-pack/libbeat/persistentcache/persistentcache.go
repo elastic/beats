@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 const (
@@ -27,9 +28,8 @@ var expiredError = errors.New("key expired")
 type PersistentCache struct {
 	log *logp.Logger
 
-	store    *Store
-	codec    codec
-	registry *Registry
+	store *Store
+	codec codec
 
 	refreshOnAccess bool
 	timeout         time.Duration
@@ -43,16 +43,34 @@ type Options struct {
 	// If set to true, expiration time of an entry is updated
 	// when the object is accessed.
 	RefreshOnAccess bool
-}
 
-// registry is the global persistent caches registry
-var registry Registry
+	// If empty, beats data path is used.
+	RootPath string
+}
 
 // New creates and returns a new persistent cache.
 // Cache returned by this method must be closed with Close() when
 // not needed anymore.
 func New(name string, opts Options) (*PersistentCache, error) {
-	return registry.NewCache(name, opts)
+	logger := logp.NewLogger("persistentcache")
+
+	rootPath := opts.RootPath
+	if rootPath == "" {
+		rootPath = paths.Resolve(paths.Data, cacheFile)
+	}
+	store, err := newStore(logger, rootPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PersistentCache{
+		log:   logger,
+		store: store,
+		codec: newCBORCodec(),
+
+		refreshOnAccess: opts.RefreshOnAccess,
+		timeout:         opts.Timeout,
+	}, nil
 }
 
 // Put writes the given key and value to the map replacing any
@@ -95,6 +113,5 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 
 // Close releases all resources associated with this cache.
 func (c *PersistentCache) Close() error {
-	err := c.registry.ReleaseStore(c.store.name)
-	return err
+	return c.store.Close()
 }

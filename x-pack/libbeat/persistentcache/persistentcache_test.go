@@ -25,9 +25,7 @@ func TestPutGet(t *testing.T) {
 	logp.TestingSetup()
 	t.Parallel()
 
-	registry := newTestRegistry(t)
-
-	cache, err := registry.NewCache("test", Options{})
+	cache, err := New("test", testOptions(t))
 	require.NoError(t, err)
 	defer cache.Close()
 
@@ -54,9 +52,9 @@ func TestPersist(t *testing.T) {
 	logp.TestingSetup()
 	t.Parallel()
 
-	registry := newTestRegistry(t)
+	options := testOptions(t)
 
-	cache, err := registry.NewCache("test", Options{})
+	cache, err := New("test", options)
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -69,45 +67,14 @@ func TestPersist(t *testing.T) {
 	err = cache.Put(key, value)
 	assert.NoError(t, err)
 
-	assert.Len(t, registry.stores, 1)
-	cache.Close()
-	assert.Len(t, registry.stores, 0)
+	err = cache.Close()
+	assert.NoError(t, err)
 
-	cache, err = registry.NewCache("test", Options{})
+	cache, err = New("test", options)
 	require.NoError(t, err)
 
 	var result valueType
 	err = cache.Get(key, &result)
-	assert.NoError(t, err)
-	assert.Equal(t, value, result)
-}
-
-func TestSharedCaches(t *testing.T) {
-	logp.TestingSetup()
-	t.Parallel()
-
-	registry := newTestRegistry(t)
-
-	cache1, err := registry.NewCache("test", Options{})
-	require.NoError(t, err)
-	defer cache1.Close()
-
-	cache2, err := registry.NewCache("test", Options{})
-	require.NoError(t, err)
-	defer cache2.Close()
-
-	type valueType struct {
-		Something string
-	}
-
-	var key = "somekey"
-	var value = valueType{Something: "foo"}
-
-	err = cache1.Put(key, value)
-	assert.NoError(t, err)
-
-	var result valueType
-	err = cache2.Get(key, &result)
 	assert.NoError(t, err)
 	assert.Equal(t, value, result)
 }
@@ -119,9 +86,8 @@ func TestExpired(t *testing.T) {
 	logp.TestingSetup()
 	t.Parallel()
 
-	registry := newTestRegistry(t)
-
-	cache, err := registry.NewCache("test", Options{})
+	options := testOptions(t)
+	cache, err := New("test", options)
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -155,15 +121,12 @@ func TestRefreshOnAccess(t *testing.T) {
 	logp.TestingSetup()
 	t.Parallel()
 
-	registry := newTestRegistry(t)
-
 	// Badger TTL is not reliable on sub-second durations.
-	options := Options{
-		Timeout:         2 * time.Second,
-		RefreshOnAccess: true,
-	}
+	options := testOptions(t)
+	options.Timeout = 2 * time.Second
+	options.RefreshOnAccess = true
 
-	cache, err := registry.NewCache("test", options)
+	cache, err := New("test", options)
 	require.NoError(t, err)
 
 	type valueType struct {
@@ -196,26 +159,6 @@ func TestRefreshOnAccess(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestForceCloseRegistry(t *testing.T) {
-	logp.TestingSetup()
-	t.Parallel()
-
-	registry := newTestRegistry(t)
-
-	cache, err := registry.NewCache("test", Options{})
-	require.NoError(t, err)
-
-	registry.ForceClose()
-
-	err = cache.Put("somekey", "somevalue")
-	assert.Error(t, err)
-
-	assert.Error(t, cache.Close())
-
-	cache, err = registry.NewCache("test", Options{})
-	require.Error(t, err)
-}
-
 var benchmarkCacheSizes = []int{10, 100, 1000, 10000, 100000}
 
 func BenchmarkPut(b *testing.B) {
@@ -224,9 +167,9 @@ func BenchmarkPut(b *testing.B) {
 		Close() error
 	}
 
-	registry := newTestRegistry(b)
+	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := registry.NewCache(name, Options{})
+		cache, err := New(name, options)
 		require.NoError(tb, err)
 		return cache
 	}
@@ -347,9 +290,9 @@ func BenchmarkOpen(b *testing.B) {
 		Close() error
 	}
 
-	registry := newTestRegistry(b)
+	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := registry.NewCache(name, Options{})
+		cache, err := New(name, options)
 		require.NoError(tb, err)
 		return cache
 	}
@@ -400,9 +343,9 @@ func BenchmarkGet(b *testing.B) {
 		Close() error
 	}
 
-	registry := newTestRegistry(b)
+	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := registry.NewCache(name, Options{})
+		cache, err := New(name, options)
 		require.NoError(tb, err)
 		return cache
 	}
@@ -459,7 +402,7 @@ func BenchmarkGet(b *testing.B) {
 	}
 }
 
-func newTestRegistry(t testing.TB) *Registry {
+func testOptions(t testing.TB) Options {
 	t.Helper()
 
 	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
@@ -467,8 +410,8 @@ func newTestRegistry(t testing.TB) *Registry {
 
 	t.Cleanup(func() { os.RemoveAll(tempDir) })
 
-	return &Registry{
-		path: filepath.Join(tempDir, cacheFile),
+	return Options{
+		RootPath: filepath.Join(tempDir, cacheFile),
 	}
 }
 

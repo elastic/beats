@@ -29,9 +29,9 @@ func TestGetApps(t *testing.T) {
 	log := logp.NewLogger("cloudfoundry")
 	hub := NewHub(&conf, "filebeat", log)
 
-	client, err := hub.ClientWithCache()
+	client, err := hub.Client()
 	require.NoError(t, err)
-	apps, err := client.(*clientCacheWrap).client.(*cfclient.Client).ListApps()
+	apps, err := client.ListApps()
 	require.NoError(t, err)
 
 	t.Logf("%d applications available", len(apps))
@@ -42,6 +42,7 @@ func TestGetApps(t *testing.T) {
 		}
 		client, err := hub.ClientWithCache()
 		require.NoError(t, err)
+		defer client.Close()
 
 		guid := apps[0].Guid
 		app, err := client.GetAppByGuid(guid)
@@ -52,6 +53,7 @@ func TestGetApps(t *testing.T) {
 	t.Run("handle error when application is not available", func(t *testing.T) {
 		client, err := hub.ClientWithCache()
 		require.NoError(t, err)
+		defer client.Close()
 
 		testNotExists := func(t *testing.T) {
 			app, err := client.GetAppByGuid("notexists")

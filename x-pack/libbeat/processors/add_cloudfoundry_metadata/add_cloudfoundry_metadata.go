@@ -40,7 +40,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.ClientWithCache()
 	if err != nil {
-		log.Debugf("%s: failed to created cloudfoundry client: %+v", processorName, err)
+		return nil, errors.Wrapf(err, "%s: creating cloudfoundry client", processorName)
 	}
 
 	return &addCloudFoundryMetadata{
