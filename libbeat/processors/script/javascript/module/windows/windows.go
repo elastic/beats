@@ -17,7 +17,7 @@
 
 // +build windows
 
-package winlogbeat
+package windows
 
 import (
 	"syscall"
@@ -60,11 +60,11 @@ func commandLineToArgvW(in string) ([]string, error) {
 	return args, nil
 }
 
-// Require registers the winlogbeat module that has utilities specific to
-// Winlogbeat like parsing Windows command lines. It can be accessed using:
+// Require registers the windows module that has utilities specific to
+// Windows like parsing Windows command lines. It can be accessed using:
 //
 //    // javascript
-//    var winlogbeat = require('winlogbeat');
+//    var windows = require('windows');
 //
 func Require(vm *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
@@ -74,9 +74,11 @@ func Require(vm *goja.Runtime, module *goja.Object) {
 
 // Enable adds path to the given runtime.
 func Enable(runtime *goja.Runtime) {
+	runtime.Set("windows", require.Require(runtime, "windows"))
 	runtime.Set("winlogbeat", require.Require(runtime, "winlogbeat"))
 }
 
 func init() {
+	require.RegisterNativeModule("windows", Require)
 	require.RegisterNativeModule("winlogbeat", Require)
 }

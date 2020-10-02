@@ -190,11 +190,11 @@ func (p *s3Input) Run() {
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
-		p.workerWg.Done()
 	})
 }
 
 func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
+	defer p.workerWg.Done()
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
