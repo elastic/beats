@@ -15,7 +15,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "INVITE sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Type: application/sdp\r\nContent-Length:   123\r\n\r\nv=0\r\no=- 42 42 IN IP4 10.0.2.20\r\ns=-\r\nc=IN IP4 10.0.2.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 5\r\na=rtpmap:5 DVI4/8000\r\na=recvonly\r\n",
-        "event.outcome": "success",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -26,9 +25,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.15",
+            "10.0.2.20"
+        ],
         "related.ip": [
             "10.0.2.20",
             "10.0.2.15"
+        ],
+        "related.user": [
+            "test",
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -71,7 +78,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_response",
+        "event.action": "sip_invite",
         "event.category": [
             "network",
             "protocol"
@@ -80,7 +87,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "SIP/2.0 100 Trying\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 INVITE\r\nUser-Agent: FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
+        "event.reason": "Trying",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -91,9 +98,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.20",
+            "10.0.2.15"
+        ],
         "related.ip": [
             "10.0.2.15",
             "10.0.2.20"
+        ],
+        "related.user": [
+            "sipp",
+            "test"
         ],
         "server.ip": "10.0.2.20",
         "server.port": 5060,
@@ -139,7 +154,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "ACK sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-5\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>;tag=e2jv529vDZ3eQ\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 ACK\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -150,9 +164,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.15",
+            "10.0.2.20"
+        ],
         "related.ip": [
             "10.0.2.20",
             "10.0.2.15"
+        ],
+        "related.user": [
+            "test",
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -203,7 +225,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "BYE sip:sipp@10.0.2.20:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.15;rport;branch=z9hG4bKDQ7XK6BBH57ya\r\nMax-Forwards: 70\r\nFrom: test <sip:test@10.0.2.15:5060>;tag=e2jv529vDZ3eQ\r\nTo: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 99750433 BYE\r\nUser-Agent: FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit\r\nAllow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY, PUBLISH, SUBSCRIBE\r\nSupported: timer, path, replaces\r\nReason: Q.850;cause=16;text=\"NORMAL_CLEARING\"\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
         "event.sequence": 99750433,
         "event.type": [
             "info"
@@ -214,9 +235,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.20",
+            "10.0.2.15"
+        ],
         "related.ip": [
             "10.0.2.15",
             "10.0.2.20"
+        ],
+        "related.user": [
+            "sipp",
+            "test"
         ],
         "server.ip": "10.0.2.20",
         "server.port": 5060,
@@ -288,7 +317,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "INVITE sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2189-1-0\r\nFrom: \"DVI4/16000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2189@10.0.2.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Type: application/sdp\r\nContent-Length:   124\r\n\r\nv=0\r\no=- 42 42 IN IP4 10.0.2.20\r\ns=-\r\nc=IN IP4 10.0.2.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 6\r\na=rtpmap:6 DVI4/16000\r\na=recvonly\r\n",
-        "event.outcome": "success",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -299,9 +327,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.15",
+            "10.0.2.20"
+        ],
         "related.ip": [
             "10.0.2.20",
             "10.0.2.15"
+        ],
+        "related.user": [
+            "test",
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -344,7 +380,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_response",
+        "event.action": "sip_invite",
         "event.category": [
             "network",
             "protocol"
@@ -353,7 +389,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "SIP/2.0 100 Trying\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2189-1-0\r\nFrom: \"DVI4/16000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2189@10.0.2.20\r\nCSeq: 1 INVITE\r\nUser-Agent: FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
+        "event.reason": "Trying",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -364,9 +400,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.20",
+            "10.0.2.15"
+        ],
         "related.ip": [
             "10.0.2.15",
             "10.0.2.20"
+        ],
+        "related.user": [
+            "sipp",
+            "test"
         ],
         "server.ip": "10.0.2.20",
         "server.port": 5060,
@@ -412,7 +456,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "ACK sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2189-1-5\r\nFrom: \"DVI4/16000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>;tag=FBcN7Xt0a8S1j\r\nCall-ID: 1-2189@10.0.2.20\r\nCSeq: 1 ACK\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
         "event.sequence": 1,
         "event.type": [
             "info"
@@ -423,9 +466,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.15",
+            "10.0.2.20"
+        ],
         "related.ip": [
             "10.0.2.20",
             "10.0.2.15"
+        ],
+        "related.user": [
+            "test",
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -476,7 +527,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "BYE sip:sipp@10.0.2.20:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.15;rport;branch=z9hG4bKe00pN1veeeyHp\r\nMax-Forwards: 70\r\nFrom: test <sip:test@10.0.2.15:5060>;tag=FBcN7Xt0a8S1j\r\nTo: \"DVI4/16000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nCall-ID: 1-2189@10.0.2.20\r\nCSeq: 99750437 BYE\r\nUser-Agent: FreeSWITCH-mod_sofia/1.6.12-20-b91a0a6~64bit\r\nAllow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY, PUBLISH, SUBSCRIBE\r\nSupported: timer, path, replaces\r\nReason: Q.850;cause=16;text=\"NORMAL_CLEARING\"\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
         "event.sequence": 99750437,
         "event.type": [
             "info"
@@ -487,9 +537,17 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "10.0.2.20",
+            "10.0.2.15"
+        ],
         "related.ip": [
             "10.0.2.15",
             "10.0.2.20"
+        ],
+        "related.user": [
+            "sipp",
+            "test"
         ],
         "server.ip": "10.0.2.20",
         "server.port": 5060,

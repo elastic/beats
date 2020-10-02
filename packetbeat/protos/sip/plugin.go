@@ -148,23 +148,21 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
 
 	var sipFields ProtocolFields
 	if m.isRequest {
-		populateRequestFields(m, &sipFields)
+		populateRequestFields(m, pbf, &sipFields)
 	} else {
 		populateResponseFields(m, &sipFields)
 	}
 
-	p.populateHeadersFields(m, &sipFields)
+	p.populateHeadersFields(m, pbf, &sipFields)
 
 	if p.parseBody {
-		populateBodyFields(m, &sipFields)
+		populateBodyFields(m, pbf, &sipFields)
 	}
 
 	pbf.Network.IANANumber = "17"
 	pbf.Network.Application = "sip"
 	pbf.Network.Protocol = "sip"
 	pbf.Network.Transport = "udp"
-
-	// pbf.Network.CommunityID  ?
 
 	src, dst := m.getEndpoints()
 	pbf.SetSource(src)
@@ -177,9 +175,9 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
 	return evt
 }
 
-func populateRequestFields(m *message, fields *ProtocolFields) {
+func populateRequestFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	fields.Type = "request"
-	fields.Method = m.method
+	fields.Method = bytes.ToUpper(m.method)
 	fields.URIOriginal = m.requestURI
 	scheme, username, host, port := parseURI(fields.URIOriginal)
 	fields.URIScheme = scheme
@@ -187,6 +185,8 @@ func populateRequestFields(m *message, fields *ProtocolFields) {
 	fields.URIUsername = username
 	fields.URIPort = port
 	fields.Version = m.version.String()
+	pbf.AddHost(string(host))
+	pbf.AddUser(string(username))
 }
 
 func populateResponseFields(m *message, fields *ProtocolFields) {
@@ -196,15 +196,15 @@ func populateResponseFields(m *message, fields *ProtocolFields) {
 	fields.Version = m.version.String()
 }
 
-func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
+func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	accept, found := m.headers["accept"]
 	if found && len(accept) > 0 {
-		fields.Accept = accept[0]
+		fields.Accept = bytes.ToLower(accept[0])
 	}
 	fields.Allow = m.allow
 	fields.CallID = m.callID
 	fields.ContentLength = m.contentLength
-	fields.ContentType = m.contentType
+	fields.ContentType = bytes.ToLower(m.contentType)
 	fields.MaxForwards = m.maxForwards
 	privateURI, found := m.headers["p-associated-uri"]
 	if found && len(privateURI) > 0 {
@@ -214,6 +214,8 @@ func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
 		fields.PrivateURIHost = host
 		fields.PrivateURIUsername = username
 		fields.PrivateURIPort = port
+		pbf.AddHost(string(host))
+		pbf.AddUser(string(username))
 	}
 	fields.Supported = m.supported
 	fields.UserAgentOriginal = m.userAgent
@@ -221,10 +223,10 @@ func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
 	cseqParts := bytes.Split(m.cseq, []byte(" "))
 	if len(cseqParts) == 2 {
 		fields.CseqCode, _ = strconv.Atoi(string(cseqParts[0]))
-		fields.CseqMethod = cseqParts[1]
+		fields.CseqMethod = bytes.ToUpper(cseqParts[1])
 	}
 
-	populateViaFields(m, fields)
+	populateViaFields(m, pbf, fields)
 
 	if len(m.from) > 0 {
 		displayInfo, uri, tag := parseFromTo(m.from)
@@ -236,6 +238,8 @@ func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
 		fields.FromURIHost = host
 		fields.FromURIUsername = username
 		fields.FromURIPort = port
+		pbf.AddHost(string(host))
+		pbf.AddUser(string(username))
 	}
 
 	if len(m.to) > 0 {
@@ -248,12 +252,14 @@ func (p *plugin) populateHeadersFields(m *message, fields *ProtocolFields) {
 		fields.ToURIHost = host
 		fields.ToURIUsername = username
 		fields.ToURIPort = port
+		pbf.AddHost(string(host))
+		pbf.AddUser(string(username))
 	}
 
-	populateContactFields(m, fields)
+	populateContactFields(m, pbf, fields)
 
 	if p.parseAuthorization {
-		populateAuthFields(m, fields)
+		populateAuthFields(m, pbf, fields)
 	}
 }
 
@@ -278,33 +284,38 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, sipFields Proto
 	}
 
 	pbf.Event.Action = func() string {
-		if !m.isRequest {
-			return "sip_response"
+		if m.isRequest {
+			return fmt.Sprintf("sip_%s", strings.ToLower(string(m.method)))
 		}
-		return fmt.Sprintf("sip_%s", strings.ToLower(string(m.method)))
+		return fmt.Sprintf("sip_%s", strings.ToLower(string(sipFields.CseqMethod)))
 	}()
 
 	pbf.Event.Outcome = func() string {
-		if m.statusCode < 400 {
-			return "success"
+		switch {
+		case m.statusCode < 200:
+			return ""
+		case m.statusCode > 299:
+			return "failure"
 		}
-		return "failure"
+		return "success"
 	}()
+
+	pbf.Event.Reason = string(sipFields.Status)
 }
 
-func populateViaFields(m *message, fields *ProtocolFields) {
+func populateViaFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	// TODO
 }
 
-func populateAuthFields(m *message, fields *ProtocolFields) {
+func populateAuthFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	// TODO
 }
 
-func populateContactFields(m *message, fields *ProtocolFields) {
+func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	// TODO
 }
 
-func populateBodyFields(m *message, fields *ProtocolFields) {
+func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	// TODO
 }
 

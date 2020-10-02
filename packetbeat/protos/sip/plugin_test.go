@@ -70,4 +70,3 @@ func TestParseFromTo(t *testing.T) {
 	assert.Equal(t, common.NetString("sip:matthew@mxtelecom.com"), uri)
 	assert.Equal(t, common.NetString(nil), tag)
 }
-

@@ -16,7 +16,6 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "REGISTER sip:sip.cybercity.dk SIP/2.0\r\nVia: SIP/2.0/UDP 192.168.1.2;branch=z9hG4bKnp112903503-43a64480192.168.1.2;rport\r\nFrom: <sip:voi18062@sip.cybercity.dk>;tag=6bac55c\r\nTo: <sip:voi18062@sip.cybercity.dk>\r\nCall-ID: 578222729-4665d775@578222732-4665d772\r\nContact:  <sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a>;expires=1200;q=0.500\r\nExpires: 1200\r\nCSeq: 75 REGISTER\r\nContent-Length: 0\r\nAuthorization: Digest username=\"voi18062\",realm=\"sip.cybercity.dk\",uri=\"sip:192.168.1.2\",nonce=\"1701b22972b90f440c3e4eb250842bb\",opaque=\"1701a1351f70795\",nc=\"00000001\",response=\"79a0543188495d288c9ebbe0c881abdc\"\r\nMax-Forwards: 70\r\nUser-Agent: Nero SIPPS IP Phone Version 2.0.51.16\r\n\r\n",
-        "event.outcome": "success",
         "event.sequence": 75,
         "event.type": [
             "info"
@@ -27,9 +26,15 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "sip.cybercity.dk"
+        ],
         "related.ip": [
             "192.168.1.2",
             "212.242.33.35"
+        ],
+        "related.user": [
+            "voi18062"
         ],
         "server.ip": "212.242.33.35",
         "server.port": 5060,
@@ -65,7 +70,7 @@
         "client.port": 5060,
         "destination.ip": "192.168.1.2",
         "destination.port": 5060,
-        "event.action": "sip_response",
+        "event.action": "sip_register",
         "event.category": [
             "network",
             "protocol"
@@ -74,7 +79,7 @@
         "event.duration": 0,
         "event.kind": "event",
         "event.original": "SIP/2.0 100 Trying\r\nCall-ID: 578222729-4665d775@578222732-4665d772\r\nCSeq: 75 REGISTER\r\nFrom: <sip:voi18062@sip.cybercity.dk>;tag=6bac55c\r\nTo: <sip:voi18062@sip.cybercity.dk>\r\nVia: SIP/2.0/UDP 192.168.1.2;received=80.230.219.70;rport=5060;branch=z9hG4bKnp112903503-43a64480192.168.1.2\r\nContent-Length: 0\r\n\r\n",
-        "event.outcome": "success",
+        "event.reason": "Trying",
         "event.sequence": 75,
         "event.type": [
             "info"
@@ -85,9 +90,15 @@
         "network.protocol": "sip",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.hosts": [
+            "sip.cybercity.dk"
+        ],
         "related.ip": [
             "212.242.33.35",
             "192.168.1.2"
+        ],
+        "related.user": [
+            "voi18062"
         ],
         "server.ip": "192.168.1.2",
         "server.port": 5060,
