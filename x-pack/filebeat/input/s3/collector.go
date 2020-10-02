@@ -94,8 +94,8 @@ var (
 )
 
 func (c *s3Collector) run() {
-	defer c.logger.Infof("s3 input worker for '%v' has stopped.", c.config.QueueURL)
-	c.logger.Infof("s3 input worker has started. with queueURL: %v", c.config.QueueURL)
+	defer c.logger.Info("s3 input worker has stopped.")
+	c.logger.Info("s3 input worker has started.")
 	for c.cancellation.Err() == nil {
 		// receive messages from sqs
 		output, err := c.receiveMessage(c.sqs, c.visibilityTimeout)
@@ -108,7 +108,7 @@ func (c *s3Collector) run() {
 		}
 
 		if output == nil || len(output.Messages) == 0 {
-			c.logger.Debug("no message received from SQS:", c.config.QueueURL)
+			c.logger.Debug("no message received from SQS")
 			continue
 		}
 

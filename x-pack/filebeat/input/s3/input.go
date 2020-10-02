@@ -49,18 +49,18 @@ func newInput(config config) (*s3Input, error) {
 	return &s3Input{config: config}, nil
 }
 
-func (inp *s3Input) Name() string { return inputName }
+func (in *s3Input) Name() string { return inputName }
 
-func (inp *s3Input) Test(ctx v2.TestContext) error {
-	_, err := awscommon.GetAWSCredentials(inp.config.AwsConfig)
+func (in *s3Input) Test(ctx v2.TestContext) error {
+	_, err := awscommon.GetAWSCredentials(in.config.AwsConfig)
 	if err != nil {
 		return fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
 	return nil
 }
 
-func (inp *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
-	collector, err := inp.createCollector(ctx, pipeline)
+func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
+	collector, err := in.createCollector(ctx, pipeline)
 	if err != nil {
 		return err
 	}
@@ -70,8 +70,8 @@ func (inp *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	return ctx.Cancelation.Err()
 }
 
-func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
-	log := ctx.Logger.With("queue_url", inp.config.QueueURL)
+func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
+	log := ctx.Logger.With("queue_url", in.config.QueueURL)
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
@@ -81,37 +81,33 @@ func (inp *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3
 		return nil, err
 	}
 
-	regionName, err := getRegionFromQueueURL(inp.config.QueueURL)
+	regionName, err := getRegionFromQueueURL(in.config.QueueURL)
 	if err != nil {
-		log.Errorf("failed to get region name from queueURL: %v", inp.config.QueueURL)
+		err := fmt.Errorf("getRegionFromQueueURL failed: %w", err)
+		log.Error(err)
+		return nil, err
 	} else {
 		log = log.With("region", regionName)
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(inp.config.AwsConfig)
+	awsConfig, err := awscommon.GetAWSCredentials(in.config.AwsConfig)
 	if err != nil {
 		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
 	awsConfig.Region = regionName
 
-	visibilityTimeout := int64(inp.config.VisibilityTimeout.Seconds())
+	visibilityTimeout := int64(in.config.VisibilityTimeout.Seconds())
 	log.Infof("visibility timeout is set to %v seconds", visibilityTimeout)
-	log.Infof("aws api timeout is set to %v", inp.config.APITimeout)
-
-	svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(inp.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
-	svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(inp.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
-
-	log.Infof("S3 input for '%v' is started.", inp.config.QueueURL)
-	defer log.Infof("S3 input for '%v' is started.", inp.config.QueueURL)
+	log.Infof("aws api timeout is set to %v", in.config.APITimeout)
 
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
-		config:            &inp.config,
+		config:            &in.config,
 		publisher:         client,
 		visibilityTimeout: visibilityTimeout,
-		sqs:               svcSQS,
-		s3:                svcS3,
+		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig)),
+		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "s3", regionName, awsConfig)),
 	}, nil
 }
 

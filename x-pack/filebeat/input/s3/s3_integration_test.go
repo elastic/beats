@@ -142,10 +142,6 @@ func runTest(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T,
 	run(t, collector, receiver)
 }
 
-type eventReceiver struct {
-	ch chan beat.Event
-}
-
 func TestS3Input(t *testing.T) {
 	runTest(t, defaultTestConfig(), false, func(t *testing.T, collector *s3Collector, receiver chan beat.Event) {
 		// upload a sample log file for testing
