@@ -39,7 +39,7 @@ func TestEventMapping(t *testing.T) {
 		Value: &metrics,
 	}
 	applicationId := "abc"
-	events := EventsMapping(result, applicationId)
+	events := EventsMapping(result, applicationId, "")
 	assert.Equal(t, len(events), 1)
 	for _, event := range events {
 		val1, _ := event.MetricSetFields.GetValue("start_date")

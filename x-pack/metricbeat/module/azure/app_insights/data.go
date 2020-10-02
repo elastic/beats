@@ -6,17 +6,36 @@ package app_insights
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/Azure/go-autorest/autorest/date"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-var segmentNames = []string{"request_name", "request_urlHost", "operation_name"}
+const aggsRegex = "_(?:sum|count|unique|avg|min|max)$"
+
+// segmentNames list is used to filter out the dimension from the api response. Based on the body format it is not possible to detect what was the segment selected
+var segmentNames = []string{
+	"request_source", "request_name", "request_url_host", "request_url_path", "request_success", "request_result_code", "request_performance_bucket", "operation_name", "operation_synthetic", "operation_synthetic_source", "user_authenticated", "application_version", "client_type", "client_model",
+	"client_os", "client_city", "client_state_or_province", "client_country_or_region", "client_browser", "cloud_role_name", "cloud_role_instance", "custom_dimensions__m_s_processedb_by_metric_extractors", "custom_dimensions_developer_mode",
+	"page_view_name", "page_view_url_path", "page_view_url_host", "page_view_performance_bucket", "custom_dimensions_ibiza_session_id", "custom_dimensions_part_instance", "browser_timing_name", "browser_timing_url_host", "browser_timing_url_path", "browser_timing_performance_bucket",
+	"trace_severity_level", "type", "custom_dimensions_agent_session", "custom_dimensions_agent_version", "custom_dimensions_machine_name", "custom_dimensions_running_mode", "custom_dimensions_source", "custom_dimensions_agent_assembly_version", "custom_dimensions_agent_process_session",
+	"custom_dimensions_hashed_machine_name",
+	"custom_dimensions_data_cube", "dependency_target", "dependency_type", "dependency_name", "dependency_success", "dependency_result_code", "dependency_performance_bucket", "custom_dimensions_container", "custom_dimensions_blob", "custom_dimensions_error_message",
+	"custom_event_name", "custom_dimensions_event_name", "custom_dimensions_page_title", "custom_dimensions_service_profiler_content", "custom_dimensions_executing_assembly_file_version", "custom_dimensions_service_profiler_version", "custom_dimensions_process_id", "custom_dimensions_request_id",
+	"custom_dimensions_running_session", "custom_dimensions_problem_id", "custom_dimensions_snapshot_context", "custom_dimensions_snapshot_version", "custom_dimensions_duration", "custom_dimensions_snapshot_id", "custom_dimensions_stamp_id", "custom_dimensions_de_optimization_id",
+	"custom_dimensions_method", "custom_dimensions_parent_process_id", "custom_dimensions_section", "custom_dimensions_configuration", "custom_dimensions_dump_folder", "custom_dimensions_reason", "custom_dimensions_extension_version", "custom_dimensions_site_name",
+	"availability_result_name", "availability_result_location", "availability_result_success", "custom_dimensions_full_test_result_available", "exception_problem_id", "exception_handled_at", "exception_type", "exception_assembly", "exception_method", "custom_dimensions_custom_perf_counter",
+	"exception_severity_level", "custom_dimensions_url", "custom_dimensions_ai.snapshot_stampid", "custom_dimensions_ai.snapshot_id", "custom_dimensions_ai.snapshot_version", "custom_dimensions_ai.snapshot_planid", "custom_dimensions__m_s_example", "custom_dimensions_s_a_origin_app_id",
+	"custom_dimensions_base_sdk_target_framework", "custom_dimensions_runtime_framework", "custom_dimensions__m_s_aggregation_interval_ms", "custom_dimensions_problem_id", "custom_dimensions_operation_name", "custom_dimensions_request_success", "custom_dimensions__MS.MetricId",
+	"custom_dimensions_dependency_success", "custom_dimensions__m_s_is_autocollected", "custom_dimensions_dependency_type", "performance_counter_name", "performance_counter_category", "performance_counter_counter", "performance_counter_instance", "custom_dimensions_counter_instance_name",
+}
 
 type MetricValue struct {
 	SegmentName map[string]string
@@ -95,7 +114,7 @@ func isSegment(metric string) bool {
 	return false
 }
 
-func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string) []mb.Event {
+func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
 	var events []mb.Event
 	if metricValues.Value == nil {
 		return events
@@ -113,7 +132,7 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 	}
 
 	for _, val := range groupedAddProp {
-		event := createNoSegEvent(val, applicationId)
+		event := createNoSegEvent(val, applicationId, namespace)
 		if len(event.MetricSetFields) > 0 {
 			events = append(events, event)
 		}
@@ -122,7 +141,7 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 		for _, seg := range val.Segments {
 			lastSeg := getValue(seg)
 			for _, ls := range lastSeg {
-				events = append(events, createSegEvent(val, ls, applicationId))
+				events = append(events, createSegEvent(val, ls, applicationId, namespace))
 			}
 		}
 	}
@@ -140,7 +159,7 @@ func getValue(metric MetricValue) []MetricValue {
 	return values
 }
 
-func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, applicationId string) mb.Event {
+func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, applicationId string, namespace string) mb.Event {
 	metricList := common.MapStr{}
 	for key, metric := range metricValue.Value {
 		metricList.Put(key, metric)
@@ -148,18 +167,7 @@ func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, appl
 	if len(metricList) == 0 {
 		return mb.Event{}
 	}
-	event := mb.Event{
-		ModuleFields: common.MapStr{},
-		MetricSetFields: common.MapStr{
-			"start_date":     parentMetricValue.Start,
-			"end_date":       parentMetricValue.End,
-			"application_id": applicationId,
-		},
-		Timestamp: parentMetricValue.End.Time,
-	}
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("cloud.provider", "azure")
-	event.MetricSetFields.Put("metrics", metricList)
+	event := createEvent(parentMetricValue.Start, parentMetricValue.End, applicationId, namespace, metricList)
 	if len(parentMetricValue.SegmentName) > 0 {
 		event.ModuleFields.Put("dimensions", parentMetricValue.SegmentName)
 	}
@@ -169,7 +177,29 @@ func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, appl
 	return event
 }
 
-func createNoSegEvent(values []MetricValue, applicationId string) mb.Event {
+func createEvent(start *date.Time, end *date.Time, applicationId string, namespace string, metricList common.MapStr) mb.Event {
+	event := mb.Event{
+		ModuleFields: common.MapStr{},
+		MetricSetFields: common.MapStr{
+			"start_date":     start,
+			"end_date":       end,
+			"application_id": applicationId,
+		},
+		Timestamp: end.Time,
+	}
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("cloud.provider", "azure")
+	if namespace == "" {
+		event.ModuleFields.Put("metrics", metricList)
+	} else {
+		for key, metric := range metricList {
+			event.MetricSetFields.Put(key, metric)
+		}
+	}
+	return event
+}
+
+func createNoSegEvent(values []MetricValue, applicationId string, namespace string) mb.Event {
 	metricList := common.MapStr{}
 	for _, value := range values {
 		for key, metric := range value.Value {
@@ -179,18 +209,8 @@ func createNoSegEvent(values []MetricValue, applicationId string) mb.Event {
 	if len(metricList) == 0 {
 		return mb.Event{}
 	}
-	event := mb.Event{
-		MetricSetFields: common.MapStr{
-			"start_date":     values[0].Start,
-			"end_date":       values[0].End,
-			"application_id": applicationId,
-		},
-		Timestamp: values[0].End.Time,
-	}
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("cloud.provider", "azure")
-	event.MetricSetFields.Put("metrics", metricList)
-	return event
+	return createEvent(values[0].Start, values[0].End, applicationId, namespace, metricList)
+
 }
 
 func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interface{} {
@@ -211,5 +231,19 @@ func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interfac
 }
 
 func cleanMetricNames(metric string) string {
-	return strings.Replace(metric, "/", "_", -1)
+	metric = strings.Replace(metric, "/", "_", -1)
+	metric = strings.Replace(metric, " ", "_", -1)
+	metric = azure.ReplaceUpperCase(metric)
+	obj := strings.Split(metric, ".")
+	for index := range obj {
+		// in some cases a trailing "_" is found
+		obj[index] = strings.TrimPrefix(obj[index], "_")
+		obj[index] = strings.TrimSuffix(obj[index], "_")
+	}
+	metric = strings.ToLower(strings.Join(obj, "_"))
+	aggsRegex := regexp.MustCompile(aggsRegex)
+	metric = aggsRegex.ReplaceAllStringFunc(metric, func(str string) string {
+		return strings.Replace(str, "_", ".", -1)
+	})
+	return metric
 }
