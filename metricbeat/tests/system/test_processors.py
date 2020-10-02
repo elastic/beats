@@ -27,7 +27,7 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 10)
+        self.assertGreater(len(output), 1)
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
@@ -37,9 +37,9 @@ class Test(metricbeat.BaseTest):
             'agent', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
-        cpu = evt["system"]["network"]
-        print(list(cpu.keys()))
-        self.assertCountEqual(self.de_dot(["name", "out"]), cpu.keys())
+        network = evt["system"]["network"]
+        print(list(network.keys()))
+        self.assertCountEqual(self.de_dot(["name", "out", "in"]), network.keys())
 
     def test_dropfields_with_condition(self):
         """
