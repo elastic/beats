@@ -326,7 +326,7 @@
             }
           }
         },
-        "title": "Application Controls [Metricbeat Azure] App State",
+        "title": "[Metricbeat Azure] App State Filters",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -397,7 +397,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Application Controls [Metricbeat Azure] App State",
+          "title": "[Metricbeat Azure] App State Filters",
           "type": "input_control_vis"
         }
       },
