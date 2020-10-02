@@ -345,7 +345,10 @@ def archiveTestOutput(Map args = [:]) {
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
       if (isUnix()) {
-        cmd(label: "Debug build folder ${args.id}", script: 'ls -ltrah && find . -name build -ls')
+        cmd(label: "Debug build folder ${args.id}", script: "echo ${args.id}; ls -ltrah && find . -name build -ls")
+        cmd(label: 'Delete folders that are causing no matches found within 10000',
+            returnStatus: true,
+            script: 'rm -rf ve || true; find . -type d -name vendor -delete')
       } else { log(level: 'INFO', text: "DEBUG build is disabled for non-unix") }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
