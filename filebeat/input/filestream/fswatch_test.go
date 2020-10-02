@@ -86,7 +86,7 @@ func TestFileScanner(t *testing.T) {
 			for p, _ := range files {
 				paths = append(paths, p)
 			}
-			assert.Equal(t, test.expectedFiles, paths)
+			assert.Equal(t, test.expectedFiles, paths, "Expected: %v Got: %v", test.expectedFiles, paths)
 		})
 	}
 }
@@ -238,7 +238,8 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 	}
 
 	go w.watch(ctx)
-	assert.Equal(t, loginp.FSEvent{Op: loginp.OpRename, OldPath: testPath, NewPath: renamedPath, Info: fi}, w.Event())
+	evt := w.Event()
+	assert.Equal(t, loginp.FSEvent{Op: loginp.OpRename, OldPath: testPath, NewPath: renamedPath, Info: fi}, evt, "Got event: %v", evt)
 }
 
 type mockScanner struct {
