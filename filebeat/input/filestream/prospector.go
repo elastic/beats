@@ -15,7 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package winlogbeat registers the winlogbeat module with the javascript script
-// processor. The module has utilities specific to Winlogbeat like parsing
-// Windows command lines.
-package winlogbeat
+package filestream
+
+import (
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+)
+
+// fileProspector implements the Prospector interface.
+// It contains a file scanner which returns file system events.
+// The FS events then trigger either new Harvester runs or updates
+// the statestore.
+type fileProspector struct{}
+
+func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.HarvesterGroup) {
+	panic("TODO: implement me")
+}
+
+func (p *fileProspector) Test() error {
+	panic("TODO: implement me")
+}

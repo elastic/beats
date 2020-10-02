@@ -12,7 +12,8 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
-    BASE_DIR = 'src/github.com/elastic/beats'
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
@@ -20,7 +21,9 @@ pipeline {
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     PIPELINE_LOG_LEVEL = 'INFO'
+    PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    SLACK_CHANNEL = "#beats-ci-builds"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -44,6 +47,7 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow arm stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {
     stage('Checkout') {
@@ -104,15 +108,8 @@ pipeline {
                 mapParallelTasks["${k}"] = v
               }
             }
+            notifyBuildReason()
             parallel(mapParallelTasks)
-          }
-        }
-      }
-      post {
-        always {
-          dir("${BASE_DIR}"){
-            // Archive the markdown files that contain the build reasons
-            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.md')
           }
         }
       }
@@ -120,10 +117,12 @@ pipeline {
   }
   post {
     always {
-      runbld()
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true)
+      notifyBuildResult(prComment: true, slackComment: true)
     }
   }
 }
@@ -355,7 +354,7 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, id: args.id)
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
@@ -367,50 +366,6 @@ def archiveTestOutput(Map args = [:]) {
         def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
-    }
-  }
-}
-
-/**
-* This method wraps the junit built-in step to archive the test reports that gonna be populated later on
-* with the runbld post build step.
-*/
-def junitAndStore(Map args = [:]) {
-  junit(args)
-  // args.id could be null in some cases, so let's use the currentmilliseconds
-  def stageName = args.id ? args.id?.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
-  stash(includes: args.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
-  stashedTestReports[stageName] = stageName
-}
-
-/**
-* This method populates the test output using the runbld approach. For such it requires the
-* global variable stashedTestReports.
-* TODO: should be moved to the shared library
-*/
-def runbld() {
-  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
-    if (stashedTestReports) {
-      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
-      deleteDir()
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      dir("${env.BASE_DIR}") {
-        // Unstash the test reports
-        stashedTestReports.each { k, v ->
-          dir(k) {
-            unstash(v)
-          }
-        }
-      }
-      sh(label: 'Process JUnit reports with runbld',
-        script: """\
-        ## for debugging purposes
-        find . -name "TEST-*.xml"
-        cat >./runbld-script <<EOF
-        echo "Processing JUnit reports with runbld..."
-        EOF
-        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
-        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }
@@ -595,6 +550,17 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
   } else {
     return false
+  }
+}
+
+/**
+* Notify the build reason.
+*/
+def notifyBuildReason() {
+  // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
+  archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
+  if (isPR()) {
+    echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
   }
 }
 
