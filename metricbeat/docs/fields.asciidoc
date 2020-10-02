@@ -24219,6 +24219,15 @@ Kibana module
 
 
 
+*`kibana.stats.usage.name`*::
++
+--
+type: alias
+
+alias to: kibana.stats.usage
+
+--
+
 [float]
 === stats
 
