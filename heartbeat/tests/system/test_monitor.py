@@ -258,10 +258,10 @@ class TestHTTPS(BaseTest):
 
         assert status_code == output["http.response.status_code"]
 
-        expiration_date = datetime.fromisoformat(
-            output["tls.server.x509.not_after"].replace("Z", ""))
-        current_date = datetime.fromisoformat(
-            output["@timestamp"].replace("Z", ""))
+        expiration_date = datetime.strptime(
+            output["tls.server.x509.not_after"].replace("Z", ""), "%Y-%m-%dT%H:%M:%S.%f")
+        current_date = datetime.strptime(
+            output["@timestamp"].replace("Z", ""), "%Y-%m-%dT%H:%M:%S.%f")
         time_to_expiry = output["tls.server.x509.time_to_expiry"]
 
         assert time_to_expiry == approx((expiration_date - current_date).total_seconds() * 1000)
