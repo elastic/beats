@@ -71,7 +71,8 @@ type callbackRetryWriter struct {
 	wrapped io.Writer
 
 	// The retry callback is called with the error that was produced and whether
-	// this is the first
+	// this is the first (subsequent) error arising from this particular
+	// write call.
 	retry func(err error, firstTime bool) bool
 }
 
