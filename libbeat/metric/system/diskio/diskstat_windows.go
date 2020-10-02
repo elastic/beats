@@ -42,7 +42,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 }
 
 // CloseSampling stub for linux implementation.
-func (stat *DiskIOStat) CloseSampling() {}
+func (stat *IOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
