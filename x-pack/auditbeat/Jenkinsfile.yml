@@ -22,7 +22,7 @@ stages:
           - "macosx"
         when:                  ## Override the top-level when.
             comments:
-                - "/test auditbeat for macos"
+                - "/test x-pack/auditbeat for macos"
             labels:
                 - "macOS"
             parameters:
