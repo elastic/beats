@@ -6,6 +6,9 @@
       type: group
       description: Information about SIP traffic.
       fields:
+      - name: timestamp
+        type: date_nanos
+        description: Timestamp with nano second precision.
       - name: code
         type: keyword
         description: Response status code.
@@ -94,164 +97,164 @@
         description: Via header transport.
       - name: via.sent_by.address
         type: keyword
-        description: ""
+        description: "Sent by address"
       - name: via.sent_by.port
         type: keyword
-        description: ""
+        description: "Sent by port"
       - name: via.received.address
         type: keyword
-        description: ""
+        description: "Received address"
       - name: via.port
         type: keyword
-        description: ""
+        description: "Via port"
       - name: via.branch
         type: keyword
-        description: ""
+        description: "Via branch"
       - name: to.display_info
         type: keyword
-        description: ""
+        description: "To display info"
       - name: to.uri.original
         type: keyword
-        description: ""
+        description: "To original URI"
         multi_fields:
           - name: text
             type: text
             analyzer: simple
       - name: to.uri.scheme
         type: keyword
-        description: ""
+        description: "To URI scheme"
       - name: to.uri.username
         type: keyword
-        description: ""
+        description: "To URI user name"
       - name: to.uri.host
         type: keyword
-        description: ""
+        description: "To URI host"
       - name: to.uri.port
         type: keyword
-        description: ""
+        description: "To URI port"
       - name: to.tag
         type: keyword
-        description: ""
+        description: "To tag"
       - name: from.display_info
         type: keyword
-        description: ""
+        description: "From display info"
       - name: from.uri.original
         type: keyword
-        description: ""
+        description: "From original URI"
         multi_fields:
           - name: text
             type: text
             analyzer: simple
       - name: from.uri.scheme
         type: keyword
-        description: ""
+        description: "From URI scheme"
       - name: from.uri.username
         type: keyword
-        description: ""
+        description: "From URI user name"
       - name: from.uri.host
         type: keyword
-        description: ""
+        description: "From URI host"
       - name: from.uri.port
         type: keyword
-        description: ""
+        description: "From URI port"
       - name: from.tag
         type: keyword
-        description: ""
+        description: "From tag"
       - name: contact.display_info
         type: keyword
-        description: ""
+        description: "Contact display info"
       - name: contact.uri.original
         type: keyword
-        description: ""
+        description: "Contact original URI"
         multi_fields:
           - name: text
             type: text
             analyzer: simple
       - name: contact.uri.scheme
         type: keyword
-        description: ""
+        description: "Contat URI scheme"
       - name: contact.uri.username
         type: keyword
-        description: ""
+        description: "Contact URI user name"
       - name: contact.uri.host
         type: keyword
-        description: ""
+        description: "Contact URI host"
       - name: contact.uri.port
         type: keyword
-        description: ""
+        description: "Contact URI port"
       - name: contact.transport
         type: keyword
-        description: ""
+        description: "Contact transport"
       - name: contact.line
         type: keyword
-        description: ""
+        description: "Contact line"
       - name: contact.expires
         type: keyword
-        description: ""
+        description: "Contact expires"
       - name: contact.q
         type: keyword
-        description: ""
+        description: "Contact Q"
       - name: auth.scheme
         type: keyword
-        description: ""
+        description: "Auth scheme"
       - name: auth.realm
         type: keyword
-        description: ""
+        description: "Auth realm"
       - name: auth.uri.original
         type: keyword
-        description: ""
+        description: "Auth original URI"
         multi_fields:
           - name: text
             type: text
             analyzer: simple
       - name: auth.uri.scheme
         type: keyword
-        description: ""
+        description: "Auth URI scheme"
       - name: auth.uri.host
         type: keyword
-        description: ""
+        description: "Auth URI host"
       - name: auth.uri.port
         type: keyword
-        description: ""
+        description: "Auth URI port"
       - name: sdp.version
         type: keyword
-        description: ""
+        description: "SDP version"
       - name: sdp.owner.username
         type: keyword
-        description: ""
+        description: "SDP owner user name"
       - name: sdp.owner.session_id
         type: keyword
-        description: ""
+        description: "SDP owner session ID"
       - name: sdp.owner.version
         type: keyword
-        description: ""
+        description: "SDP owner version"
       - name: sdp.owner.ip
-        type: keyword
-        description: ""
+        type: ip
+        description: "SDP owner IP"
       - name: sdp.session.name
         type: keyword
-        description: ""
+        description: "SDP session name"
       - name: sdp.connection.info
         type: keyword
-        description: ""
+        description: "SDP connection info"
       - name: sdp.connection.address
         type: keyword
-        description: ""
+        description: "SDP connection address"
       - name: sdp.start
-        type: keyword
-        description: ""
+        type: date
+        description: "SDP start date"
       - name: sdp.stop
-        type: keyword
-        description: ""
+        type: date
+        description: "SDP stop date"
       - name: sdp.media.description
         type: keyword
-        description: ""
+        description: "SDP media description"
       - name: sdp.media.port
         type: keyword
-        description: ""
+        description: "SDP media port"
       - name: sdp.media.format
         type: keyword
-        description: ""
+        description: "SDP media format"
       - name: sdp.media.attributes
         type: keyword
-        description: ""
+        description: "SDP media attributes"

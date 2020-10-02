@@ -1,123 +1,64 @@
 {
-  "@timestamp": "2018-05-27T07:45:15.115Z",
-  "transport": "udp",
-  "sip": {
-    "src": "192.168.122.1:5061",
-    "dst": "192.168.122.1:5060",
-    "cseq": "1 INVITE",
-    "call-id": "1-6831@127.0.1.1",
-    "raw": "INVITE sip:service@192.168.122.1:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 127.0.1.1:5061;branch=z9hG4bK-6831-1-0\r\nFrom: sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001\r\nTo: service <sip:service@192.168.122.1:5060>\r\nCall-ID: 1-6831@127.0.1.1\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@127.0.1.1:5061\r\nMax-Forwards: 70\r\nSubject: Performance Test\r\nContent-Type: application/sdp\r\nContent-Length:   129\r\n\r\nv=0\r\no=user1 53655765 2353687637 IN IP4 127.0.1.1\r\ns=-\r\nc=IN IP4 127.0.1.1\r\nt=0 0\r\nm=audio 6000 RTP/AVP 0\r\na=rtpmap:0 PCMU/8000\r\n",
-    "request-uri": "sip:service@192.168.122.1:5060",
-    "from": "sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001",
-    "body": {
-      "application/sdp": {
-        "c": [
-          "IN IP4 127.0.1.1"
-        ],
-        "t": [
-          "0 0"
-        ],
-        "m": [
-          "audio 6000 RTP/AVP 0"
-        ],
-        "a": [
-          "rtpmap:0 PCMU/8000"
-        ],
-        "v": [
-          "0"
-        ],
-        "o": [
-          "user1 53655765 2353687637 IN IP4 127.0.1.1"
-        ],
-        "s": [
-          "-"
-        ]
-      }
-    },
-    "request-uri-user": "service",
-    "request-uri-port": 5060,
-    "method": "INVITE",
-    "to": "service <sip:service@192.168.122.1:5060>",
-    "headers": {
-      "to": [
-        {
-          "port": 5060,
-          "raw": "service <sip:service@192.168.122.1:5060>",
-          "display": "service",
-          "user": "service",
-          "host": "192.168.122.1"
-        }
-      ],
-      "subject": [
-        {
-          "raw": "Performance Test"
-        }
-      ],
-      "content-length": [
-        {
-          "raw": "129",
-          "number": 129
-        }
-      ],
-      "cseq": [
-        {
-          "raw": "1 INVITE",
-          "number": 1,
-          "method": "INVITE"
-        }
-      ],
-      "content-type": [
-        {
-          "raw": "application/sdp"
-        }
-      ],
-      "from": [
-        {
-          "params": [
-            "tag=6831SIPpTag001"
-          ],
-          "raw": "sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001",
-          "display": "sipp",
-          "user": "sipp",
-          "host": "127.0.1.1",
-          "port": 5061
-        }
-      ],
-      "call-id": [
-        {
-          "raw": "1-6831@127.0.1.1"
-        }
-      ],
-      "via": [
-        {
-          "raw": "SIP/2.0/UDP 127.0.1.1:5061;branch=z9hG4bK-6831-1-0"
-        }
-      ],
-      "contact": [
-        {
-          "user": "sipp",
-          "host": "127.0.1.1",
-          "port": 5061,
-          "raw": "sip:sipp@127.0.1.1:5061"
-        }
-      ],
-      "max-forwards": [
-        {
-          "raw": "70",
-          "number": 70
-        }
-      ]
-    },
-    "request-uri-host": "192.168.122.1"
-  },
-  "type": "sip",
-  "unixtimenano": 1527407115115924000,
-  "beat": {
-    "name": "beathost",
-    "hostname": "beathost",
-    "version": "7.0.0-alpha1"
-  }
+    "@metadata.beat": "packetbeat",
+    "@metadata.type": "_doc",
+    "client.ip": "192.168.1.2",
+    "client.port": 5060,
+    "destination.ip": "212.242.33.35",
+    "destination.port": 5060,
+    "event.action": "sip_register",
+    "event.category": [
+        "network",
+        "protocol",
+        "authorization"
+    ],
+    "event.dataset": "sip",
+    "event.duration": 0,
+    "event.kind": "event",
+    "event.original": "REGISTER sip:sip.cybercity.dk SIP/2.0\r\nVia: SIP/2.0/UDP 192.168.1.2;branch=z9hG4bKnp112903503-43a64480192.168.1.2;rport\r\nFrom: <sip:voi18062@sip.cybercity.dk>;tag=6bac55c\r\nTo: <sip:voi18062@sip.cybercity.dk>\r\nCall-ID: 578222729-4665d775@578222732-4665d772\r\nContact:  <sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a>;expires=1200;q=0.500\r\nExpires: 1200\r\nCSeq: 75 REGISTER\r\nContent-Length: 0\r\nAuthorization: Digest username=\"voi18062\",realm=\"sip.cybercity.dk\",uri=\"sip:192.168.1.2\",nonce=\"1701b22972b90f440c3e4eb250842bb\",opaque=\"1701a1351f70795\",nc=\"00000001\",response=\"79a0543188495d288c9ebbe0c881abdc\"\r\nMax-Forwards: 70\r\nUser-Agent: Nero SIPPS IP Phone Version 2.0.51.16\r\n\r\n",
+    "event.sequence": 75,
+    "event.type": [
+        "info"
+    ],
+    "network.application": "sip",
+    "network.community_id": "1:dOa61R2NaaJsJlcFAiMIiyXX+Kk=",
+    "network.iana_number": "17",
+    "network.protocol": "sip",
+    "network.transport": "udp",
+    "network.type": "ipv4",
+    "related.hosts": [
+        "sip.cybercity.dk"
+    ],
+    "related.ip": [
+        "192.168.1.2",
+        "212.242.33.35"
+    ],
+    "related.user": [
+        "voi18062"
+    ],
+    "server.ip": "212.242.33.35",
+    "server.port": 5060,
+    "sip.call_id": "578222729-4665d775@578222732-4665d772",
+    "sip.cseq.code": 75,
+    "sip.cseq.method": "REGISTER",
+    "sip.from.tag": "6bac55c",
+    "sip.from.uri.host": "sip.cybercity.dk",
+    "sip.from.uri.original": "sip:voi18062@sip.cybercity.dk",
+    "sip.from.uri.scheme": "sip",
+    "sip.from.uri.username": "voi18062",
+    "sip.max_forwards": 70,
+    "sip.method": "REGISTER",
+    "sip.to.uri.host": "sip.cybercity.dk",
+    "sip.to.uri.original": "sip:voi18062@sip.cybercity.dk",
+    "sip.to.uri.scheme": "sip",
+    "sip.to.uri.username": "voi18062",
+    "sip.type": "request",
+    "sip.uri.host": "sip.cybercity.dk",
+    "sip.uri.original": "sip:sip.cybercity.dk",
+    "sip.uri.scheme": "sip",
+    "sip.user_agent.original": "Nero SIPPS IP Phone Version 2.0.51.16",
+    "sip.version": "2.0",
+    "source.ip": "192.168.1.2",
+    "source.port": 5060,
+    "status": "OK",
+    "type": "sip"
 }
-
-
-

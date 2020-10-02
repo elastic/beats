@@ -11695,6 +11695,15 @@ SIP-specific event fields.
 Information about SIP traffic.
 
 
+*`sip.timestamp`*::
++
+--
+Timestamp with nano second precision.
+
+type: date_nanos
+
+--
+
 *`sip.code`*::
 +
 --
@@ -11945,7 +11954,7 @@ type: keyword
 *`sip.via.sent_by.address`*::
 +
 --
-
+Sent by address
 
 type: keyword
 
@@ -11954,7 +11963,7 @@ type: keyword
 *`sip.via.sent_by.port`*::
 +
 --
-
+Sent by port
 
 type: keyword
 
@@ -11963,7 +11972,7 @@ type: keyword
 *`sip.via.received.address`*::
 +
 --
-
+Received address
 
 type: keyword
 
@@ -11972,7 +11981,7 @@ type: keyword
 *`sip.via.port`*::
 +
 --
-
+Via port
 
 type: keyword
 
@@ -11981,7 +11990,7 @@ type: keyword
 *`sip.via.branch`*::
 +
 --
-
+Via branch
 
 type: keyword
 
@@ -11990,7 +11999,7 @@ type: keyword
 *`sip.to.display_info`*::
 +
 --
-
+To display info
 
 type: keyword
 
@@ -11999,7 +12008,7 @@ type: keyword
 *`sip.to.uri.original`*::
 +
 --
-
+To original URI
 
 type: keyword
 
@@ -12015,7 +12024,7 @@ type: text
 *`sip.to.uri.scheme`*::
 +
 --
-
+To URI scheme
 
 type: keyword
 
@@ -12024,7 +12033,7 @@ type: keyword
 *`sip.to.uri.username`*::
 +
 --
-
+To URI user name
 
 type: keyword
 
@@ -12033,7 +12042,7 @@ type: keyword
 *`sip.to.uri.host`*::
 +
 --
-
+To URI host
 
 type: keyword
 
@@ -12042,7 +12051,7 @@ type: keyword
 *`sip.to.uri.port`*::
 +
 --
-
+To URI port
 
 type: keyword
 
@@ -12051,7 +12060,7 @@ type: keyword
 *`sip.to.tag`*::
 +
 --
-
+To tag
 
 type: keyword
 
@@ -12060,7 +12069,7 @@ type: keyword
 *`sip.from.display_info`*::
 +
 --
-
+From display info
 
 type: keyword
 
@@ -12069,7 +12078,7 @@ type: keyword
 *`sip.from.uri.original`*::
 +
 --
-
+From original URI
 
 type: keyword
 
@@ -12085,7 +12094,7 @@ type: text
 *`sip.from.uri.scheme`*::
 +
 --
-
+From URI scheme
 
 type: keyword
 
@@ -12094,7 +12103,7 @@ type: keyword
 *`sip.from.uri.username`*::
 +
 --
-
+From URI user name
 
 type: keyword
 
@@ -12103,7 +12112,7 @@ type: keyword
 *`sip.from.uri.host`*::
 +
 --
-
+From URI host
 
 type: keyword
 
@@ -12112,7 +12121,7 @@ type: keyword
 *`sip.from.uri.port`*::
 +
 --
-
+From URI port
 
 type: keyword
 
@@ -12121,7 +12130,7 @@ type: keyword
 *`sip.from.tag`*::
 +
 --
-
+From tag
 
 type: keyword
 
@@ -12130,7 +12139,7 @@ type: keyword
 *`sip.contact.display_info`*::
 +
 --
-
+Contact display info
 
 type: keyword
 
@@ -12139,7 +12148,7 @@ type: keyword
 *`sip.contact.uri.original`*::
 +
 --
-
+Contact original URI
 
 type: keyword
 
@@ -12155,7 +12164,7 @@ type: text
 *`sip.contact.uri.scheme`*::
 +
 --
-
+Contat URI scheme
 
 type: keyword
 
@@ -12164,7 +12173,7 @@ type: keyword
 *`sip.contact.uri.username`*::
 +
 --
-
+Contact URI user name
 
 type: keyword
 
@@ -12173,7 +12182,7 @@ type: keyword
 *`sip.contact.uri.host`*::
 +
 --
-
+Contact URI host
 
 type: keyword
 
@@ -12182,7 +12191,7 @@ type: keyword
 *`sip.contact.uri.port`*::
 +
 --
-
+Contact URI port
 
 type: keyword
 
@@ -12191,7 +12200,7 @@ type: keyword
 *`sip.contact.transport`*::
 +
 --
-
+Contact transport
 
 type: keyword
 
@@ -12200,7 +12209,7 @@ type: keyword
 *`sip.contact.line`*::
 +
 --
-
+Contact line
 
 type: keyword
 
@@ -12209,7 +12218,7 @@ type: keyword
 *`sip.contact.expires`*::
 +
 --
-
+Contact expires
 
 type: keyword
 
@@ -12218,7 +12227,7 @@ type: keyword
 *`sip.contact.q`*::
 +
 --
-
+Contact Q
 
 type: keyword
 
@@ -12227,7 +12236,7 @@ type: keyword
 *`sip.auth.scheme`*::
 +
 --
-
+Auth scheme
 
 type: keyword
 
@@ -12236,7 +12245,7 @@ type: keyword
 *`sip.auth.realm`*::
 +
 --
-
+Auth realm
 
 type: keyword
 
@@ -12245,7 +12254,7 @@ type: keyword
 *`sip.auth.uri.original`*::
 +
 --
-
+Auth original URI
 
 type: keyword
 
@@ -12261,7 +12270,7 @@ type: text
 *`sip.auth.uri.scheme`*::
 +
 --
-
+Auth URI scheme
 
 type: keyword
 
@@ -12270,7 +12279,7 @@ type: keyword
 *`sip.auth.uri.host`*::
 +
 --
-
+Auth URI host
 
 type: keyword
 
@@ -12279,7 +12288,7 @@ type: keyword
 *`sip.auth.uri.port`*::
 +
 --
-
+Auth URI port
 
 type: keyword
 
@@ -12288,7 +12297,7 @@ type: keyword
 *`sip.sdp.version`*::
 +
 --
-
+SDP version
 
 type: keyword
 
@@ -12297,7 +12306,7 @@ type: keyword
 *`sip.sdp.owner.username`*::
 +
 --
-
+SDP owner user name
 
 type: keyword
 
@@ -12306,7 +12315,7 @@ type: keyword
 *`sip.sdp.owner.session_id`*::
 +
 --
-
+SDP owner session ID
 
 type: keyword
 
@@ -12315,7 +12324,7 @@ type: keyword
 *`sip.sdp.owner.version`*::
 +
 --
-
+SDP owner version
 
 type: keyword
 
@@ -12324,16 +12333,16 @@ type: keyword
 *`sip.sdp.owner.ip`*::
 +
 --
+SDP owner IP
 
-
-type: keyword
+type: ip
 
 --
 
 *`sip.sdp.session.name`*::
 +
 --
-
+SDP session name
 
 type: keyword
 
@@ -12342,7 +12351,7 @@ type: keyword
 *`sip.sdp.connection.info`*::
 +
 --
-
+SDP connection info
 
 type: keyword
 
@@ -12351,7 +12360,7 @@ type: keyword
 *`sip.sdp.connection.address`*::
 +
 --
-
+SDP connection address
 
 type: keyword
 
@@ -12360,25 +12369,25 @@ type: keyword
 *`sip.sdp.start`*::
 +
 --
+SDP start date
 
-
-type: keyword
+type: date
 
 --
 
 *`sip.sdp.stop`*::
 +
 --
+SDP stop date
 
-
-type: keyword
+type: date
 
 --
 
 *`sip.sdp.media.description`*::
 +
 --
-
+SDP media description
 
 type: keyword
 
@@ -12387,7 +12396,7 @@ type: keyword
 *`sip.sdp.media.port`*::
 +
 --
-
+SDP media port
 
 type: keyword
 
@@ -12396,7 +12405,7 @@ type: keyword
 *`sip.sdp.media.format`*::
 +
 --
-
+SDP media format
 
 type: keyword
 
@@ -12405,7 +12414,7 @@ type: keyword
 *`sip.sdp.media.attributes`*::
 +
 --
-
+SDP media attributes
 
 type: keyword
 
