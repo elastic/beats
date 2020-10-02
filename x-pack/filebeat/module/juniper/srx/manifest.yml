@@ -4,7 +4,7 @@ var:
   - name: syslog_host
     default: localhost
   - name: tags
-    default: [juniper-srx, forwarded]
+    default: ["juniper.srx", "forwarded"]
   - name: syslog_port
     default: 9006
   - name: input

@@ -7,6 +7,7 @@
         "destination.as.organization.name": "Beijing Baidu Netcom Science and Technology Co., Ltd.",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "HK",
+        "destination.geo.country_name": "Hong Kong",
         "destination.geo.location.lat": 22.25,
         "destination.geo.location.lon": 114.1667,
         "destination.ip": "103.235.46.39",
@@ -48,7 +49,8 @@
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -61,6 +63,7 @@
         "destination.as.organization.name": "Zayo Bandwidth",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "216.200.241.66",
@@ -98,7 +101,8 @@
         "source.port": 1402,
         "source.user.name": "user02",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "www.checkpoint.com",
         "url.path": "/css/homepage2012.css"
@@ -147,12 +151,14 @@
         "source.as.organization.name": "Hetzner Online GmbH",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 51.2993,
         "source.geo.location.lon": 9.491,
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -196,12 +202,14 @@
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "74.125.155.147",
         "source.port": 80,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -241,7 +249,8 @@
         "source.ip": "10.2.1.101",
         "source.port": 80,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -283,7 +292,8 @@
         "source.ip": "10.10.10.1",
         "source.user.name": "user01",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -333,7 +343,8 @@
         "source.port": 58071,
         "source.user.name": "user01@testuser.com",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -344,6 +355,7 @@
         "destination.as.organization.name": "Beijing Baidu Netcom Science and Technology Co., Ltd.",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "HK",
+        "destination.geo.country_name": "Hong Kong",
         "destination.geo.location.lat": 22.25,
         "destination.geo.location.lon": 114.1667,
         "destination.ip": "103.235.46.39",
@@ -385,7 +397,8 @@
         "source.port": 58071,
         "source.user.name": "user01",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "www.baidu.com",
         "url.path": "/"
@@ -434,12 +447,14 @@
         "source.as.organization.name": "Hetzner Online GmbH",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 51.2993,
         "source.geo.location.lon": 9.491,
         "source.ip": "188.40.238.250",
         "source.port": 80,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "EICAR-Test-File"
     },
@@ -451,6 +466,7 @@
         "destination.as.organization.name": "Cloudflare, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.26.15.142",
@@ -492,7 +508,8 @@
         "source.ip": "10.1.1.100",
         "source.port": 58974,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "datawrapper.dwcdn.net",
         "url.path": "/"
@@ -505,6 +522,7 @@
         "destination.as.organization.name": "myLoc managed IT AG",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "85.114.159.93",
@@ -549,7 +567,8 @@
         "source.ip": "10.1.1.100",
         "source.port": 59075,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "dsp.adfarm1.adition.com",
         "url.path": "/"
@@ -598,12 +617,14 @@
         "source.as.organization.name": "Akamai Technologies, Inc.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "NL",
+        "source.geo.country_name": "Netherlands",
         "source.geo.location.lat": 52.3824,
         "source.geo.location.lon": 4.8995,
         "source.ip": "23.209.86.45",
         "source.port": 80,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     }
 ]

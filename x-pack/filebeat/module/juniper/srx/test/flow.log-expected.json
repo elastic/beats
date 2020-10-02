@@ -59,7 +59,8 @@
         "source.nat.port": 594,
         "source.port": 594,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -114,7 +115,8 @@
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -125,6 +127,7 @@
         "destination.as.organization.name": "Telefonica Germany",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "5.6.7.8",
@@ -171,6 +174,7 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
@@ -178,7 +182,8 @@
         "source.ip": "1.2.3.4",
         "source.port": 56639,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -193,6 +198,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "5.6.7.8",
@@ -255,6 +261,7 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
@@ -265,7 +272,8 @@
         "source.packets": 1,
         "source.port": 63456,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -275,6 +283,7 @@
         "client.port": 24065,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "30.0.0.100",
@@ -326,6 +335,7 @@
         "service.type": "juniper",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "50.0.0.100",
@@ -333,7 +343,8 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -343,6 +354,7 @@
         "client.port": 1,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "198.51.100.12",
@@ -397,7 +409,8 @@
         "source.nat.port": 1,
         "source.port": 1,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -410,6 +423,7 @@
         "destination.bytes": 84,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "198.51.100.12",
@@ -475,7 +489,8 @@
         "source.packets": 1,
         "source.port": 1,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -490,6 +505,7 @@
         "destination.bytes": 535,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.23.224.110",
@@ -564,7 +580,8 @@
         "source.packets": 6,
         "source.port": 47776,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -638,7 +655,8 @@
         "source.packets": 13,
         "source.port": 53232,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -653,6 +671,7 @@
         "destination.bytes": 136,
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "IN",
+        "destination.geo.country_name": "India",
         "destination.geo.location.lat": 20.0,
         "destination.geo.location.lon": 77.0,
         "destination.ip": "58.68.126.198",
@@ -719,6 +738,7 @@
         "source.geo.city_name": "Seogwipo",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "KR",
+        "source.geo.country_name": "South Korea",
         "source.geo.location.lat": 33.2486,
         "source.geo.location.lon": 126.5628,
         "source.geo.region_iso_code": "KR-49",
@@ -729,7 +749,8 @@
         "source.packets": 1,
         "source.port": 52890,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -744,6 +765,7 @@
         "destination.bytes": 116,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -811,7 +833,8 @@
         "source.packets": 1,
         "source.port": 62047,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -888,7 +911,8 @@
         "source.packets": 0,
         "source.port": 9057,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -900,6 +924,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "207.17.137.56",
@@ -954,6 +979,7 @@
         "source.geo.city_name": "Plymouth",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 42.3695,
         "source.geo.location.lon": -83.4769,
         "source.geo.region_iso_code": "US-MI",
@@ -963,7 +989,8 @@
         "source.nat.port": 14406,
         "source.port": 3129,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -978,6 +1005,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "207.17.137.56",
@@ -1041,6 +1069,7 @@
         "source.geo.city_name": "Plymouth",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 42.3695,
         "source.geo.location.lon": -83.4769,
         "source.geo.region_iso_code": "US-MI",
@@ -1051,7 +1080,8 @@
         "source.packets": 1,
         "source.port": 3129,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1066,6 +1096,7 @@
         "destination.bytes": 104,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "207.17.137.56",
@@ -1131,6 +1162,7 @@
         "source.geo.city_name": "Plymouth",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 42.3695,
         "source.geo.location.lon": -83.4769,
         "source.geo.region_iso_code": "US-MI",
@@ -1141,7 +1173,8 @@
         "source.packets": 3,
         "source.port": 3129,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1156,6 +1189,7 @@
         "destination.bytes": 686432,
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "SY",
+        "destination.geo.country_name": "Syria",
         "destination.geo.location.lat": 35.0,
         "destination.geo.location.lon": 38.0,
         "destination.ip": "5.0.0.1",
@@ -1223,6 +1257,7 @@
         "source.bytes": 19592,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.0.0.1",
@@ -1232,7 +1267,8 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1244,6 +1280,7 @@
         "destination.as.organization.name": "Syrian Telecom",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "SY",
+        "destination.geo.country_name": "Syria",
         "destination.geo.location.lat": 35.0,
         "destination.geo.location.lon": 38.0,
         "destination.ip": "5.0.0.1",
@@ -1305,6 +1342,7 @@
         "source.as.organization.name": "Level 3 Parent, LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.0.0.1",
@@ -1313,7 +1351,8 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1328,6 +1367,7 @@
         "destination.bytes": 646,
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "SY",
+        "destination.geo.country_name": "Syria",
         "destination.geo.location.lat": 35.0,
         "destination.geo.location.lon": 38.0,
         "destination.ip": "5.0.0.1",
@@ -1394,6 +1434,7 @@
         "source.bytes": 392,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.0.0.1",
@@ -1403,7 +1444,8 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1413,6 +1455,7 @@
         "client.port": 24065,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "30.0.0.100",
@@ -1464,6 +1507,7 @@
         "service.type": "juniper",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "50.0.0.100",
@@ -1471,7 +1515,8 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1526,7 +1571,8 @@
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1541,6 +1587,7 @@
         "destination.bytes": 646,
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "SY",
+        "destination.geo.country_name": "Syria",
         "destination.geo.location.lat": 35.0,
         "destination.geo.location.lon": 38.0,
         "destination.ip": "5.0.0.1",
@@ -1607,6 +1654,7 @@
         "source.bytes": 392,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.0.0.1",
@@ -1616,7 +1664,8 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1632,6 +1681,7 @@
         "destination.geo.city_name": "Philippsburg",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 49.2317,
         "destination.geo.location.lon": 8.4607,
         "destination.geo.region_iso_code": "DE-BW",
@@ -1700,7 +1750,8 @@
         "source.packets": 42,
         "source.port": 58943,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1716,6 +1767,7 @@
         "destination.geo.city_name": "Bratislava",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SK",
+        "destination.geo.country_name": "Slovakia",
         "destination.geo.location.lat": 48.15,
         "destination.geo.location.lon": 17.1078,
         "destination.geo.region_iso_code": "SK-BL",
@@ -1794,7 +1846,8 @@
         "source.packets": 161,
         "source.port": 64720,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1806,6 +1859,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1865,7 +1919,8 @@
         "source.nat.port": 30838,
         "source.port": 49583,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -1880,6 +1935,7 @@
         "destination.bytes": 82,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1950,7 +2006,8 @@
         "source.packets": 1,
         "source.port": 63381,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     }
 ]

@@ -77,7 +77,8 @@
         "source.port": 12345,
         "source.user.name": "unknown-user",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -158,7 +159,8 @@
         "source.port": 12345,
         "source.user.name": "unknown-user",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -236,7 +238,8 @@
         "source.packets": 0,
         "source.port": 45610,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -314,7 +317,8 @@
         "source.packets": 0,
         "source.port": 45610,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -363,7 +367,8 @@
         "server.port": 80,
         "service.type": "juniper",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -426,7 +431,8 @@
         "source.ip": "192.168.14.214",
         "source.port": 50825,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -489,7 +495,8 @@
         "source.ip": "193.168.14.214",
         "source.port": 50825,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     }
 ]

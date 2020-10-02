@@ -8,6 +8,7 @@
         "destination.geo.city_name": "Juazeiro do Norte",
         "destination.geo.continent_name": "South America",
         "destination.geo.country_iso_code": "BR",
+        "destination.geo.country_name": "Brazil",
         "destination.geo.location.lat": -7.1467,
         "destination.geo.location.lon": -39.247,
         "destination.geo.region_iso_code": "BR-CE",
@@ -57,7 +58,8 @@
         "source.port": 57116,
         "source.user.name": "user1",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ],
         "url.domain": "www.mytest.com"
     },
@@ -100,7 +102,8 @@
         "source.ip": "192.0.2.0",
         "source.user.name": "admin",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -142,7 +145,8 @@
         "source.domain": "host.example.com",
         "source.ip": "192.0.2.0",
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     },
     {
@@ -197,12 +201,14 @@
         "source.domain": "dummy_host",
         "source.geo.continent_name": "Oceania",
         "source.geo.country_iso_code": "AU",
+        "source.geo.country_name": "Australia",
         "source.geo.location.lat": -33.494,
         "source.geo.location.lon": 143.2104,
         "source.ip": "1.1.1.1",
         "source.port": 60148,
         "tags": [
-            "juniper-srx forwarded"
+            "juniper.srx",
+            "forwarded"
         ]
     }
 ]
