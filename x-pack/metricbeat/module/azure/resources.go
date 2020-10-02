@@ -27,6 +27,7 @@ type VmResource struct {
 	Size string
 	Id   string
 	Name string
+	AZ   string
 }
 
 // Metric will contain the main azure metric details
