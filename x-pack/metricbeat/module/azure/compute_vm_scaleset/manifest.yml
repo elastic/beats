@@ -12,8 +12,10 @@ input:
       - name: ["CPU Credits Remaining", "CPU Credits Consumed", "OS Per Disk Read Bytes/sec", "OS Per Disk Write Bytes/sec", "OS Per Disk Read Operations/Sec", "OS Per Disk Write Operations/Sec", "OS Per Disk QD"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
         timegrain: "PT5M"
+        ignore_unsupported: true
       - name: ["Per Disk Read Bytes/sec", "Per Disk Write Bytes/sec", "Per Disk Read Operations/Sec", "Per Disk Write Operations/Sec", "Per Disk QD"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
           - name: "SlotId"
@@ -24,6 +26,7 @@ input:
       "Premium Data Disk Cache Read Hit", "Outbound Flows Maximum Creation Rate", "Inbound Flows Maximum Creation Rate", "Outbound Flows", "Inbound Flows", "OS Disk IOPS Consumed Percentage", "OS Disk Bandwidth Consumed Percentage",
       "OS Disk Queue Depth", "OS Disk Write Operations/Sec", "OS Disk Read Operations/Sec", "OS Disk Write Bytes/sec", "OS Disk Read Bytes/sec", "Data Disk IOPS Consumed Percentage"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
           - name: "VMName"
@@ -40,9 +43,11 @@ input:
       metrics:
       - name: ["CPU Credits Remaining", "CPU Credits Consumed", "OS Per Disk Read Bytes/sec", "OS Per Disk Write Bytes/sec", "OS Per Disk Read Operations/Sec", "OS Per Disk Write Operations/Sec", "OS Per Disk QD"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
         timegrain: "PT5M"
       - name: ["Per Disk Read Bytes/sec", "Per Disk Write Bytes/sec", "Per Disk Read Operations/Sec", "Per Disk Write Operations/Sec", "Per Disk QD"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
           - name: "SlotId"
@@ -53,6 +58,7 @@ input:
                  "Premium Data Disk Cache Read Hit", "Outbound Flows Maximum Creation Rate", "Inbound Flows Maximum Creation Rate", "Outbound Flows", "Inbound Flows", "OS Disk IOPS Consumed Percentage", "OS Disk Bandwidth Consumed Percentage",
                  "OS Disk Queue Depth", "OS Disk Write Operations/Sec", "OS Disk Read Operations/Sec", "OS Disk Write Bytes/sec", "OS Disk Read Bytes/sec", "Data Disk IOPS Consumed Percentage"]
         namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
           - name: "VMName"
