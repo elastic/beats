@@ -10,6 +10,7 @@ from beat.beat import INTEGRATION_TESTS
 # default limit.
 index_pattern_size_limit = 10 * 1024 * 1024
 
+
 class TestExportsMixin:
 
     def run_export_cmd(self, cmd, extra=[]):
