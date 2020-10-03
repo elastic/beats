@@ -106,9 +106,9 @@ By configuring Heartbeat with the location of the server you will allow the
 Uptime application to display location specific information on a map, and 
 allow the Uptime anomaly detection to detect anomalies based on location.
 
-To configure the location of a Heartbeat instance, in +{beatname_lc}.yml+,
-modify the `add_observer_metadata` processor.  The following example 
-specifies the `geo.name` of the `add_observer_metadata` processor as
+To configure the location of a Heartbeat instance, modify the 
+`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
+example specifies the `geo.name` of the `add_observer_metadata` processor as
 `us-east-1a`:
 
 [source,yaml]
