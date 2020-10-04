@@ -1,8 +1,9 @@
-{{ if eq .input "syslog" }}
+{{ if eq .input "s3" }}
 
-type: udp
-udp:
-host: "{{.syslog_host}}:{{.syslog_port}}"
+type: s3
+queue_url: {{ .queue_url }}
+access_key_id: {{ .access_key_id }}
+secret_access_key: {{ .secret_access_key }}
 
 {{ else if eq .input "file" }}
 
@@ -15,12 +16,8 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
-publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
-
 processors:
-  - add_locale: ~
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.5.0
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.6.0
