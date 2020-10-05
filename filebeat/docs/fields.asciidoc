@@ -1888,6 +1888,46 @@ type: keyword
 
 --
 
+*`aws.elb.target_port`*::
++
+--
+List of IP addresses and ports for the targets that processed this request.
+
+
+type: keyword
+
+--
+
+*`aws.elb.target_status_code`*::
++
+--
+List of status codes from the responses of the targets.
+
+
+type: keyword
+
+--
+
+*`aws.elb.classification`*::
++
+--
+The classification for desync mitigation.
+
+
+type: keyword
+
+--
+
+*`aws.elb.classification_reason`*::
++
+--
+The classification reason code.
+
+
+type: keyword
+
+--
+
 [float]
 === s3access
 
