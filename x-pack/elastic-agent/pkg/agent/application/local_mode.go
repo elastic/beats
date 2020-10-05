@@ -112,6 +112,7 @@ func newLocal(
 	emit, err := emitter(
 		localApplication.bgContext,
 		log,
+		agentInfo,
 		composableCtrl,
 		router,
 		&configModifiers{
