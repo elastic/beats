@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "app_state": {
+            "end_date": "2020-10-02T13:23:11.221Z",
+            "requests_count": {
+                "sum": 16
+            },
+            "start_date": "2020-10-01T13:23:11.221Z"
+        },
+        "application_id": "42cb59a9-d5be-400b-a5c4-69b0a00434fdf4",
+        "dimensions": {
+            "request_name": "GET /auth",
+            "request_url_host": "demoapplogobs.azurewebsites.net"
+        }
+    },
+    "cloud": {
+        "provider": "azure"
+    },
+    "event": {
+        "dataset": "azure.app_state",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "app_state",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}
