@@ -1,34 +1,148 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2020-10-05T15:07:19.603Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
     },
-    "event": {
-        "dataset": "logstash.node.stats",
-        "duration": 115000,
-        "module": "logstash"
+    "metricset": {
+        "name": "node_stats",
+        "period": 10000
     },
     "logstash": {
         "node": {
             "stats": {
+                "queue": {
+                    "events_count": 0
+                },
                 "events": {
-                    "filtered": 0,
+                    "duration_in_millis": 0,
                     "in": 0,
+                    "filtered": 0,
                     "out": 0
-                }
+                },
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection_count": 5,
+                                "collection_time_in_millis": 1177
+                            },
+                            "young": {
+                                "collection_count": 15,
+                                "collection_time_in_millis": 407
+                            }
+                        }
+                    },
+                    "mem": {
+                        "heap_max_in_bytes": 1.037959168e+09,
+                        "heap_used_in_bytes": 2.02339024e+08,
+                        "heap_used_percent": 19
+                    },
+                    "uptime_in_millis": 4.602954e+06
+                },
+                "reloads": {
+                    "failures": 0,
+                    "successes": 0
+                },
+                "process": {
+                    "open_file_descriptors": 229,
+                    "max_file_descriptors": 1.048576e+06,
+                    "cpu": {
+                        "percent": 0
+                    }
+                },
+                "os": {
+                    "cpu": {
+                        "percent": 0,
+                        "load_average": {
+                            "1m": 1.96,
+                            "5m": 1.76,
+                            "15m": 1.81
+                        }
+                    },
+                    "cgroup": {
+                        "cpuacct": {
+                            "control_group": "/",
+                            "usage_nanos": 8.9799096638e+11
+                        },
+                        "cpu": {
+                            "stat": {
+                                "time_throttled_nanos": 0,
+                                "number_of_elapsed_periods": 0,
+                                "number_of_times_throttled": 0
+                            },
+                            "control_group": "/"
+                        }
+                    }
+                },
+                "pipelines": [
+                    {
+                        "id": "main",
+                        "hash": "3000c3abf87d4dfa4a57aaf6af0a1f5bee2e0fc1c48a8e8636e2a33d7d2e91dd",
+                        "ephemeral_id": "2c607fe3-0d89-4506-8fe8-32180d201e48",
+                        "events": {
+                            "queue_push_duration_in_millis": 0,
+                            "duration_in_millis": 0,
+                            "filtered": 0,
+                            "in": 0,
+                            "out": 0
+                        },
+                        "reloads": {
+                            "successes": 0,
+                            "failures": 0
+                        },
+                        "queue": {
+                            "events_count": 0,
+                            "max_queue_size_in_bytes": 0,
+                            "queue_size_in_bytes": 0,
+                            "type": "memory"
+                        },
+                        "vertices": null
+                    }
+                ],
+                "logstash": {
+                    "snapshot": true,
+                    "http_address": "0.0.0.0:9600",
+                    "uuid": "4cc683ce-3ddc-46e3-bea3-aefbf37bc082",
+                    "ephemeral_id": "94b3a942-8dff-4cfb-8ba2-51672230b903",
+                    "name": "2cb47f6e0eab",
+                    "host": "2cb47f6e0eab",
+                    "version": "8.0.0",
+                    "status": "green",
+                    "pipeline": {
+                        "batch_size": 125,
+                        "workers": 12
+                    }
+                },
+                "timestamp": "2020-10-05T15:07:19.613Z"
             }
         }
     },
-    "metricset": {
-        "name": "node_stats"
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "version": "8.0.0",
+        "ephemeral_id": "41749b5d-ffb6-4ae0-9626-4673ce48ae7c",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro"
+    },
+    "ecs": {
+        "version": "1.5.0"
     },
     "service": {
-        "address": "127.0.0.1:9600",
-        "hostname": "Shaunaks-MBP-2.attlocal.net",
-        "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
-        "name": "logstash",
+        "hostname": "2cb47f6e0eab",
+        "version": "8.0.0",
+        "address": "localhost:9600",
         "type": "logstash",
-        "version": "7.0.0"
+        "name": "logstash",
+        "id": ""
+    },
+    "event": {
+        "dataset": "logstash.node.stats",
+        "module": "logstash",
+        "duration": 10447360
     }
 }

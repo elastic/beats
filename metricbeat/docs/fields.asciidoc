@@ -28524,6 +28524,201 @@ Logstash module
 
 
 
+
+*`logstash.stats.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+
+
+*`logstash.stats.jvm.mem.heap_used`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
+
+--
+
+*`logstash.stats.jvm.mem.heap_max`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
+
+--
+
+*`logstash.stats.jvm.uptime`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.jvm.uptime_in_millis
+
+--
+
+
+*`logstash.stats.events.in`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.in
+
+--
+
+*`logstash.stats.events.out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.out
+
+--
+
+*`logstash.stats.events.duration.ms`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.events.duration_in_millis
+
+--
+
+
+*`logstash.stats.logstash.uuid`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.uuid
+
+--
+
+*`logstash.stats.logstash.version`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.version
+
+--
+
+
+
+
+*`logstash.stats.os.cpu.load_average.15m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cpu.load_average.15m
+
+--
+
+*`logstash.stats.os.cpu.load_average.1m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cpu.load_average.1m
+
+--
+
+*`logstash.stats.os.cpu.load_average.5m`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cpu.load_average.5m
+
+--
+
+
+*`logstash.stats.os.cgroup.cpuacct.usage_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cgroup.cpuacct.usage_nanos
+
+--
+
+
+
+*`logstash.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cgroup.cpu.number_of_elapsed_periods
+
+--
+
+*`logstash.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cgroup.cpu.time_throttled_nanos
+
+--
+
+*`logstash.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.logstash.os.cgroup.cpu.number_of_times_throttled
+
+--
+
+
+*`logstash.stats.process.cpu.percent`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.cpu.percent
+
+--
+
+
+*`logstash.stats.queue.events_count`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.queue.events_count
+
+--
+
+
+
+*`logstash.state.pipeline.id`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.main.id
+
+--
+
+*`logstash.state.pipeline.hash`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.main.hash
+
+--
+
 [float]
 === node
 
@@ -28591,6 +28786,38 @@ node_stats metrics.
 
 
 
+
+*`logstash.node.stats.jvm.uptime_in_millis`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`logstash.node.stats.jvm.mem.heap_used_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.jvm.mem.heap_max_in_bytes`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
 [float]
 === events
 
@@ -28625,6 +28852,144 @@ Filtered events counter.
 
 
 type: long
+
+--
+
+
+*`logstash.node.stats.logstash.uuid`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+*`logstash.node.stats.logstash.version`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+
+
+
+*`logstash.node.stats.os.cpu.load_average.15m`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.os.cpu.load_average.1m`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.os.cpu.load_average.5m`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`logstash.node.stats.os.cgroup.cpuact.usage_nanos`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+*`logstash.node.stats.process.cpu.percent`*::
++
+--
+TODO
+
+
+type: double
+
+--
+
+*`logstash.node.stats.queue.events_count`*::
++
+--
+TODO
+
+
+type: long
+
+--
+
+
+*`logstash.node.stats.pipelines.main.id`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+*`logstash.node.stats.pipelines.main.hash`*::
++
+--
+TODO
+
+
+type: keyword
 
 --
 

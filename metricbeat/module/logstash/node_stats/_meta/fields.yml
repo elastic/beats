@@ -4,6 +4,24 @@
     node_stats metrics.
   release: ga
   fields:
+    - name: jvm
+      type: group
+      fields:
+        - name: uptime_in_millis
+          type: long
+          description: >
+            TODO
+        - name: mem
+          type: group
+          fields:
+            - name: heap_used_in_bytes
+              type: long
+              description: >
+                TODO
+            - name: heap_max_in_bytes
+              type: long
+              description: >
+                TODO
     - name: events
       type: group
       description: >
@@ -21,3 +39,79 @@
           type: long
           description: >
             Filtered events counter.
+    - name: logstash
+      type: group
+      fields:
+        - name: uuid
+          type: keyword
+          description: >
+            TODO
+        - name: version
+          type: keyword
+          description: >
+            TODO
+    - name: os
+      type: group
+      fields:
+        - name: cpu
+          type: group
+          fields:
+            - name: load_average
+              type: group
+              fields:
+                - name: 15m
+                  type: long
+                  description: >
+                    TODO
+                - name: 1m
+                  type: long
+                  description: >
+                    TODO
+                - name: 5m
+                  type: long
+                  description: >
+                    TODO
+        - name: cgroup
+          type: group
+          fields:
+            - name: cpuact.usage_nanos
+              type: long
+              description: >
+                TODO
+            - name: cpu
+              type: group
+              fields:
+                - name: stat
+                  type: group
+                  fields:
+                    - name: number_of_elapsed_periods
+                      type: long
+                      description: >
+                        TODO
+                    - name: time_throttled_nanos
+                      type: long
+                      description: >
+                        TODO
+                    - name: number_of_times_throttled
+                      type: long
+                      description: >
+                        TODO
+    - name: process.cpu.percent
+      type: double
+      description: >
+        TODO
+    - name: queue.events_count
+      type: long
+      description: >
+        TODO
+    - name: pipelines
+      type: group
+      fields:
+        - name: main.id
+          type: keyword
+          description: >
+            TODO
+        - name: main.hash
+          type: keyword
+          description: >
+            TODO

@@ -69,29 +69,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err := m.updateServiceURI(); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
-	if !m.XPack {
-		return eventMapping(r, content)
-	}
-
-	err = eventMappingXPack(r, m, content)
-	if err != nil {
-		m.Logger().Error(err)
+	if err = eventMapping(r, m, content); err != nil {
+		return err
 	}
 
 	return nil
