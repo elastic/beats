@@ -50,7 +50,6 @@ type fileProspector struct {
 func newFileProspector(
 	paths []string,
 	ignoreOlder time.Duration,
-	closerConfig stateChangeCloserConfig,
 	fileWatcherNs, identifierNs *common.ConfigNamespace,
 ) (loginp.Prospector, error) {
 
@@ -69,7 +68,6 @@ func newFileProspector(
 		identifier:   identifier,
 		ignoreOlder:  ignoreOlder,
 		cleanRemoved: true,
-		monitor:      newActiveFileMonitor(closerConfig),
 	}, nil
 }
 
@@ -205,18 +203,6 @@ func (p *fileProspector) updateIdentifiersBetweenRuns(log *logp.Logger, s *state
 
 		return true, nil
 	})
-}
-
-// isSameFile checks if the given File path corresponds with the FileInfo given
-// It is used to check if the file has been renamed.
-func isSameFile(path string, info os.FileInfo) (bool, error) {
-	fileInfo, err := os.Stat(path)
-
-	if err != nil {
-		return false, err
-	}
-
-	return os.SameFile(fileInfo, info), nil
 }
 
 func (p *fileProspector) Test() error {
