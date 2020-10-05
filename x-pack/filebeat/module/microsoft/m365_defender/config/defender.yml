@@ -2,7 +2,6 @@
 
 type: httpjson
 http_method: GET
-http_headers: {"Content-Type": "application/json"}
 interval: {{ .interval }}
 json_objects_array: value
 split_events_by: alerts..entities
@@ -11,10 +10,11 @@ url: {{ .url }}
 oauth2: {{ .oauth2 | tojson }}
 oauth2.provider: azure
 oauth2.azure.resource: https://api.security.microsoft.com
-http_headers: {{ .http_headers | tojson }}
+http_headers:
+  User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
 date_cursor.field: lastUpdateTime
 date_cursor.url_field: '$filter'
-date_cursor.value_template: {{ .date_cursor.value_template }}
+date_cursor.value_template: 'lastUpdateTime gt {{.}}'
 date_cursor.initial_interval: 55m
 date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
 

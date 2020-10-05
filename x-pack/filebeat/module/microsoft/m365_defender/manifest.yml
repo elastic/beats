@@ -5,14 +5,8 @@ var:
     default: httpjson
   - name: interval
     default: 5m
-  - name: date_cursor
-    default:
-      value_template: "lastUpdateTime gt {{.}}"
   - name: tags
-    default: [defender-atp, forwarded]
-  - name: http_headers
-    default:
-      User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
+    default: [m365-defender, forwarded]
   - name: url
     default: "https://api.security.microsoft.com/api/incidents"
   - name: oauth2
