@@ -151,7 +151,7 @@ func (f *logFile) startFileMonitoringIfNeeded() {
 
 	if f.closeAfterInterval > 0 {
 		f.tg.Go(func(ctx unison.Canceler) error {
-			f.closeIfInactive(ctx)
+			f.periodicStateCheck(ctx)
 			return nil
 		})
 	}
@@ -173,7 +173,7 @@ func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 }
 
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
-	ticker := time.NewTicker(f.close)
+	ticker := time.NewTicker(f.checkInterval)
 	defer ticker.Stop()
 
 	for {
@@ -185,15 +185,13 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 				f.cancelReading()
 				return
 			}
-
 		}
 	}
 }
 
 func (f *logFile) shouldBeClosed() bool {
-	if f.closeIfInactive {
-		age := time.Since(f.lastTimeRead)
-		if age > f.closeInactive {
+	if f.closeInactive > 0 {
+		if time.Since(f.lastTimeRead) > f.closeInactive {
 			return true
 		}
 	}
@@ -226,6 +224,15 @@ func (f *logFile) shouldBeClosed() bool {
 	}
 
 	return false
+}
+
+func isSameFile(path string, info os.FileInfo) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return os.SameFile(fileInfo, info)
 }
 
 // errorChecks determines the cause for EOF errors, and how the EOF event should be handled
