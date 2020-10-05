@@ -58,7 +58,7 @@ type filestream struct {
 	excludeLines    []match.Matcher
 	includeLines    []match.Matcher
 	maxBytes        int
-	closerConfig    readerCloserConfig
+	closerConfig    closerConfig
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -87,7 +87,6 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 	prospector, err := newFileProspector(
 		config.Paths,
 		config.IgnoreOlder,
-		config.Close.OnStateChange,
 		config.FileWatcher,
 		config.FileIdentity,
 	)
@@ -108,7 +107,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		excludeLines:    config.Reader.ExcludeLines,
 		includeLines:    config.Reader.IncludeLines,
 		maxBytes:        config.Reader.MaxBytes,
-		closerConfig:    config.Close.Reader,
+		closerConfig:    config.Close,
 	}, nil
 }
 
