@@ -5,7 +5,7 @@
 // +build integration
 // +build azure
 
-package app_insights
+package app_state
 
 import (
 	"testing"
@@ -15,15 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	// Register input module and metricset
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/app_insights"
 )
 
-var metrics = []map[string]interface{}{{
-	"id": "requests/count",
-}}
-
 func TestFetchMetricset(t *testing.T) {
-	config := test.GetConfigForInsights(t, "app_insights")
-	config["metrics"] = metrics
+	config := test.GetConfigForInsights(t, "app_state")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
@@ -34,8 +32,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config := test.GetConfigForInsights(t, "app_insights")
-	config["metrics"] = metrics
+	config := test.GetConfigForInsights(t, "app_state")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }
