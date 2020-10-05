@@ -2,5 +2,5 @@
   type: group
   description: >
     query metricset
-  release: beta
+  release: ga
   fields:
