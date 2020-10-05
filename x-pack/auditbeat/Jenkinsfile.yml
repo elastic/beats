@@ -5,11 +5,11 @@ when:
         - "@ci"                ## special token regarding the changeset for the ci
         - "@xpack"             ## special token regarding the changeset for the xpack
     comments:                  ## when PR comment contains any of those entries
-        - "/test auditbeat"
+        - "/test x-pack/auditbeat"
     labels:                    ## when PR labels matches any of those entries
-        - "auditbeat"
+        - "x-pack-auditbeat"
     parameters:                ## when parameter was selected in the UI.
-        - "auditbeat"
+        - "x-pack-auditbeat"
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
@@ -22,7 +22,7 @@ stages:
           - "macosx"
         when:                  ## Override the top-level when.
             comments:
-                - "/test auditbeat for macos"
+                - "/test x-pack/auditbeat for macos"
             labels:
                 - "macOS"
             parameters:
