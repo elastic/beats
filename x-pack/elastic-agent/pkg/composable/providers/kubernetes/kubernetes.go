@@ -102,12 +102,14 @@ func (p *eventWatcher) emitRunning(pod *kubernetes.Pod) {
 		{
 			"add_fields": map[string]interface{}{
 				"fields": mapping,
-				"to":     "kubernetes",
+				"target": "kubernetes",
 			},
 		},
 	}
 
 	// Emit the pod
+	// We emit Pod + containers to ensure that configs matching Pod only
+	// get Pod metadata (not specific to any container)
 	p.comm.AddOrUpdate(string(pod.GetUID()), mapping, processors)
 
 	// Emit all containers in the pod
@@ -161,7 +163,7 @@ func (p *eventWatcher) emitContainers(pod *kubernetes.Pod, containers []kubernet
 			{
 				"add_fields": map[string]interface{}{
 					"fields": mapping,
-					"to":     "kubernetes",
+					"target": "kubernetes",
 				},
 			},
 		}
@@ -218,18 +220,4 @@ func (p *eventWatcher) OnDelete(obj interface{}) {
 	p.logger.Debugf("pod delete: %+v", obj)
 	pod := obj.(*kubernetes.Pod)
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
-}
-
-func copyMap(m map[string]interface{}) map[string]interface{} {
-	cp := make(map[string]interface{})
-	for k, v := range m {
-		vm, ok := v.(map[string]interface{})
-		if ok {
-			cp[k] = copyMap(vm)
-		} else {
-			cp[k] = v
-		}
-	}
-
-	return cp
 }

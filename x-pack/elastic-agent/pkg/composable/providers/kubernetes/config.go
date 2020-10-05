@@ -22,15 +22,10 @@ type Config struct {
 
 	// Scope of the provider (cluster or node)
 	Scope string `config:"scope"`
-
-	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
-	Unique      bool   `config:"unique"`
-	LeaderLease string `config:"leader_lease"`
 }
 
 // InitDefaults initializes the default values for the config.
 func (c *Config) InitDefaults() {
 	c.SyncPeriod = 10 * time.Minute
 	c.CleanupTimeout = 60 * time.Second
-	c.Unique = false
 }
