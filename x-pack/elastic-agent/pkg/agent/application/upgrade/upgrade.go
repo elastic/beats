@@ -77,18 +77,18 @@ func (u *Upgrader) Upgradeable() bool {
 
 // Upgrade upgrades running agent
 func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) (err error) {
-	if !u.upgradeable {
-		return fmt.Errorf(
-			"cannot be upgraded; must be installed with install sub-command and " +
-				"running under control of the systems supervisor")
-	}
-
 	// report failed
 	defer func() {
 		if err != nil {
 			u.reportFailure(ctx, a, err)
 		}
 	}()
+
+	if !u.upgradeable {
+		return fmt.Errorf(
+			"cannot be upgraded; must be installed with install sub-command and " +
+				"running under control of the systems supervisor")
+	}
 
 	u.reportUpdating(a.Version)
 
