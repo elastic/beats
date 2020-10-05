@@ -77,7 +77,7 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10255"]
-      # If using Red Hat OpenShift remove the previous hosts entry and 
+      # If using Red Hat OpenShift remove the previous hosts entry and
       # uncomment these settings:
       #hosts: ["https://${HOSTNAME}:10250"]
       #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -104,7 +104,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.8.11
+        image: docker.elastic.co/beats/metricbeat:6.8.12
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -242,7 +242,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.8.11
+        image: docker.elastic.co/beats/metricbeat:6.8.12
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
