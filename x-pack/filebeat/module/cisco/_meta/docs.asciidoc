@@ -381,22 +381,22 @@ will be found under `rsa.raw`. The default is false.
 [float]
 ==== `umbrella` fileset settings
 
-The Cisco Umbrella fileset primarily focuses on reading CSV files from a S3 bucket using the filebeat S3 input.
+The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
 
-To configure Cisco Umbrella to log to either your own S3 bucket or one that is managed by Cisco please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide]
+To configure Cisco Umbrella to log to either your own S3 bucket or one that is managed by Cisco please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide.]
 
-This fileset supports all 4 log types which is:
+This fileset supports all 4 log types:
 - Proxy
 - Cloud Firewall
 - IP Logs
 - DNS logs
 
-The Cisco Umbrella fileset is dependant on that the original file path structure is to be followed. This structure is documented https://docs.umbrella.com/deployment-umbrella/docs/log-formats-and-versioning[Umbrella Log Formats and Versioning]:
+The Cisco Umbrella fileset depends on the original file path structure being followed. This structure is documented https://docs.umbrella.com/deployment-umbrella/docs/log-formats-and-versioning[Umbrella Log Formats and Versioning]:
 
 <subfolder>/<YYYY>-<MM>-<DD>/<YYYY>-<MM>-<DD>-<hh>-<mm>-<xxxx>.csv.gz
 dnslogs/<year>-<month>-<day>/<year>-<month>-<day>-<hour>-<minute>.csv.gz
 
-When configuring the fileset, please ensure that the Queue url is set to the root folder that includes each of these subfolders above.
+When configuring the fileset, please ensure that the Queue URL is set to the root folder that includes each of these subfolders above.
 
 Example config:
 
