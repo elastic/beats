@@ -334,9 +334,8 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 			continue
 		}
 
-		var headerNameBuf [140]byte
-		headerName := getExpandedHeaderName(toLower(headerNameBuf[:], data[:i]))
-		headerVal := trim(data[i+1 : p])
+		headerName := getExpandedHeaderName(bytes.ToLower(data[:i]))
+		headerVal := bytes.TrimSpace(data[i+1 : p])
 		if isDebug {
 			debugf("Header: '%s' Value: '%s'\n", data[:i], headerVal)
 		}
@@ -414,55 +413,11 @@ func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
 	return src, dst
 }
 
-func trim(buf []byte) []byte {
-	return trimLeft(trimRight(buf))
-}
-
-func trimLeft(buf []byte) []byte {
-	for i, b := range buf {
-		if b != ' ' && b != '\t' {
-			return buf[i:]
-		}
-	}
-	return nil
-}
-
-func trimRight(buf []byte) []byte {
-	for i := len(buf) - 1; i > 0; i-- {
-		b := buf[i]
-		if b != ' ' && b != '\t' {
-			return buf[:i+1]
-		}
-	}
-	return nil
-}
-
 func parseInt(line []byte) (int, error) {
 	buf := streambuf.NewFixed(line)
 	i, err := buf.IntASCII(false)
 	return int(i), err
 	// TODO: is it an error if 'buf.Len() != 0 {}' ?
-}
-
-func toLower(buf, in []byte) []byte {
-	if len(in) > len(buf) {
-		goto unbufferedToLower
-	}
-
-	for i, b := range in {
-		if b > 127 {
-			goto unbufferedToLower
-		}
-
-		if 'A' <= b && b <= 'Z' {
-			b = b - 'A' + 'a'
-		}
-		buf[i] = b
-	}
-	return buf[:len(in)]
-
-unbufferedToLower:
-	return bytes.ToLower(in)
 }
 
 func getExpandedHeaderName(n []byte) []byte {

@@ -194,11 +194,13 @@ func populateRequestFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	scheme, username, host, port, _ := parseURI(fields.URIOriginal)
 	fields.URIScheme = scheme
 	fields.URIHost = host
-	fields.URIUsername = username
+	if !bytes.Equal(username, []byte(" ")) && !bytes.Equal(username, []byte("-")) {
+		fields.URIUsername = username
+		pbf.AddUser(string(username))
+	}
 	fields.URIPort = port
 	fields.Version = m.version.String()
 	pbf.AddHost(string(host))
-	pbf.AddUser(string(username))
 }
 
 func populateResponseFields(m *message, fields *ProtocolFields) {
@@ -224,10 +226,12 @@ func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Field
 		fields.PrivateURIOriginal = privateURI[0]
 		fields.PrivateURIScheme = scheme
 		fields.PrivateURIHost = host
-		fields.PrivateURIUsername = username
+		if !bytes.Equal(username, []byte(" ")) && !bytes.Equal(username, []byte("-")) {
+			fields.PrivateURIUsername = username
+			pbf.AddUser(string(username))
+		}
 		fields.PrivateURIPort = port
 		pbf.AddHost(string(host))
-		pbf.AddUser(string(username))
 	}
 
 	if accept, found := m.headers["accept"]; found && len(accept) > 0 {
@@ -260,10 +264,12 @@ func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 		fields.FromURIOriginal = uri
 		fields.FromURIScheme = scheme
 		fields.FromURIHost = host
-		fields.FromURIUsername = username
+		if !bytes.Equal(username, []byte(" ")) && !bytes.Equal(username, []byte("-")) {
+			fields.FromURIUsername = username
+			pbf.AddUser(string(username))
+		}
 		fields.FromURIPort = port
 		pbf.AddHost(string(host))
-		pbf.AddUser(string(username))
 	}
 }
 
@@ -276,10 +282,12 @@ func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 		fields.ToURIOriginal = uri
 		fields.ToURIScheme = scheme
 		fields.ToURIHost = host
-		fields.ToURIUsername = username
+		if !bytes.Equal(username, []byte(" ")) && !bytes.Equal(username, []byte("-")) {
+			fields.ToURIUsername = username
+			pbf.AddUser(string(username))
+		}
 		fields.ToURIPort = port
 		pbf.AddHost(string(host))
-		pbf.AddUser(string(username))
 	}
 }
 
@@ -293,12 +301,14 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 		fields.ContactURIOriginal = uri
 		fields.ContactURIScheme = scheme
 		fields.ContactURIHost = host
-		fields.ContactURIUsername = username
+		if !bytes.Equal(username, []byte(" ")) && !bytes.Equal(username, []byte("-")) {
+			fields.ContactURIUsername = username
+			pbf.AddUser(string(username))
+		}
 		fields.ContactURIPort = port
 		fields.ContactLine = urlparams["line"]
 		fields.ContactTransport = bytes.ToLower(urlparams["transport"])
 		pbf.AddHost(string(host))
-		pbf.AddUser(string(username))
 	}
 }
 
@@ -324,9 +334,9 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields Protocol
 
 	pbf.Event.Action = func() string {
 		if m.isRequest {
-			return fmt.Sprintf("sip_%s", strings.ToLower(string(m.method)))
+			return fmt.Sprintf("sip-%s", strings.ToLower(string(m.method)))
 		}
-		return fmt.Sprintf("sip_%s", strings.ToLower(string(fields.CseqMethod)))
+		return fmt.Sprintf("sip-%s", strings.ToLower(string(fields.CseqMethod)))
 	}()
 
 	pbf.Event.Outcome = func() string {
@@ -377,8 +387,11 @@ func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *Prot
 		case "realm":
 			fields.AuthRealm = kv[1]
 		case "username":
-			_, _ = evt.Fields.Put("user.name", string(kv[1]))
-			pbf.AddUser(string(kv[1]))
+			username := string(kv[1])
+			if username != "" && username != "-" {
+				_, _ = evt.Fields.Put("user.name", username)
+				pbf.AddUser(username)
+			}
 		case "uri":
 			scheme, _, host, port, _ := parseURI(kv[1])
 			fields.AuthURIOriginal = kv[1]
@@ -428,7 +441,9 @@ func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 			var pos int
 			if kv[1][pos] == '"' {
 				endUserPos := bytes.IndexByte(kv[1][pos+1:], '"')
-				fields.SDPOwnerUsername = kv[1][pos+1 : endUserPos]
+				if !bytes.Equal(kv[1][pos+1:endUserPos], []byte("-")) {
+					fields.SDPOwnerUsername = kv[1][pos+1 : endUserPos]
+				}
 				pos = endUserPos + 1
 			}
 			nParts := func() int {
@@ -445,7 +460,9 @@ func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 				continue
 			}
 			if nParts == 4 {
-				fields.SDPOwnerUsername = parts[0]
+				if !bytes.Equal(parts[0], []byte("-")) {
+					fields.SDPOwnerUsername = parts[0]
+				}
 				parts = parts[1:]
 			}
 			fields.SDPOwnerSessID = parts[0]
@@ -457,7 +474,9 @@ func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 			pbf.AddUser(string(fields.SDPOwnerUsername))
 			pbf.AddIP(string(fields.SDPOwnerIP))
 		case "s":
-			fields.SDPSessName = kv[1]
+			if !bytes.Equal(kv[1], []byte("-")) {
+				fields.SDPSessName = kv[1]
+			}
 		case "c":
 			if isInMedia {
 				continue

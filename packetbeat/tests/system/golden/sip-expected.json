@@ -6,7 +6,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
-        "event.action": "sip_invite",
+        "event.action": "sip-invite",
         "event.category": [
             "network",
             "protocol"
@@ -35,8 +35,7 @@
         ],
         "related.user": [
             "test",
-            "sipp",
-            "-"
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -65,9 +64,7 @@
         "sip.sdp.connection.info": "IN IP4 10.0.2.20",
         "sip.sdp.owner.ip": "10.0.2.20",
         "sip.sdp.owner.session_id": "42",
-        "sip.sdp.owner.username": "-",
         "sip.sdp.owner.version": "42",
-        "sip.sdp.session.name": "-",
         "sip.sdp.version": "0",
         "sip.to.display_info": "test",
         "sip.to.uri.host": "10.0.2.15",
@@ -97,7 +94,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_invite",
+        "event.action": "sip-invite",
         "event.category": [
             "network",
             "protocol"
@@ -167,7 +164,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
-        "event.action": "sip_ack",
+        "event.action": "sip-ack",
         "event.category": [
             "network",
             "protocol"
@@ -247,7 +244,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_bye",
+        "event.action": "sip-bye",
         "event.category": [
             "network",
             "protocol"
@@ -342,7 +339,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
-        "event.action": "sip_invite",
+        "event.action": "sip-invite",
         "event.category": [
             "network",
             "protocol"
@@ -371,8 +368,7 @@
         ],
         "related.user": [
             "test",
-            "sipp",
-            "-"
+            "sipp"
         ],
         "server.ip": "10.0.2.15",
         "server.port": 5060,
@@ -401,9 +397,7 @@
         "sip.sdp.connection.info": "IN IP4 10.0.2.20",
         "sip.sdp.owner.ip": "10.0.2.20",
         "sip.sdp.owner.session_id": "42",
-        "sip.sdp.owner.username": "-",
         "sip.sdp.owner.version": "42",
-        "sip.sdp.session.name": "-",
         "sip.sdp.version": "0",
         "sip.to.display_info": "test",
         "sip.to.uri.host": "10.0.2.15",
@@ -433,7 +427,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_invite",
+        "event.action": "sip-invite",
         "event.category": [
             "network",
             "protocol"
@@ -503,7 +497,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.15",
         "destination.port": 5060,
-        "event.action": "sip_ack",
+        "event.action": "sip-ack",
         "event.category": [
             "network",
             "protocol"
@@ -583,7 +577,7 @@
         "client.port": 5060,
         "destination.ip": "10.0.2.20",
         "destination.port": 5060,
-        "event.action": "sip_bye",
+        "event.action": "sip-bye",
         "event.category": [
             "network",
             "protocol"

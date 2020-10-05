@@ -6,7 +6,7 @@
         "client.port": 5060,
         "destination.ip": "212.242.33.35",
         "destination.port": 5060,
-        "event.action": "sip_register",
+        "event.action": "sip-register",
         "event.category": [
             "network",
             "protocol",
@@ -83,7 +83,7 @@
         "client.port": 5060,
         "destination.ip": "192.168.1.2",
         "destination.port": 5060,
-        "event.action": "sip_register",
+        "event.action": "sip-register",
         "event.category": [
             "network",
             "protocol"
