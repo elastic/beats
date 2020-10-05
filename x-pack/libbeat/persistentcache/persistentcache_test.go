@@ -72,6 +72,7 @@ func TestPersist(t *testing.T) {
 
 	cache, err = New("test", options)
 	require.NoError(t, err)
+	defer cache.Close()
 
 	var result valueType
 	err = cache.Get(key, &result)
@@ -89,6 +90,7 @@ func TestExpired(t *testing.T) {
 	options := testOptions(t)
 	cache, err := New("test", options)
 	require.NoError(t, err)
+	defer cache.Close()
 
 	type valueType struct {
 		Something string
@@ -98,7 +100,7 @@ func TestExpired(t *testing.T) {
 	var value = valueType{Something: "foo"}
 
 	// Badger TTL is not reliable on sub-second durations.
-	err = cache.PutWithTimeout(key, value, 1*time.Second)
+	err = cache.PutWithTimeout(key, value, 2*time.Second)
 	assert.NoError(t, err)
 
 	var result valueType
@@ -106,7 +108,7 @@ func TestExpired(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, value, result)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 	err = cache.Get(key, &result)
 	assert.Error(t, err)
 }
@@ -128,6 +130,7 @@ func TestRefreshOnAccess(t *testing.T) {
 
 	cache, err := New("test", options)
 	require.NoError(t, err)
+	defer cache.Close()
 
 	type valueType struct {
 		Something string
