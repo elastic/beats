@@ -285,7 +285,7 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
-            if sys.platform.startswith("windows"):
+            if sys.platform.startswith("win"):
                 self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
             else:
                 self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
@@ -407,7 +407,7 @@ class Test(metricbeat.BaseTest):
             assert isinstance(summary["running"], int)
             assert isinstance(summary["unknown"], int)
 
-            if not sys.platform.startswith("windows"):
+            if not sys.platform.startswith("win"):
                 assert isinstance(summary["idle"], int)
                 assert isinstance(summary["stopped"], int)
                 assert isinstance(summary["zombie"], int)
