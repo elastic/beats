@@ -603,6 +603,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Always attempt community_id processor on zeek module {pull}21155[21155]
 - Add related.hosts ecs field to all modules {pull}21160[21160]
 - Keep cursor state between httpjson input restarts {pull}20751[20751]
+- Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
 
 *Heartbeat*
 
