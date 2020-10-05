@@ -117,10 +117,10 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 	u := s.up
 	s.lock.RUnlock()
 	if u == nil {
-		// not running with upgrader
+		// not running with upgrader (must be controlled by Fleet)
 		return &proto.UpgradeResponse{
 			Status: proto.ActionStatus_FAILURE,
-			Error:  "cannot be upgraded; no upgrader defined",
+			Error:  "cannot be upgraded; perform upgrading using Fleet",
 		}, nil
 	}
 	err := u.Upgrade(ctx, &upgradeRequest{request}, false)
