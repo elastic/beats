@@ -28533,12 +28533,62 @@ Logstash module
 
 
 
+*`logstash.cluster.id`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+
+*`logstash.logstash_state.pipeline.id`*::
++
+--
+type: alias
+
+alias to: logstash.node.state.pipeline.id
+
+--
+
+*`logstash.logstash_state.pipeline.hash`*::
++
+--
+type: alias
+
+alias to: logstash.node.state.pipeline.hash
+
+--
+
 [float]
 === node
 
 node
 
 
+
+
+*`logstash.node.state.pipeline.id`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.hash`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
 
 *`logstash.node.host`*::
 +

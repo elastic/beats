@@ -39,7 +39,7 @@ func TestEventMapping(t *testing.T) {
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
+		err = commonFieldsMapping(reporter, input)
 
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= 1, f)

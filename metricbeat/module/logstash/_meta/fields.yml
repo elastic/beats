@@ -9,3 +9,16 @@
       type: group
       description: >
       fields:
+        - name: cluster.id
+          type: keyword
+          description: >
+            TODO
+        - name: logstash_state
+          type: group
+          fields:
+            - name: pipeline.id
+              type: alias
+              path: logstash.node.state.pipeline.id
+            - name: pipeline.hash
+              type: alias
+              path: logstash.node.state.pipeline.hash
