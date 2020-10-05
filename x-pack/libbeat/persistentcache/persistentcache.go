@@ -5,9 +5,7 @@
 package persistentcache
 
 import (
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
