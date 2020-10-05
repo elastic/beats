@@ -261,10 +261,8 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		events:  make(chan loginp.FSEvent),
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go w.watch(ctx)
+	go w.watch(context.Background())
 	assert.Equal(t, loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: testPath, Info: fi}, w.Event())
-	cancel()
 
 	err = os.Rename(testPath, renamedPath)
 	if err != nil {
@@ -276,10 +274,8 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ctx, cancel = context.WithCancel(context.Background())
-	go w.watch(ctx)
+	go w.watch(context.Background())
 	evt := w.Event()
-	cancel()
 
 	assert.Equal(t, loginp.OpRename, evt.Op)
 	assert.Equal(t, loginp.OpDelete, evt.Op)
