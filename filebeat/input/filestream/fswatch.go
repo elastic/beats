@@ -74,7 +74,7 @@ type fileWatcher struct {
 
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
 	if ns == nil {
-		return newScannerWatcher(paths, nil)
+		return newScannerWatcher(paths, common.NewConfig())
 	}
 
 	watcherType := ns.Name()
