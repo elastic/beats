@@ -270,6 +270,7 @@ func (inp *filestream) initFileOffset(file *os.File, offset int64) error {
 		return err
 	}
 
+	// get offset from file in case of encoding factory was required to read some data.
 	_, err := file.Seek(0, os.SEEK_CUR)
 	return err
 }
