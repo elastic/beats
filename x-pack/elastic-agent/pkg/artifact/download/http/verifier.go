@@ -59,7 +59,7 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 
 // Verify checks downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
-func (v *Verifier) Verify(programName, version string) (bool, error) {
+func (v *Verifier) Verify(programName, version, artifactName string) (bool, error) {
 	// TODO: think about verifying asc for prepacked beats
 
 	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
@@ -81,7 +81,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 		return isMatch, err
 	}
 
-	return v.verifyAsc(programName, version)
+	return v.verifyAsc(programName, version, artifactName)
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -127,7 +127,7 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	return expectedHash == computedHash, nil
 }
 
-func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
+func (v *Verifier) verifyAsc(programName, version, artifactName string) (bool, error) {
 	if len(v.pgpBytes) == 0 {
 		// no pgp available skip verification process
 		return true, nil
@@ -143,7 +143,7 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 		return false, errors.New(err, "retrieving package path")
 	}
 
-	ascURI, err := v.composeURI(programName, filename)
+	ascURI, err := v.composeURI(filename, artifactName)
 	if err != nil {
 		return false, errors.New(err, "composing URI for fetching asc file", errors.TypeNetwork)
 	}
@@ -177,7 +177,7 @@ func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 
 }
 
-func (v *Verifier) composeURI(programName, filename string) (string, error) {
+func (v *Verifier) composeURI(filename, artifactName string) (string, error) {
 	upstream := v.config.SourceURI
 	if !strings.HasPrefix(upstream, "http") && !strings.HasPrefix(upstream, "file") && !strings.HasPrefix(upstream, "/") {
 		// always default to https
@@ -190,7 +190,7 @@ func (v *Verifier) composeURI(programName, filename string) (string, error) {
 		return "", errors.New(err, "invalid upstream URI", errors.TypeNetwork, errors.M(errors.MetaKeyURI, upstream))
 	}
 
-	uri.Path = path.Join(uri.Path, "beats", programName, filename+ascSuffix)
+	uri.Path = path.Join(uri.Path, artifactName, filename+ascSuffix)
 	return uri.String(), nil
 }
 
