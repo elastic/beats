@@ -120,7 +120,7 @@ func managePropertyName(metric string) string {
 	// create an object in case of ":"
 	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
 	// replace uppercases with underscores
-	resultMetricName = replaceUpperCase(resultMetricName)
+	resultMetricName = ReplaceUpperCase(resultMetricName)
 
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
 	obj := strings.Split(resultMetricName, ".")
@@ -134,8 +134,8 @@ func managePropertyName(metric string) string {
 	return resultMetricName
 }
 
-// replaceUpperCase func will replace upper case with '_'
-func replaceUpperCase(src string) string {
+// ReplaceUpperCase func will replace upper case with '_'
+func ReplaceUpperCase(src string) string {
 	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
 	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
 		var newStr string

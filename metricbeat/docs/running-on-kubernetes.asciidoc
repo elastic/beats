@@ -177,11 +177,6 @@ $ kubectl --namespace=kube-system  get ds/metricbeat
 
 NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
 metricbeat   32        32        0         32           0           <none>          1m
-
-$ kubectl --namespace=kube-system  get deploy/metricbeat
-
-NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-metricbeat                1         1         1            1           1m
 ------------------------------------------------
 
 Metrics should start flowing to Elasticsearch.
