@@ -1,0 +1,74 @@
+[
+    {
+        "@timestamp": "2020-07-23T18:03:46.000Z",
+        "cisco.umbrella.datacenter": "ams1.edc",
+        "cisco.umbrella.identity_types": "CDFW Tunnel Device",
+        "cisco.umbrella.origin_id": "[211039844]",
+        "destination.address": "146.112.255.129",
+        "destination.ip": "146.112.255.129",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "2020-07-23 18:03:46,[211039844],Passive Monitor,CDFW Tunnel Device,OUTBOUND,1,84,172.17.3.4,,146.112.255.129,,ams1.edc,12,ALLOW",
+        "event.type": [
+            "allowed"
+        ],
+        "fileset.name": "umbrella",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "2020-07-23 18:03:46,[211039844],Passive Monitor,CDFW Tunnel Device,OUTBOUND,1,84,172.17.3.4,,146.112.255.129,,ams1.edc,12,ALLOW",
+        "network.direction": "outbound",
+        "network.transport": "1",
+        "observer.product": "Umbrella",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "172.17.3.4",
+            "146.112.255.129"
+        ],
+        "related.user": [
+            "Passive Monitor"
+        ],
+        "rule.id": "12",
+        "service.type": "cisco",
+        "source.address": "172.17.3.4",
+        "source.bytes": "84",
+        "source.ip": "172.17.3.4",
+        "source.user.name": "Passive Monitor"
+    },
+    {
+        "@timestamp": "2020-07-23T18:03:46.000Z",
+        "cisco.umbrella.datacenter": "ams1.edc",
+        "cisco.umbrella.identity_types": "CDFW Tunnel Device",
+        "cisco.umbrella.origin_id": "[211039844]",
+        "destination.address": "146.112.255.129",
+        "destination.ip": "146.112.255.129",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "2020-07-23 18:03:46,[211039844],Passive Monitor,CDFW Tunnel Device,INBOUND,1,84,172.17.3.4,,146.112.255.129,,ams1.edc,12,BLOCK",
+        "event.type": [
+            "denied"
+        ],
+        "fileset.name": "umbrella",
+        "input.type": "log",
+        "log.offset": 128,
+        "message": "2020-07-23 18:03:46,[211039844],Passive Monitor,CDFW Tunnel Device,INBOUND,1,84,172.17.3.4,,146.112.255.129,,ams1.edc,12,BLOCK",
+        "network.direction": "inbound",
+        "network.transport": "1",
+        "observer.product": "Umbrella",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "172.17.3.4",
+            "146.112.255.129"
+        ],
+        "related.user": [
+            "Passive Monitor"
+        ],
+        "rule.id": "12",
+        "service.type": "cisco",
+        "source.address": "172.17.3.4",
+        "source.bytes": "84",
+        "source.ip": "172.17.3.4",
+        "source.user.name": "Passive Monitor"
+    }
+]

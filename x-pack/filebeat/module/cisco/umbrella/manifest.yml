@@ -1,0 +1,8 @@
+module_version: "1.0"
+
+var:
+  - name: tags
+    default: [cisco-umbrella, forwarded]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
