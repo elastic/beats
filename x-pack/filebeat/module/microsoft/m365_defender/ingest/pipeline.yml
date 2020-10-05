@@ -265,6 +265,26 @@ processors:
 #############
 ## Cleanup ##
 #############
+- convert:
+    field: json.alerts.incidentId
+    type: string
+    ignore_missing: true
+- convert:
+    field: json.incidentId
+    type: string
+    ignore_missing: true
+- remove:
+    field: json.alerts.mitreTechniques
+    ignore_missing: true
+    if: ctx?.json?.alerts?.mitreTechniques.isEmpty()
+- remove:
+    field: json.alerts.devices
+    ignore_missing: true
+    if: ctx?.json?.alerts?.devices.isEmpty()
+- remove:
+    field: json.tags
+    ignore_missing: true
+    if: ctx?.json?.tags.isEmpty()
 - remove:
     ignore_missing: true
     field:
