@@ -29,11 +29,11 @@ func NewVerifier(verifiers ...download.Verifier) *Verifier {
 }
 
 // Verify checks the package from configured source.
-func (e *Verifier) Verify(programName, version string) (bool, error) {
+func (e *Verifier) Verify(programName, version, artifactName string) (bool, error) {
 	var err error
 
 	for _, v := range e.vv {
-		b, e := v.Verify(programName, version)
+		b, e := v.Verify(programName, version, artifactName)
 		if e == nil {
 			return b, nil
 		}
