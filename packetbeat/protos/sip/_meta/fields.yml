@@ -92,24 +92,13 @@
       - name: cseq.method
         type: keyword
         description: Sequence method.
-      - name: via.transport
+      - name: via.original
         type: keyword
-        description: Via header transport.
-      - name: via.sent_by.address
-        type: keyword
-        description: "Sent by address"
-      - name: via.sent_by.port
-        type: keyword
-        description: "Sent by port"
-      - name: via.received.address
-        type: keyword
-        description: "Received address"
-      - name: via.port
-        type: keyword
-        description: "Via port"
-      - name: via.branch
-        type: keyword
-        description: "Via branch"
+        description: The original Via value.
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple
       - name: to.display_info
         type: keyword
         description: "To display info"
@@ -240,21 +229,10 @@
       - name: sdp.connection.address
         type: keyword
         description: "SDP connection address"
-      - name: sdp.start
-        type: date
-        description: "SDP start date"
-      - name: sdp.stop
-        type: date
-        description: "SDP stop date"
-      - name: sdp.media.description
+      - name: sdp.body.original
         type: keyword
-        description: "SDP media description"
-      - name: sdp.media.port
-        type: keyword
-        description: "SDP media port"
-      - name: sdp.media.format
-        type: keyword
-        description: "SDP media format"
-      - name: sdp.media.attributes
-        type: keyword
-        description: "SDP media attributes"
+        description: "SDP original body"
+        multi_fields:
+          - name: text
+            type: text
+            analyzer: simple

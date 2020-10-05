@@ -120,7 +120,12 @@ func (p *plugin) doParse(pkt *protos.Packet) error {
 		return err
 	}
 
-	p.publish(p.buildEvent(m, pkt))
+	evt, err := p.buildEvent(m, pkt)
+	if err != nil {
+		return err
+	}
+
+	p.publish(*evt)
 
 	return nil
 }
@@ -139,7 +144,7 @@ func newParsingInfo(pkt *protos.Packet) *parsingInfo {
 	}
 }
 
-func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
+func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error) {
 	status := common.OK_STATUS
 	if m.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -158,7 +163,7 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
 		populateResponseFields(m, &sipFields)
 	}
 
-	p.populateHeadersFields(m, pbf, &sipFields)
+	p.populateHeadersFields(m, evt, pbf, &sipFields)
 
 	if p.parseBody {
 		populateBodyFields(m, pbf, &sipFields)
@@ -175,16 +180,18 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) beat.Event {
 
 	p.populateEventFields(m, pbf, sipFields)
 
-	_ = pb.MarshalStruct(evt.Fields, "sip", sipFields)
+	if err := pb.MarshalStruct(evt.Fields, "sip", sipFields); err != nil {
+		return nil, err
+	}
 
-	return evt
+	return &evt, nil
 }
 
 func populateRequestFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	fields.Type = "request"
 	fields.Method = bytes.ToUpper(m.method)
 	fields.URIOriginal = m.requestURI
-	scheme, username, host, port := parseURI(fields.URIOriginal)
+	scheme, username, host, port, _ := parseURI(fields.URIOriginal)
 	fields.URIScheme = scheme
 	fields.URIHost = host
 	fields.URIUsername = username
@@ -201,19 +208,19 @@ func populateResponseFields(m *message, fields *ProtocolFields) {
 	fields.Version = m.version.String()
 }
 
-func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	accept, found := m.headers["accept"]
-	if found && len(accept) > 0 {
-		fields.Accept = bytes.ToLower(accept[0])
-	}
+func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
 	fields.Allow = m.allow
 	fields.CallID = m.callID
 	fields.ContentLength = m.contentLength
 	fields.ContentType = bytes.ToLower(m.contentType)
 	fields.MaxForwards = m.maxForwards
+	fields.Supported = m.supported
+	fields.UserAgentOriginal = m.userAgent
+	fields.ViaOriginal = m.via
+
 	privateURI, found := m.headers["p-associated-uri"]
 	if found && len(privateURI) > 0 {
-		scheme, username, host, port := parseURI(privateURI[0])
+		scheme, username, host, port, _ := parseURI(privateURI[0])
 		fields.PrivateURIOriginal = privateURI[0]
 		fields.PrivateURIScheme = scheme
 		fields.PrivateURIHost = host
@@ -222,8 +229,10 @@ func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *Proto
 		pbf.AddHost(string(host))
 		pbf.AddUser(string(username))
 	}
-	fields.Supported = m.supported
-	fields.UserAgentOriginal = m.userAgent
+
+	if accept, found := m.headers["accept"]; found && len(accept) > 0 {
+		fields.Accept = bytes.ToLower(accept[0])
+	}
 
 	cseqParts := bytes.Split(m.cseq, []byte(" "))
 	if len(cseqParts) == 2 {
@@ -231,13 +240,23 @@ func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *Proto
 		fields.CseqMethod = bytes.ToUpper(cseqParts[1])
 	}
 
-	populateViaFields(m, pbf, fields)
+	populateFromFields(m, pbf, fields)
 
+	populateToFields(m, pbf, fields)
+
+	populateContactFields(m, pbf, fields)
+
+	if p.parseAuthorization {
+		populateAuthFields(m, evt, pbf, fields)
+	}
+}
+
+func populateFromFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.from) > 0 {
-		displayInfo, uri, tag := parseFromTo(m.from)
+		displayInfo, uri, params := parseFromToContact(m.from)
 		fields.FromDisplayInfo = displayInfo
-		fields.FromTag = tag
-		scheme, username, host, port := parseURI(uri)
+		fields.FromTag = params["tag"]
+		scheme, username, host, port, _ := parseURI(uri)
 		fields.FromURIOriginal = uri
 		fields.FromURIScheme = scheme
 		fields.FromURIHost = host
@@ -246,12 +265,14 @@ func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *Proto
 		pbf.AddHost(string(host))
 		pbf.AddUser(string(username))
 	}
+}
 
+func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if len(m.to) > 0 {
-		displayInfo, uri, tag := parseFromTo(m.to)
+		displayInfo, uri, params := parseFromToContact(m.to)
 		fields.ToDisplayInfo = displayInfo
-		fields.ToTag = tag
-		scheme, username, host, port := parseURI(uri)
+		fields.ToTag = params["tag"]
+		scheme, username, host, port, _ := parseURI(uri)
 		fields.ToURIOriginal = uri
 		fields.ToURIScheme = scheme
 		fields.ToURIHost = host
@@ -260,19 +281,32 @@ func (p *plugin) populateHeadersFields(m *message, pbf *pb.Fields, fields *Proto
 		pbf.AddHost(string(host))
 		pbf.AddUser(string(username))
 	}
+}
 
-	populateContactFields(m, pbf, fields)
-
-	if p.parseAuthorization {
-		populateAuthFields(m, pbf, fields)
+func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
+	if contact, found := m.headers["contact"]; found && len(contact) > 0 {
+		displayInfo, uri, params := parseFromToContact(m.to)
+		fields.ContactDisplayInfo = displayInfo
+		fields.ContactExpires, _ = strconv.Atoi(string(params["expires"]))
+		fields.ContactQ, _ = strconv.ParseFloat(string(params["q"]), 64)
+		scheme, username, host, port, urlparams := parseURI(uri)
+		fields.ContactURIOriginal = uri
+		fields.ContactURIScheme = scheme
+		fields.ContactURIHost = host
+		fields.ContactURIUsername = username
+		fields.ContactURIPort = port
+		fields.ContactLine = urlparams["line"]
+		fields.ContactTransport = bytes.ToLower(urlparams["transport"])
+		pbf.AddHost(string(host))
+		pbf.AddUser(string(username))
 	}
 }
 
-func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, sipFields ProtocolFields) {
+func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields ProtocolFields) {
 	pbf.Event.Kind = "event"
 	pbf.Event.Type = []string{"info"}
 	pbf.Event.Dataset = "sip"
-	pbf.Event.Sequence = int64(sipFields.CseqCode)
+	pbf.Event.Sequence = int64(fields.CseqCode)
 
 	// TODO: Get these values from body
 	pbf.Event.Start = m.ts
@@ -285,14 +319,14 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, sipFields Proto
 
 	pbf.Event.Category = []string{"network", "protocol"}
 	if _, found := m.headers["authorization"]; found {
-		pbf.Event.Category = append(pbf.Event.Category, "authorization")
+		pbf.Event.Category = append(pbf.Event.Category, "authentication")
 	}
 
 	pbf.Event.Action = func() string {
 		if m.isRequest {
 			return fmt.Sprintf("sip_%s", strings.ToLower(string(m.method)))
 		}
-		return fmt.Sprintf("sip_%s", strings.ToLower(string(sipFields.CseqMethod)))
+		return fmt.Sprintf("sip_%s", strings.ToLower(string(fields.CseqMethod)))
 	}()
 
 	pbf.Event.Outcome = func() string {
@@ -305,52 +339,194 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, sipFields Proto
 		return "success"
 	}()
 
-	pbf.Event.Reason = string(sipFields.Status)
+	pbf.Event.Reason = string(fields.Status)
 }
 
-func populateViaFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	// TODO
+func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
+	auths, found := m.headers["authorization"]
+	if !found || len(auths) == 0 {
+		if isDetailed {
+			detailedf("sip packet without authorization header")
+		}
+		return
+	}
+
+	if isDetailed {
+		detailedf("sip packet with authorization header")
+	}
+
+	auth := bytes.TrimSpace(auths[0])
+	pos := bytes.IndexByte(auth, ' ')
+	if pos == -1 {
+		if isDebug {
+			debugf("malformed authorization header: missing scheme")
+		}
+		return
+	}
+
+	fields.AuthScheme = auth[:pos]
+
+	pos += 1
+	for _, param := range bytes.Split(auth[pos:], []byte(",")) {
+		kv := bytes.SplitN(param, []byte("="), 2)
+		if len(kv) != 2 {
+			continue
+		}
+		kv[1] = bytes.Trim(kv[1], "'\" \t")
+		switch string(bytes.ToLower(bytes.TrimSpace(kv[0]))) {
+		case "realm":
+			fields.AuthRealm = kv[1]
+		case "username":
+			_, _ = evt.Fields.Put("user.name", string(kv[1]))
+			pbf.AddUser(string(kv[1]))
+		case "uri":
+			scheme, _, host, port, _ := parseURI(kv[1])
+			fields.AuthURIOriginal = kv[1]
+			fields.AuthURIScheme = scheme
+			fields.AuthURIHost = host
+			fields.AuthURIPort = port
+		}
+	}
 }
 
-func populateAuthFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	// TODO
-}
-
-func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	// TODO
-}
+var constSDPContentType = []byte("application/sdp")
 
 func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	// TODO
+	if !m.hasContentLength {
+		return
+	}
+
+	if !bytes.Equal(m.contentType, constSDPContentType) {
+		if isDebug {
+			debugf("body content-type: %s is not supported", m.contentType)
+		}
+		return
+	}
+
+	if _, found := m.headers["content-encoding"]; found {
+		if isDebug {
+			debugf("body decoding is not supported yet if content-endcoding is present")
+		}
+		return
+	}
+
+	fields.SDPBodyOriginal = m.body
+
+	var isInMedia bool
+	for _, line := range bytes.Split(m.body, []byte("\r\n")) {
+		kv := bytes.SplitN(line, []byte("="), 2)
+		if len(kv) != 2 {
+			continue
+		}
+
+		kv[1] = bytes.TrimSpace(kv[1])
+		ch := string(bytes.ToLower(bytes.TrimSpace(kv[0])))
+		switch ch {
+		case "v":
+			fields.SDPVersion = string(kv[1])
+		case "o":
+			var pos int
+			if kv[1][pos] == '"' {
+				endUserPos := bytes.IndexByte(kv[1][pos+1:], '"')
+				fields.SDPOwnerUsername = kv[1][pos+1 : endUserPos]
+				pos = endUserPos + 1
+			}
+			nParts := func() int {
+				if pos == 0 {
+					return 4
+				}
+				return 3 // already have user
+			}()
+			parts := bytes.SplitN(kv[1][pos:], []byte(" "), nParts)
+			if len(parts) != nParts {
+				if isDebug {
+					debugf("malformed owner SDP line")
+				}
+				continue
+			}
+			if nParts == 4 {
+				fields.SDPOwnerUsername = parts[0]
+				parts = parts[1:]
+			}
+			fields.SDPOwnerSessID = parts[0]
+			fields.SDPOwnerVersion = parts[1]
+			fields.SDPOwnerIP = func() common.NetString {
+				p := bytes.Split(parts[2], []byte(" "))
+				return p[len(p)-1]
+			}()
+			pbf.AddUser(string(fields.SDPOwnerUsername))
+			pbf.AddIP(string(fields.SDPOwnerIP))
+		case "s":
+			fields.SDPSessName = kv[1]
+		case "c":
+			if isInMedia {
+				continue
+			}
+			fields.SDPConnInfo = kv[1]
+			fields.SDPConnAddr = func() common.NetString {
+				p := bytes.Split(kv[1], []byte(" "))
+				return p[len(p)-1]
+			}()
+			pbf.AddHost(string(fields.SDPConnAddr))
+		case "m":
+			isInMedia = true
+			// TODO
+		case "i", "u", "e", "p", "b", "t", "r", "z", "k", "a":
+			// TODO
+		}
+	}
 }
 
-func parseFromTo(fromTo common.NetString) (displayInfo, uri, tag common.NetString) {
-	spacePos := bytes.IndexByte(fromTo, '<')
-	if spacePos == -1 {
-		return nil, nil, nil
+func parseFromToContact(fromTo common.NetString) (displayInfo, uri common.NetString, params map[string]common.NetString) {
+	params = make(map[string]common.NetString)
+
+	pos := bytes.IndexByte(fromTo, '<')
+	if pos == -1 {
+		pos = bytes.IndexByte(fromTo, ' ')
 	}
-	if spacePos > 0 {
-		spacePos -= 1
+
+	displayInfo = bytes.Trim(fromTo[:pos], "'\"\t ")
+
+	endURIPos := func() int {
+		if fromTo[pos] == '<' {
+			return bytes.IndexByte(fromTo, '>')
+		}
+		return bytes.IndexByte(fromTo, ';')
+	}()
+
+	if endURIPos == -1 {
+		uri = bytes.TrimRight(fromTo[pos:], ">")
+		return
 	}
-	displayInfo = bytes.Trim(fromTo[:spacePos], `'"`)
-	parts := bytes.Split(fromTo[spacePos+1:], []byte(";"))
-	uri = bytes.Trim(parts[0], "<>")
-	if len(parts) == 2 {
-		tag = bytes.TrimSpace(parts[1])[len("tag="):]
+	pos += 1
+	uri = fromTo[pos:endURIPos]
+
+	pos = endURIPos + 1
+	for _, param := range bytes.Split(fromTo[pos:], []byte(";")) {
+		kv := bytes.SplitN(param, []byte("="), 2)
+		if len(kv) != 2 {
+			continue
+		}
+		params[string(bytes.ToLower(bytes.TrimSpace(kv[0])))] = kv[1]
 	}
-	return displayInfo, uri, tag
+
+	return displayInfo, uri, params
 }
 
-func parseURI(uri common.NetString) (scheme, username, host common.NetString, port int) {
-	var prevChar rune
+func parseURI(uri common.NetString) (scheme, username, host common.NetString, port int, params map[string]common.NetString) {
+	var (
+		prevChar  rune
+		inIPv6    bool
+		idx       int
+		hasParams bool
+	)
 	uri = bytes.TrimSpace(uri)
 	prevChar = ' '
 	pos := -1
 	ppos := -1
 	epos := len(uri)
-	inIPv6 := false
-	idx := 0
 
+	params = make(map[string]common.NetString)
 loop:
 	for idx = 0; idx < len(uri); idx++ {
 		curChar := rune(uri[idx])
@@ -372,7 +548,8 @@ loop:
 			inIPv6 = false
 
 		case curChar == ';' && prevChar != '\\':
-			// we found end of URI and will ignore extra info
+			// we found end of URI
+			hasParams = true
 			epos = idx
 			break loop
 
@@ -407,5 +584,15 @@ loop:
 		}
 	}
 
-	return scheme, username, host, port
+	if hasParams {
+		for _, param := range bytes.Split(uri[epos+1:], []byte(";")) {
+			kv := bytes.Split(param, []byte("="))
+			if len(kv) != 2 {
+				continue
+			}
+			params[string(bytes.ToLower(bytes.TrimSpace(kv[0])))] = kv[1]
+		}
+	}
+
+	return scheme, username, host, port, params
 }

@@ -11942,57 +11942,19 @@ type: keyword
 
 --
 
-*`sip.via.transport`*::
+*`sip.via.original`*::
 +
 --
-Via header transport.
+The original Via value.
 
 type: keyword
 
 --
 
-*`sip.via.sent_by.address`*::
+*`sip.via.original.text`*::
 +
 --
-Sent by address
-
-type: keyword
-
---
-
-*`sip.via.sent_by.port`*::
-+
---
-Sent by port
-
-type: keyword
-
---
-
-*`sip.via.received.address`*::
-+
---
-Received address
-
-type: keyword
-
---
-
-*`sip.via.port`*::
-+
---
-Via port
-
-type: keyword
-
---
-
-*`sip.via.branch`*::
-+
---
-Via branch
-
-type: keyword
+type: text
 
 --
 
@@ -12366,57 +12328,19 @@ type: keyword
 
 --
 
-*`sip.sdp.start`*::
+*`sip.sdp.body.original`*::
 +
 --
-SDP start date
-
-type: date
-
---
-
-*`sip.sdp.stop`*::
-+
---
-SDP stop date
-
-type: date
-
---
-
-*`sip.sdp.media.description`*::
-+
---
-SDP media description
+SDP original body
 
 type: keyword
 
 --
 
-*`sip.sdp.media.port`*::
+*`sip.sdp.body.original.text`*::
 +
 --
-SDP media port
-
-type: keyword
-
---
-
-*`sip.sdp.media.format`*::
-+
---
-SDP media format
-
-type: keyword
-
---
-
-*`sip.sdp.media.attributes`*::
-+
---
-SDP media attributes
-
-type: keyword
+type: text
 
 --
 

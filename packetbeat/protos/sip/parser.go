@@ -56,7 +56,7 @@ type message struct {
 	cseq          common.NetString
 	callID        common.NetString
 	maxForwards   int
-	via           []string
+	via           []common.NetString
 	allow         []string
 	supported     []string
 
@@ -265,11 +265,8 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 
 func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 	// check if it isn't headers end yet with /r/n/r/n
-	if !(len(pi.data)-pi.parseOffset >= 4 &&
-		bytes.Equal(
-			pi.data[pi.parseOffset:pi.parseOffset+4],
-			append(constCRLF, constCRLF...),
-		)) {
+	if !(len(pi.data)-pi.parseOffset >= 2 &&
+		bytes.Equal(pi.data[pi.parseOffset:pi.parseOffset+2], constCRLF)) {
 		offset, err := parser.parseHeader(m, pi.data[pi.parseOffset:])
 		if err != nil {
 			return err
@@ -280,7 +277,7 @@ func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 		return nil
 	}
 
-	m.size = uint64(pi.parseOffset + 4)
+	m.size = uint64(pi.parseOffset + 2)
 	m.rawHeaders = pi.data[:m.size]
 	pi.data = pi.data[m.size:]
 	pi.parseOffset = 0
@@ -289,7 +286,7 @@ func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 		if isDebug {
 			debugf("Empty content length, ignore body")
 		}
-		return errors.New("empty content-length but expecting body")
+		return nil
 	}
 
 	if isDebug {
@@ -369,7 +366,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 		case bytes.Equal(headerName, nameSupported):
 			m.supported = parseCommaSeparatedList(headerVal)
 		case bytes.Equal(headerName, nameVia):
-			m.via = append(m.via, string(headerVal))
+			m.via = append(m.via, headerVal)
 		}
 
 		m.headers[string(headerName)] = append(

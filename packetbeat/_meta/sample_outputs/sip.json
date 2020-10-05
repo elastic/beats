@@ -9,7 +9,7 @@
     "event.category": [
         "network",
         "protocol",
-        "authorization"
+        "authentication"
     ],
     "event.dataset": "sip",
     "event.duration": 0,
@@ -37,7 +37,16 @@
     ],
     "server.ip": "212.242.33.35",
     "server.port": 5060,
+    "sip.auth.realm": "sip.cybercity.dk",
+    "sip.auth.scheme": "Digest",
+    "sip.auth.uri.host": "192.168.1.2",
+    "sip.auth.uri.original": "sip:192.168.1.2",
+    "sip.auth.uri.scheme": "sip",
     "sip.call_id": "578222729-4665d775@578222732-4665d772",
+    "sip.contact.uri.host": "sip.cybercity.dk",
+    "sip.contact.uri.original": "sip:voi18062@sip.cybercity.dk",
+    "sip.contact.uri.scheme": "sip",
+    "sip.contact.uri.username": "voi18062",
     "sip.cseq.code": 75,
     "sip.cseq.method": "REGISTER",
     "sip.from.tag": "6bac55c",
@@ -57,8 +66,12 @@
     "sip.uri.scheme": "sip",
     "sip.user_agent.original": "Nero SIPPS IP Phone Version 2.0.51.16",
     "sip.version": "2.0",
+    "sip.via.original": [
+        "SIP/2.0/UDP 192.168.1.2;branch=z9hG4bKnp112903503-43a64480192.168.1.2;rport"
+    ],
     "source.ip": "192.168.1.2",
     "source.port": 5060,
     "status": "OK",
-    "type": "sip"
+    "type": "sip",
+    "user.name": "voi18062"
 }

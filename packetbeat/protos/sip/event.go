@@ -18,8 +18,6 @@
 package sip
 
 import (
-	"time"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -56,12 +54,7 @@ type ProtocolFields struct {
 	CseqCode   int              `ecs:"cseq.code"`
 	CseqMethod common.NetString `ecs:"cseq.method"`
 
-	ViaTransport  common.NetString `ecs:"via.transport"`
-	ViaSentByAddr common.NetString `ecs:"via.sent_by.address"`
-	ViaSentByPort common.NetString `ecs:"via.sent_by.port"`
-	ViaRecvAddr   common.NetString `ecs:"via.received.address"`
-	ViaPort       int              `ecs:"via.port"`
-	ViaBranch     common.NetString `ecs:"via.branch"`
+	ViaOriginal []common.NetString `ecs:"via.original"`
 
 	ToDisplayInfo common.NetString `ecs:"to.display_info"`
 	ToURIOriginal common.NetString `ecs:"to.uri.original"`
@@ -105,11 +98,5 @@ type ProtocolFields struct {
 	SDPSessName      common.NetString `ecs:"sdp.session.name"`
 	SDPConnInfo      common.NetString `ecs:"sdp.connection.info"`
 	SDPConnAddr      common.NetString `ecs:"sdp.connection.address"`
-	SDPStart         time.Time        `ecs:"sdp.start"`
-	SDPStop          time.Time        `ecs:"sdp.stop"`
-
-	SDPMediaDescription []string `ecs:"sdp.media.description"`
-	SDPMediaPort        int      `ecs:"sdp.media.port"`
-	SDPMediaFormat      []string `ecs:"sdp.media.format"`
-	SDPMediaAttrs       []string `ecs:"sdp.media.attributes"`
+	SDPBodyOriginal  common.NetString `ecs:"sdp.body.original"`
 }
