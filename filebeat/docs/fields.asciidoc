@@ -26583,6 +26583,153 @@ type: keyword
 
 --
 
+[float]
+=== cisco.umbrella
+
+Fields for Cisco Umbrella.
+
+
+
+*`cisco.umbrella.identities`*::
++
+--
+An array of the different identities related to the event.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.categories`*::
++
+--
+The security or content categories that the destination matches.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.policy_identity_type`*::
++
+--
+The first identity type matched with this request. Available in version 3 and above.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.identity_types`*::
++
+--
+The type of identity that made the request. For example, Roaming Computer or Network.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.blocked_categories`*::
++
+--
+The categories that resulted in the destination being blocked. Available in version 4 and above.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.content_type`*::
++
+--
+The type of web content, typically text/html.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.sha_sha256`*::
++
+--
+Hex digest of the response content.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.av_detections`*::
++
+--
+The detection name according to the antivirus engine used in file inspection.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.puas`*::
++
+--
+A list of all potentially unwanted application (PUA) results for the proxied file as returned by the antivirus scanner.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_disposition`*::
++
+--
+The status of the files proxied and scanned by Cisco Advanced Malware Protection (AMP) as part of the Umbrella File Inspection feature; can be Clean, Malicious or Unknown.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_malware_name`*::
++
+--
+If Malicious, the name of the malware according to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_score`*::
++
+--
+The score of the malware from AMP. This field is not currently used and will be blank.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.datacenter`*::
++
+--
+The name of the Umbrella Data Center that processed the user-generated traffic.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.origin_id`*::
++
+--
+The unique identity of the network tunnel.
+
+
+type: keyword
+
+--
+
 [[exported-fields-citrix]]
 == Citrix NetScaler fields
 
