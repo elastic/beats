@@ -8,22 +8,22 @@ import unittest
 
 
 SYSTEM_CPU_FIELDS_LINUX = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                     "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
+                           "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
 SYSTEM_CPU_FIELDS_WINDOWS = ["cores", "idle.pct", "system.pct", "user.pct", "total.pct"]
 
 SYSTEM_CPU_FIELDS_DARWIN = ["cores", "idle.pct", "system.pct", "user.pct", "total.pct", "nice.pct"]
 
 SYSTEM_CPU_FIELDS_LINUX_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                         "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
-                         "steal.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+                               "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
+                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
+                               "steal.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
 
 SYSTEM_CPU_FIELDS_WINDOWS_ALL = ["cores", "idle.pct", "idle.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                         "idle.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+                                 "idle.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
 
 SYSTEM_CPU_FIELDS_DARWIN_ALL = ["cores", "idle.pct", "idle.ticks", "nice.pct", "nice.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
-                         "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
+                                "idle.norm.pct", "nice.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct", "total.value"]
 
 SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
