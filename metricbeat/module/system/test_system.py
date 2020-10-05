@@ -47,6 +47,10 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
 
+SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "files",
+                                    "mount_point", "total", "used.bytes",
+                                    "used.pct"]
+
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
@@ -281,7 +285,10 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
-            self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
+            if sys.platform.startswith("windows"):
+                self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
+            else:
+                self.assertCountEqual(self.de_dot(SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
@@ -398,13 +405,17 @@ class Test(metricbeat.BaseTest):
             assert isinstance(summary["total"], int)
             assert isinstance(summary["sleeping"], int)
             assert isinstance(summary["running"], int)
-            assert isinstance(summary["idle"], int)
-            assert isinstance(summary["stopped"], int)
-            assert isinstance(summary["zombie"], int)
             assert isinstance(summary["unknown"], int)
 
-            assert summary["total"] == summary["sleeping"] + summary["running"] + \
-                summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
+            if not sys.platform.startswith("windows"):
+                assert isinstance(summary["idle"], int)
+                assert isinstance(summary["stopped"], int)
+                assert isinstance(summary["zombie"], int)
+                assert summary["total"] == summary["sleeping"] + summary["running"] + \
+                    summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
+
+            if sys.platform.startswith("windows"):
+                assert summary["total"] == summary["sleeping"] + summary["running"] + summary["unknown"]
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
