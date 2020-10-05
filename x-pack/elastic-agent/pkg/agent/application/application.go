@@ -69,7 +69,7 @@ func createApplication(
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, rawConfig, reexec, uc)
+	return newManaged(ctx, log, rawConfig, reexec)
 }
 
 // missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.

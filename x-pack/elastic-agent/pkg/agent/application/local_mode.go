@@ -140,11 +140,13 @@ func newLocal(
 
 	// create a upgrader to use in local mode
 	upgrader := upgrade.NewUpgrader(
+		agentInfo,
 		cfg.Settings.DownloadConfig,
 		log,
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
-		newNoopAcker())
+		newNoopAcker(),
+		reporter)
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil

@@ -91,7 +91,9 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 	// report failed
 	defer func() {
 		if err != nil {
-			u.reportFailure(ctx, a, err)
+			if action := a.FleetAction(); action != nil {
+				u.reportFailure(ctx, action, err)
+			}
 		}
 	}()
 
@@ -120,7 +122,9 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 
 	if strings.HasPrefix(release.Commit(), newHash) {
 		// not an error
-		u.ackAction(ctx, a)
+		if action := a.FleetAction(); action != nil {
+			u.ackAction(ctx, action)
+		}
 		u.log.Warn("upgrading to same version")
 		return nil
 	}
