@@ -29,6 +29,12 @@ import (
 // are actively written by other applications.
 type filestream struct{}
 
+type state struct {
+	Source         string `json:"source" struct:"source"`
+	Offset         int64  `json:"offset" struct:"offset"`
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+}
+
 const pluginName = "filestream"
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
