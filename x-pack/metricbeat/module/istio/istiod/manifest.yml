@@ -4,3 +4,6 @@ input:
   metricset: collector
   defaults:
     metrics_path: /metrics
+    metrics_filters:
+      include: ["citadel_*", "galley_*", "pilot_*"]
+      exclude: ["^up$"]

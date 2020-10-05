@@ -1,3 +1,6 @@
+# Module: istio
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-istio.html
+
 # Istio mesh. To collect all Mixer-generated metrics
 - module: istio
   metricsets: ["mesh"]
