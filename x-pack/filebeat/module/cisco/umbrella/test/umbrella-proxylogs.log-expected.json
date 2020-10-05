@@ -1,0 +1,115 @@
+[
+    {
+        "@timestamp": "2020-07-23T23:48:56.000Z",
+        "cisco.umbrella.amp_disposition": "MalwareName",
+        "cisco.umbrella.av_detections": "AVDetectionName",
+        "cisco.umbrella.categories": "Business Services",
+        "cisco.umbrella.identities": "elasticuser, someotheruser",
+        "cisco.umbrella.identity_types": "Roaming Computers",
+        "cisco.umbrella.puas": "Malicious",
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2020-07-23 23:48:56\\\",\\\"elasticuser, someotheruser\\\",\\\"192.168.1.1\\\",\\\"1.1.1.1\\\",\\\"8.8.8.8\\\",\\\"\\\",\\\"ALLOWED\\\",\\\"https://elastic.co/blog/ext_id=Anyclip\\\",\\\"https://google.com/elastic\\\",\\\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36\\\",\\\"200\\\",\\\"850\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"Business Services\\\",\\\"AVDetectionName\\\",\\\"Malicious\\\",\\\"MalwareName\\\",\\\"\\\",\\\"\\\",\\\"Roaming Computers\\\",\\\"\\\"",
+        "event.type": [
+            "allowed"
+        ],
+        "fileset.name": "umbrella",
+        "http.request.bytes": "850",
+        "http.request.referrer": "https://google.com/elastic",
+        "http.response.status_code": "200",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "\"2020-07-23 23:48:56\",\"elasticuser, someotheruser\",\"192.168.1.1\",\"1.1.1.1\",\"8.8.8.8\",\"\",\"ALLOWED\",\"https://elastic.co/blog/ext_id=Anyclip\",\"https://google.com/elastic\",\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36\",\"200\",\"850\",\"\",\"\",\"\",\"Business Services\",\"AVDetectionName\",\"Malicious\",\"MalwareName\",\"\",\"\",\"Roaming Computers\",\"\"",
+        "observer.product": "Umbrella",
+        "observer.type": "proxy",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.1.1",
+            "1.1.1.1",
+            "8.8.8.8"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.nat.ip": "1.1.1.1",
+        "url.full": "https://elastic.co/blog/ext_id=Anyclip",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+    },
+    {
+        "@timestamp": "2020-07-23T23:48:56.000Z",
+        "cisco.umbrella.amp_disposition": "MalwareName",
+        "cisco.umbrella.av_detections": "AVDetectionName",
+        "cisco.umbrella.categories": "Business Services",
+        "cisco.umbrella.identities": "elasticuser, someotheruser",
+        "cisco.umbrella.identity_types": "Roaming Computers",
+        "cisco.umbrella.puas": "Malicious",
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2020-07-23 23:48:56\\\",\\\"elasticuser, someotheruser\\\",\\\"192.168.1.1\\\",\\\"1.1.1.1\\\",\\\"8.8.8.8\\\",\\\"\\\",\\\"BLOCKED\\\",\\\"https://elastic.co/blog/ext_id=Anyclip\\\",\\\"https://google.com/elastic\\\",\\\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36\\\",\\\"200\\\",\\\"850\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"Business Services\\\",\\\"AVDetectionName\\\",\\\"Malicious\\\",\\\"MalwareName\\\",\\\"\\\",\\\"\\\",\\\"Roaming Computers\\\",\\\"\\\"",
+        "event.type": [
+            "denied"
+        ],
+        "fileset.name": "umbrella",
+        "http.request.bytes": "850",
+        "http.request.referrer": "https://google.com/elastic",
+        "http.response.status_code": "200",
+        "input.type": "log",
+        "log.offset": 399,
+        "message": "\"2020-07-23 23:48:56\",\"elasticuser, someotheruser\",\"192.168.1.1\",\"1.1.1.1\",\"8.8.8.8\",\"\",\"BLOCKED\",\"https://elastic.co/blog/ext_id=Anyclip\",\"https://google.com/elastic\",\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36\",\"200\",\"850\",\"\",\"\",\"\",\"Business Services\",\"AVDetectionName\",\"Malicious\",\"MalwareName\",\"\",\"\",\"Roaming Computers\",\"\"",
+        "observer.product": "Umbrella",
+        "observer.type": "proxy",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.1.1",
+            "1.1.1.1",
+            "8.8.8.8"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.nat.ip": "1.1.1.1",
+        "url.full": "https://elastic.co/blog/ext_id=Anyclip",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+    },
+    {
+        "@timestamp": "2017-10-02T23:52:53.000Z",
+        "cisco.umbrella.amp_score": "Networks",
+        "cisco.umbrella.identities": "elasticuser",
+        "destination.address": "1.1.1.91",
+        "destination.ip": "1.1.1.91",
+        "event.dataset": "cisco.umbrella",
+        "event.module": "cisco",
+        "event.original": "\\\"2017-10-02 23:52:53\\\",\\\"elasticuser\\\",\\\"ActiveDirectoryUserName,ADSite,Network\\\",\\\"192.192.192.135\\\",\\\"1.1.1.91\\\",\\\"\\\",\\\"ALLOWED\\\",\\\"http://google.com/the.js\\\",\\\"www.google.com\\\",\\\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36\\\",\\\"200\\\",\\\"562\\\",\\\"1489\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"\\\",\\\"Networks\\\"",
+        "event.type": [
+            "allowed"
+        ],
+        "fileset.name": "umbrella",
+        "http.request.bytes": "562",
+        "http.request.referrer": "www.google.com",
+        "http.response.bytes": "1489",
+        "http.response.status_code": "200",
+        "input.type": "log",
+        "log.offset": 798,
+        "message": "\"2017-10-02 23:52:53\",\"elasticuser\",\"ActiveDirectoryUserName,ADSite,Network\",\"192.192.192.135\",\"1.1.1.91\",\"\",\"ALLOWED\",\"http://google.com/the.js\",\"www.google.com\",\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36\",\"200\",\"562\",\"1489\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"Networks\"",
+        "observer.product": "Umbrella",
+        "observer.type": "proxy",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "ActiveDirectoryUserName,ADSite,Network"
+        ],
+        "related.ip": [
+            "192.192.192.135",
+            "1.1.1.91"
+        ],
+        "service.type": "cisco",
+        "source.address": "ActiveDirectoryUserName,ADSite,Network",
+        "source.domain": "ActiveDirectoryUserName,ADSite,Network",
+        "source.nat.ip": "192.192.192.135",
+        "url.full": "http://google.com/the.js",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+    }
+]
