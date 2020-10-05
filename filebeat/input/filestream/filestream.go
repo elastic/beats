@@ -181,8 +181,7 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			shouldClose := f.shouldBeClosed()
-			if shouldClose {
+			if f.shouldBeClosed() {
 				f.cancelReading()
 				return
 			}
