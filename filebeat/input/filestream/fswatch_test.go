@@ -230,56 +230,6 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 	}
 }
 
-func TestFileWatcherRenamedFile(t *testing.T) {
-	testPath := mustAbsPath("first_name")
-	renamedPath := mustAbsPath("renamed")
-
-	f, err := os.Create(testPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	f.Close()
-	fi, err := os.Stat(testPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cfg := fileScannerConfig{
-		ExcludedFiles: nil,
-		Symlinks:      false,
-		RecursiveGlob: false,
-	}
-	scanner, err := newFileScanner([]string{testPath, renamedPath}, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-	w := fileWatcher{
-		log:     logp.L(),
-		scanner: scanner,
-		events:  make(chan loginp.FSEvent),
-	}
-
-	go w.watch(context.Background())
-	assert.Equal(t, loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: testPath, Info: fi}, w.Event())
-
-	err = os.Rename(testPath, renamedPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(renamedPath)
-	fi, err = os.Stat(renamedPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	go w.watch(context.Background())
-	evt := w.Event()
-
-	assert.Equal(t, loginp.OpRename, evt.Op)
-	assert.Equal(t, testPath, evt.OldPath)
-	assert.Equal(t, renamedPath, evt.NewPath)
-}
-
 type mockScanner struct {
 	files map[string]os.FileInfo
 }
