@@ -35,7 +35,7 @@ func addHostMetadata(event *mb.Event, metricList common.MapStr) {
 	}
 }
 
-func addCloudVMMetadata(event *mb.Event, vm VmResource) {
+func addCloudVMMetadata(event *mb.Event, vm VmResource, subscriptionId string) {
 	if vm.Name != "" {
 		event.RootFields.Put("cloud.instance.name", vm.Name)
 		event.RootFields.Put("host.name", vm.Name)
@@ -46,5 +46,8 @@ func addCloudVMMetadata(event *mb.Event, vm VmResource) {
 	}
 	if vm.Size != "" {
 		event.RootFields.Put("cloud.machine.type", vm.Size)
+	}
+	if subscriptionId != "" {
+		event.RootFields.Put("cloud.account.id", subscriptionId)
 	}
 }
