@@ -31,11 +31,7 @@ processors:
           %{TIMESTAMP_ISO8601:event.start}
           \"(?:-|%{DATA:_tmp.actions_executed})\"
           \"(?:-|%{DATA:aws.elb.redirect_url})\"
-          \"(?:-|%{DATA:aws.elb.error.reason})\"
-          \"(?:-|%{DATA:_tmp.target_port})\"
-          \"(?:-|%{DATA:_tmp.target_status_code})\"
-          \"(?:-|%{DATA:aws.elb.classification})\"
-          \"(?:-|%{DATA:aws.elb.classification_reason})\"
+          \"(?:-|%{DATA:aws.elb.error.reason})\"( \"(?:-|%{DATA:_tmp.target_port})\")?( \"(?:-|%{DATA:_tmp.target_status_code})\")?( \"(?:-|%{DATA:aws.elb.classification})\")?( \"(?:-|%{DATA:aws.elb.classification_reason})\")?
 
         # TCP from Network Load Balancers (v2 Load Balancers)
         - >-
