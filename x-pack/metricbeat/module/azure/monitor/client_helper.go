@@ -78,20 +78,20 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 		}
 	} else {
 		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
-		supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metricConfig.Name, metricDefinitions)
-		if len(unsupportedMetricNames) > 0 {
+		supportedMetricNames, unsupportedMetricNames = filterConfiguredMetrics(metricConfig.Name, metricDefinitions)
+		if len(unsupportedMetricNames) > 0 && !metricConfig.IgnoreUnsupported {
 			return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
 				strings.Join(unsupportedMetricNames, ","), resourceId, metricConfig.Namespace)
 		}
 	}
-	if len(supportedMetricNames) == 0 {
+	if len(supportedMetricNames) == 0 && !metricConfig.IgnoreUnsupported {
 		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metricConfig.Name, ","), resourceId, metricConfig.Namespace)
 	}
 	return supportedMetricNames, nil
 }
 
-// filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
-func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
+// filterConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
+func filterConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
 	var allMetrics string

@@ -28,11 +28,13 @@ changeset:
         - "^\\.ci/scripts/.*"
     oss:
         - "^go.mod"
+        - "^pytest.ini"
         - "^dev-tools/.*"
         - "^libbeat/.*"
         - "^testing/.*"
     xpack:
         - "^go.mod"
+        - "^pytest.ini"
         - "^dev-tools/.*"
         - "^libbeat/.*"
         - "^testing/.*"
