@@ -67,7 +67,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/SQS"
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
