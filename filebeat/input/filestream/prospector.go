@@ -111,12 +111,12 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.
 					}
 				}
 
-				p.startReading(ctx, hg, src, fe.NewPath)
+				hg.Run(ctx, src)
 
 			case loginp.OpWrite:
 				log.Debugf("File %s has been updated", fe.NewPath)
 
-				p.startReading(ctx, hg, src, fe.NewPath)
+				hg.Run(ctx, src)
 
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
@@ -138,11 +138,6 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.
 				log.Error("Unkown return value %v", fe.Op)
 			}
 		}
-		return nil
-	})
-
-	tg.Go(func() error {
-		p.monitor.run(ctx.Cancelation, hg)
 		return nil
 	})
 

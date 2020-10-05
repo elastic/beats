@@ -28,6 +28,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -92,11 +93,12 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 }
 
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	osstate := file.GetOSState(e.Info)
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                fmt.Sprintf("%s%s%s-%s", i.name, identitySep, s.FileStateOS.InodeString(), i.markerContents()),
+		name:                fmt.Sprintf("%s%s%s-%s", i.name, identitySep, osstate.InodeString(), i.markerContents()),
 		identifierGenerator: i.name,
 	}
 }
