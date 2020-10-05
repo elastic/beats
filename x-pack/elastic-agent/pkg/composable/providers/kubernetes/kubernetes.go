@@ -87,9 +87,7 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 
 func (p *eventWatcher) emitRunning(pod *kubernetes.Pod) {
 	mapping := map[string]interface{}{
-		"namespace": map[string]interface{}{
-			"name": pod.GetNamespace(),
-		},
+		"namespace": pod.GetNamespace(),
 		"pod": map[string]interface{}{
 			"uid":    string(pod.GetUID()),
 			"name":   pod.GetName(),
@@ -142,9 +140,7 @@ func (p *eventWatcher) emitContainers(pod *kubernetes.Pod, containers []kubernet
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
 		mapping := map[string]interface{}{
-			"namespace": map[string]interface{}{
-				"name": pod.GetNamespace(),
-			},
+			"namespace": pod.GetNamespace(),
 			"pod": map[string]interface{}{
 				"uid":    string(pod.GetUID()),
 				"name":   pod.GetName(),
