@@ -37,9 +37,9 @@ const (
 
 var (
 	identifierFactories = map[string]identifierFactory{
-		nativeName: newINodeDeviceIdentifier,
-		pathName:   newPathIdentifier,
-		//inodeMarkerName: newINodeMarkerIdentifier, TODO
+		nativeName:      newINodeDeviceIdentifier,
+		pathName:        newPathIdentifier,
+		inodeMarkerName: newINodeMarkerIdentifier,
 	}
 )
 
