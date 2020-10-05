@@ -4,10 +4,6 @@
   description: >
     application insights
   fields:
-    - name: application_id
-      type: keyword
-      description: >
-        The application ID
     - name: start_date
       type: date
       description: >
