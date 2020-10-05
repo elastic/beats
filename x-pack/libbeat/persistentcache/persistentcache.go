@@ -15,12 +15,9 @@ import (
 )
 
 const (
-	cacheFile     = "cache"
-	cacheFileMode = os.FileMode(0600)
-	gcPeriod      = 5 * time.Minute
+	cacheFile = "cache"
+	gcPeriod  = 5 * time.Minute
 )
-
-var expiredError = errors.New("key expired")
 
 // PersistentCache is a persistent map of keys to values. Elements added to the
 // cache are stored until they are explicitly deleted or are expired due to time-based
