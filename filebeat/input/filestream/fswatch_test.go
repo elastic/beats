@@ -220,9 +220,7 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 				events:  make(chan loginp.FSEvent),
 			}
 
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-			go w.watch(ctx)
+			go w.watch(context.Background())
 
 			for _, expectedEvent := range test.expectedEvents {
 				evt := w.Event()
@@ -278,9 +276,6 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 	evt := w.Event()
 
 	assert.Equal(t, loginp.OpRename, evt.Op)
-	assert.Equal(t, loginp.OpDelete, evt.Op)
-	assert.Equal(t, loginp.OpCreate, evt.Op)
-	assert.Equal(t, loginp.OpWrite, evt.Op)
 	assert.Equal(t, testPath, evt.OldPath)
 	assert.Equal(t, renamedPath, evt.NewPath)
 }
