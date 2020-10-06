@@ -1888,6 +1888,46 @@ type: keyword
 
 --
 
+*`aws.elb.target_port`*::
++
+--
+List of IP addresses and ports for the targets that processed this request.
+
+
+type: keyword
+
+--
+
+*`aws.elb.target_status_code`*::
++
+--
+List of status codes from the responses of the targets.
+
+
+type: keyword
+
+--
+
+*`aws.elb.classification`*::
++
+--
+The classification for desync mitigation.
+
+
+type: keyword
+
+--
+
+*`aws.elb.classification_reason`*::
++
+--
+The classification reason code.
+
+
+type: keyword
+
+--
+
 [float]
 === s3access
 
@@ -26585,6 +26625,153 @@ type: keyword
 
 --
 
+[float]
+=== cisco.umbrella
+
+Fields for Cisco Umbrella.
+
+
+
+*`cisco.umbrella.identities`*::
++
+--
+An array of the different identities related to the event.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.categories`*::
++
+--
+The security or content categories that the destination matches.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.policy_identity_type`*::
++
+--
+The first identity type matched with this request. Available in version 3 and above.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.identity_types`*::
++
+--
+The type of identity that made the request. For example, Roaming Computer or Network.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.blocked_categories`*::
++
+--
+The categories that resulted in the destination being blocked. Available in version 4 and above.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.content_type`*::
++
+--
+The type of web content, typically text/html.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.sha_sha256`*::
++
+--
+Hex digest of the response content.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.av_detections`*::
++
+--
+The detection name according to the antivirus engine used in file inspection.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.puas`*::
++
+--
+A list of all potentially unwanted application (PUA) results for the proxied file as returned by the antivirus scanner.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_disposition`*::
++
+--
+The status of the files proxied and scanned by Cisco Advanced Malware Protection (AMP) as part of the Umbrella File Inspection feature; can be Clean, Malicious or Unknown.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_malware_name`*::
++
+--
+If Malicious, the name of the malware according to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.amp_score`*::
++
+--
+The score of the malware from AMP. This field is not currently used and will be blank.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.datacenter`*::
++
+--
+The name of the Umbrella Data Center that processed the user-generated traffic.
+
+
+type: keyword
+
+--
+
+*`cisco.umbrella.origin_id`*::
++
+--
+The unique identity of the network tunnel.
+
+
+type: keyword
+
+--
+
 [[exported-fields-citrix]]
 == Citrix NetScaler fields
 
@@ -44041,8 +44228,15 @@ type: object
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +
@@ -87933,6 +88127,973 @@ type: keyword
 
 --
 
+[float]
+=== juniper.srx
+
+Module for parsing junipersrx syslog.
+
+
+
+*`juniper.srx.reason`*::
++
+--
+reason
+
+
+type: keyword
+
+--
+
+*`juniper.srx.connection_tag`*::
++
+--
+connection tag
+
+
+type: keyword
+
+--
+
+*`juniper.srx.service_name`*::
++
+--
+service name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.nat_connection_tag`*::
++
+--
+nat connection tag
+
+
+type: keyword
+
+--
+
+*`juniper.srx.src_nat_rule_type`*::
++
+--
+src nat rule type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.src_nat_rule_name`*::
++
+--
+src nat rule name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.dst_nat_rule_type`*::
++
+--
+dst nat rule type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.dst_nat_rule_name`*::
++
+--
+dst nat rule name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.protocol_id`*::
++
+--
+protocol id
+
+
+type: keyword
+
+--
+
+*`juniper.srx.policy_name`*::
++
+--
+policy name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.session_id_32`*::
++
+--
+session id 32
+
+
+type: keyword
+
+--
+
+*`juniper.srx.session_id`*::
++
+--
+session id
+
+
+type: keyword
+
+--
+
+*`juniper.srx.outbound_packets`*::
++
+--
+packets from client
+
+
+type: integer
+
+--
+
+*`juniper.srx.outbound_bytes`*::
++
+--
+bytes from client
+
+
+type: integer
+
+--
+
+*`juniper.srx.inbound_packets`*::
++
+--
+packets from server
+
+
+type: integer
+
+--
+
+*`juniper.srx.inbound_bytes`*::
++
+--
+bytes from server
+
+
+type: integer
+
+--
+
+*`juniper.srx.elapsed_time`*::
++
+--
+elapsed time
+
+
+type: date
+
+--
+
+*`juniper.srx.application`*::
++
+--
+application
+
+
+type: keyword
+
+--
+
+*`juniper.srx.nested_application`*::
++
+--
+nested application
+
+
+type: keyword
+
+--
+
+*`juniper.srx.username`*::
++
+--
+username
+
+
+type: keyword
+
+--
+
+*`juniper.srx.roles`*::
++
+--
+roles
+
+
+type: keyword
+
+--
+
+*`juniper.srx.encrypted`*::
++
+--
+encrypted
+
+
+type: keyword
+
+--
+
+*`juniper.srx.application_category`*::
++
+--
+application category
+
+
+type: keyword
+
+--
+
+*`juniper.srx.application_sub_category`*::
++
+--
+application sub category
+
+
+type: keyword
+
+--
+
+*`juniper.srx.application_characteristics`*::
++
+--
+application characteristics
+
+
+type: keyword
+
+--
+
+*`juniper.srx.secure_web_proxy_session_type`*::
++
+--
+secure web proxy session type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.peer_session_id`*::
++
+--
+peer session id
+
+
+type: keyword
+
+--
+
+*`juniper.srx.peer_source_address`*::
++
+--
+peer source address
+
+
+type: ip
+
+--
+
+*`juniper.srx.peer_source_port`*::
++
+--
+peer source port
+
+
+type: integer
+
+--
+
+*`juniper.srx.peer_destination_address`*::
++
+--
+peer destination address
+
+
+type: ip
+
+--
+
+*`juniper.srx.peer_destination_port`*::
++
+--
+peer destination port
+
+
+type: integer
+
+--
+
+*`juniper.srx.hostname`*::
++
+--
+hostname
+
+
+type: keyword
+
+--
+
+*`juniper.srx.src_vrf_grp`*::
++
+--
+src_vrf_grp
+
+
+type: keyword
+
+--
+
+*`juniper.srx.dst_vrf_grp`*::
++
+--
+dst_vrf_grp
+
+
+type: keyword
+
+--
+
+*`juniper.srx.icmp_type`*::
++
+--
+icmp type
+
+
+type: integer
+
+--
+
+*`juniper.srx.process`*::
++
+--
+process that generated the message
+
+
+type: keyword
+
+--
+
+*`juniper.srx.apbr_rule_type`*::
++
+--
+apbr rule type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.dscp_value`*::
++
+--
+apbr rule type
+
+
+type: integer
+
+--
+
+*`juniper.srx.logical_system_name`*::
++
+--
+logical system name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.profile_name`*::
++
+--
+profile name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.routing_instance`*::
++
+--
+routing instance
+
+
+type: keyword
+
+--
+
+*`juniper.srx.rule_name`*::
++
+--
+rule name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.uplink_tx_bytes`*::
++
+--
+uplink tx bytes
+
+
+type: integer
+
+--
+
+*`juniper.srx.uplink_rx_bytes`*::
++
+--
+uplink rx bytes
+
+
+type: integer
+
+--
+
+*`juniper.srx.obj`*::
++
+--
+url path
+
+
+type: keyword
+
+--
+
+*`juniper.srx.url`*::
++
+--
+url domain
+
+
+type: keyword
+
+--
+
+*`juniper.srx.profile`*::
++
+--
+filter profile
+
+
+type: keyword
+
+--
+
+*`juniper.srx.category`*::
++
+--
+filter category
+
+
+type: keyword
+
+--
+
+*`juniper.srx.filename`*::
++
+--
+filename
+
+
+type: keyword
+
+--
+
+*`juniper.srx.temporary_filename`*::
++
+--
+temporary_filename
+
+
+type: keyword
+
+--
+
+*`juniper.srx.name`*::
++
+--
+name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.error_message`*::
++
+--
+error_message
+
+
+type: keyword
+
+--
+
+*`juniper.srx.error_code`*::
++
+--
+error_code
+
+
+type: keyword
+
+--
+
+*`juniper.srx.action`*::
++
+--
+action
+
+
+type: keyword
+
+--
+
+*`juniper.srx.protocol`*::
++
+--
+protocol
+
+
+type: keyword
+
+--
+
+*`juniper.srx.protocol_name`*::
++
+--
+protocol name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.type`*::
++
+--
+type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.repeat_count`*::
++
+--
+repeat count
+
+
+type: integer
+
+--
+
+*`juniper.srx.alert`*::
++
+--
+repeat alert
+
+
+type: keyword
+
+--
+
+*`juniper.srx.message_type`*::
++
+--
+message type
+
+
+type: keyword
+
+--
+
+*`juniper.srx.threat_severity`*::
++
+--
+threat severity
+
+
+type: keyword
+
+--
+
+*`juniper.srx.application_name`*::
++
+--
+application name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.attack_name`*::
++
+--
+attack name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.index`*::
++
+--
+index
+
+
+type: keyword
+
+--
+
+*`juniper.srx.message`*::
++
+--
+mesagge
+
+
+type: keyword
+
+--
+
+*`juniper.srx.epoch_time`*::
++
+--
+epoch time
+
+
+type: date
+
+--
+
+*`juniper.srx.packet_log_id`*::
++
+--
+packet log id
+
+
+type: integer
+
+--
+
+*`juniper.srx.export_id`*::
++
+--
+packet log id
+
+
+type: integer
+
+--
+
+*`juniper.srx.ddos_application_name`*::
++
+--
+ddos application name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.connection_hit_rate`*::
++
+--
+connection hit rate
+
+
+type: integer
+
+--
+
+*`juniper.srx.time_scope`*::
++
+--
+time scope
+
+
+type: keyword
+
+--
+
+*`juniper.srx.context_hit_rate`*::
++
+--
+context hit rate
+
+
+type: integer
+
+--
+
+*`juniper.srx.context_value_hit_rate`*::
++
+--
+context value hit rate
+
+
+type: integer
+
+--
+
+*`juniper.srx.time_count`*::
++
+--
+time count
+
+
+type: integer
+
+--
+
+*`juniper.srx.time_period`*::
++
+--
+time period
+
+
+type: integer
+
+--
+
+*`juniper.srx.context_value`*::
++
+--
+context value
+
+
+type: keyword
+
+--
+
+*`juniper.srx.context_name`*::
++
+--
+context name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.ruleebase_name`*::
++
+--
+ruleebase name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.verdict_source`*::
++
+--
+verdict source
+
+
+type: keyword
+
+--
+
+*`juniper.srx.verdict_number`*::
++
+--
+verdict number
+
+
+type: integer
+
+--
+
+*`juniper.srx.file_category`*::
++
+--
+file category
+
+
+type: keyword
+
+--
+
+*`juniper.srx.sample_sha256`*::
++
+--
+sample sha256
+
+
+type: keyword
+
+--
+
+*`juniper.srx.malware_info`*::
++
+--
+malware info
+
+
+type: keyword
+
+--
+
+*`juniper.srx.client_ip`*::
++
+--
+client ip
+
+
+type: ip
+
+--
+
+*`juniper.srx.tenant_id`*::
++
+--
+tenant id
+
+
+type: keyword
+
+--
+
+*`juniper.srx.timestamp`*::
++
+--
+timestamp
+
+
+type: date
+
+--
+
+*`juniper.srx.th`*::
++
+--
+th
+
+
+type: keyword
+
+--
+
+*`juniper.srx.status`*::
++
+--
+status
+
+
+type: keyword
+
+--
+
+*`juniper.srx.state`*::
++
+--
+state
+
+
+type: keyword
+
+--
+
+*`juniper.srx.file_hash_lookup`*::
++
+--
+file hash lookup
+
+
+type: keyword
+
+--
+
+*`juniper.srx.file_name`*::
++
+--
+file name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.action_detail`*::
++
+--
+action detail
+
+
+type: keyword
+
+--
+
+*`juniper.srx.sub_category`*::
++
+--
+sub category
+
+
+type: keyword
+
+--
+
+*`juniper.srx.feed_name`*::
++
+--
+feed name
+
+
+type: keyword
+
+--
+
+*`juniper.srx.occur_count`*::
++
+--
+occur count
+
+
+type: integer
+
+--
+
+*`juniper.srx.tag`*::
++
+--
+system log message tag, which uniquely identifies the message.
+
+
+type: keyword
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 
@@ -94406,6 +95567,433 @@ type: keyword
 This key captures values or decorators used within a registry entry
 
 type: keyword
+
+--
+
+[float]
+=== microsoft.m365_defender
+
+Module for ingesting Microsoft Defender ATP.
+
+
+
+*`microsoft.m365_defender.incidentId`*::
++
+--
+Unique identifier to represent the incident.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.redirectIncidentId`*::
++
+--
+Only populated in case an incident is being grouped together with another incident, as part of the incident processing logic.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.incidentName`*::
++
+--
+Name of the Incident.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.determination`*::
++
+--
+Specifies the determination of the incident. The property values are: NotAvailable, Apt, Malware, SecurityPersonnel, SecurityTesting, UnwantedSoftware, Other.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.investigationState`*::
++
+--
+The current state of the Investigation.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.assignedTo`*::
++
+--
+Owner of the alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.tags`*::
++
+--
+Array of custom tags associated with an incident, for example to flag a group of incidents with a common characteristic.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.status`*::
++
+--
+Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.classification`*::
++
+--
+Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.incidentId`*::
++
+--
+Unique identifier to represent the incident this alert is associated with.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.resolvedTime`*::
++
+--
+Time when alert was resolved.
+
+
+type: date
+
+--
+
+*`microsoft.m365_defender.alerts.status`*::
++
+--
+Categorize alerts (as New, Active, or Resolved).
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.severity`*::
++
+--
+The severity of the related alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.creationTime`*::
++
+--
+Time when alert was first created.
+
+
+type: date
+
+--
+
+*`microsoft.m365_defender.alerts.lastUpdatedTime`*::
++
+--
+Time when alert was last updated.
+
+
+type: date
+
+--
+
+*`microsoft.m365_defender.alerts.investigationId`*::
++
+--
+The automated investigation id triggered by this alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.userSid`*::
++
+--
+The SID of the related user
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.detectionSource`*::
++
+--
+The service that initially detected the threat.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.classification`*::
++
+--
+The specification for the incident. The property values are: Unknown, FalsePositive, TruePositive or null.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.investigationState`*::
++
+--
+Information on the investigation's current status.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.determination`*::
++
+--
+Specifies the determination of the incident. The property values are: NotAvailable, Apt, Malware, SecurityPersonnel, SecurityTesting, UnwantedSoftware, Other or null
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.assignedTo`*::
++
+--
+Owner of the incident, or null if no owner is assigned.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.actorName`*::
++
+--
+The activity group, if any, the associated with this alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.threatFamilyName`*::
++
+--
+Threat family associated with this alert.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.mitreTechniques`*::
++
+--
+The attack techniques, as aligned with the MITRE ATT&CK™ framework.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.entityType`*::
++
+--
+Entities that have been identified to be part of, or related to, a given alert. The properties values are: User, Ip, Url, File, Process, MailBox, MailMessage, MailCluster, Registry.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.accountName`*::
++
+--
+Account name of the related user.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.mailboxDisplayName`*::
++
+--
+The display name of the related mailbox.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.mailboxAddress`*::
++
+--
+The mail address of the related mailbox.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.clusterBy`*::
++
+--
+A list of metadata if the entityType is MailCluster.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.sender`*::
++
+--
+The sender for the related email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.recipient`*::
++
+--
+The recipient for the related email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.subject`*::
++
+--
+The subject for the related email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.deliveryAction`*::
++
+--
+The delivery status for the related email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.securityGroupId`*::
++
+--
+The Security Group ID for the user related to the email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.securityGroupName`*::
++
+--
+The Security Group Name for the user related to the email message.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.registryHive`*::
++
+--
+Reference to which Hive in registry the event is related to, if eventType is registry. Example: HKEY_LOCAL_MACHINE.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.registryKey`*::
++
+--
+Reference to the related registry key to the event.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.registryValueType`*::
++
+--
+Value type of the registry key/value pair related to the event.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.deviceId`*::
++
+--
+The unique ID of the device related to the event.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.entities.ipAddress`*::
++
+--
+The related IP address to the event.
+
+
+type: keyword
+
+--
+
+*`microsoft.m365_defender.alerts.devices`*::
++
+--
+The devices related to the investigation.
+
+
+type: flattened
 
 --
 

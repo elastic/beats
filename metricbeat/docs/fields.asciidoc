@@ -4669,6 +4669,16 @@ type: keyword
 
 --
 
+*`azure.application_id`*::
++
+--
+The application ID
+
+
+type: keyword
+
+--
+
 *`azure.dimensions.*`*::
 +
 --
@@ -4695,16 +4705,6 @@ type: object
 application insights
 
 
-
-*`azure.app_insights.application_id`*::
-+
---
-The application ID
-
-
-type: keyword
-
---
 
 *`azure.app_insights.start_date`*::
 +
@@ -4733,6 +4733,213 @@ The metrics
 
 
 type: object
+
+--
+
+[float]
+=== app_state
+
+application state
+
+
+
+*`azure.app_state.start_date`*::
++
+--
+The start date
+
+
+type: date
+
+--
+
+*`azure.app_state.end_date`*::
++
+--
+The end date
+
+
+type: date
+
+--
+
+*`azure.app_state.requests_count.sum`*::
++
+--
+Request count
+
+
+type: float
+
+--
+
+*`azure.app_state.requests_failed.sum`*::
++
+--
+Request failed count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_count.unique`*::
++
+--
+User count
+
+
+type: float
+
+--
+
+*`azure.app_state.sessions_count.unique`*::
++
+--
+Session count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_authenticated.unique`*::
++
+--
+Authenticated users count
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_network_duration.avg`*::
++
+--
+Browser timings network duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_send_duration.avg`*::
++
+--
+Browser timings send duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_receive_uration.avg`*::
++
+--
+Browser timings receive duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_processing_duration.avg`*::
++
+--
+Browser timings processing duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_total_duration.avg`*::
++
+--
+Browser timings total duration
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_count.sum`*::
++
+--
+Exception count
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_browser.sum`*::
++
+--
+Exception count at browser level
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_server.sum`*::
++
+--
+Exception count at server level
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_memory_available_bytes.avg`*::
++
+--
+Performance counters memory available bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_private_bytes.avg`*::
++
+--
+Performance counters process private bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage_total.avg`*::
++
+--
+Performance counters process cpu percentage total
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage.avg`*::
++
+--
+Performance counters process cpu percentage
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_processiobytes_per_second.avg`*::
++
+--
+Performance counters process IO bytes per second
+
+
+type: float
 
 --
 
@@ -9164,8 +9371,15 @@ Stats collected from Dropwizard.
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +

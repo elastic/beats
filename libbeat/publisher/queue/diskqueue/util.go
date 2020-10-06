@@ -69,16 +69,32 @@ func writeErrorIsRetriable(err error) bool {
 // "wrapped" field in-place as long as it isn't captured by the callback.
 type callbackRetryWriter struct {
 	wrapped io.Writer
-	retry   func(error) bool
+
+	// The retry callback is called with the error that was produced and whether
+	// this is the first (subsequent) error arising from this particular
+	// write call.
+	retry func(err error, firstTime bool) bool
 }
 
 func (w callbackRetryWriter) Write(p []byte) (int, error) {
+	// firstTime tracks whether the current error is the first subsequent error
+	// being passed to the retry callback. This is so that the callback can
+	// reset its internal counters in case it is using exponential backoff or
+	// a retry limit.
+	firstTime := true
 	bytesWritten := 0
 	writer := w.wrapped
 	n, err := writer.Write(p)
 	for n < len(p) {
-		if err != nil && !w.retry(err) {
-			return bytesWritten + n, err
+		if err != nil {
+			shouldRetry := w.retry(err, firstTime)
+			firstTime = false
+			if !shouldRetry {
+				return bytesWritten + n, err
+			}
+		} else {
+			// If we made progress without an error, reset firstTime.
+			firstTime = true
 		}
 		// Advance p and try again.
 		bytesWritten += n

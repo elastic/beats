@@ -4,7 +4,6 @@
     - elb
     - natgateway
     - rds
-    - s3_request
     - transitgateway
     - usage
     - vpn
@@ -45,3 +44,8 @@
   period: 24h
   metricsets:
     - s3_daily_storage
+- module: aws
+  period: 1m
+  latency: 5m
+  metricsets:
+    - s3_request

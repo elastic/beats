@@ -2399,8 +2399,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.119.181.171",
-            "10.166.144.66"
+            "10.166.144.66",
+            "10.119.181.171"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "dol",

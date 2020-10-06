@@ -27,5 +27,21 @@ func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker)
 		return fmt.Errorf("invalid type, expected ActionUpgrade and received %T", a)
 	}
 
-	return h.upgrader.Upgrade(ctx, action)
+	return h.upgrader.Upgrade(ctx, &upgradeAction{action}, true)
+}
+
+type upgradeAction struct {
+	*fleetapi.ActionUpgrade
+}
+
+func (a *upgradeAction) Version() string {
+	return a.ActionUpgrade.Version
+}
+
+func (a *upgradeAction) SourceURI() string {
+	return a.ActionUpgrade.SourceURI
+}
+
+func (a *upgradeAction) FleetAction() *fleetapi.ActionUpgrade {
+	return a.ActionUpgrade
 }

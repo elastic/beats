@@ -95,13 +95,13 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	rex := reexec.NewManager(rexLogger, execPath)
 
 	// start the control listener
-	control := server.New(logger.Named("control"), rex)
+	control := server.New(logger.Named("control"), rex, nil)
 	if err := control.Start(); err != nil {
 		return err
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex)
+	app, err := application.New(logger, pathConfigFile, rex, control)
 	if err != nil {
 		return err
 	}

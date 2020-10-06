@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -61,16 +62,26 @@ type Settings struct {
 	// A listener that should be sent ACKs when an event is successfully
 	// written to disk.
 	WriteToDiskListener queue.ACKListener
+
+	// RetryInterval specifies how long to wait before retrying a fatal error
+	// writing to disk. If MaxRetryInterval is nonzero, subsequent retries will
+	// use exponential backoff up to the specified limit.
+	RetryInterval    time.Duration
+	MaxRetryInterval time.Duration
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
 // by the end user in the beats yml file.
 type userConfig struct {
-	Path            string            `config:"path"`
-	MaxSize         cfgtype.ByteSize  `config:"max_size" validate:"required"`
-	SegmentSize     *cfgtype.ByteSize `config:"segment_size"`
-	ReadAheadLimit  *int              `config:"read_ahead"`
-	WriteAheadLimit *int              `config:"write_ahead"`
+	Path        string            `config:"path"`
+	MaxSize     cfgtype.ByteSize  `config:"max_size" validate:"required"`
+	SegmentSize *cfgtype.ByteSize `config:"segment_size"`
+
+	ReadAheadLimit  *int `config:"read_ahead"`
+	WriteAheadLimit *int `config:"write_ahead"`
+
+	RetryInterval    *time.Duration `config:"retry_interval" validate:"positive"`
+	MaxRetryInterval *time.Duration `config:"max_retry_interval" validate:"positive"`
 }
 
 func (c *userConfig) Validate() error {
@@ -96,6 +107,13 @@ func (c *userConfig) Validate() error {
 			"Disk queue segment_size (%d) cannot be less than 1MB", *c.SegmentSize)
 	}
 
+	if c.RetryInterval != nil && c.MaxRetryInterval != nil &&
+		*c.MaxRetryInterval < *c.RetryInterval {
+		return fmt.Errorf(
+			"Disk queue max_retry_interval (%v) can't be less than retry_interval (%v)",
+			*c.MaxRetryInterval, *c.RetryInterval)
+	}
+
 	return nil
 }
 
@@ -108,6 +126,9 @@ func DefaultSettings() Settings {
 
 		ReadAheadLimit:  512,
 		WriteAheadLimit: 2048,
+
+		RetryInterval:    1 * time.Second,
+		MaxRetryInterval: 30 * time.Second,
 	}
 }
 
@@ -137,6 +158,13 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 		settings.WriteAheadLimit = *userConfig.WriteAheadLimit
 	}
 
+	if userConfig.RetryInterval != nil {
+		settings.RetryInterval = *userConfig.RetryInterval
+	}
+	if userConfig.MaxRetryInterval != nil {
+		settings.MaxRetryInterval = *userConfig.RetryInterval
+	}
+
 	return settings, nil
 }
 
@@ -163,4 +191,18 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 
 func (settings Settings) maxSegmentOffset() segmentOffset {
 	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
+}
+
+// Given a retry interval, nextRetryInterval returns the next higher level
+// of backoff.
+func (settings Settings) nextRetryInterval(
+	currentInterval time.Duration,
+) time.Duration {
+	if settings.MaxRetryInterval > 0 {
+		currentInterval *= 2
+		if currentInterval > settings.MaxRetryInterval {
+			currentInterval = settings.MaxRetryInterval
+		}
+	}
+	return currentInterval
 }

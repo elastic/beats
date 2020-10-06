@@ -119,7 +119,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	if fromInstall {
 		force = true
 	}
-	if !force {
+
+	// prompt only when it is not forced and is already enrolled
+	if !force && (cfg.Fleet != nil && cfg.Fleet.Enabled == true) {
 		confirm, err := c.Confirm("This will replace your current settings. Do you want to continue?", true)
 		if err != nil {
 			return errors.New(err, "problem reading prompt response")

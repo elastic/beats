@@ -207,10 +207,15 @@ func (segment *queueSegment) getWriter(
 // retry callback returns true. This is used for timed retries when
 // creating a queue segment from the writer loop.
 func (segment *queueSegment) getWriterWithRetry(
-	queueSettings Settings, retry func(error) bool,
+	queueSettings Settings, retry func(err error, firstTime bool) bool,
 ) (*os.File, error) {
+	firstTime := true
 	file, err := segment.getWriter(queueSettings)
-	for err != nil && retry(err) {
+	for err != nil && retry(err, firstTime) {
+		// Set firstTime to false so the retry callback can perform backoff
+		// etc if needed.
+		firstTime = false
+
 		// Try again
 		file, err = segment.getWriter(queueSettings)
 	}
