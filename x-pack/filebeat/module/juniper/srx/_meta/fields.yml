@@ -1,0 +1,488 @@
+- name: juniper.srx
+  type: group
+  release: beta
+  default_field: false
+  overwrite: true
+  description: >
+    Module for parsing junipersrx syslog.
+  fields:
+    - name: reason
+      type: keyword
+      description: >
+        reason
+
+    - name: connection_tag
+      type: keyword
+      description: >
+        connection tag
+
+    - name: service_name
+      type: keyword
+      description: >
+        service name
+
+    - name: nat_connection_tag
+      type: keyword
+      description: >
+        nat connection tag
+
+    - name: src_nat_rule_type
+      type: keyword
+      description: >
+        src nat rule type
+
+    - name: src_nat_rule_name
+      type: keyword
+      description: >
+        src nat rule name
+
+    - name: dst_nat_rule_type
+      type: keyword
+      description: >
+        dst nat rule type
+
+    - name: dst_nat_rule_name
+      type: keyword
+      description: >
+        dst nat rule name
+
+    - name: protocol_id
+      type: keyword
+      description: >
+        protocol id
+
+    - name: policy_name
+      type: keyword
+      description: >
+        policy name
+
+    - name: session_id_32
+      type: keyword
+      description: >
+        session id 32
+
+    - name: session_id
+      type: keyword
+      description: >
+        session id
+
+    - name: outbound_packets
+      type: integer
+      description: >
+        packets from client
+
+    - name: outbound_bytes
+      type: integer
+      description: >
+        bytes from client
+
+    - name: inbound_packets
+      type: integer
+      description: >
+        packets from server
+
+    - name: inbound_bytes
+      type: integer
+      description: >
+        bytes from server
+
+    - name: elapsed_time
+      type: date
+      description: >
+        elapsed time
+
+    - name: application
+      type: keyword
+      description: >
+        application
+
+    - name: nested_application
+      type: keyword
+      description: >
+        nested application
+
+    - name: username
+      type: keyword
+      description: >
+        username
+
+    - name: roles
+      type: keyword
+      description: >
+        roles
+
+    - name: encrypted
+      type: keyword
+      description: >
+        encrypted
+
+    - name: application_category
+      type: keyword
+      description: >
+        application category
+
+    - name: application_sub_category
+      type: keyword
+      description: >
+        application sub category
+
+    - name: application_characteristics
+      type: keyword
+      description: >
+        application characteristics
+
+    - name: secure_web_proxy_session_type
+      type: keyword
+      description: >
+        secure web proxy session type
+
+    - name: peer_session_id
+      type: keyword
+      description: >
+        peer session id
+
+    - name: peer_source_address
+      type: ip
+      description: >
+        peer source address
+
+    - name: peer_source_port
+      type: integer
+      description: >
+        peer source port
+
+    - name: peer_destination_address
+      type: ip
+      description: >
+        peer destination address
+
+    - name: peer_destination_port
+      type: integer
+      description: >
+        peer destination port
+
+    - name: hostname
+      type: keyword
+      description: >
+        hostname
+
+    - name: src_vrf_grp
+      type: keyword
+      description: >
+        src_vrf_grp
+
+    - name: dst_vrf_grp
+      type: keyword
+      description: >
+        dst_vrf_grp
+
+    - name: icmp_type
+      type: integer
+      description: >
+        icmp type
+
+    - name: process
+      type: keyword
+      description: >
+        process that generated the message
+
+    - name: apbr_rule_type
+      type: keyword
+      description: >
+        apbr rule type
+
+    - name: dscp_value
+      type: integer
+      description: >
+        apbr rule type
+
+    - name: logical_system_name
+      type: keyword
+      description: >
+        logical system name
+
+    - name: profile_name
+      type: keyword
+      description: >
+        profile name
+
+    - name: routing_instance
+      type: keyword
+      description: >
+        routing instance
+
+    - name: rule_name
+      type: keyword
+      description: >
+        rule name
+
+    - name: uplink_tx_bytes
+      type: integer
+      description: >
+        uplink tx bytes
+
+    - name: uplink_rx_bytes
+      type: integer
+      description: >
+        uplink rx bytes
+
+    - name: obj
+      type: keyword
+      description: >
+        url path
+
+    - name: url
+      type: keyword
+      description: >
+        url domain
+
+    - name: profile
+      type: keyword
+      description: >
+        filter profile
+
+    - name: category
+      type: keyword
+      description: >
+        filter category
+
+    - name: filename
+      type: keyword
+      description: >
+        filename
+
+    - name: temporary_filename
+      type: keyword
+      description: >
+        temporary_filename
+
+    - name: name
+      type: keyword
+      description: >
+        name
+
+    - name: error_message
+      type: keyword
+      description: >
+        error_message
+
+    - name: error_code
+      type: keyword
+      description: >
+        error_code
+
+    - name: action
+      type: keyword
+      description: >
+        action
+
+    - name: protocol
+      type: keyword
+      description: >
+        protocol
+
+    - name: protocol_name
+      type: keyword
+      description: >
+        protocol name
+
+    - name: type
+      type: keyword
+      description: >
+        type
+
+    - name: repeat_count
+      type: integer
+      description: >
+        repeat count
+
+    - name: alert
+      type: keyword
+      description: >
+        repeat alert
+
+    - name: message_type
+      type: keyword
+      description: >
+        message type
+
+    - name: threat_severity
+      type: keyword
+      description: >
+        threat severity
+
+    - name: application_name
+      type: keyword
+      description: >
+        application name
+
+    - name: attack_name
+      type: keyword
+      description: >
+        attack name
+
+    - name: index
+      type: keyword
+      description: >
+        index
+
+    - name: message
+      type: keyword
+      description: >
+        mesagge
+
+    - name: epoch_time
+      type: date
+      description: >
+        epoch time
+
+    - name: packet_log_id
+      type: integer
+      description: >
+        packet log id
+
+    - name: export_id
+      type: integer
+      description: >
+        packet log id
+
+    - name: ddos_application_name
+      type: keyword
+      description: >
+        ddos application name
+
+    - name: connection_hit_rate
+      type: integer
+      description: >
+        connection hit rate
+
+    - name: time_scope
+      type: keyword
+      description: >
+        time scope
+
+    - name: context_hit_rate
+      type: integer
+      description: >
+        context hit rate
+
+    - name: context_value_hit_rate
+      type: integer
+      description: >
+        context value hit rate
+
+    - name: time_count
+      type: integer
+      description: >
+        time count
+
+    - name: time_period
+      type: integer
+      description: >
+        time period
+
+    - name: context_value
+      type: keyword
+      description: >
+        context value
+
+    - name: context_name
+      type: keyword
+      description: >
+        context name
+
+    - name: ruleebase_name
+      type: keyword
+      description: >
+        ruleebase name
+
+    - name: verdict_source
+      type: keyword
+      description: >
+        verdict source
+
+    - name: verdict_number
+      type: integer
+      description: >
+        verdict number
+
+    - name: file_category
+      type: keyword
+      description: >
+        file category
+
+    - name: sample_sha256
+      type: keyword
+      description: >
+        sample sha256
+
+    - name: malware_info
+      type: keyword
+      description: >
+        malware info
+
+    - name: client_ip
+      type: ip
+      description: >
+        client ip
+
+    - name: tenant_id
+      type: keyword
+      description: >
+        tenant id
+
+    - name: timestamp
+      type: date
+      description: >
+        timestamp
+
+    - name: th
+      type: keyword
+      description: >
+        th
+
+    - name: status
+      type: keyword
+      description: >
+        status
+
+    - name: state
+      type: keyword
+      description: >
+        state
+
+    - name: file_hash_lookup
+      type: keyword
+      description: >
+       file hash lookup
+
+    - name: file_name
+      type: keyword
+      description: >
+       file name
+
+    - name: action_detail
+      type: keyword
+      description: >
+       action detail
+
+    - name: sub_category
+      type: keyword
+      description: >
+       sub category
+
+    - name: feed_name
+      type: keyword
+      description: >
+       feed name
+
+    - name: occur_count
+      type: integer
+      description: >
+       occur count
+
+    - name: tag
+      type: keyword
+      description: >
+        system log message tag, which uniquely identifies the message.
+

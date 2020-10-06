@@ -48,12 +48,12 @@ type closerConfig struct {
 
 type readerCloserConfig struct {
 	AfterInterval time.Duration
-	Inactive      time.Duration
 	OnEOF         bool
 }
 
 type stateChangeCloserConfig struct {
 	CheckInterval time.Duration
+	Inactive      time.Duration
 	Removed       bool
 	Renamed       bool
 }
@@ -94,11 +94,11 @@ func defaultCloserConfig() closerConfig {
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
 			Removed:       true, // TODO check clean_removed option
+			Inactive:      0 * time.Second,
 			Renamed:       false,
 		},
 		Reader: readerCloserConfig{
 			OnEOF:         false,
-			Inactive:      0 * time.Second,
 			AfterInterval: 0 * time.Second,
 		},
 	}

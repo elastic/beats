@@ -108,7 +108,7 @@ func TestMapMetric(t *testing.T) {
 
 func TestFilterSConfiguredMetrics(t *testing.T) {
 	selectedRange := []string{"TotalRequests", "Capacity", "CPUUsage"}
-	intersection, difference := filterSConfiguredMetrics(selectedRange, *MockMetricDefinitions())
+	intersection, difference := filterConfiguredMetrics(selectedRange, *MockMetricDefinitions())
 	assert.Equal(t, intersection, []string{"TotalRequests", "Capacity"})
 	assert.Equal(t, difference, []string{"CPUUsage"})
 }
