@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 type httpMetadataFetcher struct {
@@ -129,7 +130,8 @@ func (f *httpMetadataFetcher) fetchRaw(
 func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
-		MetadataHostAndPort string `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
+		MetadataHostAndPort string            `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
+		TLSConfig           *tlscommon.Config `config:"ssl"`
 	}{
 		MetadataHostAndPort: defaultHost,
 	}
@@ -137,8 +139,12 @@ func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string
 	if err != nil {
 		return urls, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
 	}
+	scheme := "http"
+	if config.TLSConfig.IsEnabled() {
+		scheme = "https"
+	}
 	for _, uri := range metadataURIs {
-		urls = append(urls, "http://"+config.MetadataHostAndPort+uri)
+		urls = append(urls, scheme+"://"+config.MetadataHostAndPort+uri)
 	}
 	return urls, nil
 }

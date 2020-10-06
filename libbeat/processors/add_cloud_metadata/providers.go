@@ -138,6 +138,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 				Timeout:   p.initData.timeout,
 				KeepAlive: 0,
 			}).DialContext,
+			TLSClientConfig: p.initData.tlsConfig.ToConfig(),
 		},
 	}
 
