@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu-20 && immutable' }
+  agent { label 'ubuntu-18 && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
