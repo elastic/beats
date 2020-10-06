@@ -44,6 +44,16 @@ type Upgrader struct {
 	upgradeable bool
 }
 
+// Action is the upgrade action state.
+type Action interface {
+	// Version to upgrade to.
+	Version() string
+	// SourceURI for download.
+	SourceURI() string
+	// FleetAction is the action from fleet that started the action (optional).
+	FleetAction() *fleetapi.ActionUpgrade
+}
+
 type reexecManager interface {
 	ReExec(argOverrides ...string)
 }
@@ -60,13 +70,14 @@ type stateReporter interface {
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
 func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker, r stateReporter) *Upgrader {
 	return &Upgrader{
+		agentInfo:   agentInfo,
 		settings:    settings,
 		log:         log,
 		closers:     closers,
 		reexec:      reexec,
 		acker:       a,
 		reporter:    r,
-		upgradeable: getUpgradable(),
+		upgradeable: getUpgradeable(),
 	}
 }
 
@@ -76,11 +87,13 @@ func (u *Upgrader) Upgradeable() bool {
 }
 
 // Upgrade upgrades running agent
-func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) (err error) {
+func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err error) {
 	// report failed
 	defer func() {
 		if err != nil {
-			u.reportFailure(ctx, a, err)
+			if action := a.FleetAction(); action != nil {
+				u.reportFailure(ctx, action, err)
+			}
 		}
 	}()
 
@@ -90,15 +103,15 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) (err 
 				"running under control of the systems supervisor")
 	}
 
-	u.reportUpdating(a.Version)
+	u.reportUpdating(a.Version())
 
-	sourceURI, err := u.sourceURI(a.Version, a.SourceURI)
-	archivePath, err := u.downloadArtifact(ctx, a.Version, sourceURI)
+	sourceURI, err := u.sourceURI(a.Version(), a.SourceURI())
+	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI)
 	if err != nil {
 		return err
 	}
 
-	newHash, err := u.unpack(ctx, a.Version, archivePath)
+	newHash, err := u.unpack(ctx, a.Version(), archivePath)
 	if err != nil {
 		return err
 	}
@@ -109,7 +122,9 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) (err 
 
 	if strings.HasPrefix(release.Commit(), newHash) {
 		// not an error
-		u.ackAction(ctx, a)
+		if action := a.FleetAction(); action != nil {
+			u.ackAction(ctx, action)
+		}
 		u.log.Warn("upgrading to same version")
 		return nil
 	}
@@ -128,7 +143,9 @@ func (u *Upgrader) Upgrade(ctx context.Context, a *fleetapi.ActionUpgrade) (err 
 		return err
 	}
 
-	u.reexec.ReExec()
+	if reexecNow {
+		u.reexec.ReExec()
+	}
 	return nil
 }
 
@@ -224,7 +241,7 @@ func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
 }
 
-func getUpgradable() bool {
+func getUpgradeable() bool {
 	// only upgradeable if running from Agent installer and running under the
 	// control of the system supervisor (or built specifically with upgrading enabled)
 	return release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
