@@ -408,6 +408,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix timestamp handling in remote_write. {pull}21166[21166]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
+- Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 
 *Packetbeat*
 
