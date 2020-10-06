@@ -6,9 +6,6 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
-    JOB_GCS_BUCKET = 'beats-ci-artifacts'
-    JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
-    JOB_GCS_CREDENTIALS = 'apm-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     SYNTHETICS = "-synthetics"
@@ -37,7 +34,6 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       }
     }
     stage('Build and test'){
@@ -61,7 +57,6 @@ pipeline {
       }
       steps {
         withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
-          deleteDir()
           release()
           pushCIDockerImages()
         }
@@ -100,20 +95,7 @@ def release(){
     dir("${env.BEATS_FOLDER}") {
       sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
     }
-    publishPackages("${env.BEATS_FOLDER}")
   }
-}
-
-def publishPackages(baseDir){
-  def bucketUri = "gs://${JOB_GCS_BUCKET}/synthetics"
-  def beatsFolderName = getBeatsName(baseDir)
-  googleStorageUpload(bucket: "${bucketUri}/${beatsFolderName}",
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
 }
 
 /**
@@ -133,7 +115,6 @@ def withBeatsEnv(Closure body) {
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}"){
         body()
       }
