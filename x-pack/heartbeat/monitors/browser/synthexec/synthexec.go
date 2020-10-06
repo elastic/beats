@@ -61,7 +61,7 @@ Outer:
 			if se == nil {
 				break Outer
 			}
-			if se.Type == "journey/start" {
+			if se.Type == "journey/register" {
 				journeyNames = append(journeyNames, se.Journey.Name)
 			}
 		}
