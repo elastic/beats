@@ -5,15 +5,15 @@
 
 == Cisco module
 
-beta[]
-
-This is a module for Cisco network device's logs. It includes the following
+This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
 - `asa` fileset: supports Cisco ASA firewall logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
 - `nexus` fileset: supports Cisco Nexus switch logs.
+- `meraki` fileset: supports Cisco Meraki logs.
+- `umbrella` fileset: supports Cisco Umbrella logs.
 
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
@@ -28,6 +28,8 @@ include::../include/configuring-intro.asciidoc[]
 The module is by default configured to run via syslog on port 9001 for ASA and
 port 9002 for IOS. However it can also be configured to read from a file path.
 See the following example.
+
+Cisco Umbrella publishes its logs in a compressed CSV format to a S3 bucket.
 
 ["source","yaml",subs="attributes"]
 -----
@@ -371,6 +373,59 @@ which causes both ECS and custom fields under `rsa` to be added.
 
 Flag to control the addition of the raw parser fields to the event. This fields
 will be found under `rsa.raw`. The default is false.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `umbrella` fileset settings
+
+The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
+
+To configure Cisco Umbrella to log to either your own S3 bucket or one that is managed by Cisco please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide.]
+
+This fileset supports all 4 log types:
+- Proxy
+- Cloud Firewall
+- IP Logs
+- DNS logs
+
+The Cisco Umbrella fileset depends on the original file path structure being followed. This structure is documented https://docs.umbrella.com/deployment-umbrella/docs/log-formats-and-versioning[Umbrella Log Formats and Versioning]:
+
+<subfolder>/<YYYY>-<MM>-<DD>/<YYYY>-<MM>-<DD>-<hh>-<mm>-<xxxx>.csv.gz
+dnslogs/<year>-<month>-<day>/<year>-<month>-<day>-<hour>-<minute>.csv.gz
+
+When configuring the fileset, please ensure that the Queue URL is set to the root folder that includes each of these subfolders above.
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  umbrella:
+    enabled: true
+    var.input: s3
+    var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    var.access_key_id: 123456
+    var.secret_access_key: PASSWORD
+----
+
+*`var.input`*::
+
+The input from which messages are read. Can be S3 or file.
+
+*`var.queue_url`*::
+
+The URL to the SQS queue if the input type is S3.
+
+*`var.access_key_id`*::
+
+The ID for the access key used to read from the SQS queue.
+
+*`var.secret_access_key`*::
+
+The secret token used for authenticating to the SQS queue.
 
 :has-dashboards!:
 
