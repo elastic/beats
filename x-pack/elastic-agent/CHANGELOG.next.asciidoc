@@ -31,3 +31,4 @@
 - Send updating state {pull}21461[21461]
 - Add `elastic.agent.id` and `elastic.agent.version` to published events from filebeat and metricbeat {pull}21543[21543]
 - Add `upgrade` subcommand to perform upgrade of installed Elastic Agent {pull}21425[21425]
+- Disable heartbeat. {pull}xx[xxx]
