@@ -261,8 +261,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
         // See https://github.com/elastic/beats/issues/17787.
         sh(label: 'check git config', script: '''
           if [ -z "$(git config --get user.email)" ]; then
-            git config user.email "beatsmachine@users.noreply.github.com"
-            git config user.name "beatsmachine"
+            git config --global user.email "beatsmachine@users.noreply.github.com"
+            git config --global user.name "beatsmachine"
           fi''')
       }
       try {
