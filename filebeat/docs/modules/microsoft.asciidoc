@@ -31,8 +31,7 @@ include::../include/config-option-intro.asciidoc[]
 
 beta[]
 
-To configure access for filebeat to Microsoft 365 Defender you will have to create a new Azure Application registration, this will again return
-Oauth tokens with access to the Microsoft 365 Defender API
+To configure access for Filebeat to Microsoft 365 Defender you will have to create a new Azure Application registration, this will again return Oauth tokens with access to the Microsoft 365 Defender API
 
 The procedure to create an application is found on the below link:
 
