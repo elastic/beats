@@ -15,6 +15,7 @@ import (
 type config struct {
 	QueueURL                 string              `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout        time.Duration       `config:"visibility_timeout"`
+	FipsEnabled              bool                `config:"fips_enabled"`
 	AwsConfig                awscommon.ConfigAWS `config:",inline"`
 	ExpandEventListFromField string              `config:"expand_event_list_from_field"`
 	APITimeout               time.Duration       `config:"api_timeout"`
@@ -32,6 +33,7 @@ func defaultConfig() config {
 	return config{
 		VisibilityTimeout: 300 * time.Second,
 		APITimeout:        120 * time.Second,
+		FipsEnabled:       false,
 	}
 }
 

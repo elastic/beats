@@ -696,6 +696,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - New Cisco Umbrella dataset {pull}21504[21504]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
 - Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
+- Adding support for FIPS in s3 input {pull}21446[21446]
 
 *Heartbeat*
 
