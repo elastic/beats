@@ -117,7 +117,7 @@ func (a *Application) Name() string {
 
 // Started returns true if the application is started.
 func (a *Application) Started() bool {
-	return a.state.Status != state.Stopped
+	return a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed
 }
 
 // Stop stops the current application.
