@@ -8,7 +8,7 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
-    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    JOB_GCS_CREDENTIALS = 'apm-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     SYNTHETICS = "-synthetics"
