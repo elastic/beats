@@ -122,7 +122,7 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: true)
+      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() && isTag()))
     }
   }
 }
