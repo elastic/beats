@@ -15,59 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
-// +build darwin,cgo freebsd linux windows
+// +build linux
 
-package diskio
+package iostat
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
-
-func TestDataNameFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
-	defer func() {
-		system.HostFS = oldFS
-	}()
-
-	conf := map[string]interface{}{
-		"module":                 "system",
-		"metricsets":             []string{"diskio"},
-		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
-	}
-
-	f := mbtest.NewReportingMetricSetV2Error(t, conf)
-	data, errs := mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
-	assert.Equal(t, 3, len(data))
-}
-
-func TestDataEmptyFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
-	defer func() {
-		system.HostFS = oldFS
-	}()
-
-	conf := map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"diskio"},
-	}
-
-	f := mbtest.NewReportingMetricSetV2Error(t, conf)
-	data, errs := mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
-	assert.Equal(t, 10, len(data))
-}
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
@@ -78,17 +36,12 @@ func TestFetch(t *testing.T) {
 		t.FailNow()
 	}
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("system", "diskio").Fields.StringToPrint())
+		events[0].BeatEvent("linux", "iostat").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
-
-	// Do a first fetch to have a sample
-	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(1 * time.Second)
-
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -96,7 +49,7 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"diskio"},
+		"module":     "linux",
+		"metricsets": []string{"iostat"},
 	}
 }

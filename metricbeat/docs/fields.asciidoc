@@ -29186,6 +29186,7 @@ linux module
 [float]
 === linux
 
+linux system metrics
 
 
 
@@ -29284,6 +29285,147 @@ type: long
 --
 
 [float]
+=== iostat
+
+iostat
+
+
+
+*`linux.iostat.read.request.merges_per_sec`*::
++
+--
+The number of read requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.merges_per_sec`*::
++
+--
+The number of write requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.read.request.per_sec`*::
++
+--
+The number of read requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.per_sec`*::
++
+--
+The number of write requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.read.per_sec.bytes`*::
++
+--
+The number of Bytes read from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.read.await`*::
++
+--
+The average time spent for read requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.per_sec.bytes`*::
++
+--
+The number of Bytes write from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.write.await`*::
++
+--
+The average time spent for write requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.request.avg_size`*::
++
+--
+The average size (in bytes) of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.queue.avg_size`*::
++
+--
+The average queue length of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.await`*::
++
+--
+The average time spent for requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.service_time`*::
++
+--
+The average service time (in milliseconds) for I/O requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.busy`*::
++
+--
+Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+type: float
+
+--
+
+[float]
 === ksm
 
 ksm
@@ -29354,6 +29496,186 @@ Number of duplicated KSM pages.
 
 
 type: long
+
+--
+
+[float]
+=== memory
+
+Linux memory data
+
+
+
+[float]
+=== page_stats
+
+memory page statistics
+
+
+*`linux.memory.page_stats.pgscan_kswapd.pages`*::
++
+--
+pages scanned by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgscan_direct.pages`*::
++
+--
+pages scanned directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgfree.pages`*::
++
+--
+pages freed by the system
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_kswapd.pages`*::
++
+--
+number of pages reclaimed by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_direct.pages`*::
++
+--
+number of pages reclaimed directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.direct_efficiency.pct`*::
++
+--
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.page_stats.kswapd_efficiency.pct`*::
++
+--
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== hugepages
+
+This group contains statistics related to huge pages usage on the system.
+
+
+*`linux.memory.hugepages.total`*::
++
+--
+Number of huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.used.bytes`*::
++
+--
+Memory used in allocated huge pages.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.hugepages.used.pct`*::
++
+--
+Percentage of huge pages used.
+
+
+type: long
+
+format: percent
+
+--
+
+*`linux.memory.hugepages.free`*::
++
+--
+Number of available huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.reserved`*::
++
+--
+Number of reserved but not allocated huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.surplus`*::
++
+--
+Number of overcommited huge pages.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.default_size`*::
++
+--
+Default size for huge pages.
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -40718,7 +41040,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files.
+Total number of files. Not on Windows.
 
 type: long
 
@@ -41580,7 +41902,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes. Not available on Windows.
 
 
 type: long
@@ -41592,7 +41914,31 @@ format: bytes
 *`system.process.memory.rss.pct`*::
 +
 --
-The percentage of memory the process occupied in main memory (RAM).
+The percentage of memory the process occupied in main memory (RAM). Not available on Windows.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`system.process.memory.wss.bytes`*::
++
+--
+The Working Set Size. The amount of memory the process occupied in main memory (RAM). Windows only.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.memory.wss.pct`*::
++
+--
+The percentage of memory the process occupied in main memory (RAM). Windows only.
 
 
 type: scaled_float
@@ -41604,7 +41950,7 @@ format: percent
 *`system.process.memory.share`*::
 +
 --
-The shared memory the process uses.
+The shared memory the process uses. Not available on Windows.
 
 
 type: long
