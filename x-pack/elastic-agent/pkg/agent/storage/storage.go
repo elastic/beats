@@ -20,7 +20,9 @@ import (
 
 const perms os.FileMode = 0600
 
+// Store saves the io.Reader.
 type Store interface {
+	// Save the io.Reader.
 	Save(io.Reader) error
 }
 
