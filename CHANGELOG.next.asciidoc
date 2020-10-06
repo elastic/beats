@@ -607,6 +607,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add related.hosts ecs field to all modules {pull}21160[21160]
 - Keep cursor state between httpjson input restarts {pull}20751[20751]
 - Convert aws s3 to v2 input {pull}20005[20005]
+- Add support for additional fields from V2 ALB logs. {pull}21540[21540]
 - Release Cloud Foundry input as GA. {pull}21525[21525]
 - New Cisco Umbrella dataset {pull}21504[21504]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
@@ -738,6 +739,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
+- Move Prometheus query & remote_write to GA. {pull}21507[21507]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 
