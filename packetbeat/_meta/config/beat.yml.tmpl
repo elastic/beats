@@ -101,6 +101,10 @@ packetbeat.protocols:
     - 8883  # Secure MQTT
     - 9243  # Elasticsearch
 
+- type: sip
+  # Configure the ports where to listen for SIP traffic. You can disable the SIP protocol by commenting out the list of ports.
+  ports: [5060]
+
 {{header "Elasticsearch template setting"}}
 
 setup.template.settings:
