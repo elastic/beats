@@ -39,7 +39,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	}()
 
 	// already started if not stopped or crashed
-	if a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed {
+	if a.Started() {
 		return nil
 	}
 
