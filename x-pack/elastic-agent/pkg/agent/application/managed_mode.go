@@ -168,6 +168,7 @@ func newManaged(
 	emit, err := emitter(
 		managedApplication.bgContext,
 		log,
+		agentInfo,
 		composableCtrl,
 		router,
 		&configModifiers{
