@@ -19,10 +19,6 @@ func init() {
 	composable.Providers.AddDynamicProvider("kubernetes", DynamicProviderBuilder)
 }
 
-type kubernertesContainerData struct {
-	mapping    map[string]interface{}
-	processors []map[string]interface{}
-}
 type dynamicProvider struct {
 	logger *logger.Logger
 	config *Config
@@ -52,7 +48,7 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
-		p.logger.Infof("Kubernetes provider skipped, unable to connect: %s", err)
+		p.logger.Debugf("Kubernetes provider skipped, unable to connect: %s", err)
 		return nil
 	}
 
@@ -63,8 +59,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	} else {
 		p.config.Node = ""
 	}
-
-	p.logger.Debugf("Initializing a new Kubernetes watcher using node: %v", p.config.Node)
+	p.logger.Infof("Kubernetes provider started with %s scope", p.config.Scope)
+	p.logger.Debugf("Initializing Kubernetes watcher using node: %v", p.config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: p.config.SyncPeriod,
