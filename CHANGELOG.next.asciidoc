@@ -695,6 +695,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Release Cloud Foundry input as GA. {pull}21525[21525]
 - New Cisco Umbrella dataset {pull}21504[21504]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
+- Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
 
 *Heartbeat*
 
