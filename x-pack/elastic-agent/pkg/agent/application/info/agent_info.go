@@ -4,6 +4,8 @@
 
 package info
 
+import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
 	agentID string
@@ -43,4 +45,14 @@ func ForceNewAgentInfo() (*AgentInfo, error) {
 // AgentID returns an agent identifier.
 func (i *AgentInfo) AgentID() string {
 	return i.agentID
+}
+
+// Version returns the version for this Agent.
+func (*AgentInfo) Version() string {
+	return release.Version()
+}
+
+// Snapshot returns if this version is a snapshot.
+func (*AgentInfo) Snapshot() bool {
+	return release.Snapshot()
 }
