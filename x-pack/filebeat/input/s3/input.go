@@ -105,6 +105,8 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		s3Servicename = "s3-fips"
 	}
 
+	log.Debug("s3 service name = ", s3Servicename)
+
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
