@@ -34,7 +34,96 @@ func Get_CLK_TCK() uint32 {
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	return disk.IOCounters(names...)
+	stats, err := disk.IOCounters(names...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Use `stats`, as `names` might be empty
+	stats["summary"] = summaryIOCounter(stats)
+	return stats, nil
+}
+
+func summaryIOCounter(stats map[string]disk.IOCountersStat) disk.IOCountersStat {
+
+	topCounters := topLevelCounters(stats)
+
+	sum := disk.IOCountersStat{}
+	sum.Name = "summary"
+
+	for _, counter := range topCounters {
+		sum.ReadCount += counter.ReadCount
+		sum.ReadBytes += counter.ReadBytes
+		sum.ReadTime += counter.ReadTime
+		sum.WriteCount += counter.WriteCount
+		sum.WriteBytes += counter.WriteBytes
+		sum.WriteTime += counter.WriteTime
+		sum.IoTime += counter.IoTime
+		sum.MergedReadCount += counter.MergedReadCount
+		sum.MergedWriteCount += counter.MergedWriteCount
+		sum.WeightedIO += counter.WeightedIO
+	}
+
+	return sum
+}
+
+// topLevelCounters will return a map of top level counters,
+// and it removes only aggregate counters from the given map `stats`.
+// For example, when `stats` with keys {"hda","hda1","sda1","sdb"} is given,
+// it will return a map with keys {"hda","sda1","sdb"},
+// and `stats` will remain elements with keys {"hda1","sda1","sdb"}
+func topLevelCounters(stats map[string]disk.IOCountersStat) map[string]disk.IOCountersStat {
+
+	result := map[string]disk.IOCountersStat{}
+
+	hasChild := make(map[string]struct{})
+
+Outer:
+	for name := range stats {
+		i := len(name)
+
+		// Skip tailing numbers
+		for c := name[i-1]; c <= '9' && c >= '0'; c = name[i-1] {
+			i--
+		}
+
+		// a) If nothing skipped, the name represents a disk (Not NVMe).
+		if i == len(name) {
+			result[name] = stats[name]
+			continue
+		}
+
+		// b) Search the stem for `name`.
+		// Loop a bit as there are two naming conventions:
+		// - For SATA and IDE devices(as well as RAID), a partition name of the disk "sda" would be "sda#"(# stands for numbers),
+		// - For NVMe devices, the names would be like `nvme0n1`(disk) and `nvme0n1p1`(partition)
+		for j := i; j > i-2; j-- {
+
+			if _, ok := hasChild[name[:j]]; ok {
+				continue Outer
+			}
+
+			if _, ok := stats[name[:j]]; ok {
+				hasChild[name[:j]] = struct{}{}
+				continue Outer
+			}
+		}
+
+		// c) If no stem was found, add the element to `separated`,
+		// This happens when:
+		//   i) the stem is not contained,
+		//   ii) it is a NVMe disk name.
+		result[name] = stats[name]
+	}
+
+	for name := range hasChild {
+		if _, ok := result[name]; !ok {
+			result[name] = stats[name]
+		}
+		delete(stats, name)
+	}
+
+	return result
 }
 
 // NewDiskIOStat :init DiskIOStat object.
