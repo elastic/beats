@@ -21,8 +21,8 @@
         ],
         "related.user": [
             "itv",
-            "quasiarc",
-            "utl"
+            "utl",
+            "quasiarc"
         ],
         "rsa.db.index": "nes",
         "rsa.internal.event_desc": "pexe",
@@ -63,14 +63,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.259",
+        "related.hosts": [
+            "iatnu3810.mail.localdomain"
+        ],
         "related.ip": [
-            "10.175.75.18",
-            "10.92.136.230"
+            "10.92.136.230",
+            "10.175.75.18"
         ],
         "related.user": [
+            "dolore",
             "nnumqu",
-            "orev",
-            "dolore"
+            "orev"
         ],
         "rsa.db.database": "umdo",
         "rsa.db.index": "vol",
@@ -123,13 +126,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.7269",
+        "related.hosts": [
+            "anti4454.api.example"
+        ],
         "related.ip": [
-            "10.51.132.10",
-            "10.46.185.46"
+            "10.46.185.46",
+            "10.51.132.10"
         ],
         "related.user": [
-            "nse",
             "incid",
+            "nse",
             "serror"
         ],
         "rsa.db.database": "byC",
@@ -183,14 +189,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6713",
+        "related.hosts": [
+            "uam6303.api.lan"
+        ],
         "related.ip": [
             "10.155.236.240",
             "10.53.192.140"
         ],
         "related.user": [
             "atcup",
-            "psumquia",
-            "ptass"
+            "ptass",
+            "psumquia"
         ],
         "rsa.db.database": "aperi",
         "rsa.db.index": "llumd",
@@ -245,8 +254,8 @@
         ],
         "related.user": [
             "eos",
-            "oremips",
-            "giatq"
+            "giatq",
+            "oremips"
         ],
         "rsa.db.index": "tempo",
         "rsa.internal.event_desc": "uian",
@@ -287,14 +296,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3491",
+        "related.hosts": [
+            "temq1198.internal.example"
+        ],
         "related.ip": [
-            "10.139.186.201",
-            "10.172.14.142"
+            "10.172.14.142",
+            "10.139.186.201"
         ],
         "related.user": [
+            "uam",
             "tcupida",
-            "aboris",
-            "uam"
+            "aboris"
         ],
         "rsa.db.database": "isiu",
         "rsa.db.index": "iatisu",
@@ -347,14 +359,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6875",
+        "related.hosts": [
+            "tenbyCic5882.api.home"
+        ],
         "related.ip": [
             "10.47.76.251",
             "10.104.111.129"
         ],
         "related.user": [
-            "ele",
             "etconsec",
-            "ipis"
+            "ipis",
+            "ele"
         ],
         "rsa.db.database": "riat",
         "rsa.db.index": "umdolor",
@@ -408,8 +423,8 @@
             "10.116.120.216"
         ],
         "related.user": [
-            "umdo",
             "quiratio",
+            "umdo",
             "animi"
         ],
         "rsa.db.index": "oll",
@@ -451,14 +466,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.5529",
+        "related.hosts": [
+            "isqu7224.localdomain"
+        ],
         "related.ip": [
             "10.57.40.29",
             "10.62.54.220"
         ],
         "related.user": [
+            "psum",
             "rnatura",
-            "taevi",
-            "psum"
+            "taevi"
         ],
         "rsa.db.database": "emeumfug",
         "rsa.db.index": "omn",
@@ -556,9 +574,9 @@
             "10.18.165.35"
         ],
         "related.user": [
-            "lor",
+            "remeum",
             "modocons",
-            "remeum"
+            "lor"
         ],
         "rsa.db.index": "etM",
         "rsa.internal.event_desc": "etc",
@@ -600,9 +618,9 @@
             "10.74.253.127"
         ],
         "related.user": [
-            "tema",
             "onproide",
-            "icab"
+            "icab",
+            "tema"
         ],
         "rsa.db.index": "mqui",
         "rsa.internal.event_desc": "eomnisis",
@@ -642,6 +660,9 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1697",
+        "related.hosts": [
+            "tlabo6088.www.localdomain"
+        ],
         "related.ip": [
             "10.189.109.245",
             "10.92.8.15"
@@ -701,9 +722,9 @@
             "10.21.78.128"
         ],
         "related.user": [
+            "giatquov",
             "taut",
-            "upt",
-            "giatquov"
+            "upt"
         ],
         "rsa.db.index": "iadese",
         "rsa.internal.event_desc": "deFinibu",
@@ -745,9 +766,9 @@
             "10.18.109.121"
         ],
         "related.user": [
-            "pida",
+            "hil",
             "tatn",
-            "hil"
+            "pida"
         ],
         "rsa.db.index": "quip",
         "rsa.internal.event_desc": "ecillu",
@@ -788,14 +809,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3727",
+        "related.hosts": [
+            "iavolu5352.localhost"
+        ],
         "related.ip": [
-            "10.63.37.192",
-            "10.225.115.13"
+            "10.225.115.13",
+            "10.63.37.192"
         ],
         "related.user": [
-            "reetd",
             "iunt",
-            "equep"
+            "equep",
+            "reetd"
         ],
         "rsa.db.database": "aliqu",
         "rsa.db.index": "mipsumd",
@@ -848,14 +872,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3219",
+        "related.hosts": [
+            "estiae3750.api.corp"
+        ],
         "related.ip": [
             "10.95.64.124",
             "10.47.202.102"
         ],
         "related.user": [
             "run",
-            "ice",
-            "ntor"
+            "ntor",
+            "ice"
         ],
         "rsa.db.database": "ite",
         "rsa.db.index": "iquipex",
@@ -907,13 +934,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6371",
+        "related.hosts": [
+            "aquaeabi7735.internal.lan"
+        ],
         "related.ip": [
             "10.244.114.61",
             "10.106.239.55"
         ],
         "related.user": [
-            "serunt",
-            "itquiin"
+            "itquiin",
+            "serunt"
         ],
         "rsa.db.database": "itame",
         "rsa.db.index": "oluptas",
@@ -965,14 +995,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.821",
+        "related.hosts": [
+            "etMalor4236.www5.host"
+        ],
         "related.ip": [
             "10.125.160.129",
             "10.53.168.235"
         ],
         "related.user": [
-            "one",
             "abi",
-            "ione"
+            "ione",
+            "one"
         ],
         "rsa.db.database": "sperna",
         "rsa.db.index": "estia",
@@ -1025,9 +1058,12 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1123",
+        "related.hosts": [
+            "quioffi1359.internal.lan"
+        ],
         "related.ip": [
-            "10.227.177.121",
-            "10.33.245.220"
+            "10.33.245.220",
+            "10.227.177.121"
         ],
         "related.user": [
             "liqui",
@@ -1088,13 +1124,17 @@
         "observer.version": "1.5071",
         "process.name": "laboree.exe",
         "process.pid": 6501,
+        "related.hosts": [
+            "",
+            "nsecte3304.mail.corp"
+        ],
         "related.ip": [
             "10.167.85.181",
             "10.98.182.220"
         ],
         "related.user": [
-            "econs",
-            "fde"
+            "fde",
+            "econs"
         ],
         "rsa.db.database": "equat",
         "rsa.internal.event_desc": "orpor",
@@ -1192,14 +1232,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.509",
+        "related.hosts": [
+            "nevo4284.internal.local"
+        ],
         "related.ip": [
-            "10.72.148.32",
-            "10.214.191.180"
+            "10.214.191.180",
+            "10.72.148.32"
         ],
         "related.user": [
+            "uteirure",
             "tDuisaut",
-            "luptatev",
-            "uteirure"
+            "luptatev"
         ],
         "rsa.db.database": "uamest",
         "rsa.db.index": "uae",
@@ -1252,14 +1295,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3599",
+        "related.hosts": [
+            "itas981.mail.domain"
+        ],
         "related.ip": [
             "10.136.190.236",
             "10.252.124.150"
         ],
         "related.user": [
-            "ipsumd",
+            "com",
             "litessec",
-            "com"
+            "ipsumd"
         ],
         "rsa.db.database": "tasn",
         "rsa.db.index": "squirati",
@@ -1312,14 +1358,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.5649",
+        "related.hosts": [
+            "tnonpro7635.localdomain"
+        ],
         "related.ip": [
-            "10.213.144.249",
-            "10.192.34.76"
+            "10.192.34.76",
+            "10.213.144.249"
         ],
         "related.user": [
-            "iquipe",
+            "lore",
             "temqu",
-            "lore"
+            "iquipe"
         ],
         "rsa.db.database": "gnamal",
         "rsa.db.index": "ntexplic",
@@ -1371,13 +1420,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.2217",
+        "related.hosts": [
+            "rQuisau5300.www5.example"
+        ],
         "related.ip": [
             "10.216.84.30",
             "10.154.4.197"
         ],
         "related.user": [
-            "untu",
-            "intoc"
+            "intoc",
+            "untu"
         ],
         "rsa.db.database": "oditem",
         "rsa.db.index": "borios",
@@ -1431,8 +1483,8 @@
         ],
         "related.user": [
             "tqu",
-            "niamqui",
-            "quid"
+            "quid",
+            "niamqui"
         ],
         "rsa.db.index": "inci",
         "rsa.internal.event_desc": "eroinBCS",
@@ -1473,6 +1525,9 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.5632",
+        "related.hosts": [
+            "uamei2389.internal.example"
+        ],
         "related.ip": [
             "10.193.83.81",
             "10.65.175.9"
@@ -1535,8 +1590,8 @@
         ],
         "related.user": [
             "isiuta",
-            "umdolo",
-            "tatn"
+            "tatn",
+            "umdolo"
         ],
         "rsa.db.index": "proide",
         "rsa.internal.event_desc": "ameiusm",
@@ -1578,9 +1633,9 @@
             "10.107.9.163"
         ],
         "related.user": [
-            "mac",
             "sit",
-            "mquisno"
+            "mquisno",
+            "mac"
         ],
         "rsa.db.index": "sit",
         "rsa.internal.event_desc": "tdol",
@@ -1622,9 +1677,9 @@
             "10.80.101.72"
         ],
         "related.user": [
-            "asiarc",
             "umSe",
-            "quidexea"
+            "quidexea",
+            "asiarc"
         ],
         "rsa.db.index": "veli",
         "rsa.internal.event_desc": "quatu",
@@ -1665,14 +1720,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.267",
+        "related.hosts": [
+            "miurerep1152.internal.domain"
+        ],
         "related.ip": [
-            "10.39.10.155",
-            "10.235.136.109"
+            "10.235.136.109",
+            "10.39.10.155"
         ],
         "related.user": [
             "urExcept",
-            "ptass",
-            "aboreetd"
+            "aboreetd",
+            "ptass"
         ],
         "rsa.db.database": "teirured",
         "rsa.db.index": "dolorem",
@@ -1770,9 +1828,9 @@
             "10.71.238.250"
         ],
         "related.user": [
-            "reseo",
             "moenimi",
-            "aec"
+            "aec",
+            "reseo"
         ],
         "rsa.db.index": "mac",
         "rsa.internal.event_desc": "quamest",
@@ -1813,14 +1871,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3804",
+        "related.hosts": [
+            "rum5798.home"
+        ],
         "related.ip": [
-            "10.226.101.180",
-            "10.226.20.199"
+            "10.226.20.199",
+            "10.226.101.180"
         ],
         "related.user": [
+            "ritt",
             "rationev",
-            "veniamqu",
-            "ritt"
+            "veniamqu"
         ],
         "rsa.db.database": "conse",
         "rsa.db.index": "imveniam",
@@ -1874,13 +1935,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1493",
+        "related.hosts": [
+            "nisiut3624.api.example"
+        ],
         "related.ip": [
-            "10.134.65.15",
-            "10.86.22.67"
+            "10.86.22.67",
+            "10.134.65.15"
         ],
         "related.user": [
-            "utaliqu",
             "quaUten",
+            "utaliqu",
             "cab"
         ],
         "rsa.db.database": "isciv",
@@ -1938,9 +2002,9 @@
             "10.70.147.120"
         ],
         "related.user": [
+            "cidunt",
             "tten",
-            "emqu",
-            "cidunt"
+            "emqu"
         ],
         "rsa.db.index": "eaqu",
         "rsa.internal.event_desc": "quidol",
@@ -1981,14 +2045,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6255",
+        "related.hosts": [
+            "tesse1089.www.host"
+        ],
         "related.ip": [
             "10.24.111.229",
             "10.178.242.100"
         ],
         "related.user": [
             "dqu",
-            "idid",
-            "loi"
+            "loi",
+            "idid"
         ],
         "rsa.db.database": "tenatuse",
         "rsa.db.index": "ullamcor",
@@ -2043,8 +2110,8 @@
         ],
         "related.user": [
             "ritati",
-            "mmodoc",
-            "untincul"
+            "untincul",
+            "mmodoc"
         ],
         "rsa.db.index": "emvele",
         "rsa.internal.event_desc": "oluptas",
@@ -2086,9 +2153,9 @@
             "10.30.243.163"
         ],
         "related.user": [
+            "illu",
             "mven",
-            "dolore",
-            "illu"
+            "dolore"
         ],
         "rsa.db.index": "idol",
         "rsa.internal.event_desc": "lore",
@@ -2129,13 +2196,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1844",
+        "related.hosts": [
+            "dictasun3878.internal.localhost"
+        ],
         "related.ip": [
             "10.212.214.4",
             "10.6.79.159"
         ],
         "related.user": [
-            "quid",
             "amvo",
+            "quid",
             "midestl"
         ],
         "rsa.db.database": "urExce",
@@ -2189,14 +2259,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3546",
+        "related.hosts": [
+            "aecatcup2241.www5.test"
+        ],
         "related.ip": [
             "10.70.147.46",
             "10.237.170.202"
         ],
         "related.user": [
             "liquide",
-            "atDu",
-            "rcit"
+            "rcit",
+            "atDu"
         ],
         "rsa.db.database": "taedict",
         "rsa.db.index": "loremeu",
@@ -2249,14 +2322,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.4282",
+        "related.hosts": [
+            "mad5185.www5.localhost"
+        ],
         "related.ip": [
             "10.179.50.138",
             "10.228.118.81"
         ],
         "related.user": [
-            "itasper",
             "emoe",
-            "tatemU"
+            "tatemU",
+            "itasper"
         ],
         "rsa.db.database": "toditaut",
         "rsa.db.index": "ugit",
@@ -2309,13 +2385,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3806",
+        "related.hosts": [
+            "esseq7889.www.invalid"
+        ],
         "related.ip": [
             "10.49.71.118",
             "10.234.165.130"
         ],
         "related.user": [
-            "emip",
             "henderit",
+            "emip",
             "iuntNequ"
         ],
         "rsa.db.database": "veniamqu",
@@ -2370,8 +2449,8 @@
             "10.199.5.49"
         ],
         "related.user": [
-            "turadipi",
             "emip",
+            "turadipi",
             "olorema"
         ],
         "rsa.db.index": "ataevi",
@@ -2457,14 +2536,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.7083",
+        "related.hosts": [
+            "tem6815.home"
+        ],
         "related.ip": [
             "10.174.185.109",
             "10.120.167.217"
         ],
         "related.user": [
-            "animid",
+            "dolorem",
             "rsp",
-            "dolorem"
+            "animid"
         ],
         "rsa.db.database": "tsuntinc",
         "rsa.db.index": "quovo",
@@ -2517,13 +2599,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1432",
+        "related.hosts": [
+            "mporainc2064.home"
+        ],
         "related.ip": [
-            "10.117.137.159",
-            "10.141.213.219"
+            "10.141.213.219",
+            "10.117.137.159"
         ],
         "related.user": [
-            "atev",
             "accusa",
+            "atev",
             "ate"
         ],
         "rsa.db.database": "nibus",
@@ -2577,14 +2662,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.4043",
+        "related.hosts": [
+            "caboNem1043.internal.home"
+        ],
         "related.ip": [
             "10.166.90.130",
             "10.94.224.229"
         ],
         "related.user": [
-            "rem",
             "eavol",
-            "etconsec"
+            "etconsec",
+            "rem"
         ],
         "rsa.db.database": "oditempo",
         "rsa.db.index": "deF",
@@ -2639,14 +2727,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.2456",
+        "related.hosts": [
+            "tatio6513.www.invalid"
+        ],
         "related.ip": [
-            "10.38.28.151",
-            "10.201.81.46"
+            "10.201.81.46",
+            "10.38.28.151"
         ],
         "related.user": [
             "incidid",
-            "mipsumqu",
-            "tiumto"
+            "tiumto",
+            "mipsumqu"
         ],
         "rsa.db.database": "abor",
         "rsa.db.index": "adol",
@@ -2701,14 +2792,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.2721",
+        "related.hosts": [
+            "dolori6232.api.invalid"
+        ],
         "related.ip": [
-            "10.255.28.56",
-            "10.214.245.95"
+            "10.214.245.95",
+            "10.255.28.56"
         ],
         "related.user": [
+            "umdolors",
             "rerepre",
-            "uptatem",
-            "umdolors"
+            "uptatem"
         ],
         "rsa.db.database": "odt",
         "rsa.db.index": "riosa",
@@ -2762,9 +2856,9 @@
             "10.45.35.180"
         ],
         "related.user": [
+            "Utenima",
             "mip",
-            "qui",
-            "Utenima"
+            "qui"
         ],
         "rsa.db.index": "boree",
         "rsa.internal.event_desc": "uteir",
@@ -2806,9 +2900,9 @@
             "10.141.200.133"
         ],
         "related.user": [
-            "enim",
+            "iame",
             "ess",
-            "iame"
+            "enim"
         ],
         "rsa.db.index": "nofdeFi",
         "rsa.internal.event_desc": "isnostru",
@@ -2850,9 +2944,9 @@
             "10.83.238.145"
         ],
         "related.user": [
-            "ugi",
+            "runtmo",
             "illoi",
-            "runtmo"
+            "ugi"
         ],
         "rsa.db.index": "eetdo",
         "rsa.internal.event_desc": "quaer",
@@ -2893,14 +2987,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3147",
+        "related.hosts": [
+            "mestq2106.api.host"
+        ],
         "related.ip": [
-            "10.39.143.155",
-            "10.41.89.217"
+            "10.41.89.217",
+            "10.39.143.155"
         ],
         "related.user": [
-            "tperspic",
             "sedquiac",
-            "tem"
+            "tem",
+            "tperspic"
         ],
         "rsa.db.database": "radipis",
         "rsa.db.index": "nse",
@@ -2953,14 +3050,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6382",
+        "related.hosts": [
+            "lors7553.api.local"
+        ],
         "related.ip": [
             "10.153.123.20",
             "10.5.5.1"
         ],
         "related.user": [
-            "unt",
+            "minim",
             "CSe",
-            "minim"
+            "unt"
         ],
         "rsa.db.database": "atu",
         "rsa.db.index": "roi",
@@ -3013,14 +3113,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3193",
+        "related.hosts": [
+            "olu5333.www.domain"
+        ],
         "related.ip": [
             "10.210.61.109",
             "10.168.132.175"
         ],
         "related.user": [
-            "iamea",
+            "eursinto",
             "giatquov",
-            "eursinto"
+            "iamea"
         ],
         "rsa.db.database": "ici",
         "rsa.db.index": "iquaUt",
@@ -3074,9 +3177,9 @@
             "10.123.154.17"
         ],
         "related.user": [
-            "quiac",
+            "dolorsi",
             "lmo",
-            "dolorsi"
+            "quiac"
         ],
         "rsa.db.index": "idunt",
         "rsa.internal.event_desc": "usantiu",
@@ -3120,8 +3223,8 @@
         ],
         "related.user": [
             "oeni",
-            "etquasia",
-            "xplic"
+            "xplic",
+            "etquasia"
         ],
         "rsa.db.index": "hend",
         "rsa.internal.event_desc": "piscivel",
@@ -3210,14 +3313,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3184",
+        "related.hosts": [
+            "fic5107.home"
+        ],
         "related.ip": [
             "10.169.101.161",
             "10.164.66.154"
         ],
         "related.user": [
-            "eufug",
             "orissu",
-            "ine"
+            "ine",
+            "eufug"
         ],
         "rsa.db.database": "stquidol",
         "rsa.db.index": "imadmini",
@@ -3271,9 +3377,9 @@
             "10.70.83.200"
         ],
         "related.user": [
-            "ihilmole",
+            "metco",
             "riat",
-            "metco"
+            "ihilmole"
         ],
         "rsa.db.index": "urQuis",
         "rsa.internal.event_desc": "iutaliq",
@@ -3314,14 +3420,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.4887",
+        "related.hosts": [
+            "onpr47.api.home"
+        ],
         "related.ip": [
             "10.207.97.192",
             "10.134.55.11"
         ],
         "related.user": [
-            "madminim",
             "tanimid",
-            "mmod"
+            "mmod",
+            "madminim"
         ],
         "rsa.db.database": "tetura",
         "rsa.db.index": "uptasnul",
@@ -3374,6 +3483,9 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3601",
+        "related.hosts": [
+            "rehen4859.api.host"
+        ],
         "related.ip": [
             "10.31.187.19",
             "10.52.150.104"
@@ -3434,14 +3546,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3175",
+        "related.hosts": [
+            "eufugia4481.corp"
+        ],
         "related.ip": [
-            "10.61.175.217",
-            "10.41.232.147"
+            "10.41.232.147",
+            "10.61.175.217"
         ],
         "related.user": [
-            "tat",
+            "runtm",
             "ntexpl",
-            "runtm"
+            "tat"
         ],
         "rsa.db.database": "rere",
         "rsa.db.index": "nonn",
@@ -3539,8 +3654,8 @@
             "10.98.71.45"
         ],
         "related.user": [
-            "CSe",
             "fugitse",
+            "CSe",
             "onse"
         ],
         "rsa.db.index": "Dui",
@@ -3583,9 +3698,9 @@
             "10.252.251.143"
         ],
         "related.user": [
+            "nonn",
             "remq",
-            "rspic",
-            "nonn"
+            "rspic"
         ],
         "rsa.db.index": "nre",
         "rsa.internal.event_desc": "tev",
@@ -3627,9 +3742,9 @@
             "10.197.203.167"
         ],
         "related.user": [
-            "eserun",
             "iumdo",
-            "uta"
+            "uta",
+            "eserun"
         ],
         "rsa.db.index": "smo",
         "rsa.internal.event_desc": "olesti",
@@ -3671,8 +3786,8 @@
             "10.187.170.23"
         ],
         "related.user": [
-            "sectetu",
             "ibusBo",
+            "sectetu",
             "enima"
         ],
         "rsa.db.index": "uido",
@@ -3714,14 +3829,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3824",
+        "related.hosts": [
+            "involu1450.www.localhost"
+        ],
         "related.ip": [
             "10.123.62.215",
             "10.250.248.215"
         ],
         "related.user": [
             "aevitaed",
-            "quaeratv",
-            "tinculpa"
+            "tinculpa",
+            "quaeratv"
         ],
         "rsa.db.database": "lica",
         "rsa.db.index": "uisnos",
@@ -3773,6 +3891,9 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3759",
+        "related.hosts": [
+            "osa3211.www5.example"
+        ],
         "related.ip": [
             "10.147.154.118",
             "10.146.57.23"
@@ -3833,8 +3954,8 @@
         ],
         "related.user": [
             "niamqui",
-            "ptatemU",
-            "uamestqu"
+            "uamestqu",
+            "ptatemU"
         ],
         "rsa.db.index": "doeiu",
         "rsa.internal.event_desc": "uasiarc",
@@ -3876,8 +3997,8 @@
             "10.154.172.82"
         ],
         "related.user": [
-            "nesci",
             "onnumqua",
+            "nesci",
             "tetura"
         ],
         "rsa.db.index": "oinBCSed",
@@ -3920,8 +4041,8 @@
             "10.47.63.70"
         ],
         "related.user": [
-            "midestl",
             "tpers",
+            "midestl",
             "expl"
         ],
         "rsa.db.index": "olu",
@@ -3964,9 +4085,9 @@
             "10.178.160.245"
         ],
         "related.user": [
+            "fdeFinib",
             "turQuis",
-            "olupta",
-            "fdeFinib"
+            "olupta"
         ],
         "rsa.db.index": "rsint",
         "rsa.internal.event_desc": "odico",
@@ -4007,14 +4128,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6648",
+        "related.hosts": [
+            "tatemac5192.www5.test"
+        ],
         "related.ip": [
-            "10.89.154.115",
-            "10.85.13.237"
+            "10.85.13.237",
+            "10.89.154.115"
         ],
         "related.user": [
             "emeu",
-            "luptat",
-            "Nem"
+            "Nem",
+            "luptat"
         ],
         "rsa.db.database": "nturmag",
         "rsa.db.index": "maliqua",
@@ -4067,14 +4191,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3387",
+        "related.hosts": [
+            "nimve2787.mail.test"
+        ],
         "related.ip": [
             "10.65.207.234",
             "10.222.32.183"
         ],
         "related.user": [
-            "eruntmo",
+            "eve",
             "itame",
-            "eve"
+            "eruntmo"
         ],
         "rsa.db.database": "udexerc",
         "rsa.db.index": "volup",
@@ -4172,9 +4299,9 @@
             "10.91.213.82"
         ],
         "related.user": [
-            "illoin",
+            "amnis",
             "uianon",
-            "amnis"
+            "illoin"
         ],
         "rsa.db.index": "ons",
         "rsa.internal.event_desc": "temaccus",
@@ -4216,9 +4343,9 @@
             "10.204.214.98"
         ],
         "related.user": [
-            "eprehe",
             "porissus",
-            "tdolo"
+            "tdolo",
+            "eprehe"
         ],
         "rsa.db.index": "abo",
         "rsa.internal.event_desc": "ecte",
@@ -4260,9 +4387,9 @@
             "10.223.178.192"
         ],
         "related.user": [
-            "moenimip",
+            "etc",
             "evel",
-            "etc"
+            "moenimip"
         ],
         "rsa.db.index": "iarchit",
         "rsa.internal.event_desc": "apari",
@@ -4303,14 +4430,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.801",
+        "related.hosts": [
+            "ama6820.mail.example"
+        ],
         "related.ip": [
             "10.26.137.126",
             "10.26.33.181"
         ],
         "related.user": [
+            "taevit",
             "ati",
-            "audant",
-            "taevit"
+            "audant"
         ],
         "rsa.db.database": "com",
         "rsa.db.index": "mveni",
@@ -4363,13 +4493,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.10",
+        "related.hosts": [
+            "olupt966.www5.corp"
+        ],
         "related.ip": [
             "10.148.195.208",
             "10.142.161.116"
         ],
         "related.user": [
-            "quaerat",
             "isi",
+            "quaerat",
             "mpori"
         ],
         "rsa.db.database": "squamest",
@@ -4423,14 +4556,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.1026",
+        "related.hosts": [
+            "lit4112.www.localhost"
+        ],
         "related.ip": [
-            "10.10.174.253",
-            "10.107.24.54"
+            "10.107.24.54",
+            "10.10.174.253"
         ],
         "related.user": [
-            "hend",
             "itinvo",
-            "uptasn"
+            "uptasn",
+            "hend"
         ],
         "rsa.db.database": "lup",
         "rsa.db.index": "isau",
@@ -4486,8 +4622,8 @@
         ],
         "related.user": [
             "luptate",
-            "eeufug",
-            "tamr"
+            "tamr",
+            "eeufug"
         ],
         "rsa.db.index": "oreeufug",
         "rsa.internal.event_desc": "ura",
@@ -4532,14 +4668,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.5649",
+        "related.hosts": [
+            "dictasun3408.internal.invalid"
+        ],
         "related.ip": [
-            "10.161.51.135",
-            "10.231.51.136"
+            "10.231.51.136",
+            "10.161.51.135"
         ],
         "related.user": [
-            "asper",
             "Finibus",
-            "accus"
+            "accus",
+            "asper"
         ],
         "rsa.db.database": "litani",
         "rsa.db.index": "arch",
@@ -4637,9 +4776,9 @@
             "10.108.123.148"
         ],
         "related.user": [
+            "ollita",
             "mmodicon",
-            "cusa",
-            "ollita"
+            "cusa"
         ],
         "rsa.db.index": "ercitati",
         "rsa.internal.event_desc": "pteurs",
@@ -4681,9 +4820,12 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.425",
+        "related.hosts": [
+            "uidol6868.mail.localdomain"
+        ],
         "related.ip": [
-            "10.198.187.144",
-            "10.114.0.148"
+            "10.114.0.148",
+            "10.198.187.144"
         ],
         "related.user": [
             "equatD",
@@ -4747,8 +4889,8 @@
         ],
         "related.user": [
             "loru",
-            "naaliq",
-            "equa"
+            "equa",
+            "naaliq"
         ],
         "rsa.db.index": "umfugiat",
         "rsa.internal.event_desc": "ora",
@@ -4789,13 +4931,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.6988",
+        "related.hosts": [
+            "ptat4878.lan"
+        ],
         "related.ip": [
-            "10.93.24.151",
-            "10.149.238.108"
+            "10.149.238.108",
+            "10.93.24.151"
         ],
         "related.user": [
-            "nven",
             "ite",
+            "nven",
             "sequamn"
         ],
         "rsa.db.database": "fugi",
@@ -4850,9 +4995,9 @@
             "10.101.45.225"
         ],
         "related.user": [
-            "cipitla",
             "emi",
-            "uinesc"
+            "uinesc",
+            "cipitla"
         ],
         "rsa.db.index": "caecat",
         "rsa.internal.event_desc": "tsunt",
@@ -4895,8 +5040,8 @@
             "10.2.204.161"
         ],
         "related.user": [
-            "ore",
             "quela",
+            "ore",
             "eumfugia"
         ],
         "rsa.db.index": "olup",
@@ -4943,9 +5088,9 @@
             "10.33.112.100"
         ],
         "related.user": [
-            "ptatemse",
+            "aliqu",
             "enimad",
-            "aliqu"
+            "ptatemse"
         ],
         "rsa.db.index": "Except",
         "rsa.internal.event_desc": "cons",
@@ -4986,14 +5131,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.3175",
+        "related.hosts": [
+            "isno4595.local"
+        ],
         "related.ip": [
             "10.94.152.238",
             "10.151.110.250"
         ],
         "related.user": [
             "neavol",
-            "pidatatn",
-            "tla"
+            "tla",
+            "pidatatn"
         ],
         "rsa.db.database": "itaedict",
         "rsa.db.index": "onemull",
@@ -5046,14 +5194,17 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.4965",
+        "related.hosts": [
+            "tatemse5403.home"
+        ],
         "related.ip": [
             "10.77.9.17",
             "10.146.61.5"
         ],
         "related.user": [
             "umS",
-            "tevel",
-            "alorumwr"
+            "alorumwr",
+            "tevel"
         ],
         "rsa.db.database": "amremap",
         "rsa.db.index": "aqu",
@@ -5107,8 +5258,8 @@
             "10.128.102.130"
         ],
         "related.user": [
-            "ore",
             "que",
+            "ore",
             "sequatu"
         ],
         "rsa.db.index": "exerci",
@@ -5150,13 +5301,16 @@
         "observer.type": "Access",
         "observer.vendor": "Cyberark",
         "observer.version": "1.7701",
+        "related.hosts": [
+            "reprehe650.www.corp"
+        ],
         "related.ip": [
             "10.31.86.83",
             "10.200.162.248"
         ],
         "related.user": [
-            "reseo",
             "onnu",
+            "reseo",
             "doloremi"
         ],
         "rsa.db.database": "billo",
@@ -5211,9 +5365,9 @@
             "10.103.215.159"
         ],
         "related.user": [
+            "volup",
             "apa",
-            "atatn",
-            "volup"
+            "atatn"
         ],
         "rsa.db.index": "atcupi",
         "rsa.internal.event_desc": "did",

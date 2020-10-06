@@ -65,6 +65,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -154,6 +157,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -211,6 +217,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -251,6 +258,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -312,6 +322,7 @@
         "destination.bytes": 314,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -355,6 +366,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -410,6 +424,7 @@
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 50.1188,
         "destination.geo.location.lon": 8.6843,
         "destination.geo.region_iso_code": "DE-HE",
@@ -447,6 +462,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -511,6 +529,7 @@
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 50.1188,
         "destination.geo.location.lon": 8.6843,
         "destination.geo.region_iso_code": "DE-HE",
@@ -557,6 +576,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -615,6 +637,7 @@
         "destination.geo.city_name": "Magdeburg",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 52.1333,
         "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
@@ -652,6 +675,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -715,6 +741,7 @@
         "destination.geo.city_name": "Magdeburg",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 52.1333,
         "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
@@ -758,6 +785,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -843,6 +873,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -941,6 +974,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"

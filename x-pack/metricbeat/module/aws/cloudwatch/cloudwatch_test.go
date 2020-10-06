@@ -1357,7 +1357,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 			Value: "test-ec2",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1399,7 +1399,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1447,7 +1447,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 			Value: "foo",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)

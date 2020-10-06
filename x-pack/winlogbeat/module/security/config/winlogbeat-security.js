@@ -5,7 +5,7 @@
 var security = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
 
     // Logon Types
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-audit-logon-events
@@ -1479,11 +1479,12 @@ var security = (function () {
             fields: [
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
-                {from: "winlog.event_data.ClientAddress", to: "source.ip"},
+                {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
             ignore_missing: true,
+            fail_on_error: false,
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.AccountName");
@@ -1669,7 +1670,7 @@ var security = (function () {
             if (!cl) {
                 return;
             }
-            evt.Put("process.args", winlogbeat.splitCommandLine(cl));
+            evt.Put("process.args", windows.splitCommandLine(cl));
             evt.Put("process.command_line", cl);
         })
         .Build();

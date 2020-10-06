@@ -200,15 +200,17 @@ func newManaged(
 	}
 
 	managedApplication.upgrader = upgrade.NewUpgrader(
+		agentInfo,
 		cfg.Settings.DownloadConfig,
 		log,
 		[]context.CancelFunc{managedApplication.cancelCtxFn},
 		reexec,
-		acker)
+		acker,
+		combinedReporter)
 
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{
 			log:     log,
 			emitter: emit,
 		},
