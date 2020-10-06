@@ -2,5 +2,5 @@
   type: group
   description: >
     remote write metrics from Prometheus server
-  release: beta
+  release: ga
   fields:
