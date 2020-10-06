@@ -43,6 +43,11 @@ The `s3` input supports the following configuration options plus the
 URL of the AWS SQS queue that messages will be received from. Required.
 
 [float]
+==== `fips_enabled`
+
+When enabled this option changes the servicename from s3 to s3-fips for connecting to the correct s3 endpoint
+
+[float]
 ==== `visibility_timeout`
 
 The duration that the received messages are hidden from subsequent

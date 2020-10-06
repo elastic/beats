@@ -100,6 +100,11 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	log.Infof("visibility timeout is set to %v seconds", visibilityTimeout)
 	log.Infof("aws api timeout is set to %v", in.config.APITimeout)
 
+	s3Servicename := "s3"
+	if in.config.FipsEnabled {
+		s3Servicename = "s3-fips"
+	}
+
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
@@ -107,7 +112,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		publisher:         client,
 		visibilityTimeout: visibilityTimeout,
 		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig)),
-		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "s3", regionName, awsConfig)),
+		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, s3Servicename, regionName, awsConfig)),
 	}, nil
 }
 
