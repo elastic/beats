@@ -94,7 +94,7 @@ filebeat.autodiscover:
 
 . Grant the `filebeat` service account access to the privileged SCC:
 +
-[source,yaml]
+[source,shell]
 -----
 oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:filebeat
 -----
