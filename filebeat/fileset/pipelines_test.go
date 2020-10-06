@@ -402,7 +402,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 		isErrExpected bool
 	}{
 		{
-			name:      "ES < 7.10.0: set to true",
+			name:      "ES < 7.11.0: set to true",
 			esVersion: common.MustNewVersion("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
@@ -427,7 +427,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES < 7.10.0: set to false",
+			name:      "ES < 7.11.0: set to false",
 			esVersion: common.MustNewVersion("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
@@ -453,8 +453,8 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES == 7.10.0",
-			esVersion: common.MustNewVersion("7.10.0"),
+			name:      "ES == 7.11.0",
+			esVersion: common.MustNewVersion("7.11.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -479,7 +479,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES > 7.10.0",
+			name:      "ES > 7.11.0",
 			esVersion: common.MustNewVersion("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
@@ -505,7 +505,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES < 7.10.0: existing if",
+			name:      "ES < 7.11.0: existing if",
 			esVersion: common.MustNewVersion("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
@@ -531,7 +531,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES < 7.10.0: existing if with contains",
+			name:      "ES < 7.11.0: existing if with contains",
 			esVersion: common.MustNewVersion("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
@@ -557,7 +557,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			isErrExpected: false,
 		},
 		{
-			name:      "ES < 7.10.0: no value",
+			name:      "ES < 7.11.0: no value",
 			esVersion: common.MustNewVersion("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{

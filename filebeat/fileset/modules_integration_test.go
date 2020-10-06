@@ -48,8 +48,8 @@ func TestLoadPipeline(t *testing.T) {
 
 	content := map[string]interface{}{
 		"description": "describe pipeline",
-		"processors": []map[string]interface{}{
-			{
+		"processors": []interface{}{
+			map[string]interface{}{
 				"set": map[string]interface{}{
 					"field": "foo",
 					"value": "bar",
