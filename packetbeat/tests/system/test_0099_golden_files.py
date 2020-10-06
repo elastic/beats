@@ -79,6 +79,9 @@ def clean_keys(obj):
         # Network direction is populated based on local-IPs which is misleading
         # when reading from a pcap and leads to inconsistent results.
         "network.direction",
+
+        # module specific
+        "sip.timestamp",
     ]
     for key in keys:
         if key in obj:
