@@ -5,8 +5,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-prometheus-query]]
 === Prometheus query metricset
 
-beta[]
-
 include::../../../module/prometheus/query/_meta/docs.asciidoc[]
 
 
