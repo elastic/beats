@@ -25,24 +25,24 @@ import (
 )
 
 // NewDiskIOStat :init DiskIOStat object.
-func NewDiskIOStat() *DiskIOStat {
-	return &DiskIOStat{
+func NewDiskIOStat() *IOStat {
+	return &IOStat{
 		lastDiskIOCounters: map[string]disk.IOCountersStat{},
 	}
 }
 
 // OpenSampling stub for linux implementation.
-func (stat *DiskIOStat) OpenSampling() error {
+func (stat *IOStat) OpenSampling() error {
 	return nil
 }
 
-// CalIOStatistics stub for linux implementation.
-func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
-	return errors.New("iostat is not implement for Windows")
+// CalcIOStatistics stub for linux implementation.
+func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, error) {
+	return IOMetric{}, errors.New("iostat is not implement for Windows")
 }
 
 // CloseSampling stub for linux implementation.
-func (stat *DiskIOStat) CloseSampling() {}
+func (stat *IOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
