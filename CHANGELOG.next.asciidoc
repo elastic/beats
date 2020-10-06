@@ -833,6 +833,7 @@ field. You can revert this change by configuring tags for the module and omittin
   port. {pull}19209[19209]
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 - Add 100-continue support {issue}15830[15830] {pull}19349[19349]
+- Add initial SIP protocol support {pull}21221[21221]
 
 
 *Functionbeat*
