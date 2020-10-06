@@ -1,0 +1,240 @@
+[
+    {
+        "@timestamp": "2013-12-14T14:06:59.134-02:00",
+        "client.ip": "10.10.10.1",
+        "client.port": 57116,
+        "destination.as.number": 28126,
+        "destination.as.organization.name": "BRISANET SERVICOS DE TELECOMUNICACOES LTDA",
+        "destination.geo.city_name": "Juazeiro do Norte",
+        "destination.geo.continent_name": "South America",
+        "destination.geo.country_iso_code": "BR",
+        "destination.geo.country_name": "Brazil",
+        "destination.geo.location.lat": -7.1467,
+        "destination.geo.location.lon": -39.247,
+        "destination.geo.region_iso_code": "BR-CE",
+        "destination.geo.region_name": "Ceara",
+        "destination.ip": "187.19.188.200",
+        "destination.port": 80,
+        "event.action": "malware_detected",
+        "event.category": [
+            "network",
+            "malware"
+        ],
+        "event.dataset": "juniper.srx",
+        "event.kind": "alert",
+        "event.module": "juniper",
+        "event.original": "http-host=\"www.mytest.com\" file-category=\"executable\" action=\"BLOCK\" verdict-number=\"8\" verdict-source=\u201dcloud/blacklist/whitelist\u201d source-address=\"10.10.10.1\" source-port=\"57116\" destination-address=\"187.19.188.200\" destination-port=\"80\" protocol-id=\"6\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" policy-name=\"argon_policy\" username=\"user1\" session-id-32=\"50000002\" source-zone-name=\"untrust\" destination-zone-name=\"trust\"",
+        "event.outcome": "success",
+        "event.severity": "14",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied",
+            "connection"
+        ],
+        "fileset.name": "srx",
+        "input.type": "log",
+        "juniper.srx.action": "BLOCK",
+        "juniper.srx.file_category": "executable",
+        "juniper.srx.policy_name": "argon_policy",
+        "juniper.srx.process": "RT_AAMW",
+        "juniper.srx.session_id_32": "50000002",
+        "juniper.srx.tag": "SRX_AAMW_ACTION_LOG",
+        "juniper.srx.verdict_number": "8",
+        "juniper.srx.verdict_source": "\u201dcloud/blacklist/whitelist\u201d",
+        "log.level": "informational",
+        "log.offset": 0,
+        "network.iana_number": "6",
+        "observer.egress.zone": "trust",
+        "observer.ingress.zone": "untrust",
+        "observer.name": "pinarello",
+        "observer.product": "SRX",
+        "observer.type": "firewall",
+        "observer.vendor": "Juniper",
+        "related.hosts": [
+            "www.mytest.com"
+        ],
+        "related.ip": [
+            "10.10.10.1",
+            "187.19.188.200"
+        ],
+        "server.ip": "187.19.188.200",
+        "server.port": 80,
+        "service.type": "juniper",
+        "source.ip": "10.10.10.1",
+        "source.port": 57116,
+        "source.user.name": "user1",
+        "tags": [
+            "juniper.srx",
+            "forwarded"
+        ],
+        "url.domain": "www.mytest.com"
+    },
+    {
+        "@timestamp": "2016-09-20T15:43:30.330-02:00",
+        "event.action": "malware_detected",
+        "event.category": [
+            "network",
+            "malware"
+        ],
+        "event.dataset": "juniper.srx",
+        "event.kind": "alert",
+        "event.module": "juniper",
+        "event.original": "timestamp=\"Thu Jun 23 09:55:38 2016\" tenant-id=\"ABC123456\" sample-sha256=\"ABC123\" client-ip=\"192.0.2.0\" verdict-number=\"9\" malware-info=\"Eicar:TestVirus\" username=\"admin\" hostname=\"host.example.com\"",
+        "event.outcome": "success",
+        "event.severity": "14",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied",
+            "connection"
+        ],
+        "fileset.name": "srx",
+        "input.type": "log",
+        "juniper.srx.malware_info": "Eicar:TestVirus",
+        "juniper.srx.process": "RT_AAMW",
+        "juniper.srx.sample_sha256": "ABC123",
+        "juniper.srx.tag": "AAMW_MALWARE_EVENT_LOG",
+        "juniper.srx.tenant_id": "ABC123456",
+        "juniper.srx.timestamp": "2016-06-23T09:55:38.000Z",
+        "juniper.srx.verdict_number": "9",
+        "log.level": "informational",
+        "log.offset": 529,
+        "observer.name": "host-example",
+        "observer.product": "SRX",
+        "observer.type": "firewall",
+        "observer.vendor": "Juniper",
+        "related.hosts": [
+            "host.example.com"
+        ],
+        "related.ip": [
+            "192.0.2.0"
+        ],
+        "service.type": "juniper",
+        "source.domain": "host.example.com",
+        "source.ip": "192.0.2.0",
+        "source.user.name": "admin",
+        "tags": [
+            "juniper.srx",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2016-09-20T15:40:30.050-02:00",
+        "event.category": [
+            "network",
+            "malware"
+        ],
+        "event.dataset": "juniper.srx",
+        "event.kind": "alert",
+        "event.module": "juniper",
+        "event.original": "timestamp=\"Thu Jun 23 09:55:38 2016\" tenant-id=\"ABC123456\" client-ip=\"192.0.2.0\" hostname=\"host.example.com\" status=\"in_progress\" policy-name=\"default\" th=\"7\" state=\"added\" reason=\"malware\" message=\"malware analysis detected host downloaded a malicious_file with score 9, sha256 ABC123\"",
+        "event.outcome": "success",
+        "event.severity": "11",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "srx",
+        "input.type": "log",
+        "juniper.srx.message": "malware analysis detected host downloaded a malicious_file with score 9, sha256 ABC123",
+        "juniper.srx.policy_name": "default",
+        "juniper.srx.process": "RT_AAMW",
+        "juniper.srx.reason": "malware",
+        "juniper.srx.state": "added",
+        "juniper.srx.status": "in_progress",
+        "juniper.srx.tag": "AAMW_HOST_INFECTED_EVENT_LOG",
+        "juniper.srx.tenant_id": "ABC123456",
+        "juniper.srx.th": "7",
+        "juniper.srx.timestamp": "2016-06-23T09:55:38.000Z",
+        "log.level": "error",
+        "log.offset": 835,
+        "observer.name": "host-example",
+        "observer.product": "SRX",
+        "observer.type": "firewall",
+        "observer.vendor": "Juniper",
+        "related.hosts": [
+            "host.example.com"
+        ],
+        "related.ip": [
+            "192.0.2.0"
+        ],
+        "service.type": "juniper",
+        "source.domain": "host.example.com",
+        "source.ip": "192.0.2.0",
+        "tags": [
+            "juniper.srx",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2007-02-15T07:17:15.719-02:00",
+        "client.ip": "1.1.1.1",
+        "client.port": 60148,
+        "destination.ip": "10.0.0.1",
+        "destination.port": 80,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "juniper.srx",
+        "event.kind": "event",
+        "event.module": "juniper",
+        "event.original": "hostname=\"dummy_host\" file-category=\"executable\" verdict-number=\"10\" malware-info=\"Testfile\" action=\"PERMIT\" list-hit=\"N/A\" file-hash-lookup=\"FALSE\" source-address=\"1.1.1.1\" source-port=\"60148\" destination-address=\"10.0.0.1\" destination-port=\"80\" protocol-id=\"6\" application=\"HTTP\" nested-application=\"N/A\" policy-name=\"test-policy\" username=\"N/A\" roles=\"N/A\" session-id-32=\"502156\" source-zone-name=\"Inside\" destination-zone-name=\"Outside\" sample-sha256=\"e038b5168d9209267058112d845341cae83d92b1d1af0a10b66830acb7529494\" file-name=\"dummy_file\" url=\"dummy_url\"",
+        "event.outcome": "success",
+        "event.severity": "165",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "srx",
+        "input.type": "log",
+        "juniper.srx.action": "PERMIT",
+        "juniper.srx.application": "HTTP",
+        "juniper.srx.file_category": "executable",
+        "juniper.srx.file_hash_lookup": "FALSE",
+        "juniper.srx.file_name": "dummy_file",
+        "juniper.srx.malware_info": "Testfile",
+        "juniper.srx.policy_name": "test-policy",
+        "juniper.srx.process": "RT_AAMW",
+        "juniper.srx.sample_sha256": "e038b5168d9209267058112d845341cae83d92b1d1af0a10b66830acb7529494",
+        "juniper.srx.session_id_32": "502156",
+        "juniper.srx.tag": "AAMW_ACTION_LOG",
+        "juniper.srx.url": "dummy_url",
+        "juniper.srx.verdict_number": "10",
+        "log.level": "notification",
+        "log.offset": 1235,
+        "network.iana_number": "6",
+        "observer.egress.zone": "Outside",
+        "observer.ingress.zone": "Inside",
+        "observer.name": "aamw1",
+        "observer.product": "SRX",
+        "observer.type": "firewall",
+        "observer.vendor": "Juniper",
+        "related.hosts": [
+            "dummy_host"
+        ],
+        "related.ip": [
+            "1.1.1.1",
+            "10.0.0.1"
+        ],
+        "server.ip": "10.0.0.1",
+        "server.port": 80,
+        "service.type": "juniper",
+        "source.as.number": 13335,
+        "source.as.organization.name": "Cloudflare, Inc.",
+        "source.domain": "dummy_host",
+        "source.geo.continent_name": "Oceania",
+        "source.geo.country_iso_code": "AU",
+        "source.geo.country_name": "Australia",
+        "source.geo.location.lat": -33.494,
+        "source.geo.location.lon": 143.2104,
+        "source.ip": "1.1.1.1",
+        "source.port": 60148,
+        "tags": [
+            "juniper.srx",
+            "forwarded"
+        ]
+    }
+]
