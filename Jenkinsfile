@@ -24,7 +24,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
-    SLACK_CHANNEL = "#beats-ci-builds"
+    SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
