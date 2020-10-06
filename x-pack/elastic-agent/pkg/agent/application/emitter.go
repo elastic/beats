@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
@@ -18,7 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
+type decoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
 type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
 type reloadable interface {
@@ -36,6 +37,7 @@ type programsDispatcher interface {
 
 type emitterController struct {
 	logger      *logger.Logger
+	agentInfo   *info.AgentInfo
 	controller  composable.Controller
 	router      programsDispatcher
 	modifiers   *configModifiers
@@ -117,14 +119,14 @@ func (e *emitterController) update() error {
 
 	e.logger.Debug("Converting single configuration into specific programs configuration")
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(e.agentInfo, ast)
 	if err != nil {
 		return err
 	}
 
 	for _, decorator := range e.modifiers.Decorators {
 		for outputType, ptr := range programsToRun {
-			programsToRun[outputType], err = decorator(outputType, ast, ptr)
+			programsToRun[outputType], err = decorator(e.agentInfo, outputType, ast, ptr)
 			if err != nil {
 				return err
 			}
@@ -140,12 +142,13 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
 	init, _ := transpiler.NewVars(map[string]interface{}{})
 	ctrl := &emitterController{
 		logger:      log,
+		agentInfo:   agentInfo,
 		controller:  controller,
 		router:      router,
 		modifiers:   modifiers,
