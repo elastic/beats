@@ -5,12 +5,14 @@
 pipeline {
   agent none
   environment {
-    BASE_DIR = 'src/github.com/elastic/beats'
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
   }
@@ -119,6 +121,7 @@ pipeline {
                     release()
                     pushCIDockerImages()
                   }
+                  runE2ETestForPackages()
                 }
               }
               stage('Package Mac OS'){
@@ -208,6 +211,25 @@ def tagAndPush(name){
   }
 }
 
+def runE2ETestForPackages(){
+  def suite = ''
+
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
+    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
+      suite = 'helm,ingest-manager'
+    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
+      suite = ''
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
+      suite = 'ingest-manager'
+    } else {
+      echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
+      return
+    }
+
+    triggerE2ETests(suite)
+  }
+}
+
 def release(){
   withBeatsEnv(){
     dir("${env.BEATS_FOLDER}") {
@@ -215,6 +237,32 @@ def release(){
     }
     publishPackages("${env.BEATS_FOLDER}")
   }
+}
+
+def triggerE2ETests(String suite) {
+  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}.")
+
+  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
+  def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+  build(job: "${e2eTestsPipeline}",
+    parameters: [
+      booleanParam(name: 'forceSkipGitChecks', value: true),
+      booleanParam(name: 'forceSkipPresubmit', value: true),
+      booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+      booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
+      string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
+      string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
+      string(name: 'runTestsSuites', value: suite),
+      string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
+      string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+    ],
+    propagate: false,
+    wait: false
+  )
+
+  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME} for ${env.BEATS_FOLDER}"
+  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){
