@@ -299,7 +299,7 @@ func modifySetProcessor(esVersion common.Version, pipelineID string, content map
 // modifyAppendProcessor replaces allow_duplicates option with an if statement
 // so ES less than 7.10 will still work
 func modifyAppendProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
-	flagVersion := common.MustNewVersion("7.10.0")
+	flagVersion := common.MustNewVersion("7.11.0")
 	if !esVersion.LessThan(flagVersion) {
 		return nil
 	}
