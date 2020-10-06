@@ -87,6 +87,8 @@ rules:
     values:
     - true
 
+- inject_agent_info: {}
+
 - copy:
     from: inputs
     to: filebeat
