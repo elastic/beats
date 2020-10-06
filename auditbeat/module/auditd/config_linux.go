@@ -31,14 +31,8 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-libaudit/rule"
-	"github.com/elastic/go-libaudit/rule/flags"
-)
-
-const (
-	moduleName         = "auditd"
-	metricsetName      = "auditd"
-	recursiveGlobDepth = 8
+	"github.com/elastic/go-libaudit/v2/rule"
+	"github.com/elastic/go-libaudit/v2/rule/flags"
 )
 
 // Config defines the kernel metricset's possible configuration options.
@@ -52,9 +46,7 @@ type Config struct {
 	RulesBlob    string   `config:"audit_rules"`         // Audit rules. One rule per line.
 	RuleFiles    []string `config:"audit_rule_files"`    // List of rule files.
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
-
-	// reload auditd rule files
-	Reload Reload `config:"reload"`
+	Reload       Reload   `config:"reload"`              // reload auditd rule files
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
