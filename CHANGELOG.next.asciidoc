@@ -193,6 +193,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - [Autodiscover] Handle input-not-finished errors in config reload. {pull}20915[20915]
 - Explicitly detect missing variables in autodiscover configuration, log them at the debug level. {issue}20568[20568] {pull}20898[20898]
 - Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
+- The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 
 *Auditbeat*
 
