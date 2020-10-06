@@ -253,3 +253,7 @@ func (f *fleetGateway) stop() {
 	close(f.done)
 	f.wg.Wait()
 }
+
+func (f *fleetGateway) SetClient(client clienter) {
+	f.client = client
+}
