@@ -27,7 +27,7 @@ The Istio module is tested with Istio `1.7` for `istiod`.
 === Dashboard
 
 The Istio module includes a predefined dashboard with overview information about Istio Daemon.
-This Dashboard is only compatible with versions of Istio after `1.5` which should be monitored with `istiod` metricset.
+This dashboard is only compatible with versions of Istio after `1.5` which should be monitored with `istiod` metricset.
 
 image::./images/metricbeat-istio-overview.png[]
 
