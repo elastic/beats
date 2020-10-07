@@ -556,8 +556,10 @@ func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *
 		Fields: common.MapStr{
 			"message": log,
 			"log": common.MapStr{
-				"offset":    int64(offset),
-				"file.path": constructObjectURL(info),
+				"offset": int64(offset),
+				"file": common.MapStr{
+					"path": constructObjectURL(info),
+				},
 			},
 			"aws": common.MapStr{
 				"s3": common.MapStr{
