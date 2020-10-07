@@ -15,8 +15,8 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
-	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 )
 
 func init() {

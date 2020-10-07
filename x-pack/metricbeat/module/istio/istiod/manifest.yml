@@ -8,4 +8,4 @@ input:
       include: ["citadel_*", "galley_*", "pilot_*"]
       exclude: ["^up$"]
     use_types: true
-    use_rates: true
+    rate_counters: true
