@@ -60,8 +60,8 @@ var cloudMetaProviders = map[string]provider{
 	"gcp":           gceMetadataFetcher,
 	"openstack":     openstackNovaMetadataFetcher,
 	"nova":          openstackNovaMetadataFetcher,
-	"openstack-ssl": openstackNovaMetadataFetcherSSL,
-	"nova-ssl":      openstackNovaMetadataFetcherSSL,
+	"openstack-ssl": openstackNovaSSLMetadataFetcher,
+	"nova-ssl":      openstackNovaSSLMetadataFetcher,
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
 }

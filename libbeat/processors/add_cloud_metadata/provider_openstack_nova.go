@@ -37,7 +37,7 @@ var openstackNovaMetadataFetcher = provider{
 	Create: buildOpenstackNovaCreate("http"),
 }
 
-var openstackNovaMetadataFetcherSSL = provider{
+var openstackNovaSSLMetadataFetcher = provider{
 	Name:   "openstack-nova-ssl",
 	Local:  true,
 	Create: buildOpenstackNovaCreate("https"),
