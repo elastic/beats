@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -127,7 +128,7 @@ func (inp *o365input) Run(
 			publisher.Publish(event, nil)
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", failureRetryInterval)
-			time.Sleep(failureRetryInterval)
+			timed.Wait(ctx.Cancelation, failureRetryInterval)
 		}
 	}
 	return nil
