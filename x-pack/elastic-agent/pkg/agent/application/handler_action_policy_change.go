@@ -61,7 +61,7 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetA
 	return acker.Ack(ctx, action)
 }
 
-func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) error {
+func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
 	cfg, err := configuration.NewFromConfig(c)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
@@ -70,9 +70,21 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) error {
 		// already the same hosts
 		return nil
 	}
+
 	// only set protocol/hosts as that is all Fleet currently sends
+	prevProtocol := h.config.Fleet.Kibana.Protocol
+	prevHosts := h.config.Fleet.Kibana.Hosts
 	h.config.Fleet.Kibana.Protocol = cfg.Fleet.Kibana.Protocol
 	h.config.Fleet.Kibana.Hosts = cfg.Fleet.Kibana.Hosts
+
+	// rollback on failure
+	defer func() {
+		if err != nil {
+			h.config.Fleet.Kibana.Protocol = prevProtocol
+			h.config.Fleet.Kibana.Hosts = prevHosts
+		}
+	}()
+
 	client, err := fleetapi.NewAuthWithConfig(h.log, h.config.Fleet.AccessAPIKey, h.config.Fleet.Kibana)
 	if err != nil {
 		return errors.New(
