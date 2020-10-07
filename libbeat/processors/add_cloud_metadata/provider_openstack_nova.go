@@ -32,16 +32,24 @@ const (
 // OpenStack Nova Metadata Service
 // Document https://docs.openstack.org/nova/latest/user/metadata-service.html
 var openstackNovaMetadataFetcher = provider{
-	Name: "openstack-nova",
+	Name:   "openstack-nova",
+	Local:  true,
+	Create: buildOpenstackNovaCreate("http"),
+}
 
-	Local: true,
+var openstackNovaSSLMetadataFetcher = provider{
+	Name:   "openstack-nova-ssl",
+	Local:  true,
+	Create: buildOpenstackNovaCreate("https"),
+}
 
-	Create: func(provider string, c *common.Config) (metadataFetcher, error) {
+func buildOpenstackNovaCreate(scheme string) func(provider string, c *common.Config) (metadataFetcher, error) {
+	return func(provider string, c *common.Config) (metadataFetcher, error) {
 		osSchema := func(m map[string]interface{}) common.MapStr {
 			return common.MapStr(m)
 		}
 
-		urls, err := getMetadataURLs(c, metadataHost, []string{
+		urls, err := getMetadataURLsWithScheme(c, scheme, metadataHost, []string{
 			osMetadataInstanceIDURI,
 			osMetadataInstanceTypeURI,
 			osMetadataHostnameURI,
@@ -71,5 +79,5 @@ var openstackNovaMetadataFetcher = provider{
 		}
 		fetcher := &httpMetadataFetcher{"openstack", nil, responseHandlers, osSchema}
 		return fetcher, nil
-	},
+	}
 }
