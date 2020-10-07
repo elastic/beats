@@ -333,7 +333,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -452,7 +452,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -570,7 +570,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -690,7 +690,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -810,7 +810,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -930,7 +930,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -1555,7 +1555,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
@@ -1667,7 +1667,7 @@
                         "axis_min": 0,
                         "axis_position": "left",
                         "axis_scale": "normal",
-                        "default_index_pattern": "heartbeat-*",
+                        "default_index_pattern": "metricbeat-*",
                         "default_timefield": "@timestamp",
                         "filter": {
                             "language": "kuery",
