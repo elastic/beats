@@ -102,9 +102,9 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 Heartbeat can be deployed in multiple locations so that you can detect 
 differences in availability and response times across those locations.
-By configuring Heartbeat with the location of the server you will allow the
-Uptime application to display location specific information on a map, and 
-allow the Uptime anomaly detection to detect anomalies based on location.
+Configure the Heartbeat location to allow {kib} to display location-specific
+information on Uptime maps and perform Uptime anomaly detection based
+on location.
 
 To configure the location of a Heartbeat instance, modify the 
 `add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
