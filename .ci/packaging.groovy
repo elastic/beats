@@ -249,7 +249,7 @@ def triggerE2ETests(String suite) {
   def parameters = [
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
-    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR())
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
