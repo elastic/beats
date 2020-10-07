@@ -128,6 +128,11 @@ func (f *httpMetadataFetcher) fetchRaw(
 
 // getMetadataURLs loads config and generates the metadata URLs.
 func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
+	return getMetadataURLsWithScheme(c, "http", defaultHost, metadataURIs)
+}
+
+// getMetadataURLsWithScheme loads config and generates the metadata URLs.
+func getMetadataURLsWithScheme(c *common.Config, scheme string, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
 		MetadataHostAndPort string            `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
@@ -138,10 +143,6 @@ func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string
 	err := c.Unpack(&config)
 	if err != nil {
 		return urls, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
-	}
-	scheme := "http"
-	if config.TLSConfig.IsEnabled() {
-		scheme = "https"
 	}
 	for _, uri := range metadataURIs {
 		urls = append(urls, scheme+"://"+config.MetadataHostAndPort+uri)
