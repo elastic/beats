@@ -105,6 +105,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
+- Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 
 *Packetbeat*
 
@@ -408,6 +409,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix timestamp handling in remote_write. {pull}21166[21166]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
+- Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 
 *Packetbeat*
 
@@ -696,6 +698,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Release Cloud Foundry input as GA. {pull}21525[21525]
 - New Cisco Umbrella dataset {pull}21504[21504]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
+- Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
+- Adding support for FIPS in s3 input {pull}21446[21446]
 
 *Heartbeat*
 
@@ -827,6 +831,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
+- Move Prometheus query & remote_write to GA. {pull}21507[21507]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 

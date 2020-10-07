@@ -26,7 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 )
 
-func Get_CLK_TCK() uint32 {
+// GetCLKTCK emulates the _SC_CLK_TCK syscall
+func GetCLKTCK() uint32 {
 	// return uint32(C.sysconf(C._SC_CLK_TCK))
 	// NOTE: _SC_CLK_TCK should be fetched from sysconf using cgo
 	return uint32(100)
@@ -38,77 +39,78 @@ func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 }
 
 // NewDiskIOStat :init DiskIOStat object.
-func NewDiskIOStat() *DiskIOStat {
-	return &DiskIOStat{
+func NewDiskIOStat() *IOStat {
+	return &IOStat{
 		lastDiskIOCounters: map[string]disk.IOCountersStat{},
 	}
 }
 
 // OpenSampling creates current cpu sampling
 // need call as soon as get IOCounters.
-func (stat *DiskIOStat) OpenSampling() error {
-	return stat.curCpu.Get()
+func (stat *IOStat) OpenSampling() error {
+	return stat.curCPU.Get()
 }
 
-// CalIOStatistics calculates IO statistics.
-func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
+// CalcIOStatistics calculates IO statistics.
+func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, error) {
 	var last disk.IOCountersStat
 	var ok bool
 
 	// if last counter not found, create one and return all 0
 	if last, ok = stat.lastDiskIOCounters[counter.Name]; !ok {
 		stat.lastDiskIOCounters[counter.Name] = counter
-		return nil
+		return IOMetric{}, nil
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
-	deltams := 1000.0 * float64(stat.curCpu.Total()-stat.lastCpu.Total()) / float64(cpu.NumCores) / float64(Get_CLK_TCK())
+	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(cpu.NumCores) / float64(GetCLKTCK())
 	if deltams <= 0 {
-		return errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
+		return IOMetric{}, errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
 
-	rd_ios := counter.ReadCount - last.ReadCount
-	rd_merges := counter.MergedReadCount - last.MergedReadCount
-	rd_bytes := counter.ReadBytes - last.ReadBytes
-	rd_ticks := counter.ReadTime - last.ReadTime
-	wr_ios := counter.WriteCount - last.WriteCount
-	wr_merges := counter.MergedWriteCount - last.MergedWriteCount
-	wr_bytes := counter.WriteBytes - last.WriteBytes
-	wr_ticks := counter.WriteTime - last.WriteTime
+	rdIOs := counter.ReadCount - last.ReadCount
+	rdMerges := counter.MergedReadCount - last.MergedReadCount
+	rdBytes := counter.ReadBytes - last.ReadBytes
+	rdTicks := counter.ReadTime - last.ReadTime
+	wrIOs := counter.WriteCount - last.WriteCount
+	wrMerges := counter.MergedWriteCount - last.MergedWriteCount
+	wrBytes := counter.WriteBytes - last.WriteBytes
+	wrTicks := counter.WriteTime - last.WriteTime
 	ticks := counter.IoTime - last.IoTime
 	aveq := counter.WeightedIO - last.WeightedIO
-	n_ios := rd_ios + wr_ios
-	n_ticks := rd_ticks + wr_ticks
-	n_bytes := rd_bytes + wr_bytes
+	nIOs := rdIOs + wrIOs
+	nTicks := rdTicks + wrTicks
+	nBytes := rdBytes + wrBytes
 	size := float64(0)
 	wait := float64(0)
 	svct := float64(0)
 
-	if n_ios > 0 {
-		size = float64(n_bytes) / float64(n_ios)
-		wait = float64(n_ticks) / float64(n_ios)
-		svct = float64(ticks) / float64(n_ios)
+	if nIOs > 0 {
+		size = float64(nBytes) / float64(nIOs)
+		wait = float64(nTicks) / float64(nIOs)
+		svct = float64(ticks) / float64(nIOs)
 	}
 
 	queue := float64(aveq) / deltams
-	per_sec := func(x uint64) float64 {
+	perSec := func(x uint64) float64 {
 		return 1000.0 * float64(x) / deltams
 	}
 
-	result.ReadRequestMergeCountPerSec = per_sec(rd_merges)
-	result.WriteRequestMergeCountPerSec = per_sec(wr_merges)
-	result.ReadRequestCountPerSec = per_sec(rd_ios)
-	result.WriteRequestCountPerSec = per_sec(wr_ios)
-	result.ReadBytesPerSec = per_sec(rd_bytes)
-	result.WriteBytesPerSec = per_sec(wr_bytes)
+	result := IOMetric{}
+	result.ReadRequestMergeCountPerSec = perSec(rdMerges)
+	result.WriteRequestMergeCountPerSec = perSec(wrMerges)
+	result.ReadRequestCountPerSec = perSec(rdIOs)
+	result.WriteRequestCountPerSec = perSec(wrIOs)
+	result.ReadBytesPerSec = perSec(rdBytes)
+	result.WriteBytesPerSec = perSec(wrBytes)
 	result.AvgRequestSize = size
 	result.AvgQueueSize = queue
 	result.AvgAwaitTime = wait
-	if rd_ios > 0 {
-		result.AvgReadAwaitTime = float64(rd_ticks) / float64(rd_ios)
+	if rdIOs > 0 {
+		result.AvgReadAwaitTime = float64(rdTicks) / float64(rdIOs)
 	}
-	if wr_ios > 0 {
-		result.AvgWriteAwaitTime = float64(wr_ticks) / float64(wr_ios)
+	if wrIOs > 0 {
+		result.AvgWriteAwaitTime = float64(wrTicks) / float64(wrIOs)
 	}
 	result.AvgServiceTime = svct
 	result.BusyPct = 100.0 * float64(ticks) / deltams
@@ -117,10 +119,11 @@ func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCou
 	}
 
 	stat.lastDiskIOCounters[counter.Name] = counter
-	return nil
+	return result, nil
 
 }
 
-func (stat *DiskIOStat) CloseSampling() {
-	stat.lastCpu = stat.curCpu
+// CloseSampling closes the disk sampler
+func (stat *IOStat) CloseSampling() {
+	stat.lastCPU = stat.curCPU
 }

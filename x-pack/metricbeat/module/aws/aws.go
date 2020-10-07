@@ -196,11 +196,14 @@ func StringInSlice(str string, list []string) (bool, int) {
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
-func InitEvent(regionName string, accountName string, accountID string) mb.Event {
-	event := mb.Event{}
-	event.MetricSetFields = common.MapStr{}
-	event.ModuleFields = common.MapStr{}
-	event.RootFields = common.MapStr{}
+func InitEvent(regionName string, accountName string, accountID string, timestamp time.Time) mb.Event {
+	event := mb.Event{
+		Timestamp:       timestamp,
+		MetricSetFields: common.MapStr{},
+		ModuleFields:    common.MapStr{},
+		RootFields:      common.MapStr{},
+	}
+
 	event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
 		event.RootFields.Put("cloud.region", regionName)

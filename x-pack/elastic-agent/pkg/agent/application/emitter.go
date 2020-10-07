@@ -44,10 +44,11 @@ type emitterController struct {
 	reloadables []reloadable
 
 	// state
-	lock   sync.RWMutex
-	config *config.Config
-	ast    *transpiler.AST
-	vars   []*transpiler.Vars
+	lock       sync.RWMutex
+	updateLock sync.Mutex
+	config     *config.Config
+	ast        *transpiler.AST
+	vars       []*transpiler.Vars
 }
 
 func (e *emitterController) Update(c *config.Config) error {
@@ -93,6 +94,10 @@ func (e *emitterController) Set(vars []*transpiler.Vars) {
 }
 
 func (e *emitterController) update() error {
+	// locking whole update because it can be called concurrently via Set and Update method
+	e.updateLock.Lock()
+	defer e.updateLock.Unlock()
+
 	e.lock.RLock()
 	cfg := e.config
 	rawAst := e.ast
