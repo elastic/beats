@@ -1118,13 +1118,7 @@
             "migrationVersion": {
                 "visualization": "7.8.0"
             },
-            "references": [
-                {
-                    "id": "c4aed3c0-0880-11eb-a3fd-1b45ec532bb3",
-                    "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-                    "type": "index-pattern"
-                }
-            ],
+            "references": [],
             "type": "visualization",
             "updated_at": "2020-10-07T09:48:31.873Z",
             "version": "WzQ0MjcsMV0="
@@ -1219,13 +1213,7 @@
             "migrationVersion": {
                 "visualization": "7.8.0"
             },
-            "references": [
-                {
-                    "id": "c4aed3c0-0880-11eb-a3fd-1b45ec532bb3",
-                    "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-                    "type": "index-pattern"
-                }
-            ],
+            "references": [],
             "type": "visualization",
             "updated_at": "2020-10-07T09:50:53.286Z",
             "version": "WzQ0MzMsMV0="
@@ -1320,13 +1308,7 @@
             "migrationVersion": {
                 "visualization": "7.8.0"
             },
-            "references": [
-                {
-                    "id": "c4aed3c0-0880-11eb-a3fd-1b45ec532bb3",
-                    "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-                    "type": "index-pattern"
-                }
-            ],
+            "references": [],
             "type": "visualization",
             "updated_at": "2020-10-07T10:04:27.677Z",
             "version": "WzQ0NTksMV0="
@@ -1421,13 +1403,7 @@
             "migrationVersion": {
                 "visualization": "7.8.0"
             },
-            "references": [
-                {
-                    "id": "c4aed3c0-0880-11eb-a3fd-1b45ec532bb3",
-                    "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-                    "type": "index-pattern"
-                }
-            ],
+            "references": [],
             "type": "visualization",
             "updated_at": "2020-10-07T09:45:30.182Z",
             "version": "WzQ0MjAsMV0="
@@ -1522,13 +1498,7 @@
             "migrationVersion": {
                 "visualization": "7.8.0"
             },
-            "references": [
-                {
-                    "id": "c4aed3c0-0880-11eb-a3fd-1b45ec532bb3",
-                    "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-                    "type": "index-pattern"
-                }
-            ],
+            "references": [],
             "type": "visualization",
             "updated_at": "2020-10-07T09:47:11.918Z",
             "version": "WzQ0MjQsMV0="
