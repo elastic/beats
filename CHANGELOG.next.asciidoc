@@ -520,6 +520,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Cloud Foundry metadata is cached to disk. {pull}20775[20775]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
+- Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
 
 *Auditbeat*
 
