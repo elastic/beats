@@ -7,3 +7,5 @@ input:
     metrics_filters:
       include: ["citadel_*", "galley_*", "pilot_*"]
       exclude: ["^up$"]
+    use_types: true
+    use_rates: true
