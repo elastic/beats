@@ -105,5 +105,26 @@
         "rule.id": "4",
         "rule.uuid": "563b3ea6-b26c-401f-a68b-4d84950d210b",
         "service.type": "misp"
+    },
+    {
+        "@timestamp": "2020-10-07T13:42:00.000Z",
+        "event.category": "threat-intel",
+        "event.dataset": "misp.threat",
+        "event.id": "83078f8c-3d38-4fec-87a1-8be22a0be0a6",
+        "event.kind": "event",
+        "event.module": "misp",
+        "event.type": "indicator",
+        "fileset.name": "threat",
+        "input.type": "log",
+        "log.offset": 2149,
+        "message": "endgame.hungmnguyen.us",
+        "misp.threat_indicator.attack_pattern": "[url:full = 'endgame.hungmnguyen.us']",
+        "misp.threat_indicator.attack_pattern_kql": "url.full: \"endgame.hungmnguyen.us\"",
+        "misp.threat_indicator.feed": "misp",
+        "misp.threat_indicator.type": "url",
+        "rule.category": "Network activity",
+        "service.type": "misp",
+        "tags": "critical-ioc-quarantine",
+        "url.full": "endgame.hungmnguyen.us"
     }
 ]

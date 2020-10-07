@@ -37,6 +37,19 @@ var threat = (function () {
         ignore_missing: true,
     });
 
+    // Copy tag names from MISP event to tags field.
+    var copyTags = function (evt) {
+        var mispTags = evt.Get("json.Tag");
+        if (!mispTags) {
+            return;
+        }
+        mispTags.forEach(function (tag) {
+            if (tag.name) {
+                evt.AppendTo("tags", tag.name);
+            }
+        });
+    };
+
     var setAttackPattern = function (evt) {
         var indicator_type = evt.Get("json.type");
         var attackPattern;
@@ -202,6 +215,7 @@ var threat = (function () {
         .Add(setThreatFeedField)
         .Add(convertFields)
         .Add(setAttackPattern)
+        .Add(copyTags)
         .Build();
 
     return {
