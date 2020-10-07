@@ -29,7 +29,6 @@ type config struct {
 	TLS       *tlscommon.Config `config:"ssl"`       // TLS configuration
 	Overwrite bool              `config:"overwrite"` // Overwrite if cloud.* fields already exist.
 	Providers providerList      `config:"providers"` // List of providers to probe
-
 }
 
 type providerList []string
