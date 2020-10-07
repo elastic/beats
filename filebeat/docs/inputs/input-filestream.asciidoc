@@ -157,6 +157,8 @@ disable it.
 
 include::../inputs/input-filestream-reader-options.asciidoc[]
 
+include::../inputs/input-filestream-file-options.asciidoc[]
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
 
