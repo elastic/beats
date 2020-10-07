@@ -5,12 +5,6 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
-    # Order is important here, labels will match first, the rest are double
-    - name: prometheus.labels.*
-      type: object
-      object_type: keyword
-      description: >
-        Prometheus metric labels
     - name: prometheus.*.value
       type: object
       object_type: double
