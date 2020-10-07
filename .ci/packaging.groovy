@@ -245,19 +245,25 @@ def triggerE2ETests(String suite) {
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+
+  def parameters = [
+    booleanParam(name: 'forceSkipGitChecks', value: true),
+    booleanParam(name: 'forceSkipPresubmit', value: true),
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR())
+    string(name: 'runTestsSuites', value: suite),
+    string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
+    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+  ]
+  if (isPR()) {
+    def version = "pr-${env.CHANGE_ID}"
+    parameters.push(booleanParam(name: 'USE_CI_SNAPSHOTS', value: true))
+    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
+    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
+  }
+
   build(job: "${e2eTestsPipeline}",
-    parameters: [
-      booleanParam(name: 'forceSkipGitChecks', value: true),
-      booleanParam(name: 'forceSkipPresubmit', value: true),
-      booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-      booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
-      string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
-      string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
-      string(name: 'runTestsSuites', value: suite),
-      string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
-      string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-    ],
+    parameters: parameters,
     propagate: false,
     wait: false
   )
