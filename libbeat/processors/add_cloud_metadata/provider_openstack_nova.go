@@ -34,16 +34,16 @@ const (
 var openstackNovaMetadataFetcher = provider{
 	Name:   "openstack-nova",
 	Local:  true,
-	Create: buildCreate("http"),
+	Create: buildOpenstackNovaCreate("http"),
 }
 
 var openstackNovaMetadataFetcherSSL = provider{
 	Name:   "openstack-nova-ssl",
 	Local:  true,
-	Create: buildCreate("https"),
+	Create: buildOpenstackNovaCreate("https"),
 }
 
-func buildCreate(scheme string) func(provider string, c *common.Config) (metadataFetcher, error) {
+func buildOpenstackNovaCreate(scheme string) func(provider string, c *common.Config) (metadataFetcher, error) {
 	return func(provider string, c *common.Config) (metadataFetcher, error) {
 		osSchema := func(m map[string]interface{}) common.MapStr {
 			return common.MapStr(m)
