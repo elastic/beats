@@ -268,15 +268,14 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.email "beatsmachine@users.noreply.github.com"
             git config --global user.name "beatsmachine"
           fi''')
-      }
-      // Add more stability when dependencies are not accessible temporarily
-      // See https://github.com/elastic/beats/issues/21609
-      try {
-        retryWithSleep(retries: 2, seconds: 5, backoff: true){
-          cmd(label: 'Fetch go dependencies', script: 'go get ./...')
+
+        // Add more stability when dependencies are not accessible temporarily
+        // See https://github.com/elastic/beats/issues/21609
+        // retry/try/catch approach reports errors, let's avoid it to keep the
+        // notifications cleaner.
+        if (sh(label: 'Fetch go dependencies', script: 'go get ./...', returnStatus: true) > 0) {
+          sh(label: 'Fetch go dependencies - retry', script: 'go get ./...', returnStatus: true)
         }
-      }catch(err) {
-        log(level: 'WARN', text: "Go dependencies could not be fetched directly. Let's fallback in the build command itself.")
       }
       try {
         body()
