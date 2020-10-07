@@ -66,11 +66,13 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) error {
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}
-	if hostsEqual(h.config.Fleet.Kibana, cfg.Fleet.Kibana) {
+	if kibanaEqual(h.config.Fleet.Kibana, cfg.Fleet.Kibana) {
 		// already the same hosts
 		return nil
 	}
-	h.config.Fleet.Kibana = cfg.Fleet.Kibana
+	// only set protocol/hosts as that is all Fleet currently sends
+	h.config.Fleet.Kibana.Protocol = cfg.Fleet.Kibana.Protocol
+	h.config.Fleet.Kibana.Hosts = cfg.Fleet.Kibana.Hosts
 	client, err := fleetapi.NewAuthWithConfig(h.log, h.config.Fleet.AccessAPIKey, h.config.Fleet.Kibana)
 	if err != nil {
 		return errors.New(
@@ -95,7 +97,11 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) error {
 	return nil
 }
 
-func hostsEqual(k1 *kibana.Config, k2 *kibana.Config) bool {
+func kibanaEqual(k1 *kibana.Config, k2 *kibana.Config) bool {
+	if k1.Protocol != k2.Protocol {
+		return false
+	}
+
 	sort.Strings(k1.Hosts)
 	sort.Strings(k2.Hosts)
 	if len(k1.Hosts) != len(k2.Hosts) {
