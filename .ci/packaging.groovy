@@ -207,13 +207,20 @@ def tagAndPush(name){
     def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
     def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
 
-    retry(3){
-      sh(label:'Change tag and push', script: """
+    def iterations = 0
+    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+      iterations++
+      def status = sh(label:'Change tag and push', script: """
         docker tag ${oldName} ${newName}
         docker push ${newName}
         docker tag ${oldName} ${commitName}
         docker push ${commitName}
-      """)
+      """, returnStatus: true) 
+      if ( status > 0 && iterations < 3) {
+        error('tag and push failed, retry')
+      } else if ( status > 0 ) {
+        log(level: 'WARN', text: "Some beats don't have ubi8 docker images. See https://github.com/elastic/beats/pull/21621")
+      }
     }
   }
 }
