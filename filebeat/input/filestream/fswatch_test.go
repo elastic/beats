@@ -115,7 +115,6 @@ func removeFilesOfScannerTest(t *testing.T) {
 }
 
 func TestFileWatchNewDeleteModified(t *testing.T) {
-
 	oldTs := time.Now()
 	newTs := oldTs.Add(5 * time.Second)
 	testCases := map[string]struct {
