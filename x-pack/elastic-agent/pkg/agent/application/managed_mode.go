@@ -213,12 +213,17 @@ func newManaged(
 		acker,
 		combinedReporter)
 
+	policyChanger := &handlerPolicyChange{
+		log:       log,
+		emitter:   emit,
+		agentInfo: agentInfo,
+		config:    cfg,
+		store:     store,
+		setters:   []clientSetter{acker},
+	}
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{
-			log:     log,
-			emitter: emit,
-		},
+		policyChanger,
 	)
 
 	actionDispatcher.MustRegister(
@@ -268,6 +273,9 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
+	// add the gateway to setters, so the gateway can be updated
+	// when the hosts for Kibana are updated by the policy.
+	policyChanger.setters = append(policyChanger.setters, gateway)
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
