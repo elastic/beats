@@ -219,7 +219,7 @@ def tagAndPush(name){
       if ( status > 0 && iterations < 3) {
         error('tag and push failed, retry')
       } else if ( status > 0 ) {
-        log(level: 'WARN', text: "Some beats don't have ubi8 docker images. See https://github.com/elastic/beats/pull/21621")
+        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
       }
     }
   }
