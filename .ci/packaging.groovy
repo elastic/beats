@@ -198,17 +198,30 @@ def tagAndPush(name){
     tagName = "pr-${env.CHANGE_ID}"
   }
 
-  def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
-  def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-  retry(3){
-    sh(label:'Change tag and push', script: """
-      docker tag ${oldName} ${newName}
-      docker push ${newName}
-      docker tag ${oldName} ${commitName}
-      docker push ${commitName}
-    """)
+
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
+    def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
+    def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
+
+    def iterations = 0
+    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+      iterations++
+      def status = sh(label:'Change tag and push', script: """
+        docker tag ${oldName} ${newName}
+        docker push ${newName}
+        docker tag ${oldName} ${commitName}
+        docker push ${commitName}
+      """, returnStatus: true) 
+      if ( status > 0 && iterations < 3) {
+        error('tag and push failed, retry')
+      } else if ( status > 0 ) {
+        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      }
+    }
   }
 }
 
