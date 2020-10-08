@@ -16,7 +16,7 @@
       type: group
       fields:
         - name: result_type
-          type: long
+          type: keyword
           description: >
             TODO
         - name: model.bytes
