@@ -367,8 +367,8 @@
         "observer.vendor": "F5",
         "process.pid": 2289,
         "related.ip": [
-            "10.204.123.107",
-            "10.225.160.182"
+            "10.225.160.182",
+            "10.204.123.107"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "eFinib",
@@ -983,8 +983,8 @@
         "observer.vendor": "F5",
         "process.pid": 4318,
         "related.ip": [
-            "10.169.101.161",
-            "10.122.204.151"
+            "10.122.204.151",
+            "10.169.101.161"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "snulap",
@@ -1565,8 +1565,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.47.99.72",
-            "10.187.64.126"
+            "10.187.64.126",
+            "10.47.99.72"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",
