@@ -221,7 +221,6 @@ def tagAndPush(name){
       } else if ( status > 0 ) {
         log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
       }
-    }
   }
 }
 
