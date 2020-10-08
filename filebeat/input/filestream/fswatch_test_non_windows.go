@@ -88,7 +88,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 			for p, _ := range files {
 				paths = append(paths, p)
 			}
-			assert.Equal(t, test.expectedFiles, paths)
+			assert.ElementsMatch(t, test.expectedFiles, paths)
 		})
 	}
 }
