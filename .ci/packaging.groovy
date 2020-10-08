@@ -201,7 +201,7 @@ def tagAndPush(name){
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
 
   // supported image flavours
-  def variants = ["", "-ubi8"]
+  def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
     def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
     def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
