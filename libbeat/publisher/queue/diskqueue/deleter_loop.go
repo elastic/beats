@@ -57,6 +57,7 @@ func newDeleterLoop(settings Settings) *deleterLoop {
 }
 
 func (dl *deleterLoop) run() {
+	currentRetryInterval := dl.settings.RetryInterval
 	for {
 		request, ok := <-dl.requestChan
 		if !ok {
@@ -87,10 +88,14 @@ func (dl *deleterLoop) run() {
 			// The delay can be interrupted if the request channel is closed,
 			// indicating queue shutdown.
 			select {
-			// TODO: make the retry interval configurable.
-			case <-time.After(time.Second):
+			case <-time.After(currentRetryInterval):
 			case <-dl.requestChan:
 			}
+			currentRetryInterval =
+				dl.settings.nextRetryInterval(currentRetryInterval)
+		} else {
+			// If we made progress, reset the retry interval.
+			currentRetryInterval = dl.settings.RetryInterval
 		}
 		dl.responseChan <- deleterLoopResponse{
 			results: results,

@@ -68,6 +68,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(run)
 	cmd.AddCommand(newInstallCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newUninstallCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newUpgradeCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
 

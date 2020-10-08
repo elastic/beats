@@ -37,7 +37,7 @@ type updateMarker struct {
 }
 
 // markUpgrade marks update happened so we can handle grace period
-func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action *fleetapi.ActionUpgrade) error {
+func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) error {
 	prevVersion := release.Version()
 	prevHash := release.Commit()
 	if len(prevHash) > hashLen {
@@ -49,7 +49,7 @@ func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action *fleetap
 		UpdatedOn:   time.Now(),
 		PrevVersion: prevVersion,
 		PrevHash:    prevHash,
-		Action:      action,
+		Action:      action.FleetAction(),
 	}
 
 	markerBytes, err := yaml.Marshal(marker)

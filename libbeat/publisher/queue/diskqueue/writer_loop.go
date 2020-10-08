@@ -82,6 +82,8 @@ type writerLoop struct {
 	// The file handle corresponding to currentSegment. When currentSegment
 	// changes, this handle is closed and a new one is created.
 	outputFile *os.File
+
+	currentRetryInterval time.Duration
 }
 
 func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
@@ -91,6 +93,8 @@ func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
 
 		requestChan:  make(chan writerLoopRequest, 1),
 		responseChan: make(chan writerLoopResponse),
+
+		currentRetryInterval: settings.RetryInterval,
 	}
 }
 
@@ -215,14 +219,31 @@ outerLoop:
 	return append(bytesWritten, curBytesWritten)
 }
 
-// retryCallback is called (by way of retryCallbackWriter) when there is
+func (wl *writerLoop) applyRetryBackoff() {
+	wl.currentRetryInterval =
+		wl.settings.nextRetryInterval(wl.currentRetryInterval)
+}
+
+func (wl *writerLoop) resetRetryBackoff() {
+	wl.currentRetryInterval = wl.settings.RetryInterval
+}
+
+// retryCallback is called (by way of callbackRetryWriter) when there is
 // an error writing to a segment file. It pauses for a configurable
 // interval and returns true if the operation should be retried (which
 // it always should, unless the queue is being closed).
-func (wl *writerLoop) retryCallback(err error) bool {
+func (wl *writerLoop) retryCallback(err error, firstTime bool) bool {
+	if firstTime {
+		// Reset any exponential backoff in the retry interval.
+		wl.resetRetryBackoff()
+	}
 	if writeErrorIsRetriable(err) {
 		return true
 	}
+	// If this error isn't immediately retriable, increase the exponential
+	// backoff afterwards.
+	defer wl.applyRetryBackoff()
+
 	// If the error is not immediately retriable, log the error
 	// and wait for the retry interval before trying again, but
 	// abort if the queue is closed (indicated by the request channel
@@ -230,8 +251,7 @@ func (wl *writerLoop) retryCallback(err error) bool {
 	wl.logger.Errorf("Writing to segment %v: %v",
 		wl.currentSegment.id, err)
 	select {
-	case <-time.After(time.Second):
-		// TODO: use a configurable interval here
+	case <-time.After(wl.currentRetryInterval):
 		return true
 	case <-wl.requestChan:
 		return false

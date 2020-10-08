@@ -24,7 +24,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
-    SLACK_CHANNEL = "#beats-ci-builds"
+    SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -74,7 +74,7 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: true) {
+          withBeatsEnv(archive: true, id: 'lint') {
             dumpVariables()
             cmd(label: 'make check', script: 'make check')
           }
@@ -127,7 +127,7 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true)
+      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
     }
   }
 }
@@ -270,8 +270,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
         // See https://github.com/elastic/beats/issues/17787.
         sh(label: 'check git config', script: '''
           if [ -z "$(git config --get user.email)" ]; then
-            git config user.email "beatsmachine@users.noreply.github.com"
-            git config user.name "beatsmachine"
+            git config --global user.email "beatsmachine@users.noreply.github.com"
+            git config --global user.name "beatsmachine"
           fi''')
       }
       try {
@@ -350,8 +350,13 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
+      if (isUnix()) {
+        cmd(label: 'Delete folders that are causing exceptions (See JENKINS-58421)',
+            returnStatus: true,
+            script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
+      } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+      tar(file: "test-build-artifacts-${args.id}.tgz", dir: '.', archive: true, allowMissing: true)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()

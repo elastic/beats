@@ -343,6 +343,14 @@ metricbeat.modules:
   metrics:
     - id: ["requests/count", "requests/duration"]
 
+- module: azure
+  metricsets:
+    - app_state
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -894,8 +902,10 @@ metricbeat.modules:
   period: 10s
   metricsets:
     - "pageinfo"
+    - "memory"
     # - ksm
     # - conntrack
+    # - iostat
   enabled: true
   #hostfs: /hostfs
 
