@@ -1,0 +1,25 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/S3
+        statistic: ["Average"]
+        name:
+          - AllRequests
+          - GetRequests
+          - PutRequests
+          - DeleteRequests
+          - HeadRequests
+          - PostRequests
+          - SelectRequests
+          - SelectScannedBytes
+          - SelectReturnedBytes
+          - ListRequests
+          - BytesDownloaded
+          - BytesUploaded
+          - 4xxErrors
+          - 5xxErrors
+          - FirstByteLatency
+          - TotalRequestLatency
