@@ -9,6 +9,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,6 +35,8 @@ func (m *mockEmitter) Emitter(policy *config.Config) error {
 func TestPolicyChange(t *testing.T) {
 	log, _ := logger.New("")
 	ack := newNoopAcker()
+	agentInfo, _ := info.NewAgentInfo()
+	nullStore := &storage.NullStore{}
 
 	t.Run("Receive a config change and successfully emits a raw configuration", func(t *testing.T) {
 		emitter := &mockEmitter{}
@@ -42,7 +48,14 @@ func TestPolicyChange(t *testing.T) {
 			Policy:     conf,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		cfg := configuration.DefaultConfiguration()
+		handler := &handlerPolicyChange{
+			log:       log,
+			emitter:   emitter.Emitter,
+			agentInfo: agentInfo,
+			config:    cfg,
+			store:     nullStore,
+		}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.NoError(t, err)
@@ -60,7 +73,14 @@ func TestPolicyChange(t *testing.T) {
 			Policy:     conf,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		cfg := configuration.DefaultConfiguration()
+		handler := &handlerPolicyChange{
+			log:       log,
+			emitter:   emitter.Emitter,
+			agentInfo: agentInfo,
+			config:    cfg,
+			store:     nullStore,
+		}
 
 		err := handler.Handle(context.Background(), action, ack)
 		require.Error(t, err)
@@ -69,6 +89,9 @@ func TestPolicyChange(t *testing.T) {
 
 func TestPolicyAcked(t *testing.T) {
 	log, _ := logger.New("")
+	agentInfo, _ := info.NewAgentInfo()
+	nullStore := &storage.NullStore{}
+
 	t.Run("Config change should not ACK on error", func(t *testing.T) {
 		tacker := &testAcker{}
 
@@ -83,7 +106,14 @@ func TestPolicyAcked(t *testing.T) {
 			Policy:     config,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		cfg := configuration.DefaultConfiguration()
+		handler := &handlerPolicyChange{
+			log:       log,
+			emitter:   emitter.Emitter,
+			agentInfo: agentInfo,
+			config:    cfg,
+			store:     nullStore,
+		}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.Error(t, err)
@@ -105,7 +135,14 @@ func TestPolicyAcked(t *testing.T) {
 			Policy:     config,
 		}
 
-		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
+		cfg := configuration.DefaultConfiguration()
+		handler := &handlerPolicyChange{
+			log:       log,
+			emitter:   emitter.Emitter,
+			agentInfo: agentInfo,
+			config:    cfg,
+			store:     nullStore,
+		}
 
 		err := handler.Handle(context.Background(), action, tacker)
 		require.NoError(t, err)
