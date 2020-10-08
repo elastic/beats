@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
 	"github.com/stretchr/testify/require"
