@@ -38,7 +38,6 @@ var (
 )
 
 func TestFileScanner(t *testing.T) {
-
 	testCases := map[string]struct {
 		paths         []string
 		excludedFiles []match.Matcher
