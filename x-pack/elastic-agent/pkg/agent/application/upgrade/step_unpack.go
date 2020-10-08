@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-// untar unpacks archive correctly, skips root (symlink, config...) unpacks data/*
-func (u *Upgrader) unpack(ctx context.Context, version, sourceURI, archivePath string) (string, error) {
+// unpack unpacks archive correctly, skips root (symlink, config...) unpacks data/*
+func (u *Upgrader) unpack(ctx context.Context, version, archivePath string) (string, error) {
 	// unpack must occur in directory that holds the installation directory
 	// or the extraction will be double nested
 	var hash string

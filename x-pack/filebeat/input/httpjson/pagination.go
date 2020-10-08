@@ -16,7 +16,7 @@ import (
 
 type pagination struct {
 	extraBodyContent common.MapStr
-	header           *Header
+	header           *headerConfig
 	idField          string
 	requestField     string
 	urlField         string
@@ -24,7 +24,7 @@ type pagination struct {
 }
 
 func newPaginationFromConfig(config config) *pagination {
-	if !config.Pagination.IsEnabled() {
+	if !config.Pagination.isEnabled() {
 		return nil
 	}
 	return &pagination{

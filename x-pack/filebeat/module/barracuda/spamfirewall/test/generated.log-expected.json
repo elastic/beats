@@ -496,8 +496,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.18.165.35",
-            "10.110.109.5"
+            "10.110.109.5",
+            "10.18.165.35"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,

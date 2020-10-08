@@ -38,6 +38,8 @@ const (
 	EventSubTypeFailed = "FAILED"
 	// EventSubTypeStopping is an event type indicating application is stopping.
 	EventSubTypeStopping = "STOPPING"
+	// EventSubTypeUpdating is an event type indicating update process in progress.
+	EventSubTypeUpdating = "UPDATING"
 )
 
 type agentInfo interface {
@@ -127,6 +129,10 @@ func generateRecord(agentID string, id string, name string, s state.State) event
 	case state.Restarting:
 		subType = EventSubTypeStarting
 		subTypeText = "RESTARTING"
+	case state.Updating:
+		subType = EventSubTypeUpdating
+		subTypeText = EventSubTypeUpdating
+
 	}
 
 	err := errors.New(

@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -33,6 +34,12 @@ type AgentECSMeta struct {
 	ID string `json:"id"`
 	// Version specifies current version of an agent.
 	Version string `json:"version"`
+	// Snapshot is a flag specifying that the agent used is a snapshot build.
+	Snapshot bool `json:"snapshot"`
+	// BuildOriginal is an extended build information for the agent.
+	BuildOriginal string `json:"build.original"`
+	// Upgradeable is a flag specifying if it is possible for agent to be upgraded.
+	Upgradeable bool `json:"upgradeable"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -126,8 +133,13 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 	return &ECSMeta{
 		Elastic: &ElasticECSMeta{
 			Agent: &AgentECSMeta{
-				ID:      i.agentID,
-				Version: release.Version(),
+				ID:            i.agentID,
+				Version:       release.Version(),
+				Snapshot:      release.Snapshot(),
+				BuildOriginal: release.Info().String(),
+				// only upgradeable if running from Agent installer and running under the
+				// control of the system supervisor (or built specifically with upgrading enabled)
+				Upgradeable: release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
 			},
 		},
 		Host: &HostECSMeta{
