@@ -53,7 +53,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
    signinlogs:
      enabled: false
      var:
-       eventhub: ["insights-logs-signinlogs"]
+       eventhub: "insights-logs-signinlogs"
        consumer_group: "$Default"
        connection_string: ""
        storage_account: ""
@@ -64,9 +64,9 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 
 
 `eventhub` ::
-  _[]string_
-Is a fully managed, real-time data ingestion service.
-Default value `insights-operational-logs`
+  _string_
+Is the fully managed, real-time data ingestion service.
+Default value `insights-operational-logs`.
 
 `consumer_group` ::
 _string_

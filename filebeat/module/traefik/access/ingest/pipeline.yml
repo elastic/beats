@@ -1,6 +1,9 @@
 description: Pipeline for parsing Traefik access logs. Requires the geoip and user_agent
   plugins.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - dissect:
     field: message
     pattern: '%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}]

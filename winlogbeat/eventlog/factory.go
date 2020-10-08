@@ -28,7 +28,7 @@ import (
 )
 
 var commonConfigKeys = []string{"type", "api", "name", "fields", "fields_under_root",
-	"tags", "processors", "index"}
+	"tags", "processors", "index", "id", "meta", "revision"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration

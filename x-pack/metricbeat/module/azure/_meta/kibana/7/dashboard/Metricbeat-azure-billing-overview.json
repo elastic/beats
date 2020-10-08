@@ -238,7 +238,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "cloud.instance.name",
+                "fieldName": "azure.resource.name",
                 "id": "1578578146383",
                 "indexPatternRefName": "control_4_index_pattern",
                 "label": "Resource Name",
@@ -483,7 +483,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "cloud.instance.name",
+                "field": "azure.resource.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

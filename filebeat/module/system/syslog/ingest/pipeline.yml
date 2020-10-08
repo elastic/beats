@@ -1,5 +1,8 @@
 description: Pipeline for parsing Syslog messages.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
@@ -49,8 +52,13 @@ processors:
 - remove:
     field: system.syslog.timestamp
 - set:
-    field: event.type
+    field: event.kind
     value: event
+- append:
+    field: related.hosts
+    value: "{{host.hostname}}"
+    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+    allow_duplicates: false
 on_failure:
 - set:
     field: error.message

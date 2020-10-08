@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 type operatorStream struct {
@@ -56,7 +57,8 @@ func streamFactory(ctx context.Context, cfg *configuration.SettingsConfig, srv *
 
 func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) (*operation.Operator, error) {
 	fetcher := downloader.NewDownloader(log, config.DownloadConfig)
-	verifier, err := downloader.NewVerifier(log, config.DownloadConfig)
+	allowEmptyPgp, pgp := release.PGP()
+	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp)
 	if err != nil {
 		return nil, errors.New(err, "initiating verifier")
 	}

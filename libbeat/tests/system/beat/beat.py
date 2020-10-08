@@ -109,12 +109,12 @@ class Proc(object):
         try:
             self.proc.terminate()
             self.proc.kill()
-        except:
+        except BaseException:
             pass
         # Ensure the output is closed.
         try:
             self.output.close()
-        except:
+        except BaseException:
             pass
 
 
@@ -134,14 +134,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
-        template_paths = [
-            self.beat_path,
-            os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-        ]
         if not hasattr(self, 'template_paths'):
-            self.template_paths = template_paths
-        else:
-            self.template_paths.append(template_paths)
+            self.template_paths = [
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ]
 
         # Create build path
         build_dir = self.beat_path + "/build"
@@ -183,7 +180,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc = self.start_beat(cmd=cmd, config=config, output=output,
                                logging_args=logging_args,
                                extra_args=extra_args, env=env)
-        if exit_code != None:
+        if exit_code is not None:
             return proc.check_wait(exit_code)
 
         return proc.wait()
@@ -279,7 +276,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 try:
                     jsons.append(self.flatten_object(json.loads(
                         line, object_pairs_hook=self.json_raise_on_duplicates), []))
-                except:
+                except BaseException:
                     print("Fail to load the json {}".format(line))
                     raise
 
@@ -345,7 +342,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 os.unlink(self.build_path + "last_run")
             os.symlink(self.build_path + "run/{}".format(self.id()),
                        self.build_path + "last_run")
-        except:
+        except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
@@ -412,7 +409,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         Returns the number of appearances of the given string in the log file
         """
-        is_regexp = type(msg) == REGEXP_TYPE
+        is_regexp = isinstance(msg, REGEXP_TYPE)
 
         counter = 0
         if ignore_case:
@@ -758,7 +755,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # the file make that difficult
             with open(path) as fhandle:
                 for line in fhandle:
-                    if re.search("ecs\.version", line):
+                    if re.search(r"ecs\.version", line):
                         return True
             return False
 

@@ -18,6 +18,10 @@
 package elasticsearch
 
 import (
+	"fmt"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -36,6 +40,31 @@ var (
 	}.Build()
 )
 
+type Scope int
+
+const (
+	// Indicates that each item in the hosts list points to a distinct Elasticsearch node in a
+	// cluster.
+	ScopeNode Scope = iota
+
+	// Indicates that each item in the hosts lists points to a endpoint for a distinct Elasticsearch
+	// cluster (e.g. a load-balancing proxy) fronting the cluster.
+	ScopeCluster
+)
+
+func (h *Scope) Unpack(str string) error {
+	switch str {
+	case "node":
+		*h = ScopeNode
+	case "cluster":
+		*h = ScopeCluster
+	default:
+		return fmt.Errorf("invalid scope: %v", str)
+	}
+
+	return nil
+}
+
 // MetricSet can be used to build other metric sets that query RabbitMQ
 // management plugin
 type MetricSet struct {
@@ -43,6 +72,7 @@ type MetricSet struct {
 	servicePath string
 	*helper.HTTP
 	XPack bool
+	Scope Scope
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -54,9 +84,11 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack bool `config:"xpack.enabled"`
+		XPack bool  `config:"xpack.enabled"`
+		Scope Scope `config:"scope"`
 	}{
 		XPack: false,
+		Scope: ScopeNode,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -67,6 +99,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.XPack,
+		config.Scope,
 	}
 
 	ms.SetServiceURI(servicePath)
@@ -83,4 +116,23 @@ func (m *MetricSet) GetServiceURI() string {
 func (m *MetricSet) SetServiceURI(servicePath string) {
 	m.servicePath = servicePath
 	m.HTTP.SetURI(m.GetServiceURI())
+}
+
+func (m *MetricSet) ShouldSkipFetch() (bool, error) {
+	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
+	// we don't collect the same stats from every node and end up duplicating them.
+	if m.Scope == ScopeNode {
+		isMaster, err := IsMaster(m.HTTP, m.GetServiceURI())
+		if err != nil {
+			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		}
+
+		// Not master, no event sent
+		if !isMaster {
+			m.Logger().Debugf("trying to fetch %v stats from a non-master node", m.Name())
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

@@ -20,7 +20,9 @@ import (
 
 const perms os.FileMode = 0600
 
-type store interface {
+// Store saves the io.Reader.
+type Store interface {
+	// Save the io.Reader.
 	Save(io.Reader) error
 }
 
@@ -62,12 +64,12 @@ type ReplaceOnSuccessStore struct {
 	target      string
 	replaceWith []byte
 
-	wrapped store
+	wrapped Store
 }
 
 // NewReplaceOnSuccessStore takes a target file and a replacement content and will replace the target
 // file content if the wrapped store execution is done without any error.
-func NewReplaceOnSuccessStore(target string, replaceWith []byte, wrapped store) *ReplaceOnSuccessStore {
+func NewReplaceOnSuccessStore(target string, replaceWith []byte, wrapped Store) *ReplaceOnSuccessStore {
 	return &ReplaceOnSuccessStore{
 		target:      target,
 		replaceWith: replaceWith,

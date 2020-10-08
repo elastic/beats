@@ -2,32 +2,11 @@
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
 {{- $repoInfo := repo }}
 
-FROM {{ .from }}
-
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum clean all
-
-LABEL \
-  org.label-schema.build-date="{{ date }}" \
-  org.label-schema.schema-version="1.0" \
-  org.label-schema.vendor="{{ .BeatVendor }}" \
-  org.label-schema.license="{{ .License }}" \
-  org.label-schema.name="{{ .BeatName }}" \
-  org.label-schema.version="{{ beat_version }}" \
-  org.label-schema.url="{{ .BeatURL }}" \
-  org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
-  org.label-schema.vcs-ref="{{ commit }}" \
-  license="{{ .License }}" \
-  description="{{ .BeatDescription }}"
-
-ENV ELASTIC_CONTAINER "true"
-ENV PATH={{ $beatHome }}:$PATH
+# Prepare home in a different stage to avoid creating additional layers on
+# the final image because of permission changes.
+FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
-COPY docker-entrypoint /usr/local/bin/docker-entrypoint
-RUN chmod 755 /usr/local/bin/docker-entrypoint
-
-RUN groupadd --gid 1000 {{ .BeatName }}
 
 RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
@@ -42,7 +21,56 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
 {{- end }}
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
+FROM {{ .from }}
+
+{{- if contains .from "ubi-minimal" }}
+RUN microdnf -y --setopt=tsflags=nodocs update && \
+    microdnf install shadow-utils && \
+    microdnf clean all
+{{- else }}
+RUN yum -y --setopt=tsflags=nodocs update && yum clean all
+{{- end }}
+
+LABEL \
+  org.label-schema.build-date="{{ date }}" \
+  org.label-schema.schema-version="1.0" \
+  org.label-schema.vendor="{{ .BeatVendor }}" \
+  org.label-schema.license="{{ .License }}" \
+  org.label-schema.name="{{ .BeatName }}" \
+  org.label-schema.version="{{ beat_version }}" \
+  org.label-schema.url="{{ .BeatURL }}" \
+  org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
+  org.label-schema.vcs-ref="{{ commit }}" \
+  io.k8s.description="{{ .BeatDescription }}" \
+  io.k8s.display-name="{{ .BeatName | title }} image" \
+  org.opencontainers.image.created="{{ date }}" \
+  org.opencontainers.image.licenses="{{ .License }}" \
+  org.opencontainers.image.title="{{ .BeatName | title }}" \
+  org.opencontainers.image.vendor="{{ .BeatVendor }}" \
+  name="{{ .BeatName }}" \
+  maintainer="infra@elastic.co" \
+  vendor="{{ .BeatVendor }}" \
+  version="{{ beat_version }}" \
+  release="1" \
+  url="{{ .BeatURL }}" \
+  summary="{{ .BeatName }}" \
+  license="{{ .License }}" \
+  description="{{ .BeatDescription }}"
+
+ENV ELASTIC_CONTAINER "true"
+ENV PATH={{ $beatHome }}:$PATH
+
+COPY docker-entrypoint /usr/local/bin/docker-entrypoint
+RUN chmod 755 /usr/local/bin/docker-entrypoint
+
+COPY --from=home {{ $beatHome }} {{ $beatHome }}
+
+RUN mkdir /licenses
+COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
+COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
+
 {{- if ne .user "root" }}
+RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}

@@ -23,7 +23,7 @@ inputs:
     #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
     #   Cannot start with -, _, +
     #   Cannot be . or ..
-    dataset.namespace: default
+    data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
@@ -33,13 +33,13 @@ inputs:
         #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
         #   Cannot start with -, _, +
         #   Cannot be . or ..
-        dataset.name: system.cpu
+        data_stream.dataset: system.cpu
       - metricset: memory
-        dataset.name: system.memory
+        data_stream.dataset: system.memory
       - metricset: network
-        dataset.name: system.network
+        data_stream.dataset: system.network
       - metricset: filesystem
-        dataset.name: system.filesystem
+        data_stream.dataset: system.filesystem
 
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:

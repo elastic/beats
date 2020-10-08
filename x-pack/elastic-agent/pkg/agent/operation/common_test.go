@@ -58,7 +58,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,15 +94,13 @@ func getLogger() *logger.Logger {
 }
 
 func getProgram(binary, version string) *app.Descriptor {
+	spec := program.SupportedMap[binary]
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
 		Architecture:    "32",
 	}
-	return app.NewDescriptor(program.Spec{
-		Name: binary,
-		Cmd:  binary,
-	}, version, downloadCfg, nil)
+	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }
 
 func getAbsPath(path string) string {
@@ -145,7 +143,7 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(p, v string) (bool, error) {
+func (*DummyVerifier) Verify(p, v, _ string, _ bool) (bool, error) {
 	return true, nil
 }
 

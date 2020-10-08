@@ -19,7 +19,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -49,8 +48,7 @@ func makeConfigHash(cfg map[string]string) string {
 }
 
 // load pipeline starts up a new pipeline with the given config
-func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp.Logger) (*Pipeline, error) {
-
+func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *logp.Logger) (*Pipeline, error) {
 	cfg, err := logOptsConfig.CreateConfig()
 	if err != nil {
 		return nil, err
@@ -68,7 +66,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp
 		return nil, fmt.Errorf("unpacking config failed: %v", err)
 	}
 
-	info, err := getBeatInfo(cfg)
+	info, err := getBeatInfo(logOptsConfig, hostname)
 	if err != nil {
 		return nil, err
 	}
@@ -131,38 +129,25 @@ func parseCfgKeys(cfg map[string]string) (map[string]interface{}, error) {
 }
 
 // getBeatInfo returns the beat.Info type needed to start the pipeline
-func getBeatInfo(cfg *common.Config) (beat.Info, error) {
+func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, error) {
 	vers := version.GetDefaultVersion()
-	hostname, err := os.Hostname()
-	if err != nil {
-		return beat.Info{}, errors.Wrap(err, "error getting hostname")
-	}
+
 	eid, err := uuid.NewV4()
 	if err != nil {
 		return beat.Info{}, errors.Wrap(err, "error creating ephemeral ID")
 	}
 
-	type nameStr struct {
-		Name string `config:"name"`
-	}
-	name := nameStr{}
-	err = cfg.Unpack(&name)
-	if err != nil {
-		return beat.Info{}, fmt.Errorf("unpacking config failed: %v", err)
-	}
-
-	if name.Name == "" {
-		name.Name = "elastic-log-driver"
-	}
 	id, err := loadMeta("/tmp/meta.json")
 	if err != nil {
 		return beat.Info{}, errors.Wrap(err, "error loading UUID")
 	}
 
+	beatName := "elastic-log-driver"
+
 	info := beat.Info{
-		Beat:        name.Name,
-		Name:        name.Name,
-		IndexPrefix: name.Name,
+		Beat:        beatName,
+		Name:        pluginOpts.BeatName,
+		IndexPrefix: "logs-docker",
 		Hostname:    hostname,
 		Version:     vers,
 		EphemeralID: eid,

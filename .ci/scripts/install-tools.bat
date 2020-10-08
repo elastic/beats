@@ -4,7 +4,7 @@ set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw64\bin;%PAT
 
 where /q curl
 IF ERRORLEVEL 1 (
- choco install curl -y --no-progress --skipdownloadcache
+    choco install curl -y --no-progress --skipdownloadcache
 )
 mkdir %WORKSPACE%\bin
 
@@ -28,16 +28,22 @@ go get github.com/magefile/mage
 mage -version
 where mage
 
-if not exist C:\Python38\python.exe (
-    REM Install python 3.8.
-    choco install python -y -r --no-progress --version 3.8.2 || echo ERROR && exit /b
+IF NOT EXIST C:\Python38\python.exe (
+    REM Install python 3.8
+    choco install python -y -r --no-progress --version 3.8.5
+    IF NOT ERRORLEVEL 0 (
+        exit /b 1
+    )
 )
 python --version
 where python
 
-if not exist C:\tools\mingw64\bin\gcc.exe (
+IF NOT EXIST C:\tools\mingw64\bin\gcc.exe (
     REM Install mingw 5.3.0
-    choco install mingw -y -r --no-progress --version 5.3.0 || echo ERROR && exit /b
+    choco install mingw -y -r --no-progress --version 5.3.0
+    IF NOT ERRORLEVEL 0 (
+        exit /b 1
+    )
 )
 gcc --version
 where gcc

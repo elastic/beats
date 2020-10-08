@@ -31,10 +31,14 @@ func New(
 	maxBytes int,
 	config *Config,
 ) (reader.Reader, error) {
-	if config.Type == patternMode {
+	switch config.Type {
+	case patternMode:
 		return newMultilinePatternReader(r, separator, maxBytes, config)
-	} else if config.Type == countMode {
+	case countMode:
 		return newMultilineCountReader(r, separator, maxBytes, config)
+	case whilePatternMode:
+		return newMultilineWhilePatternReader(r, separator, maxBytes, config)
+	default:
+		return nil, fmt.Errorf("unknown multiline type %d", config.Type)
 	}
-	return nil, fmt.Errorf("unknown multiline type %d", config.Type)
 }

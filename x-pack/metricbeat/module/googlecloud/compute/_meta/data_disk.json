@@ -5,15 +5,16 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "7925831082803123728",
+            "name": "heartbeat-tokyo"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "f1-micro"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "asia-northeast1-b",
+    "cloud.region": "asia-northeast1",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -30,24 +31,33 @@
                         "value": 0
                     },
                     "write_bytes_count": {
-                        "value": 158506
+                        "value": 0
                     },
                     "write_ops_count": {
-                        "value": 25
+                        "value": 0
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "instance-test-ks",
+                "device_name": "disk-1",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
-            },
-            "user": {
-                "created-by": "ks"
             }
         }
+    },
+    "host": {
+        "disk": {
+            "read": {
+                "bytes": 0
+            },
+            "write": {
+                "bytes": 0
+            }
+        },
+        "id": "7925831082803123728",
+        "name": "heartbeat-tokyo"
     },
     "metricset": {
         "name": "compute",

@@ -160,6 +160,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 			}
 		}
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+		return
 	}
 
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
@@ -334,19 +335,29 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
+		meta := p.metagen.Generate(
+			pod,
+			metadata.WithFields("container.name", c.Name),
+			metadata.WithFields("container.image", c.Image),
+		)
+
 		cmeta := common.MapStr{
+			"id": cid,
+			"image": common.MapStr{
+				"name": c.Image,
+			},
+			"runtime": runtimes[c.Name],
+		}
+
+		// Information that can be used in discovering a workload
+		kubemeta := meta.Clone()
+		kubemeta["annotations"] = annotations
+		kubemeta["container"] = common.MapStr{
 			"id":      cid,
 			"name":    c.Name,
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name),
-			metadata.WithFields("container.image", c.Image))
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
-		kubemeta["annotations"] = annotations
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
 		}
@@ -363,6 +374,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)
@@ -379,6 +391,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)

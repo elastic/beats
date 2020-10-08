@@ -187,18 +187,14 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
-	// Normally the nodeStruct should only contain one node. But if _local is removed
-	// from the path and Metricbeat is not installed on the same machine as the node
-	// it will provid the data for multiple nodes. This will mean the detection of the
-	// master node will not be accurate anymore as often in these cases a proxy is in front
-	// of ES and it's not know if the request will be routed to the same node as before.
+	masterNodeID, err := elasticsearch.GetMasterNodeID(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
+
 	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
-		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
-			continue
-		}
+		isMaster := nodeID == masterNodeID
 
 		event := mb.Event{}
 
@@ -207,6 +203,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
 			continue
 		}
+
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 

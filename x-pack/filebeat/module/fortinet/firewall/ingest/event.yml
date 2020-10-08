@@ -218,6 +218,11 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.event?.duration == null"
+- convert:
+    field: fortinet.firewall.mem
+    type: integer
+    ignore_failure: true
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: source.geo

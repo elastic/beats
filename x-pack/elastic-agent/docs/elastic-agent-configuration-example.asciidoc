@@ -2,7 +2,7 @@
 [role="xpack"]
 = Configuration example
 
-experimental[]
+beta[]
 
 The following example shows a full list of configuration options:
 

@@ -1,12 +1,9 @@
+import metricbeat
 import os
 import requests
 import sys
 import time
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 HTTP_FIELDS = metricbeat.COMMON_FIELDS + ["http"]

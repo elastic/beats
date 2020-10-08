@@ -1,6 +1,19 @@
 type: s3
 queue_url: {{ .queue_url }}
-expand_event_list_from_field: Records
+file_selectors:
+{{ if .process_cloudtrail_logs }}
+  - regex: '^AWSLogs/\d+/CloudTrail/'
+    expand_event_list_from_field: 'Records'
+{{ end }}
+
+{{ if .process_digest_logs }}
+  - regex: '^AWSLogs/\d+/CloudTrail-Digest/'
+{{ end }}
+
+{{ if .process_insight_logs }}
+  - regex: '^AWSLogs/\d+/CloudTrail-Insight/'
+    expand_event_list_from_field: 'Records'
+{{ end }}
 
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
@@ -38,6 +51,10 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+{{ if .fips_enabled }}
+fips_enabled: {{ .fips_enabled }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
@@ -45,4 +62,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

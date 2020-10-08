@@ -21,6 +21,8 @@ include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
+include::./release-notes/whats-new.asciidoc[]
+
 include::./communitybeats.asciidoc[]
 
 include::./getting-started.asciidoc[]
@@ -28,8 +30,6 @@ include::./getting-started.asciidoc[]
 include::./config-file-format.asciidoc[]
 
 include::./upgrading.asciidoc[]
-
-include::./release-notes/highlights/highlights.asciidoc[]
 
 include::./release-notes/breaking/breaking.asciidoc[]
 
