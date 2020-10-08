@@ -65,11 +65,11 @@ func TestParseFromTo(t *testing.T) {
 	assert.Equal(t, common.NetString(nil), params["tag"])
 
 	// From
-	displayInfo, uri, params = parseFromToContact(common.NetString("\"PCMU/8000\" <sip:sipp@10.0.2.15:5060>;tag=1"))
+	displayInfo, uri, params = parseFromToContact(common.NetString("\"PCMU/8000\"   <sip:sipp@10.0.2.15:5060>;tag=1"))
 	assert.Equal(t, common.NetString("PCMU/8000"), displayInfo)
 	assert.Equal(t, common.NetString("sip:sipp@10.0.2.15:5060"), uri)
 	assert.Equal(t, common.NetString("1"), params["tag"])
-	displayInfo, uri, params = parseFromToContact(common.NetString("\"Matthew Hodgson\" <sip:matthew@mxtelecom.com>;tag=5c7cdb68"))
+	displayInfo, uri, params = parseFromToContact(common.NetString("  \"Matthew Hodgson\" <sip:matthew@mxtelecom.com>;tag=5c7cdb68"))
 	assert.Equal(t, common.NetString("Matthew Hodgson"), displayInfo)
 	assert.Equal(t, common.NetString("sip:matthew@mxtelecom.com"), uri)
 	assert.Equal(t, common.NetString("5c7cdb68"), params["tag"])
@@ -83,7 +83,7 @@ func TestParseFromTo(t *testing.T) {
 	assert.Equal(t, common.NetString(nil), params["tag"])
 
 	// Contact
-	displayInfo, uri, _ = parseFromToContact(common.NetString("<sip:test@10.0.2.15:5060;transport=udp>"))
+	displayInfo, uri, _ = parseFromToContact(common.NetString("  <sip:test@10.0.2.15:5060;transport=udp>"))
 	assert.Equal(t, common.NetString(nil), displayInfo)
 	assert.Equal(t, common.NetString("sip:test@10.0.2.15:5060;transport=udp"), uri)
 	displayInfo, uri, params = parseFromToContact(common.NetString("<sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a>;expires=1200;q=0.500"))
@@ -100,6 +100,12 @@ func TestParseFromTo(t *testing.T) {
 	assert.Equal(t, common.NetString("Mr. Watson"), displayInfo)
 	assert.Equal(t, common.NetString("mailto:watson@bell-telephone.com"), uri)
 	assert.Equal(t, common.NetString("0.1"), params["q"])
+
+	// url is not bounded by <...>
+	displayInfo, uri, params = parseFromToContact(common.NetString("   sip:test@10.0.2.15:5060;transport=udp"))
+	assert.Equal(t, common.NetString(nil), displayInfo)
+	assert.Equal(t, common.NetString("sip:test@10.0.2.15:5060"), uri)
+	assert.Equal(t, common.NetString("udp"), params["transport"])
 }
 
 func TestParseUDP(t *testing.T) {
