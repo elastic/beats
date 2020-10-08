@@ -499,27 +499,46 @@ func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 func parseFromToContact(fromTo common.NetString) (displayInfo, uri common.NetString, params map[string]common.NetString) {
 	params = make(map[string]common.NetString)
 
-	pos := bytes.IndexByte(fromTo, '<')
-	if pos == -1 {
-		pos = bytes.IndexByte(fromTo, ' ')
-	}
+	fromTo = bytes.TrimSpace(fromTo)
+
+	var uriIsWrapped bool
+	pos := func() int {
+		// look for the beginning of a url wrapped in <...>
+		if pos := bytes.IndexByte(fromTo, '<'); pos > -1 {
+			uriIsWrapped = true
+			return pos
+		}
+		// if there is no < char, it means there is no display info, and
+		// that the url starts from the beginning
+		// https://tools.ietf.org/html/rfc3261#section-20.10
+		return 0
+	}()
 
 	displayInfo = bytes.Trim(fromTo[:pos], "'\"\t ")
 
 	endURIPos := func() int {
-		if fromTo[pos] == '<' {
+		if uriIsWrapped {
 			return bytes.IndexByte(fromTo, '>')
 		}
 		return bytes.IndexByte(fromTo, ';')
 	}()
 
+	// not wrapped and no header params
 	if endURIPos == -1 {
-		uri = bytes.TrimRight(fromTo[pos:], ">")
-		return
+		uri = fromTo[pos:]
+		return displayInfo, uri, params
 	}
-	pos += 1
+
+	// if wrapped, we want to get over the < char
+	if uriIsWrapped {
+		pos += 1
+	}
+
+	// if wrapped, we will get the string between <...>
+	// if not wrapped, we will get the value before the header params (until ;)
 	uri = fromTo[pos:endURIPos]
 
+	// parse the header params
 	pos = endURIPos + 1
 	for _, param := range bytes.Split(fromTo[pos:], []byte(";")) {
 		kv := bytes.SplitN(param, []byte("="), 2)
