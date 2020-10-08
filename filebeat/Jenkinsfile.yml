@@ -33,4 +33,4 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            - "windows-2012-r2"
+            #- "windows-2016"  https://github.com/elastic/beats/issues/19641
