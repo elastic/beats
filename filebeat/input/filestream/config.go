@@ -53,7 +53,7 @@ type readerCloserConfig struct {
 }
 
 type stateChangeCloserConfig struct {
-	CheckInterval time.Duration `config:"check_interval" validate="nonzero"`
+	CheckInterval time.Duration `config:"check_interval" validate:"nonzero"`
 	Inactive      time.Duration `config:"inactive"`
 	Removed       bool          `config:"removed"`
 	Renamed       bool          `config:"renamed"`
@@ -79,9 +79,9 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
+		readerConfig:   defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
-		Reader:         defaultReaderConfig(),
 		CleanInactive:  0,
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
