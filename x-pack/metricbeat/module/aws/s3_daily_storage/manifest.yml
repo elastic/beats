@@ -12,9 +12,9 @@ input:
 
 processors:
 - rename:
-  ignore_missing: true
-  fields:
-    - from: "aws.s3.metrics.NumberOfObjects.avg"
-      to: "aws.s3_daily_storage.s3_daily_storage"
-    - from: "aws.s3.metrics.BucketSizeBytes.avg"
-      to: "aws.s3_daily_storage.bucket.size.bytes"
+    ignore_missing: true
+    fields:
+      - from: "aws.s3.metrics.NumberOfObjects.avg"
+        to: "aws.s3_daily_storage.number_of_objects"
+      - from: "aws.s3.metrics.BucketSizeBytes.avg"
+        to: "aws.s3_daily_storage.bucket.size.bytes"

@@ -6,12 +6,12 @@
         },
         "dimensions": {
             "BucketName": "filebeat-aws-elb-test",
-            "StorageType": "StandardStorage"
+            "StorageType": "AllStorageTypes"
         },
         "s3": {
             "metrics": {
-                "BucketSizeBytes": {
-                    "avg": 64070062
+                "NumberOfObjects": {
+                    "avg": 57828
                 }
             }
         }
