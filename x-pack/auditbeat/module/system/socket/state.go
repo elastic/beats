@@ -549,13 +549,13 @@ func (s *state) ExpireOlder() {
 	s.dns.CleanUp()
 }
 
-func (s *state) CreateProcess(p process) error {
+func (s *state) CreateProcess(p *process) error {
 	if p.pid == 0 {
 		return errors.New("can't create process with PID 0")
 	}
 	s.Lock()
 	defer s.Unlock()
-	s.processes[p.pid] = &p
+	s.processes[p.pid] = p
 	if p.createdTime == (time.Time{}) {
 		p.createdTime = s.kernTimestampToTime(p.created)
 	}
