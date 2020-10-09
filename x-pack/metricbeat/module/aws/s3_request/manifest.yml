@@ -60,3 +60,5 @@ processors:
           to: "aws.s3_request.latency.first_byte.ms"
         - from: "aws.s3.metrics.TotalRequestLatency.avg"
           to: "aws.s3_request.latency.total_request.ms"
+        - from: "aws.dimensions.BucketName"
+          to: "aws.s3.bucket.name"

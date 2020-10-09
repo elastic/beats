@@ -18,3 +18,5 @@ processors:
         to: "aws.s3_daily_storage.number_of_objects"
       - from: "aws.s3.metrics.BucketSizeBytes.avg"
         to: "aws.s3_daily_storage.bucket.size.bytes"
+      - from: "aws.dimensions.BucketName"
+        to: "aws.s3.bucket.name"
