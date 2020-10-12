@@ -44,6 +44,9 @@ type Processor interface {
 
 // Closer defines the interface for processors that should be closed after using
 // them.
+// Close() is not part of the Processor interface because implementing this method
+// is also a way to indicate that the processor keeps some resource that needs to
+// be released or orderly closed.
 type Closer interface {
 	Close() error
 }
