@@ -285,6 +285,10 @@ func TestRuleReload(t *testing.T) {
 	c := map[string]interface{}{
 		"module":      "auditd",
 		"socket_type": "unicast",
+		"reload": map[string]interface{}{
+			"period":  time.Second * 5,
+			"enabled": true,
+		},
 		"audit_rule_files": []string{
 			"/tmp/test.rules",
 		},
@@ -307,6 +311,9 @@ func TestRuleReload(t *testing.T) {
 			"/tmp/test.rules",
 		).Output()
 	})
+
+	// wait for rule reload
+	time.AfterFunc(time.Second, func() { exec.Command("sleep", "10").Output() })
 
 	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
 	events = mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
