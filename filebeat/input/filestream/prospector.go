@@ -72,7 +72,7 @@ func newFileProspector(
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.HarvesterGroup) {
+func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
