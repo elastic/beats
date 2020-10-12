@@ -30,6 +30,8 @@ const (
 	Crashed
 	// Restarting is status describing application is restarting.
 	Restarting
+	// Updating is status describing application is updating.
+	Updating
 )
 
 // State wraps the process state and application status.
