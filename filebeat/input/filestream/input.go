@@ -94,19 +94,19 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
 	}
 
 	return prospector, &filestream{
-		readerConfig:    config.Reader,
-		bufferSize:      config.Reader.BufferSize,
+		readerConfig:    config.readerConfig,
+		bufferSize:      config.BufferSize,
 		encodingFactory: encodingFactory,
-		lineTerminator:  config.Reader.LineTerminator,
-		excludeLines:    config.Reader.ExcludeLines,
-		includeLines:    config.Reader.IncludeLines,
-		maxBytes:        config.Reader.MaxBytes,
+		lineTerminator:  config.LineTerminator,
+		excludeLines:    config.ExcludeLines,
+		includeLines:    config.IncludeLines,
+		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
 	}, nil
 }
