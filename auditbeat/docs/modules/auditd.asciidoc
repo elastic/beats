@@ -135,6 +135,9 @@ following example shows all configuration options with their default values.
   include_raw_message: false
   include_warnings: false
   backpressure_strategy: auto
+  reload:
+    period: 30s
+    enabled: true
 ----
 
 This module also supports the
@@ -206,6 +209,12 @@ that of the `audit_rules` field.
 *`backpressure_strategy`*:: Specifies the strategy that {beatname_uc} uses to
 prevent backpressure from propagating to the kernel and impacting audited
 processes.
+
+*`reload`*:: `enabled` auditbeat check auditd rule files in fixed interval 
+`period`, reload auditd rule on host if any changes to the rule file detected.
+Its similar to the config reload, but instead of .yml files it is for .rules
+files.
+
 +
 --
 The possible values are:
