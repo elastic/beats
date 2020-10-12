@@ -28,6 +28,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -41,7 +42,6 @@ var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 type publishClient struct {
 	es     *eslegclient.Connection
 	params map[string]string
-	format report.Format
 
 	log *logp.Logger
 }
@@ -49,12 +49,10 @@ type publishClient struct {
 func newPublishClient(
 	es *eslegclient.Connection,
 	params map[string]string,
-	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
-		format: format,
 
 		log: logp.NewLogger(logSelector),
 	}
@@ -140,14 +138,7 @@ func (c *publishClient) Publish(ctx context.Context, batch publisher.Batch) erro
 			}
 		}
 
-		switch c.format {
-		case report.FormatXPackMonitoringBulk:
-			err = c.publishXPackBulk(params, event, typ)
-		case report.FormatBulk:
-			err = c.publishBulk(ctx, event, typ)
-		}
-
-		if err != nil {
+		if err := c.publishBulk(ctx, event, typ); err != nil {
 			failed = append(failed, event)
 			reason = err
 		}
@@ -169,26 +160,6 @@ func (c *publishClient) String() string {
 	return "monitoring(" + c.es.URL + ")"
 }
 
-func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
-	meta := common.MapStr{
-		"_index":   "",
-		"_routing": nil,
-		"_type":    typ,
-	}
-	bulk := [2]interface{}{
-		common.MapStr{"index": meta},
-		report.Event{
-			Timestamp: event.Content.Timestamp,
-			Fields:    event.Content.Fields,
-		},
-	}
-
-	// Currently one request per event is sent. Reason is that each event can contain different
-	// interval params and X-Pack requires to send the interval param.
-	_, err := c.es.SendMonitoringBulk(params, bulk[:])
-	return err
-}
-
 func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
@@ -200,14 +171,14 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		meta["_type"] = "doc"
 	}
 
-	action := common.MapStr{}
-	var opType string
+	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
-		opType = "index"
-	} else {
-		opType = "create"
+		opType = events.OpTypeIndex
 	}
-	action[opType] = meta
+
+	action := common.MapStr{
+		opType.String(): meta,
+	}
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 

@@ -15,7 +15,15 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+fields_under_root: true
+fields:
+  observer:
+    vendor: Palo Alto Networks
+    product: PAN-OS
+    type: firewall
 
 processors:
   - add_locale: ~
@@ -27,17 +35,18 @@ processors:
   - extract_array:
       field: csv
       overwrite_keys: true
+      omit_empty: true
       mappings:
         event.created: 1
         observer.serial_number: 2
-        _temp_.message_type: 3
-        _temp_.message_subtype: 4
+        panw.panos.type: 3
+        panw.panos.sub_type: 4
         _temp_.generated_time: 6
 
   - extract_array:
       when:
         equals:
-          _temp_.message_type: TRAFFIC
+          panw.panos.type: TRAFFIC
       field: csv
       overwrite_keys: true
       omit_empty: true
@@ -50,7 +59,9 @@ processors:
         destination.ip: 8
         destination.address: 8
         source.nat.ip: 9
+        client.nat.ip: 9
         destination.nat.ip: 10
+        server.nat.ip: 10
         panw.panos.ruleset: 11
         client.user.name: 12
         source.user.name: 12
@@ -58,39 +69,46 @@ processors:
         destination.user.name: 13
         network.application: 14
         panw.panos.source.zone: 16
+        observer.ingress.zone: 16
         panw.panos.destination.zone: 17
+        observer.egress.zone: 17
         panw.panos.source.interface: 18
+        observer.ingress.interface.name: 18
         panw.panos.destination.interface: 19
+        observer.egress.interface.name: 19
         panw.panos.flow_id: 22
         client.port: 24
         source.port: 24
         destination.port: 25
         server.port: 25
         source.nat.port: 26
+        client.nat.port: 26
         destination.nat.port: 27
+        server.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         panw.panos.action: 30
         network.bytes: 31
         client.bytes: 32
-        destination.bytes: 32
+        source.bytes: 32
         server.bytes: 33
-        source.bytes: 33
+        destination.bytes: 33
         network.packets: 34
         event.start: 35
         event.duration: 36
         panw.panos.url.category: 37
         panw.panos.sequence_number: 39
-        server.packets: 44
-        destination.packets: 44
-        client.packets: 45
-        source.packets: 45
+        client.packets: 44
+        source.packets: 44
+        server.packets: 45
+        destination.packets: 45
+        panw.panos.endreason: 46
         observer.hostname: 52
 
   - extract_array:
       when:
        equals:
-          _temp_.message_type: THREAT
+          panw.panos.type: THREAT
       field: csv
       omit_empty: true
       overwrite_keys: true
@@ -103,7 +121,9 @@ processors:
         destination.ip: 8
         destination.address: 8
         source.nat.ip: 9
+        client.nat.ip: 9
         destination.nat.ip: 10
+        server.nat.ip: 10
         panw.panos.ruleset: 11
         client.user.name: 12
         source.user.name: 12
@@ -111,16 +131,22 @@ processors:
         destination.user.name: 13
         network.application: 14
         panw.panos.source.zone: 16
+        observer.ingress.zone: 16
         panw.panos.destination.zone: 17
+        observer.egress.zone: 17
         panw.panos.source.interface: 18
+        observer.ingress.interface.name: 18
         panw.panos.destination.interface: 19
+        observer.egress.interface.name: 19
         panw.panos.flow_id: 22
         client.port: 24
         source.port: 24
         destination.port: 25
         server.port: 25
         source.nat.port: 26
+        client.nat.port: 26
         destination.nat.port: 27
+        server.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         panw.panos.action: 30
@@ -169,4 +195,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

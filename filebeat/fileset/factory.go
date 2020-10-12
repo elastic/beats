@@ -76,7 +76,7 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
 	if err != nil {
@@ -98,7 +98,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *commo
 
 	inputs := make([]cfgfile.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		inputs[i], err = f.inputFactory.Create(p, pConfig, meta)
+		inputs[i], err = f.inputFactory.Create(p, pConfig)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err
@@ -116,7 +116,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *commo
 }
 
 func (f *Factory) CheckConfig(c *common.Config) error {
-	_, err := f.Create(pubpipeline.NewNilPipeline(), c, nil)
+	_, err := f.Create(pubpipeline.NewNilPipeline(), c)
 	return err
 }
 

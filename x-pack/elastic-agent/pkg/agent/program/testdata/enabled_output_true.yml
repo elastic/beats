@@ -1,11 +1,9 @@
-datasources:
-  - use_output: default
-    inputs:
-      - type: event/file
-        streams:
-          - paths:
-              - /var/log/hello1.log
-              - /var/log/hello2.log
+inputs:
+  - type: event/file
+    streams:
+      - paths:
+          - /var/log/hello1.log
+          - /var/log/hello2.log
 management:
   host: "localhost"
 config:

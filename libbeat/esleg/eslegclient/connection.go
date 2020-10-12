@@ -18,6 +18,7 @@
 package eslegclient
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,8 +49,9 @@ type Connection struct {
 	Encoder BodyEncoder
 	HTTP    esHTTPClient
 
-	version common.Version
-	log     *logp.Logger
+	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
+	version          common.Version
+	log              *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -60,7 +62,7 @@ type ConnectionSettings struct {
 
 	Username string
 	Password string
-	APIKey   string
+	APIKey   string // Raw API key, NOT base64-encoded
 	Headers  map[string]string
 
 	TLS      *tlscommon.TLSConfig
@@ -129,28 +131,26 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	var httpClient esHTTPClient
 	// when dropping the legacy client in favour of the official Go client, it should be instrumented
 	// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
+	transp := apmelasticsearch.WrapRoundTripper(&http.Transport{
+		Dial:            dialer.Dial,
+		DialTLS:         tlsDialer.Dial,
+		TLSClientConfig: s.TLS.ToConfig(),
+		Proxy:           proxy,
+		IdleConnTimeout: s.IdleConnTimeout,
+	})
+
+	var httpClient esHTTPClient
 	httpClient = &http.Client{
-		Transport: apmelasticsearch.WrapRoundTripper(&http.Transport{
-			Dial:            dialer.Dial,
-			DialTLS:         tlsDialer.Dial,
-			TLSClientConfig: s.TLS.ToConfig(),
-			Proxy:           proxy,
-			IdleConnTimeout: s.IdleConnTimeout,
-		}),
-		Timeout: s.Timeout,
+		Transport: transp,
+		Timeout:   s.Timeout,
 	}
 
 	if s.Kerberos.IsEnabled() {
 		c := &http.Client{
-			Transport: &http.Transport{
-				Dial:            dialer.Dial,
-				Proxy:           proxy,
-				IdleConnTimeout: s.IdleConnTimeout,
-			},
-			Timeout: s.Timeout,
+			Transport: transp,
+			Timeout:   s.Timeout,
 		}
 		httpClient, err = kerberos.NewClient(s.Kerberos, c, s.URL)
 		if err != nil {
@@ -159,12 +159,18 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logp.Info("kerberos client created")
 	}
 
-	return &Connection{
+	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               httpClient,
 		Encoder:            encoder,
 		log:                logp.NewLogger("esclientleg"),
-	}, nil
+	}
+
+	if s.APIKey != "" {
+		conn.apiKeyAuthHeader = "ApiKey " + base64.StdEncoding.EncodeToString([]byte(s.APIKey))
+	}
+
+	return &conn, nil
 }
 
 func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
@@ -437,8 +443,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.APIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
+	if conn.apiKeyAuthHeader != "" {
+		req.Header.Add("Authorization", conn.apiKeyAuthHeader)
 	}
 
 	for name, value := range conn.Headers {

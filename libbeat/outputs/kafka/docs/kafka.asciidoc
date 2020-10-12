@@ -5,6 +5,14 @@
 <titleabbrev>Kafka</titleabbrev>
 ++++
 
+[IMPORTANT]
+.Known issue in version 7.8.0
+====
+The Kafka output fails to connect when using multiple TLS brokers. We advise
+not to upgrade to {beatname_uc} 7.8.0 if you're using the Kafka output in this
+configuration.
+====
+
 The Kafka output sends events to Apache Kafka.
 
 To use this output, edit the {beatname_uc} configuration file to disable the {es}
@@ -34,7 +42,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output works with all Kafka versions in between 0.11 and 2.1.0. Older versions
+This output works with all Kafka versions in between 0.11 and 2.2.2. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options

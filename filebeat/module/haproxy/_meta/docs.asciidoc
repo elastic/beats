@@ -14,6 +14,8 @@ include::../include/gs-link.asciidoc[]
 
 The +{modulename}+ module was tested with logs from `haproxy` running on AWS Linux as a gateway to a cluster of microservices.
 
+The module was also tested with HAProxy 1.8, 1.9 and 2.0 running on a Debian.
+
 This module is not available for Windows.
 
 include::../include/configuring-intro.asciidoc[]

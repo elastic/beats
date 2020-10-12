@@ -1,21 +1,24 @@
-[id="{beatname_lc}-getting-started"]
+[id="{beatname_lc}-installation-configuration"]
 [role="xpack"]
-== Get started with {beatname_uc}
+== {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+This guide describes how to get started quickly monitoring data from your cloud
+services. You'll learn how to:
 
-* <<{beatname_lc}-installation>>
-* <<{beatname_lc}-configuration>>
-* <<{beatname_lc}-template>>
-* <<{beatname_lc}-deploying>>
-* <<view-kibana-dashboards>>
 
-[id="{beatname_lc}-installation"]
-[role="xpack"]
+* download the {beatname_uc} distribution
+* configure details about the cloud functions you want to deploy, including the
+services to monitor and triggers
+* deploy the cloud functions to your serverless environment
+* collect data from cloud services and ship it to the {stack}
+* visualize the data in {kib}
+
+[float]
+[[install]]
 === Step 1: Download {beatname_uc}
 
 The {beatname_uc} distribution contains the command line tools, configuration
@@ -25,81 +28,26 @@ environment.
 To download and extract the package, use the commands that work with your
 system.
 
-[[linux]]
-*linux:*
+include::{libbeat-dir}/tab-widgets/install-linux-mac-win-short-widget.asciidoc[]
 
-ifeval::["{release-state}"=="unreleased"]
+[float]
+[[set-connection]]
+=== Step 2: Connect to the {stack}
 
-Version {version} of {beatname_uc} has not yet been released.
+include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
-tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-[[mac]]
-*mac:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
-tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-[[win]]
-*win:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-. Download the {beatname_uc} Windows zip file from the
-https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
-
-. Extract the contents of the zip file. 
-
-endif::[]
-
-[id="{beatname_lc}-configuration"]
-[role="xpack"]
-=== Step 2: Configure {beatname_uc}
+[float]
+[[configuration]]
+=== Step 3: Configure cloud functions
 
 Before deploying {beatname_uc} to your cloud provider, you need to specify
 details about the cloud functions that you want to deploy, including the
 function name and type, and the triggers that will cause the function to
-execute. You also need to specify connection details for your {es} cluster. 
+execute. 
 
-You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
-is located in the archive that you extracted earlier.
-
-TIP: See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
-
-. Configure the functions that you want to deploy. The configuration settings
-vary depending on the type of function and cloud provider you're using. This
-section provides a couple of example configurations.
+. In +{beatname_lc}.yml+, configure the functions that you want to deploy. The
+configuration settings vary depending on the type of function and cloud provider
+you're using. This section provides a couple of example configurations.
 +
 --
 * *AWS example*: This example configures a function called `cloudwatch` that
@@ -156,24 +104,39 @@ See <<configuration-{beatname_lc}-gcp-options>> for more examples.
 
 --
 
-include::{libbeat-dir}/step-configure-output.asciidoc[]
+include::{libbeat-dir}/shared/config-check.asciidoc[]
 
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+[float]
+[[setup-assets]]
+=== Step 4: Set up assets
 
-include::{libbeat-dir}/step-test-config.asciidoc[]
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+. Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
 
-[id="{beatname_lc}-template"]
-[role="xpack"]
-=== Step 3: Load the index template in Elasticsearch
+. From the installation directory, run:
++
+--
+include::{libbeat-dir}/tab-widgets/setup-linux-mac-win-widget.asciidoc[]
+--
++
+`-e` is optional and sends output to standard error instead of the configured log output.
 
-:allplatforms:
-include::{libbeat-dir}/shared-template-load.asciidoc[]
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
 
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>>.
+=====
+
+[float]
 [id="{beatname_lc}-deploying"]
 [role="xpack"]
-=== Step 4: Deploy {beatname_uc}
+=== Step 5: Deploy {beatname_uc}
 
 To deploy {beatname_uc} functions to your cloud provider, either use the
 {beatname_uc} manager, as described here, or <<own-deployment,use your own
@@ -182,29 +145,16 @@ deployment infrastructure>>.
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
 
+[float]
 [[deploy-to-aws]]
 ==== Deploy to AWS
 
 . Make sure you have the credentials required to authenticate with AWS. You can
 set environment variables that contain your credentials:
 +
-*linux and mac*:
-+
-[source, shell]
-----
-export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
-export AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
-export AWS_DEFAULT_REGION=us-east-1
-----
-+
-*win*:
-+
-[source, shell]
-----
-set AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
-set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
-set AWS_DEFAULT_REGION=us-east-1
-----
+--
+include::tab-widgets/credentials-aws-widget.asciidoc[]
+--
 +
 Set `AWS_DEFAULT_REGION` to the region where your services are running.
 
@@ -215,25 +165,18 @@ function. For more information, see <<iam-permissions>>.
 +
 For example, the following command deploys a function called `cloudwatch`: 
 +
-*linux and mac:*
-+
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-./{beatname_lc} -v -e -d "*" deploy cloudwatch
-----------------------------------------------------------------------
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-.{backslash}{beatname_lc}.exe -v -e -d "*" deploy cloudwatch
-----------------------------------------------------------------------
+--
+include::tab-widgets/deploy-aws-widget.asciidoc[]
+--
 +
 The function is deployed to AWS and ready to send log events to the configured
 output.
 +
 If deployment fails, see <<faq>> for help troubleshooting.
 
+:fnexample!:
+
+[float]
 [[deploy-to-gcp]]
 ==== Deploy to Google Cloud Platform
 
@@ -251,49 +194,39 @@ Cloud documentation] for more information about creating a service account.
 . Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to
 the JSON file that contains your service account key. For example:
 +
-*linux and mac*:
-+
-[source, shell]
-----
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/myproject-5a90ee91d102.json"
-----
-+
-*win*:
-+
-[source, shell]
-----
-set GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\myproject-5a90ee91d102.json"
-----
+--
+include::tab-widgets/credentials-google-widget.asciidoc[]
+--
 
 . Deploy the cloud functions.
 +
 For example, the following command deploys a function called `storage`: 
 +
-*linux and mac:*
-+
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-./{beatname_lc} -v -e -d "*" deploy storage
-----------------------------------------------------------------------
-+
-*win:*
-+
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-.{backslash}{beatname_lc}.exe -v -e -d "*" deploy storage
-----------------------------------------------------------------------
+--
+include::tab-widgets/deploy-google-widget.asciidoc[]
+--
 +
 The function is deployed to Google Cloud Platform and ready to send events
 to the configured output.
 +
 If deployment fails, see <<faq>> for help troubleshooting.
 
-[[view-kibana-dashboards]]
-[role="xpack"]
-=== Step 5: View your data in Kibana
+[float]
+[[view-data]]
+=== Step 6: View your data in {kib}
 
 There are currently no example dashboards available for {beatname_uc}.
 
 To learn how to view and explore your data, see the
 _{kibana-ref}/index.html[{kib} User Guide]_.
 
+[float]
+=== What's next?
+
+Now that you have your cloud data streaming into {es}, learn how to unify your
+logs, metrics, uptime, and application performance data.
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[]
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

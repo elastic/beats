@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/docker/go-plugins-helpers/sdk"
 
@@ -41,6 +42,14 @@ func genNewMonitoringConfig() (*common.Config, error) {
 	return cfg, nil
 }
 
+func setDestroyLogsOnStop() (bool, error) {
+	setting, ok := os.LookupEnv("DESTROY_LOGS_ON_STOP")
+	if !ok {
+		return false, nil
+	}
+	return strconv.ParseBool(setting)
+}
+
 func fatal(format string, vs ...interface{}) {
 	fmt.Fprintf(os.Stderr, format, vs...)
 	os.Exit(1)
@@ -60,12 +69,24 @@ func main() {
 		fatal("error starting log handler: %s", err)
 	}
 
-	pipelines := pipelinemanager.NewPipelineManager(logcfg)
+	logDestroy, err := setDestroyLogsOnStop()
+	if err != nil {
+		fatal("DESTROY_LOGS_ON_STOP must be 'true' or 'false': %s", err)
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		fatal("Error fetching hostname: %s", err)
+	}
+
+	pipelines := pipelinemanager.NewPipelineManager(logDestroy, hostname)
 
 	sdkHandler := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
 	// Create handlers for startup and shutdown of the log driver
 	sdkHandler.HandleFunc("/LogDriver.StartLogging", startLoggingHandler(pipelines))
 	sdkHandler.HandleFunc("/LogDriver.StopLogging", stopLoggingHandler(pipelines))
+	sdkHandler.HandleFunc("/LogDriver.Capabilities", reportCaps())
+	sdkHandler.HandleFunc("/LogDriver.ReadLogs", readLogHandler(pipelines))
 
 	err = sdkHandler.ServeUnix("beatSocket", 0)
 	if err != nil {

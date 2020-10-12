@@ -8,7 +8,8 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -21,12 +22,20 @@ type Application interface {
 	AgentInfo() *info.AgentInfo
 }
 
+type reexecManager interface {
+	ReExec(argOverrides ...string)
+}
+
+type upgraderControl interface {
+	SetUpgrader(upgrader *upgrade.Upgrader)
+}
+
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string) (Application, error) {
+func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, uc upgraderControl) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return nil, err
 	}
@@ -35,39 +44,35 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, uc)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
 	rawConfig *config.Config,
+	reexec reexecManager,
+	uc upgraderControl,
 ) (Application, error) {
 	warn.LogNotGA(log)
-
 	log.Info("Detecting execution mode")
-	c := localDefaultConfig()
-	err := rawConfig.Unpack(c)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
-
-	mgmt := defaultManagementConfig()
-	err = c.Management.Unpack(mgmt)
-	if err != nil {
-		return nil, errors.New(err, "initiating application")
-	}
-
 	ctx := context.Background()
 
-	switch mgmt.Mode {
-	case localMode:
-		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig)
-	case fleetMode:
-		log.Info("Agent is managed by Fleet")
-		return newManaged(ctx, log, rawConfig)
-	default:
-		return nil, ErrInvalidMgmtMode
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
 	}
+
+	if isStandalone(cfg.Fleet) {
+		log.Info("Agent is managed locally")
+		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, uc)
+	}
+
+	log.Info("Agent is managed by Fleet")
+	return newManaged(ctx, log, rawConfig, reexec)
+}
+
+// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+	return cfg == nil || !cfg.Enabled
 }

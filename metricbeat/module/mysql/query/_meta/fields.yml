@@ -1,0 +1,6 @@
+- name: query
+  type: group
+  release: beta
+  description: >
+    `query` metricset fetches custom queries from the user to a MySQL instance.
+  fields:

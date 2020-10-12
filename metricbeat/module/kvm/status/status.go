@@ -124,9 +124,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				"name": d.Name,
 			},
 			MetricSetFields: common.MapStr{
-				"stat": common.MapStr{
-					"state": getDomainStateName(state),
-				},
+				"state": getDomainStateName(state),
 			},
 		})
 		if !reported {

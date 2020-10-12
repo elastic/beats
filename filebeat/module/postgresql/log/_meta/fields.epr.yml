@@ -1,0 +1,13 @@
+- name: event.kind
+  type: keyword
+  description: Event kind (e.g. event)
+- name: event.category
+  type: keyword
+  description: Event category (e.g. database)
+- name: event.code
+  type: keyword
+  description: Identification code for this event
+- name: event.type
+  type: keyword
+  description: Event severity (e.g. info, error)
+

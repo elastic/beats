@@ -39,20 +39,22 @@ type reader struct {
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
-	watcher, err := monitor.New(c.Recursive)
-	if err != nil {
-		return nil, err
-	}
-
 	return &reader{
-		watcher: watcher,
-		config:  c,
-		log:     logp.NewLogger(moduleName),
+		config: c,
+		log:    logp.NewLogger(moduleName),
 	}, nil
 }
 
 func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
+	watcher, err := monitor.New(r.config.Recursive)
+	if err != nil {
+		return nil, err
+	}
+
+	r.watcher = watcher
 	if err := r.watcher.Start(); err != nil {
+		// Ensure that watcher is closed so that we don't leak watchers
+		r.watcher.Close()
 		return nil, errors.Wrap(err, "unable to start watcher")
 	}
 

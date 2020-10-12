@@ -79,11 +79,7 @@ func newInput(
 		return nil, errors.Wrap(err, "reading mqtt input config")
 	}
 
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
+	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
 	}

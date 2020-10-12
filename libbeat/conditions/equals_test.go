@@ -31,7 +31,7 @@ func TestEqualsCreate(t *testing.T) {
 	}
 
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestEqualsSingleFieldPositiveMatch(t *testing.T) {

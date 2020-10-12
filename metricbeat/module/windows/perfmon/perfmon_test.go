@@ -175,7 +175,7 @@ func TestQuery(t *testing.T) {
 		t.Fatal(path[0], "not found")
 	}
 
-	assert.NoError(t, value[0].Err)
+	assert.NoError(t, value[0].Err.Error)
 	assert.Equal(t, "TestInstanceName", value[0].Instance)
 }
 
@@ -444,6 +444,7 @@ func TestWildcardQuery(t *testing.T) {
 	}
 	config.Queries[0].Name = "Processor Information"
 	config.Queries[0].Instance = []string{"*"}
+	config.Queries[0].Namespace = "metrics"
 	config.Queries[0].Counters = []QueryCounter{
 		{
 			Name: "% Processor Time",
@@ -478,6 +479,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	}
 	config.Queries[0].Name = "Process"
 	config.Queries[0].Instance = []string{"*"}
+	config.Queries[0].Namespace = "metrics"
 	config.Queries[0].Counters = []QueryCounter{
 		{
 			Name: "Private Bytes",
@@ -523,6 +525,7 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	config.Queries[0].Name = "Processor Information"
 	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Namespace = "metrics"
 	config.Queries[0].Counters = []QueryCounter{
 		{
 			Name: "% Processor Time",

@@ -2,28 +2,10 @@
 # Beats is configured under Fleet, you can define most settings
 # from the Kibana UI. You can update this file to configure the settings that
 # are not supported by Fleet.
-management:
-  mode: "fleet"
+fleet:
+  enabled: true
 
-  # Check in frequency configure the time between calls to fleet to retrieve the new configuration.
-  #
-  # Default is 30s
-  #checkin_frequency: 30s
-
-  # Add variance between API calls to better distribute the calls.
-  #jitter: 5s
-
-  # The Elastic Agent does Exponential backoff when an error happen.
-  #
-  #backoff:
-  #
-  # Initial time to wait before retrying the call.
-  # init: 1s
-  #
-  # Maximum time to wait before retrying the call.
-  # max: 10s
-
-# download:
+# agent.download:
 #   # source of the artifacts, requires elastic like structure and naming of the binaries
 #   # e.g /windows-x86.zip
 #   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
@@ -38,7 +20,7 @@ management:
 #   # for reading program specifications.
 #   install_path: "${path.data}/install"
 
-# process:
+# agent.process:
 #   # minimal port number for spawned processes
 #   min_port: 10000
 #   # maximum port number for spawned processes
@@ -47,7 +29,7 @@ management:
 #   # start operation is considered a failure
 #   spawn_timeout: 30s
 
-# retry:
+# agent.retry:
 #   # enabled determines whether retry is possible. Default is false.
 #   enabled: true
 #   # retries_count specifies number of retries. Default is 3.

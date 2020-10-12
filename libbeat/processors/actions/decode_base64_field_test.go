@@ -179,9 +179,9 @@ func TestDecodeBase64Run(t *testing.T) {
 
 			newEvent, err := f.Run(event)
 			if !test.error {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			} else {
-				assert.NotNil(t, err)
+				assert.Error(t, err)
 			}
 
 			assert.Equal(t, test.Output, newEvent.Fields)

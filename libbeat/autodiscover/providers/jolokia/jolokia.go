@@ -49,12 +49,17 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	templates template.Mapper
 	discovery DiscoveryProber
-	keystore  keystore.Keystore
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
 	}
@@ -70,15 +75,15 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		Interfaces:   config.Interfaces,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 {
+	if len(mapper.ConditionMaps) == 0 {
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -94,7 +99,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
-		keystore:  keystore,
 	}, nil
 }
 
@@ -109,8 +113,6 @@ func (p *Provider) Start() {
 }
 
 func (p *Provider) publish(event bus.Event) {
-	// attach keystore to the event to be consumed by the static configs
-	event["keystore"] = p.keystore
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else if config := p.builders.GetConfig(event); config != nil {

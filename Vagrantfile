@@ -135,7 +135,7 @@ def linuxDebianProvision()
 #!/usr/bin/env bash
 set -eio pipefail
 apt-get update
-apt-get install -y make gcc python3 python3-pip python3-venv git
+apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev
 SCRIPT
 end
 
@@ -228,6 +228,11 @@ Vagrant.configure(2) do |config|
   config.vm.define "ubuntu1804", primary: true do |c|
     c.vm.box = "ubuntu/bionic64"
     c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: linuxGvmProvision, privileged: false

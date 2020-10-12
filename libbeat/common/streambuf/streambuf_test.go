@@ -83,7 +83,7 @@ func Test_SnapshotRestore(t *testing.T) {
 	err := b.Advance(5)
 	assert.Equal(t, 5, b.BufferConsumed())
 	assert.Equal(t, 4, b.Len())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, b.Failed())
 
 	b.Restore(snapshot)
@@ -139,7 +139,7 @@ func Test_AppendOnFixedLater(t *testing.T) {
 	b := New([]byte("abc"))
 
 	err := b.Append([]byte("def"))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	b.Fix()
 	err = b.Append([]byte("def"))
@@ -163,7 +163,7 @@ func Test_AppendAfterNoMoreBytes(t *testing.T) {
 	assert.Equal(t, ErrNoMoreBytes, err)
 
 	err = b.Append([]byte(" test"))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.False(t, b.Failed())
 }
 
@@ -244,7 +244,7 @@ func Test_CollectData(t *testing.T) {
 	d, err := b.Collect(2)
 
 	b.checkInvariants(t)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []byte("te"), d)
 }
 
@@ -281,7 +281,7 @@ func Test_CollectWithSuffixData(t *testing.T) {
 	d, err := b.CollectWithSuffix(4, []byte("\r\n"))
 	b.checkInvariants(t)
 	assert.False(t, b.Failed())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []byte("test"), d)
 }
 

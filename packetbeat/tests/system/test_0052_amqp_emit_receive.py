@@ -16,6 +16,7 @@ class Test(BaseTest):
         assert all([o["server.port"] == 5672 for o in objs])
 
         assert objs[0]["method"] == "exchange.declare"
+        assert objs[0]["event.action"] == "amqp.exchange.declare"
         assert objs[0]["status"] == "OK"
         assert objs[0]["amqp.exchange"] == "logs"
         assert objs[0]["amqp.durable"] == True
@@ -24,6 +25,7 @@ class Test(BaseTest):
         assert objs[0]["amqp.no-wait"] == False
 
         assert objs[1]["method"] == "queue.declare"
+        assert objs[1]["event.action"] == "amqp.queue.declare"
         assert objs[1]["status"] == "OK"
         assert objs[1]["amqp.queue"] != ""
         assert objs[1]["amqp.exclusive"] == True
@@ -33,12 +35,14 @@ class Test(BaseTest):
         assert objs[1]["amqp.passive"] == False
 
         assert objs[2]["method"] == "queue.bind"
+        assert objs[2]["event.action"] == "amqp.queue.bind"
         assert objs[2]["status"] == "OK"
         assert objs[2]["amqp.queue"] != ""
         assert objs[2]["amqp.exchange"] == "logs"
         assert objs[2]["amqp.no-wait"] == False
 
         assert objs[3]["method"] == "basic.consume"
+        assert objs[3]["event.action"] == "amqp.basic.consume"
         assert objs[3]["status"] == "OK"
         assert objs[3]["amqp.queue"] != ""
         assert objs[3]["amqp.no-ack"] == True
@@ -47,6 +51,7 @@ class Test(BaseTest):
         assert objs[3]["amqp.exclusive"] == False
 
         assert objs[4]["method"] == "exchange.declare"
+        assert objs[4]["event.action"] == "amqp.exchange.declare"
         assert objs[4]["status"] == "OK"
         assert objs[4]["amqp.exchange"] == "logs"
         assert objs[4]["amqp.durable"] == True
@@ -55,6 +60,7 @@ class Test(BaseTest):
         assert objs[4]["amqp.no-wait"] == False
 
         assert objs[5]["method"] == "basic.publish"
+        assert objs[5]["event.action"] == "amqp.basic.publish"
         assert objs[5]["status"] == "OK"
         assert objs[5]["amqp.content-type"] == "text/plain"
         assert objs[5]["amqp.exchange"] == "logs"
@@ -62,6 +68,7 @@ class Test(BaseTest):
         assert objs[5]["amqp.mandatory"] == False
 
         assert objs[6]["method"] == "basic.deliver"
+        assert objs[6]["event.action"] == "amqp.basic.deliver"
         assert objs[6]["status"] == "OK"
         assert objs[6]["amqp.content-type"] == "text/plain"
         assert objs[6]["amqp.delivery-tag"] == 1

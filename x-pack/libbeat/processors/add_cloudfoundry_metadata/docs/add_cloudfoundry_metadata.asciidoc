@@ -6,8 +6,6 @@
 <titleabbrev>add_cloudfoundry_metadata</titleabbrev>
 ++++
 
-beta[]
-
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
 from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
 only if the event contains a reference to a Cloud Foundry application (using field
@@ -53,6 +51,8 @@ It has the following settings:
 
 `client_secret`:: Client Secret to authenticate with Cloud Foundry.
 
-`cache_duration`:: (Optional) Maximum amount of time to cache an application's metadata.
+`cache_duration`:: (Optional) Maximum amount of time to cache an application's metadata. Defaults to 120 seconds.
+
+`cache_retry_delay`:: (Optional) Time to wait before trying to obtain an application's metadata again in case of error. Defaults to 20 seconds.
 
 `ssl`:: (Optional) SSL configuration to use when connecting to Cloud Foundry.

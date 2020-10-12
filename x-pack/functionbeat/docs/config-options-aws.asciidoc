@@ -176,7 +176,7 @@ Set this option to an ARN that points to an SQS queue.
 [id="{beatname_lc}-batch-size"]
 ==== `batch_size`
 
-The number of events to read from a Kinesis stream, the minimal values is 100 and the maximun is
+The number of events to read from a Kinesis stream, the minimum value is 100 and the maximum is
 10000. The default is 100.
 
 [float]
@@ -185,6 +185,13 @@ The number of events to read from a Kinesis stream, the minimal values is 100 an
 
 The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
 The default is trim_horizon.
+
+[float]
+[id="{beatname_lc}-parallelization-factor"]
+==== `parallelization_factor`
+
+The number of batches to process from each shard concurrently, the minimum value is 1 and the maximum is 10
+The default is 1.
 
 [float]
 [id="{beatname_lc}-keep-null"]

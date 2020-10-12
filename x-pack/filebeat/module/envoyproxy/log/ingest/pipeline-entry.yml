@@ -1,0 +1,51 @@
+description: Pipeline for normalizing envoyproxy logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- pipeline:
+    if: ctx.message.charAt(0) != (char)("{")
+    name: '{< IngestPipeline "pipeline-plaintext" >}'
+- pipeline:
+    if: ctx.message.charAt(0) == (char)("{")
+    name: '{< IngestPipeline "pipeline-json" >}'
+- pipeline:
+    name: '{< IngestPipeline "pipeline-geo-as" >}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: network
+- append:
+    field: event.outcome
+    value: failure
+    if: "ctx?.envoyproxy?.response_flags != null"
+- append:
+    field: event.outcome
+    value: success
+    if: "ctx?.envoyproxy?.response_flags == null"
+- set:
+    field: '@timestamp'
+    value: '{{timestamp}}'
+    ignore_empty_value: true
+- remove:
+    field:
+    - timestamp
+    ignore_failure: true
+on_failure:
+- set:
+    field: error.message
+    value: 'pipeline-entry: {{ _ingest.on_failure_message }}'

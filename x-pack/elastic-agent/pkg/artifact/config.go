@@ -21,18 +21,14 @@ type Config struct {
 	// Architecture: target architecture [32, 64]
 	Architecture string `json:"-" config:",ignore"`
 
-	// BeatsSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/beats/
-	BeatsSourceURI string `json:"sourceURI" config:"sourceURI"`
+	// SourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/
+	SourceURI string `json:"sourceURI" config:"sourceURI"`
 
 	// TargetDirectory: path to the directory containing downloaded packages
 	TargetDirectory string `json:"targetDirectory" config:"target_directory"`
 
 	// Timeout: timeout for downloading package
 	Timeout time.Duration `json:"timeout" config:"timeout"`
-
-	// PgpFile: filepath to a public key used for verifying downloaded artifacts
-	// if not file is present elastic-agent will try to load public key from elastic.co website.
-	PgpFile string `json:"pgpfile" config:"pgpfile"`
 
 	// InstallPath: path to the directory containing installed packages
 	InstallPath string `yaml:"installPath" config:"install_path"`
@@ -47,13 +43,12 @@ type Config struct {
 
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
-	dataPath := paths.Data()
+	homePath := paths.Home()
 	return &Config{
-		BeatsSourceURI:  "https://artifacts.elastic.co/downloads/beats/",
-		TargetDirectory: filepath.Join(dataPath, "downloads"),
+		SourceURI:       "https://artifacts.elastic.co/downloads/",
+		TargetDirectory: filepath.Join(homePath, "downloads"),
 		Timeout:         30 * time.Second,
-		PgpFile:         filepath.Join(dataPath, "elastic.pgp"),
-		InstallPath:     filepath.Join(dataPath, "install"),
+		InstallPath:     filepath.Join(homePath, "install"),
 	}
 }
 

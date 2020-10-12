@@ -45,7 +45,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 17805,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -91,7 +92,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 47091,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -140,7 +142,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59319,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -189,7 +192,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 44181,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -238,7 +242,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 64358,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -284,7 +289,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 58830,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -333,7 +339,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 51985,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -382,7 +389,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 4099,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -428,7 +436,8 @@
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59287,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
@@ -474,7 +483,8 @@
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 53296,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

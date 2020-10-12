@@ -190,8 +190,8 @@ type mockedConnector struct {
 
 var _ channel.Connector = new(mockedConnector)
 
-func (m *mockedConnector) Connect(*common.Config) (channel.Outleter, error) {
-	panic("implement me")
+func (m *mockedConnector) Connect(c *common.Config) (channel.Outleter, error) {
+	return m.ConnectWith(c, beat.ClientConfig{})
 }
 
 func (m *mockedConnector) ConnectWith(*common.Config, beat.ClientConfig) (channel.Outleter, error) {

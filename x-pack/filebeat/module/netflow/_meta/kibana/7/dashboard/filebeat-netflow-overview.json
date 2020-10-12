@@ -1039,7 +1039,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Flow Exporter",
-                "field": "agent.hostname",
+                "field": "agent.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 50

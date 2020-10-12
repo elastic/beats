@@ -23,6 +23,10 @@
         "network.community_id": "1:E57Z1w3RrSdR+fi6rSZblbQVhzY=",
         "network.protocol": "dnp3",
         "network.transport": "tcp",
+        "related.ip": [
+            "127.0.0.1",
+            "127.0.0.1"
+        ],
         "service.type": "zeek",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

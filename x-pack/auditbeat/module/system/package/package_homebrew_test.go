@@ -58,7 +58,8 @@ func TestHomebrew(t *testing.T) {
 			checkFieldValue(t, event, "system.audit.package.summary", "Test package")
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 			checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
-			checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
+			// FIXME: The value of this field changes on each execution in CI - https://github.com/elastic/beats/issues/18855
+			// checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
 			checkFieldValue(t, event, "package.name", "test-package")
 			checkFieldValue(t, event, "package.description", "Test package")
 			checkFieldValue(t, event, "package.reference", "https://www.elastic.co/")
@@ -69,9 +70,10 @@ func TestHomebrew(t *testing.T) {
 }
 
 func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
+	t.Helper()
 	value, err := event.GetValue(fieldName)
-	if assert.NoError(t, err) {
-		assert.Equal(t, fieldValue, value)
+	if assert.NoError(t, err, "checking field %s", fieldName) {
+		assert.Equal(t, fieldValue, value, "checking field %v", fieldName)
 	}
 }
 

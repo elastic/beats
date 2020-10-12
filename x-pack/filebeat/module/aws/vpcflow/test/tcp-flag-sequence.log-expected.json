@@ -49,12 +49,16 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "IE",
+        "source.geo.country_name": "Ireland",
         "source.geo.location.lat": 53.3338,
         "source.geo.location.lon": -6.2488,
         "source.geo.region_iso_code": "IE-L",
         "source.geo.region_name": "Leinster",
         "source.ip": "52.213.180.42",
         "source.packets": 8,
-        "source.port": 43416
+        "source.port": 43416,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

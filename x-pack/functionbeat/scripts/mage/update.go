@@ -7,7 +7,6 @@ package mage
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/magefile/mage/mg"
 
@@ -61,32 +60,23 @@ func (Update) VendorBeats() error {
 			return err
 		}
 
-		deps, err := gotool.ListDeps("github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/" + f)
+		deps, err := gotool.ListDepsLocation("github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/" + f)
 		if err != nil {
 			return err
 		}
 
-		for _, d := range deps {
-			var in string
-			if strings.HasPrefix(d, "github.com/elastic/beats/v7") {
-				in = strings.ReplaceAll(d, "github.com/elastic/beats/v7/", "")
-				in = filepath.Join("..", "..", in)
-			} else {
-				in = filepath.Join("..", "..", "vendor", d)
-			}
-
-			out := strings.ReplaceAll(d, "github.com/elastic/beats/v7/vendor", "")
-
+		for importPath, location := range deps {
 			cp := &devtools.CopyTask{
-				Source: in,
-				Dest:   filepath.Join(gcpVendorPath, out),
-				Mode:   0600,
+				Source:  location,
+				Dest:    filepath.Join(gcpVendorPath, importPath),
+				Mode:    0600,
+				DirMode: os.ModeDir | 0750,
 				Exclude: []string{
 					".*_test.go$",
 					".*.yml",
 				},
 			}
-			err := cp.Execute()
+			err = cp.Execute()
 			if err != nil {
 				return err
 			}

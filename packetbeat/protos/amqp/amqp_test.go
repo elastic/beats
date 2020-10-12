@@ -78,7 +78,7 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000000f006e000c0000075465737447657401ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 
@@ -97,7 +97,7 @@ func TestAmqp_FrameSize(t *testing.T) {
 
 	//incomplete frame
 	data, err := hex.DecodeString("0100000000000c000a001fffff000200")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -119,7 +119,7 @@ func TestAmqp_PartialFrameSize(t *testing.T) {
 
 	//incomplete frame
 	data, err := hex.DecodeString("414d515000060606010000000000")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -139,7 +139,7 @@ func TestAmqp_WrongShortStringSize(t *testing.T) {
 
 	data, err := hex.DecodeString("02000100000019003c000000000000000000058000ac" +
 		"746578742f706c61696ece")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, _ := amqp.amqpMessageParser(stream)
@@ -156,7 +156,7 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000001a0032000a00000e5468697320697" +
 		"3206120544553541800000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
@@ -188,7 +188,7 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000001c0028000a00000a6c6f67735f746f7" +
 		"0696305746f7069630200000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
@@ -221,7 +221,7 @@ func TestAmqp_BasicConsume(t *testing.T) {
 
 	data, err := hex.DecodeString("01000100000028003c001400000e4957616e74" +
 		"546f436f6e73756d650d6d6973746572436f6e73756d650300000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
@@ -254,7 +254,7 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 
 	data, err := hex.DecodeString("010001000000100028001400000844656c65746" +
 		"54d6501ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
@@ -282,7 +282,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000001c0028001e0000057465737431" +
 		"057465737432044d5346540000000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 
@@ -316,9 +316,9 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000001c00280028000005746573743105" +
 		"7465737432044d5346540000000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("0100010000000400280033ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -351,13 +351,13 @@ func TestAmqp_PublishMessage(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000001b003c002800000a6c6f67735f746f70" +
 		"696308414d51507465737400ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("02000100000019003c0000000000000000001c800" +
 		"00a746578742f706c61696ece")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data3, err := hex.DecodeString("0300010000001c48656c6c6f204461726c696e67" +
 		"2049276d20686f6d6520616761696ece")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -401,12 +401,12 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	data, err := hex.DecodeString("01000100000034003c003c0d6d6973746572436f6e73" +
 		"756d650000000000000002000c7465737445786368616e67650b7465737444656c697" +
 		"66572ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("02000100000019003c000000000000000000058" +
 		"0000a746578742f706c61696ece")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data3, err := hex.DecodeString("030001000000056b696b6f6fce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -450,7 +450,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 		"40000000000002060a656c206d656e73616a650000000055f81dc00c6c6f7665206d65" +
 		"7373616765ce0300010000001a5465737420686561646572206669656c647320666f72" +
 		"65766572ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -492,7 +492,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 		"6f5f64656c6574652720666f722065786368616e676520277465737445786368616e676" +
 		"52720696e2076686f737420272f273a207265636569766564202774727565272062757" +
 		"42063757272656e74206973202766616c7365270028000ace")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data1, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -537,7 +537,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 
 	data, err := hex.DecodeString("010001000000120032002800000a546573745468" +
 		"6f6d617304ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -568,7 +568,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000000d003c005a000000000000000101ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -599,9 +599,9 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 
 	data, err := hex.DecodeString("01000100000013003c004600000b526f626269" +
 		"654b65616e6501ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("01000100000005003c004800ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -627,12 +627,12 @@ func TestAmqp_GetMethod(t *testing.T) {
 
 	data, err := hex.DecodeString("0100010000000f003c0046000007546573744" +
 		"7657401ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("0100010000001a003c00470000000000000001" +
 		"0000075465737447657400000001ce02000100000019003c000000000000000000" +
 		"1280000a746578742f706c61696ece03000100000012476574206d6520696620796" +
 		"f752064617265ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -660,7 +660,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	data, err := hex.DecodeString("01000100000010003c002800000007546573744d617" +
 		"800ce02000100000019003c0000000000000000001680000a746578742f706c61696ece" +
 		"0300010000001649276d2061207665727920626967206d657373616765ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -691,7 +691,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		"17800ce02000100000018003c0000000000000000003a800009696d6167652f676966" +
 		"ce0300010000003a41414141414141414141414141414141414141414141414141414141" +
 		"414141414141414141414141414141414141414141414141414141414141ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple = testTCPTuple()
 
@@ -731,7 +731,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	data, err := hex.DecodeString("0100010000004d0032000a00000a5465737448656164" +
 		"6572180000003704626f6f6c74010362697462050568656c6c6f530000001f4869206461" +
 		"726c696e6720c3aac3aac3aac3aac3aac3aac3aae697a5e69cacce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
@@ -757,7 +757,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 		"4657200ce02000100000026003c0000000000000000001a98800a746578742f706c61696" +
 		"e02060a656c206d656e73616a65ce0300010000001a54657374206865616465722066696" +
 		"56c647320666f7265766572ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcptuple = testTCPTuple()
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
@@ -787,9 +787,9 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000005003c006e01ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("01000100000004003c006fce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -814,7 +814,7 @@ func TestAmqp_BasicNack(t *testing.T) {
 	_, amqp := amqpModForTests()
 
 	data1, err := hex.DecodeString("0100010000000d003c0078000000000000000102ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data1, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -841,7 +841,7 @@ func TestAmqp_GetTable(t *testing.T) {
 		"696d616c440500ec49050568656c6c6f530000001f4869206461726c696e6720c3aac3aa" +
 		"c3aac3aac3aac3aac3aae697a5e69cac06646f75626c656440453e100cbd7da405666c6f" +
 		"6174664124cccd04626f6f6c7401ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -900,7 +900,7 @@ func TestAmqp_TableInception(t *testing.T) {
 		"000006445245414d5306696e6365703253000000064d4152494f4e056c696d626f46" +
 		"00000021066c696d626f315300000004436f6262066c696d626f3253000000055361" +
 		"69746f06626967496e746c00071afd498d0000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -950,7 +950,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 	//byte array, rabbitMQ specific field
 	data, err := hex.DecodeString("010001000000260028000a0000057465737431057" +
 		"46f706963020000000f05617272617978000000040a007dd2ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -975,7 +975,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 		"0a66666666666096172726179626f6f6c410000000a740174007400740174010b617272" +
 		"6179737472696e674100000030530000000441414141530000000442424242530000001" +
 		"9d090d0bdd0bdd0b020d09ad0b0d180d0b5d0bdd0b8d0bdd0b0ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream = &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete = amqp.amqpMessageParser(stream)
@@ -1030,7 +1030,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		"96d616c440500ec49050568656c6c6f530000001f4869206461726c696e6720c3aac3aac" +
 		"3aac3aac3aac3aac3aae697a5e69cac06646f75626c656440453e100cbd7da405666c6f6" +
 		"174664124cccd04626f6f6c7401ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
@@ -1053,7 +1053,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		"96d616c447600ec49180568036c6c0b536400001f480a2064076e6c696e0520c3aac3aac" +
 		"34613aac3aac3aa01aae697a5e69cac3c780b75626c6564a4453e100cbd7da4320a6c0b0" +
 		"90b664124cc1904626f6f6c7401ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream = &amqpStream{data: data, message: new(amqpMessage)}
 	ok, complete = amqp.amqpMessageParser(stream)
@@ -1101,9 +1101,9 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 		"6f5f64656c6574652720666f722065786368616e676520277465737445786368616e676" +
 		"52720696e2076686f737420272f273a207265636569766564202774727565272062757" +
 		"42063757272656e74206973202766616c7365270028000ace")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("0100010000000400280033ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -1127,9 +1127,9 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 	amqp.hideConnectionInformation = false
 
 	data, err := hex.DecodeString("01000000000012000a003200c8076b74687862616900000000ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("01000000000004000a0033ce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 
@@ -1161,9 +1161,9 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 		"02000100000021003c0000000000000000002a80400a746578742f706c61696e00000000" +
 		"56a22873ce030001000000202a2a2a68656c6c6f2049206c696b6520746f207075626c69" +
 		"736820626967206dce")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	data2, err := hex.DecodeString("0300010000000a657373616765732a2a2ace")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}

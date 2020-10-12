@@ -124,3 +124,24 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 	}
 	return metrics, interval, nil
 }
+
+// getResourceNameFormId maps resource group from resource ID
+func getResourceNameFromId(path string) string {
+	params := strings.Split(path, "/")
+	if strings.HasSuffix(path, "/") {
+		return params[len(params)-2]
+	}
+	return params[len(params)-1]
+
+}
+
+// getResourceTypeFromId maps resource group from resource ID
+func getResourceTypeFromId(path string) string {
+	params := strings.Split(path, "/")
+	for i, param := range params {
+		if param == "providers" {
+			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
+		}
+	}
+	return ""
+}

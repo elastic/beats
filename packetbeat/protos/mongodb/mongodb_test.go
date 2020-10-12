@@ -88,7 +88,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 			"00000000746573742e72667374617572" +
 			"616e7473000000000001000000050000" +
 			"0000")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	respData, err := hex.DecodeString(
 		"020200004a0000000a00000001000000" +
 			"08000000000000000000000000000000" +
@@ -123,7 +123,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 			"53686f70000272657374617572616e74" +
 			"5f696400090000003330303735343435" +
 			"0000")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
@@ -157,7 +157,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 			"00000000746573742e72667374617572" +
 			"616e7473000000000001000000050000" +
 			"0000")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	respData1, err := hex.DecodeString(
 		"020200004a0000000a00000001000000" +
 			"08000000000000000000000000000000" +
@@ -196,7 +196,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 			"53686f70000272657374617572616e74" +
 			"5f696400090000003330303735343435" +
 			"0000")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
@@ -381,7 +381,7 @@ func TestDocumentLengthBoundsChecked(t *testing.T) {
 			"06000000" +
 			// Document (1 byte instead of 2)
 			"00")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}

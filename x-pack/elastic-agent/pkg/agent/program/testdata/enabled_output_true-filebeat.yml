@@ -7,11 +7,21 @@ filebeat:
     index: logs-generic-default
     processors:
       - add_fields:
-          target: "stream"
+          target: "data_stream"
           fields:
             type: logs
             dataset: generic
             namespace: default
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
+      - add_fields:
+          target: "elastic"
+          fields:
+            agent.id: agent-id
+            agent.version: 8.0.0
+            agent.snapshot: false
 output:
   elasticsearch:
     enabled: true

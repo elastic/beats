@@ -21,28 +21,35 @@ package main
 
 import (
 	"flag"
+	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/cmd"
+	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
+	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
 var systemTest *bool
+var fbCommand *cmd.BeatsRootCmd
 
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	fbCommand = fbcmd.Filebeat(inputs.Init)
+	fbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	fbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
 	if *systemTest {
-		main()
+		if err := fbCommand.Execute(); err != nil {
+			os.Exit(1)
+		}
 	}
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+	template.TestTemplate(t, fbCommand.Name())
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 
@@ -54,6 +55,7 @@ func (g *typedGenerator) Start() {
 }
 
 func (g *typedGenerator) Stop() {
+	logp.Debug("prometheus.collector.cache", "stopping counterCache")
 	g.counterCache.Stop()
 }
 
@@ -136,7 +138,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			events = append(events, collector.PromEvent{
 				Data: common.MapStr{
 					name: common.MapStr{
-						"histogram": promHistogramToES(g.counterCache, name, labels, histogram),
+						"histogram": PromHistogramToES(g.counterCache, name, labels, histogram),
 					},
 				},
 				Labels: labels,

@@ -132,7 +132,7 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 	}
 
 	logMatcher, err := newLogsPathMatcher(*testConfig)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	input := common.MapStr{
 		"log": common.MapStr{

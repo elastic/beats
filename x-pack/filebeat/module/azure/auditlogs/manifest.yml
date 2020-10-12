@@ -11,8 +11,10 @@ var:
   - name: storage_account
   - name: storage_account_key
   - name: resource_manager_endpoint
+  - name: tags
+    default: [forwarded]
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ../azure-shared-pipeline.json
+  - ingest/pipeline.yml
+  - ../azure-shared-pipeline.yml
 input: config/{{.input}}.yml

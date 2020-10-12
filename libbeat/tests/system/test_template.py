@@ -1,11 +1,12 @@
+import json
+import logging
+import os
+import pytest
+import shutil
+import unittest
+
 from base import BaseTest
 from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
-import shutil
-import logging
-import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -83,7 +84,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_json_template(self):
         """
         Test loading of json based template
@@ -140,7 +141,7 @@ class TestRunTemplate(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_default(self):
         """
         Test run cmd with default settings for template
@@ -157,7 +158,7 @@ class TestRunTemplate(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_disabled(self):
         """
         Test run cmd does not load template when disabled in config
@@ -201,7 +202,7 @@ class TestCommandSetupTemplate(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup(self):
         """
         Test setup cmd with template and ilm-policy subcommands
@@ -216,7 +217,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_default(self):
         """
         Test template setup with default config
@@ -235,7 +236,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_disabled(self):
         """
         Test template setup when ilm disabled
@@ -254,7 +255,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_with_opts(self):
         """
         Test template setup with config options
@@ -275,7 +276,7 @@ class TestCommandSetupTemplate(BaseTest):
         assert index["number_of_shards"] == "2", index["number_of_shards"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_with_ilm_changed_pattern(self):
         """
         Test template setup with changed ilm.rollover_alias config
@@ -290,7 +291,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_created_on_ilm_policy_created(self):
         """
         Test template setup overwrites template when new ilm policy is created

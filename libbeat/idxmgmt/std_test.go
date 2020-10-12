@@ -139,12 +139,25 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
+		"without ilm must be lowercase": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "TeSt-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
+		},
 		"event alias without ilm": {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test"),
 			meta: common.MapStr{
 				"alias": "test",
+			},
+		},
+		"event alias without ilm must be lowercae": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("test"),
+			meta: common.MapStr{
+				"alias": "Test",
 			},
 		},
 		"event index without ilm": {
@@ -155,8 +168,21 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 				"index": "test",
 			},
 		},
+		"event index without ilm must be lowercase": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     dateIdx("test"),
+			meta: common.MapStr{
+				"index": "Test",
+			},
+		},
 		"with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
+		},
+		"with ilm must be lowercase": {
+			ilmCalls: ilmTemplateSettings("Test-9.9.9", "Test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
@@ -166,6 +192,14 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			want:     stable("event-alias"),
 			meta: common.MapStr{
 				"alias": "event-alias",
+			},
+		},
+		"event alias wit ilm must be lowercase": {
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("event-alias"),
+			meta: common.MapStr{
+				"alias": "Event-alias",
 			},
 		},
 		"event index with ilm": {
@@ -182,6 +216,16 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 				"index": "test-%{[agent.version]}",
 				"indices": []map[string]interface{}{
 					{"index": "myindex"},
+				},
+			},
+			want: stable("myindex"),
+		},
+		"use indices settings must be lowercase": {
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg: map[string]interface{}{
+				"index": "test-%{[agent.version]}",
+				"indices": []map[string]interface{}{
+					{"index": "MyIndex"},
 				},
 			},
 			want: stable("myindex"),

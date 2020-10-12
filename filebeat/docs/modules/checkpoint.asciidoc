@@ -62,6 +62,12 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
 
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[checkpoint-firewall, forwarded]`.
+
 [float]
 ==== Check Point devices
 
@@ -165,6 +171,7 @@ Check Point Syslog extensions are mapped as follows to ECS:
 |==============================================================
 
 :modulename!:
+
 
 [float]
 === Fields

@@ -32,6 +32,8 @@ heartbeat.monitors:
   schedule: '@every 10s'
   # Total test connection and data exchange timeout
   #timeout: 16s
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service_name: my-apm-service-name
 
 {{header "Elasticsearch template setting"}}
 

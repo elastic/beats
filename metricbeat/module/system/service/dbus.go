@@ -139,33 +139,43 @@ func listUnitsWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitSt
 	if err != nil {
 		return nil, errors.Wrap(err, "ListUnits error")
 	}
-	if len(patterns) > 0 {
-		units, err = matchUnitPatterns(patterns, units)
-		if err != nil {
-			return nil, errors.Wrap(err, "error matching unit patterns")
-		}
+
+	units, err = matchUnitPatterns(patterns, units)
+	if err != nil {
+		return nil, errors.Wrap(err, "error matching unit patterns")
 	}
 
-	if len(states) > 0 {
-		var finalUnits []dbus.UnitStatus
-		for _, unit := range units {
-			for _, state := range states {
-				if unit.LoadState == state || unit.ActiveState == state || unit.SubState == state {
-					finalUnits = append(finalUnits, unit)
-					break
-				}
+	finalUnits := matchUnitState(states, units)
+
+	return finalUnits, nil
+}
+
+// matchUnitState returns a list of units that match the pattern list
+// This checks the LoadState, ActiveState, and SubState for a matching status string
+func matchUnitState(states []string, units []dbus.UnitStatus) []dbus.UnitStatus {
+	if len(states) == 0 {
+		return units
+	}
+	var finalUnits []dbus.UnitStatus
+	for _, unit := range units {
+		for _, state := range states {
+			if unit.LoadState == state || unit.ActiveState == state || unit.SubState == state {
+				finalUnits = append(finalUnits, unit)
+				break
 			}
 		}
-		return finalUnits, nil
 	}
+	return finalUnits
 
-	return units, nil
 }
 
 // matchUnitPatterns returns a list of units that match the pattern list.
 // This algo, including filepath.Match, is designed to (somewhat) emulate the behavior of ListUnitsByPatterns, which uses `fnmatch`.
 func matchUnitPatterns(patterns []string, units []dbus.UnitStatus) ([]dbus.UnitStatus, error) {
 	var matchUnits []dbus.UnitStatus
+	if len(patterns) == 0 {
+		return units, nil
+	}
 	for _, unit := range units {
 		for _, pattern := range patterns {
 			match, err := filepath.Match(pattern, unit.Name)

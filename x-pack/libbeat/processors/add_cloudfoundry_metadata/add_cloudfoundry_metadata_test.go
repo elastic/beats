@@ -5,9 +5,7 @@
 package add_cloudfoundry_metadata
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/gofrs/uuid"
@@ -16,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 )
 
 func TestNoClient(t *testing.T) {
@@ -85,25 +84,13 @@ func TestCFAppNotFound(t *testing.T) {
 
 func TestCFAppUpdated(t *testing.T) {
 	guid := mustCreateFakeGuid()
-	app := cfclient.App{
-		Guid: guid,
-		Name: "My Fake App",
-		SpaceData: cfclient.SpaceResource{
-			Meta: cfclient.Meta{
-				Guid: mustCreateFakeGuid(),
-			},
-			Entity: cfclient.Space{
-				Name: "My Fake Space",
-				OrgData: cfclient.OrgResource{
-					Meta: cfclient.Meta{
-						Guid: mustCreateFakeGuid(),
-					},
-					Entity: cfclient.Org{
-						Name: "My Fake Org",
-					},
-				},
-			},
-		},
+	app := cloudfoundry.AppMeta{
+		Guid:      guid,
+		Name:      "My Fake App",
+		SpaceGuid: mustCreateFakeGuid(),
+		SpaceName: "My Fake Space",
+		OrgGuid:   mustCreateFakeGuid(),
+		OrgName:   "My Fake Org",
 	}
 	p := addCloudFoundryMetadata{
 		log:    logp.NewLogger("add_cloudfoundry_metadata"),
@@ -127,12 +114,12 @@ func TestCFAppUpdated(t *testing.T) {
 					"name": app.Name,
 				},
 				"space": common.MapStr{
-					"id":   app.SpaceData.Meta.Guid,
-					"name": app.SpaceData.Entity.Name,
+					"id":   app.SpaceGuid,
+					"name": app.SpaceName,
 				},
 				"org": common.MapStr{
-					"id":   app.SpaceData.Entity.OrgData.Meta.Guid,
-					"name": app.SpaceData.Entity.OrgData.Entity.Name,
+					"id":   app.OrgGuid,
+					"name": app.OrgName,
 				},
 			},
 		},
@@ -143,20 +130,18 @@ func TestCFAppUpdated(t *testing.T) {
 }
 
 type fakeClient struct {
-	app cfclient.App
+	app cloudfoundry.AppMeta
 }
 
-func (c *fakeClient) GetAppByGuid(guid string) (*cfclient.App, error) {
+func (c *fakeClient) GetAppByGuid(guid string) (*cloudfoundry.AppMeta, error) {
 	if c.app.Guid != guid {
-		return nil, fmt.Errorf("unknown app")
+		return nil, cfclient.CloudFoundryError{Code: 100004}
 	}
 	return &c.app, nil
 }
 
-func (c *fakeClient) StartJanitor(_ time.Duration) {
-}
-
-func (c *fakeClient) StopJanitor() {
+func (c *fakeClient) Close() error {
+	return nil
 }
 
 func mustCreateFakeGuid() string {

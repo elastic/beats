@@ -9,7 +9,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -63,15 +62,4 @@ func (reporter *MockReporterV2) Event(event mb.Event) bool {
 func (reporter *MockReporterV2) Error(err error) bool {
 	args := reporter.Called(err)
 	return args.Get(0).(bool)
-}
-
-// NewMockClient instantiates a new client with the mock azure service
-func NewMockClient() *Client {
-	azureMockService := new(MockService)
-	client := &Client{
-		AzureMonitorService: azureMockService,
-		Config:              Config{},
-		Log:                 logp.NewLogger("test azure monitor"),
-	}
-	return client
 }

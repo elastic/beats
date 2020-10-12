@@ -10,19 +10,37 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/composed"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/fs"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/http"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/snapshot"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // NewVerifier creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewVerifier(config *artifact.Config, downloaders ...download.Downloader) (download.Verifier, error) {
-	fsVer, err := fs.NewVerifier(config)
+func NewVerifier(log *logger.Logger, config *artifact.Config, allowEmptyPgp bool, pgp []byte) (download.Verifier, error) {
+	verifiers := make([]download.Verifier, 0, 3)
+
+	fsVer, err := fs.NewVerifier(config, allowEmptyPgp, pgp)
 	if err != nil {
 		return nil, err
 	}
-	remoteVer, err := http.NewVerifier(config)
-	if err != nil {
-		return nil, err
+	verifiers = append(verifiers, fsVer)
+
+	// try snapshot repo before official
+	if release.Snapshot() {
+		snapshotVerifier, err := snapshot.NewVerifier(config, allowEmptyPgp, pgp)
+		if err != nil {
+			log.Error(err)
+		} else {
+			verifiers = append(verifiers, snapshotVerifier)
+		}
 	}
 
-	return composed.NewVerifier(fsVer, remoteVer), nil
+	remoteVer, err := http.NewVerifier(config, allowEmptyPgp, pgp)
+	if err != nil {
+		return nil, err
+	}
+	verifiers = append(verifiers, remoteVer)
+
+	return composed.NewVerifier(verifiers...), nil
 }

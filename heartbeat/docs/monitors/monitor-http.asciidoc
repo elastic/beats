@@ -82,6 +82,15 @@ Example configuration:
 
 Also see <<configuration-ssl>> for a full description of the `ssl` options.
 
+
+[float]
+[[monitor-http-headers]]
+=== `headers`
+
+Controls the indexing of the HTTP response headers `http.response.body.headers` field.
+
+On by default. Set `response.include_headers` to `false` to disable.
+
 [float]
 [[monitor-http-response]]
 === `response`

@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
@@ -330,8 +331,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 
 	// test with no filters
-	ms.includeMetrics, _ = compilePatternList(&[]string{})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
 	metricsToKeep := 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -341,8 +342,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, metricsToKeep, len(testFamilies))
 
 	// test with only one include filter
-	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -352,8 +353,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, metricsToKeep, 2)
 
 	// test with only one exclude filter
-	ms.includeMetrics, _ = compilePatternList(&[]string{""})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -363,8 +364,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
 	// test with ine include and one exclude
-	ms.includeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = compilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
+	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {

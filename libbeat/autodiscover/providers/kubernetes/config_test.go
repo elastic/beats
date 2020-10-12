@@ -22,6 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -42,7 +44,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	config := common.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
 	err := config.Unpack(&c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	cfg1 := common.MapStr{
 		"hints.enabled": false,
@@ -50,7 +52,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	config, err = common.NewConfigFrom(&cfg1)
 	c = defaultConfig()
 	err = config.Unpack(&c)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestConfigWithIncorrectScope(t *testing.T) {
@@ -63,7 +65,7 @@ func TestConfigWithIncorrectScope(t *testing.T) {
 	config := common.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
 	err := config.Unpack(&c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "service", c.Resource)
 	assert.Equal(t, "cluster", c.Scope)
@@ -76,6 +78,6 @@ func newMockBuilder(_ *common.Config) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil
 }
 
-func (m *mockBuilder) CreateConfig(event bus.Event) []*common.Config {
+func (m *mockBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	return nil
 }

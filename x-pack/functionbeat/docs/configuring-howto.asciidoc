@@ -8,13 +8,7 @@
 <titleabbrev>Configure</titleabbrev>
 ++++
 
-Before modifying configuration settings, make sure you've completed the
-<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
-This section describes some common use cases for changing configuration options.
-
-include::{libbeat-dir}/shared-configuring.asciidoc[]
-
-The following topics describe how to configure {beatname_uc}:
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-{beatname_lc}-options>>
 * <<configuration-{beatname_lc}-gcp-options>>
@@ -27,6 +21,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
 * <<regexp-support>>
+* <<configuration-instrumentation>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -62,6 +57,9 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/regexp.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/reference-yml.asciidoc[]

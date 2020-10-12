@@ -34,11 +34,16 @@ type Provider struct {
 	stopListener  bus.Listener
 	watcher       *watcher
 	uuid          uuid.UUID
-	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 
 	config := awsauto.DefaultConfig()
@@ -86,7 +91,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
 func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +101,6 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		bus:       bus,
 		templates: &mapper,
 		uuid:      uuid,
-		keystore:  keystore,
 	}
 
 	p.watcher = newWatcher(

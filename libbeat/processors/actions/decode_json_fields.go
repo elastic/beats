@@ -26,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -159,7 +160,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			if event.Meta == nil {
 				event.Meta = common.MapStr{}
 			}
-			event.Meta["_id"] = id
+			event.Meta[events.FieldMetaID] = id
 		}
 	}
 

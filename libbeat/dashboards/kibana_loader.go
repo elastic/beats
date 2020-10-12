@@ -35,12 +35,14 @@ import (
 
 var importAPI = "/api/kibana/dashboards/import"
 
+// KibanaLoader loads Kibana files
 type KibanaLoader struct {
-	client       *kibana.Client
-	config       *Config
-	version      common.Version
-	hostname     string
-	msgOutputter MessageOutputter
+	client        *kibana.Client
+	config        *Config
+	version       common.Version
+	hostname      string
+	msgOutputter  MessageOutputter
+	defaultLogger *logp.Logger
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
@@ -56,11 +58,12 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 	}
 
 	loader := KibanaLoader{
-		client:       client,
-		config:       dashboardsConfig,
-		version:      client.GetVersion(),
-		hostname:     hostname,
-		msgOutputter: msgOutputter,
+		client:        client,
+		config:        dashboardsConfig,
+		version:       client.GetVersion(),
+		hostname:      hostname,
+		msgOutputter:  msgOutputter,
+		defaultLogger: logp.NewLogger("dashboards"),
 	}
 
 	version := client.GetVersion()
@@ -145,6 +148,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	return loader.client.ImportJSON(importAPI, params, content)
 }
 
+// Close closes the client
 func (loader KibanaLoader) Close() error {
 	return loader.client.Close()
 }
@@ -153,6 +157,6 @@ func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {
-		logp.Debug("dashboards", msg, a...)
+		loader.defaultLogger.Debugf(msg, a...)
 	}
 }

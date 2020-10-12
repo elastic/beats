@@ -13,6 +13,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 0,
         "o365.audit.AppId": "",
@@ -38,6 +39,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -54,6 +58,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 980,
         "o365.audit.AppId": "",
@@ -92,6 +97,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -108,6 +116,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 2735,
         "o365.audit.AppId": "",
@@ -146,6 +155,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -162,6 +174,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 4490,
         "o365.audit.AppId": "",
@@ -187,6 +200,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -203,6 +219,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 5269,
         "o365.audit.AppId": "",
@@ -228,6 +245,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -244,6 +264,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 6035,
         "o365.audit.AppId": "",
@@ -270,6 +291,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -286,6 +310,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 6914,
         "o365.audit.AppId": "",
@@ -313,6 +338,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -329,6 +357,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 7955,
         "o365.audit.AppId": "",
@@ -354,6 +383,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -370,6 +402,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 8743,
         "o365.audit.AppId": "",
@@ -408,6 +441,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -424,6 +460,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 10498,
         "o365.audit.AppId": "",
@@ -462,6 +499,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -478,6 +518,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 12253,
         "o365.audit.AppId": "",
@@ -504,6 +545,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -520,6 +564,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 13107,
         "o365.audit.AppId": "",
@@ -558,6 +603,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -574,6 +622,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 14862,
         "o365.audit.AppId": "",
@@ -612,6 +661,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -628,6 +680,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 16617,
         "o365.audit.AppId": "",
@@ -666,6 +719,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -682,6 +738,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 18372,
         "o365.audit.AppId": "",
@@ -720,6 +777,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -736,6 +796,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 20127,
         "o365.audit.AppId": "",
@@ -774,6 +835,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -790,6 +854,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 21882,
         "o365.audit.AppId": "",
@@ -828,6 +893,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -844,6 +912,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 23638,
         "o365.audit.AppId": "",
@@ -869,6 +938,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -885,6 +957,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 24439,
         "o365.audit.AppId": "",
@@ -911,6 +984,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -927,6 +1003,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 25318,
         "o365.audit.AppId": "",
@@ -953,6 +1030,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -969,6 +1049,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 26189,
         "o365.audit.AppId": "",
@@ -994,6 +1075,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1010,6 +1094,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 26990,
         "o365.audit.AppId": "",
@@ -1036,6 +1121,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1052,6 +1140,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 27869,
         "o365.audit.AppId": "",
@@ -1090,6 +1179,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1106,6 +1198,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 29609,
         "o365.audit.AppId": "",
@@ -1144,6 +1237,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1160,6 +1256,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 31365,
         "o365.audit.AppId": "",
@@ -1198,6 +1295,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1214,6 +1314,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 33120,
         "o365.audit.AppId": "",
@@ -1252,6 +1353,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1268,6 +1372,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 34875,
         "o365.audit.AppId": "",
@@ -1306,6 +1411,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1322,6 +1430,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 36630,
         "o365.audit.AppId": "",
@@ -1360,6 +1469,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1376,6 +1488,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 38385,
         "o365.audit.AppId": "",
@@ -1414,6 +1527,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1430,6 +1546,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 40140,
         "o365.audit.AppId": "",
@@ -1468,6 +1585,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1484,6 +1604,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 41895,
         "o365.audit.AppId": "",
@@ -1524,6 +1645,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1540,6 +1664,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 43719,
         "o365.audit.AppId": "",
@@ -1578,6 +1703,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1594,6 +1722,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 45474,
         "o365.audit.AppId": "",
@@ -1632,6 +1761,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1648,6 +1780,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 47229,
         "o365.audit.AppId": "",
@@ -1686,6 +1819,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1702,6 +1838,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 48984,
         "o365.audit.AppId": "",
@@ -1740,6 +1877,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1756,6 +1896,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 50739,
         "o365.audit.AppId": "",
@@ -1794,6 +1935,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1810,6 +1954,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 52494,
         "o365.audit.AppId": "",
@@ -1848,6 +1993,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1864,6 +2012,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 54249,
         "o365.audit.AppId": "",
@@ -1902,6 +2051,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1918,6 +2070,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 56004,
         "o365.audit.AppId": "",
@@ -1956,6 +2109,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -1972,6 +2128,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 57759,
         "o365.audit.AppId": "",
@@ -2010,6 +2167,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2026,6 +2186,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 59514,
         "o365.audit.AppId": "",
@@ -2061,6 +2222,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2077,6 +2241,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 60916,
         "o365.audit.AppId": "",
@@ -2104,6 +2269,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2120,6 +2288,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 61845,
         "o365.audit.AppId": "",
@@ -2146,6 +2315,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2162,6 +2334,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 62639,
         "o365.audit.AppId": "",
@@ -2188,6 +2361,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2204,6 +2380,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 63518,
         "o365.audit.AppId": "",
@@ -2230,6 +2407,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2246,6 +2426,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 64330,
         "o365.audit.AppId": "",
@@ -2286,6 +2467,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2302,6 +2486,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 66154,
         "o365.audit.AppId": "",
@@ -2340,6 +2525,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2356,6 +2544,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 67910,
         "o365.audit.AppId": "",
@@ -2394,6 +2583,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2410,6 +2602,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 69665,
         "o365.audit.AppId": "",
@@ -2448,6 +2641,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2464,6 +2660,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 71420,
         "o365.audit.AppId": "",
@@ -2502,6 +2699,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2518,6 +2718,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 73175,
         "o365.audit.AppId": "",
@@ -2556,6 +2757,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2572,6 +2776,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 74930,
         "o365.audit.AppId": "",
@@ -2610,6 +2815,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2626,6 +2834,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 76685,
         "o365.audit.AppId": "",
@@ -2664,6 +2873,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2680,6 +2892,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 78440,
         "o365.audit.AppId": "",
@@ -2718,6 +2931,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2734,6 +2950,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 80195,
         "o365.audit.AppId": "",
@@ -2772,6 +2989,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2788,6 +3008,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 81938,
         "o365.audit.AppId": "",
@@ -2826,6 +3047,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2842,6 +3066,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 83693,
         "o365.audit.AppId": "",
@@ -2880,6 +3105,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2896,6 +3124,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 85448,
         "o365.audit.AppId": "",
@@ -2923,6 +3152,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2939,6 +3171,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 86366,
         "o365.audit.AppId": "",
@@ -2966,6 +3199,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -2982,6 +3218,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 87295,
         "o365.audit.AppId": "",
@@ -3020,6 +3257,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3036,6 +3276,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 89050,
         "o365.audit.AppId": "",
@@ -3074,6 +3315,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3090,6 +3334,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 90805,
         "o365.audit.AppId": "",
@@ -3117,6 +3362,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3133,6 +3381,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 91734,
         "o365.audit.AppId": "",
@@ -3158,6 +3407,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3174,6 +3426,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 92522,
         "o365.audit.AppId": "",
@@ -3214,6 +3467,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3230,6 +3486,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 94346,
         "o365.audit.AppId": "",
@@ -3268,6 +3525,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3284,6 +3544,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 96101,
         "o365.audit.AppId": "",
@@ -3322,6 +3583,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3338,6 +3602,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 97844,
         "o365.audit.AppId": "",
@@ -3376,6 +3641,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3392,6 +3660,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 99599,
         "o365.audit.AppId": "",
@@ -3430,6 +3699,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3446,6 +3718,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 101354,
         "o365.audit.AppId": "",
@@ -3484,6 +3757,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3500,6 +3776,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 103109,
         "o365.audit.AppId": "",
@@ -3538,6 +3815,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3554,6 +3834,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 104864,
         "o365.audit.AppId": "",
@@ -3592,6 +3873,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3608,6 +3892,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 106619,
         "o365.audit.AppId": "",
@@ -3634,6 +3919,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3650,6 +3938,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 107473,
         "o365.audit.AppId": "",
@@ -3677,6 +3966,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3693,6 +3985,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 108402,
         "o365.audit.AppId": "",
@@ -3719,6 +4012,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3735,6 +4031,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 109265,
         "o365.audit.AppId": "",
@@ -3762,6 +4059,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3778,6 +4078,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 110183,
         "o365.audit.AppId": "",
@@ -3803,6 +4104,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3819,6 +4123,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 110984,
         "o365.audit.AppId": "",
@@ -3846,6 +4151,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3862,6 +4170,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 112168,
         "o365.audit.AppId": "",
@@ -3887,6 +4196,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3903,6 +4215,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 113148,
         "o365.audit.AppId": "",
@@ -3930,6 +4243,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -3946,6 +4262,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 114077,
         "o365.audit.AppId": "",
@@ -3984,6 +4301,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4000,6 +4320,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 115817,
         "o365.audit.AppId": "",
@@ -4038,6 +4359,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4054,6 +4378,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 117572,
         "o365.audit.AppId": "",
@@ -4092,6 +4417,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4108,6 +4436,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 119327,
         "o365.audit.AppId": "",
@@ -4146,6 +4475,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4162,6 +4494,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 121082,
         "o365.audit.AppId": "",
@@ -4200,6 +4533,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4216,6 +4552,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 122837,
         "o365.audit.AppId": "",
@@ -4254,6 +4591,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4270,6 +4610,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 124592,
         "o365.audit.AppId": "",
@@ -4308,6 +4649,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4324,6 +4668,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 126347,
         "o365.audit.AppId": "",
@@ -4362,6 +4707,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4378,6 +4726,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 128102,
         "o365.audit.AppId": "",
@@ -4405,6 +4754,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4421,6 +4773,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 129286,
         "o365.audit.AppId": "",
@@ -4459,6 +4812,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4475,6 +4831,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 131041,
         "o365.audit.AppId": "",
@@ -4513,6 +4870,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4529,6 +4889,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 132784,
         "o365.audit.AppId": "",
@@ -4555,6 +4916,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4571,6 +4935,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 133638,
         "o365.audit.AppId": "",
@@ -4609,6 +4974,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4625,6 +4993,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 135393,
         "o365.audit.AppId": "",
@@ -4650,6 +5019,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4666,6 +5038,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 136145,
         "o365.audit.AppId": "",
@@ -4693,6 +5066,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4709,6 +5085,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 137063,
         "o365.audit.AppId": "",
@@ -4744,6 +5121,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4760,6 +5140,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 138465,
         "o365.audit.AppId": "",
@@ -4798,6 +5179,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4814,6 +5198,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 140220,
         "o365.audit.AppId": "",
@@ -4841,6 +5226,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4857,6 +5245,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 141138,
         "o365.audit.AppId": "",
@@ -4895,6 +5284,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4911,6 +5303,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 142893,
         "o365.audit.AppId": "",
@@ -4951,6 +5344,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
     {
@@ -4967,6 +5363,7 @@
         "event.type": "info",
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
+        "host.name": "testsiem.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 144717,
         "o365.audit.AppId": "",
@@ -5005,6 +5402,9 @@
         "organization.name": "testsiem.onmicrosoft.com",
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     }
 ]

@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-s3_request]]
+[role="xpack"]
 === AWS s3_request metricset
 
 include::../../../../x-pack/metricbeat/module/aws/s3_request/_meta/docs.asciidoc[]

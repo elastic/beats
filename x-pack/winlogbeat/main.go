@@ -7,8 +7,6 @@ package main
 import (
 	"os"
 
-	_ "github.com/elastic/beats/v7/winlogbeat/include"
-
 	"github.com/elastic/beats/v7/x-pack/winlogbeat/cmd"
 )
 

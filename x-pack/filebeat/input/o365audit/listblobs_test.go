@@ -187,7 +187,7 @@ func testConfig() apiEnvironment {
 	config := defaultConfig()
 	return apiEnvironment{
 		Config: config.API,
-		Logger: logp.NewLogger(inputName + " test"),
+		Logger: logp.NewLogger(pluginName + " test"),
 		Clock: func() time.Time {
 			return now
 		},
@@ -215,7 +215,9 @@ func TestListBlob(t *testing.T) {
 		makeBlob(now.Add(-time.Hour*12), "today_1"),
 		makeBlob(now.Add(-time.Hour*7), "today_2"),
 	}
-	lb := ListBlob(newCursor(stream{"1234", contentType}, time.Time{}), ctx)
+	ctx.TenantID = "1234"
+	ctx.ContentType = contentType
+	lb := makeListBlob(checkpoint{}, ctx)
 	var f fakePoll
 	// 6 days ago
 	blobs, next := f.SearchQuery(t, lb, db)
@@ -282,7 +284,7 @@ func TestListBlob(t *testing.T) {
 	blobs, next = f.SearchQuery(t, next.(listBlob), db)
 	assert.Equal(t, []string{"live_4a", "live_4b", "live_4c"}, blobs)
 
-	blobs, next = f.SearchQuery(t, next.(listBlob), db)
+	blobs, _ = f.SearchQuery(t, next.(listBlob), db)
 	assert.Empty(t, blobs)
 }
 
@@ -297,7 +299,9 @@ func TestSubscriptionStart(t *testing.T) {
 			return now
 		},
 	}
-	lb := ListBlob(newCursor(stream{"1234", contentType}, time.Time{}), ctx)
+	ctx.TenantID = "1234"
+	ctx.ContentType = contentType
+	lb := makeListBlob(checkpoint{}, ctx)
 	var f fakePoll
 	s, l := f.subscriptionError(t, lb)
 	assert.Equal(t, lb.cursor, l.cursor)
@@ -309,7 +313,7 @@ func TestSubscriptionStart(t *testing.T) {
 	assert.Equal(t, lb.env.ContentType, l.env.ContentType)
 	assert.Equal(t, lb.env.Logger, l.env.Logger)
 	assert.Equal(t, contentType, s.ContentType)
-	assert.Equal(t, lb.cursor.tenantID, s.TenantID)
+	assert.Equal(t, "1234", s.TenantID)
 }
 
 func TestPagination(t *testing.T) {
@@ -324,7 +328,9 @@ func TestPagination(t *testing.T) {
 		makeBlob(now.Add(-time.Hour*47+7*time.Nanosecond), "e7"),
 		makeBlob(now.Add(-time.Hour*47+8*time.Nanosecond), "e8"),
 	}
-	lb := ListBlob(newCursor(stream{"1234", contentType}, now.Add(-time.Hour*48)), ctx)
+	ctx.TenantID = "1234"
+	ctx.ContentType = contentType
+	lb := makeListBlob(checkpoint{Timestamp: now.Add(-time.Hour * 48)}, ctx)
 	var f fakePoll
 	// 6 days ago
 	blobs, next := f.PagedSearchQuery(t, lb, db)
@@ -369,7 +375,9 @@ func TestAdvance(t *testing.T) {
 	ctx.Clock = func() time.Time {
 		return *now
 	}
-	lb := ListBlob(newCursor(stream{"tenant", contentType}, start), ctx)
+	ctx.TenantID = "tenant"
+	ctx.ContentType = contentType
+	lb := makeListBlob(checkpoint{Timestamp: start}, ctx)
 	assert.Equal(t, start, lb.startTime)
 	assert.Equal(t, start.Add(time.Hour*24), lb.endTime)
 	assert.True(t, lb.endTime.Before(now1))

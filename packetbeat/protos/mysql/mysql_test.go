@@ -519,7 +519,7 @@ func Test_gap_in_response(t *testing.T) {
 	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d2074657374")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	respData, err := hex.DecodeString(
 		"0100000103240000020364656604" +
 			"74657374047465737404746573740161" +
@@ -537,7 +537,7 @@ func Test_gap_in_response(t *testing.T) {
 			"6f6620746865207072696e74696e6720" +
 			"616e64207479706573657474696e6720" +
 			"696e6475737472792e204c6f72656d20")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
@@ -571,7 +571,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d20746573")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
 	ok, complete := mysqlMessageParser(stream)
@@ -589,13 +589,13 @@ func Test_read_length(t *testing.T) {
 	var length int
 
 	_, err = readLength([]byte{}, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	_, err = readLength([]byte{0x00, 0x00}, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	length, err = readLength([]byte{0x01, 0x00, 0x00}, 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, length, 1)
 }
 
@@ -662,7 +662,7 @@ func Test_PreparedStatement(t *testing.T) {
 
 	send := func(dir uint8, data string) {
 		rawData, err := hex.DecodeString(data)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		packet := protos.Packet{Payload: rawData}
 
 		var private protos.ProtocolData

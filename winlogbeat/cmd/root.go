@@ -20,6 +20,7 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/winlogbeat/beater"
 
@@ -29,15 +30,26 @@ import (
 	// Import processors and supporting modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
-// Name of this beat
-var Name = "winlogbeat"
+const (
+	// Name of this beat.
+	Name = "winlogbeat"
 
-// RootCmd to handle beats cli
+	// ecsVersion specifies the version of ECS that Winlogbeat is implementing.
+	ecsVersion = "1.6.0"
+)
+
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
+
+// RootCmd to handle beats CLI.
 var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
 	Name:          Name,
 	HasDashboards: true,
-	Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithAgentMeta()),
+	Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
 })

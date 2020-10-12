@@ -92,11 +92,11 @@ condition.equals:
 			}
 
 			appender, err := NewConfigAppender(config)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.NotNil(t, appender)
 
 			eveConfig, err := common.NewConfigFrom(&test.eventConfig)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 
 			test.event["config"] = []*common.Config{eveConfig}
 			appender.Append(test.event)

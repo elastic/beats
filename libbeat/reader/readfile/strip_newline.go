@@ -81,3 +81,7 @@ func (p *StripNewline) autoLineEndingChars(l []byte) int {
 	}
 	return 1
 }
+
+func (p *StripNewline) Close() error {
+	return p.reader.Close()
+}

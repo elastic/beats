@@ -5,8 +5,6 @@
 package add_cloudfoundry_metadata
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -40,13 +38,10 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	log := logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
-	client, err := hub.Client()
+	client, err := hub.ClientWithCache()
 	if err != nil {
-		log.Debugf("%s: failed to created cloudfoundry client: %+v", processorName, err)
+		return nil, errors.Wrapf(err, "%s: creating cloudfoundry client", processorName)
 	}
-
-	// Janitor run every 5 minutes to clean up the client cache.
-	client.StartJanitor(5 * time.Minute)
 
 	return &addCloudFoundryMetadata{
 		log:    log,
@@ -60,7 +55,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
-		// doesn't have the required cf.app.id value to add more information
+		// doesn't have the required cloudfoundry.app.id value to add more information
 		return event, nil
 	}
 	val, _ := valI.(string)
@@ -79,18 +74,31 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 				"name": app.Name,
 			},
 			"space": common.MapStr{
-				"id":   app.SpaceData.Meta.Guid,
-				"name": app.SpaceData.Entity.Name,
+				"id":   app.SpaceGuid,
+				"name": app.SpaceName,
 			},
 			"org": common.MapStr{
-				"id":   app.SpaceData.Entity.OrgData.Meta.Guid,
-				"name": app.SpaceData.Entity.OrgData.Entity.Name,
+				"id":   app.OrgGuid,
+				"name": app.OrgName,
 			},
 		},
 	})
 	return event, nil
 }
 
+// String returns this processor name.
 func (d *addCloudFoundryMetadata) String() string {
 	return processorName
+}
+
+// Close closes the underlying client and releases its resources.
+func (d *addCloudFoundryMetadata) Close() error {
+	if d.client == nil {
+		return nil
+	}
+	err := d.client.Close()
+	if err != nil {
+		return errors.Wrap(err, "closing client")
+	}
+	return nil
 }

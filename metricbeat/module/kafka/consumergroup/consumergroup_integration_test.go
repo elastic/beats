@@ -100,6 +100,11 @@ func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
+	// The test panics unless CommitInterval is set due to the following bug in sarama:
+	// https://github.com/Shopify/sarama/issues/1638
+	// To work around the issue we need to set CommitInterval, but now sarama emits
+	// a deprecation warning.
+	config.Consumer.Offsets.CommitInterval = 1 * time.Second
 	return saramacluster.NewConsumer(brokers, "test-group", topics, config)
 }
 

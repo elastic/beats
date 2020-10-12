@@ -256,6 +256,18 @@ func execPing(
 		"body":        bodyFields,
 	}
 
+	if responseConfig.IncludeHeaders {
+		headerFields := common.MapStr{}
+		for canonicalHeaderKey, vals := range resp.Header {
+			if len(vals) > 1 {
+				headerFields[canonicalHeaderKey] = vals
+			} else {
+				headerFields[canonicalHeaderKey] = vals[0]
+			}
+		}
+		responseFields["headers"] = headerFields
+	}
+
 	httpFields := common.MapStr{"response": responseFields}
 
 	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})

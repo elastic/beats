@@ -11,9 +11,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
 )
 
 func TestData(t *testing.T) {
@@ -33,9 +34,10 @@ func TestData(t *testing.T) {
 		{"googlecloud.compute.instance.network", "./_meta/data_network.json"},
 		{"googlecloud.compute.instance.cpu", "./_meta/data_cpu.json"},
 		{"googlecloud.compute.firewall", "./_meta/data_firewall.json"},
+		{"googlecloud.compute.instance.memory", "./_meta/data_memory.json"},
 	}
 
-	config := stackdriver.GetConfigForTest(t, "compute")
+	config := metrics.GetConfigForTest(t, "compute")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

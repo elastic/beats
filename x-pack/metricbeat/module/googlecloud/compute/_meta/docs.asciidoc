@@ -80,3 +80,17 @@ Here is a list of metrics collected by `compute` metricset:
 * `instance.network.sent_packets_count`: Count of packets sent over the network
 - `instance_name`: The name of the VM instance.
 - `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
+
+[float]
+==== memory
+* `instance.memory.balloon.ram_size`: The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+- `instance_name`: The name of the VM instance.
+
+* `instance.memory.balloon.ram_used`: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+- `instance_name`: The name of the VM instance.
+
+* `instance.memory.balloon.swap_in_bytes_count`: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+- `instance_name`: The name of the VM instance.
+
+* `instance.memory.balloon.swap_out_bytes_count`: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+- `instance_name`: The name of the VM instance.

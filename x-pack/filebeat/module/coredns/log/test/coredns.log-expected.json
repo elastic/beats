@@ -24,15 +24,27 @@
         "dns.question.name": "httpbin.org.cluster.local",
         "dns.question.type": "A",
         "dns.response_code": "NXDOMAIN",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "coredns.log",
         "event.duration": 102078,
+        "event.kind": "event",
         "event.module": "coredns",
+        "event.outcome": "failure",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 0,
         "message": "2019-03-06T08:55:28.903Z [INFO] 172.17.0.4:36413 - 21583 \"A IN httpbin.org.cluster.local. udp 43 false 512\" NXDOMAIN qr,rd,ra 136 0.000102078s",
+        "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "172.17.0.4"
+        ],
         "service.type": "coredns",
         "source.address": "172.17.0.4",
         "source.ip": "172.17.0.4",
@@ -66,15 +78,27 @@
         "dns.question.name": "www.yahoo.com",
         "dns.question.type": "A",
         "dns.response_code": "NOERROR",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "coredns.log",
         "event.duration": 20948545,
+        "event.kind": "event",
         "event.module": "coredns",
+        "event.outcome": "success",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 143,
         "message": "2019-03-18T22:13:36.289-07:00 [INFO] [::1]:57413 - 14639 \"A IN www.yahoo.com. udp 42 false 4096\" NOERROR qr,rd,ra 188 0.020948545s",
+        "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "::1"
+        ],
         "service.type": "coredns",
         "source.address": "::1",
         "source.ip": "::1",

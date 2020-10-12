@@ -34,4 +34,19 @@ Starting in version 7.7.0, scripts that use these processors will fail. To
 resolve this problem, define the processors in your configuration instead of the
 script.
 
+[float]
+==== Systemd unit file no longer overrides logging options
+
+Prior to this release, the systemd unit file set `BEAT_LOG_OPTS=-e`, which
+caused {beats} to ignore the logging options specified in the
+configuration file.
+
+The systemd unit file no longer sets this option, and the logging settings
+specified under `logging` in the configuration now work.
+
+If you set `Environment="BEAT_LOG_OPTS=` in a previous release to work around
+this problem, remove that workaround now, and use the `logging` options in the
+configuration file to control logging behavior. For example, see
+{filebeat-ref}/configuration-logging.html[Configure logging]. 
+
 // end::notable-breaking-changes[]

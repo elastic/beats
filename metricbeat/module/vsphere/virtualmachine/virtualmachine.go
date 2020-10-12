@@ -164,20 +164,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			},
 		}
 
-		if vm.Summary.Runtime.Host != nil {
-			event["host.id"] = vm.Summary.Runtime.Host.Value
+		if host := vm.Summary.Runtime.Host; host != nil {
+			event["host.id"] = host.Value
+			hostSystem, err := getHostSystem(ctx, c, host.Reference())
+			if err == nil {
+				event["host.hostname"] = hostSystem.Summary.Config.Name
+			} else {
+				m.Logger().Debug(err.Error())
+			}
 		} else {
 			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
 				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
 				"from host/guest")
 		}
 
-		hostSystem, err := getHostSystem(ctx, c, vm.Summary.Runtime.Host.Reference())
-		if err != nil {
-			m.Logger().Debug(err.Error())
-		} else {
-			event["host.hostname"] = hostSystem.Summary.Config.Name
-		}
 		// Get custom fields (attributes) values if get_custom_fields is true.
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
 			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)

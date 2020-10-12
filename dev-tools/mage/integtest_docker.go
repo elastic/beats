@@ -19,12 +19,15 @@ package mage
 
 import (
 	"fmt"
+	"go/build"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -93,6 +96,8 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 	dockerRepoRoot := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	dockerGoCache := filepath.Join(dockerRepoRoot, "build/docker-gocache")
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
+	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod/cache/download")
+	dockerGoPkgCache := "/gocache"
 
 	// Execute the inside of docker-compose.
 	args := []string{"-p", dockerComposeProjectName(), "run",
@@ -104,6 +109,9 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
 		"-e", "GOCACHE=" + dockerGoCache,
+		// Use the host machine's pkg cache to minimize external downloads.
+		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
+		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
@@ -156,6 +164,13 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 func (d *DockerIntegrationTester) InsideTest(test func() error) error {
 	// Fix file permissions after test is done writing files as root.
 	if runtime.GOOS != "windows" {
+		repo, err := GetProjectRepoInfo()
+		if err != nil {
+			return err
+		}
+
+		// Handle virtualenv and the current project dir.
+		defer DockerChown(path.Join(repo.RootDir, "build"))
 		defer DockerChown(".")
 	}
 	return test()
@@ -232,5 +247,17 @@ func dockerComposeBuildImages() error {
 		os.Stderr,
 		"docker-compose", args...,
 	)
+
+	// This sleep is to avoid hitting the docker build issues when resources are not available.
+	if err != nil {
+		fmt.Println(">> Building docker images again")
+		time.Sleep(10)
+		_, err = sh.Exec(
+			composeEnv,
+			out,
+			os.Stderr,
+			"docker-compose", args...,
+		)
+	}
 	return err
 }

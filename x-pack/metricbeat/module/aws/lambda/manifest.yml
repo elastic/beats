@@ -9,12 +9,12 @@ input:
         name: ["Invocations", "Errors", "DeadLetterErrors", "DestinationDeliveryFailures", "Duration",
                "Throttles", "IteratorAge", "ConcurrentExecutions",
                "UnreservedConcurrentExecutions"]
-        tags.resource_type_filter: lambda
+        resource_type: lambda
       - namespace: AWS/Lambda
         statistic: ["Maximum"]
         name: ["ProvisionedConcurrentExecutions", "ProvisionedConcurrencyUtilization"]
-        tags.resource_type_filter: lambda
+        resource_type: lambda
       - namespace: AWS/Lambda
         statistic: ["Sum"]
         name: ["ProvisionedConcurrencyInvocations", "ProvisionedConcurrencySpilloverInvocations"]
-        tags.resource_type_filter: lambda
+        resource_type: lambda

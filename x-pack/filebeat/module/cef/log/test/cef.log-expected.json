@@ -45,13 +45,15 @@
         "service.type": "cef",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "6.7.8.9",
         "source.port": 33876,
         "source.service.name": "httpd",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ],
         "url.original": "https://www.example.com/cart"
     },
@@ -76,6 +78,7 @@
         "destination.geo.city_name": "Moscow",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "RU",
+        "destination.geo.country_name": "Russia",
         "destination.geo.location.lat": 55.7527,
         "destination.geo.location.lon": 37.6172,
         "destination.geo.region_iso_code": "RU-MOW",
@@ -113,13 +116,15 @@
         "service.type": "cef",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "6.7.8.9",
         "source.port": 33876,
         "source.user.name": "bob",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -148,7 +153,8 @@
         "service.type": "cef",
         "source.user.group.name": "user",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -182,7 +188,8 @@
         "service.type": "cef",
         "source.ip": "192.168.3.4",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     }
 ]

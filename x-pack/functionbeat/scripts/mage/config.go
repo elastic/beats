@@ -13,7 +13,7 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
 	p.ExtraVars = map[string]interface{}{
-		"ExcludeConsole":             true,
+		"ExcludeConsole":             false,
 		"ExcludeFileOutput":          true,
 		"ExcludeKafka":               true,
 		"ExcludeRedis":               true,

@@ -443,22 +443,22 @@ func TestDynamicTemplates(t *testing.T) {
 				Name: "context",
 			},
 			expected: []common.MapStr{
-				common.MapStr{
-					"context": common.MapStr{
+				{
+					"context_float": common.MapStr{
 						"mapping":            common.MapStr{"type": "float"},
 						"match_mapping_type": "float",
 						"path_match":         "context.*",
 					},
 				},
-				common.MapStr{
-					"context": common.MapStr{
+				{
+					"context_boolean": common.MapStr{
 						"mapping":            common.MapStr{"type": "boolean"},
 						"match_mapping_type": "boolean",
 						"path_match":         "context.*",
 					},
 				},
-				common.MapStr{
-					"context": common.MapStr{
+				{
+					"context_*": common.MapStr{
 						"mapping":            common.MapStr{"type": "scaled_float", "scaling_factor": 10000},
 						"match_mapping_type": "*",
 						"path_match":         "context.*",

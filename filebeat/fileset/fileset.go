@@ -27,6 +27,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"text/template"
@@ -290,6 +291,18 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 	}
 
 	return template.FuncMap{
+		"inList": func(collection []interface{}, item string) bool {
+			for _, h := range collection {
+				if reflect.DeepEqual(item, h) {
+					return true
+				}
+			}
+			return false
+		},
+		"tojson": func(v interface{}) (string, error) {
+			bytes, err := json.Marshal(v)
+			return string(bytes), err
+		},
 		"IngestPipeline": func(shortID string) string {
 			return formatPipelineID(
 				builtinVars["prefix"].(string),

@@ -76,6 +76,8 @@ type Stats struct {
 
 	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
+
+	logger *logp.Logger
 }
 
 // Ticks of CPU for a process
@@ -217,15 +219,10 @@ func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
 	return nil
 }
 
+// GetProcMemPercentage returns process memory usage as a percent of total memory usage
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
-	// in unit tests, total_phymem is set to a value greater than zero
 	if totalPhyMem == 0 {
-		memStat, err := memory.Get()
-		if err != nil {
-			logp.Warn("Getting memory details: %v", err)
-			return 0
-		}
-		totalPhyMem = memStat.Mem.Total
+		return 0
 	}
 
 	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
@@ -233,6 +230,7 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 	return common.Round(perc, 4)
 }
 
+// Pids returns a list of PIDs
 func Pids() ([]int, error) {
 	pids := sigar.ProcList{}
 	err := pids.Get()
@@ -273,6 +271,15 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 }
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
+
+	var totalPhyMem uint64
+	baseMem, err := memory.Get()
+	if err != nil {
+		procStats.logger.Warnf("Getting memory details: %v", err)
+	} else {
+		totalPhyMem = baseMem.Mem.Total
+	}
+
 	proc := common.MapStr{
 		"pid":      process.Pid,
 		"ppid":     process.Ppid,
@@ -284,7 +291,7 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 			"size": process.Mem.Size,
 			"rss": common.MapStr{
 				"bytes": process.Mem.Resident,
-				"pct":   GetProcMemPercentage(process, 0 /* read total mem usage */),
+				"pct":   GetProcMemPercentage(process, totalPhyMem),
 			},
 			"share": process.Mem.Share,
 		},
@@ -380,6 +387,7 @@ func (procStats *Stats) matchProcess(name string) bool {
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
+	procStats.logger = logp.NewLogger("processes")
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {
@@ -431,7 +439,7 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	procStats.ProcsMap = newProcs
 
 	processes = procStats.includeTopProcesses(processes)
-	logp.Debug("processes", "Filtered top processes down to %d processes", len(processes))
+	procStats.logger.Debugf("Filtered top processes down to %d processes", len(processes))
 
 	procs := make([]common.MapStr, 0, len(processes))
 	for _, process := range processes {
@@ -472,18 +480,18 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	process, err := newProcess(pid, cmdline, env)
 	if err != nil {
-		logp.Debug("processes", "Skip process pid=%d: %v", pid, err)
+		procStats.logger.Debugf("Skip process pid=%d: %v", pid, err)
 		return nil
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		logp.Debug("processes", "Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
+		procStats.logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
 		return nil
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		logp.Debug("processes", "Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
+		procStats.logger.Debugf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
 		return nil
 	}
 

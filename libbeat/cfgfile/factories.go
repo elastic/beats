@@ -67,13 +67,12 @@ func MatchDefault(factory RunnerFactory) FactoryMatcher {
 func (f multiplexedFactory) Create(
 	p beat.PipelineConnector,
 	config *common.Config,
-	meta *common.MapStrPointer,
 ) (Runner, error) {
 	factory, err := f.findFactory(config)
 	if err != nil {
 		return nil, err
 	}
-	return factory.Create(p, config, meta)
+	return factory.Create(p, config)
 }
 
 func (f multiplexedFactory) CheckConfig(c *common.Config) error {

@@ -69,17 +69,18 @@ docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
 docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
 golang:${GO_VERSION}
 "
+if [ -x "$(command -v docker)" ]; then
+  for image in ${DOCKER_IMAGES}
+  do
+  (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
+  done
 
-for image in ${DOCKER_IMAGES}
-do
-(retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
-done
-
-docker tag \
-  docker.elastic.co/observability-ci/database-instantclient:12.2.0.1 \
-  store/oracle/database-instantclient:12.2.0.1 \
-  || echo "Error setting the Oracle Instant Client tag"
-docker tag \
-  docker.elastic.co/observability-ci/database-enterprise:12.2.0.1 \
-  store/oracle/database-enterprise:12.2.0.1 \
-  || echo "Error setting the Oracle Dtabase tag"
+  docker tag \
+    docker.elastic.co/observability-ci/database-instantclient:12.2.0.1 \
+    store/oracle/database-instantclient:12.2.0.1 \
+    || echo "Error setting the Oracle Instant Client tag"
+  docker tag \
+    docker.elastic.co/observability-ci/database-enterprise:12.2.0.1 \
+    store/oracle/database-enterprise:12.2.0.1 \
+    || echo "Error setting the Oracle Dtabase tag"
+fi

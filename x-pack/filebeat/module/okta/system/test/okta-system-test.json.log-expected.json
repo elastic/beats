@@ -55,6 +55,7 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.7201,
         "source.geo.location.lon": -121.919,
         "source.geo.region_iso_code": "US-CA",
@@ -62,7 +63,10 @@
         "source.ip": "108.255.197.247",
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
-        "user_agent.device.name": "Other",
+        "tags": [
+            "forwarded"
+        ],
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -127,6 +131,7 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.7201,
         "source.geo.location.lon": -121.919,
         "source.geo.region_iso_code": "US-CA",
@@ -134,7 +139,10 @@
         "source.ip": "108.255.197.247",
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
-        "user_agent.device.name": "Other",
+        "tags": [
+            "forwarded"
+        ],
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.15",
@@ -214,6 +222,7 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.7201,
         "source.geo.location.lon": -121.919,
         "source.geo.region_iso_code": "US-CA",
@@ -221,7 +230,10 @@
         "source.ip": "108.255.197.247",
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
-        "user_agent.device.name": "Other",
+        "tags": [
+            "forwarded"
+        ],
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.15",

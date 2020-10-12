@@ -51,18 +51,30 @@ func NewDownloaderWithClient(config *artifact.Config, client http.Client) *Downl
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(ctx context.Context, programName, version string) (string, error) {
+func (e *Downloader) Download(ctx context.Context, programName, artifactName, version string) (_ string, err error) {
+	downloadedFiles := make([]string, 0, 2)
+	defer func() {
+		if err != nil {
+			for _, path := range downloadedFiles {
+				os.Remove(path)
+			}
+		}
+	}()
+
 	// download from source to dest
-	path, err := e.download(ctx, e.config.OS(), programName, version)
+	path, err := e.download(ctx, e.config.OS(), programName, artifactName, version)
+	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
-		os.Remove(path)
+		return "", err
 	}
 
+	hashPath, err := e.downloadHash(ctx, e.config.OS(), programName, artifactName, version)
+	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
 
-func (e *Downloader) composeURI(programName, packageName string) (string, error) {
-	upstream := e.config.BeatsSourceURI
+func (e *Downloader) composeURI(artifactName, packageName string) (string, error) {
+	upstream := e.config.SourceURI
 	if !strings.HasPrefix(upstream, "http") && !strings.HasPrefix(upstream, "file") && !strings.HasPrefix(upstream, "/") {
 		// always default to https
 		upstream = fmt.Sprintf("https://%s", upstream)
@@ -74,11 +86,11 @@ func (e *Downloader) composeURI(programName, packageName string) (string, error)
 		return "", errors.New(err, "invalid upstream URI", errors.TypeConfig)
 	}
 
-	uri.Path = path.Join(uri.Path, programName, packageName)
+	uri.Path = path.Join(uri.Path, artifactName, packageName)
 	return uri.String(), nil
 }
 
-func (e *Downloader) download(ctx context.Context, operatingSystem, programName, version string) (string, error) {
+func (e *Downloader) download(ctx context.Context, operatingSystem, programName, artifactName, version string) (string, error) {
 	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
@@ -89,7 +101,28 @@ func (e *Downloader) download(ctx context.Context, operatingSystem, programName,
 		return "", errors.New(err, "generating package path failed")
 	}
 
-	sourceURI, err := e.composeURI(programName, filename)
+	return e.downloadFile(ctx, artifactName, filename, fullPath)
+}
+
+func (e *Downloader) downloadHash(ctx context.Context, operatingSystem, programName, artifactName, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+	if err != nil {
+		return "", errors.New(err, "generating package name failed")
+	}
+
+	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	if err != nil {
+		return "", errors.New(err, "generating package path failed")
+	}
+
+	filename = filename + ".sha512"
+	fullPath = fullPath + ".sha512"
+
+	return e.downloadFile(ctx, artifactName, filename, fullPath)
+}
+
+func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, fullPath string) (string, error) {
+	sourceURI, err := e.composeURI(artifactName, filename)
 	if err != nil {
 		return "", err
 	}

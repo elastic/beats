@@ -1,6 +1,9 @@
 ---
 description: Pipeline for normalizing Kubernetes CoreDNS logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - pipeline:
       if: ctx.message.charAt(0) == (char)("{")
       name: '{< IngestPipeline "pipeline-json" >}'
@@ -34,7 +37,7 @@ processors:
   - set:
       field: source.ip
       value: "{{source.address}}"
-      if: ctx.source?.address != null
+      ignore_empty_value: true
   - convert:
       field: source.port
       type: integer
@@ -73,25 +76,25 @@ processors:
   # namespace to avoid introducing breaking change. This should be removed
   # for 8.0.0. Additionally coredns.dnssec_ok can be removed.
   - set:
-      if: ctx.dns?.id != null
       field: coredns.id
       value: '{{dns.id}}'
+      ignore_empty_value: true
   - set:
-      if: ctx.dns?.question?.class != null
       field: coredns.query.class
       value: '{{dns.question.class}}'
+      ignore_empty_value: true
   - set:
-      if: ctx.dns?.question?.name != null
       field: coredns.query.name
       value: '{{dns.question.name}}'
+      ignore_empty_value: true
   - set:
-      if: ctx.dns?.question?.type != null
       field: coredns.query.type
       value: '{{dns.question.type}}'
+      ignore_empty_value: true
   - set:
-      if: ctx.dns?.response_code != null
       field: coredns.response.code
       value: '{{dns.response_code}}'
+      ignore_empty_value: true
   - script:
       if: ctx.dns?.header_flags != null
       lang: painless
@@ -107,6 +110,34 @@ processors:
         if (q.charAt(end) == (char) '.') {
             ctx.dns.question.name = q.substring(0, end);
         }
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: network
+  - append:
+      field: event.type
+      value: protocol
+  - set:
+      field: event.outcome
+      value: success
+      if: "ctx?.dns?.response_code == 'NOERROR'"
+  - set:
+      field: event.outcome
+      value: failure
+      if: "ctx?.dns?.response_code != null && ctx.dns.response_code != 'NOERROR'"
+  - set:
+      field: network.protocol
+      value: dns
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      if: "ctx?.source?.ip != null"
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      if: "ctx?.destination?.ip != null"
 on_failure:
   - set:
       field: error.message

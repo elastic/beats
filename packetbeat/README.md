@@ -17,7 +17,7 @@ To learn more about Packetbeat, check out <https://www.elastic.co/products/beats
 
 ## Getting started
 
-Please follow the [getting started](https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html)
+Please follow the [getting started](https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation-configuration.html)
 guide from the docs.
 
 ## Documentation

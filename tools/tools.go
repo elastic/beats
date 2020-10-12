@@ -33,5 +33,7 @@ import (
 	_ "github.com/reviewdog/reviewdog/cmd/reviewdog"
 	_ "golang.org/x/lint/golint"
 
+	_ "go.elastic.co/go-licence-detector"
+
 	_ "github.com/elastic/go-licenser"
 )

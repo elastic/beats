@@ -1,6 +1,9 @@
 description: Pipeline for Okta system logs.
 
 processors:
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
   - user_agent:
       field: user_agent.original
       ignore_missing: true
@@ -10,7 +13,7 @@ processors:
       ignore_missing: true
   - geoip:
       field: destination.ip
-      target_field: source.geo
+      target_field: destination.geo
       ignore_missing: true
   - geoip:
       database_file: GeoLite2-ASN.mmdb
@@ -44,8 +47,8 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
-  
+
 on_failure:
   - set:
       field: error.message
-      value: '{{ _ingest.on_failure_message }}'
+      value: "{{ _ingest.on_failure_message }}"

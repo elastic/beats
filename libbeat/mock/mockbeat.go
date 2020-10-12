@@ -34,13 +34,15 @@ var Name = "mockbeat"
 var Settings = instance.Settings{Name: Name, Version: Version, HasDashboards: true}
 
 type Mockbeat struct {
-	done chan struct{}
+	done   chan struct{}
+	logger *logp.Logger
 }
 
 // Creates beater
 func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	return &Mockbeat{
-		done: make(chan struct{}),
+		done:   make(chan struct{}),
+		logger: logp.NewLogger("mock"),
 	}, nil
 }
 
@@ -76,7 +78,7 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 }
 
 func (mb *Mockbeat) Stop() {
-	logp.Info("Mockbeat Stop")
+	mb.logger.Info("Mockbeat Stop")
 
 	close(mb.done)
 }

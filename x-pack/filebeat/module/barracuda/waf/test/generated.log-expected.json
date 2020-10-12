@@ -1,0 +1,1984 @@
+[
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Started monitoring",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Started monitoring",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "BYPASS",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "BYPASS: Mode set to BYPASS (nbyCic).",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 28,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " Mode set to BYPASS.",
+        "rsa.internal.messageid": "BYPASS",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:tvolup] New attack definition version 1.1000 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 65,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.1000",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.1000",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 138,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully initialized STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 227,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully initialized STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Initializing STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 270,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Initializing STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Forwarding log messages to syslog host #imadm, address=10.16.222.151",
+        "fileset.name": "waf",
+        "host.ip": "10.16.222.151",
+        "input.type": "log",
+        "log.offset": 301,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "related.ip": [
+            "10.16.222.151"
+        ],
+        "rsa.internal.event_desc": "eventmgr: Forwarding log messages to syslog host",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:eritqui] One of the RAID arrays is degrading.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 380,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:One of the RAID arrays is degrading.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "BYPASS",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "BYPASS: Mode change: ccusant,epteurs",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 442,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "Mode change.",
+        "rsa.internal.messageid": "BYPASS",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:modoco] New attack definition version 1.3971 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 479,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.3971",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.3971",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:       LB-doloreeu elillumq CreateServer =loremeum",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 552,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:   WebLog-radi ula itsed: SapCtx=rad,SapId=olupta, ididu",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 607,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:xcepte] New attack definition version 1.4012 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 668,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.4012",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.4012",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Monitoring links: lo4933",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 741,
+        "network.interface.name": "lo4933",
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Monitoring links.",
+        "rsa.internal.messageid": "PROCMON",
+        "rsa.network.interface": "lo4933",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:doconse] One of the RAID arrays is degrading.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 775,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:One of the RAID arrays is degrading.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: odite atn It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., sectet",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 837,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:       LB-tet voluptas ActiveServerOutOfBandMonitorAttr =inv",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 967,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: [ALERT:obeata] Configuration size is pexeaco which exceeds the ercitati safe limit. Please check your configuration.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1032,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: ALERT Configuration size exceeds the safe memory limit.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "BYPASS",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "BYPASS: Mode change: urEx,labo",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1162,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "Mode change.",
+        "rsa.internal.messageid": "BYPASS",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Event manager startup succeeded.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1193,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "eventmgr: Event manager startup succeeded.",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:       LB-Maloru lapariat SetServerdmin=oinBCSed",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 1236,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully stopped STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1289,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully stopped STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:amv] Firmware storage exceeds ipsaqua",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1328,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "ipsaqua",
+        "rsa.internal.event_desc": "PROCMON:Firmware storage exceeding.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:       LB-isistena Malorum SetSapquelauda=enderit",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 1382,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Forwarding log messages to syslog host #equun, address=10.4.65.246",
+        "fileset.name": "waf",
+        "host.ip": "10.4.65.246",
+        "input.type": "log",
+        "log.offset": 1436,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "related.ip": [
+            "10.4.65.246"
+        ],
+        "rsa.internal.event_desc": "eventmgr: Forwarding log messages to syslog host",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:exer] New attack definition version 1.481 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1513,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.481",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.481",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Event manager startup succeeded.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1583,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "eventmgr: Event manager startup succeeded.",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1626,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: isnisiu aspernat Update succeeded",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1715,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Update succeded.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for mquel release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1763,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from ueporr to ptate",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1812,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:onsequ] enp0s7094: link is up",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1866,
+        "network.interface.name": "enp0s7094",
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:Link is up.",
+        "rsa.internal.messageid": "PROCMON",
+        "rsa.network.interface": "enp0s7094",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: iquip tDuisau It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., amali",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 1912,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Event manager startup succeeded.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2045,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "eventmgr: Event manager startup succeeded.",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Started monitoring",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2088,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Started monitoring",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:       LB-mveniam rvelill EnableServer =iame",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 2116,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: number of stm worker threads iseuf",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2165,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "euf",
+        "rsa.internal.event_desc": "PROCMON: number of stm worker threads",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:   WebLog-ipiscin idolore turExce: SapCtx=modoc,SapId=mdolors, borios",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 2209,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully stopped STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2283,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully stopped STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Forwarding log messages to syslog host #ccusa, address=10.58.33.30",
+        "fileset.name": "waf",
+        "host.ip": "10.58.33.30",
+        "input.type": "log",
+        "log.offset": 2322,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "related.ip": [
+            "10.58.33.30"
+        ],
+        "rsa.internal.event_desc": "eventmgr: Forwarding log messages to syslog host",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:uiadolo] eth321: link is up",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2399,
+        "network.interface.name": "eth321",
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:Link is up.",
+        "rsa.internal.messageid": "PROCMON",
+        "rsa.network.interface": "eth321",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: rsi ciduntut Update succeeded",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2443,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Update succeded.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: radipis RPC Name =isa, RPC Result: aal",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2487,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT: RPC information.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for ris release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2540,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: aliqui rcitat Update succeeded",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2587,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Update succeded.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: aeconse Initiating config_agent database commit phase.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2632,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Initiating config_agent database commit phase.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Started monitoring",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2701,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Started monitoring",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: iaecon ipexea Update succeeded",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2729,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Update succeded.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from nulapa to cillu",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2774,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:ectetura] Firmware storage exceeds didun",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2828,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "didun",
+        "rsa.internal.event_desc": "PROCMON:Firmware storage exceeding.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: rcit nul Received put-tree command",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2885,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Received put-tree command.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:aliquaU] New attack definition version 1.1278 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 2934,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.1278",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.1278",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:amei] New attack definition version 1.7778 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3008,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.7778",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.7778",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:gelitse] New attack definition version 1.3018 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3079,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.3018",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.3018",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from iceroin to qui",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3153,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from pariatu to issusc",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3206,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:  FAILOVE-roinBCSe oreet Stateful Failover Module initialized.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 3262,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Committing UI configuration.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3329,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Committing UI configuration.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3371,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Rolling back the current database transaction. Configuration digest failed.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Forwarding log messages to syslog host #rroquisq, address=10.126.62.60",
+        "fileset.name": "waf",
+        "host.ip": "10.126.62.60",
+        "input.type": "log",
+        "log.offset": 3460,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "related.ip": [
+            "10.126.62.60"
+        ],
+        "rsa.internal.event_desc": "eventmgr: Forwarding log messages to syslog host",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully initialized STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3541,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully initialized STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM: RespPage-rinrepr rvelill CreateRP: Response Page mve created successfully",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3584,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM: RespPage Response Page created successfully.",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: [ALERT:ineav] Configuration size is onp which exceeds the gnaaliqu safe limit. Please check your configuration.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3663,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: ALERT Configuration size exceeds the safe memory limit.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:eumfu] eth5074: link is up",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3788,
+        "network.interface.name": "eth5074",
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:Link is up.",
+        "rsa.internal.messageid": "PROCMON",
+        "rsa.network.interface": "eth5074",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: tutlabo Initiating config_agent database commit phase.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3831,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Initiating config_agent database commit phase.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for pli release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3900,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: erit Initiating config_agent database commit phase.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 3947,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Initiating config_agent database commit phase.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for mod release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4013,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for lamcolab release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4060,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from estlab to tis",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4112,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:uamqua] Firmware storage exceeds labo",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4164,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "labo",
+        "rsa.internal.event_desc": "PROCMON:Firmware storage exceeding.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Migrating configuration from tfugit to taspern",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4218,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: migrating configuration.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Forwarding log messages to syslog host #meiusm, address=10.48.248.158",
+        "fileset.name": "waf",
+        "host.ip": "10.48.248.158",
+        "input.type": "log",
+        "log.offset": 4274,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "related.ip": [
+            "10.48.248.158"
+        ],
+        "rsa.internal.event_desc": "eventmgr: Forwarding log messages to syslog host",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully initialized STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4354,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully initialized STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: number of stm worker threads isonula",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4397,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "onula",
+        "rsa.internal.event_desc": "PROCMON: number of stm worker threads",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:   FTPSVC-nimi ilmoles Ftp proxy initialized labor",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4443,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: [ALERT:atev] One of the RAID arrays is degrading.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4498,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON:One of the RAID arrays is degrading.",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: amaliq ept Received put-tree command",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4557,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "CONFIG_AGENT:Received put-tree command.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "BYPASS",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "BYPASS: Mode set to BYPASS (ectetura).",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4608,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " Mode set to BYPASS.",
+        "rsa.internal.messageid": "BYPASS",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:   COOKIE-icab quiado scipit = quiavolu",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4647,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "BYPASS",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "BYPASS: Mode set to never bypass.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4691,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " Mode set to never BYPASS.",
+        "rsa.internal.messageid": "BYPASS",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:    CACHE-oconseq tsedd untin SapCtx susc, SapId amr, Return Code success",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4725,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:      aps-ddoeius tautfugi ParamProtectionClonePatterns: Old:cin, New:fugia, PatternsNode:olors",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4803,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for admi release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 4903,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:      aps-Bon seosqui AddIpsCloakFilterRespHeader [idu] Ret stquidol, SapCtx itautfug, sapId byCi",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 4951,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully stopped STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5053,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully stopped STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Started monitoring",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5092,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Started monitoring",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "UPDATE",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "UPDATE: [ALERT:ntoc] New attack definition version 1.7781 is available",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5120,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "observer.version": "1.7781",
+        "rsa.internal.event_desc": "UPDATE: ALERT New attack definition version is available",
+        "rsa.internal.messageid": "UPDATE",
+        "rsa.misc.version": "1.7781",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "INSTALL",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "INSTALL: Loading the snapshot for stru release.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5191,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": " INSTALL: Loading snapshot from previous version.",
+        "rsa.internal.messageid": "INSTALL",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Monitoring links: enp0s6182",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5239,
+        "network.interface.name": "enp0s6182",
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Monitoring links.",
+        "rsa.internal.messageid": "PROCMON",
+        "rsa.network.interface": "enp0s6182",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: command(--digest) execution status = quaeratv",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5276,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.db.index": "quaeratv",
+        "rsa.internal.event_desc": "STM_WRAPPER: command execution status.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully initialized STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5335,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully initialized STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "eventmgr",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "eventmgr: Event manager startup succeeded.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5378,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "eventmgr: Event manager startup succeeded.",
+        "rsa.internal.messageid": "eventmgr",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Initializing STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5421,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Initializing STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Successfully initialized STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5452,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Successfully initialized STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "PROCMON",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "PROCMON: Started monitoring",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5495,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "PROCMON: Started monitoring",
+        "rsa.internal.messageid": "PROCMON",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "CONFIG_AGENT",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "CONFIG_AGENT: tDuis isnis It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time., metMa",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5523,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "It is recommended to configure cookie_encryption_key_expiry atleast 7 days ahead of current time.",
+        "rsa.internal.messageid": "CONFIG_AGENT",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM_WRAPPER",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM_WRAPPER: Initializing STM.",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.offset": 5654,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.event_desc": "STM_WRAPPER: Initializing STM.",
+        "rsa.internal.messageid": "STM_WRAPPER",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:      aps-quam etquasi CreateRC: RC Add policy Success",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 5685,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    },
+    {
+        "event.code": "STM",
+        "event.dataset": "barracuda.waf",
+        "event.module": "barracuda",
+        "event.original": "STM:   WebLog-untutl eseosqui user: SapCtx=ons,SapId=ation, eabilloi",
+        "fileset.name": "waf",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 5744,
+        "observer.product": "Web",
+        "observer.type": "WAF",
+        "observer.vendor": "Barracuda",
+        "rsa.internal.messageid": "STM",
+        "service.type": "barracuda",
+        "tags": [
+            "barracuda.waf",
+            "forwarded"
+        ]
+    }
+]

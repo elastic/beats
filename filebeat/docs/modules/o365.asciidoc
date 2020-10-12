@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Office 365 module
 
+beta[]
+
 This is a module for Office 365 logs received via one of the Office 365 API
 endpoints. It currently supports user, admin, system, and policy actions and
 events from Office 365 and Azure AD activity logs exposed by the Office 365
@@ -187,7 +189,8 @@ endpoints.
 
 The maximum data retention period to support. `168h` by default. {beatname_uc}
 will fetch all retained data for a tenant when run for the first time. The
-default is 7 days. Adjust it if your tenant has a different retention period.
+default is 7 days, which matches the standard period that Microsoft will keep the
+logs before deleting them. Only increase it if your tenant has a longer retention period.
 
 *`var.api.poll_interval`*::
 

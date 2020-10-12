@@ -77,7 +77,7 @@ func KubectlDeleteInput(env map[string]string, stdout, stderr io.Writer, manifes
 // KubectlWait waits for a condition to occur for a resource in the kubernetes cluster.
 //
 // KUBECONFIG must be in `env` to target a specific cluster.
-func KubectlWait(env map[string]string, stdout, stderr io.Writer, waitFor, resource string) error {
+func KubectlWait(env map[string]string, stdout, stderr io.Writer, waitFor, resource string, labels string) error {
 	_, err := sh.Exec(
 		env,
 		stdout,
@@ -87,6 +87,8 @@ func KubectlWait(env map[string]string, stdout, stderr io.Writer, waitFor, resou
 		"--timeout=300s",
 		fmt.Sprintf("--for=%s", waitFor),
 		resource,
+		"-l",
+		labels,
 	)
 	return err
 }

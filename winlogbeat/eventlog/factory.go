@@ -22,13 +22,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 )
-
-var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
-	"tags", "processors", "index"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration
@@ -42,33 +37,18 @@ type validator interface {
 	Validate() error
 }
 
-func readConfig(
-	c *common.Config,
-	config interface{},
-	validKeys common.StringSet,
-) error {
+func readConfig(c *common.Config, config interface{}) error {
 	if err := c.Unpack(config); err != nil {
 		return fmt.Errorf("failed unpacking config. %v", err)
 	}
 
-	var errs multierror.Errors
-	if len(validKeys) > 0 {
-		// Check for invalid keys.
-		for _, k := range c.GetFields() {
-			if !validKeys.Has(k) {
-				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
-					"found. Valid keys are %s", k, strings.Join(validKeys.ToSlice(), ", ")))
-			}
-		}
-	}
-
 	if v, ok := config.(validator); ok {
 		if err := v.Validate(); err != nil {
-			errs = append(errs, err)
+			return err
 		}
 	}
 
-	return errs.Err()
+	return nil
 }
 
 // Producer produces a new event log instance for reading event log records.
@@ -114,7 +94,7 @@ func New(options *common.Config) (EventLog, error) {
 	}
 
 	var config ConfigCommon
-	if err := readConfig(options, &config, nil); err != nil {
+	if err := readConfig(options, &config); err != nil {
 		return nil, err
 	}
 

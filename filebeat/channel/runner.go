@@ -32,7 +32,7 @@ type onCreateFactory struct {
 	create  onCreateWrapper
 }
 
-type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config, *common.MapStrPointer) (cfgfile.Runner, error)
+type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config) (cfgfile.Runner, error)
 
 // commonInputConfig defines common input settings
 // for the publisher pipeline.
@@ -63,12 +63,8 @@ func (f *onCreateFactory) CheckConfig(cfg *common.Config) error {
 	return f.factory.CheckConfig(cfg)
 }
 
-func (f *onCreateFactory) Create(
-	pipeline beat.PipelineConnector,
-	cfg *common.Config,
-	meta *common.MapStrPointer,
-) (cfgfile.Runner, error) {
-	return f.create(f.factory, pipeline, cfg, meta)
+func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
+	return f.create(f.factory, pipeline, cfg)
 }
 
 // RunnerFactoryWithCommonInputSettings wraps a runner factory, such that all runners
@@ -93,14 +89,13 @@ func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactor
 			f cfgfile.RunnerFactory,
 			pipeline beat.PipelineConnector,
 			cfg *common.Config,
-			meta *common.MapStrPointer,
 		) (runner cfgfile.Runner, err error) {
 			pipeline, err = withClientConfig(info, pipeline, cfg)
 			if err != nil {
 				return nil, err
 			}
 
-			return f.Create(pipeline, cfg, meta)
+			return f.Create(pipeline, cfg)
 		})
 }
 

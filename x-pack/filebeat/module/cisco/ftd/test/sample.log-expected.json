@@ -9,25 +9,43 @@
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 0,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.2.30",
+            "192.0.0.8"
+        ],
         "service.type": "cisco",
         "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -40,25 +58,43 @@
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 139,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.2.30",
+            "192.0.0.8"
+        ],
         "service.type": "cisco",
         "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -72,25 +108,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.1.2.16(2241) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 294,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.2.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.1.2.16",
         "source.ip": "10.1.2.16",
         "source.port": 2241,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -103,13 +157,21 @@
         "destination.ip": "192.0.2.10",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]",
         "event.outcome": "deny",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
@@ -117,12 +179,26 @@
         "log.offset": 465,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "INT-FW01",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
+        "related.ip": [
+            "172.29.2.101",
+            "192.0.2.10"
+        ],
         "service.type": "cisco",
         "source.address": "172.29.2.101",
         "source.ip": "172.29.2.101",
         "source.port": 1039,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -135,13 +211,21 @@
         "destination.ip": "192.0.2.57",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106100: access-list inside permitted udp inside/172.29.2.3(1065) -> outside/192.0.2.57(53) hit-cnt 144 300-second interval [0xe982c7a4, 0x0]",
         "event.outcome": "allow",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
@@ -149,126 +233,325 @@
         "log.offset": 632,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "INT-FW01",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
+        "related.ip": [
+            "172.29.2.3",
+            "192.0.2.57"
+        ],
         "service.type": "cisco",
         "source.address": "172.29.2.3",
         "source.ip": "172.29.2.3",
         "source.port": 1065,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 12834,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4952 to outside:192.0.2.130/12834",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 812,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.3.42",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.3.42",
+        "source.ip": "10.123.3.42",
+        "source.port": 4952,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743274",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.3.42",
+        "cisco.ftd.mapped_destination_port": 12834,
+        "cisco.ftd.mapped_source_ip": "192.0.2.43",
+        "cisco.ftd.mapped_source_port": 443,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.3.42",
+        "destination.ip": "10.123.3.42",
+        "destination.nat.port": "12834",
+        "destination.port": 4952,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42.130/12834)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 938,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.43",
+            "10.123.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.43",
+        "source.ip": "192.0.2.43",
+        "source.port": 443,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 25882,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic UDP translation from outside:10.123.1.35/52925 to outside:192.0.2.130/25882",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1110,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.1.35",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.1.35",
+        "source.ip": "10.123.1.35",
+        "source.port": 52925,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743275",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.1.35",
+        "cisco.ftd.mapped_destination_port": 25882,
+        "cisco.ftd.mapped_source_ip": "192.0.2.43",
+        "cisco.ftd.mapped_source_port": 53,
         "cisco.ftd.message_id": "302015",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.1.35",
+        "destination.ip": "10.123.1.35",
+        "destination.nat.port": "25882",
+        "destination.port": 52925,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302015: Built outbound UDP connection 89743275 for outside:192.0.2.222/53 (192.0.2.43/53) to outside:10.123.1.35/52925 (10.123.1.35/25882)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1237,
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "10.123.1.35"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.nat.ip": "192.0.2.43",
+        "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.0.2.130",
+        "destination.ip": "192.0.2.130",
+        "destination.port": 45392,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4953 to outside:192.0.2.130/45392",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1405,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.123.3.42",
+            "192.0.2.130"
+        ],
         "service.type": "cisco",
+        "source.address": "10.123.3.42",
+        "source.ip": "10.123.3.42",
+        "source.port": 4953,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743276",
+        "cisco.ftd.destination_interface": "outside",
+        "cisco.ftd.mapped_destination_ip": "10.123.3.130",
+        "cisco.ftd.mapped_destination_port": 45392,
+        "cisco.ftd.mapped_source_ip": "192.0.2.1",
+        "cisco.ftd.mapped_source_port": 80,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.3.42",
+        "destination.ip": "10.123.3.42",
+        "destination.nat.ip": "10.123.3.130",
+        "destination.nat.port": "45392",
+        "destination.port": 4953,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743276 for outside:192.0.2.1/80 (192.0.2.1/80) to outside:10.123.3.42/4953 (10.123.3.130/45392)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1531,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.1",
+            "10.123.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.1",
+        "source.ip": "192.0.2.1",
+        "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -281,15 +564,23 @@
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 5025000000000,
         "event.end": "2013-04-29T12:59:50.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 89743275 for outside:192.0.2.222/53 to inside:10.123.1.35/52925 duration 1:23:45 bytes 140",
         "event.severity": 6,
         "event.start": "2013-04-29T13:36:05.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -297,12 +588,22 @@
         "network.bytes": 140,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "10.123.1.35"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -317,15 +618,23 @@
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 36000000000000,
         "event.end": "2013-04-29T12:59:50.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 666 for outside:192.0.2.222/53 user1 to inside:10.123.1.35/52925 user2 duration 10:00:00 bytes 9999999",
         "event.severity": 6,
         "event.start": "2013-04-29T04:59:50.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -333,12 +642,22 @@
         "network.bytes": 9999999,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.222",
+            "10.123.1.35"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -348,12 +667,20 @@
         "destination.address": "172.24.177.29",
         "destination.ip": "172.24.177.29",
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302021,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302021: Teardown ICMP connection for faddr 172.24.177.29/0 gaddr 192.168.132.46/17233 laddr 192.168.132.46/17233",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "FJSG2NRFW01",
         "input.type": "log",
@@ -361,49 +688,123 @@
         "log.offset": 2012,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.hostname": "FJSG2NRFW01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "FJSG2NRFW01"
+        ],
+        "related.ip": [
+            "192.168.132.46",
+            "172.24.177.29"
+        ],
         "service.type": "cisco",
         "source.address": "192.168.132.46",
         "source.ip": "192.168.132.46",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.130",
+        "destination.ip": "192.0.0.130",
+        "destination.port": 10879,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 305011,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from inside:192.168.3.42/4954 to outside:192.0.0.130/10879",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2167,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.3.42",
+            "192.0.0.130"
+        ],
         "service.type": "cisco",
+        "source.address": "192.168.3.42",
+        "source.ip": "192.168.3.42",
+        "source.port": 4954,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2013-04-29T12:59:50.000-02:00",
+        "cisco.ftd.connection_id": "89743277",
+        "cisco.ftd.destination_interface": "inside",
+        "cisco.ftd.mapped_destination_ip": "10.0.0.130",
+        "cisco.ftd.mapped_destination_port": 10879,
+        "cisco.ftd.mapped_source_ip": "192.0.0.17",
+        "cisco.ftd.mapped_source_port": 80,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.3.42",
+        "destination.ip": "192.168.3.42",
+        "destination.nat.ip": "10.0.0.130",
+        "destination.nat.port": "10879",
+        "destination.port": 4954,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743277 for outside:192.0.0.17/80 (192.0.0.17/80) to inside:192.168.3.42/4954 (10.0.0.130/10879)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2293,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.0.17",
+            "192.168.3.42"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.0.17",
+        "source.ip": "192.0.0.17",
+        "source.port": 80,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -413,13 +814,21 @@
         "destination.ip": "10.1.2.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106007,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106007: Deny inbound UDP from 192.0.0.66/12981 to 10.1.2.60/53 due to DNS Query",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -428,12 +837,20 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.0.66",
+            "10.1.2.60"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.0.66",
         "source.ip": "192.0.0.66",
         "source.port": 12981,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -446,25 +863,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2006) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2567,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2006,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -477,25 +912,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49734) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2726,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49734,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -508,25 +961,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49735) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2887,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49735,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -539,25 +1010,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49736) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3048,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49736,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -570,25 +1059,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49737) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3209,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49737,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -601,25 +1108,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49738) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3370,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49738,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -632,25 +1157,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49746) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3531,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49746,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -663,25 +1206,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2007) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3692,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2007,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -694,25 +1255,43 @@
         "destination.ip": "192.168.33.31",
         "destination.port": 25,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.13(43013) -> dmz/192.168.33.31(25) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3851,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.13",
+            "192.168.33.31"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.13",
         "source.ip": "10.0.0.13",
         "source.port": 43013,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -725,25 +1304,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2008) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4008,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2008,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -754,13 +1351,21 @@
         "destination.ip": "10.1.2.42",
         "destination.port": 137,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106006,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106006: Deny inbound UDP from 192.0.2.66/137 to 10.1.2.42/137 on interface inside",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -768,12 +1373,21 @@
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.66",
+            "10.1.2.42"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 137,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -783,13 +1397,21 @@
         "destination.ip": "10.1.5.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106007,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106007: Deny inbound UDP from 192.0.2.66/12981 to 10.1.5.60/53 due to DNS Query",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -798,12 +1420,20 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.66",
+            "10.1.5.60"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 12981,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -816,25 +1446,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2009) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4387,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2009,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -847,25 +1495,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49776) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4546,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49776,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -878,25 +1544,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2010) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4707,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2010,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -909,25 +1593,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2011) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "deny",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4866,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2011,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -940,25 +1642,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2012) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "deny",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5022,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2012,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -971,25 +1691,43 @@
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 5178,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.126",
+            "10.0.0.132"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1002,25 +1740,43 @@
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 5325,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.0.2.126",
+            "10.0.0.132"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1033,25 +1789,43 @@
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.46(49840) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5472,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.46",
+            "192.0.0.88"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49840,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1064,25 +1838,43 @@
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5635,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.89"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2013,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1096,65 +1888,100 @@
         "destination.ip": "192.0.0.99",
         "destination.port": 2000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106100,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5796,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.0.0.16",
+            "192.0.0.99"
+        ],
         "service.type": "cisco",
         "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2241,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-12-11T08:01:24.000-02:00",
+        "cisco.ftd.connection_id": "447235",
+        "cisco.ftd.destination_interface": "identity",
+        "cisco.ftd.mapped_destination_ip": "10.0.13.13",
+        "cisco.ftd.mapped_destination_port": 80,
+        "cisco.ftd.mapped_source_ip": "192.168.77.12",
+        "cisco.ftd.mapped_source_port": 11180,
         "cisco.ftd.message_id": "302015",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.0.13.13",
+        "destination.ip": "10.0.13.13",
+        "destination.port": 80,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5967,
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "identity",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.168.77.12",
+            "10.0.13.13"
+        ],
         "service.type": "cisco",
+        "source.address": "192.168.77.12",
+        "source.ip": "192.168.77.12",
+        "source.port": 11180,
         "tags": [
-            "cisco-ftd"
-        ]
-    },
-    {
-        "@timestamp": "2018-12-11T08:01:24.000-02:00",
-        "cisco.ftd.message_id": "302015",
-        "event.action": "firewall-rule",
-        "event.code": 302015,
-        "event.dataset": "cisco.ftd",
-        "event.module": "cisco",
-        "event.original": "%FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)",
-        "event.severity": 6,
-        "event.timezone": "-02:00",
-        "fileset.name": "ftd",
-        "host.hostname": "127.0.0.1",
-        "input.type": "log",
-        "log.level": "informational",
-        "log.offset": 6147,
-        "service.type": "cisco",
-        "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1167,13 +1994,21 @@
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1181,12 +2016,26 @@
         "log.offset": 6332,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "dmz",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.168.1.33",
+            "192.0.0.12"
+        ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1199,13 +2048,21 @@
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1213,52 +2070,140 @@
         "log.offset": 6487,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "dmz",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.168.1.33",
+            "192.0.0.12"
+        ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-12-11T08:01:31.000-02:00",
+        "cisco.ftd.connection_id": "447236",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_host": "OCSP_Server",
+        "cisco.ftd.mapped_destination_port": 5678,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "OCSP_Server",
+        "destination.domain": "OCSP_Server",
+        "destination.port": 5678,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6642,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
+        "related.ip": [
+            "192.0.2.222"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-12-11T08:01:31.000-02:00",
+        "cisco.ftd.connection_id": "447236",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_host": "OCSP_Server",
+        "cisco.ftd.mapped_destination_port": 5678,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "OCSP_Server",
+        "destination.domain": "OCSP_Server",
+        "destination.port": 5678,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 6817,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
+        "related.ip": [
+            "192.0.2.222"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1271,15 +2216,23 @@
         "destination.ip": "192.168.1.34",
         "destination.port": 5678,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
         "event.end": "2018-12-11T08:01:31.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447236 for outside:192.0.2.222/1234 to dmz:192.168.1.34/5678 duration 0:00:00 bytes 14804 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T10:01:31.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1288,12 +2241,26 @@
         "network.bytes": 14804,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1306,15 +2273,23 @@
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
         "event.end": "2018-12-11T08:01:38.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T10:00:30.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1323,12 +2298,26 @@
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.35"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1341,15 +2330,23 @@
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
         "event.end": "2018-12-11T08:01:38.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T10:00:30.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1358,12 +2355,26 @@
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.35"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1374,26 +2385,45 @@
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "deny",
+        "event.outcome": "tcp",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7504,
-        "network.iana_number": 6,
-        "network.transport": "tcp",
+        "network.transport": "(no",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1404,26 +2434,45 @@
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106015,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "deny",
+        "event.outcome": "tcp",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7651,
-        "network.iana_number": 6,
-        "network.transport": "tcp",
+        "network.transport": "(no",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1436,13 +2485,21 @@
         "destination.ip": "192.0.0.12",
         "destination.port": 5000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group \"dmz\" [0x123a465e, 0x8c20f21]",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1450,52 +2507,140 @@
         "log.offset": 7798,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "dmz",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.168.1.34",
+            "192.0.0.12"
+        ],
         "service.type": "cisco",
         "source.address": "192.168.1.34",
         "source.ip": "192.168.1.34",
         "source.port": 5679,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-12-11T08:01:53.000-02:00",
+        "cisco.ftd.connection_id": "447237",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_ip": "192.168.1.34",
+        "cisco.ftd.mapped_destination_port": 65000,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
+        "destination.ip": "192.168.1.34",
+        "destination.port": 65000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7954,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
         "@timestamp": "2018-12-11T08:01:53.000-02:00",
+        "cisco.ftd.connection_id": "447237",
+        "cisco.ftd.destination_interface": "dmz",
+        "cisco.ftd.mapped_destination_ip": "192.168.1.34",
+        "cisco.ftd.mapped_destination_port": 65000,
+        "cisco.ftd.mapped_source_ip": "192.0.2.222",
+        "cisco.ftd.mapped_source_port": 1234,
         "cisco.ftd.message_id": "302013",
+        "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
+        "destination.ip": "192.168.1.34",
+        "destination.port": 65000,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302013,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)",
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 8133,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "192.168.1.34"
+        ],
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
+        "source.ip": "192.0.2.222",
+        "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1508,15 +2653,23 @@
         "destination.ip": "10.10.10.10",
         "destination.port": 1235,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 86399000000000,
         "event.end": "2018-12-11T08:01:53.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447237 for outside:192.0.2.222/1234 to dmz:10.10.10.10/1235 duration 23:59:59 bytes 11420 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-10T10:01:54.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1525,12 +2678,26 @@
         "network.bytes": 11420,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "dmz",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
+        "related.ip": [
+            "192.0.2.222",
+            "10.10.10.10"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1543,15 +2710,23 @@
         "destination.ip": "10.44.2.2",
         "destination.port": 500,
         "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 122000000000,
         "event.end": "2012-08-15T23:30:09.000-02:00",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 40 for outside:10.44.4.4/500 to inside:10.44.2.2/500 duration 0:02:02 bytes 1416",
         "event.severity": 6,
         "event.start": "2012-08-16T01:28:07.000Z",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -1559,12 +2734,22 @@
         "network.bytes": 1416,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.44.4.4",
+            "10.44.2.2"
+        ],
         "service.type": "cisco",
         "source.address": "10.44.4.4",
         "source.ip": "10.44.4.4",
         "source.port": 500,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1574,23 +2759,44 @@
         "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8624,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.47"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1600,23 +2806,44 @@
         "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8745,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.57"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1626,23 +2853,44 @@
         "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8866,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.47"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1652,23 +2900,44 @@
         "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8987,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.47"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1678,23 +2947,44 @@
         "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9108,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.57"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1704,23 +2994,44 @@
         "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9229,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.88.99.57"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1730,23 +3041,44 @@
         "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9350,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.168.1.255"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1756,23 +3088,44 @@
         "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106016,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9472,
+        "observer.egress.interface.name": "Mobile_Traffic",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "0.0.0.0",
+            "192.168.1.255"
+        ],
         "service.type": "cisco",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1785,13 +3138,21 @@
         "destination.ip": "10.32.112.125",
         "destination.port": 25,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106023,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.95/24069 dst inside:10.32.112.125/25 by access-group \"PERMIT_IN\" [0x0, 0x0]\"",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1799,12 +3160,26 @@
         "log.offset": 9594,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "192.0.2.95",
+            "10.32.112.125"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.95",
         "source.ip": "192.0.2.95",
         "source.port": 24069,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1814,13 +3189,21 @@
         "cisco.ftd.message_id": "313001",
         "cisco.ftd.source_interface": "Outside",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 313001,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside",
         "event.outcome": "deny",
         "event.severity": 3,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1828,11 +3211,23 @@
         "log.offset": 9748,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Outside",
+        "observer.hostname": "GIFRCHN01",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
+        "related.ip": [
+            "10.2.3.5"
+        ],
         "service.type": "cisco",
         "source.address": "10.2.3.5",
         "source.ip": "10.2.3.5",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1843,24 +3238,41 @@
         "destination.address": "172.16.1.10",
         "destination.ip": "172.16.1.10",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 313004,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 9858,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "172.16.30.2",
+            "172.16.1.10"
+        ],
         "service.type": "cisco",
         "source.address": "172.16.30.2",
         "source.ip": "172.16.30.2",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1878,19 +3290,39 @@
         "destination.ip": "192.88.99.129",
         "destination.port": 80,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 338002,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-338002: Dynamic Filter permitted black listed TCP traffic from inside:10.1.1.45/6798 (192.88.99.1/7890) to outside:192.88.99.129/80 (192.88.99.129/80), destination 192.88.99.129 resolved from dynamic list: bad.example.com",
         "event.outcome": "allow",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 9994,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "bad.example.com"
+        ],
+        "related.ip": [
+            "10.1.1.45",
+            "192.88.99.129"
+        ],
         "server.domain": "bad.example.com",
         "service.type": "cisco",
         "source.address": "10.1.1.45",
@@ -1899,7 +3331,8 @@
         "source.nat.port": "7890",
         "source.port": 6798,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1917,30 +3350,45 @@
         "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.nat.ip": "192.0.2.225",
-        "destination.nat.port": "80",
         "destination.port": 80,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 338004,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.225/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
         "event.outcome": "monitored",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 10245,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outsidet",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.1.1",
+            "192.0.2.223"
+        ],
         "service.type": "cisco",
         "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
-        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1957,31 +3405,47 @@
         "cisco.ftd.threat_level": "very-high",
         "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
-        "destination.nat.ip": "192.0.2.223",
         "destination.nat.port": "8080",
         "destination.port": 80,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 338008,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-338008: Dynamic Filter dropped blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/8080), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
         "event.outcome": "deny",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 10544,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outsidet",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.1.1.1",
+            "192.0.2.223"
+        ],
         "service.type": "cisco",
         "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
-        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -1990,22 +3454,38 @@
         "destination.address": "192.0.2.1",
         "destination.ip": "192.0.2.1",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 304001,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 10843,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.30.30.30",
+            "192.0.2.1"
+        ],
         "service.type": "cisco",
         "source.address": "10.30.30.30",
         "source.ip": "10.30.30.30",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.original": "/app"
     },
@@ -2015,22 +3495,38 @@
         "destination.address": "192.0.2.32",
         "destination.ip": "192.0.2.32",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 304001,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com",
         "event.outcome": "allow",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 10920,
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.5.111.32",
+            "192.0.2.32"
+        ],
         "service.type": "cisco",
         "source.address": "10.5.111.32",
         "source.ip": "10.5.111.32",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.original": "http://example.com"
     },
@@ -2041,22 +3537,39 @@
         "destination.address": "192.0.0.19",
         "destination.ip": "192.0.0.19",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 304002,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside",
         "event.outcome": "deny",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 11012,
+        "observer.egress.interface.name": "inside",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.69.6.39",
+            "192.0.0.19"
+        ],
         "service.type": "cisco",
         "source.address": "10.69.6.39",
         "source.ip": "10.69.6.39",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.original": "http://www.example.net/images/favicon.ico"
     }

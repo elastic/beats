@@ -96,6 +96,40 @@
       description: >
         The user agent of the caller. This information is not authenticated and 
         should be treated accordingly.
+  - name: response
+    type: group
+    description: >
+      The operation response.
+    fields:
+    - name: proto_name
+      type: keyword
+      description: >
+        Type property of the response.
+    - name: details
+      type: group
+      description: >
+        The details of the response.
+      fields:
+      - name: group
+        type: keyword
+        description: >
+          The name of the group.
+      - name: kind
+        type: keyword
+        description: >
+          The kind of the response details.
+      - name: name
+        type: keyword
+        description: >
+          The name of the response details.
+      - name: uid
+        type: keyword
+        description: >
+          The uid of the response details.
+    - name: status
+      type: keyword
+      description: >
+       Status of the response. 
   - name: resource_name
     type: keyword
     description: >

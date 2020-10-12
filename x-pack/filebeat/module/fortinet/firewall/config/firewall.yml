@@ -1,8 +1,12 @@
-{{ if eq .input "syslog" }}
+{{ if eq .input "tcp" }}
 
-type: syslog
-protocol.udp:
-  host: "{{.syslog_host}}:{{.syslog_port}}"
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "udp" }}
+
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
 
 {{ else if eq .input "file" }}
 
@@ -11,11 +15,16 @@ paths:
 {{ range $i, $path := .paths }}
   - {{$path}}
 {{ end }}
+
 exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.6.0

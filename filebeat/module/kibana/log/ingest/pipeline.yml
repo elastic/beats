@@ -4,6 +4,9 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: '@timestamp'
     target_field: event.created
@@ -70,7 +73,7 @@ processors:
 - set:
     field: source.ip
     value: '{{source.address}}'
-    if: ctx.source?.address != null
+    ignore_empty_value: true
 - rename:
     field: kibana.log.meta.req.url
     target_field: url.original

@@ -19,7 +19,6 @@ package collector
 
 import (
 	"regexp"
-	"sync"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -76,13 +75,13 @@ type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, 
 // MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus     p.Prometheus
-	includeMetrics []*regexp.Regexp
-	excludeMetrics []*regexp.Regexp
-	namespace      string
-	promEventsGen  PromEventsGenerator
-	once           sync.Once
-	host           string
+	prometheus      p.Prometheus
+	includeMetrics  []*regexp.Regexp
+	excludeMetrics  []*regexp.Regexp
+	namespace       string
+	promEventsGen   PromEventsGenerator
+	host            string
+	eventGenStarted bool
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -104,18 +103,19 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		}
 
 		ms := &MetricSet{
-			BaseMetricSet: base,
-			prometheus:    prometheus,
-			namespace:     namespace,
-			promEventsGen: promEventsGen,
+			BaseMetricSet:   base,
+			prometheus:      prometheus,
+			namespace:       namespace,
+			promEventsGen:   promEventsGen,
+			eventGenStarted: false,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
-		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
+		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
 		}
-		ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
+		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile include patterns")
 		}
@@ -126,7 +126,10 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.once.Do(m.promEventsGen.Start)
+	if !m.eventGenStarted {
+		m.promEventsGen.Start()
+		m.eventGenStarted = true
+	}
 
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
@@ -186,7 +189,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops the metricset
 func (m *MetricSet) Close() error {
-	m.promEventsGen.Stop()
+	if m.eventGenStarted {
+		m.promEventsGen.Stop()
+	}
 	return nil
 }
 
@@ -232,39 +237,13 @@ func (m *MetricSet) skipFamilyName(family string) bool {
 
 	// if include_metrics are defined, check if this metric should be included
 	if len(m.includeMetrics) > 0 {
-		if !matchMetricFamily(family, m.includeMetrics) {
+		if !p.MatchMetricFamily(family, m.includeMetrics) {
 			return true
 		}
 	}
 	// now exclude the metric if it matches any of the given patterns
 	if len(m.excludeMetrics) > 0 {
-		if matchMetricFamily(family, m.excludeMetrics) {
-			return true
-		}
-	}
-	return false
-}
-
-func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
-	var compiledPatterns []*regexp.Regexp
-	compiledPatterns = []*regexp.Regexp{}
-	if patterns != nil {
-		for _, pattern := range *patterns {
-			r, err := regexp.Compile(pattern)
-			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
-			}
-			compiledPatterns = append(compiledPatterns, r)
-		}
-		return compiledPatterns, nil
-	}
-	return []*regexp.Regexp{}, nil
-}
-
-func matchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
-	for _, checkMetric := range matchMetrics {
-		matched := checkMetric.MatchString(family)
-		if matched {
+		if p.MatchMetricFamily(family, m.excludeMetrics) {
 			return true
 		}
 	}

@@ -9,13 +9,27 @@
         "envoyproxy.log_type": "ACCESS",
         "envoyproxy.proxy_type": "tcp",
         "envoyproxy.request_id": "-",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 4000000,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "success"
+        ],
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0,
         "message": "[2019-04-08T16:50:12.533Z] \"- - -\" 0 - 87 254 4 - \"-\" \"-\" \"-\" \"-\" \"172.27.0.2:80\"",
+        "network.transport": "tcp",
+        "related.ip": [
+            "172.27.0.2"
+        ],
         "service.type": "envoyproxy",
         "source.bytes": 254,
         "tags": [
@@ -32,9 +46,20 @@
         "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "c219f6da-2b7f-483e-9ced-ec323d9330a9",
         "envoyproxy.upstream_service_time": 4000000,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 5000000,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "success"
+        ],
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "log",
         "http.request.body.bytes": 89,
         "http.request.method": "GET",
@@ -44,6 +69,10 @@
         "input.type": "log",
         "log.offset": 82,
         "message": "[2019-04-08T16:16:55.931Z] \"GET /service/1 HTTP/1.1\" 200 - 0 89 5 4 \"-\" \"curl/7.54.0\" \"c219f6da-2b7f-483e-9ced-ec323d9330a9\" \"localhost:8000\" \"172.27.0.3:80\"",
+        "network.protocol": "http",
+        "related.ip": [
+            "172.27.0.3"
+        ],
         "service.type": "envoyproxy",
         "tags": [
             "envoyproxy"
@@ -64,9 +93,20 @@
         "envoyproxy.response_flags": [
             "NR"
         ],
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "failure"
+        ],
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "log",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
@@ -76,6 +116,10 @@
         "input.type": "log",
         "log.offset": 240,
         "message": "[2019-04-11T00:31:55.439Z] \"GET /elastic HTTP/1.1\" 404 NR 0 0 0 - \"172.17.0.3\" \"curl/7.59.0\" \"58436667-bf70-4fd0-9fe9-cdadadecfd55\" \"192.168.99.107:30901\" \"-\"",
+        "network.protocol": "http",
+        "related.ip": [
+            "172.17.0.3"
+        ],
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
         "source.ip": "172.17.0.3",
@@ -96,6 +140,7 @@
         "destination.as.organization.name": "Fastly",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "151.101.66.217",
@@ -105,9 +150,20 @@
         "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "078d1daa-b786-4d6d-85a5-7e4366adaa19",
         "envoyproxy.upstream_service_time": 39000000,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "envoyproxy.log",
         "event.duration": 41000000,
+        "event.kind": "event",
         "event.module": "envoyproxy",
+        "event.outcome": [
+            "success"
+        ],
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "log",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
@@ -117,6 +173,11 @@
         "input.type": "log",
         "log.offset": 399,
         "message": "[2019-04-11T00:51:07.980Z] \"GET /elastic/ HTTP/1.1\" 301 - 0 0 41 39 \"172.17.0.3\" \"curl/7.59.0\" \"078d1daa-b786-4d6d-85a5-7e4366adaa19\" \"www.elastic.co\" \"151.101.66.217:80\"",
+        "network.protocol": "http",
+        "related.ip": [
+            "172.17.0.3",
+            "151.101.66.217"
+        ],
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
         "source.ip": "172.17.0.3",

@@ -6,11 +6,42 @@ metricbeat:
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:
-        target: "stream"
+        target: "data_stream"
         fields:
           type: metrics
           dataset: docker.status
           namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: docker.status
+    - add_fields:
+        target: "elastic"
+        fields:
+          agent.id: agent-id
+          agent.version: 8.0.0
+          agent.snapshot: false
+  - module: docker
+    metricsets: [info]
+    index: metrics-generic-default
+    hosts: ["http://127.0.0.1:8080"]
+    processors:
+    - add_fields:
+        target: "data_stream"
+        fields:
+          type: metrics
+          dataset: generic
+          namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: generic
+    - add_fields:
+        target: "elastic"
+        fields:
+          agent.id: agent-id
+          agent.version: 8.0.0
+          agent.snapshot: false
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
@@ -20,11 +51,21 @@ metricbeat:
           fields:
             should_be: first
       - add_fields:
-          target: "stream"
+          target: "data_stream"
           fields:
             type: metrics
             dataset: generic
             namespace: testing
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
+      - add_fields:
+          target: "elastic"
+          fields:
+            agent.id: agent-id
+            agent.version: 8.0.0
+            agent.snapshot: false
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]

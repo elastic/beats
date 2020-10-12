@@ -26,6 +26,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "system_info",
         "osquery.result.unix_time": "1512649280",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -60,6 +63,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -94,6 +100,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -128,6 +137,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -162,6 +174,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -196,6 +211,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -230,6 +248,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -264,6 +285,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -298,6 +322,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -332,6 +359,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -366,6 +396,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -400,6 +433,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -434,6 +470,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -468,6 +507,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -502,6 +544,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -536,6 +581,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -570,6 +618,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -604,6 +655,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -638,6 +692,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -672,6 +729,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -706,6 +766,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -740,6 +803,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -774,6 +840,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -808,6 +877,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -842,6 +914,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -876,6 +951,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -910,6 +988,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -944,6 +1025,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -978,6 +1062,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1012,6 +1099,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1046,6 +1136,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1080,6 +1173,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1114,6 +1210,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1148,6 +1247,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1182,6 +1284,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1216,6 +1321,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1250,6 +1358,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1284,6 +1395,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1318,6 +1432,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1352,6 +1469,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1386,6 +1506,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1420,6 +1543,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1454,6 +1580,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1488,6 +1617,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1522,6 +1654,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1556,6 +1691,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1590,6 +1728,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1624,6 +1765,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1658,6 +1802,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1692,6 +1839,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1726,6 +1876,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1760,6 +1913,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1794,6 +1950,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1828,6 +1987,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1862,6 +2024,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1896,6 +2061,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1930,6 +2098,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1944,8 +2115,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -1966,6 +2135,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -1980,8 +2152,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2002,6 +2172,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2016,8 +2189,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2038,6 +2209,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2052,8 +2226,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2074,6 +2246,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2088,8 +2263,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2110,6 +2283,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2124,8 +2300,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2146,6 +2320,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2160,8 +2337,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2182,6 +2357,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2196,8 +2374,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2218,6 +2394,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2232,8 +2411,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2254,6 +2431,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2268,8 +2448,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2290,6 +2468,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2304,8 +2485,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2326,6 +2505,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2363,6 +2545,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2416,6 +2601,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669438",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2430,8 +2618,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2452,6 +2638,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2466,8 +2655,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2488,6 +2675,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2502,8 +2692,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2524,6 +2712,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2538,8 +2729,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2560,6 +2749,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2574,8 +2766,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2596,6 +2786,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2610,8 +2803,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2632,6 +2823,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2646,8 +2840,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2668,6 +2860,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2682,8 +2877,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2704,6 +2897,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2718,8 +2914,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2740,6 +2934,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2754,8 +2951,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2776,6 +2971,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2790,8 +2988,6 @@
         "event.kind": "event",
         "event.module": "osquery",
         "event.type": "info",
-        "file.type": "",
-        "file.uid": "",
         "fileset.name": "result",
         "host.hostname": "ubuntu-xenial",
         "host.id": "72E1287B-D1BC-4FC6-B9D8-64F4352776A9",
@@ -2812,6 +3008,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2849,6 +3048,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2902,6 +3104,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669439",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2943,6 +3148,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -2984,6 +3192,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3025,6 +3236,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3066,6 +3280,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3107,6 +3324,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3148,6 +3368,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3189,6 +3412,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3230,6 +3456,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3271,6 +3500,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3312,6 +3544,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3353,6 +3588,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3394,6 +3632,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3435,6 +3676,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3476,6 +3720,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3517,6 +3764,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3558,6 +3808,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],
@@ -3599,6 +3852,9 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.hosts": [
+            "ubuntu-xenial"
+        ],
         "related.user": [
             "ubuntu"
         ],

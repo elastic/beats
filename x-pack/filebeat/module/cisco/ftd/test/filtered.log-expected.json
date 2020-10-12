@@ -3,22 +3,37 @@
         "@timestamp": "2019-01-01T01:00:27.000-02:00",
         "cisco.ftd.message_id": "999999",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 999999,
         "event.dataset": "cisco.ftd",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-999999: This message is not filtered.",
         "event.severity": 7,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ftd",
         "host.hostname": "beats",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 0,
+        "observer.hostname": "beats",
+        "observer.product": "ftd",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

@@ -121,8 +121,9 @@ type Package struct {
 	Size        uint64
 	Summary     string
 	URL         string
-	Error       error
 	Type        string
+
+	error error
 }
 
 // Hash creates a hash for Package.
@@ -389,8 +390,8 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
 	}
 
-	if pkg.Error != nil {
-		event.RootFields.Put("error.message", pkg.Error.Error())
+	if pkg.error != nil {
+		event.RootFields.Put("error.message", pkg.error.Error())
 	}
 
 	return event

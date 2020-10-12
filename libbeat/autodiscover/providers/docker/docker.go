@@ -56,11 +56,16 @@ type Provider struct {
 	stoppers      map[string]*time.Timer
 	stopTrigger   chan *dockerContainerMetadata
 	logger        *logp.Logger
-	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
@@ -78,15 +83,15 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 && !config.Hints.Enabled() {
+	if len(mapper.ConditionMaps) == 0 && !config.Hints.Enabled() {
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -117,7 +122,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
 		logger:        logger,
-		keystore:      keystore,
 	}, nil
 }
 
@@ -306,8 +310,6 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 }
 
 func (d *Provider) publish(event bus.Event) {
-	// attach keystore to the event to be consumed by the static configs
-	event["keystore"] = d.keystore
 	// Try to match a config
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config

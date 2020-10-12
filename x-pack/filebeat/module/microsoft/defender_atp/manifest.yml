@@ -1,0 +1,24 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 5m
+  - name: date_cursor
+    default:
+      value_template: "lastUpdateTime gt {{.}}"
+  - name: tags
+    default: [defender-atp, forwarded]
+  - name: http_headers
+    default:
+      User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
+  - name: url
+    default: "https://api.securitycenter.windows.com/api/alerts?$expand=evidence"
+  - name: oauth2
+
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/atp.yml
+
+

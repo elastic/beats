@@ -30,7 +30,7 @@ var (
 	// ErrAlreadyLocked is returned when a lock on the data path is attempted but
 	// unsuccessful because another Beat instance already has the lock on the same
 	// data path.
-	ErrAlreadyLocked = errors.New("data path already locked by another beat")
+	ErrAlreadyLocked = errors.New("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data).")
 )
 
 type locker struct {

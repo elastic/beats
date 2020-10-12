@@ -248,3 +248,42 @@ func GenerateHints(annotations common.MapStr, container, prefix string) common.M
 
 	return hints
 }
+
+// GetHintsAsList gets a set of hints and tries to convert them into a list of hints
+func GetHintsAsList(hints common.MapStr, key string) []common.MapStr {
+	raw := GetHintMapStr(hints, key, "")
+	if raw == nil {
+		return nil
+	}
+
+	var words, nums []string
+
+	for key := range raw {
+		if _, err := strconv.Atoi(key); err != nil {
+			words = append(words, key)
+			continue
+		} else {
+			nums = append(nums, key)
+		}
+	}
+
+	sort.Strings(nums)
+
+	var configs []common.MapStr
+	for _, key := range nums {
+		rawCfg, _ := raw[key]
+		if config, ok := rawCfg.(common.MapStr); ok {
+			configs = append(configs, config)
+		}
+	}
+
+	defaultMap := common.MapStr{}
+	for _, word := range words {
+		defaultMap[word] = raw[word]
+	}
+
+	if len(defaultMap) != 0 {
+		configs = append(configs, defaultMap)
+	}
+	return configs
+}

@@ -5,15 +5,16 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "1174463293187628268",
-            "name": "gke-observability-8--observability-8--bc1afd95-ngmh"
+            "id": "2438671519308240892",
+            "name": "heartbeat-mumbai"
         },
         "machine": {
-            "type": "n1-standard-4"
+            "type": "f1-micro"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "asia-south1-c",
+    "cloud.region": "asia-south1",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -21,33 +22,39 @@
     },
     "googlecloud": {
         "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 435
+                },
+                "dropped_packets_count": {
+                    "value": 7
+                }
+            },
             "instance": {
-                "disk": {
-                    "read_bytes_count": {
-                        "value": 0
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 0.2
                     },
-                    "read_ops_count": {
-                        "value": 0
+                    "usage_time": {
+                        "value": 0.8653667340986431
                     },
-                    "write_bytes_count": {
-                        "value": 0
-                    },
-                    "write_ops_count": {
-                        "value": 0
+                    "utilization": {
+                        "value": 0.07211389450822024
                     }
+                },
+                "uptime": {
+                    "value": 60
                 }
             }
         },
-        "labels": {
-            "metrics": {
-                "device_name": "disk-2",
-                "device_type": "permanent",
-                "storage_type": "pd-standard"
-            },
-            "user": {
-                "goog-gke-node": ""
-            }
-        }
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.07211389450822024
+        },
+        "id": "2438671519308240892",
+        "name": "heartbeat-mumbai"
     },
     "metricset": {
         "name": "compute",

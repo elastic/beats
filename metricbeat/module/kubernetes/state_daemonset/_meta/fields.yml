@@ -1,0 +1,29 @@
+- name: daemonset
+  type: group
+  description: >
+    Kubernetes DaemonSet metrics
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+    - name: replicas
+      type: group
+      description: >
+        Kubernetes DaemonSet replica metrics
+      fields:
+        - name: available
+          type: long
+          description: >
+            The number of available replicas per DaemonSet
+        - name: desired
+          type: long
+          description: >
+            The desired number of replicas per DaemonSet
+        - name: ready
+          type: long
+          description: >
+            The number of ready replicas per DaemonSet
+        - name: unavailable
+          type: long
+          description: >
+            The number of unavailable replicas per DaemonSet

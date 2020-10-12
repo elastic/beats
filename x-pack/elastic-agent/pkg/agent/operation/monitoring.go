@@ -5,23 +5,30 @@
 package operation
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 )
 
 const (
-	monitoringName          = "FLEET_MONITORING"
-	outputKey               = "output"
-	monitoringEnabledSubkey = "enabled"
+	monitoringName     = "FLEET_MONITORING"
+	outputKey          = "output"
+	logsProcessName    = "filebeat"
+	metricsProcessName = "metricbeat"
+	artifactPrefix     = "beats"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	// if monitoring is disabled and running stop it
 	if !o.monitor.IsMonitoringEnabled() {
-		if o.isMonitoring {
+		if o.isMonitoring != 0 {
 			o.logger.Info("operator.handleStartSidecar: monitoring is running and disabled, proceeding to stop")
 			return o.handleStopSidecar(s)
 		}
@@ -30,14 +37,12 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 		return nil
 	}
 
-	o.isMonitoring = true
-
-	for _, step := range o.getMonitoringSteps(s, o.monitor.WatchLogs(), o.monitor.WatchMetrics()) {
+	for _, step := range o.getMonitoringSteps(s) {
 		p, cfg, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, step.Process),
+				errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd),
 				"operator.handleStartSidecar failed to create program")
 		}
 
@@ -45,10 +50,14 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 		if step.ID == configrequest.StepRemove {
 			if err := o.stop(p); err != nil {
 				result = multierror.Append(err, err)
+			} else {
+				o.markStopMonitoring(step.ProgramSpec.Cmd)
 			}
 		} else {
 			if err := o.start(p, cfg); err != nil {
 				result = multierror.Append(err, err)
+			} else {
+				o.markStartMonitoring(step.ProgramSpec.Cmd)
 			}
 		}
 	}
@@ -57,25 +66,21 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.getMonitoringSteps(s, true, true) {
+	for _, step := range o.generateMonitoringSteps(s.Version, nil) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
 				errors.TypeApplication,
-				errors.M(errors.MetaKeyAppName, step.Process),
+				errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd),
 				"operator.handleStopSidecar failed to create program")
 		}
 
 		o.logger.Debugf("stopping program %v", p)
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
+		} else {
+			o.markStopMonitoring(step.ProgramSpec.Cmd)
 		}
-	}
-
-	// if result != nil then something might be still running, setting isMonitoring to false
-	// will prevent tearing it down in a future
-	if result == nil {
-		o.isMonitoring = false
 	}
 
 	return result
@@ -87,7 +92,7 @@ func monitoringTags() map[app.Tag]string {
 	}
 }
 
-func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchMetrics bool) []configrequest.Step {
+func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.Step {
 	// get output
 	config, err := getConfigFromStep(step)
 	if err != nil {
@@ -97,7 +102,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchM
 
 	outputIface, found := config[outputKey]
 	if !found {
-		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar of type %s", step.Process)
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar of type %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
@@ -109,26 +114,33 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchM
 
 	output, found := outputMap["elasticsearch"]
 	if !found {
-		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.Process)
+		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.ProgramSpec.Cmd)
 		return nil
 	}
 
-	return o.generateMonitoringSteps(step.Version, output, watchLogs, watchMetrics)
+	return o.generateMonitoringSteps(step.Version, output)
 }
 
-func (o *Operator) generateMonitoringSteps(version string, output interface{}, watchLogs, watchMetrics bool) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version string, output interface{}) []configrequest.Step {
 	var steps []configrequest.Step
+	watchLogs := o.monitor.WatchLogs()
+	watchMetrics := o.monitor.WatchMetrics()
 
-	if watchLogs {
+	// generate only on change
+	if watchLogs != o.isMonitoringLogs() {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
-		if !any {
+		if !watchLogs || !any {
 			stepID = configrequest.StepRemove
 		}
 		filebeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: "filebeat",
+			ProgramSpec: program.Spec{
+				Name:     logsProcessName,
+				Cmd:      logsProcessName,
+				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, logsProcessName),
+			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
 			},
@@ -136,18 +148,21 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}, w
 
 		steps = append(steps, filebeatStep)
 	}
-
-	if watchMetrics {
+	if watchMetrics != o.isMonitoringMetrics() {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
-		if !any {
+		if !watchMetrics || !any {
 			stepID = configrequest.StepRemove
 		}
 
 		metricbeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: "metricbeat",
+			ProgramSpec: program.Spec{
+				Name:     metricsProcessName,
+				Cmd:      metricsProcessName,
+				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, metricsProcessName),
+			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
 			},
@@ -160,37 +175,78 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}, w
 }
 
 func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
-	paths := o.getLogFilePaths()
-	if len(paths) == 0 {
-		return nil, false
-	}
-
-	result := map[string]interface{}{
-		"filebeat": map[string]interface{}{
-			"inputs": []interface{}{
-				map[string]interface{}{
-					"type": "log",
-					"multiline": map[string]interface{}{
-						"pattern": "^[0-9]{4}",
-						"negate":  true,
-						"match":   "after",
+	inputs := []interface{}{
+		map[string]interface{}{
+			"type": "log",
+			"json": map[string]interface{}{
+				"keys_under_root": true,
+				"overwrite_keys":  true,
+				"message_key":     "message",
+			},
+			"paths": []string{
+				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+			},
+			"index": "logs-elastic.agent-default",
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "logs",
+							"dataset":   "elastic.agent",
+							"namespace": "default",
+						},
 					},
-					"paths": paths,
-					"index": "logs-agent-default",
-					"processors": []map[string]interface{}{
-						map[string]interface{}{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "logs",
-									"dataset":   "agent",
-									"namespace": "default",
-								},
-							},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": "elastic.agent",
 						},
 					},
 				},
 			},
+		},
+	}
+	logPaths := o.getLogFilePaths()
+	if len(logPaths) > 0 {
+		for name, paths := range logPaths {
+			inputs = append(inputs, map[string]interface{}{
+				"type": "log",
+				"json": map[string]interface{}{
+					"keys_under_root": true,
+					"overwrite_keys":  true,
+					"message_key":     "message",
+				},
+				"paths": paths,
+				"index": fmt.Sprintf("logs-elastic.agent.%s-default", name),
+				"processors": []map[string]interface{}{
+					{
+						"add_fields": map[string]interface{}{
+							"target": "data_stream",
+							"fields": map[string]interface{}{
+								"type":      "logs",
+								"dataset":   fmt.Sprintf("elastic.agent.%s", name),
+								"namespace": "default",
+							},
+						},
+					},
+					{
+						"add_fields": map[string]interface{}{
+							"target": "event",
+							"fields": map[string]interface{}{
+								"dataset": fmt.Sprintf("elastic.agent.%s", name),
+							},
+						},
+					},
+				},
+			})
+		}
+	}
+	result := map[string]interface{}{
+		"filebeat": map[string]interface{}{
+			"inputs": inputs,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,
@@ -207,30 +263,39 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	if len(hosts) == 0 {
 		return nil, false
 	}
-
-	result := map[string]interface{}{
-		"metricbeat": map[string]interface{}{
-			"modules": []interface{}{
-				map[string]interface{}{
-					"module":     "beat",
-					"metricsets": []string{"stats", "state"},
-					"period":     "10s",
-					"hosts":      hosts,
-					"index":      "metrics-agent-default",
-					"processors": []map[string]interface{}{
-						map[string]interface{}{
-							"add_fields": map[string]interface{}{
-								"target": "stream",
-								"fields": map[string]interface{}{
-									"type":      "metrics",
-									"dataset":   "agent",
-									"namespace": "default",
-								},
-							},
+	var modules []interface{}
+	for name, endpoints := range hosts {
+		modules = append(modules, map[string]interface{}{
+			"module":     "beat",
+			"metricsets": []string{"stats", "state"},
+			"period":     "10s",
+			"hosts":      endpoints,
+			"index":      fmt.Sprintf("metrics-elastic.agent.%s-default", name),
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "metrics",
+							"dataset":   fmt.Sprintf("elastic.agent.%s", name),
+							"namespace": "default",
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": fmt.Sprintf("elastic.agent.%s", name),
 						},
 					},
 				},
 			},
+		})
+	}
+	result := map[string]interface{}{
+		"metricbeat": map[string]interface{}{
+			"modules": modules,
 		},
 		"output": map[string]interface{}{
 			"elasticsearch": output,
@@ -242,8 +307,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	return result, true
 }
 
-func (o *Operator) getLogFilePaths() []string {
-	var paths []string
+func (o *Operator) getLogFilePaths() map[string][]string {
+	paths := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -251,15 +316,15 @@ func (o *Operator) getLogFilePaths() []string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
 		if logPath != "" {
-			paths = append(paths, logPath)
+			paths[a.Name()] = append(paths[a.Name()], logPath)
 		}
 	}
 
 	return paths
 }
 
-func (o *Operator) getMetricbeatEndpoints() []string {
-	var endpoints []string
+func (o *Operator) getMetricbeatEndpoints() map[string][]string {
+	endpoints := map[string][]string{}
 
 	o.appsLock.Lock()
 	defer o.appsLock.Unlock()
@@ -267,9 +332,35 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	for _, a := range o.apps {
 		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints = append(endpoints, metricEndpoint)
+			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
 
 	return endpoints
+}
+
+func (o *Operator) markStopMonitoring(process string) {
+	switch process {
+	case logsProcessName:
+		o.isMonitoring ^= isMonitoringLogsFlag
+	case metricsProcessName:
+		o.isMonitoring ^= isMonitoringMetricsFlag
+	}
+}
+
+func (o *Operator) markStartMonitoring(process string) {
+	switch process {
+	case logsProcessName:
+		o.isMonitoring |= isMonitoringLogsFlag
+	case metricsProcessName:
+		o.isMonitoring |= isMonitoringMetricsFlag
+	}
+}
+
+func (o *Operator) isMonitoringLogs() bool {
+	return (o.isMonitoring & isMonitoringLogsFlag) != 0
+}
+
+func (o *Operator) isMonitoringMetrics() bool {
+	return (o.isMonitoring & isMonitoringMetricsFlag) != 0
 }

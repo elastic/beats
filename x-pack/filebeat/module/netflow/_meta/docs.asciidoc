@@ -39,7 +39,7 @@ traffic from network devices.
       netflow_port: 2055
 -----
 
-`var.netflow_host`:: Address to find to. Defaults to `localhost`.
+`var.netflow_host`:: Address to bind to. Defaults to `localhost`.
 
 `var.netflow_port`:: Port to listen on. Defaults to `2055`.
 
@@ -66,6 +66,12 @@ details.
 `var.detect_sequence_reset`:: Flag controlling whether {beatname_uc} should
 monitor sequence numbers in the Netflow packets to detect an Exporting Process
 reset. See <<filebeat-input-netflow,netflow input>> for details.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[forwarded]`.
 
 :has-dashboards!:
 

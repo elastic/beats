@@ -2,7 +2,9 @@
 
 from filebeat import BaseTest
 import os
+import sys
 import time
+import unittest
 
 from beat.beat import Proc
 
@@ -682,3 +684,113 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert "host.name" not in output[0]
+
+    def test_path_based_identity_tracking(self):
+        """
+        Renamed files are picked up again as the path of the file has changed.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_eof="true",
+            input_raw="  file_identity.path: ~",
+        )
+
+        testfile = os.path.join(self.working_dir, "log", "test.log")
+        self.__write_hello_word_to_test_input_file(testfile)
+
+        proc = self.start_beat()
+
+        # wait until the file is picked up
+        self.wait_until(lambda: self.output_has(lines=1))
+
+        renamedfile = os.path.join(self.working_dir, "log", "renamed.log")
+        os.rename(testfile, renamedfile)
+
+        # wait until the both messages are received by the output
+        self.wait_until(lambda: self.output_has(lines=2))
+        proc.check_kill_and_wait()
+
+        # assert that renaming of the file went undetected
+        assert not self.log_contains("File rename was detected:" + testfile + " -> " + renamedfile)
+
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/20010")
+    @unittest.skipIf(sys.platform.startswith("win"), "inode_marker is not supported on windows")
+    def test_inode_marker_based_identity_tracking(self):
+        """
+        File is picked up again if the contents of the marker file changes.
+        """
+
+        marker_location = os.path.join(self.working_dir, "marker")
+        with open(marker_location, 'w') as m:
+            m.write("very-unique-string")
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            close_eof="true",
+            input_raw="  file_identity.inode_marker.path: " + marker_location,
+        )
+
+        testfile = os.path.join(self.working_dir, "log", "test.log")
+        self.__write_hello_word_to_test_input_file(testfile)
+
+        proc = self.start_beat()
+
+        # wait until the file is picked up
+        self.wait_until(lambda: self.log_contains("Start harvester for new file: " + testfile))
+
+        # change the ID in the marker file to simulate a new file
+        with open(marker_location, 'w') as m:
+            m.write("different-very-unique-id")
+
+        self.wait_until(lambda: self.log_contains("Start harvester for new file: " + testfile))
+
+        # wait until the both messages are received by the output
+        self.wait_until(lambda: self.output_has(lines=2))
+        proc.check_kill_and_wait()
+
+    @unittest.skipIf(sys.platform.startswith("win"), "inode_marker is not supported on windows")
+    def test_inode_marker_based_identity_tracking_to_path_based(self):
+        """
+        File reading can be continued after file_identity is changed.
+        """
+
+        marker_location = os.path.join(self.working_dir, "marker")
+        with open(marker_location, 'w') as m:
+            m.write("very-unique-string")
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            input_raw="  file_identity.inode_marker.path: " + marker_location,
+        )
+
+        testfile = os.path.join(self.working_dir, "log", "test.log")
+        self.__write_hello_word_to_test_input_file(testfile)
+
+        proc = self.start_beat()
+
+        # wait until the file is picked up
+        self.wait_until(lambda: self.log_contains("Start harvester for new file: " + testfile))
+
+        self.wait_until(lambda: self.output_has(lines=1))
+        proc.check_kill_and_wait()
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            rotateonstartup="false",
+            input_raw="  file_identity.path: ~",
+        )
+
+        with open(testfile, 'w+') as f:
+            f.write("hello world again\n")
+
+        proc = self.start_beat()
+
+        # on startup output is rotated
+        self.wait_until(lambda: self.output_has(lines=1, output_file="output/filebeat.1"))
+        self.wait_until(lambda: self.output_has(lines=1))
+        proc.check_kill_and_wait()
+
+    def __write_hello_word_to_test_input_file(self, testfile):
+        os.mkdir(self.working_dir + "/log/")
+        with open(testfile, 'w') as f:
+            f.write("hello world\n")

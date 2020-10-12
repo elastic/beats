@@ -35,7 +35,7 @@ func TestRegxpCreate(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestContainsMultiFieldPositiveMatch(t *testing.T) {

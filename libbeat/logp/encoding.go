@@ -44,13 +44,13 @@ func buildEncoder(cfg Config) zapcore.Encoder {
 	var encCfg zapcore.EncoderConfig
 	var encCreator encoderCreator
 	if cfg.JSON {
-		encCfg = jsonEncoderConfig()
+		encCfg = JSONEncoderConfig()
 		encCreator = zapcore.NewJSONEncoder
 	} else if cfg.ToSyslog {
-		encCfg = syslogEncoderConfig()
+		encCfg = SyslogEncoderConfig()
 		encCreator = zapcore.NewConsoleEncoder
 	} else {
-		encCfg = consoleEncoderConfig()
+		encCfg = ConsoleEncoderConfig()
 		encCreator = zapcore.NewConsoleEncoder
 	}
 
@@ -60,19 +60,19 @@ func buildEncoder(cfg Config) zapcore.Encoder {
 	return encCreator(encCfg)
 }
 
-func jsonEncoderConfig() zapcore.EncoderConfig {
+func JSONEncoderConfig() zapcore.EncoderConfig {
 	return baseEncodingConfig
 }
 
-func consoleEncoderConfig() zapcore.EncoderConfig {
+func ConsoleEncoderConfig() zapcore.EncoderConfig {
 	c := baseEncodingConfig
 	c.EncodeLevel = zapcore.CapitalLevelEncoder
 	c.EncodeName = bracketedNameEncoder
 	return c
 }
 
-func syslogEncoderConfig() zapcore.EncoderConfig {
-	c := consoleEncoderConfig()
+func SyslogEncoderConfig() zapcore.EncoderConfig {
+	c := ConsoleEncoderConfig()
 	// Time is generally added by syslog.
 	// But when logging with ECS the empty TimeKey will be
 	// ignored and @timestamp is still added to log line

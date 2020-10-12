@@ -24,10 +24,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
 	"github.com/gofrs/uuid"
@@ -118,11 +114,4 @@ func TestEmptyMetaJson(t *testing.T) {
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
-}
-
-func TestAPMTracerDisabledByDefault(t *testing.T) {
-	tracer, err := apm.NewTracer("", "")
-	require.NoError(t, err)
-	defer tracer.Close()
-	assert.False(t, tracer.Active())
 }

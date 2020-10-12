@@ -378,7 +378,7 @@ func newEventBase(env *events.Envelope) eventBase {
 
 func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 	msg := env.GetHttpStartStop()
-	return &EventHttpAccess{
+	e := EventHttpAccess{
 		eventAppBase: eventAppBase{
 			eventBase: newEventBase(env),
 			appGuid:   formatUUID(msg.ApplicationId),
@@ -393,9 +393,12 @@ func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 		userAgent:      *msg.UserAgent,
 		statusCode:     *msg.StatusCode,
 		contentLength:  *msg.ContentLength,
-		instanceIndex:  *msg.InstanceIndex,
 		forwarded:      msg.Forwarded,
 	}
+	if msg.InstanceIndex != nil {
+		e.instanceIndex = *msg.InstanceIndex
+	}
+	return &e
 }
 
 func newEventLog(env *events.Envelope) *EventLog {
@@ -489,13 +492,19 @@ func envelopMap(evt Event) common.MapStr {
 func baseMap(evt Event) common.MapStr {
 	return common.MapStr{
 		"cloudfoundry": common.MapStr{
-			"type": evt.String(),
-			evt.String(): common.MapStr{
-				"timestamp": evt.Timestamp(),
-			},
+			"type":     evt.String(),
 			"envelope": envelopMap(evt),
+			"tags":     dedotedTags(evt.Tags()),
 		},
 	}
+}
+
+func dedotedTags(tags map[string]string) common.MapStr {
+	result := common.MapStr{}
+	for name, value := range tags {
+		result[common.DeDot(name)] = value
+	}
+	return result
 }
 
 func baseMapWithApp(evt EventWithAppID) common.MapStr {

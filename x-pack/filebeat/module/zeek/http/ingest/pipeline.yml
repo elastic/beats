@@ -1,8 +1,11 @@
 description: Pipeline for normalizing Zeek http.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.http.ts
     formats:
@@ -49,9 +52,6 @@ processors:
     ignore_missing: true
 - user_agent:
     field: user_agent.original
-    ignore_missing: true
-- lowercase:
-    field: "http.request.method"
     ignore_missing: true
 - lowercase:
     field: "event.action"

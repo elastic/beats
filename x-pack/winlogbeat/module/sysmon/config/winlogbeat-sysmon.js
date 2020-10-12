@@ -15,7 +15,8 @@ if (!String.prototype.startsWith) {
 var sysmon = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
+    var net = require("net");
 
     // Windows error codes for DNS. This list was generated using
     // 'go run gen_dns_error_codes.go'.
@@ -310,7 +311,7 @@ var sysmon = (function () {
         if (!commandLine) {
             return;
         }
-        evt.Put(target, winlogbeat.splitCommandLine(commandLine));
+        evt.Put(target, windows.splitCommandLine(commandLine));
     };
 
     var splitProcessArgs = function (evt) {
@@ -331,8 +332,19 @@ var sysmon = (function () {
             evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
             evt.Put("user.name", userParts[1]);
+            evt.AppendTo("related.user", userParts[1]);
             evt.Delete("winlog.event_data.User");
         }
+    };
+
+    var setRuleName = function (evt) {
+        var ruleName = evt.Get("winlog.event_data.RuleName");
+        if (!ruleName || ruleName === "-") {
+            return;
+        }
+
+        evt.Put("rule.name", ruleName);
+        evt.Delete("winlog.event_data.RuleName");
     };
 
     var addNetworkDirection = function (evt) {
@@ -360,7 +372,39 @@ var sysmon = (function () {
         evt.Delete("winlog.event_data.DestinationIsIpv6");
     };
 
-    var addHashes = function (evt, hashField) {
+    var setRelatedIP = function (evt) {
+        var sourceIP = evt.Get("source.ip");
+        if (sourceIP) {
+            evt.AppendTo("related.ip", sourceIP);
+        }
+
+        var destIP = evt.Get("destination.ip");
+        if (destIP) {
+            evt.AppendTo("related.ip", destIP);
+        }
+    };
+
+    var getHashPath = function (namespace, hashKey) {
+        if (hashKey === "imphash") {
+            return namespace + ".pe.imphash";
+        }
+
+        return namespace + ".hash." + hashKey;
+    };
+
+    var emptyHashRegex = /^0*$/;
+
+    var hashIsEmpty = function (value) {
+        if (!value) {
+            return true;
+        }
+
+        return emptyHashRegex.test(value);
+    }
+
+    // Adds hashes from the given hashField in the event to the 'hash' key
+    // in the specified namespace. It also adds all the hashes to 'related.hash'.
+    var addHashes = function (evt, namespace, hashField) {
         var hashes = evt.Get(hashField);
         evt.Delete(hashField);
         hashes.split(",").forEach(function (hash) {
@@ -371,16 +415,28 @@ var sysmon = (function () {
 
             var key = parts[0].toLowerCase();
             var value = parts[1].toLowerCase();
-            evt.Put("hash." + key, value);
+
+            if (hashIsEmpty(value)) {
+                return;
+            }
+
+            var path = getHashPath(namespace, key);
+
+            evt.Put(path, value);
+            evt.AppendTo("related.hash", value);
         });
     };
 
-    var splitHashes = function (evt) {
-        addHashes(evt, "winlog.event_data.Hashes");
+    var splitFileHashes = function (evt) {
+        addHashes(evt, "file", "winlog.event_data.Hashes");
     };
 
-    var splitHash = function (evt) {
-        addHashes(evt, "winlog.event_data.Hash");
+    var splitFileHash = function (evt) {
+        addHashes(evt, "file", "winlog.event_data.Hash");
+    };
+
+    var splitProcessHashes = function (evt) {
+        addHashes(evt, "process", "winlog.event_data.Hashes");
     };
 
     var removeEmptyEventData = function (evt) {
@@ -432,17 +488,19 @@ var sysmon = (function () {
             } else {
                 // Convert V4MAPPED addresses.
                 answer = answer.replace("::ffff:", "");
-                ips.push(answer);
+                if (net.isIP(answer)) {
+                    ips.push(answer);
 
-                // Synthesize record type based on IP address type.
-                var type = "A";
-                if (answer.indexOf(":") !== -1) {
-                    type = "AAAA";
+                    // Synthesize record type based on IP address type.
+                    var type = "A";
+                    if (answer.indexOf(":") !== -1) {
+                        type = "AAAA";
+                    }
+                    answers.push({
+                        type: type,
+                        data: answer,
+                    });
                 }
-                answers.push({
-                    type: type,
-                    data: answer,
-                });
             }
         }
 
@@ -472,6 +530,28 @@ var sysmon = (function () {
         evt.Put("file.code_signature.signed", true);
         var signatureStatus = evt.Get("winlog.event_data.SignatureStatus");
         evt.Put("file.code_signature.valid", signatureStatus === "Valid");
+    };
+
+    var setAdditionalFileFieldsFromPath = function (evt) {
+        var filePath = evt.Get("file.path");
+        if (!filePath) {
+            return;
+        }
+
+        evt.Put("file.name", path.basename(filePath));
+        evt.Put("file.directory", path.dirname(filePath));
+
+        // path returns extensions with a preceding ., e.g.: .tmp, .png
+        // according to ecs the expected format is without it, so we need to remove it.
+        var ext = path.extname(filePath);
+        if (!ext) {
+            return;
+        }
+
+        if (ext.charAt(0) === ".") {
+            ext = ext.substr(1);
+        }
+        evt.Put("file.extension", ext);
     };
 
     // https://docs.microsoft.com/en-us/windows/win32/sysinfo/registry-hives
@@ -549,14 +629,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["start", "process_start"],
+                category: ["process"],
+                type: ["start", "process_start"],
             },
-            target: "",
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -603,10 +682,11 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(splitProcessArgs)
         .Add(addUser)
-        .Add(splitHashes)
+        .Add(splitProcessHashes)
         .Add(setParentProcessNameUsingExe)
         .Add(splitParentProcessArgs)
         .Add(removeEmptyEventData)
@@ -617,13 +697,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["change"],
+                category: ["file"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -649,6 +729,8 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -658,13 +740,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["network"],
-                "event.type": ["connection", "start", "protocol"],
+                category: ["network"],
+                type: ["connection", "start", "protocol"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -724,6 +806,8 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setRelatedIP)
         .Add(setProcessNameUsingExe)
         .Add(addUser)
         .Add(addNetworkDirection)
@@ -737,17 +821,16 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["change"],
+                category: ["process"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -760,14 +843,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["end", "process_end"],
+                category: ["process"],
+                type: ["end", "process_end"],
             },
-            target: "",
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -789,6 +871,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -798,13 +881,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["driver"],
-                "event.type": ["start"],
+                category: ["driver"],
+                type: ["start"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -818,8 +901,7 @@ var sysmon = (function () {
             fail_on_error: false,
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.Signature",
                     to: "file.code_signature.subject_name",
                 },
@@ -830,8 +912,10 @@ var sysmon = (function () {
             ],
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setAdditionalSignatureFields)
-        .Add(splitHashes)
+        .Add(splitFileHashes)
         .Add(removeEmptyEventData)
         .Build();
 
@@ -840,13 +924,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["change"],
+                category: ["process"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -873,8 +957,7 @@ var sysmon = (function () {
             fail_on_error: false,
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.Signature",
                     to: "file.code_signature.subject_name",
                 },
@@ -885,9 +968,11 @@ var sysmon = (function () {
             ],
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setAdditionalSignatureFields)
         .Add(setProcessNameUsingExe)
-        .Add(splitHashes)
+        .Add(splitFileHashes)
         .Add(removeEmptyEventData)
         .Build();
 
@@ -895,8 +980,7 @@ var sysmon = (function () {
     var event8 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -918,6 +1002,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -926,8 +1011,7 @@ var sysmon = (function () {
     var event9 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -953,6 +1037,8 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -962,13 +1048,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["access"],
+                category: ["process"],
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -995,6 +1081,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -1004,13 +1091,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["creation"],
+                category: ["file"],
+                type: ["creation"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1036,6 +1123,8 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -1044,8 +1133,7 @@ var sysmon = (function () {
     var event12 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1067,6 +1155,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -1076,8 +1165,7 @@ var sysmon = (function () {
     var event13 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1099,6 +1187,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -1108,8 +1197,7 @@ var sysmon = (function () {
     var event14 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1131,6 +1219,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -1141,13 +1230,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["access"],
+                category: ["file"],
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1173,8 +1262,10 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(setProcessNameUsingExe)
-        .Add(splitHash)
+        .Add(splitFileHash)
         .Add(removeEmptyEventData)
         .Build();
 
@@ -1182,12 +1273,10 @@ var sysmon = (function () {
     var event16 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -1200,13 +1289,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["creation"],
+                category: ["file"], // pipes are files
+                type: ["creation"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1232,6 +1321,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -1241,13 +1331,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["access"],
+                category: ["file"], // pipes are files
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1273,6 +1363,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -1281,16 +1372,15 @@ var sysmon = (function () {
     var event19 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(addUser)
         .Add(removeEmptyEventData)
         .Build();
@@ -1299,8 +1389,7 @@ var sysmon = (function () {
     var event20 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1313,6 +1402,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(addUser)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -1322,16 +1412,15 @@ var sysmon = (function () {
     var event21 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(addUser)
         .Add(removeEmptyEventData)
         .Build();
@@ -1341,16 +1430,19 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["network"],
-                "event.type": ["connection", "protocol", "info"],
+                category: ["network"],
+                type: ["connection", "protocol", "info"],
             },
-            network: {
+            target: "event",
+        })
+        .AddFields({
+            fields: {
                 protocol: "dns",
             },
+            target: "network",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1386,6 +1478,7 @@ var sysmon = (function () {
             field: "dns.question.name",
             target_field: "dns.question.registered_domain",
         })
+        .Add(setRuleName)
         .Add(translateDnsQueryStatus)
         .Add(splitDnsQueryResults)
         .Add(setProcessNameUsingExe)
@@ -1397,13 +1490,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["deletion"],
+                category: ["file"], // pipes are files
+                type: ["deletion"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1422,7 +1515,7 @@ var sysmon = (function () {
                 },
                 {
                     from: "winlog.event_data.TargetFilename",
-                    to: "file.name",
+                    to: "file.path",
                 },
                 {
                     from: "winlog.event_data.Image",
@@ -1443,9 +1536,11 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRuleName)
         .Add(addUser)
-        .Add(splitHashes)
+        .Add(splitProcessHashes)
         .Add(setProcessNameUsingExe)
+        .Add(setAdditionalFileFieldsFromPath)
         .Add(removeEmptyEventData)
         .Build();
 
@@ -1453,8 +1548,7 @@ var sysmon = (function () {
     var event255 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },

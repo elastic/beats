@@ -28,6 +28,11 @@
               description: >
                 List of redirects followed to arrive at final content. Last item on the list is the URL for which
                 body content is shown.
+            - name: headers.*
+              type: object
+              enabled: false
+              description: >
+                The canonical headers of the monitored HTTP response.
         - name: rtt
           type: group
           description: >

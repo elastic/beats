@@ -7,11 +7,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -38,7 +41,9 @@ const (
 	buildDir       = "build"
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
+	devEnv         = "DEV"
 	configFile     = "elastic-agent.yml"
+	agentDropPath  = "AGENT_DROP_PATH"
 )
 
 // Aliases for commands required by master makefile
@@ -76,11 +81,34 @@ type Format mg.Namespace
 // Demo runs agent out of container.
 type Demo mg.Namespace
 
+// Dev runs package and build for dev purposes.
+type Dev mg.Namespace
+
 // Env returns information about the environment.
 func (Prepare) Env() {
 	mg.Deps(Mkdir("build"), Build.GenerateConfig)
 	RunGo("version")
 	RunGo("env")
+}
+
+// Build builds the agent binary with DEV flag set.
+func (Dev) Build() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	mg.Deps(Build.All)
+}
+
+// Package packages the agent binary with DEV flag set.
+func (Dev) Package() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	Package()
 }
 
 // InstallGoLicenser install go-licenser to check license of the files.
@@ -108,7 +136,7 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
 	return devtools.GolangCrossBuild(params)
 }
 
@@ -117,7 +145,8 @@ func GolangCrossBuildOSS() error {
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.OutputDir = "build/golang-crossbuild"
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
+
 	if err := devtools.GolangCrossBuild(params); err != nil {
 		return err
 	}
@@ -136,32 +165,23 @@ func BuildGoDaemon() error {
 // BinaryOSS build the fleet artifact.
 func (Build) BinaryOSS() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent-oss"),
-		"-ldflags", flags(),
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.Name = "elastic-agent-oss"
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Binary build the fleet artifact.
 func (Build) Binary() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-	)
-}
 
-// Dev make a special build with the Dev tags.
-func (Build) Dev() error {
-	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-tags", "dev",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Clean up dev environment.
@@ -173,9 +193,15 @@ func (Build) Clean() {
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
+	configurableName := "configurable"
+	serviceableName := "serviceable"
+	if runtime.GOOS == "windows" {
+		configurableName += ".exe"
+		serviceableName += ".exe"
+	}
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86", "main.go")),
-		RunGo("build", "-o", filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "configurablebyfile"), filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -236,9 +262,10 @@ func (Test) All() {
 }
 
 // Unit runs all the unit tests.
-func (Test) Unit() error {
+func (Test) Unit(ctx context.Context) error {
 	mg.Deps(Prepare.Env, Build.TestBinaries)
-	return RunGo("test", "-race", "-v", "-coverprofile", filepath.Join(buildDir, "coverage.out"), "./...")
+	params := devtools.DefaultGoTestUnitArgs()
+	return devtools.GoTest(ctx, params)
 }
 
 // Coverage takes the coverages report from running all the tests and display the results in the browser.
@@ -268,14 +295,30 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	packageAgent([]string{
-		"darwin-x86_64.tar.gz",
-		"linux-x86.tar.gz",
-		"linux-x86_64.tar.gz",
-		"windows-x86.zip",
-		"windows-x86_64.zip",
-		"linux-arm64.tar.gz",
-	}, devtools.UseElasticAgentPackaging)
+	platformPackages := []struct {
+		platform string
+		packages string
+	}{
+		{"darwin/amd64", "darwin-x86_64.tar.gz"},
+		{"linux/386", "linux-x86.tar.gz"},
+		{"linux/amd64", "linux-x86_64.tar.gz"},
+		{"linux/arm64", "linux-arm64.tar.gz"},
+		{"windows/386", "windows-x86.zip"},
+		{"windows/amd64", "windows-x86_64.zip"},
+	}
+
+	var requiredPackages []string
+	for _, p := range platformPackages {
+		if _, enabled := devtools.Platforms.Get(p.platform); enabled {
+			requiredPackages = append(requiredPackages, p.packages)
+		}
+	}
+
+	if len(requiredPackages) == 0 {
+		panic("elastic-agent package is expected to include other packages")
+	}
+
+	packageAgent(requiredPackages, devtools.UseElasticAgentPackaging)
 }
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
@@ -325,25 +368,9 @@ func commitID() string {
 	return commitID
 }
 
-func flags() string {
-	return strings.Join(flagsSet(), " ")
-}
-
-func flagsSet() []string {
-	ts := time.Now().Format(time.RFC3339)
-	commitID := commitID()
-	isSnapshot, _ := os.LookupEnv(snapshotEnv)
-
-	return []string{
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.buildTime=%s"`, ts),
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.commit=%s"`, commitID),
-		fmt.Sprintf(` -X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot=%s"`, isSnapshot),
-	}
-}
-
-// Update is an alias for executing fields, dashboards, config, includes.
+// Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(Config, BuildSpec, BuildPGP, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -361,14 +388,29 @@ func Config() {
 	mg.Deps(configYML)
 }
 
+// ControlProto generates pkg/agent/control/proto module.
+func ControlProto() error {
+	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
+}
+
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
-	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/elastic-agent/pkg/agent/program/supported.go
 	goF := filepath.Join("dev-tools", "cmd", "buildspec", "buildspec.go")
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
 	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
+}
+
+func BuildPGP() error {
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildpgp/build_pgp.go --in x-pack/agent/spec/GPG-KEY-elasticsearch --out x-pack/elastic-agent/pkg/release/pgp.go
+	goF := filepath.Join("dev-tools", "cmd", "buildpgp", "build_pgp.go")
+	in := "GPG-KEY-elasticsearch"
+	out := filepath.Join("pkg", "release", "pgp.go")
+
+	fmt.Printf(">> BuildPGP from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -443,7 +485,14 @@ func (Demo) NoEnroll() error {
 }
 
 func runAgent(env map[string]string) error {
-	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+	prevPlatforms := os.Getenv("PLATFORMS")
+	defer os.Setenv("PLATFORMS", prevPlatforms)
+
+	// setting this improves build time
+	os.Setenv("PLATFORMS", "+all linux/amd64")
+	devtools.Platforms = devtools.NewPlatformList("+all linux/amd64")
+
+	supportedEnvs := map[string]int{"FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
 	dockerImageOut, err := sh.Output("docker", "image", "ls")
@@ -455,7 +504,6 @@ func runAgent(env map[string]string) error {
 	if !strings.Contains(dockerImageOut, tag) {
 		// produce docker package
 		packageAgent([]string{
-			"linux-x86.tar.gz",
 			"linux-x86_64.tar.gz",
 		}, devtools.UseElasticAgentDemoPackaging)
 
@@ -471,7 +519,11 @@ func runAgent(env map[string]string) error {
 	}
 
 	// prepare env variables
-	var envs []string
+	envs := []string{
+		// providing default kibana to be fixed for os-es if not provided
+		"KIBANA_HOST=http://localhost:5601",
+	}
+
 	envs = append(envs, os.Environ()...)
 	for k, v := range env {
 		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
@@ -484,6 +536,9 @@ func runAgent(env map[string]string) error {
 		if _, isSupported := supportedEnvs[parts[0]]; !isSupported {
 			continue
 		}
+
+		// fix value
+		e = fmt.Sprintf("%s=%s", parts[0], fixOsEnv(parts[0], parts[1]))
 
 		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
 	}
@@ -498,26 +553,50 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		version = release.Version()
 	}
 
-	packedBeats := []string{"filebeat", "metricbeat"}
-
-	for _, b := range packedBeats {
-		pwd, err := filepath.Abs(filepath.Join("..", b))
+	// build deps only when drop is not provided
+	if dropPathEnv, found := os.LookupEnv(agentDropPath); !found || len(dropPathEnv) == 0 {
+		// prepare new drop
+		dropPath := filepath.Join("build", "distributions", "elastic-agent-drop")
+		dropPath, err := filepath.Abs(dropPath)
 		if err != nil {
 			panic(err)
 		}
 
-		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
-			continue
+		if err := os.MkdirAll(dropPath, 0755); err != nil {
+			panic(err)
 		}
 
-		cmd := exec.Command("mage", "package")
-		cmd.Dir = pwd
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+		os.Setenv(agentDropPath, dropPath)
 
-		if err := cmd.Run(); err != nil {
-			panic(err)
+		// cleanup after build
+		defer os.RemoveAll(dropPath)
+		defer os.Unsetenv(agentDropPath)
+
+		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
+
+		for _, b := range packedBeats {
+			pwd, err := filepath.Abs(filepath.Join("..", b))
+			if err != nil {
+				panic(err)
+			}
+
+			if !requiredPackagesPresent(pwd, b, version, requiredPackages) {
+				cmd := exec.Command("mage", "package")
+				cmd.Dir = pwd
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+				if err := cmd.Run(); err != nil {
+					panic(err)
+				}
+			}
+
+			// copy to new drop
+			sourcePath := filepath.Join(pwd, "build", "distributions")
+			if err := copyAll(sourcePath, dropPath); err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -526,7 +605,24 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package)
+	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+func copyAll(from, to string) error {
+	return filepath.Walk(from, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		targetFile := filepath.Join(to, info.Name())
+
+		// overwrites with current build
+		return sh.Copy(targetFile, path)
+	})
 }
 
 func dockerTag() string {
@@ -539,4 +635,38 @@ func dockerTag() string {
 	}
 
 	return tagBase
+}
+
+func fixOsEnv(k, v string) string {
+	switch k {
+	case "KIBANA_HOST":
+		// network host works in a weird way here
+		if runtime.GOOS == "darwin" || runtime.GOOS == "windows" {
+			return strings.Replace(strings.ToLower(v), "localhost", "host.docker.internal", 1)
+		}
+	}
+
+	return v
+}
+
+func buildVars() map[string]string {
+	vars := make(map[string]string)
+
+	isSnapshot, _ := os.LookupEnv(snapshotEnv)
+	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
+		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowUpgrade"] = "true"
+		}
+	}
+
+	return vars
+}
+
+func injectBuildVars(m map[string]string) {
+	for k, v := range buildVars() {
+		m[k] = v
+	}
 }

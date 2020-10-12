@@ -54,7 +54,7 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 	for {
 		lenFrame, err = reader.getValidLengthFrame()
 		if err != nil {
-			return errors.Wrap(err, "error getting length frame")
+			return err
 		}
 		if lenFrame <= reader.maxSize {
 			break

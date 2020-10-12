@@ -6,41 +6,21 @@ package application
 
 import (
 	"context"
-	"io"
-	"net/http"
-	"net/url"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
-	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
-
-// EventProcessor is an processor of application event
-type reporter interface {
-	OnStarting(ctx context.Context, app string)
-	OnRunning(ctx context.Context, app string)
-	OnFailing(ctx context.Context, app string, err error)
-	OnStopping(ctx context.Context, app string)
-	OnStopped(ctx context.Context, app string)
-	OnFatal(ctx context.Context, app string, err error)
-}
-
-type sender interface {
-	Send(
-		ctx context.Context,
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
-}
 
 type operatorStream struct {
 	configHandler ConfigHandler
@@ -49,17 +29,21 @@ type operatorStream struct {
 }
 
 func (b *operatorStream) Close() error {
-	return b.configHandler.HandleConfig(&configRequest{})
+	return b.configHandler.Close()
 }
 
-func (b *operatorStream) Execute(cfg *configRequest) error {
+func (b *operatorStream) Execute(cfg configrequest.Request) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
-func streamFactory(ctx context.Context, cfg *config.Config, client sender, r reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
+func (b *operatorStream) Shutdown() {
+	b.configHandler.Shutdown()
+}
+
+func streamFactory(ctx context.Context, cfg *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
-		operator, err := newOperator(ctx, log, id, cfg, r, m)
+		operator, err := newOperator(ctx, log, id, cfg, srv, r, m)
 		if err != nil {
 			return nil, err
 		}
@@ -71,16 +55,22 @@ func streamFactory(ctx context.Context, cfg *config.Config, client sender, r rep
 	}
 }
 
-func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *config.Config, r reporter, m monitoring.Monitor) (*operation.Operator, error) {
-	operatorConfig := operatorCfg.DefaultConfig()
-	if err := config.Unpack(&operatorConfig); err != nil {
-		return nil, err
+func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) (*operation.Operator, error) {
+	fetcher := downloader.NewDownloader(log, config.DownloadConfig)
+	allowEmptyPgp, pgp := release.PGP()
+	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp)
+	if err != nil {
+		return nil, errors.New(err, "initiating verifier")
 	}
 
-	fetcher := downloader.NewDownloader(operatorConfig.DownloadConfig)
-	installer, err := install.NewInstaller(operatorConfig.DownloadConfig)
+	installer, err := install.NewInstaller(config.DownloadConfig)
 	if err != nil {
 		return nil, errors.New(err, "initiating installer")
+	}
+
+	uninstaller, err := uninstall.NewUninstaller()
+	if err != nil {
+		return nil, errors.New(err, "initiating uninstaller")
 	}
 
 	stateResolver, err := stateresolver.NewStateResolver(log)
@@ -94,8 +84,11 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		id,
 		config,
 		fetcher,
+		verifier,
 		installer,
+		uninstaller,
 		stateResolver,
+		srv,
 		r,
 		m,
 	)

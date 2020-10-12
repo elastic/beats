@@ -17,7 +17,7 @@
             "connection"
         ],
         "fileset.name": "access",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 404,
         "iis.access.sub_status": 4,
         "iis.access.win32_status": 2,
@@ -57,7 +57,7 @@
             "connection"
         ],
         "fileset.name": "access",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 200,
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,
@@ -90,7 +90,7 @@
             "connection"
         ],
         "fileset.name": "access",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 200,
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,
@@ -123,7 +123,7 @@
             "connection"
         ],
         "fileset.name": "access",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.status_code": 200,
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,

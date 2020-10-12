@@ -1,7 +1,0 @@
-{
-  "rules": {
-    "textlint-rule-common-misspellings": true,
-    "textlint-rule-write-good": true,
-    "textlint-rule-no-dead-link": true
-  }
-}

@@ -21,6 +21,7 @@ package users
 
 import (
 	"net"
+	"strconv"
 
 	"github.com/godbus/dbus"
 	"github.com/pkg/errors"
@@ -107,7 +108,7 @@ func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2
 			},
 			"user": common.MapStr{
 				"name": session.User,
-				"id":   session.UID,
+				"id":   strconv.Itoa(int(session.UID)),
 			},
 		}
 

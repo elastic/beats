@@ -104,7 +104,7 @@ func (c *configAppender) Append(event bus.Event) {
 		}
 
 		// Apply the template
-		template.ApplyConfigTemplate(event, cfgs, false)
+		template.ApplyConfigTemplate(event, cfgs)
 	}
 
 	// Replace old config with newly appended configs

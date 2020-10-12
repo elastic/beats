@@ -28,8 +28,6 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::{libbeat-dir}/repositories.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
@@ -45,4 +43,5 @@ include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
+
 

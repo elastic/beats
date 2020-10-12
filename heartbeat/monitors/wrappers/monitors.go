@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -31,32 +29,34 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, id string, name string, typ string, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(id, name, typ, len(js) > 1, sched, timeout)
+			return addMonitorMeta(stdMonFields, len(js) > 1)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
+func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
 			cont, e := job(event)
-			thisID := id
+			thisID := stdMonFields.ID
 
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -65,20 +65,25 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *sch
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", id, urlHash)
+				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
 			}
 
-			eventext.MergeEventFields(
-				event,
-				common.MapStr{
-					"monitor": common.MapStr{
-						"id":       thisID,
-						"name":     name,
-						"type":     typ,
-						"timespan": timespan(started, sched, timeout),
-					},
+			fieldsToMerge := common.MapStr{
+				"monitor": common.MapStr{
+					"id":       thisID,
+					"name":     stdMonFields.Name,
+					"type":     stdMonFields.Type,
+					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
 				},
-			)
+			}
+
+			if stdMonFields.ServiceName != "" {
+				fieldsToMerge["service"] = common.MapStr{
+					"name": stdMonFields.ServiceName,
+				}
+			}
+
+			eventext.MergeEventFields(event, fieldsToMerge)
 
 			return cont, e
 		}

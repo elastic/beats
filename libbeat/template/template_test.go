@@ -113,6 +113,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 7.x", func(t *testing.T) {
@@ -120,6 +121,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
@@ -127,6 +129,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 }
 

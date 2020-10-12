@@ -6,6 +6,7 @@ package googlecloud
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -54,7 +55,8 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	ecs := common.MapStr{
 		ECSCloud: common.MapStr{
 			ECSCloudAccount: common.MapStr{
-				ECSCloudAccountID: accountID,
+				ECSCloudAccountID:   accountID,
+				ECSCloudAccountName: accountID,
 			},
 			ECSCloudProvider: "googlecloud",
 		},
@@ -62,6 +64,12 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	if availabilityZone != "" {
 		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
+
+		// Get region name from availability zone name
+		region := getRegionName(availabilityZone)
+		if region != "" {
+			ecs[ECSCloud+"."+ECSCloudRegion] = region
+		}
 	}
 
 	//Remove keys from resource that refers to ECS fields
@@ -168,4 +176,13 @@ func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Po
 	}
 
 	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
+}
+
+func getRegionName(availabilityZone string) (region string) {
+	azSplit := strings.Split(availabilityZone, "-")
+	if len(azSplit) != 3 {
+		return ""
+	}
+	region = azSplit[0] + "-" + azSplit[1]
+	return
 }

@@ -26,7 +26,10 @@ func TestFetch(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	assert.NotEmpty(t, events)
+	if events != nil {
+		assert.NotEmpty(t, events)
+	}
+
 }
 
 func TestData(t *testing.T) {

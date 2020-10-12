@@ -45,12 +45,14 @@ processors:
 - dns:
     type: reverse
     action: append
+    transport: tls
     fields:
       server.ip: server.hostname
       client.ip: client.hostname
     success_cache:
       capacity.initial: 1000
       capacity.max: 10000
+      min_ttl: 1m
     failure_cache:
       capacity.initial: 1000
       capacity.max: 10000
@@ -80,6 +82,9 @@ the memory for this number of items. Default value is `1000`.
 cache can hold. When the maximum capacity is reached a random item is evicted.
 Default value is `10000`.
 
+`success_cache.min_ttl`:: The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached.
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
+
 `failure_cache.capacity.initial`:: The initial number of items that the failure
 cache will be allocated to hold. When initialized the processor will allocate
 the memory for this number of items. Default value is `1000`.
@@ -104,3 +109,6 @@ for each DNS request so if you have 2 nameservers then the total timeout will be
 `tag_on_failure`:: A list of tags to add to the event when any lookup fails. The
 tags are only added once even if multiple lookups fail. By default no tags are
 added upon failure.
+
+`transport`:: The type of transport connection that should be used can either be
+`tls` (DNS over TLS) or `udp`. Defaults to `udp`.

@@ -149,9 +149,6 @@ func WithAgentMeta() modifier {
 			"name":         info.Hostname,
 			"type":         info.Beat,
 			"version":      info.Version,
-			// hostname is deprecated. To be removed for 8.0. It's not in ECS.
-			// See https://github.com/elastic/beats/issues/16377.
-			"hostname": info.Hostname,
 		}
 		if info.Name != "" {
 			metadata["name"] = info.Name

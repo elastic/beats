@@ -19,6 +19,7 @@ package template
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -319,11 +320,12 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 
 	for _, otp := range otParams {
 		dynProperties := getDefaultProperties(f)
+		var matchingType string
 
 		switch otp.ObjectType {
 		case "scaled_float":
 			dynProperties = p.scaledFloat(f, common.MapStr{scalingFactorKey: otp.ScalingFactor})
-			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
+			matchingType = matchType("*", otp.ObjectTypeMappingType)
 		case "text":
 			dynProperties["type"] = "text"
 
@@ -331,17 +333,38 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 				dynProperties["type"] = "string"
 				dynProperties["index"] = "analyzed"
 			}
-			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+			matchingType = matchType("string", otp.ObjectTypeMappingType)
 		case "keyword":
 			dynProperties["type"] = otp.ObjectType
-			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+			matchingType = matchType("string", otp.ObjectTypeMappingType)
 		case "byte", "double", "float", "long", "short", "boolean":
 			dynProperties["type"] = otp.ObjectType
-			addDynamicTemplate(f, dynProperties, matchType(otp.ObjectType, otp.ObjectTypeMappingType))
+			matchingType = matchType(otp.ObjectType, otp.ObjectTypeMappingType)
 		case "histogram":
 			dynProperties["type"] = otp.ObjectType
-			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
+			matchingType = matchType("*", otp.ObjectTypeMappingType)
+		default:
+			continue
 		}
+
+		path := f.Path
+		if len(path) > 0 {
+			path += "."
+		}
+		path += f.Name
+		pathMatch := path
+		// ensure the `path_match` string ends with a `*`
+		if !strings.ContainsRune(path, '*') {
+			pathMatch += ".*"
+		}
+		// When multiple object type parameters are detected for a field,
+		// add a unique part to the name of the dynamic template.
+		// Duplicated dynamic template names can lead to errors when template
+		// inheritance is applied, and will not be supported in future versions
+		if len(otParams) > 1 {
+			path = fmt.Sprintf("%s_%s", path, matchingType)
+		}
+		addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
 	}
 
 	properties := getDefaultProperties(f)
@@ -357,18 +380,10 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func addDynamicTemplate(f *mapping.Field, properties common.MapStr, matchType string) {
-	path := ""
-	if len(f.Path) > 0 {
-		path = f.Path + "."
-	}
-	pathMatch := path + f.Name
-	if !strings.ContainsRune(pathMatch, '*') {
-		pathMatch += ".*"
-	}
+func addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
 	template := common.MapStr{
 		// Set the path of the field as name
-		path + f.Name: common.MapStr{
+		path: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
 			"path_match":         pathMatch,

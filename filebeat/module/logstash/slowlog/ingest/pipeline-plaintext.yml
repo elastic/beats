@@ -1,0 +1,68 @@
+description: Pipeline for parsing logstash slowlogs in the plain format
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+processors:
+- grok:
+    field: message
+    pattern_definitions:
+      LOGSTASH_CLASS_MODULE: '[\w\.]+\s*'
+      LOGSTASH_LOGLEVEL: INFO|ERROR|DEBUG|FATAL|WARN|TRACE
+    patterns:
+    - \[%{TIMESTAMP_ISO8601:logstash.slowlog.timestamp}\]\[%{LOGSTASH_LOGLEVEL:log.level}\s?\]\[%{LOGSTASH_CLASS_MODULE:logstash.slowlog.module}\]
+      %{GREEDYDATA:message}
+- grok:
+    field: logstash.slowlog.module
+    patterns:
+    - slowlog.logstash.%{WORD:logstash.slowlog.plugin_type}.%{WORD:logstash.slowlog.plugin_name}
+- grok:
+    field: message
+    patterns:
+    - '{:plugin_params=>%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=>%{NUMBER:event.duration},
+      :took_in_millis=>%{NUMBER:logstash.slowlog.took_in_millis}, :event=>%{GREEDYDATA:logstash.slowlog.event}}'
+- date:
+    if: ctx.event.timezone == null
+    field: logstash.slowlog.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd'T'HH:mm:ss,SSS
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- date:
+    if: ctx.event.timezone != null
+    field: logstash.slowlog.timestamp
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd'T'HH:mm:ss,SSS
+    timezone: '{{ event.timezone }}'
+    on_failure:
+    - append:
+        field: error.message
+        value: '{{ _ingest.on_failure_message }}'
+- remove:
+    field:
+    - message
+    - logstash.slowlog.timestamp
+- convert:
+    field: event.duration
+    type: long
+- convert:
+    field: logstash.slowlog.took_in_millis
+    type: long
+- set:
+    field: event.kind
+    value: event
+- script:
+    lang: painless
+    source: >-
+      def errorLevels = ["ERROR", "FATAL"];
+      if (ctx?.log?.level != null) {
+        if (errorLevels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
+      }

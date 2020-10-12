@@ -5,15 +5,16 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "2528596280375797115",
-            "name": "gke-dev-next-oblt-dev-next-oblt-pool-404d7f0c-cpj6"
+            "id": "7925831082803123728",
+            "name": "heartbeat-tokyo"
         },
         "machine": {
-            "type": "n1-standard-4"
+            "type": "f1-micro"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "asia-northeast1-b",
+    "cloud.region": "asia-northeast1",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,7 +24,7 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 386
+                    "value": 422
                 },
                 "dropped_packets_count": {
                     "value": 7
@@ -32,13 +33,13 @@
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 4
+                        "value": 0.2
                     },
                     "usage_time": {
-                        "value": 106.88293868489563
+                        "value": 0.8921228461549617
                     },
                     "utilization": {
-                        "value": 0.4453455778537318
+                        "value": 0.07434357051291347
                     }
                 },
                 "uptime": {
@@ -46,11 +47,14 @@
                 }
             }
         },
-        "labels": {
-            "user": {
-                "goog-gke-node": ""
-            }
-        }
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.07434357051291347
+        },
+        "id": "7925831082803123728",
+        "name": "heartbeat-tokyo"
     },
     "metricset": {
         "name": "compute",

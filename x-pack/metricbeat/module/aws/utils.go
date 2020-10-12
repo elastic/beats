@@ -22,8 +22,13 @@ import (
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
+func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time, time.Time) {
 	endTime := time.Now()
+	if latency != 0 {
+		// add latency if config is not 0
+		endTime = endTime.Add(latency * -1)
+	}
+
 	// Set startTime double the period earlier than the endtime in order to
 	// make sure GetMetricDataRequest gets the latest data point for each metric.
 	return endTime.Add(period * -2), endTime
@@ -188,18 +193,28 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 		}
 
 		for _, resourceTag := range output.ResourceTagMappingList {
-			identifier, err := findIdentifierFromARN(*resourceTag.ResourceARN)
-			if err != nil {
-				err = errors.Wrap(err, "error findIdentifierFromARN")
+			shortIdentifier, err := FindShortIdentifierFromARN(*resourceTag.ResourceARN)
+			if err == nil {
+				resourceTagMap[shortIdentifier] = resourceTag.Tags
+			} else {
+				err = errors.Wrap(err, "error occurs when proccessing shortIdentifier")
 				return nil, err
 			}
-			resourceTagMap[identifier] = resourceTag.Tags
+
+			wholeIdentifier, err := FindWholeIdentifierFromARN(*resourceTag.ResourceARN)
+			if err == nil {
+				resourceTagMap[wholeIdentifier] = resourceTag.Tags
+			} else {
+				err = errors.Wrap(err, "error occurs when proccessing longIdentifier")
+				return nil, err
+			}
 		}
 	}
 	return resourceTagMap, nil
 }
 
-func findIdentifierFromARN(resourceARN string) (string, error) {
+// FindShortIdentifierFromARN function extracts short resource id from resource filed of ARN.
+func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
 		err = errors.Wrap(err, "error Parse arn")
@@ -217,4 +232,14 @@ func findIdentifierFromARN(resourceARN string) (string, error) {
 		return resourceARNSplit[0], nil
 	}
 	return strings.Join(resourceARNSplit[1:], "/"), nil
+}
+
+// FindWholeIdentifierFromARN funtion extracts whole resource filed of ARN
+func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
+	arnParsed, err := arn.Parse(resourceARN)
+	if err != nil {
+		err = errors.Wrap(err, "error Parse arn")
+		return "", err
+	}
+	return arnParsed.Resource, nil
 }

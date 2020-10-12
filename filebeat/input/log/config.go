@@ -27,49 +27,13 @@ import (
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
-)
-
-var (
-	defaultConfig = config{
-		// Common
-		ForwarderConfig: harvester.ForwarderConfig{
-			Type: cfg.DefaultType,
-		},
-		CleanInactive: 0,
-
-		// Input
-		Enabled:        true,
-		IgnoreOlder:    0,
-		ScanFrequency:  10 * time.Second,
-		CleanRemoved:   true,
-		HarvesterLimit: 0,
-		Symlinks:       false,
-		TailFiles:      false,
-		ScanSort:       "",
-		ScanOrder:      "asc",
-		RecursiveGlob:  true,
-
-		// Harvester
-		BufferSize:     16 * humanize.KiByte,
-		MaxBytes:       10 * humanize.MiByte,
-		LineTerminator: readfile.AutoLineTerminator,
-		LogConfig: LogConfig{
-			Backoff:       1 * time.Second,
-			BackoffFactor: 2,
-			MaxBackoff:    10 * time.Second,
-			CloseInactive: 5 * time.Minute,
-			CloseRemoved:  true,
-			CloseRenamed:  false,
-			CloseEOF:      false,
-			CloseTimeout:  0,
-		},
-	}
 )
 
 type config struct {
@@ -81,16 +45,17 @@ type config struct {
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
 	// Input
-	Enabled        bool            `config:"enabled"`
-	ExcludeFiles   []match.Matcher `config:"exclude_files"`
-	IgnoreOlder    time.Duration   `config:"ignore_older"`
-	Paths          []string        `config:"paths"`
-	ScanFrequency  time.Duration   `config:"scan_frequency" validate:"min=0,nonzero"`
-	CleanRemoved   bool            `config:"clean_removed"`
-	HarvesterLimit uint32          `config:"harvester_limit" validate:"min=0"`
-	Symlinks       bool            `config:"symlinks"`
-	TailFiles      bool            `config:"tail_files"`
-	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
+	Enabled        bool                    `config:"enabled"`
+	ExcludeFiles   []match.Matcher         `config:"exclude_files"`
+	IgnoreOlder    time.Duration           `config:"ignore_older"`
+	Paths          []string                `config:"paths"`
+	ScanFrequency  time.Duration           `config:"scan_frequency" validate:"min=0,nonzero"`
+	CleanRemoved   bool                    `config:"clean_removed"`
+	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
+	Symlinks       bool                    `config:"symlinks"`
+	TailFiles      bool                    `config:"tail_files"`
+	RecursiveGlob  bool                    `config:"recursive_glob.enabled"`
+	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
 
 	// Harvester
 	BufferSize int    `config:"harvester_buffer_size"`
@@ -145,6 +110,44 @@ var ValidScanSort = map[string]struct{}{
 	ScanSortNone:     {},
 	ScanSortModtime:  {},
 	ScanSortFilename: {},
+}
+
+func defaultConfig() config {
+	return config{
+		// Common
+		ForwarderConfig: harvester.ForwarderConfig{
+			Type: cfg.DefaultType,
+		},
+		CleanInactive: 0,
+
+		// Input
+		Enabled:        true,
+		IgnoreOlder:    0,
+		ScanFrequency:  10 * time.Second,
+		CleanRemoved:   true,
+		HarvesterLimit: 0,
+		Symlinks:       false,
+		TailFiles:      false,
+		ScanSort:       "",
+		ScanOrder:      "asc",
+		RecursiveGlob:  true,
+		FileIdentity:   nil,
+
+		// Harvester
+		BufferSize:     16 * humanize.KiByte,
+		MaxBytes:       10 * humanize.MiByte,
+		LineTerminator: readfile.AutoLineTerminator,
+		LogConfig: LogConfig{
+			Backoff:       1 * time.Second,
+			BackoffFactor: 2,
+			MaxBackoff:    10 * time.Second,
+			CloseInactive: 5 * time.Minute,
+			CloseRemoved:  true,
+			CloseRenamed:  false,
+			CloseEOF:      false,
+			CloseTimeout:  0,
+		},
+	}
 }
 
 func (c *config) Validate() error {

@@ -10,7 +10,7 @@ include::../../_meta/shared-azure.asciidoc[]
 `resource_id`:: (_[]string_) The fully qualified ID's of the resource, including the resource name and resource type. Has the format /subscriptions/{guid}/resourceGroups/{resource-group-name}/providers/{resource-provider-namespace}/{resource-type}/{resource-name}.
   Should return a list of resources.
 
-`resource_group`:: (_[]string_) This option should return a list of storage accounts we want to apply our metric configuration options on.
+`resource_group`:: (_[]string_) This option will return all storage accounts inside the resource group.
 
 `service_type`:: (_[]string_) This configuration key can be used with any of the 2 options above, for example:
 

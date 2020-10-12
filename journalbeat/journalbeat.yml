@@ -18,6 +18,11 @@ journalbeat.inputs:
   # When empty starts to read from local journal.
 - paths: []
 
+  # An optional unique identifier for the input. By providing a unique `id` you
+  # can operate multiple inputs on the same journal. This allows each input's
+  # cursor to be persisted independently in the registry file.
+  #id: ""
+
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
   # The maximum number of seconds to wait before attempting to read again from journals.
@@ -182,6 +187,28 @@ processors:
 # that it is pointing to your Elasticsearch monitoring cluster, you can simply
 # uncomment the following line.
 #monitoring.elasticsearch:
+
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the journalbeat.
+#instrumentation:
+    # Set to true to enable instrumentation of journalbeat.
+    #enabled: false
+
+    # Environment in which journalbeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
 
 # ================================= Migration ==================================
 

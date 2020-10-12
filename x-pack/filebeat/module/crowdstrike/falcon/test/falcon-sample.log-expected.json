@@ -1,0 +1,424 @@
+[
+    {
+        "crowdstrike.event.ConnectionDirection": "1",
+        "crowdstrike.event.CustomerId": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.event.DeviceId": "718af202ab2c4ba5b6a5d10d39c0e0a5",
+        "crowdstrike.event.EventType": "FirewallRuleIP4Matched",
+        "crowdstrike.event.Flags.Audit": false,
+        "crowdstrike.event.Flags.Log": false,
+        "crowdstrike.event.Flags.Monitor": true,
+        "crowdstrike.event.HostName": "TESTDEVICE01",
+        "crowdstrike.event.Ipv": "ipv4",
+        "crowdstrike.event.LocalAddress": "10.37.60.194",
+        "crowdstrike.event.LocalPort": "445",
+        "crowdstrike.event.MatchCount": 1,
+        "crowdstrike.event.MatchCountSinceLastReport": 1,
+        "crowdstrike.event.NetworkProfile": "2",
+        "crowdstrike.event.PID": "206158879910",
+        "crowdstrike.event.PolicyID": "74e7f1552a3a4d90a6d65578642c8584",
+        "crowdstrike.event.PolicyName": "PROD-FW-Workstations-General",
+        "crowdstrike.event.Protocol": "6",
+        "crowdstrike.event.RemoteAddress": "10.37.60.21",
+        "crowdstrike.event.RemotePort": "54952",
+        "crowdstrike.event.RuleAction": "2",
+        "crowdstrike.event.RuleFamilyID": "fec73e96a1bf4481be582c3f89b234fa",
+        "crowdstrike.event.RuleGroupName": "SMB Rules",
+        "crowdstrike.event.RuleId": "4877172638743447345",
+        "crowdstrike.event.RuleName": "Inbound SMB Block & Log Private",
+        "crowdstrike.event.Timestamp": "2020-07-20T12:41:44Z",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-20T12:41:46.000Z",
+        "crowdstrike.metadata.eventType": "FirewallMatchEvent",
+        "crowdstrike.metadata.offset": 70689,
+        "crowdstrike.metadata.version": "1.0",
+        "destination.ip": "10.37.60.194",
+        "destination.port": "445",
+        "event.action": "firewall_match_event",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "FirewallRuleIP4Matched",
+        "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": [
+            "unknown"
+        ],
+        "event.type": [
+            "start",
+            "connection"
+        ],
+        "fileset.name": "falcon",
+        "host.name": "TESTDEVICE01",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "message": "Firewall Rule 'Inbound SMB Block & Log Private' triggered",
+        "network.direction": "inbound",
+        "network.type": "ipv4",
+        "process.pid": "206158879910",
+        "related.ip": [
+            "10.37.60.21",
+            "10.37.60.194"
+        ],
+        "rule.category": "fec73e96a1bf4481be582c3f89b234fa",
+        "rule.description": "",
+        "rule.id": "4877172638743447345",
+        "rule.name": "Inbound SMB Block & Log Private",
+        "rule.ruleset": "SMB Rules",
+        "service.type": "crowdstrike",
+        "source.ip": "10.37.60.21",
+        "source.port": "54952",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "crowdstrike.event.FalconHostLink": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:1234567893cd4e55b3a832ba2140478e:72e291e40c1544d390eabf135d875e54",
+        "crowdstrike.event.FineScore": 0.1,
+        "crowdstrike.event.IncidentEndTime": "2020-07-17T17:01:56.000Z",
+        "crowdstrike.event.IncidentStartTime": "2020-07-17T17:01:56.000Z",
+        "crowdstrike.event.LateralMovement": 0,
+        "crowdstrike.event.State": "open",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-17T17:02:08.414Z",
+        "crowdstrike.metadata.eventType": "IncidentSummaryEvent",
+        "crowdstrike.metadata.offset": 57181,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "incident",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.kind": "alert",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "info"
+        ],
+        "event.url": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:1234567893cd4e55b3a832ba2140478e:72e291e40c1544d390eabf135d875e54",
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1469,
+        "message": "Incident score 0.1",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "trace_id",
+                "ValueString": "b0b33836-555c-4e0e-a5ef-d368f6799f6b"
+            },
+            {
+                "Key": "actor_user",
+                "ValueString": "first.last@company.com"
+            },
+            {
+                "Key": "actor_user_uuid",
+                "ValueString": "123ab141-fab1-41c9-85c5-43a1ef90d2c2"
+            },
+            {
+                "Key": "actor_cid",
+                "ValueString": "774694c2ef8c43fdb64ec3056ddfb96d"
+            },
+            {
+                "Key": "target_user",
+                "ValueString": "first.last@company.com"
+            }
+        ],
+        "crowdstrike.event.OperationName": "saml2Assert",
+        "crowdstrike.event.ServiceName": "Crowdstrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-07-20T12:26:10.000Z",
+        "crowdstrike.event.UserId": "first.last@company.com",
+        "crowdstrike.event.UserIp": "165.225.220.184",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-20T12:26:10.093Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 70509,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "saml2_assert",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2041,
+        "message": "Crowdstrike Authentication",
+        "related.ip": "165.225.220.184",
+        "related.user": "first.last@company.com",
+        "service.type": "crowdstrike",
+        "source.ip": "165.225.220.184",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "first.last@company.com",
+        "user.name": "first.last@company.com"
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "quarantined_file_id",
+                "ValueString": "ab1cde05567b455b93afbe2d3df352c9_328024a065630f897f09963d4b67b0c95d4054f540c2ca8014d5b012718bfa21"
+            },
+            {
+                "Key": "action_taken",
+                "ValueString": "quarantined"
+            }
+        ],
+        "crowdstrike.event.OperationName": "quarantined_file_update",
+        "crowdstrike.event.ServiceName": "quarantined_files",
+        "crowdstrike.event.UTCTimestamp": "2020-07-20T12:41:25.000Z",
+        "crowdstrike.event.UserId": "Crowdstrike",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-20T12:41:25.000Z",
+        "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
+        "crowdstrike.metadata.offset": 70683,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_activity_audit_event",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 3219,
+        "message": "quarantined_file_update",
+        "related.user": "Crowdstrike",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.name": "Crowdstrike"
+    },
+    {
+        "crowdstrike.event.HostnameField": "TESTDEVICE01",
+        "crowdstrike.event.SessionId": "330633db-1cda-4355-b0d8-2c2edc91fe3e",
+        "crowdstrike.event.StartTimestamp": "2020-07-17T17:14:53.000Z",
+        "crowdstrike.event.UserName": "first.last@company.com",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-17T17:14:53.000Z",
+        "crowdstrike.metadata.eventType": "RemoteResponseSessionStartEvent",
+        "crowdstrike.metadata.offset": 57217,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "remote_response_session_start_event",
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "falcon",
+        "host.name": "TESTDEVICE01",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 4017,
+        "message": "Remote response session started",
+        "related.user": "first.last@company.com",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "first.last@company.com",
+        "user.name": "first.last@company.com"
+    },
+    {
+        "crowdstrike.event.Commands": [
+            "cd \\Program Files (x86)\\Symantec",
+            "ls .",
+            "cd \\Program Files (x86)",
+            "ls .",
+            "reg query HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default",
+            "reg set HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default GroupingTags -ValueType=```REG_SZ``` -Value=```Protect```",
+            "reg query HKEY_LOCAL_MACHINE\\SYSTEM\\CrowdStrike\\{9b03c1d9-3138-44ed-9fae-d9f4c034b88d}\\{16e0423f-7058-48c9-a204-725362b67639}\\Default",
+            "restart",
+            "restart -Confirm"
+        ],
+        "crowdstrike.event.EndTimestamp": "2020-07-17T17:28:19.000Z",
+        "crowdstrike.event.HostnameField": "TESTDEVICE01",
+        "crowdstrike.event.SessionId": "330633db-1cda-4355-b0d8-2c2edc91fe3e",
+        "crowdstrike.event.UserName": "first.last@company.com",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-17T17:28:19.000Z",
+        "crowdstrike.metadata.eventType": "RemoteResponseSessionEndEvent",
+        "crowdstrike.metadata.offset": 57269,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "remote_response_session_end_event",
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "end"
+        ],
+        "fileset.name": "falcon",
+        "host.name": "TESTDEVICE01",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 4466,
+        "message": "Remote response session ended",
+        "related.user": "first.last@company.com",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "first.last@company.com",
+        "user.name": "first.last@company.com"
+    },
+    {
+        "crowdstrike.event.CommandLine": "\"C:\\ProgramData\\file\\path\\filename.exe\" ",
+        "crowdstrike.event.ComputerName": "TESTDEVICE01",
+        "crowdstrike.event.DetectDescription": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
+        "crowdstrike.event.DetectId": "ldt:1abcd2345b8c4151a0cb45dcfbe6d3d0:124559902719",
+        "crowdstrike.event.DetectName": "NGAV",
+        "crowdstrike.event.ExecutablesWritten": [
+            {
+                "FileName": "NEURO_200_J1939Configuration.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            },
+            {
+                "FileName": "NEURO_200_J1939Configuration.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            },
+            {
+                "FileName": "NEURO_200_J1939CanPackMessage.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            },
+            {
+                "FileName": "NEURO_200_J1939CanPackMessage.mexw64",
+                "FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path\\is\\right\\here\\folder",
+                "Timestamp": 1595002290
+            }
+        ],
+        "crowdstrike.event.FalconHostLink": "https://falcon.crowdstrike.com/activity/detections/detail/1abcd2345b8c4151a0cb45dcfbe6d3d0/124559902719?_cid=12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.event.FileName": "filename.exe",
+        "crowdstrike.event.FilePath": "\\Device\\HarddiskVolume2\\ProgramData\\file\\path",
+        "crowdstrike.event.GrandparentCommandLine": "C:\\Windows\\system32\\userinit.exe",
+        "crowdstrike.event.GrandparentImageFileName": "\\Device\\HarddiskVolume2\\Windows\\System32\\userinit.exe",
+        "crowdstrike.event.IOCType": "hash_sha256",
+        "crowdstrike.event.IOCValue": "0a123b185f9a32fde1df59897089014c92e3d08a0533b54baa72ba2a93d64deb",
+        "crowdstrike.event.LocalIP": "10.1.190.117",
+        "crowdstrike.event.MACAddress": "54-ad-d4-d2-a8-0b",
+        "crowdstrike.event.MD5String": "0ab1235adca04aef6239f5496ef0a5df",
+        "crowdstrike.event.MachineDomain": "NA",
+        "crowdstrike.event.Objective": "Falcon Detection Method",
+        "crowdstrike.event.ParentCommandLine": "C:\\Windows\\Explorer.EXE",
+        "crowdstrike.event.ParentImageFileName": "\\Device\\HarddiskVolume2\\Windows\\explorer.exe",
+        "crowdstrike.event.ParentProcessId": 627311656469,
+        "crowdstrike.event.PatternDispositionDescription": "Detection, process would have been blocked if related prevention policy setting was enabled.",
+        "crowdstrike.event.PatternDispositionFlags.BootupSafeguardEnabled": false,
+        "crowdstrike.event.PatternDispositionFlags.CriticalProcessDisabled": false,
+        "crowdstrike.event.PatternDispositionFlags.Detect": false,
+        "crowdstrike.event.PatternDispositionFlags.FsOperationBlocked": false,
+        "crowdstrike.event.PatternDispositionFlags.InddetMask": false,
+        "crowdstrike.event.PatternDispositionFlags.Indicator": false,
+        "crowdstrike.event.PatternDispositionFlags.KillParent": false,
+        "crowdstrike.event.PatternDispositionFlags.KillProcess": false,
+        "crowdstrike.event.PatternDispositionFlags.KillSubProcess": false,
+        "crowdstrike.event.PatternDispositionFlags.OperationBlocked": false,
+        "crowdstrike.event.PatternDispositionFlags.PolicyDisabled": true,
+        "crowdstrike.event.PatternDispositionFlags.ProcessBlocked": true,
+        "crowdstrike.event.PatternDispositionFlags.QuarantineFile": false,
+        "crowdstrike.event.PatternDispositionFlags.QuarantineMachine": false,
+        "crowdstrike.event.PatternDispositionFlags.RegistryOperationBlocked": false,
+        "crowdstrike.event.PatternDispositionFlags.Rooting": false,
+        "crowdstrike.event.PatternDispositionFlags.SensorOnly": false,
+        "crowdstrike.event.PatternDispositionValue": 2304,
+        "crowdstrike.event.ProcessEndTime": "2020-07-17T16:11:30.000Z",
+        "crowdstrike.event.ProcessId": 663790158277,
+        "crowdstrike.event.ProcessStartTime": "2020-07-17T16:11:30.000Z",
+        "crowdstrike.event.SHA1String": "0000000000000000000000000000000000000000",
+        "crowdstrike.event.SHA256String": "0a123b185f9a32fde1df59897089014c92e3d08a0533b54baa72ba2a93d64deb",
+        "crowdstrike.event.SensorId": "1abcd2345b8c4151a0cb45dcfbe6d3d0",
+        "crowdstrike.event.Severity": 2,
+        "crowdstrike.event.SeverityName": "Low",
+        "crowdstrike.event.Tactic": "Machine Learning",
+        "crowdstrike.event.Technique": "Sensor-based ML",
+        "crowdstrike.event.UserName": "First.last",
+        "crowdstrike.metadata.customerIDString": "12345a1bc2d34fghi56jk7890lmno12p",
+        "crowdstrike.metadata.eventCreationTime": "2020-07-17T16:11:31.000Z",
+        "crowdstrike.metadata.eventType": "DetectionSummaryEvent",
+        "crowdstrike.metadata.offset": 57047,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "Detection, process would have been blocked if related prevention policy setting was enabled.",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.kind": "alert",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.severity": 2,
+        "event.type": [
+            "info"
+        ],
+        "event.url": "https://falcon.crowdstrike.com/activity/detections/detail/1abcd2345b8c4151a0cb45dcfbe6d3d0/124559902719?_cid=12345a1bc2d34fghi56jk7890lmno12p",
+        "file.hash.md5": "0ab1235adca04aef6239f5496ef0a5df",
+        "file.hash.sha1": "0000000000000000000000000000000000000000",
+        "file.hash.sha256": "0a123b185f9a32fde1df59897089014c92e3d08a0533b54baa72ba2a93d64deb",
+        "fileset.name": "falcon",
+        "host.name": "TESTDEVICE01",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 5646,
+        "message": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
+        "process.args": [
+            "\"C:\\ProgramData\\file\\path\\filename.exe\""
+        ],
+        "process.command_line": "\"C:\\ProgramData\\file\\path\\filename.exe\" ",
+        "process.executable": "\"C:\\ProgramData\\file\\path\\filename.exe\"",
+        "process.name": "filename.exe",
+        "process.parent.command_line": "C:\\Windows\\Explorer.EXE",
+        "process.parent.executable": "\\Device\\HarddiskVolume2\\Windows\\explorer.exe",
+        "process.pid": 663790158277,
+        "related.ip": "10.1.190.117",
+        "rule.description": "This file meets the machine learning-based on-sensor AV protection's low confidence threshold for malicious files.",
+        "rule.name": "NGAV",
+        "service.type": "crowdstrike",
+        "source.ip": "10.1.190.117",
+        "tags": [
+            "forwarded"
+        ],
+        "threat.tactic.name": "machine learning",
+        "threat.technique.name": "sensor-based ml",
+        "user.domain": "NA",
+        "user.name": "First.last"
+    }
+]

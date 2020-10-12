@@ -2,11 +2,10 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package tests
+package storage
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/storage"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,10 +53,10 @@ func TestFetch(t *testing.T) {
 	module, metricsets, err := mb.NewModule(c, mb.Registry)
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
-	assert.Nil(t, err)
-	ms, ok := metricsets[0].(*storage.MetricSet)
+	assert.NoError(t, err)
+	ms, ok := metricsets[0].(*MetricSet)
 	assert.Equal(t, len(ms.Client.Config.Resources), 1)
-	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", "Microsoft.Storage/storageAccounts"))
+	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace))
 
 	c, err = common.NewConfigFrom(resourceConfig)
 	if err != nil {
@@ -66,7 +65,7 @@ func TestFetch(t *testing.T) {
 	module, metricsets, err = mb.NewModule(c, mb.Registry)
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
-	ms, ok = metricsets[0].(*storage.MetricSet)
+	ms, ok = metricsets[0].(*MetricSet)
 	require.True(t, ok, "metricset must be MetricSet")
 	assert.NotNil(t, ms)
 }

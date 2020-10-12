@@ -13,7 +13,16 @@ The `elasticsearch` module collects metrics about {es}.
 The `elasticsearch` module works with {es} 6.7.0 and later.
 
 [float]
-=== Usage for Stack Monitoring
+=== Module-specific configuration notes
+
+Like other {beatname_uc} modules, the `elasticsearch` module accepts a `hosts` configuration setting.
+This setting can contain a list of entries. The related `scope` setting determines how each entry in
+the `hosts` list is interpreted by the module.
+
+* If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an
+  {es} cluster.
+* If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct
+  {es} cluster (for example, a load-balancing proxy fronting the cluster).
 
 The `elasticsearch` module can be used to collect metrics shown in our {stack} {monitor-features}
 UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
@@ -45,12 +54,9 @@ metricbeat.modules:
   #password: "changeme"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Set to false to fetch all entries
   #index_recovery.active_only: true
-
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
+  #scope: node
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

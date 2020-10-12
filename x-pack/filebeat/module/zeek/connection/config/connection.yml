@@ -4,13 +4,15 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.orig_bytes","json.resp_bytes","json.tunnel_parents"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
@@ -88,7 +90,6 @@ processors:
         kind: event
         category:
           - network
-{{ if .community_id }}
   - if:
       equals.network.transport: icmp
     then:
@@ -98,8 +99,7 @@ processors:
           icmp_code: zeek.connection.icmp.code
     else:
       community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

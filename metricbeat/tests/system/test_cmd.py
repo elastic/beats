@@ -124,6 +124,21 @@ class TestCommands(metricbeat.BaseTest):
         assert self.log_contains("cpu...OK")
         assert self.log_contains("memory...OK")
 
+    def test_modules_test_with_module_in_main_config(self):
+        self.render_config_template(reload=False, modules=[{
+            "name": "system",
+            "metricsets": ["cpu", "memory"],
+            "period": "10s",
+        }])
+
+        exit_code = self.run_beat(
+            logging_args=None,
+            extra_args=["test", "modules"])
+
+        assert exit_code == 0
+        assert self.log_contains("cpu...OK")
+        assert self.log_contains("memory...OK")
+
     def test_modules_test_error(self):
         """
         Test test modules command with an error result
@@ -141,7 +156,7 @@ class TestCommands(metricbeat.BaseTest):
                 self.log_contains("ERROR error fetching status"),
                 self.log_contains("ERROR timeout waiting for an event"),
             ))
-        except:
+        except BaseException:
             # Print log to help debugging this if error message changes
             print(self.get_log())
             raise

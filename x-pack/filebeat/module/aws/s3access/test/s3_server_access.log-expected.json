@@ -33,6 +33,7 @@
         "geo.city_name": "Ashburn",
         "geo.continent_name": "North America",
         "geo.country_iso_code": "US",
+        "geo.country_name": "United States",
         "geo.location.lat": 39.0481,
         "geo.location.lon": -77.4728,
         "geo.region_iso_code": "US-VA",
@@ -47,6 +48,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -92,6 +96,7 @@
         "geo.city_name": "Ashburn",
         "geo.continent_name": "North America",
         "geo.country_iso_code": "US",
+        "geo.country_name": "United States",
         "geo.location.lat": 39.0481,
         "geo.location.lon": -77.4728,
         "geo.region_iso_code": "US-VA",
@@ -106,6 +111,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -152,6 +160,7 @@
         "geo.city_name": "Ashburn",
         "geo.continent_name": "North America",
         "geo.country_iso_code": "US",
+        "geo.country_name": "United States",
         "geo.location.lat": 39.0481,
         "geo.location.lon": -77.4728,
         "geo.region_iso_code": "US-VA",
@@ -166,6 +175,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -211,6 +223,7 @@
         "geo.city_name": "Ashburn",
         "geo.continent_name": "North America",
         "geo.country_iso_code": "US",
+        "geo.country_name": "United States",
         "geo.location.lat": 39.0481,
         "geo.location.lon": -77.4728,
         "geo.region_iso_code": "US-VA",
@@ -225,6 +238,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -267,6 +283,7 @@
         "geo.city_name": "Teruel",
         "geo.continent_name": "Europe",
         "geo.country_iso_code": "ES",
+        "geo.country_name": "Spain",
         "geo.location.lat": 40.3456,
         "geo.location.lon": -1.1065,
         "geo.region_iso_code": "ES-TE",
@@ -281,6 +298,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
@@ -316,6 +336,7 @@
         "geo.city_name": "Denver",
         "geo.continent_name": "North America",
         "geo.country_iso_code": "US",
+        "geo.country_name": "United States",
         "geo.location.lat": 39.7044,
         "geo.location.lon": -105.0023,
         "geo.region_iso_code": "US-CO",
@@ -330,6 +351,9 @@
             "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2"
         ],
         "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"

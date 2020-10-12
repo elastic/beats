@@ -57,7 +57,7 @@ type agentInfo interface {
 }
 
 // NewReporter creates a new fleet reporter.
-func NewReporter(agentInfo agentInfo, l *logger.Logger, c *ManagementConfig) (*Reporter, error) {
+func NewReporter(agentInfo agentInfo, l *logger.Logger, c *Config) (*Reporter, error) {
 	r := &Reporter{
 		info:      agentInfo,
 		queue:     make([]fleetapi.SerializableEvent, 0),

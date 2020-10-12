@@ -22,6 +22,8 @@ import (
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -172,7 +174,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "NOSE_"), "GENERATE")...)
+	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {
 		return err
 	}
@@ -180,6 +182,6 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		return devtools.PythonNoseTest(args)
+		return devtools.PythonTest(args)
 	})
 }

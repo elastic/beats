@@ -12,6 +12,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+const (
+	// ActionTypeUpgrade specifies upgrade action.
+	ActionTypeUpgrade = "UPGRADE"
+	// ActionTypeUnenroll specifies unenroll action.
+	ActionTypeUnenroll = "UNENROLL"
+	// ActionTypePolicyChange specifies policy change action.
+	ActionTypePolicyChange = "POLICY_CHANGE"
+)
+
 // Action base interface for all the implemented action from the fleet API.
 type Action interface {
 	fmt.Stringer
@@ -57,14 +66,14 @@ func (a *ActionUnknown) OriginalType() string {
 	return a.originalType
 }
 
-// ActionConfigChange is a request to apply a new
-type ActionConfigChange struct {
+// ActionPolicyChange is a request to apply a new
+type ActionPolicyChange struct {
 	ActionID   string
 	ActionType string
-	Config     map[string]interface{} `json:"config"`
+	Policy     map[string]interface{} `json:"policy"`
 }
 
-func (a *ActionConfigChange) String() string {
+func (a *ActionPolicyChange) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
 	s.WriteString(a.ActionID)
@@ -74,12 +83,65 @@ func (a *ActionConfigChange) String() string {
 }
 
 // Type returns the type of the Action.
-func (a *ActionConfigChange) Type() string {
+func (a *ActionPolicyChange) Type() string {
 	return a.ActionType
 }
 
 // ID returns the ID of the Action.
-func (a *ActionConfigChange) ID() string {
+func (a *ActionPolicyChange) ID() string {
+	return a.ActionID
+}
+
+// ActionUpgrade is a request for agent to upgrade.
+type ActionUpgrade struct {
+	ActionID   string `json:"id" yaml:"id"`
+	ActionType string `json:"type" yaml:"type"`
+	Version    string `json:"version" yaml:"version"`
+	SourceURI  string `json:"source_uri,omitempty" yaml:"source_uri,omitempty"`
+}
+
+func (a *ActionUpgrade) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionUpgrade) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionUpgrade) ID() string {
+	return a.ActionID
+}
+
+// ActionUnenroll is a request for agent to unhook from fleet.
+type ActionUnenroll struct {
+	ActionID   string
+	ActionType string
+	IsDetected bool
+}
+
+func (a *ActionUnenroll) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionUnenroll) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionUnenroll) ID() string {
 	return a.ActionID
 }
 
@@ -107,14 +169,30 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 
 	for _, response := range responses {
 		switch response.ActionType {
-		case "CONFIG_CHANGE":
-			action = &ActionConfigChange{
+		case ActionTypePolicyChange:
+			action = &ActionPolicyChange{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
-					"fail to decode CONFIG_CHANGE action",
+					"fail to decode POLICY_CHANGE action",
+					errors.TypeConfig)
+			}
+		case ActionTypeUnenroll:
+			action = &ActionUnenroll{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+		case ActionTypeUpgrade:
+			action = &ActionUpgrade{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode UPGRADE_ACTION action",
 					errors.TypeConfig)
 			}
 		default:

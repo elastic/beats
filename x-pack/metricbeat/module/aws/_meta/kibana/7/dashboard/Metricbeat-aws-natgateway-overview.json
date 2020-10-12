@@ -438,7 +438,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -524,7 +524,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -609,7 +609,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -689,7 +689,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -766,7 +766,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -847,7 +847,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -928,7 +928,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -1009,7 +1009,7 @@
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -1095,7 +1095,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -1181,7 +1181,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -1267,7 +1267,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -1353,7 +1353,7 @@
               "query": ""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [

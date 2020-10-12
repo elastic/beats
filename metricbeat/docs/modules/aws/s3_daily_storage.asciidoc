@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-s3_daily_storage]]
+[role="xpack"]
 === AWS s3_daily_storage metricset
 
 include::../../../../x-pack/metricbeat/module/aws/s3_daily_storage/_meta/docs.asciidoc[]
