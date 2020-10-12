@@ -209,6 +209,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
 - auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
 - system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
+- system/socket: Fixed a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
 
 *Filebeat*
 
