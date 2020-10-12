@@ -219,17 +219,20 @@ func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
 	if p == nil {
 		return dict
 	}
+	var currentList *transpiler.List
 	current, ok := dict.Find("processors")
-	currentList, isList := current.Value().(*transpiler.List)
-	if !isList {
-		return dict
+	if ok {
+		currentList, ok = current.Value().(*transpiler.List)
+		if !ok {
+			return dict
+		}
 	}
 	ast, _ := transpiler.NewAST(map[string]interface{}{
 		"processors": p,
 	})
 	procs, _ := transpiler.Lookup(ast, "processors")
 	nodes := nodesFromList(procs.Value().(*transpiler.List))
-	if ok {
+	if ok && currentList != nil {
 		nodes = append(nodes, nodesFromList(currentList)...)
 	}
 	dictNodes := dict.Value().([]transpiler.Node)
