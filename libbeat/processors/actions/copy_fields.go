@@ -22,6 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -51,7 +53,7 @@ func init() {
 }
 
 // NewCopyFields returns a new copy_fields processor.
-func NewCopyFields(c *common.Config) (processors.Processor, error) {
+func NewCopyFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

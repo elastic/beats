@@ -26,6 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
@@ -58,7 +60,7 @@ type processor struct {
 //
 // Other IP-borne protocols:
 //   IP src / IP dst / IP proto
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")

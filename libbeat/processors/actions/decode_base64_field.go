@@ -21,6 +21,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -55,7 +56,7 @@ func init() {
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
-func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
+func NewDecodeBase64Field(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := base64Config{
 		IgnoreMissing: false,
 		FailOnError:   true,

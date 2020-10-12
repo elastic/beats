@@ -25,6 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -60,7 +62,7 @@ func init() {
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
-func NewTruncateFields(c *common.Config) (processors.Processor, error) {
+func NewTruncateFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {

@@ -24,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -58,7 +60,7 @@ func init() {
 }
 
 // New constructs a new add_locale processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{

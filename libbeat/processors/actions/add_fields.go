@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -47,7 +49,7 @@ func init() {
 }
 
 // CreateAddFields constructs an add_fields processor from config.
-func CreateAddFields(c *common.Config) (processors.Processor, error) {
+func CreateAddFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields common.MapStr `config:"fields" validate:"required"`
 		Target *string       `config:"target"`

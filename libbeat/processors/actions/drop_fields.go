@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
@@ -42,7 +43,7 @@ func init() {
 			checks.AllowedFields("fields", "when", "ignore_missing")))
 }
 
-func newDropFields(c *common.Config) (processors.Processor, error) {
+func newDropFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`

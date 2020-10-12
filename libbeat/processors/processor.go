@@ -20,7 +20,7 @@ package processors
 import (
 	"strings"
 
-	"github.com/joeshaw/multierror"
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,20 +42,6 @@ type Processor interface {
 	String() string
 }
 
-// Closer defines the interface for processors that should be closed after using
-// them.
-type Closer interface {
-	Close() error
-}
-
-// Close closes a processor if it implements the Closer interface
-func Close(p Processor) error {
-	if closer, ok := p.(Closer); ok {
-		return closer.Close()
-	}
-	return nil
-}
-
 // NewList creates a new empty processor list.
 // Additional processors can be added to the List field.
 func NewList(log *logp.Logger) *Processors {
@@ -66,7 +52,7 @@ func NewList(log *logp.Logger) *Processors {
 }
 
 // New creates a list of processors from a list of free user configurations.
-func New(config PluginConfig) (*Processors, error) {
+func New(group unison.Group, config PluginConfig) (*Processors, error) {
 	procs := NewList(nil)
 
 	for _, procConfig := range config {
@@ -105,7 +91,7 @@ func New(config PluginConfig) (*Processors, error) {
 
 		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
-		plugin, err := constructor(actionCfg)
+		plugin, err := constructor(group, actionCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -167,17 +153,6 @@ func (procs *Processors) All() []beat.Processor {
 		ret[i] = p
 	}
 	return ret
-}
-
-func (procs *Processors) Close() error {
-	var errs multierror.Errors
-	for _, p := range procs.List {
-		err := Close(p)
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return errs.Err()
 }
 
 // Run executes the all processors serially and returns the event and possibly

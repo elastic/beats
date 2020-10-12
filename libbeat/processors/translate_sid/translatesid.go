@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
@@ -51,7 +52,7 @@ type processor struct {
 
 // New returns a new translate_sid processor for converting windows SID values
 // to names.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the translate_sid configuration")

@@ -23,6 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -56,7 +58,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *common.Config) (processors.Processor, error) {
+func NewReplaceString(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

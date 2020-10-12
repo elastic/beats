@@ -5,6 +5,7 @@
 package add_cloudfoundry_metadata
 
 import (
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -30,7 +31,7 @@ type addCloudFoundryMetadata struct {
 const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(group unison.Group, cfg *common.Config) (processors.Processor, error) {
 	var config cloudfoundry.Config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -38,7 +39,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	log := logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
-	client, err := hub.ClientWithCache()
+	client, err := hub.ClientWithCache(group)
 	if err != nil {
 		return nil, errors.Wrapf(err, "%s: creating cloudfoundry client", processorName)
 	}
@@ -89,16 +90,4 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 // String returns this processor name.
 func (d *addCloudFoundryMetadata) String() string {
 	return processorName
-}
-
-// Close closes the underlying client and releases its resources.
-func (d *addCloudFoundryMetadata) Close() error {
-	if d.client == nil {
-		return nil
-	}
-	err := d.client.Close()
-	if err != nil {
-		return errors.Wrap(err, "closing client")
-	}
-	return nil
 }

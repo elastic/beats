@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -55,7 +56,7 @@ func init() {
 	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func New(c *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

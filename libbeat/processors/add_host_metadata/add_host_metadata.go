@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -55,7 +56,7 @@ const (
 )
 
 // New constructs a new add_host_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

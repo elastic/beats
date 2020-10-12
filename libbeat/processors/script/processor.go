@@ -20,6 +20,7 @@ package script
 import (
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,7 +36,7 @@ func init() {
 }
 
 // New constructs a new script processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	var config = struct {
 		Lang string `config:"lang" validate:"required"`
 	}{}

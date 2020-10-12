@@ -20,6 +20,8 @@ package processors
 import (
 	"errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	p "github.com/elastic/beats/v7/libbeat/plugin"
@@ -47,7 +49,7 @@ func init() {
 	})
 }
 
-type Constructor func(config *common.Config) (Processor, error)
+type Constructor func(group unison.Group, config *common.Config) (Processor, error)
 
 var registry = NewNamespace()
 

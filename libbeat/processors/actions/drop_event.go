@@ -18,6 +18,8 @@
 package actions
 
 import (
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -33,7 +35,7 @@ func init() {
 
 var dropEventsSingleton = (*dropEvent)(nil)
 
-func newDropEvent(c *common.Config) (processors.Processor, error) {
+func newDropEvent(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	return dropEventsSingleton, nil
 }
 

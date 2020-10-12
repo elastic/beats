@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -48,7 +49,7 @@ type processor struct {
 }
 
 // New constructs a new convert processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the convert processor configuration")

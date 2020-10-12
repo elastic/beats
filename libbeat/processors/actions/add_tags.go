@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -39,7 +41,7 @@ func init() {
 			checks.AllowedFields("tags", "target", "when")))
 }
 
-func createAddTags(c *common.Config) (processors.Processor, error) {
+func createAddTags(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Tags   []string `config:"tags" validate:"required"`
 		Target string   `config:"target"`

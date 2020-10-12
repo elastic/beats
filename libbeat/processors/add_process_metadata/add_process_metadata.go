@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -86,11 +87,11 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
+func New(group unison.Group, cfg *common.Config) (processors.Processor, error) {
+	return newProcessMetadataProcessorWithProvider(group, cfg, &procCache)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(group unison.Group, cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -125,7 +126,12 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 			}
 
 			cgroupsCache := common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
-			cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
+			group.Go(func(c unison.Canceler) error {
+				cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
+				<-c.Done()
+				cgroupsCache.StopJanitor()
+				return nil
+			})
 			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, cgroupsCache)
 		} else {
 			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)

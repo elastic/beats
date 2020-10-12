@@ -18,7 +18,10 @@
 package processor
 
 import (
+	"fmt"
+
 	"github.com/dop251/goja"
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -147,19 +150,15 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 		config = common.NewConfig()
 	}
 
-	p, err := constructor(config)
+	// Script processor doesn't support releasing resources of stateful processors,
+	// what can lead to leaks, so prevent use of these processors. They shouldn't
+	// be registered. If this error happens, a processor that needs some cleanupt is
+	// being registered, this should be avoided.
+	// See https://github.com/elastic/beats/pull/16349
+	group := unison.ClosedGroup(fmt.Errorf("stateful processor cannot be used in script processor, this is probably a bug, processor config: %v", config))
+	p, err := constructor(group, config)
 	if err != nil {
 		return nil, err
-	}
-
-	if closer, ok := p.(processors.Closer); ok {
-		closer.Close()
-		// Script processor doesn't support releasing resources of stateful processors,
-		// what can lead to leaks, so prevent use of these processors. They shouldn't
-		// be registered. If this error happens, a processor that needs to be closed is
-		// being registered, this should be avoided.
-		// See https://github.com/elastic/beats/pull/16349
-		return nil, errors.Errorf("stateful processor cannot be used in script processor, this is probably a bug: %s", p)
 	}
 
 	return &nativeProcessor{p}, nil

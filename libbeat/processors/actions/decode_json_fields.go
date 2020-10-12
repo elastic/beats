@@ -25,6 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -74,7 +76,7 @@ func init() {
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
-func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
+func NewDecodeJSONFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 	logger := logp.NewLogger("truncate_fields")
 

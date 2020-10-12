@@ -21,10 +21,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -41,6 +42,8 @@ type client struct {
 	mutex      sync.Mutex
 	acker      beat.ACKer
 	waiter     *clientCloseWaiter
+
+	processorsTaskGroup unison.TaskGroup
 
 	eventFlags   publisher.EventFlags
 	canDrop      bool
@@ -166,14 +169,12 @@ func (c *client) Close() error {
 		c.unlink()
 		log.Debug("client: done unlink")
 
-		if c.processors != nil {
-			log.Debug("client: closing processors")
-			err := processors.Close(c.processors)
-			if err != nil {
-				log.Errorf("client: error closing processors: %v", err)
-			}
-			log.Debug("client: done closing processors")
+		log.Debug("client: stop processors")
+		err := c.processorsTaskGroup.Stop()
+		if err != nil {
+			log.Errorf("client: stopping processors: %v")
 		}
+		log.Debug("client: done stop processors")
 	})
 	return nil
 }

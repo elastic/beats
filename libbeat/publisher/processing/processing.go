@@ -18,6 +18,8 @@
 package processing
 
 import (
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -26,7 +28,7 @@ import (
 // SupportFactory creates a new processing Supporter that can be used with
 // the publisher pipeline.  The factory gets the global configuration passed,
 // in order to configure some shared global event processing.
-type SupportFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (Supporter, error)
+type SupportFactory func(group unison.Group, info beat.Info, log *logp.Logger, cfg *common.Config) (Supporter, error)
 
 // Supporter is used to create an event processing pipeline. It is used by the
 // publisher pipeline when a client connects to the pipeline. The supporter
@@ -35,6 +37,5 @@ type SupportFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (
 // If `drop` is set, then the processor generated must always drop all events.
 // A Supporter needs to be closed with `Close()` to release its global resources.
 type Supporter interface {
-	Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
-	Close() error
+	Create(group unison.Group, cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
 }

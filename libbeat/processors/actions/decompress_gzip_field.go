@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -51,7 +52,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
+func NewDecompressGzipFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

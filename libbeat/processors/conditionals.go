@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,8 +33,8 @@ import (
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *common.Config) (Processor, error) {
-		rule, err := ruleFactory(cfg)
+	return func(group unison.Group, cfg *common.Config) (Processor, error) {
+		rule, err := ruleFactory(group, cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -141,14 +142,14 @@ func NewIfElseThenProcessor(cfg *common.Config) (*IfThenElseProcessor, error) {
 			return nil, nil
 		}
 		if !c.IsArray() {
-			return New([]*common.Config{c})
+			return New(unison.ClosedGroup(nil), []*common.Config{c})
 		}
 
 		var pc PluginConfig
 		if err := c.Unpack(&pc); err != nil {
 			return nil, err
 		}
-		return New(pc)
+		return New(unison.ClosedGroup(nil), pc)
 	}
 
 	var ifProcessors, elseProcessors *Processors

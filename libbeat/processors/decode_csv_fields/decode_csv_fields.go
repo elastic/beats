@@ -25,6 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -66,7 +68,7 @@ func init() {
 }
 
 // NewDecodeCSVField construct a new decode_csv_field processor.
-func NewDecodeCSVField(c *common.Config) (processors.Processor, error) {
+func NewDecodeCSVField(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := defaultCSVConfig
 
 	err := c.Unpack(&config)

@@ -24,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -54,7 +56,7 @@ const (
 )
 
 // New creates a new instance of the add_observer_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

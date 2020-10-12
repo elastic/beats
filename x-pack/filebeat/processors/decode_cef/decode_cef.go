@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
@@ -34,7 +35,7 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the "+procName+" processor configuration")

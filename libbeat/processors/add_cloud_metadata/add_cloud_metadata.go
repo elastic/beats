@@ -24,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -59,7 +61,7 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")

@@ -20,11 +20,12 @@ package add_id
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/processors/add_id/generator"
+	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_id/generator"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
@@ -41,7 +42,7 @@ type addID struct {
 }
 
 // New constructs a new Add ID processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)

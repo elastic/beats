@@ -18,6 +18,8 @@
 package channel
 
 import (
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -83,14 +85,14 @@ func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *common.Co
 //  - *index*: Configure the index name for events to be collected from this input
 //  - *type*: implicit event type
 //  - *service.type*: implicit event type
-func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
+func RunnerFactoryWithCommonInputSettings(group unison.Group, info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return wrapRunnerCreate(f,
 		func(
 			f cfgfile.RunnerFactory,
 			pipeline beat.PipelineConnector,
 			cfg *common.Config,
 		) (runner cfgfile.Runner, err error) {
-			pipeline, err = withClientConfig(info, pipeline, cfg)
+			pipeline, err = withClientConfig(group, info, pipeline, cfg)
 			if err != nil {
 				return nil, err
 			}
@@ -106,11 +108,12 @@ func wrapRunnerCreate(f cfgfile.RunnerFactory, edit onCreateWrapper) cfgfile.Run
 // withClientConfig reads common Beat input instance configurations from the
 // configuration object and ensure that the settings are applied to each client.
 func withClientConfig(
+	group unison.Group,
 	beatInfo beat.Info,
 	pipeline beat.PipelineConnector,
 	cfg *common.Config,
 ) (beat.PipelineConnector, error) {
-	editor, err := newCommonConfigEditor(beatInfo, cfg)
+	editor, err := newCommonConfigEditor(group, beatInfo, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -118,6 +121,7 @@ func withClientConfig(
 }
 
 func newCommonConfigEditor(
+	group unison.Group,
 	beatInfo beat.Info,
 	cfg *common.Config,
 ) (pipetool.ConfigEditor, error) {
@@ -137,7 +141,7 @@ func newCommonConfigEditor(
 		indexProcessor = add_formatted_index.New(timestampFormat)
 	}
 
-	userProcessors, err := processors.New(config.Processors)
+	userProcessors, err := processors.New(group, config.Processors)
 	if err != nil {
 		return nil, err
 	}

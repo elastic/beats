@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -77,12 +78,12 @@ func (h *Hub) Client() (*cfclient.Client, error) {
 	return cf, nil
 }
 
-func (h *Hub) ClientWithCache() (Client, error) {
+func (h *Hub) ClientWithCache(group unison.Group) (Client, error) {
 	c, err := h.Client()
 	if err != nil {
 		return nil, err
 	}
-	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
+	return newClientCacheWrap(group, c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through

@@ -20,6 +20,8 @@ package checks
 import (
 	"fmt"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 )
@@ -31,13 +33,13 @@ func ConfigChecked(
 	checks ...func(*common.Config) error,
 ) processors.Constructor {
 	validator := checkAll(checks...)
-	return func(cfg *common.Config) (processors.Processor, error) {
+	return func(group unison.Group, cfg *common.Config) (processors.Processor, error) {
 		err := validator(cfg)
 		if err != nil {
 			return nil, fmt.Errorf("%v in %v", err.Error(), cfg.Path())
 		}
 
-		return constr(cfg)
+		return constr(group, cfg)
 	}
 }
 

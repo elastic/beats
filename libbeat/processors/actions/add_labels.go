@@ -20,6 +20,8 @@ package actions
 import (
 	"fmt"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
@@ -35,7 +37,7 @@ func init() {
 			checks.AllowedFields(LabelsKey, "when")))
 }
 
-func createAddLabels(c *common.Config) (processors.Processor, error) {
+func createAddLabels(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Labels common.MapStr `config:"labels" validate:"required"`
 	}{}

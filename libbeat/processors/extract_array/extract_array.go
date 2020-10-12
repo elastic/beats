@@ -22,6 +22,7 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -88,7 +89,7 @@ func (f *extractArrayProcessor) Unpack(from *common.Config) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {

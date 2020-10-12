@@ -28,6 +28,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/elastic/gosigar/cgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -55,6 +56,7 @@ func init() {
 
 type addDockerMetadata struct {
 	log             *logp.Logger
+	group           unison.Group
 	watcher         docker.Watcher
 	fields          []string
 	sourceProcessor processors.Processor
@@ -69,11 +71,11 @@ type addDockerMetadata struct {
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
-	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
+func New(group unison.Group, cfg *common.Config) (processors.Processor, error) {
+	return buildDockerMetadataProcessor(group, logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(group unison.Group, log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -102,7 +104,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 			"index":     config.SourceIndex,
 			"target":    dockerContainerIDKey,
 		})
-		sourceProcessor, err = actions.NewExtractField(procConf)
+		sourceProcessor, err = actions.NewExtractField(group, procConf)
 		if err != nil {
 			return nil, err
 		}
@@ -110,6 +112,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 
 	return &addDockerMetadata{
 		log:             log,
+		group:           group,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
@@ -127,7 +130,13 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 			d.log.Debugf("Evicted cached cgroups for PID=%v", k)
 		}
 		d.cgroups = common.NewCacheWithRemovalListener(cgroupCacheExpiration, 100, evictionListener)
-		d.cgroups.StartJanitor(5 * time.Second)
+
+		d.group.Go(func(c unison.Canceler) error {
+			d.cgroups.StartJanitor(5 * time.Second)
+			<-c.Done()
+			d.cgroups.StopJanitor()
+			return nil
+		})
 	}
 }
 
@@ -207,18 +216,6 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	return event, nil
-}
-
-func (d *addDockerMetadata) Close() error {
-	if d.cgroups != nil {
-		d.cgroups.StopJanitor()
-	}
-	d.watcher.Stop()
-	err := processors.Close(d.sourceProcessor)
-	if err != nil {
-		return errors.Wrap(err, "closing source processor of add_docker_metadata")
-	}
-	return nil
 }
 
 func (d *addDockerMetadata) String() string {

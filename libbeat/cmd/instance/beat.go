@@ -33,6 +33,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -75,6 +76,8 @@ import (
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
+
+	taskgroup unison.TaskGroup
 
 	Config       beatConfig
 	RawConfig    *common.Config // Raw config that can be unpacked to get Beat specific config data.
@@ -372,8 +375,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 	defer func() {
-		if err := b.processing.Close(); err != nil {
-			logp.Warn("Failed to close global processing: %v", err)
+		err := b.taskgroup.Stop()
+		if err != nil {
+			logp.Err("Failed to stop pending tasks: %v", err)
 		}
 	}()
 
@@ -672,7 +676,7 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
-	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	b.processing, err = processingFactory(&b.taskgroup, b.Info, logp.L().Named("processors"), b.RawConfig)
 
 	return err
 }

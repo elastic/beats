@@ -138,7 +138,6 @@ type ClientEventer interface {
 
 type ProcessorList interface {
 	Processor
-	Close() error
 	All() []Processor
 }
 

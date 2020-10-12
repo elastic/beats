@@ -23,6 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -40,7 +42,7 @@ func init() {
 			checks.AllowedFields("fields", "when")))
 }
 
-func newIncludeFields(c *common.Config) (processors.Processor, error) {
+func newIncludeFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}

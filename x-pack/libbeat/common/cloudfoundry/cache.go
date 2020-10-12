@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -32,7 +33,7 @@ type clientCacheWrap struct {
 }
 
 // newClientCacheWrap creates a new cache for application data.
-func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
+func newClientCacheWrap(group unison.Group, client cfClient, cacheName string, ttl time.Duration, errorTTL time.Duration, log *logp.Logger) (*clientCacheWrap, error) {
 	options := persistentcache.Options{
 		Timeout: ttl,
 	}
@@ -45,6 +46,18 @@ func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, er
 	cache, err := persistentcache.New(name, options)
 	if err != nil {
 		return nil, fmt.Errorf("creating metadata cache: %w", err)
+	}
+
+	err = group.Go(func(c unison.Canceler) error {
+		<-c.Done()
+		err := cache.Close()
+		if err != nil {
+			return fmt.Errorf("closing cache: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("preparing cache cleanup: %w", err)
 	}
 
 	return &clientCacheWrap{

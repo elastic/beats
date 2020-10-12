@@ -22,6 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -55,7 +57,7 @@ func init() {
 }
 
 // NewRenameFields returns a new rename processor.
-func NewRenameFields(c *common.Config) (processors.Processor, error) {
+func NewRenameFields(_ unison.Group, c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

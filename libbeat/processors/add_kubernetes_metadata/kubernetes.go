@@ -27,6 +27,8 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -89,7 +91,7 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err

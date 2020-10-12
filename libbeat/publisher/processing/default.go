@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/ecs/code/go/ecs"
+	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -97,7 +98,7 @@ func MakeDefaultSupport(
 	normalize bool,
 	modifiers ...modifier,
 ) SupportFactory {
-	return func(info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
+	return func(group unison.Group, info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
 		cfg := struct {
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
@@ -107,7 +108,7 @@ func MakeDefaultSupport(
 			return nil, err
 		}
 
-		processors, err := processors.New(cfg.Processors)
+		processors, err := processors.New(group, cfg.Processors)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
@@ -253,7 +254,7 @@ func newBuilder(
 //  9. (P) timeseries mangling
 //  10. (P) (if publish/debug enabled) log event
 //  11. (P) (if output disabled) dropEvent
-func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+func (b *builder) Create(group unison.Group, cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	var (
 		// pipeline processors
 		processors = newGroup("processPipeline", b.log)
@@ -339,8 +340,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 8: pipeline processors list
 	if b.processors != nil {
-		// Add the global pipeline as a function processor, so clients cannot close it
-		processors.add(newProcessor(b.processors.title, b.processors.Run))
+		processors.add(b.processors)
 	}
 
 	// setup 9: time series metadata
@@ -359,13 +359,6 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	return processors, nil
-}
-
-func (b *builder) Close() error {
-	if b.processors != nil {
-		return b.processors.Close()
-	}
-	return nil
 }
 
 func makeClientProcessors(

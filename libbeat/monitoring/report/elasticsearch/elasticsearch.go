@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -161,7 +163,8 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	processing, err := processing.MakeDefaultSupport(true)(beat, log, common.NewConfig())
+	group := unison.ClosedGroup(errors.New("unexpected tasks here"))
+	processing, err := processing.MakeDefaultSupport(true)(group, beat, log, common.NewConfig())
 	if err != nil {
 		return nil, err
 	}

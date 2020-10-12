@@ -302,7 +302,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
+	var tg unison.TaskGroup
+	inputLoader := channel.RunnerFactoryWithCommonInputSettings(&tg, b.Info, compat.Combine(
 		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
 	))
@@ -412,6 +413,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		} else {
 			waitEvents.AddChan(fb.done)
 		}
+	}
+
+	err = tg.Stop()
+	if err != nil {
+		inputsLogger.Errorf("Failed to stop pending tasks: %v", err)
 	}
 
 	return nil

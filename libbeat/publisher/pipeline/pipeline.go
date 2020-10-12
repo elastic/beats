@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -76,6 +78,9 @@ type Pipeline struct {
 	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
 	sigNewClient             chan *client
+
+	// TODO: Many closers here can be probably replaced
+	group unison.TaskGroup
 
 	processors processing.Supporter
 }
@@ -230,6 +235,11 @@ func (p *Pipeline) Close() error {
 	p.observer.cleanup()
 	if p.sigNewClient != nil {
 		close(p.sigNewClient)
+	}
+
+	err = p.group.Stop()
+	if err != nil {
+		log.Error("pipeline tasks shutdown error: ", err)
 	}
 
 	return nil
@@ -424,7 +434,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish)
+	return p.processors.Create(&p.group, cfg, noPublish)
 }
 
 func (e *pipelineEventer) OnACK(n int) {

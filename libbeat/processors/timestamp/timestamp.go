@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"4d63.com/tz"
+	"github.com/elastic/go-concert/unison"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -47,7 +48,7 @@ type processor struct {
 
 // New constructs a new timestamp processor for parsing time strings into
 // time.Time values.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(_ unison.Group, cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack the timestamp configuration")

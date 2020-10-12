@@ -23,6 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -87,7 +89,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 }
 
 func (ns *Namespace) Plugin() Constructor {
-	return NewConditional(func(cfg *common.Config) (Processor, error) {
+	return NewConditional(func(group unison.Group, cfg *common.Config) (Processor, error) {
 		var section string
 		for _, name := range cfg.GetFields() {
 			if name == "when" { // TODO: remove check for "when" once fields are filtered
@@ -117,7 +119,7 @@ func (ns *Namespace) Plugin() Constructor {
 		}
 
 		constructor := backend.Plugin()
-		return constructor(config)
+		return constructor(group, config)
 	})
 }
 
