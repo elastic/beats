@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-06-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
@@ -57,18 +57,22 @@ func NewService(clientId string, clientSecret string, tenantId string, subscript
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
 func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResource, error) {
 	var resourceQuery string
-	var resources []resources.GenericResource
+	var resourceList []resources.GenericResource
 	if len(id) > 0 {
-		// listing resourceId conditions does not seem to work with the API, extracting the name and resource type does not work as the position of the `resourceType` can move if a parent resource is involved, filtering by resource name and resource group (if extracted) is also not possible as
+		// listing multiple resourceId conditions does not seem to work with the API, extracting the name and resource type does not work as the position of the `resourceType` can move if a parent resource is involved, filtering by resource name and resource group (if extracted) is also not possible as
 		// different types of resources can contain the same name.
 		for _, id := range id {
-			resource, err := service.resourceClient.GetByID(service.context, id)
+			resource, err := service.resourceClient.List(service.context, fmt.Sprintf("resourceId eq '%s'", id), "", nil)
 			if err != nil {
 				return nil, err
 			}
-			resources = append(resources, resource)
+			if len(resource.Values()) > 0 {
+				resourceList = append(resourceList, resource.Values()...)
+			}
 		}
-	} else if len(group) > 0 {
+		return resourceList, nil
+	}
+	if len(group) > 0 {
 		var filterList []string
 		for _, gr := range group {
 			filterList = append(filterList, fmt.Sprintf("resourceGroup eq '%s'", gr))
@@ -82,9 +86,9 @@ func (service MonitorService) GetResourceDefinitions(id []string, group []string
 	}
 	result, err := service.resourceClient.List(service.context, resourceQuery, "", nil)
 	if err == nil {
-		resources = result.Values()
+		resourceList = result.Values()
 	}
-	return resources, err
+	return resourceList, err
 }
 
 // GetResourceDefinitionById will retrieve the azure resource based on the resource Id
