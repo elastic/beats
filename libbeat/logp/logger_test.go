@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -40,28 +41,12 @@ func TestLoggerWithOptions(t *testing.T) {
 	logger1.Info("hello logger1")             // should just go to the first observer
 	logger2.Info("hello logger1 and logger2") // should go to both observers
 
-	assert.Equal(t, []observer.LoggedEntry{{
-		Context: []zapcore.Field{},
-		Entry: zapcore.Entry{
-			Level:      zapcore.InfoLevel,
-			LoggerName: "bo",
-			Message:    "hello logger1",
-		},
-	}, {
-		Context: []zapcore.Field{},
-		Entry: zapcore.Entry{
-			Level:      zapcore.InfoLevel,
-			LoggerName: "bo",
-			Message:    "hello logger1 and logger2",
-		},
-	}}, observed1.AllUntimed())
+	observedEntries1 := observed1.All()
+	require.Len(t, observedEntries1, 2)
+	assert.Equal(t, "hello logger1", observedEntries1[0].Message)
+	assert.Equal(t, "hello logger1 and logger2", observedEntries1[1].Message)
 
-	assert.Equal(t, []observer.LoggedEntry{{
-		Context: []zapcore.Field{},
-		Entry: zapcore.Entry{
-			Level:      zapcore.InfoLevel,
-			LoggerName: "bo",
-			Message:    "hello logger1 and logger2",
-		},
-	}}, observed2.AllUntimed())
+	observedEntries2 := observed2.All()
+	require.Len(t, observedEntries2, 1)
+	assert.Equal(t, "hello logger1 and logger2", observedEntries2[0].Message)
 }
