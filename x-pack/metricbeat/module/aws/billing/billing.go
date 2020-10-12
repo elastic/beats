@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
 
 	// get cost metrics from cost explorer
 	awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -178,26 +178,28 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(metricDataOutput)
-	if !timestamp.IsZero() {
-		for _, output := range metricDataOutput {
-			if len(output.Values) == 0 {
-				continue
-			}
-			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-			if exists {
-				labels := strings.Split(*output.Label, labelSeparator)
+	if timestamp.IsZero() {
+		return nil
+	}
 
-				event := aws.InitEvent("", m.AccountName, m.AccountID)
-				event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+	for _, output := range metricDataOutput {
+		if len(output.Values) == 0 {
+			continue
+		}
+		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+		if exists {
+			labels := strings.Split(*output.Label, labelSeparator)
 
-				i := 1
-				for i < len(labels)-1 {
-					event.MetricSetFields.Put(labels[i], labels[i+1])
-					i += 2
-				}
-				event.Timestamp = endTime
-				events = append(events, event)
+			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
+			event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+
+			i := 1
+			for i < len(labels)-1 {
+				event.MetricSetFields.Put(labels[i], labels[i+1])
+				i += 2
 			}
+			event.Timestamp = endTime
+			events = append(events, event)
 		}
 	}
 	return events
@@ -278,7 +280,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 }
 
 func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, groupDefinition costexplorer.GroupDefinition, startDate string, endDate string) mb.Event {
-	event := aws.InitEvent("", m.AccountName, m.AccountID)
+	event := aws.InitEvent("", m.AccountName, m.AccountID, time.Now())
 
 	// add group definition
 	event.MetricSetFields.Put("group_definition", common.MapStr{

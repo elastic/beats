@@ -13,8 +13,8 @@ set -eo pipefail
 # KIBANA_USERNAME - username for accessing kibana API [elastic]
 
 function setup(){
-  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
-  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/setup \
+  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
+ curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/agents/setup \
     -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true' \
     -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
@@ -27,7 +27,7 @@ function enroll(){
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]]; then
       apikey="${FLEET_ENROLLMENT_TOKEN}"
     else
-      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
@@ -40,7 +40,7 @@ function enroll(){
       local apikeyId=$(echo $enrollResp | jq -r '.list[0].id')
       echo $apikeyId
 
-      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys/$apikeyId \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/fleet/enrollment-api-keys/$apikeyId \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )

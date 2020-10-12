@@ -25,11 +25,11 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
-// mapping fields which output by `iostat -x` on linux
+// IOMetric contains mapping fields which are outputed by `iostat -x` on linux
 //
 // Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
 // sda               0.06     0.78    0.09    0.27     9.42     8.06    48.64     0.00    1.34    0.99    1.45   0.77   0.03
-type DiskIOMetric struct {
+type IOMetric struct {
 	ReadRequestMergeCountPerSec  float64 `json:"rrqmCps"`
 	WriteRequestMergeCountPerSec float64 `json:"wrqmCps"`
 	ReadRequestCountPerSec       float64 `json:"rrqCps"`
@@ -46,8 +46,9 @@ type DiskIOMetric struct {
 	BusyPct           float64 `json:"busy"`
 }
 
-type DiskIOStat struct {
+// IOStat carries disk statistics for all devices
+type IOStat struct {
 	lastDiskIOCounters map[string]disk.IOCountersStat
-	lastCpu            sigar.Cpu
-	curCpu             sigar.Cpu
+	lastCPU            sigar.Cpu
+	curCPU             sigar.Cpu
 }

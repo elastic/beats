@@ -87,7 +87,7 @@ func TestFileScanner(t *testing.T) {
 			for p, _ := range files {
 				paths = append(paths, p)
 			}
-			assert.True(t, checkIfSameContents(test.expectedFiles, paths))
+			assert.ElementsMatch(t, paths, test.expectedFiles)
 		})
 	}
 }
@@ -112,23 +112,6 @@ func removeFilesOfScannerTest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-// only handles sets
-func checkIfSameContents(one, other []string) bool {
-	if len(one) != len(other) {
-		return false
-	}
-
-	mustFind := len(one)
-	for _, oneElem := range one {
-		for _, otherElem := range other {
-			if oneElem == otherElem {
-				mustFind--
-			}
-		}
-	}
-	return mustFind == 0
 }
 
 func TestFileWatchNewDeleteModified(t *testing.T) {
@@ -222,10 +205,13 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 
 			go w.watch(context.Background())
 
-			for _, expectedEvent := range test.expectedEvents {
-				evt := w.Event()
-				assert.Equal(t, expectedEvent, evt)
+			count := len(test.expectedEvents)
+			actual := make([]loginp.FSEvent, count)
+			for i := 0; i < count; i++ {
+				actual[i] = w.Event()
 			}
+
+			assert.ElementsMatch(t, actual, test.expectedEvents)
 		})
 	}
 }

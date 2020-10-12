@@ -17,34 +17,14 @@
 
 // +build windows
 
-package diskio
+package filestream
 
 import (
-	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// NewDiskIOStat :init DiskIOStat object.
-func NewDiskIOStat() *DiskIOStat {
-	return &DiskIOStat{
-		lastDiskIOCounters: map[string]disk.IOCountersStat{},
-	}
-}
-
-// OpenSampling stub for linux implementation.
-func (stat *DiskIOStat) OpenSampling() error {
-	return nil
-}
-
-// CalIOStatistics stub for linux implementation.
-func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
-	return errors.New("iostat is not implement for Windows")
-}
-
-// CloseSampling stub for linux implementation.
-func (stat *DiskIOStat) CloseSampling() {}
-
-// IOCounters should map functionality to disk package for linux os.
-func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	return ioCounters(names...)
+func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
+	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }
