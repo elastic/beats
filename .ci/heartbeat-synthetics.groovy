@@ -23,7 +23,6 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/packag[ing|e] synthetics$')
-    upstream("apm-agent-rum/elastic-synthetics/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : 'master' }")
   }
   parameters {
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
