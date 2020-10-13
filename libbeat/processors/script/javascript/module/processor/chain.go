@@ -151,6 +151,17 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 	if err != nil {
 		return nil, err
 	}
+
+	if closer, ok := p.(processors.Closer); ok {
+		closer.Close()
+		// Script processor doesn't support releasing resources of stateful processors,
+		// what can lead to leaks, so prevent use of these processors. They shouldn't
+		// be registered. If this error happens, a processor that needs to be closed is
+		// being registered, this should be avoided.
+		// See https://github.com/elastic/beats/pull/16349
+		return nil, errors.Errorf("stateful processor cannot be used in script processor, this is probably a bug: %s", p)
+	}
+
 	return &nativeProcessor{p}, nil
 }
 
