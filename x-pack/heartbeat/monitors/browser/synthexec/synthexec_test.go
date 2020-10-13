@@ -37,7 +37,7 @@ func TestLineToSynthEventFactory(t *testing.T) {
 	require.NotNil(t, res)
 	require.Equal(t, testType, res.Type)
 	require.Equal(t, testText, res.Payload["message"])
-	require.Greater(t, res.TimestampEpochMillis, int64(0))
+	require.Greater(t, res.TimestampEpochMillis, float64(0))
 }
 
 func TestJsonToSynthEvent(t *testing.T) {
