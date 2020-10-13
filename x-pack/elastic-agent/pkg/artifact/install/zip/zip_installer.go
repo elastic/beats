@@ -111,6 +111,8 @@ func (i *Installer) unzip(artifactPath string) error {
 				return err
 			}
 
+			// sometimes we try executing binary too fast and run into text file busy after unpacking
+			// syncing prevents this
 			f.Sync()
 		}
 		return nil
