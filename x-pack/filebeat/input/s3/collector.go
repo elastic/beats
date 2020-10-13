@@ -166,7 +166,7 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 				if err == context.DeadlineExceeded {
 					c.logger.Info("Context deadline exceeded, updating visibility timeout")
 				} else {
-					c.logger.Warn("Processing message failed, updating visibility timeout")
+					c.logger.Warnf("Processing message failed '%w', updating visibility timeout", err)
 				}
 
 				err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
