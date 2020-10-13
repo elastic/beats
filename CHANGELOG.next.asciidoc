@@ -449,6 +449,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added experimental dataset `sophos/utm`. {pull}20820[20820]
 - Add Cloud Foundry tags in related events. {pull}21177[21177]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
+- Add istiod metricset. {pull}21519[21519]
 
 *Auditbeat*
 
