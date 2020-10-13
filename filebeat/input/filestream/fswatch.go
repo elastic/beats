@@ -57,9 +57,9 @@ type fileScanner struct {
 
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
-	Interval time.Duration
+	Interval time.Duration `config:"check_interval"`
 	// Scanner is the configuration of the scanner.
-	Scanner fileScannerConfig
+	Scanner fileScannerConfig `config:",inline"`
 }
 
 // fileWatcher gets the list of files from a FSWatcher and creates events by
@@ -212,10 +212,9 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 }
 
 type fileScannerConfig struct {
-	Paths         []string
-	ExcludedFiles []match.Matcher
-	Symlinks      bool
-	RecursiveGlob bool
+	ExcludedFiles []match.Matcher `config:"exclude_files"`
+	Symlinks      bool            `config:"symlinks"`
+	RecursiveGlob bool            `config:"recursive_glob"`
 }
 
 func defaultFileScannerConfig() fileScannerConfig {
