@@ -24,7 +24,7 @@ func TestOKInstall(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	ctx, _ := context.WithCancel(context.Background())
+	ctx := context.Background()
 	installDir := filepath.Join(os.TempDir(), "install_dir")
 
 	wg.Add(1)
