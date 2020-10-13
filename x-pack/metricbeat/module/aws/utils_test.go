@@ -176,7 +176,7 @@ func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
+	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
 	var metricDataQueries []cloudwatch.MetricDataQuery
@@ -205,7 +205,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestGetMetricDataResults(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
+	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
 	metricInfo := cloudwatch.Metric{

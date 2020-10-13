@@ -42,7 +42,7 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		contentMap: common.MapStr{},
 		headers:    common.MapStr{},
 	}
-	err := pagination.setRequestInfoFromBody(
+	_ = pagination.setRequestInfoFromBody(
 		common.MapStr(m),
 		common.MapStr(m),
 		ri,

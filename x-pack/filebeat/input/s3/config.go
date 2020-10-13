@@ -9,18 +9,17 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/harvester"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type config struct {
-	harvester.ForwarderConfig `config:",inline"`
-	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
-	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
-	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
-	ExpandEventListFromField  string              `config:"expand_event_list_from_field"`
-	APITimeout                time.Duration       `config:"api_timeout"`
-	FileSelectors             []FileSelectorCfg   `config:"file_selectors"`
+	QueueURL                 string              `config:"queue_url" validate:"nonzero,required"`
+	VisibilityTimeout        time.Duration       `config:"visibility_timeout"`
+	FipsEnabled              bool                `config:"fips_enabled"`
+	AwsConfig                awscommon.ConfigAWS `config:",inline"`
+	ExpandEventListFromField string              `config:"expand_event_list_from_field"`
+	APITimeout               time.Duration       `config:"api_timeout"`
+	FileSelectors            []FileSelectorCfg   `config:"file_selectors"`
 }
 
 // FileSelectorCfg defines type and configuration of FileSelectors
@@ -32,11 +31,9 @@ type FileSelectorCfg struct {
 
 func defaultConfig() config {
 	return config{
-		ForwarderConfig: harvester.ForwarderConfig{
-			Type: "s3",
-		},
 		VisibilityTimeout: 300 * time.Second,
 		APITimeout:        120 * time.Second,
+		FipsEnabled:       false,
 	}
 }
 

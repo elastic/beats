@@ -110,7 +110,7 @@ func TestVerify(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			isOk, err := testVerifier.Verify(beatName, version)
+			isOk, err := testVerifier.Verify(beatName, version, artifactName, false)
 			if err != nil {
 				t.Fatal(err)
 			}

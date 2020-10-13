@@ -6,8 +6,6 @@
 <titleabbrev>add_cloudfoundry_metadata</titleabbrev>
 ++++
 
-beta[]
-
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
 from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
 only if the event contains a reference to a Cloud Foundry application (using field

@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func initOpenstackNovaTestServer() *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func openstackNovaMetadataHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == osMetadataInstanceIDURI {
 			w.Write([]byte("i-0000ffac"))
 			return
@@ -49,13 +49,13 @@ func initOpenstackNovaTestServer() *httptest.Server {
 		}
 
 		http.Error(w, "not found", http.StatusNotFound)
-	}))
+	})
 }
 
 func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 	logp.TestingSetup()
 
-	server := initOpenstackNovaTestServer()
+	server := httptest.NewServer(openstackNovaMetadataHandler())
 	defer server.Close()
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
@@ -66,6 +66,28 @@ func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	assertOpenstackNova(t, config)
+}
+
+func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
+	logp.TestingSetup()
+
+	server := httptest.NewTLSServer(openstackNovaMetadataHandler())
+	defer server.Close()
+
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host":                  server.Listener.Addr().String(),
+		"ssl.verification_mode": "none",
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assertOpenstackNova(t, config)
+}
+
+func assertOpenstackNova(t *testing.T, config *common.Config) {
 	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)

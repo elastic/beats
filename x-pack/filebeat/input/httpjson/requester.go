@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"strings"
 
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -40,6 +40,8 @@ type requester struct {
 	authScheme    string
 	jsonObjects   string
 	splitEventsBy string
+
+	cursorState cursorState
 }
 
 func newRequester(
@@ -72,9 +74,9 @@ type response struct {
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.Publisher) error {
+func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Publisher) error {
 	ri := &requestInfo{
-		url:        r.dateCursor.getURL(),
+		url:        r.dateCursor.getURL(r.cursorState.LastDateCursorValue),
 		contentMap: common.MapStr{},
 		headers:    r.headers,
 	}
@@ -166,7 +168,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 	}
 
 	if lastObj != nil && r.dateCursor.enabled {
-		r.dateCursor.advance(common.MapStr(lastObj))
+		r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
 	}
 
 	return nil
@@ -210,7 +212,7 @@ func (r *requester) createHTTPRequest(ctx context.Context, ri *requestInfo) (*ht
 }
 
 // processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
-func (r *requester) processEventArray(publisher stateless.Publisher, events []interface{}) (map[string]interface{}, error) {
+func (r *requester) processEventArray(publisher cursor.Publisher, events []interface{}) (map[string]interface{}, error) {
 	var last map[string]interface{}
 	for _, t := range events {
 		switch v := t.(type) {
@@ -221,7 +223,9 @@ func (r *requester) processEventArray(publisher stateless.Publisher, events []in
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal %+v: %w", e, err)
 				}
-				publisher.Publish(makeEvent(string(d)))
+				if err := publisher.Publish(makeEvent(string(d)), r.cursorState); err != nil {
+					return nil, fmt.Errorf("failed to publish: %w", err)
+				}
 			}
 		default:
 			return nil, fmt.Errorf("expected only JSON objects in the array but got a %T", v)
@@ -272,4 +276,24 @@ func splitEvent(splitKey string, event map[string]interface{}) []map[string]inte
 	}
 
 	return events
+}
+
+type cursorState struct {
+	LastCalledURL       string
+	LastDateCursorValue string
+}
+
+func (r *requester) updateCursorState(url, value string) {
+	r.cursorState.LastCalledURL = url
+	r.cursorState.LastDateCursorValue = value
+}
+
+func (r *requester) loadCursor(c *cursor.Cursor, log *logp.Logger) {
+	if c == nil || c.IsNew() {
+		return
+	}
+
+	if err := c.Unpack(&r.cursorState); err != nil {
+		log.Errorf("Reset http cursor state. Failed to read from registry: %v", err)
+	}
 }

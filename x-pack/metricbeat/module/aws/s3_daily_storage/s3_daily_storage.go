@@ -69,7 +69,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -185,8 +186,6 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 }
 
 func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName, accountName, accountID)
-
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
@@ -213,6 +212,7 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 		return
 	}
 
+	event = aws.InitEvent(regionName, accountName, accountID, timestamp)
 	event.MetricSetFields = resultMetricSetFields
 	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return

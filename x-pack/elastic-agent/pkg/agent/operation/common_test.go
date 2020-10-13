@@ -143,7 +143,7 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(p, v string) (bool, error) {
+func (*DummyVerifier) Verify(p, v, _ string, _ bool) (bool, error) {
 	return true, nil
 }
 
