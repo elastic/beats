@@ -33,8 +33,11 @@ import (
 )
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
+	minuteAgo := time.Now().Add(-1 * time.Minute)
+
 	testCases := map[string]struct {
 		events          []loginp.FSEvent
+		ignoreOlder     time.Duration
 		expectedSources []string
 	}{
 		"two new files": {
@@ -50,6 +53,38 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			},
 			expectedSources: []string{"filestream::path::/path/to/file"},
 		},
+		"old files with ignore older configured": {
+			events: []loginp.FSEvent{
+				loginp.FSEvent{
+					Op:      loginp.OpCreate,
+					NewPath: "/path/to/file",
+					Info:    testFileInfo{"/path/to/file", 5, minuteAgo},
+				},
+				loginp.FSEvent{
+					Op:      loginp.OpWrite,
+					NewPath: "/path/to/other/file",
+					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
+				},
+			},
+			ignoreOlder:     10 * time.Second,
+			expectedSources: []string{},
+		},
+		"newer files with ignore older": {
+			events: []loginp.FSEvent{
+				loginp.FSEvent{
+					Op:      loginp.OpCreate,
+					NewPath: "/path/to/file",
+					Info:    testFileInfo{"/path/to/file", 5, minuteAgo},
+				},
+				loginp.FSEvent{
+					Op:      loginp.OpWrite,
+					NewPath: "/path/to/other/file",
+					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
+				},
+			},
+			ignoreOlder:     5 * time.Minute,
+			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+		},
 	}
 
 	for name, test := range testCases {
@@ -64,11 +99,11 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			p := fileProspector{
 				filewatcher: &mockFileWatcher{events: test.events},
 				identifier:  pathIdentifier,
+				ignoreOlder: test.ignoreOlder,
 			}
 
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := getTestHarvesterGroup()
-
 			p.Run(ctx, testStateStore(), hg)
 
 			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
@@ -127,69 +162,6 @@ func TestProspectorDeletedFile(t *testing.T) {
 				assert.True(t, has)
 
 			}
-		})
-	}
-}
-
-func TestProspectorIgnoreOlder(t *testing.T) {
-	testCases := map[string]struct {
-		events          []loginp.FSEvent
-		ignoreOlder     time.Duration
-		expectedSources []string
-	}{
-		"old files with ignore older configured": {
-			events: []loginp.FSEvent{
-				loginp.FSEvent{
-					Op:      loginp.OpCreate,
-					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, time.Now().Add(-1 * time.Minute)},
-				},
-				loginp.FSEvent{
-					Op:      loginp.OpWrite,
-					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, time.Now().Add(-1 * time.Minute)},
-				},
-			},
-			ignoreOlder:     10 * time.Second,
-			expectedSources: []string{},
-		},
-		"old files without ignore older": {
-			events: []loginp.FSEvent{
-				loginp.FSEvent{
-					Op:      loginp.OpCreate,
-					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, time.Now().Add(-1 * time.Minute)},
-				},
-				loginp.FSEvent{
-					Op:      loginp.OpWrite,
-					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, time.Now().Add(-1 * time.Minute)},
-				},
-			},
-			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
-		},
-	}
-
-	for name, test := range testCases {
-		test := test
-
-		t.Run(name, func(t *testing.T) {
-			pathIdentifier, err := newPathIdentifier(nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			p := fileProspector{
-				filewatcher: &mockFileWatcher{events: test.events},
-				identifier:  pathIdentifier,
-				ignoreOlder: test.ignoreOlder,
-			}
-
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
-			hg := getTestHarvesterGroup()
-			p.Run(ctx, testStateStore(), hg)
-
-			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
 		})
 	}
 }
