@@ -34,7 +34,7 @@ type config struct {
 
 	Paths          []string                `config:"paths"`
 	Close          closerConfig            `config:"close"`
-	FileWatcher    *common.ConfigNamespace `config:"file_watcher"`
+	FileWatcher    *common.ConfigNamespace `config:"prospector"`
 	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
 	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
 	CleanRemoved   bool                    `config:"clean_removed"`
