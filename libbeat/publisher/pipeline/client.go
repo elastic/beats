@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -164,6 +165,15 @@ func (c *client) Close() error {
 		log.Debug("client: unlink from queue")
 		c.unlink()
 		log.Debug("client: done unlink")
+
+		if c.processors != nil {
+			log.Debug("client: closing processors")
+			err := processors.Close(c.processors)
+			if err != nil {
+				log.Errorf("client: error closing processors: %v", err)
+			}
+			log.Debug("client: done closing processors")
+		}
 	})
 	return nil
 }
