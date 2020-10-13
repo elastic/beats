@@ -55,6 +55,22 @@ plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
 endif::[]
 
 ifndef::no-output-logstash[]
+[[disconnections-problem]]
+=== {beatname_uc} reports connections being reset by {ls}
+
+If you see errors such as:
+[source,shell]
+----------------------------------------------------------------------
+Failed to publish events caused by: write tcp ... write: connection reset by peer
+----------------------------------------------------------------------
+
+It is possible a firewall might be interfering with the connection between {beatname_uc} and {ls} (it is a persistent TCP connection).
+
+You can solve the problem making sure the firewall is not closing connections between {beatname_uc} and {ls} or configuring the {ls}
+output adding a `ttl` value lower than the maximum allowed time by the firewall. 
+endif::[]
+
+ifndef::no-output-logstash[]
 [[metadata-missing]]
 === @metadata is missing in {ls}
 
