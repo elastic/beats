@@ -106,8 +106,8 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			return fmt.Errorf("problem reading prompt response")
 		}
 		if !confirm {
-			// not enrolling, all done (standalone mode)
-			return nil
+			// not enrolling
+			enroll = false
 		}
 	}
 	if !askEnroll && (kibana == "" || token == "") {
