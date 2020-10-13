@@ -91,19 +91,14 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			pathIdentifier, err := newPathIdentifier(nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
 			p := fileProspector{
 				filewatcher: &mockFileWatcher{events: test.events},
-				identifier:  pathIdentifier,
+				identifier:  mustPathIdentifier(),
 				ignoreOlder: test.ignoreOlder,
 			}
-
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := getTestHarvesterGroup()
+
 			p.Run(ctx, testStateStore(), hg)
 
 			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
@@ -134,18 +129,13 @@ func TestProspectorDeletedFile(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			pathIdentifier, err := newPathIdentifier(nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
 			p := fileProspector{
 				filewatcher:  &mockFileWatcher{events: test.events},
-				identifier:   pathIdentifier,
+				identifier:   mustPathIdentifier(),
 				cleanRemoved: test.cleanRemoved,
 			}
-
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
 			testStore := testStateStore()
 			testStore.Set("filestream::path::/path/to/file", nil)
 
@@ -195,4 +185,13 @@ func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
 func testStateStore() *statestore.Store {
 	s, _ := statestore.NewRegistry(storetest.NewMemoryStoreBackend()).Get(pluginName)
 	return s
+}
+
+func mustPathIdentifier() fileIdentifier {
+	pathIdentifier, err := newPathIdentifier(nil)
+	if err != nil {
+		panic(err)
+	}
+	return pathIdentifier
+
 }
