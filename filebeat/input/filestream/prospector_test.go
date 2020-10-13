@@ -20,6 +20,7 @@ package filestream
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -33,21 +34,21 @@ import (
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	testCases := map[string]struct {
-		events              []loginp.FSEvent
-		expectedSourceNames []string
+		events          []loginp.FSEvent
+		expectedSources []string
 	}{
 		"two new files": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file"},
 			},
-			expectedSourceNames: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
 			},
-			expectedSourceNames: []string{"filestream::path::/path/to/file"},
+			expectedSources: []string{"filestream::path::/path/to/file"},
 		},
 	}
 
@@ -66,9 +67,11 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			}
 
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
-			hg := &testHarvesterGroup{t: t, expectedNames: test.expectedSourceNames}
+			hg := getTestHarvesterGroup()
 
 			p.Run(ctx, testStateStore(), hg)
+
+			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
 		})
 	}
 }
@@ -111,7 +114,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			testStore := testStateStore()
 			testStore.Set("filestream::path::/path/to/file", nil)
 
-			p.Run(ctx, testStore, &testHarvesterGroup{})
+			p.Run(ctx, testStore, getTestHarvesterGroup())
 
 			has, err := testStore.Has("filestream::path::/path/to/file")
 			if err != nil {
@@ -128,13 +131,77 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}
 }
 
-type testHarvesterGroup struct {
-	t             *testing.T
-	expectedNames []string
+func TestProspectorIgnoreOlder(t *testing.T) {
+	testCases := map[string]struct {
+		events          []loginp.FSEvent
+		ignoreOlder     time.Duration
+		expectedSources []string
+	}{
+		"old files with ignore older configured": {
+			events: []loginp.FSEvent{
+				loginp.FSEvent{
+					Op:      loginp.OpCreate,
+					NewPath: "/path/to/file",
+					Info:    testFileInfo{"/path/to/file", 5, time.Now().Add(-1 * time.Minute)},
+				},
+				loginp.FSEvent{
+					Op:      loginp.OpWrite,
+					NewPath: "/path/to/other/file",
+					Info:    testFileInfo{"/path/to/other/file", 5, time.Now().Add(-1 * time.Minute)},
+				},
+			},
+			ignoreOlder:     10 * time.Second,
+			expectedSources: []string{},
+		},
+		"old files without ignore older": {
+			events: []loginp.FSEvent{
+				loginp.FSEvent{
+					Op:      loginp.OpCreate,
+					NewPath: "/path/to/file",
+					Info:    testFileInfo{"/path/to/file", 5, time.Now().Add(-1 * time.Minute)},
+				},
+				loginp.FSEvent{
+					Op:      loginp.OpWrite,
+					NewPath: "/path/to/other/file",
+					Info:    testFileInfo{"/path/to/other/file", 5, time.Now().Add(-1 * time.Minute)},
+				},
+			},
+			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+		},
+	}
+
+	for name, test := range testCases {
+		test := test
+
+		t.Run(name, func(t *testing.T) {
+			pathIdentifier, err := newPathIdentifier(nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			p := fileProspector{
+				filewatcher: &mockFileWatcher{events: test.events},
+				identifier:  pathIdentifier,
+				ignoreOlder: test.ignoreOlder,
+			}
+
+			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			hg := getTestHarvesterGroup()
+			p.Run(ctx, testStateStore(), hg)
+
+			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
+		})
+	}
 }
 
+type testHarvesterGroup struct {
+	encounteredNames []string
+}
+
+func getTestHarvesterGroup() *testHarvesterGroup { return &testHarvesterGroup{make([]string, 0)} }
+
 func (t *testHarvesterGroup) Run(_ input.Context, s loginp.Source) error {
-	assert.Contains(t.t, t.expectedNames, s.Name())
+	t.encounteredNames = append(t.encounteredNames, s.Name())
 	return nil
 }
 
