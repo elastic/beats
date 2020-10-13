@@ -60,6 +60,10 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 }
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test is only supported on non-windows")
+		return
+	}
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
 	extraLargeMessages := generateMessages(2, 65*1024)
