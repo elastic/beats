@@ -115,24 +115,26 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		enroll = false
 	}
 
-	if kibana == "" {
-		kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
-		if err != nil {
-			return fmt.Errorf("problem reading prompt response")
-		}
+	if enroll {
 		if kibana == "" {
-			fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
-			return nil
-		}
-	}
-	if token == "" {
-		token, err = c.ReadInput("Fleet enrollment token:")
-		if err != nil {
-			return fmt.Errorf("problem reading prompt response")
+			kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
+			if err != nil {
+				return fmt.Errorf("problem reading prompt response")
+			}
+			if kibana == "" {
+				fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
+				return nil
+			}
 		}
 		if token == "" {
-			fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
-			return nil
+			token, err = c.ReadInput("Fleet enrollment token:")
+			if err != nil {
+				return fmt.Errorf("problem reading prompt response")
+			}
+			if token == "" {
+				fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
+				return nil
+			}
 		}
 	}
 
