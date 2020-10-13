@@ -229,11 +229,11 @@ def runE2ETestForPackages(){
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
     if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
-      suite = 'helm,ingest-manager'
+      suite = 'helm,fleet'
     } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
       suite = ''
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      suite = 'ingest-manager'
+      suite = 'fleet'
     } else {
       echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
       return
