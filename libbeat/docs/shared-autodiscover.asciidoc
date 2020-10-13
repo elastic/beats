@@ -171,9 +171,10 @@ If the `exclude_labels` config is added to the provider config, then the list of
 will be excluded from the event.
 
 if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be replaced with `_`.
+By default it is `true`.
 
 if the `annotations.dedot` config is set to be `true` in the provider config, then `.` in annotations will be replaced
-with `_`.
+with `_`. By default it is `true`.
 
 
 For example:
