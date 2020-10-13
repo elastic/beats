@@ -43,6 +43,7 @@ would like the Agent to operate.
 }
 
 func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+	var err error
 	if !install.HasRoot() {
 		return fmt.Errorf("unable to perform install command, not executed with %s permissions", install.PermissionUser)
 	}
@@ -75,17 +76,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			}
 		}
 	}
-
-	err := install.Install()
-	if err != nil {
-		return fmt.Errorf("Error: %s", err)
-	}
-	err = install.StartService()
-	if err != nil {
-		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
-		return err
-	}
-	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
 
 	askEnroll := true
 	kibana, _ := cmd.Flags().GetString("kibana-url")
@@ -134,7 +124,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 
 	enrollArgs := []string{"enroll", kibana, token, "--from-install"}
 	enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
-	enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
+	enrollCmd := exec.Command(os.Args[0], enrollArgs...)
 	enrollCmd.Stdin = os.Stdin
 	enrollCmd.Stdout = os.Stdout
 	enrollCmd.Stderr = os.Stderr
@@ -143,12 +133,23 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		return fmt.Errorf("failed to execute enroll command: %s", err)
 	}
 	err = enrollCmd.Wait()
-	if err == nil {
-		return nil
+	if err != nil {
+		exitErr, ok := err.(*exec.ExitError)
+		if ok {
+			return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+		}
+		return fmt.Errorf("enroll command failed for unknown reason: %s", err)
 	}
-	exitErr, ok := err.(*exec.ExitError)
-	if ok {
-		return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+
+	err = install.Install()
+	if err != nil {
+		return fmt.Errorf("Error: %s", err)
 	}
-	return fmt.Errorf("enroll command failed for unknown reason: %s", err)
+	err = install.StartService()
+	if err != nil {
+		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
+		return err
+	}
+	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
+	return nil
 }
