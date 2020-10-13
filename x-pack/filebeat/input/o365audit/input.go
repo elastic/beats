@@ -21,14 +21,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
 	pluginName   = "o365audit"
 	fieldsPrefix = pluginName
-
-	// How long to retry when a fatal error is encountered in the input.
-	failureRetryInterval = time.Minute * 5
 )
 
 type o365input struct {
@@ -126,8 +124,8 @@ func (inp *o365input) Run(
 			}
 			publisher.Publish(event, nil)
 			ctx.Logger.Errorf("Input failed: %v", err)
-			ctx.Logger.Infof("Restarting in %v", failureRetryInterval)
-			time.Sleep(failureRetryInterval)
+			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
+			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
 		}
 	}
 	return nil

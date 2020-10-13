@@ -156,25 +156,6 @@ class Test(WriteReadTest):
         self.assertEqual(evts[0]["winlog.event_id"], 10)
         self.assertEqual(evts[0]["event.code"], 10)
 
-    def test_unknown_eventlog_config(self):
-        """
-        eventlogging - Unknown config parameter
-        """
-        self.render_config_template(
-            event_logs=[
-                {
-                    "name": self.providerName,
-                    "api": self.api,
-                    "event_id": "10, 12",
-                    "level": "info",
-                    "provider": ["me"],
-                    "include_xml": True,
-                }
-            ]
-        )
-        self.start_beat().check_wait(exit_code=1)
-        assert self.log_contains("4 errors: invalid event log key")
-
     def test_utf16_characters(self):
         """
         eventlogging - UTF-16 characters

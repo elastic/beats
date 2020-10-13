@@ -188,8 +188,6 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 
 // CreateS3Events creates s3_request and s3_daily_storage events from Cloudwatch metric data.
 func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName, accountName, accountID)
-
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
@@ -216,6 +214,7 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 		return
 	}
 
+	event = aws.InitEvent(regionName, accountName, accountID, timestamp)
 	event.MetricSetFields = resultMetricSetFields
 	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return

@@ -198,17 +198,30 @@ def tagAndPush(name){
     tagName = "pr-${env.CHANGE_ID}"
   }
 
-  def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
-  def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-  retry(3){
-    sh(label:'Change tag and push', script: """
-      docker tag ${oldName} ${newName}
-      docker push ${newName}
-      docker tag ${oldName} ${commitName}
-      docker push ${commitName}
-    """)
+
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
+    def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
+    def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
+
+    def iterations = 0
+    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+      iterations++
+      def status = sh(label:'Change tag and push', script: """
+        docker tag ${oldName} ${newName}
+        docker push ${newName}
+        docker tag ${oldName} ${commitName}
+        docker push ${commitName}
+      """, returnStatus: true)
+
+    if ( status > 0 && iterations < 3) {
+      error('tag and push failed, retry')
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+    }
   }
 }
 
@@ -245,19 +258,25 @@ def triggerE2ETests(String suite) {
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+
+  def parameters = [
+    booleanParam(name: 'forceSkipGitChecks', value: true),
+    booleanParam(name: 'forceSkipPresubmit', value: true),
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'runTestsSuites', value: suite),
+    string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
+    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+  ]
+  if (isPR()) {
+    def version = "pr-${env.CHANGE_ID}"
+    parameters.push(booleanParam(name: 'USE_CI_SNAPSHOTS', value: true))
+    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
+    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
+  }
+
   build(job: "${e2eTestsPipeline}",
-    parameters: [
-      booleanParam(name: 'forceSkipGitChecks', value: true),
-      booleanParam(name: 'forceSkipPresubmit', value: true),
-      booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-      booleanParam(name: 'USE_CI_SNAPSHOTS', value: true),
-      string(name: 'ELASTIC_AGENT_VERSION', value: "pr-${env.CHANGE_ID}"),
-      string(name: 'METRICBEAT_VERSION', value: "pr-${env.CHANGE_ID}"),
-      string(name: 'runTestsSuites', value: suite),
-      string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
-      string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-      string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-    ],
+    parameters: parameters,
     propagate: false,
     wait: false
   )
