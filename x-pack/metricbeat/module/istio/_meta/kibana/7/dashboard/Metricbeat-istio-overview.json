@@ -31,7 +31,7 @@
             },
             "panelIndex": "3ab7d813-a0b5-48b8-9c10-5ac962a4177c",
             "panelRefName": "panel_0",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -47,7 +47,7 @@
             "panelIndex": "06af11e6-e026-48db-a06b-b34b402b535b",
             "panelRefName": "panel_1",
             "title": "Pilot xds Push Time",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -63,7 +63,7 @@
             "panelIndex": "d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c",
             "panelRefName": "panel_2",
             "title": "Pilot xds Pushes",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -79,7 +79,7 @@
             "panelIndex": "a8e47ef0-03db-419f-890f-0880d674682c",
             "panelRefName": "panel_3",
             "title": "Pilot Inbound Updates",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "0a63d980-8d93-4ce1-b5a1-ab77e589ceec",
             "panelRefName": "panel_4",
             "title": "Pilot Conflict Inbound Listener",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "cd1bbc4f-95de-4156-a3ef-c091cf6402c0",
             "panelRefName": "panel_5",
             "title": "Pilot Proxy Queue Time",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -128,7 +128,7 @@
             "panelIndex": "724f0f9e-2186-4ddd-859c-edb2649b8c0f",
             "panelRefName": "panel_6",
             "title": "Galley Validation Failed",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -145,7 +145,7 @@
             "panelIndex": "32eaa989-a4f9-4d31-97cb-684f31488aa8",
             "panelRefName": "panel_7",
             "title": "Pods witout IP",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -162,7 +162,7 @@
             "panelIndex": "6a8463fe-b7cb-4cd8-bf01-f7ca6a185178",
             "panelRefName": "panel_8",
             "title": "Pilot Virtual Services",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -179,7 +179,7 @@
             "panelIndex": "51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad",
             "panelRefName": "panel_9",
             "title": "Pilot Services",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -196,7 +196,7 @@
             "panelIndex": "9fbfca4c-37b5-4a1a-924e-49fc9ef2294c",
             "panelRefName": "panel_10",
             "title": "Pilot eds instances",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -212,7 +212,7 @@
             "panelIndex": "e708abfa-5a95-483c-9bb2-4470ee913f3c",
             "panelRefName": "panel_11",
             "title": "Citadel Cert Issuane",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -228,7 +228,7 @@
             "panelIndex": "d6b2845f-9582-4863-853e-ab753f3d763e",
             "panelRefName": "panel_12",
             "title": "Pilot xds endpoints",
-            "version": "7.8.0"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -244,7 +244,7 @@
             "panelIndex": "3d0dec37-26c3-490b-a45f-48b6d1baa160",
             "panelRefName": "panel_13",
             "title": "Pilot xds expired",
-            "version": "7.8.0"
+            "version": "7.10.0"
           }
         ],
         "timeRestore": false,
@@ -253,8 +253,11 @@
       },
       "id": "d899d3f0-0883-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "dashboard": "7.3.0"
+        "dashboard": "7.9.3"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "19a8b9c0-0c7f-11eb-a3fd-1b45ec532bb3",
@@ -328,8 +331,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-10-12T11:38:59.035Z",
-      "version": "WzY0NDMsMV0="
+      "updated_at": "2020-10-13T13:01:42.340Z",
+      "version": "WzI5OCwxXQ=="
     },
     {
       "attributes": {
@@ -359,12 +362,15 @@
       },
       "id": "19a8b9c0-0c7f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-12T11:35:59.579Z",
-      "version": "WzY0MzgsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzQ2LDFd"
     },
     {
       "attributes": {
@@ -408,13 +414,13 @@
                   "language": "kuery",
                   "query": "prometheus.labels.type: \"rds\" OR prometheus.labels.type: \"lds\" OR prometheus.labels.type: \"cds\" OR prometheus.labels.type: \"eds\""
                 },
-                "formatter": "s,s,",
+                "formatter": "s,s,2",
                 "id": "7ccbe641-07d8-11eb-985d-2f490d4c2901",
                 "label": "pilot_xds_push_time",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "prometheus.pilot_xds_push_time.histogram.values",
+                    "field": "prometheus.pilot_xds_push_time.histogram",
                     "id": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
                     "percentiles": [
                       {
@@ -469,6 +475,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Pilot xds Push Time [Metricbeat Istio]",
@@ -477,24 +484,21 @@
       },
       "id": "b5b3abb0-087c-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDQsMV0="
+      "updated_at": "2020-10-13T13:01:21.843Z",
+      "version": "WzI2MCwxXQ=="
     },
     {
       "attributes": {
         "description": "Pilot build and send errors for lds, rds, cds and eds.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Pilot xds Pushes [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -597,24 +601,21 @@
       },
       "id": "f858c200-087e-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDUsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzQ4LDFd"
     },
     {
       "attributes": {
         "description": "Total number of updates received by pilot.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Pilot Inbound Updates [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -717,12 +718,15 @@
       },
       "id": "aa997510-087d-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDYsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzQ5LDFd"
     },
     {
       "attributes": {
@@ -812,8 +816,11 @@
       },
       "id": "d62a1e60-0881-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -822,8 +829,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTIsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzUwLDFd"
     },
     {
       "attributes": {
@@ -869,7 +876,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "prometheus.pilot_proxy_queue_time.histogram.values",
+                    "field": "prometheus.pilot_proxy_queue_time.histogram",
                     "id": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
                     "percentiles": [
                       {
@@ -929,6 +936,7 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Pilot Proxy Queue Time [Metricbeat Istio]",
@@ -937,24 +945,21 @@
       },
       "id": "dd1392f0-07d8-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDMsMV0="
+      "updated_at": "2020-10-13T12:59:52.108Z",
+      "version": "WzI0NywxXQ=="
     },
     {
       "attributes": {
         "description": "Resource validation failed.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Galley Validation Failed [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -1057,12 +1062,15 @@
       },
       "id": "98b01f00-087f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDgsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzUyLDFd"
     },
     {
       "attributes": {
@@ -1152,8 +1160,11 @@
       },
       "id": "4275f710-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -1162,8 +1173,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDksMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzUzLDFd"
     },
     {
       "attributes": {
@@ -1253,8 +1264,11 @@
       },
       "id": "96bfe060-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -1263,8 +1277,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTAsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU0LDFd"
     },
     {
       "attributes": {
@@ -1354,8 +1368,11 @@
       },
       "id": "6cfbe3f0-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -1364,8 +1381,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTEsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU1LDFd"
     },
     {
       "attributes": {
@@ -1455,8 +1472,11 @@
       },
       "id": "12cdcce0-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -1465,20 +1485,14 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTMsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU2LDFd"
     },
     {
       "attributes": {
         "description": "The number of certificates issuances that have succeeded.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Citadel Cert Issuance [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -1581,24 +1595,21 @@
       },
       "id": "506c8490-087f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMDcsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU3LDFd"
     },
     {
       "attributes": {
         "description": "Number of endpoints connected to this pilot using XDS.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Pilot XDS endpoints [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -1693,24 +1704,21 @@
       },
       "id": "e5f3e870-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTQsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU4LDFd"
     },
     {
       "attributes": {
         "description": "Total number of XDS requests with an expired nonce.",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Pilot XDS expired [Metricbeat Istio]",
         "uiStateJSON": {},
@@ -1805,13 +1813,16 @@
       },
       "id": "0ed17c80-0883-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-10-07T13:54:44.030Z",
-      "version": "WzYyMTUsMV0="
+      "updated_at": "2020-10-13T12:53:51.050Z",
+      "version": "WzU5LDFd"
     }
   ],
-  "version": "7.8.0"
+  "version": "7.10.0"
 }

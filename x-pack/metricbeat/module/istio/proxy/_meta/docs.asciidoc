@@ -25,15 +25,7 @@ metricbeat.autodiscover:
       templates:
         - condition:
             contains:
-<<<<<<< HEAD
-<<<<<<< HEAD
               kubernetes.annotations.prometheus.io/path: "/stats/prometheus"
-=======
-              kubernetes.annotations.prometheus.io/scrape: "true"
->>>>>>> da9bc48c2e... Add proxy metricset
-=======
-              kubernetes.annotations.prometheus.io/path: "/stats/prometheus"
->>>>>>> 71b71c1af8... fix docs
           config:
             - module: istio
               metricsets: ["proxy"]
