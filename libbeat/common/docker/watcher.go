@@ -138,6 +138,7 @@ func NewWatcher(log *logp.Logger, host string, tls *TLSConfig, storeShortID bool
 	// Extra check to confirm that Docker is available
 	_, err = client.Info(context.Background())
 	if err != nil {
+		client.Close()
 		return nil, err
 	}
 
@@ -395,14 +396,12 @@ func (w *watcher) cleanupWorker() {
 	log := w.log
 
 	for {
-		// Wait a full period
-		time.Sleep(w.cleanupTimeout)
-
 		select {
 		case <-w.ctx.Done():
 			w.stopped.Done()
 			return
-		default:
+		// Wait a full period
+		case <-time.After(w.cleanupTimeout):
 			// Check entries for timeout
 			var toDelete []string
 			timeout := time.Now().Add(-w.cleanupTimeout)

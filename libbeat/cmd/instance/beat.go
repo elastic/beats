@@ -372,6 +372,11 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := b.processing.Close(); err != nil {
+			logp.Warn("Failed to close global processing: %v", err)
+		}
+	}()
 
 	// Windows: Mark service as stopped.
 	// After this is run, a Beat service is considered by the OS to be stopped
