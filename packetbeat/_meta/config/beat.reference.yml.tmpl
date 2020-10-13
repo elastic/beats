@@ -531,6 +531,19 @@ packetbeat.protocols:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
+- type: sip
+  # Configure the ports where to listen for SIP traffic. You can disable the SIP protocol by commenting out the list of ports.
+  ports: [5060]
+
+  # Parse the authorization headers
+  parse_authorization: true
+
+  # Parse body contents (only when body is SDP)
+  parse_body: true
+
+  # Preserve original contents in event.original
+  keep_original: true
+
 {{header "Monitored processes"}}
 
 # Packetbeat can enrich events with information about the process associated

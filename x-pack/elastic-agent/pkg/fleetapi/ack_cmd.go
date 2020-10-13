@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
+const ackPath = "/api/fleet/agents/%s/acks"
 
 // AckEvent is an event sent in an ACK request.
 type AckEvent struct {

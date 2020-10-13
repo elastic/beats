@@ -24,7 +24,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
-    SLACK_CHANNEL = "#beats-ci-builds"
+    SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -122,7 +122,7 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true)
+      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
     }
   }
 }
@@ -265,8 +265,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
         // See https://github.com/elastic/beats/issues/17787.
         sh(label: 'check git config', script: '''
           if [ -z "$(git config --get user.email)" ]; then
-            git config user.email "beatsmachine@users.noreply.github.com"
-            git config user.name "beatsmachine"
+            git config --global user.email "beatsmachine@users.noreply.github.com"
+            git config --global user.name "beatsmachine"
           fi''')
       }
       try {

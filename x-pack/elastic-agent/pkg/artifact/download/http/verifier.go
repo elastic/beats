@@ -59,9 +59,7 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 
 // Verify checks downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
-func (v *Verifier) Verify(programName, version, artifactName string) (bool, error) {
-	// TODO: think about verifying asc for prepacked beats
-
+func (v *Verifier) Verify(programName, version, artifactName string, removeOnFailure bool) (isMatch bool, err error) {
 	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
@@ -72,12 +70,16 @@ func (v *Verifier) Verify(programName, version, artifactName string) (bool, erro
 		return false, errors.New(err, "retrieving package path")
 	}
 
-	isMatch, err := v.verifyHash(filename, fullPath)
-	if !isMatch || err != nil {
-		// remove bits so they can be redownloaded
-		os.Remove(fullPath)
-		os.Remove(fullPath + ".sha512")
-		os.Remove(fullPath + ".asc")
+	defer func() {
+		if removeOnFailure && (!isMatch || err != nil) {
+			// remove bits so they can be redownloaded
+			os.Remove(fullPath)
+			os.Remove(fullPath + ".sha512")
+			os.Remove(fullPath + ".asc")
+		}
+	}()
+
+	if isMatch, err := v.verifyHash(filename, fullPath); !isMatch || err != nil {
 		return isMatch, err
 	}
 

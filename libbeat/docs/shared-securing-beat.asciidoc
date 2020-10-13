@@ -29,10 +29,12 @@ For secure communication between APM Server and APM Agents, see <<secure-communi
 endif::[]
 
 ifndef::serverless[]
+ifndef::win_only[]
 On Linux, {beatname_uc} can take advantage of secure computing mode to restrict the
 system calls that a process can issue.
 
 * <<linux-seccomp>>
+endif::[]
 endif::[]
 
 // APM HTTPS information
@@ -70,5 +72,7 @@ endif::[]
 
 // Linux Seccomp
 ifndef::serverless[]
+ifndef::win_only[]
 include::./security/linux-seccomp.asciidoc[]
+endif::[]
 endif::[]
