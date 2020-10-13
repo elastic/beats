@@ -1,9 +1,22 @@
-This is the Istio module. The Istio module collects metrics from the
+This is the Istio module.
+This module is compatible with versions before `1.5` of Istio where microservices architecture is used. If using
+versions priot to `1.5` then `mesh`, `mixer`, `pilot`, `galley`, `citadel` metricsets should be used.
+wehre the Istio module collects metrics from the
 Istio https://istio.io/v1.4/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
+For versions after `1.5`, `istiod` metricset can be used which collects metrics directly from Istio Daemon.
 
 The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
 
 [float]
 === Compatibility
 
-The Istio module is tested with Istio `1.4`.
+The Istio module is tested with Istio `1.4` for `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
+The Istio module is tested with Istio `1.7` for `istiod`.
+
+[float]
+=== Dashboard
+
+The Istio module includes a predefined dashboard with overview information about Istio Daemon.
+This dashboard is only compatible with versions of Istio after `1.5` which should be monitored with `istiod` metricset.
+
+image::./images/metricbeat-istio-overview.png[]
