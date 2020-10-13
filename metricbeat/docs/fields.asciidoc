@@ -7601,16 +7601,6 @@ Leader id (broker).
 
 --
 
-*`kafka.partition.partition.isr`*::
-+
---
-type: keyword
-
-List of isr ids.
-
-
---
-
 *`kafka.partition.partition.replica`*::
 +
 --
