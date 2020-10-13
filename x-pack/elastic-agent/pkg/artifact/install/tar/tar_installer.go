@@ -99,15 +99,19 @@ func unpack(r io.Reader, dir string) error {
 			}
 
 			_, err = io.Copy(wf, tr)
+
+			if err == nil {
+				// sometimes we try executing binary too fast and run into text file busy after unpacking
+				// syncing prevents this
+				if syncErr := wf.Sync(); syncErr != nil {
+					err = syncErr
+				}
+			}
+
 			if closeErr := wf.Close(); closeErr != nil && err == nil {
 				err = closeErr
 			}
 
-			// sometimes we try executing binary too fast and run into text file busy after unpacking
-			// syncing prevents this
-			if syncErr := wf.Sync(); syncErr != nil && err == nil {
-				err = syncErr
-			}
 			if err != nil {
 				return fmt.Errorf("TarInstaller: error writing to %s: %v", abs, err)
 			}
