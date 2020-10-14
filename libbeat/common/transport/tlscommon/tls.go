@@ -66,7 +66,7 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 		return nil, err
 	}
 
-	log.Debugf("tls", "loading certificate: %v and key %v", certificate, key)
+	log.Debugf("Loading certificate: %v and key %v", certificate, key)
 	return &cert, nil
 }
 
@@ -169,7 +169,7 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, r))
 			continue
 		}
-		log.Debugf("tls", "successfully loaded CA certificate: %v", r)
+		log.Debugf("Successfully loaded CA certificate: %v", r)
 	}
 
 	return roots, errors

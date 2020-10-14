@@ -7,7 +7,7 @@
     },
     "host": {
         "cpu": {
-            "pct": 0.0816
+            "pct": 0.1629
         }
     },
     "metricset": {
@@ -19,68 +19,68 @@
     },
     "system": {
         "cpu": {
-            "cores": 12,
+            "cores": 4,
             "idle": {
                 "norm": {
-                    "pct": 0.9184
+                    "pct": 0.8371
                 },
-                "pct": 11.0208,
-                "ticks": 1964402
+                "pct": 3.3484,
+                "ticks": 806327077
             },
             "iowait": {
                 "norm": {
                     "pct": 0
                 },
                 "pct": 0,
-                "ticks": 5083
+                "ticks": 312229
             },
             "irq": {
                 "norm": {
-                    "pct": 0
+                    "pct": 0.0125
                 },
-                "pct": 0,
-                "ticks": 0
+                "pct": 0.0501,
+                "ticks": 6548016
             },
             "nice": {
                 "norm": {
                     "pct": 0
                 },
                 "pct": 0,
-                "ticks": 9752
+                "ticks": 517231
             },
             "softirq": {
                 "norm": {
-                    "pct": 0.0058
+                    "pct": 0.0025
                 },
-                "pct": 0.0699,
-                "ticks": 10386
+                "pct": 0.01,
+                "ticks": 1561223
             },
             "steal": {
                 "norm": {
                     "pct": 0
                 },
                 "pct": 0,
-                "ticks": 0
+                "ticks": 156646
             },
             "system": {
                 "norm": {
-                    "pct": 0.005
+                    "pct": 0.0551
                 },
-                "pct": 0.06,
-                "ticks": 22274
+                "pct": 0.2206,
+                "ticks": 31037256
             },
             "total": {
                 "norm": {
-                    "pct": 0.0816
+                    "pct": 0.1629
                 },
-                "pct": 0.9792
+                "pct": 0.6516
             },
             "user": {
                 "norm": {
-                    "pct": 0.0708
+                    "pct": 0.0927
                 },
-                "pct": 0.8493,
-                "ticks": 123767
+                "pct": 0.3709,
+                "ticks": 139619320
             }
         }
     }

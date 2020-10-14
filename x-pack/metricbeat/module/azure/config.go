@@ -41,7 +41,7 @@ type MetricConfig struct {
 	Dimensions   []DimensionConfig `config:"dimensions"`
 	Timegrain    string            `config:"timegrain"`
 	// namespaces can be unsupported by some resources and supported in some, this configuration option makes sure no error messages are returned if namespace is unsupported
-	// info messages will be logged instead
+	// info messages will be logged instead. Same situation with metrics, some are being removed from the API, we would like to make sure that does not affect the module
 	IgnoreUnsupported bool `config:"ignore_unsupported"`
 }
 
