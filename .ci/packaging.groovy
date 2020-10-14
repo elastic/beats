@@ -121,7 +121,7 @@ pipeline {
                     release()
                     pushCIDockerImages()
                   }
-                  runE2ETestForPackages()
+                  runE2ETestForPackages("${BEATS_FOLDER}")
                 }
               }
               stage('Package Mac OS'){
@@ -225,18 +225,18 @@ def tagAndPush(name){
   }
 }
 
-def runE2ETestForPackages(){
+def runE2ETestForPackages(String beat){
   def suite = ''
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
+    if ("${beat}" == "filebeat" || "${beat}" == "x-pack/filebeat") {
       suite = 'helm,fleet'
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
+    } else if ("${beat}" == "metricbeat" || "${beat}" == "x-pack/metricbeat") {
       suite = ''
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
+    } else if ("${beat}" == "x-pack/elastic-agent") {
       suite = 'fleet'
     } else {
-      echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
+      echo("Skipping E2E tests for ${beat}.")
       return
     }
 
