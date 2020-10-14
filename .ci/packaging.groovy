@@ -5,7 +5,7 @@
 import groovy.transform.Field
 
 /**
- This is required to store the build status for the downstream jobs.
+ This is required to store the test suites we will use to trigger the E2E tests.
 */
 @Field def e2eTestSuites = []
 
