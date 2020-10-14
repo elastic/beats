@@ -245,8 +245,12 @@ def runE2ETestForPackages(){
 
 def release(){
   withBeatsEnv(){
-    dir("${env.BEATS_FOLDER}") {
-      sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+    withEnv([
+      "DEV=true"
+    ]) {
+      dir("${env.BEATS_FOLDER}") {
+        sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+      }
     }
     publishPackages("${env.BEATS_FOLDER}")
   }
