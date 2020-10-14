@@ -92,7 +92,7 @@ cd 'C:\Program Files\Elastic-Agent'
 .\install-service-elastic-agent.ps1 <1> <2>
 ----
 <1> You must run {agent} under the SYSTEM account if you plan
-to use the {elastic-endpoint} integration.
+to use the {elastic-endpoint-integration} integration.
 <2> If script execution is disabled on your system, set the execution policy for
 the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
