@@ -151,14 +151,14 @@ func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
 		"available":   fsStat.Avail,
-		"files":       fsStat.Files,
+		"free":        fsStat.Free,
 		"used": common.MapStr{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
 		},
 	}
 	if runtime.GOOS != "windows" {
-		evt.Put("free", fsStat.Free)
+		evt.Put("files", fsStat.Files)
 		evt.Put("free_files", fsStat.FreeFiles)
 	}
 	return evt

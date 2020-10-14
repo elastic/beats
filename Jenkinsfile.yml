@@ -40,10 +40,9 @@ changeset:
         - "^testing/.*"
         - "^x-pack/libbeat/.*"
 
-## Proposal
-## TBC: This will allow to configure what to do based on the PR configuration
 disabled:
     when:
-        labels:      ## Skip the GitHub Pull Request builds if there is a GitHub label match
-            - "skip-ci"
+        labels:      ## Skip the GitHub Pull Request builds if any of the given GitHub labels match with the assigned labels in the PR.
+            - skip-ci
+        ## TODO: This will allow to configure what to do based on the PR configuration
         draft: true  ## Skip the GitHub Pull Request builds with Draft PRs.
