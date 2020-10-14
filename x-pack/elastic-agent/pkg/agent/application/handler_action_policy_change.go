@@ -73,14 +73,17 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
 
 	// only set protocol/hosts as that is all Fleet currently sends
 	prevProtocol := h.config.Fleet.Kibana.Protocol
+	prevPath := h.config.Fleet.Kibana.Path
 	prevHosts := h.config.Fleet.Kibana.Hosts
 	h.config.Fleet.Kibana.Protocol = cfg.Fleet.Kibana.Protocol
+	h.config.Fleet.Kibana.Path = cfg.Fleet.Kibana.Path
 	h.config.Fleet.Kibana.Hosts = cfg.Fleet.Kibana.Hosts
 
 	// rollback on failure
 	defer func() {
 		if err != nil {
 			h.config.Fleet.Kibana.Protocol = prevProtocol
+			h.config.Fleet.Kibana.Path = prevPath
 			h.config.Fleet.Kibana.Hosts = prevHosts
 		}
 	}()
@@ -111,6 +114,9 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
 
 func kibanaEqual(k1 *kibana.Config, k2 *kibana.Config) bool {
 	if k1.Protocol != k2.Protocol {
+		return false
+	}
+	if k1.Path != k2.Path {
 		return false
 	}
 
