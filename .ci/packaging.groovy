@@ -268,6 +268,11 @@ def release(){
 }
 
 def runE2ETests(){
+  if (e2eTestSuites.size()) {
+    echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
+    return
+  }
+
   def suites = '' // empty value represents all suites in the E2E tests
 
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
