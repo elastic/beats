@@ -222,7 +222,7 @@ def tagAndPush(name){
     def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
 
     def iterations = 0
-    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+    retryWithSleep(retries: 3, seconds: 5, backoff: true) {
       iterations++
       def status = sh(label:'Change tag and push', script: """
         docker tag ${oldName} ${newName}
@@ -230,6 +230,7 @@ def tagAndPush(name){
         docker tag ${oldName} ${commitName}
         docker push ${commitName}
       """, returnStatus: true)
+    }
 
     if ( status > 0 && iterations < 3) {
       error('tag and push failed, retry')
