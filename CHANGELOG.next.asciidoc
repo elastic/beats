@@ -415,6 +415,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix remote_write flaky test. {pull}21173[21173]
 - Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
+- Report the correct windows events for system/filesystem {pull}21758[21758]
 
 *Packetbeat*
 
