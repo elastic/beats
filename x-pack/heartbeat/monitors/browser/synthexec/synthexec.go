@@ -91,7 +91,7 @@ func JourneyJob(ctx context.Context, script string, params common.MapStr) jobs.J
 		return exec.Command(
 			"npx",
 			"@elastic/synthetics",
-			"--stdin",
+			"--inline",
 			"--screenshots",
 		)
 	}
