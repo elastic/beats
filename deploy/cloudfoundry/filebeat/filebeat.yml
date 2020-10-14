@@ -11,7 +11,7 @@ filebeat.inputs:
     #doppler_address: ${DOPPLER_ADDRESS}
     #uaa_address: ${UAA_ADDRESS}
     #rlp_address: ${RLP_ADDRESS}
-    #shard_id: ${SHARD_ID}
+    shard_id: ${SHARD_ID}
     #version: v1
 
 
