@@ -60,6 +60,10 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 }
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/19641")
+		return
+	}
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
 	extraLargeMessages := generateMessages(2, 65*1024)
@@ -255,6 +259,10 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 }
 
 func TestSocketCleanup(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		return
+	}
 	path := filepath.Join(os.TempDir(), "test.sock")
 	mockStaleSocket, err := net.Listen("unix", path)
 	require.NoError(t, err)
@@ -298,6 +306,10 @@ func TestSocketCleanupRefusal(t *testing.T) {
 }
 
 func TestReceiveNewEventsConcurrently(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		return
+	}
 	workers := 4
 	eventsCount := 100
 	path := filepath.Join(os.TempDir(), "test.sock")
