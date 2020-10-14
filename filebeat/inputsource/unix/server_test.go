@@ -61,7 +61,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("test is only supported on non-windows")
+		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/19641")
 		return
 	}
 	expectedMessages := generateMessages(5, 100)
