@@ -273,7 +273,7 @@ def runE2ETests(){
   catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
     def suitesSet = e2eTestSuites.toSet()
 
-    if !suitesSet.contains('ALL') {
+    if (!suitesSet.contains('ALL')) {
       suitesSet.each { suite ->
         suites += "${suite},"
       };
