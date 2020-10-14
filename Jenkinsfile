@@ -103,13 +103,17 @@ pipeline {
           script {
             def mapParallelTasks = [:]
             def content = readYaml(file: 'Jenkinsfile.yml')
-            content['projects'].each { projectName ->
-              generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                mapParallelTasks["${k}"] = v
+            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+            } else {
+              content['projects'].each { projectName ->
+                generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
+                  mapParallelTasks["${k}"] = v
+                }
               }
+              notifyBuildReason()
+              parallel(mapParallelTasks)
             }
-            notifyBuildReason()
-            parallel(mapParallelTasks)
           }
         }
       }
@@ -230,9 +234,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
     artifacts = '**/build/TEST*.out'
   } else {
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
+    def mingw64Path = 'C:\\tools\\mingw64\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH};${mingw64Path}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
