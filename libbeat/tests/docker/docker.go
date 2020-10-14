@@ -102,17 +102,28 @@ func (c Client) ContainerWait(ID string) error {
 	return nil
 }
 
+// ContainerInspect recovers information of the container
+func (c Client) ContainerInspect(ID string) (types.ContainerJSON, error) {
+	ctx := context.Background()
+	return c.cli.ContainerInspect(ctx, ID)
+}
+
 // ContainerKill kills the given container
 func (c Client) ContainerKill(ID string) error {
 	ctx := context.Background()
 	return c.cli.ContainerKill(ctx, ID, "KILL")
 }
 
-// ContainerRemove removes the given container
+// ContainerRemove kills and removes the given container
 func (c Client) ContainerRemove(ID string) error {
 	ctx := context.Background()
-	options := types.ContainerRemoveOptions{
-		Force: true,
-	}
-	return c.cli.ContainerRemove(ctx, ID, options)
+	return c.cli.ContainerRemove(ctx, ID, types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+	})
+}
+
+// Close closes the underlying client
+func (c *Client) Close() error {
+	return c.cli.Close()
 }
