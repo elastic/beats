@@ -58,7 +58,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 				ECSCloudAccountID:   accountID,
 				ECSCloudAccountName: accountID,
 			},
-			ECSCloudProvider: "googlecloud",
+			ECSCloudProvider: "gcp",
 		},
 	}
 
