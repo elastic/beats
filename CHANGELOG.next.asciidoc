@@ -108,6 +108,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
+- Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 
 *Packetbeat*
