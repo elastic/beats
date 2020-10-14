@@ -9,6 +9,9 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
@@ -28,7 +31,7 @@ would like the Agent to operate.
 `,
 		Run: func(c *cobra.Command, args []string) {
 			if err := installCmd(streams, c, flags, args); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
 		},
@@ -43,6 +46,7 @@ would like the Agent to operate.
 }
 
 func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+	var err error
 	if !install.HasRoot() {
 		return fmt.Errorf("unable to perform install command, not executed with %s permissions", install.PermissionUser)
 	}
@@ -51,6 +55,16 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		return fmt.Errorf("already installed at: %s", install.InstallPath)
 	}
 
+	// check the lock to ensure that elastic-agent is not already running in this directory
+	locker := application.NewAppLocker(paths.Data())
+	if err := locker.TryLock(); err != nil {
+		if err == application.ErrAppAlreadyRunning {
+			return fmt.Errorf("cannot perform installation as Elastic Agent is already running from this directory")
+		}
+		return err
+	}
+	locker.Unlock()
+
 	warn.PrintNotGA(streams.Out)
 	force, _ := cmd.Flags().GetBool("force")
 	if status == install.Broken {
@@ -58,7 +72,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
 			confirm, err := c.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
-				return fmt.Errorf("Error: problem reading prompt response")
+				return fmt.Errorf("problem reading prompt response")
 			}
 			if !confirm {
 				return fmt.Errorf("installation was cancelled by the user")
@@ -68,7 +82,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		if !force {
 			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", install.InstallPath), true)
 			if err != nil {
-				return fmt.Errorf("Error: problem reading prompt response")
+				return fmt.Errorf("problem reading prompt response")
 			}
 			if !confirm {
 				return fmt.Errorf("installation was cancelled by the user")
@@ -76,17 +90,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	}
 
-	err := install.Install()
-	if err != nil {
-		return fmt.Errorf("Error: %s", err)
-	}
-	err = install.StartService()
-	if err != nil {
-		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
-		return err
-	}
-	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
-
+	enroll := true
 	askEnroll := true
 	kibana, _ := cmd.Flags().GetString("kibana-url")
 	token, _ := cmd.Flags().GetString("enrollment-token")
@@ -102,53 +106,71 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			return fmt.Errorf("problem reading prompt response")
 		}
 		if !confirm {
-			// not enrolling, all done (standalone mode)
-			return nil
+			// not enrolling
+			enroll = false
 		}
 	}
 	if !askEnroll && (kibana == "" || token == "") {
 		// force was performed without required enrollment arguments, all done (standalone mode)
-		return nil
+		enroll = false
 	}
 
-	if kibana == "" {
-		kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
-		if err != nil {
-			return fmt.Errorf("problem reading prompt response")
-		}
+	if enroll {
 		if kibana == "" {
-			fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
-			return nil
-		}
-	}
-	if token == "" {
-		token, err = c.ReadInput("Fleet enrollment token:")
-		if err != nil {
-			return fmt.Errorf("problem reading prompt response")
+			kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
+			if err != nil {
+				return fmt.Errorf("problem reading prompt response")
+			}
+			if kibana == "" {
+				fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
+				return nil
+			}
 		}
 		if token == "" {
-			fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
-			return nil
+			token, err = c.ReadInput("Fleet enrollment token:")
+			if err != nil {
+				return fmt.Errorf("problem reading prompt response")
+			}
+			if token == "" {
+				fmt.Fprintf(streams.Out, "Enrollment cancelled because no enrollment token was provided.\n")
+				return nil
+			}
 		}
 	}
 
-	enrollArgs := []string{"enroll", kibana, token, "--from-install"}
-	enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
-	enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
-	enrollCmd.Stdin = os.Stdin
-	enrollCmd.Stdout = os.Stdout
-	enrollCmd.Stderr = os.Stderr
-	err = enrollCmd.Start()
+	err = install.Install()
 	if err != nil {
-		return fmt.Errorf("failed to execute enroll command: %s", err)
+		return err
 	}
-	err = enrollCmd.Wait()
-	if err == nil {
-		return nil
+
+	if enroll {
+		enrollArgs := []string{"enroll", kibana, token, "--from-install"}
+		enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
+		enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
+		enrollCmd.Stdin = os.Stdin
+		enrollCmd.Stdout = os.Stdout
+		enrollCmd.Stderr = os.Stderr
+		err = enrollCmd.Start()
+		if err != nil {
+			install.Uninstall()
+			return fmt.Errorf("failed to execute enroll command: %s", err)
+		}
+		err = enrollCmd.Wait()
+		if err != nil {
+			install.Uninstall()
+			exitErr, ok := err.(*exec.ExitError)
+			if ok {
+				return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+			}
+			return fmt.Errorf("enroll command failed for unknown reason: %s", err)
+		}
 	}
-	exitErr, ok := err.(*exec.ExitError)
-	if ok {
-		return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+
+	err = install.StartService()
+	if err != nil {
+		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
+		return err
 	}
-	return fmt.Errorf("enroll command failed for unknown reason: %s", err)
+	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
+	return nil
 }
