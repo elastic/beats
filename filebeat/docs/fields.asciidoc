@@ -82,6 +82,7 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-symantec>>
 * <<exported-fields-system>>
+* <<exported-fields-threatintel>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
@@ -150910,6 +150911,200 @@ alias to: process.pid
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-threatintel]]
+== threatintel fields
+
+Threatintel Module
+
+
+
+[float]
+=== threatintel
+
+Fields from threatintel.
+
+
+
+*`threatintel.file_type`*::
++
+--
+File type guessed by URLhaus.
+
+
+type: keyword
+
+--
+
+*`threatintel.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.urlhaus_download`*::
++
+--
+Location (URL) where you can download a copy of this file.
+
+
+type: keyword
+
+--
+
+*`threatintel.virustotal.result`*::
++
+--
+AV detection ration.
+
+
+type: keyword
+
+--
+
+*`threatintel.virustotal.percent`*::
++
+--
+AV detection in percent.
+
+
+type: float
+
+--
+
+*`threatintel.virustotal.link`*::
++
+--
+Link to the Virustotal report.
+
+
+type: keyword
+
+--
+
+*`threatintel.imphash`*::
++
+--
+The file's import hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.ssdeep`*::
++
+--
+The file's ssdeep hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.tlsh`*::
++
+--
+The file's tlsh hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.id`*::
++
+--
+The ID of the url.
+
+
+type: keyword
+
+--
+
+*`threatintel.urlhaus_reference`*::
++
+--
+Link to URLhaus entry.
+
+
+type: keyword
+
+--
+
+*`threatintel.url_status`*::
++
+--
+The current status of the URL. Possible values are: online, offline and unknown.
+
+
+type: keyword
+
+--
+
+*`threatintel.threat`*::
++
+--
+The threat corresponding to this malware URL.
+
+
+type: keyword
+
+--
+
+*`threatintel.blacklists.surbl`*::
++
+--
+SURBL blacklist status. Possible values are: listed and not_listed
+
+
+type: keyword
+
+--
+
+*`threatintel.blacklists.spamhaus_dbl`*::
++
+--
+Spamhaus DBL blacklist status.
+
+
+type: keyword
+
+--
+
+*`threatintel.reporter`*::
++
+--
+The Twitter handle of the repoter that has reported this malware URL (or anonymous).
+
+
+type: keyword
+
+--
+
+*`threatintel.larted`*::
++
+--
+Indicates whether the malware URL has been reported to the hosting provider (true or false)
+
+
+type: keyword
+
+--
+
+*`threatintel.tags`*::
++
+--
+A list of tags associated with the queried malware URL
+
+
+type: keyword
 
 --
 

@@ -1,0 +1,45 @@
+description: Pipeline for parsing Abuse.ch URL Threat Intel
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: url.scheme
+    value: https
+    if: ctx?.json?.url.startsWith('https:')
+- set:
+    field: url.scheme
+    value: http
+    if: ctx?.json?.url.startsWith('http:')
+- remove:
+    field:
+    - "@timestamp"
+    ignore_missing: true
+    if: ctx?.json?.date_added != null
+- date:
+    field: json.date_added
+    formats:
+      - "yyyy-MM-dd HH:mm:ss z"
+      - "yyyy-MM-dd HH:mm:ss Z"
+    if: "ctx?.json?.date_added != null"
+- rename:
+    field: json.url
+    target_field: url.full
+    ignore_missing: true
+- rename:
+    field: json.host
+    target_field: url.domain
+    ignore_missing: true
+- rename:
+    field: json
+    target_field: threatintel
+    ignore_missing: true
+- remove:
+    field:
+    - threatintel.date_added
+    - message
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

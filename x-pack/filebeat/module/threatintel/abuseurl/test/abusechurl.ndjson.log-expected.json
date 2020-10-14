@@ -1,0 +1,55 @@
+[
+    {
+        "@timestamp": "2019-08-10T09:02:05.000Z",
+        "event.dataset": "threatintel.abuseurl",
+        "event.module": "threatintel",
+        "fileset.name": "abuseurl",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "threatintel",
+        "tags": [
+            "threatintel",
+            "forwarded"
+        ],
+        "threatintel.blacklists.spamhaus_dbl": "not listed",
+        "threatintel.blacklists.surbl": "not listed",
+        "threatintel.larted": "true",
+        "threatintel.reporter": "zbetcheckin",
+        "threatintel.tags": [
+            "elf"
+        ],
+        "threatintel.threat": "malware_download",
+        "threatintel.url_status": "offline",
+        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/223622/",
+        "url.domain": "45.61.49.78",
+        "url.full": "http://45.61.49.78/razor/r4z0r.mips",
+        "url.scheme": "http"
+    },
+    {
+        "@timestamp": "2019-08-10T09:02:03.000Z",
+        "event.dataset": "threatintel.abuseurl",
+        "event.module": "threatintel",
+        "fileset.name": "abuseurl",
+        "input.type": "log",
+        "log.offset": 350,
+        "service.type": "threatintel",
+        "tags": [
+            "threatintel",
+            "forwarded"
+        ],
+        "threatintel.blacklists.spamhaus_dbl": "not listed",
+        "threatintel.blacklists.surbl": "not listed",
+        "threatintel.larted": "true",
+        "threatintel.reporter": "zbetcheckin",
+        "threatintel.tags": [
+            "elf",
+            "mirai"
+        ],
+        "threatintel.threat": "malware_download",
+        "threatintel.url_status": "offline",
+        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/223621/",
+        "url.domain": "45.61.49.78",
+        "url.full": "http://45.61.49.78/razor/r4z0r.sh4",
+        "url.scheme": "http"
+    }
+]

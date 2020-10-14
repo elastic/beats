@@ -1610,6 +1610,32 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+#----------------------------- Threatintel Module -----------------------------
+- module: threatintel
+  abuseurl:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls
+    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+
+    # The interval to poll the API for updates
+    var.interval: 60m
+
+  abusemalware:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+
+    # The interval to poll the API for updates
+    var.interval: 60m
+
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:

@@ -1,0 +1,108 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-threatintel]]
+[role="xpack"]
+
+:modulename: threatintel
+:has-dashboards: false
+
+
+== Threat Intel module
+beta[]
+
+This module is a collection of different threat intelligence sources.
+
+Currently supporting:
+- `abuseurl` fileset: Supports URL entities from Abuse.ch
+- `abusemalware` fileset: Supports Malware/Payload entities from Abuse.ch
+
+include::../include/gs-link.asciidoc[]
+
+
+[float]
+=== Compatibility
+
+This module has been tested against the Abuse.ch APIs documented below:
+https://urlhaus-api.abuse.ch/#urls-recent
+https://urlhaus-api.abuse.ch/#payloads-recent
+
+[float]
+==== `abuseurl` fileset settings
+
+To configure the module, please utilize the default URL unless specified as the example below:
+
+[source,yaml]
+----
+- module: threatintel
+  abuseurl:
+    enabled: true
+    var.input: httpjson
+    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+    var.interval: 60m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+AbuseCH URL Threat Intel is mapped to the following ECS fields
+[options="header"]
+|==============================================================
+| URL Threat Intel Fields'   | ECS Fields                     |
+| url                        | url.full                       |
+| date_added                 | @timestamp                     |
+| host                       | host.ip/domain                 |
+|==============================================================
+
+[float]
+==== `abusemalware` fileset settings
+
+To configure the module, please utilize the default URL unless specified as the example below:
+
+[source,yaml]
+----
+- module: threatintel
+  abusemalware:
+    enabled: true
+    var.input: httpjson
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.interval: 60m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+AbuseCH Malware Threat Intel is mapped to the following ECS fields
+[options="header"]
+|==============================================================
+| Malware Threat IntelFields | ECS Fields                     |
+| md5_hash                   | file.hash.md5                  |
+| sha256_hash                | file.hash.sha256               |
+| file_size                  | file.size                      |
+|==============================================================
+
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-threatintel,exported fields>> section.
+

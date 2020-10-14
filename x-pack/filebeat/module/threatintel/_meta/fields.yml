@@ -1,0 +1,11 @@
+- key: threatintel
+  title: threatintel
+  description: >
+    Threatintel Module
+  fields:
+    - name: threatintel
+      type: group
+      default_field: false
+      description: >
+        Fields from threatintel.
+      fields:
