@@ -24,7 +24,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
-    SLACK_CHANNEL = "#beats-ci-builds"
+    SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -103,13 +103,17 @@ pipeline {
           script {
             def mapParallelTasks = [:]
             def content = readYaml(file: 'Jenkinsfile.yml')
-            content['projects'].each { projectName ->
-              generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                mapParallelTasks["${k}"] = v
+            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+            } else {
+              content['projects'].each { projectName ->
+                generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
+                  mapParallelTasks["${k}"] = v
+                }
               }
+              notifyBuildReason()
+              parallel(mapParallelTasks)
             }
-            notifyBuildReason()
-            parallel(mapParallelTasks)
           }
         }
       }
@@ -122,7 +126,7 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true)
+      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
     }
   }
 }

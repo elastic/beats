@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -834,4 +835,29 @@ func TestSocketReuse(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Len(t, flows, 1)
+}
+
+func TestProcessDNSRace(t *testing.T) {
+	p := new(process)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	address := func(i byte) net.IP { return net.IPv4(172, 16, 0, i) }
+	go func() {
+		for i := byte(255); i > 0; i-- {
+			p.addTransaction(dns.Transaction{
+				Client:    net.UDPAddr{IP: net.IPv4(10, 20, 30, 40)},
+				Server:    net.UDPAddr{IP: net.IPv4(10, 20, 30, 41)},
+				Domain:    "example.net",
+				Addresses: []net.IP{address(i)},
+			})
+		}
+		wg.Done()
+	}()
+	go func() {
+		for i := byte(255); i > 0; i-- {
+			p.ResolveIP(address(i))
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
