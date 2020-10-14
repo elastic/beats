@@ -94,7 +94,7 @@ rm /Library/Launchdaemons/co.elastic.agent.plist
 . <<unenroll-elastic-agent,Unenroll the agent from {fleet}>>.
 +
 Unenrolling the agent should stop {agent} and any other programs started by
-the agent, such as Elastic {endpoint-sec} and data shippers.
+the agent, such as {elastic-sec} and data shippers.
 
 . If necessary, manually kill the `elastic-agent` process and any other
 processes started by the agent. 
