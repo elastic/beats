@@ -358,8 +358,6 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 }
 
 func TestWatcherDie(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/7906")
-
 	watcher := runWatcher(t, false,
 		[][]types.Container{
 			[]types.Container{
@@ -404,8 +402,6 @@ func TestWatcherDie(t *testing.T) {
 }
 
 func TestWatcherDieShortID(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/7906")
-
 	watcher := runWatcherShortID(t, false,
 		[][]types.Container{
 			[]types.Container{
