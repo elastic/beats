@@ -284,12 +284,6 @@ shared:
     <<: *common
     files:
       <<: *agent_binary_files
-      install-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service-elastic-agent.ps1.tmpl'
-        mode: 0755
-      uninstall-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
-        mode: 0755
       'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
