@@ -66,7 +66,7 @@ To check the status, run:
 $ cf apps
 
 name       requested state   instances   memory   disk   urls
-filebeat   started           1/1         256M     1G
+filebeat   started           1/1         512M     1G
 ------------------------------------------------
 
 Log events should start flowing to Elasticsearch. The events are annotated with
