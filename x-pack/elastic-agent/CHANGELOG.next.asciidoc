@@ -35,4 +35,6 @@
 - Add `elastic.agent.id` and `elastic.agent.version` to published events from filebeat and metricbeat {pull}21543[21543]
 - Add `upgrade` subcommand to perform upgrade of installed Elastic Agent {pull}21425[21425]
 - Update `fleet.yml` and Kibana hosts when a policy change updates the Kibana hosts {pull}21599[21599]
+- Update `install` command to perform enroll before starting Elastic Agent {pull}21772[21772]
+- Update `fleet.kibana.path` from a POLICY_CHANGE {pull}21804[21804]
 - Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]

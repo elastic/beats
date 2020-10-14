@@ -32,15 +32,7 @@ func Uninstall() error {
 		}
 		status = service.StatusStopped
 	}
-	if status == service.StatusStopped {
-		err := svc.Uninstall()
-		if err != nil {
-			return errors.New(
-				err,
-				fmt.Sprintf("failed to uninstall service (%s)", ServiceName),
-				errors.M("service", ServiceName))
-		}
-	}
+	_ = svc.Uninstall()
 
 	// remove, if present on platform
 	if ShellWrapperPath != "" {
