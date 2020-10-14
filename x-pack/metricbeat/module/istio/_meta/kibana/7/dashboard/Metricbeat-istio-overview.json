@@ -362,7 +362,7 @@
       },
       "id": "19a8b9c0-0c7f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -484,7 +484,7 @@
       },
       "id": "b5b3abb0-087c-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -601,7 +601,7 @@
       },
       "id": "f858c200-087e-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -718,7 +718,7 @@
       },
       "id": "aa997510-087d-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -816,7 +816,7 @@
       },
       "id": "d62a1e60-0881-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -945,7 +945,7 @@
       },
       "id": "dd1392f0-07d8-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1062,7 +1062,7 @@
       },
       "id": "98b01f00-087f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1160,7 +1160,7 @@
       },
       "id": "4275f710-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1264,7 +1264,7 @@
       },
       "id": "96bfe060-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1368,7 +1368,7 @@
       },
       "id": "6cfbe3f0-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1472,7 +1472,7 @@
       },
       "id": "12cdcce0-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1595,7 +1595,7 @@
       },
       "id": "506c8490-087f-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1704,7 +1704,7 @@
       },
       "id": "e5f3e870-0882-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1813,7 +1813,7 @@
       },
       "id": "0ed17c80-0883-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"

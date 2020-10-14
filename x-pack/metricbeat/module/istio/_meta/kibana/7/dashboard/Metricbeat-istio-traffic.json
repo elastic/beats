@@ -303,7 +303,7 @@
       },
       "id": "96c4a5c0-0c7c-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -413,7 +413,7 @@
       },
       "id": "e14e3560-0c78-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -523,7 +523,7 @@
       },
       "id": "c7468af0-0c78-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -590,7 +590,7 @@
       },
       "id": "1d076a90-0c7e-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -686,7 +686,7 @@
       },
       "id": "3ae9b3f0-0c7a-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -779,7 +779,7 @@
       },
       "id": "60dacbe0-0c79-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -872,7 +872,7 @@
       },
       "id": "78375380-0c79-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -962,7 +962,7 @@
       },
       "id": "5fd462f0-0c7a-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1055,7 +1055,7 @@
       },
       "id": "b4235550-0c7a-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1148,7 +1148,7 @@
       },
       "id": "8d818070-0c7a-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
@@ -1259,7 +1259,7 @@
       },
       "id": "09404610-0c7b-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "visualization": "7.10.0"
+        "visualization": "7.8.0"
       },
       "namespaces": [
         "default"
