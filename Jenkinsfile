@@ -272,16 +272,15 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.email "beatsmachine@users.noreply.github.com"
             git config --global user.name "beatsmachine"
           fi''')
-
+      }
+      try {
         // Add more stability when dependencies are not accessible temporarily
         // See https://github.com/elastic/beats/issues/21609
         // retry/try/catch approach reports errors, let's avoid it to keep the
         // notifications cleaner.
-        if (sh(label: 'Fetch go dependencies', script: 'go get ./...', returnStatus: true) > 0) {
-          sh(label: 'Fetch go dependencies - retry', script: 'go get ./...', returnStatus: true)
+        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
         }
-      }
-      try {
         body()
       } finally {
         if (archive) {
