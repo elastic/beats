@@ -371,6 +371,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
 - Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
+- Report the correct windows events for system/filesystem {pull}21758[21758]
 
 *Packetbeat*
 

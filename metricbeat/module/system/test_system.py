@@ -47,7 +47,7 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
 
-SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "files",
+SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
 
