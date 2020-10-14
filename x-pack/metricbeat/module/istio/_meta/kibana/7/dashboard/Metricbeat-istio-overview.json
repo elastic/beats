@@ -253,7 +253,7 @@
       },
       "id": "d899d3f0-0883-11eb-a3fd-1b45ec532bb3",
       "migrationVersion": {
-        "dashboard": "7.9.3"
+        "dashboard": "7.3.0"
       },
       "namespaces": [
         "default"
