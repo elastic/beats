@@ -31,7 +31,7 @@
             },
             "panelIndex": "fbc3815e-eb3a-46dd-b37a-a61b741b754e",
             "panelRefName": "panel_0",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "1f88dc8b-1c21-40e0-8507-b468643d5507",
             "panelRefName": "panel_1",
             "title": "Number of requests per source",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -65,7 +65,7 @@
             "panelIndex": "7c7c491b-c55c-4892-a73e-3bfb5af9a610",
             "panelRefName": "panel_2",
             "title": "Number of requests per destination",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -81,7 +81,7 @@
             "panelIndex": "c87dc307-71f1-4642-8d2a-60066f5ab114",
             "panelRefName": "panel_3",
             "title": "Destination Apps",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -98,7 +98,7 @@
             "panelIndex": "894e458b-c822-4df1-ae43-aa99d73bfedc",
             "panelRefName": "panel_4",
             "title": "Duration of requests per destination",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -115,7 +115,7 @@
             "panelIndex": "28d6f60d-1b2c-4688-9cbc-5ebf3d587469",
             "panelRefName": "panel_5",
             "title": "Size of requests per source",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -132,7 +132,7 @@
             "panelIndex": "1b1f0dcb-613d-4b71-a8a9-e30f79734ede",
             "panelRefName": "panel_6",
             "title": "Size of requests per destination",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -149,7 +149,7 @@
             "panelIndex": "ae905bb4-456f-4122-8f5c-44a9ced608f1",
             "panelRefName": "panel_7",
             "title": "Duration of requests per source",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -166,7 +166,7 @@
             "panelIndex": "3f4222fc-a243-4141-8787-1dd41d9f1661",
             "panelRefName": "panel_8",
             "title": "Size of response per source",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -183,7 +183,7 @@
             "panelIndex": "4c498b69-296c-4e30-8a35-1510566ea5ef",
             "panelRefName": "panel_9",
             "title": "Size of response per destination",
-            "version": "7.10.0"
+            "version": "7.9.0"
           },
           {
             "embeddableConfig": {
@@ -200,7 +200,7 @@
             "panelIndex": "2a128040-ef73-40a2-8b52-62c8180bcad7",
             "panelRefName": "panel_10",
             "title": "Response Codes",
-            "version": "7.10.0"
+            "version": "7.9.0"
           }
         ],
         "timeRestore": false,
@@ -1270,5 +1270,5 @@
       "version": "WzcxLDFd"
     }
   ],
-  "version": "7.10.0"
+  "version": "7.9.0"
 }
