@@ -36,10 +36,7 @@ func newStore(logger *logp.Logger, dir, name string) (*Store, error) {
 	// Opinionated options for the use of badger as a store for metadata caches in Beats.
 	options := badger.DefaultOptions(dbPath)
 	options.Logger = badgerLogger{logger.Named("badger")}
-	// TODO: Disabling sync writes gives better performance, and data loss wouldn't
-	// be a problem for caches. But we are not properly closing processors yet, so let
-	// sync on writes by now.
-	// options.SyncWrites = false
+	options.SyncWrites = false
 
 	db, err := badger.Open(options)
 	if err != nil {
