@@ -230,12 +230,12 @@ def tagAndPush(name){
         docker tag ${oldName} ${commitName}
         docker push ${commitName}
       """, returnStatus: true)
-    }
 
-    if ( status > 0 && iterations < 3) {
-      error('tag and push failed, retry')
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      if ( status > 0 && iterations < 3) {
+        error('tag and push failed, retry')
+      } else if ( status > 0 ) {
+        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      }
     }
   }
 }
