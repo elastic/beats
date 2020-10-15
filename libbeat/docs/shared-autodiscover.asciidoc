@@ -24,7 +24,7 @@ start/stop events. This ensures you don't need to worry about state, but only de
 The Docker autodiscover provider watches for Docker containers to start and stop.
 
 
-These are the available fields during within config templating. The `docker.*` fields will be available on each emitted event.
+These are the fields available within config templating. The `docker.*` fields will be available on each emitted event.
 event:
 
   * host
