@@ -117,7 +117,7 @@ Client Secret to authenticate with Cloud Foundry. Default: "".
 === `shard_id`
 
 Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
-from the RLP Gateway. Default: "(generated UUID)".
+from the RLP Gateway.
 
 [float]
 ==== `version`
@@ -152,6 +152,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  shard_id: metricbeat
   version: v1
 ----
 

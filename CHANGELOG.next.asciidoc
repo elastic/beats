@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
+- API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 
 *Auditbeat*
 
@@ -78,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed experimental modules `citrix`, `kaspersky`, `rapid7` and `tenable`. {pull}20706[20706]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
 
 *Heartbeat*
 
@@ -95,6 +97,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Rename googlecloud stackdriver metricset to metrics. {pull}19718[19718]
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
+- Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
+- API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 
 *Packetbeat*
 
@@ -366,7 +370,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
+- Report the correct windows events for system/filesystem {pull}21758[21758]
 
 *Packetbeat*
 
@@ -458,6 +464,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add istiod metricset. {pull}21519[21519]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
+- Add proxy metricset for istio module. {pull}21751[21751]
 
 *Auditbeat*
 
@@ -750,6 +757,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move Prometheus query & remote_write to GA. {pull}21507[21507]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
+- Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 
 *Packetbeat*
 
