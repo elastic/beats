@@ -126,7 +126,9 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
+      notifyBuildResult(prComment: true,
+                        slackComment: true, slackNotify: (isBranch() || isTag())
+                        analyzeFlakey: true, flakyReportIdx: "reporter-beats-pipeline-master")
     }
   }
 }
