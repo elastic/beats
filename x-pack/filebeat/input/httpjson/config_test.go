@@ -25,7 +25,7 @@ func TestConfigValidationCase1(t *testing.T) {
 		"url":               "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
 	}
@@ -39,7 +39,7 @@ func TestConfigValidationCase2(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
 	}
@@ -53,7 +53,7 @@ func TestConfigValidationCase3(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
 	}
@@ -66,7 +66,7 @@ func TestConfigValidationCase4(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
 	}
@@ -79,7 +79,7 @@ func TestConfigValidationCase5(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
 	}
@@ -92,7 +92,7 @@ func TestConfigValidationCase6(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
 	}
@@ -105,7 +105,7 @@ func TestConfigValidationCase7(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
 	}
@@ -116,7 +116,7 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 		"url": "::invalid::",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	err := cfg.Unpack(&conf)
 	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'url'`)
 }
@@ -362,6 +362,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url": "localhost",
 			},
 		},
+		/* Flaky test: https://github.com/elastic/beats/issues/21748
 		{
 			name:        "date_cursor.date_format will fail if invalid",
 			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
@@ -370,6 +371,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url":         "localhost",
 			},
 		},
+		*/
 		{
 			name: "date_cursor must work with a valid date_format",
 			input: map[string]interface{}{
@@ -414,7 +416,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 
 			cfg := common.MustNewConfigFrom(c.input)
-			conf := defaultConfig()
+			conf := newDefaultConfig()
 			err := cfg.Unpack(&conf)
 
 			switch {
