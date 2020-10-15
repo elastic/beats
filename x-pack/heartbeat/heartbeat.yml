@@ -13,6 +13,11 @@ heartbeat.synthetic_suites:
   schedule: "@every 1m"
 
 heartbeat.monitors:
+- type: http
+  id: testh
+  urls: http://www.google.com
+  schedule: "@every 1s"
+  name: blah
 - type: browser
   id: my-monitor
   name: My Monitor
@@ -38,13 +43,9 @@ setup.kibana:
 output.elasticsearch:
   hosts:
   - localhost:9200
-  protocol: https
-  username: heartbeat
+  protocol: http
+  username: elastic
   password: changeme
-  ssl:
-    certificate_authorities: "${HOME}/projects/kibana/packages/kbn-dev-utils/certs/ca.crt"
-    certificate: "${HOME}/projects/kibana/packages/kbn-dev-utils/certs/elasticsearch.crt"
-    key: "${HOME}/projects/kibana/packages/kbn-dev-utils/certs/elasticsearch.key"
 processors:
 - add_observer_metadata:
 

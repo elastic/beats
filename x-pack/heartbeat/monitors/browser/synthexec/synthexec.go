@@ -48,7 +48,8 @@ func init() {
 // ListJourneys takes the given suite perfors a dry run, capturing the Journey names, and returns the list.
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
 	cmd := exec.Command(
-		"node",
+		"npx",
+		"@elastic/synthetics",
 		suiteFile,
 		"--dry-run",
 	)
@@ -75,7 +76,8 @@ Outer:
 func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) jobs.Job {
 	newCmd := func() *exec.Cmd {
 		return exec.Command(
-			"node",
+			"npx",
+			"@elastic/synthetics",
 			suiteFile,
 			"--screenshots",
 			"--journey-name", journeyName,
