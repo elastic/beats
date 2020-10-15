@@ -35,24 +35,24 @@ import (
 func TestCheckBody(t *testing.T) {
 
 	var matchTests = []struct {
-		description   string
-		body          string
-		patterns      []string
-		positiveCheck bool
-		result        bool
+		description string
+		body        string
+		positive    []string
+		negative    []string
+		result      bool
 	}{
 		{
 			"Single regex that matches",
 			"ok",
 			[]string{"ok"},
-			true,
+			nil,
 			true,
 		},
 		{
 			"Regex matching json example",
 			`{"status": "ok"}`,
 			[]string{`{"status": "ok"}`},
-			true,
+			nil,
 			true,
 		},
 		{
@@ -60,7 +60,7 @@ func TestCheckBody(t *testing.T) {
 			`first line
 			second line`,
 			[]string{"first"},
-			true,
+			nil,
 			true,
 		},
 		{
@@ -68,7 +68,7 @@ func TestCheckBody(t *testing.T) {
 			`first line
 			second line`,
 			[]string{"second"},
-			true,
+			nil,
 			true,
 		},
 		{
@@ -77,7 +77,7 @@ func TestCheckBody(t *testing.T) {
 			second line
 			third line`,
 			[]string{"(?s)first.*second.*third"},
-			true,
+			nil,
 			true,
 		},
 		{
@@ -86,57 +86,71 @@ func TestCheckBody(t *testing.T) {
 			second line
 			third line`,
 			[]string{"(?s)first.*fourth.*third"},
+			nil,
 			false,
-			true,
 		},
 		{
 			"Single regex that doesn't match",
 			"ok",
 			[]string{"notok"},
+			nil,
 			false,
-			true,
 		},
 		{
 			"Multiple regex match where at least one must match",
 			"ok",
 			[]string{"ok", "yay"},
-			true,
+			nil,
 			true,
 		},
 		{
 			"Multiple regex match where none of the patterns match",
 			"ok",
 			[]string{"notok", "yay"},
+			nil,
 			false,
-			true,
 		},
 		{
-			"Positive check on HTTP body when body check is matched and positiveCheck is true",
+			"Only positive check where pattern matches HTTP return body",
 			"'status': 'red'",
 			[]string{"red"},
-			true,
+			nil,
 			true,
 		},
 		{
-			"Negative check on HTTP body when body check is matched and positiveCheck is false",
+			"Only positive check where pattern not match HTTP return body",
+			"'status': 'green'",
+			[]string{"red"},
+			nil,
+			false,
+		},
+		{
+			"Only negative check where pattern matches HTTP return body",
 			"'status': 'red'",
+			nil,
 			[]string{"red"},
 			false,
-			false,
 		},
 		{
-			"Positive check on HTTP body when body check is not matched and positiveCheck is true",
-			"'status': 'red'",
-			[]string{"green"},
+			"Only negative check where pattern not match HTTP return body",
+			"'status': 'green'",
+			nil,
+			[]string{"red"},
 			true,
-			false,
 		},
 		{
-			"Negative check on HTTP body when body check is not matched and positiveCheck is false",
-			"'status': 'red'",
+			"Positive with negative check where all positive pattern matches and none negative check matches",
+			"'status': 'green', 'cluster': 'healthy'",
 			[]string{"green"},
-			false,
+			[]string{"unhealthy"},
 			true,
+		},
+		{
+			"Positive with negative check where positive and negative pattern both match",
+			"'status': 'green', 'cluster': 'healthy'",
+			[]string{"green"},
+			[]string{"healthy"},
+			false,
 		},
 	}
 
@@ -152,19 +166,23 @@ func TestCheckBody(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			patterns := []match.Matcher{}
-			for _, pattern := range test.patterns {
-				patterns = append(patterns, match.MustCompile(pattern))
+			var positivePatterns []match.Matcher
+			var negativePatterns []match.Matcher
+			for _, p := range test.positive {
+				positivePatterns = append(positivePatterns, match.MustCompile(p))
+			}
+			for _, n := range test.negative {
+				negativePatterns = append(negativePatterns, match.MustCompile(n))
 			}
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
-			check := checkBody(patterns, test.positiveCheck)(res, string(body))
+			check := checkBody(positivePatterns, negativePatterns)(res, string(body))
 
-			if result := (check == nil); result != test.result {
+			if result := check == nil; result != test.result {
 				if test.result {
-					t.Fatalf("Expected at least one of patterns: %s to match body: %s", test.patterns, test.body)
+					t.Fatalf("Expected at least one of positive patterns or all negative patterns: %s %s to match body: %s", test.positive, test.negative, test.body)
 				} else {
-					t.Fatalf("Did not expect patterns: %s to match body: %s", test.patterns, test.body)
+					t.Fatalf("Did not expect positive patterns or negative patterns: %s %s to match body: %s", test.positive, test.negative, test.body)
 				}
 			}
 		})
