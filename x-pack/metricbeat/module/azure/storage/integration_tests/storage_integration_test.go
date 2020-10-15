@@ -5,10 +5,12 @@
 package integration_tests
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/pulumi/pulumi/pkg/v2/testing/integration"
 	"github.com/pulumi/pulumi/sdk/v2/go/common/apitype"
 	"os"
 	"path"
+	"time"
 
 	"testing"
 
@@ -22,31 +24,87 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/storage"
 )
 
-const location          = "WestEurope"
+const location = "WestEurope"
 
-
-
-func TestFetch(t *testing.T) {
-	config :=  map[string]interface{}{
-		"module":                "azure",
-		"period":                "300s",
-		"refresh_list_interval": "600s",
-		"metricsets":            []string{"storage"},
-		"client_id":             "26a2f804-b87d-4112-babd-e373dbf1e7a1",
-		"client_secret":         "testtesttest",
-		"tenant_id":             "aa40685b-417d-4664-b4ec-8f7640719adb",
-		"subscription_id":       "70bd6e77-4b1e-4835-8896-db77b8eef364",
+func GetConfigCredentials(t *testing.T) map[string]string {
+	t.Helper()
+	clientId, ok := os.LookupEnv("AZURE_CLIENT_ID")
+	if !ok {
+		t.Fatal("Could not find var AZURE_CLIENT_ID")
 	}
-	config["resources"] = []map[string]interface{}{{
-		"resource_id": "jhj",
-		"metrics": []map[string]interface{}{{"namespace": "Microsoft.DocumentDb/databaseAccounts",
-			"name": []string{"DataUsage", "DocumentCount", "DocumentQuota"}}}}}
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
-	assert.Nil(t, errs)
-	assert.NotEmpty(t, events)
+	tenantId, ok := os.LookupEnv("AZURE_TENANT_ID")
+	if !ok {
+		t.Fatal("Could not find var AZURE_TENANT_ID")
+	}
+	subId, ok := os.LookupEnv("AZURE_SUBSCRIPTION_ID")
+	if !ok {
+		t.Fatal("Could not find var AZURE_SUBSCRIPTION_ID")
+	}
+	return map[string]string{
+		"cloud:provider":       "azure",
+		"azure:environment":    "public",
+		"azure:location":       location,
+		"azure:subscriptionId": subId,
+		"azure:clientId":       clientId,
+		"azure:tenantId":       tenantId,
+	}
 }
 
+func GetConfigSecret(t *testing.T) map[string]string {
+	t.Helper()
+	clientSecret, ok := os.LookupEnv("AZURE_CLIENT_SECRET")
+	if !ok {
+		t.Fatal("Could not find var AZURE_CLIENT_SECRET")
+	}
+	return map[string]string{
+		"azure:clientSecret": clientSecret,
+	}
+}
+
+func TestFetchMetricset(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal("Error thrown: " + err.Error())
+	}
+	dir := path.Join(cwd, "config")
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Quick:       true,
+		SkipRefresh: true,
+		Dir:         dir,
+		Config:      GetConfigCredentials(t),
+		Secrets:     GetConfigSecret(t),
+		ExtraRuntimeValidation: func(t *testing.T, stack integration.RuntimeValidationStackInfo) {
+			var storageAccount apitype.ResourceV3
+			for _, res := range stack.Deployment.Resources {
+				if res.Type == "azure:storage/account:Account" {
+					storageAccount = res
+				}
+			}
+			assert.NotNil(t, storageAccount)
+			// will need some time to gather relevand metric values, else no vlaues are returned
+			time.Sleep(150 * time.Second)
+			config := test.GetConfig(t, "storage")
+			config["resources"] = []map[string]interface{}{{
+				"resource_id": storageAccount.ID}}
+			metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+			events, errs := mbtest.ReportingFetchV2Error(metricSet)
+			assert.Nil(t, errs)
+			assert.NotEmpty(t, events)
+			timegrain, err := events[0].ModuleFields.GetValue("timegrain")
+			if err != nil {
+				t.Fatal("Error thrown: " + err.Error())
+			}
+			assert.Equal(t, timegrain, "PT5M")
+			resource, err := events[0].ModuleFields.GetValue("resource")
+			if err != nil {
+				t.Fatal("Error thrown: " + err.Error())
+			}
+			res := resource.(common.MapStr)
+			assert.Equal(t, res["type"], "Microsoft.Storage/storageAccounts")
+			assert.Equal(t, res["id"], storageAccount.ID)
+		},
+	})
+}
 
 func TestData(t *testing.T) {
 	config := test.GetConfig(t, "storage")
