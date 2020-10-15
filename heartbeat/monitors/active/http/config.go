@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 )
@@ -77,10 +76,8 @@ type responseParameters struct {
 	// expected HTTP response configuration
 	Status      []uint16             `config:"status"`
 	RecvHeaders map[string]string    `config:"headers"`
-	RecvBody    []match.Matcher      `config:"body"`
+	RecvBody    interface{}          `config:"body"`
 	RecvJSON    []*jsonResponseCheck `config:"json"`
-	// add this option to control the match on http body is positive check or negative check
-	PositiveCheckOnHTTPBody bool `config:"positive_check_on_http_body"`
 }
 
 type jsonResponseCheck struct {
@@ -109,10 +106,9 @@ var defaultConfig = Config{
 			SendBody:    "",
 		},
 		Response: responseParameters{
-			RecvHeaders:             nil,
-			RecvBody:                []match.Matcher{},
-			RecvJSON:                nil,
-			PositiveCheckOnHTTPBody: true,
+			RecvHeaders: nil,
+			RecvBody:    nil,
+			RecvJSON:    nil,
 		},
 	},
 }
