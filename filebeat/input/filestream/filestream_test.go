@@ -91,13 +91,7 @@ func TestLogFileTruncated(t *testing.T) {
 	defer f.Close()
 	defer os.Remove(f.Name())
 
-	reader, err := newFileReader(
-		logp.L(),
-		context.TODO(),
-		f,
-		readerConfig{},
-		closerConfig{},
-	)
+	reader, err := newFileReader(logp.L(), context.TODO(), f, readerConfig{}, closerConfig{})
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)
 	}
@@ -106,20 +100,14 @@ func TestLogFileTruncated(t *testing.T) {
 	_, err = reader.Read(buf)
 	assert.Nil(t, err)
 
-	go func() {
-		err := f.Truncate(0)
-		if err != nil {
-			panic(err)
-		}
-	}()
-
-	for err == nil {
-		buf := make([]byte, 1024)
-		_, err = reader.Read(buf)
+	err = f.Truncate(0)
+	if err != nil {
+		t.Fatalf("error while truncating file: %+v", err)
 	}
 
-	assert.Equal(t, ErrFileTruncate, err)
+	err = readUntilError(reader)
 
+	assert.Equal(t, ErrFileTruncate, err)
 }
 
 func TestLogFileRenamed(t *testing.T) {
@@ -148,18 +136,15 @@ func TestLogFileRenamed(t *testing.T) {
 	_, err = reader.Read(buf)
 	assert.Nil(t, err)
 
-	go func() {
-		err := os.Rename(f.Name(), renamedFile)
-		if err != nil {
-			panic(err)
-		}
-	}()
+	err = os.Rename(f.Name(), renamedFile)
+	if err != nil {
+		t.Fatalf("error while renaming file: %+v", err)
+	}
 
 	err = readUntilError(reader)
+	os.Remove(renamedFile)
 
 	assert.Equal(t, ErrClosed, err)
-
-	os.Remove(renamedFile)
 }
 
 func TestLogFileRemoved(t *testing.T) {
@@ -186,12 +171,10 @@ func TestLogFileRemoved(t *testing.T) {
 	_, err = reader.Read(buf)
 	assert.Nil(t, err)
 
-	go func() {
-		err := os.Remove(f.Name())
-		if err != nil {
-			panic(err)
-		}
-	}()
+	err = os.Remove(f.Name())
+	if err != nil {
+		t.Fatalf("error while remove file: %+v", err)
+	}
 
 	err = readUntilError(reader)
 
@@ -199,20 +182,15 @@ func TestLogFileRemoved(t *testing.T) {
 }
 
 func createTestLogFile() *os.File {
-	f := createEmptyTestFile()
+	f, err := ioutil.TempFile("", "filestream_reader_test")
+	if err != nil {
+		panic(err)
+	}
 	content := []byte("first log line\nanother interesting line\na third log message\n")
 	if _, err := f.Write(content); err != nil {
 		panic(err)
 	}
 	if _, err := f.Seek(0, io.SeekStart); err != nil {
-		panic(err)
-	}
-	return f
-}
-
-func createEmptyTestFile() *os.File {
-	f, err := ioutil.TempFile("", "filestream_reader_test")
-	if err != nil {
 		panic(err)
 	}
 	return f
