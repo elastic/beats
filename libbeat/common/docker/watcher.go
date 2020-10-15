@@ -246,7 +246,7 @@ func (w *watcher) watch() {
 	lastValidTimestamp := time.Now()
 
 	watch := func() bool {
-		lastWatchReceivedEventTime := time.Now()
+		lastReceivedEventTime := time.Now()
 
 		w.log.Debugf("Fetching events since %s", lastValidTimestamp)
 
@@ -264,7 +264,7 @@ func (w *watcher) watch() {
 			case event := <-events:
 				w.log.Debugf("Got a new docker event: %v", event)
 				lastValidTimestamp = time.Unix(event.Time, event.TimeNano)
-				lastWatchReceivedEventTime = time.Now()
+				lastReceivedEventTime = time.Now()
 
 				switch event.Action {
 				case "start", "update":
@@ -287,7 +287,7 @@ func (w *watcher) watch() {
 				}
 				return false
 			case <-tickChan.C:
-				if time.Since(lastWatchReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
+				if time.Since(lastReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
 					w.log.Infof("No events received within %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
 					return false
 				}
@@ -303,6 +303,7 @@ func (w *watcher) watch() {
 		if done {
 			return
 		}
+		// Wait before trying to reconnect
 		time.Sleep(1 * time.Second)
 	}
 }
