@@ -529,6 +529,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add istiod metricset. {pull}21519[21519]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
+- Add proxy metricset for istio module. {pull}21751[21751]
 
 *Auditbeat*
 
