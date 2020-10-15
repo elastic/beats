@@ -18,7 +18,6 @@ pipeline {
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
-    GOX_FLAGS = "-arch amd64"
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
@@ -30,7 +29,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 2, unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -47,6 +46,7 @@ pipeline {
     booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
+    booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
@@ -224,10 +224,17 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts
+  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags
 
   if(isUnix()) {
-    goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
+    if (isArm() && is64arm()) {
+      // TODO: nodeOS() should support ARM
+      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.linux.arm64"
+      gox_flags = '-arch arm'
+    } else {
+      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
+      gox_flags = '-arch amd64'
+    }
     path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
@@ -241,6 +248,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
+    gox_flags = '-arch amd64'
   }
 
   deleteDir()
@@ -258,7 +266,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "PYTHON_ENV=${pythonEnv}",
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
-    "TEST_TAGS=${env.TEST_TAGS},oracle"
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
+    "GOX_FLAGS=${gox_flags}"
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
@@ -362,7 +371,9 @@ def archiveTestOutput(Map args = [:]) {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
       log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
       if (folder.trim()) {
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + nodeOS()
+        // TODO: nodeOS() should support ARM
+        def os_suffix = isArm() ? 'linux' : nodeOS()
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
