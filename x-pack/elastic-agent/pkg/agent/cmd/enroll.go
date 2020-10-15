@@ -36,7 +36,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		Args:  cobra.ExactArgs(2),
 		Run: func(c *cobra.Command, args []string) {
 			if err := enroll(streams, c, flags, args); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
 		},
@@ -193,7 +193,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	// skip restarting
 	noRestart, _ := cmd.Flags().GetBool("no-restart")
-	if noRestart {
+	if noRestart || fromInstall {
 		return nil
 	}
 

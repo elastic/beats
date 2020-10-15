@@ -398,6 +398,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  shard_id: metricbeat
   version: v1
 
 #----------------------------- CockroachDB Module -----------------------------
@@ -699,6 +700,13 @@ metricbeat.modules:
   period: 10s
   # use istiod.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ['localhost:15014']
+
+# Istio proxy to monitor Envoy sidecars for versions after 1.5 of Istio.
+- module: istio
+  metricsets: ['proxy']
+  period: 10s
+  # it's recommended to deploy this metricset with autodiscovery, see metricset's docs for more info
+  hosts: ['localhost:15090']
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

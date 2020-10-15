@@ -234,9 +234,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
     artifacts = '**/build/TEST*.out'
   } else {
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
+    def mingw64Path = 'C:\\tools\\mingw64\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH};${mingw64Path}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
@@ -274,6 +275,13 @@ def withBeatsEnv(Map args = [:], Closure body) {
           fi''')
       }
       try {
+        // Add more stability when dependencies are not accessible temporarily
+        // See https://github.com/elastic/beats/issues/21609
+        // retry/try/catch approach reports errors, let's avoid it to keep the
+        // notifications cleaner.
+        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+        }
         body()
       } finally {
         if (archive) {
