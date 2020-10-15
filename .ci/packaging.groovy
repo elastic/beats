@@ -174,19 +174,17 @@ pipeline {
 def pushCIDockerImages(){
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if ("${env.BEATS_FOLDER}" == "auditbeat"){
-      tagAndPush('auditbeat-oss')
+      tagAndPush('auditbeat')
     } else if ("${env.BEATS_FOLDER}" == "filebeat") {
-      tagAndPush('filebeat-oss')
+      tagAndPush('filebeat')
     } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
-      tagAndPush('heartbeat-oss')
+      tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
-      tagAndPush('journalbeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
-      tagAndPush('metricbeat-oss')
+      tagAndPush('metricbeat')
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush('packetbeat')
-      tagAndPush('packetbeat-oss')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/auditbeat"){
       tagAndPush('auditbeat')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
