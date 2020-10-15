@@ -100,9 +100,7 @@ processors:
       tokenizer: "%{user.name}/%{user.domain}"
       field: zeek.kerberos.client
       target_prefix: ""
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:

@@ -206,6 +206,14 @@
             "value": "{{osquery.result.name}}",
             "ignore_empty_value": true
         }
+    },
+    {
+        "append": {
+            "field": "related.hosts",
+            "value": "{{host.hostname}}",
+            "if": "ctx?.host?.hostname != null && ctx.host?.hostname != ''",
+            "allow_duplicates": false
+        }
     }
   ],
   "on_failure" : [{

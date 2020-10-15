@@ -102,6 +102,18 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Process CloudTrail logs
+    # default is true, set to false to skip Cloudtrail logs
+    # var.process_cloudtrail_logs: false
+
+    # Process CloudTrail Digest logs
+    # default true, set to false to skip CloudTrail Digest logs
+    # var.process_digest_logs: false
+
+    # Process CloudTrail Insight logs
+    # default true, set to false to skip CloudTrail Insight logs
+    # var.process_insight_logs: false
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -355,6 +367,25 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  spamfirewall:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9524
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #-------------------------- Blue Coat Director Module --------------------------
 - module: bluecoat
   director:
@@ -473,6 +504,46 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  meraki:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9525
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#--------------------------- Citrix NetScaler Module ---------------------------
+- module: citrix
+  netscaler:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9526
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
@@ -492,6 +563,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------------ Cyber-Ark Module ------------------------------
+- module: cyberark
+  corepas:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9527
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #---------------------------- CylanceProtect Module ----------------------------
 - module: cylance
@@ -579,6 +671,25 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  bigipafm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9528
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:
@@ -601,6 +712,44 @@ filebeat.modules:
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9510
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimail:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9529
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimanager:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9530
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -882,6 +1031,38 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  netscreen:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9523
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  srx:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9006.
+    #var.syslog_port: 9006
+
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
   # All logs
@@ -937,7 +1118,20 @@ filebeat.modules:
 
     # Oauth Client Secret
     #var.oauth2.client.secret: ""
-   
+
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  m365_defender:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
   dhcp:
@@ -1197,6 +1391,27 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#---------------------- Proofpoint Email Security Module ----------------------
+- module: proofpoint
+  emailsecurity:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9531
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
   # All logs
@@ -1256,6 +1471,27 @@ filebeat.modules:
     # Filebeat will choose the the default path.
     #var.paths:
 
+#--------------------------- Snort/Sourcefire Module ---------------------------
+- module: snort
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9532
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #----------------------------- Sonicwall-FW Module -----------------------------
 - module: sonicwall
   firewall:
@@ -1303,6 +1539,25 @@ filebeat.modules:
       #  hostname: "b.host.local"
 
 
+  utm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9533
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #-------------------------------- Squid Module --------------------------------
 - module: squid
   log:
@@ -1333,6 +1588,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#---------------- Symantec AntiVirus/Endpoint Protection Module ----------------
+- module: symantec
+  endpointprotection:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9534
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
@@ -1507,6 +1783,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
+# * filestream: Improved version of log input. Experimental.
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -1726,6 +2003,145 @@ filebeat.inputs:
 
   # Defines if inputs is enabled
   #enabled: true
+
+#--------------------------- Filestream input ----------------------------
+- type: filestream
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  # To fetch all ".log" files from a specific level of subdirectories
+  # /var/log/*/*.log can be used.
+  # For each file found under this path, a harvester is started.
+  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Configure the file encoding for reading files with international characters
+  # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+  # Some sample encodings:
+  #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+  #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
+  #encoding: plain
+
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, no lines are dropped.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, all the lines are exported.
+  #include_lines: ['^ERR', '^WARN']
+
+  ### Prospector options
+
+  # How often the input checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
+  #prospector.scanner.check_interval: 10s
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Expand "**" patterns into regular glob patterns.
+  #prospector.scanner.recursive_glob: true
+
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
+  # original for harvesting but will report the symlink name as source.
+  #prospector.scanner.symlinks: false
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: true
+
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
+  # By default, all events contain `host.name`. This option can be set to true
+  # to disable the addition of this field to all events. The default value is
+  # false.
+  #publisher_pipeline.disable_host: false
+
+  # Ignore files which were modified more then the defined timespan in the past.
+  # ignore_older is disabled by default, so no files are ignored by setting it to 0.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #ignore_older: 0
+
+  # Defines the buffer size every harvester uses when fetching the file
+  #harvester_buffer_size: 16384
+
+  # Maximum number of bytes a single log event can have
+  # All bytes after max_bytes are discarded and not sent. The default is 10MB.
+  # This is especially useful for multiline log messages which can get large.
+  #message_max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # Backoff values define how aggressively filebeat crawls new files for updates
+  # The default values can be used in most cases. Backoff defines how long it is waited
+  # to check a file again after EOF is reached. Default is 1s which means the file
+  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # Every time a new line appears, backoff is reset to the initial value.
+  #backoff.init: 1s
+
+  # Max backoff defines what the maximum backoff time is. After having backed off multiple times
+  # from checking the files, the waiting time will never exceed max_backoff independent of the
+  # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
+  # file after having backed off multiple times, it takes a maximum of 10s to read the new line
+  #backoff.max: 10s
+
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close.on_state_change.inactive: 5m
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.on_state_change.renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  #close.on_state_change.removed: true
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.eof: false
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.after_interval: 0
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -3054,6 +3470,11 @@ output.elasticsearch:
 
 # Set to false to disable template loading.
 #setup.template.enabled: true
+
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default filebeat uses the legacy index templates.
+#setup.template.type: legacy
 
 # Template name. By default the template name is "filebeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.

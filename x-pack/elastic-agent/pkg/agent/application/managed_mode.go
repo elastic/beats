@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -53,12 +54,14 @@ type Managed struct {
 	router      *router
 	srv         *server.Server
 	as          *actionStore
+	upgrader    *upgrade.Upgrader
 }
 
 func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
 	rawConfig *config.Config,
+	reexec reexecManager,
 ) (*Managed, error) {
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
@@ -165,6 +168,7 @@ func newManaged(
 	emit, err := emitter(
 		managedApplication.bgContext,
 		log,
+		agentInfo,
 		composableCtrl,
 		router,
 		&configModifiers{
@@ -196,12 +200,26 @@ func newManaged(
 		return nil, err
 	}
 
+	managedApplication.upgrader = upgrade.NewUpgrader(
+		agentInfo,
+		cfg.Settings.DownloadConfig,
+		log,
+		[]context.CancelFunc{managedApplication.cancelCtxFn},
+		reexec,
+		acker,
+		combinedReporter)
+
+	policyChanger := &handlerPolicyChange{
+		log:       log,
+		emitter:   emit,
+		agentInfo: agentInfo,
+		config:    cfg,
+		store:     store,
+		setters:   []clientSetter{acker},
+	}
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
-			log:     log,
-			emitter: emit,
-		},
+		&fleetapi.ActionPolicyChange{},
+		policyChanger,
 	)
 
 	actionDispatcher.MustRegister(
@@ -212,6 +230,14 @@ func newManaged(
 			dispatcher:  router,
 			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
 			actionStore: actionStore,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionUpgrade{},
+		&handlerUpgrade{
+			upgrader: managedApplication.upgrader,
+			log:      log,
 		},
 	)
 
@@ -243,6 +269,9 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
+	// add the gateway to setters, so the gateway can be updated
+	// when the hosts for Kibana are updated by the policy.
+	policyChanger.setters = append(policyChanger.setters, gateway)
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
@@ -254,6 +283,10 @@ func (m *Managed) Start() error {
 	if m.wasUnenrolled() {
 		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
 		return nil
+	}
+
+	if err := m.upgrader.Ack(m.bgContext); err != nil {
+		m.log.Warnf("failed to ack update %v", err)
 	}
 
 	m.gateway.Start()
