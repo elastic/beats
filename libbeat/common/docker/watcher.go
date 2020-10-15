@@ -21,7 +21,7 @@ package docker
 
 import (
 	"context"
-	"fmt"
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -243,16 +243,18 @@ func (w *watcher) watch() {
 	tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
 	defer tickChan.Stop()
 
-	lastValidTimestamp := time.Now().Unix()
-	lastWatchReceivedEventTime := time.Now()
+	lastValidTimestamp := time.Now()
 
 	watch := func() bool {
+		lastWatchReceivedEventTime := time.Now()
+
+		w.log.Debugf("Fetching events since %s", lastValidTimestamp)
+
 		options := types.EventsOptions{
-			Since:   fmt.Sprintf("%d", lastValidTimestamp),
+			Since:   lastValidTimestamp.Format(time.RFC3339Nano),
 			Filters: filter,
 		}
 
-		w.log.Debugf("Fetching events since %s", options.Since)
 		ctx, cancel := context.WithCancel(w.ctx)
 		defer cancel()
 
@@ -261,7 +263,7 @@ func (w *watcher) watch() {
 			select {
 			case event := <-events:
 				w.log.Debugf("Got a new docker event: %v", event)
-				lastValidTimestamp = event.Time
+				lastValidTimestamp = time.Unix(event.Time, event.TimeNano)
 				lastWatchReceivedEventTime = time.Now()
 
 				switch event.Action {
@@ -271,8 +273,10 @@ func (w *watcher) watch() {
 					w.containerDelete(event)
 				}
 			case err := <-errors:
-				// Restart watch call
 				switch err {
+				case io.EOF:
+					// Client disconnected, watch is not done, reconnect
+					w.log.Debug("EOF received in events stream, restarting watch call")
 				case context.DeadlineExceeded:
 					w.log.Debug("Context deadline exceeded for docker request, restarting watch call")
 				case context.Canceled:
