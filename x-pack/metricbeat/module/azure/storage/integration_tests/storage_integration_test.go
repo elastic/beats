@@ -2,15 +2,20 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+// +build azure
+
 package integration_tests
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/pulumi/pulumi/pkg/v2/testing/integration"
-	"github.com/pulumi/pulumi/sdk/v2/go/common/apitype"
 	"os"
 	"path"
 	"time"
+
+	"github.com/pulumi/pulumi/pkg/v2/testing/integration"
+	"github.com/pulumi/pulumi/sdk/v2/go/common/apitype"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"testing"
 
