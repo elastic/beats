@@ -12,21 +12,23 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
-    BASE_DIR = 'src/github.com/elastic/beats'
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
-    GOX_FLAGS = "-arch amd64"
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     PIPELINE_LOG_LEVEL = 'INFO'
+    PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 2, unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -43,7 +45,9 @@ pipeline {
     booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
+    booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {
     stage('Checkout') {
@@ -70,7 +74,7 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: true) {
+          withBeatsEnv(archive: true, id: 'lint') {
             dumpVariables()
             cmd(label: 'make check', script: 'make check')
           }
@@ -99,20 +103,17 @@ pipeline {
           script {
             def mapParallelTasks = [:]
             def content = readYaml(file: 'Jenkinsfile.yml')
-            content['projects'].each { projectName ->
-              generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                mapParallelTasks["${k}"] = v
+            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+            } else {
+              content['projects'].each { projectName ->
+                generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
+                  mapParallelTasks["${k}"] = v
+                }
               }
+              notifyBuildReason()
+              parallel(mapParallelTasks)
             }
-            parallel(mapParallelTasks)
-          }
-        }
-      }
-      post {
-        always {
-          dir("${BASE_DIR}"){
-            // Archive the markdown files that contain the build reasons
-            archiveArtifacts(allowEmptyArchive: false, artifacts: 'build-reasons/*.md')
           }
         }
       }
@@ -120,10 +121,12 @@ pipeline {
   }
   post {
     always {
-      runbld()
+      deleteDir()
+      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true)
+      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
     }
   }
 }
@@ -220,10 +223,17 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts
+  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags
 
   if(isUnix()) {
-    goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
+    if (isArm() && is64arm()) {
+      // TODO: nodeOS() should support ARM
+      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.linux.arm64"
+      gox_flags = '-arch arm'
+    } else {
+      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
+      gox_flags = '-arch amd64'
+    }
     path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
@@ -231,12 +241,14 @@ def withBeatsEnv(Map args = [:], Closure body) {
     artifacts = '**/build/TEST*.out'
   } else {
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
+    def mingw64Path = 'C:\\tools\\mingw64\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH};${mingw64Path}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
+    gox_flags = '-arch amd64'
   }
 
   deleteDir()
@@ -254,7 +266,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "PYTHON_ENV=${pythonEnv}",
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
-    "TEST_TAGS=${env.TEST_TAGS},oracle"
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
+    "GOX_FLAGS=${gox_flags}"
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
@@ -266,11 +279,18 @@ def withBeatsEnv(Map args = [:], Closure body) {
         // See https://github.com/elastic/beats/issues/17787.
         sh(label: 'check git config', script: '''
           if [ -z "$(git config --get user.email)" ]; then
-            git config user.email "beatsmachine@users.noreply.github.com"
-            git config user.name "beatsmachine"
+            git config --global user.email "beatsmachine@users.noreply.github.com"
+            git config --global user.name "beatsmachine"
           fi''')
       }
       try {
+        // Add more stability when dependencies are not accessible temporarily
+        // See https://github.com/elastic/beats/issues/21609
+        // retry/try/catch approach reports errors, let's avoid it to keep the
+        // notifications cleaner.
+        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+        }
         body()
       } finally {
         if (archive) {
@@ -346,60 +366,23 @@ def archiveTestOutput(Map args = [:]) {
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, id: args.id)
-      archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
+      if (isUnix()) {
+        cmd(label: 'Delete folders that are causing exceptions (See JENKINS-58421)',
+            returnStatus: true,
+            script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
+      } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
+      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
+      tar(file: "test-build-artifacts-${args.id}.tgz", dir: '.', archive: true, allowMissing: true)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
       log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
       if (folder.trim()) {
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + nodeOS()
+        // TODO: nodeOS() should support ARM
+        def os_suffix = isArm() ? 'linux' : nodeOS()
+        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
-    }
-  }
-}
-
-/**
-* This method wraps the junit built-in step to archive the test reports that gonna be populated later on
-* with the runbld post build step.
-*/
-def junitAndStore(Map args = [:]) {
-  junit(args)
-  // args.id could be null in some cases, so let's use the currentmilliseconds
-  def stageName = args.id ? args.id?.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
-  stash(includes: args.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
-  stashedTestReports[stageName] = stageName
-}
-
-/**
-* This method populates the test output using the runbld approach. For such it requires the
-* global variable stashedTestReports.
-* TODO: should be moved to the shared library
-*/
-def runbld() {
-  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
-    if (stashedTestReports) {
-      def jobName = isPR() ? 'elastic+beats+pull-request' : 'elastic+beats'
-      deleteDir()
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      dir("${env.BASE_DIR}") {
-        // Unstash the test reports
-        stashedTestReports.each { k, v ->
-          dir(k) {
-            unstash(v)
-          }
-        }
-      }
-      sh(label: 'Process JUnit reports with runbld',
-        script: """\
-        ## for debugging purposes
-        find . -name "TEST-*.xml"
-        cat >./runbld-script <<EOF
-        echo "Processing JUnit reports with runbld..."
-        EOF
-        /usr/local/bin/runbld ./runbld-script --job-name ${jobName}
-        """.stripIndent())  // stripIdent() requires '''/
     }
   }
 }
@@ -584,6 +567,17 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
   } else {
     return false
+  }
+}
+
+/**
+* Notify the build reason.
+*/
+def notifyBuildReason() {
+  // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
+  archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
+  if (isPR()) {
+    echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
   }
 }
 

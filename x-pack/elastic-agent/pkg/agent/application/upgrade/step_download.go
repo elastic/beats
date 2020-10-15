@@ -6,6 +6,7 @@ package upgrade
 
 import (
 	"context"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
@@ -16,7 +17,13 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	// do not update source config
 	settings := *u.settings
 	if sourceURI != "" {
-		settings.SourceURI = sourceURI
+		if strings.HasPrefix(sourceURI, "file://") {
+			// update the DropPath so the fs.Downloader can download from this
+			// path instead of looking into the installed downloads directory
+			settings.DropPath = strings.TrimPrefix(sourceURI, "file://")
+		} else {
+			settings.SourceURI = sourceURI
+		}
 	}
 
 	allowEmptyPgp, pgp := release.PGP()
@@ -31,7 +38,7 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		return "", errors.New(err, "failed upgrade of agent binary")
 	}
 
-	matches, err := verifier.Verify(agentName, version)
+	matches, err := verifier.Verify(agentName, version, agentArtifactName, true)
 	if err != nil {
 		return "", errors.New(err, "failed verification of agent binary")
 	}

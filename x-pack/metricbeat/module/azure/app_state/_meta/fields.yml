@@ -1,0 +1,86 @@
+- name: app_state
+  type: group
+  release: beta
+  description: >
+    application state
+  fields:
+    - name: start_date
+      type: date
+      description: >
+        The start date
+    - name: end_date
+      type: date
+      description: >
+        The end date
+    - name: requests_count.sum
+      type: float
+      description: >
+        Request count
+    - name: requests_failed.sum
+      type: float
+      description: >
+        Request failed count
+    - name: users_count.unique
+      type: float
+      description: >
+        User count
+    - name: sessions_count.unique
+      type: float
+      description: >
+        Session count
+    - name: users_authenticated.unique
+      type: float
+      description: >
+        Authenticated users count
+    - name: browser_timings_network_duration.avg
+      type: float
+      description: >
+        Browser timings network duration
+    - name: browser_timings_send_duration.avg
+      type: float
+      description: >
+        Browser timings send duration
+    - name: browser_timings_receive_uration.avg
+      type: float
+      description: >
+        Browser timings receive duration
+    - name: browser_timings_processing_duration.avg
+      type: float
+      description: >
+        Browser timings processing duration
+    - name: browser_timings_total_duration.avg
+      type: float
+      description: >
+        Browser timings total duration
+    - name: exceptions_count.sum
+      type: float
+      description: >
+        Exception count
+    - name: exceptions_browser.sum
+      type: float
+      description: >
+        Exception count at browser level
+    - name: exceptions_server.sum
+      type: float
+      description: >
+        Exception count at server level
+    - name: performance_counters_memory_available_bytes.avg
+      type: float
+      description: >
+        Performance counters memory available bytes
+    - name: performance_counters_process_private_bytes.avg
+      type: float
+      description: >
+        Performance counters process private bytes
+    - name: performance_counters_process_cpu_percentage_total.avg
+      type: float
+      description: >
+        Performance counters process cpu percentage total
+    - name: performance_counters_process_cpu_percentage.avg
+      type: float
+      description: >
+        Performance counters process cpu percentage
+    - name: performance_counters_processiobytes_per_second.avg
+      type: float
+      description: >
+        Performance counters process IO bytes per second

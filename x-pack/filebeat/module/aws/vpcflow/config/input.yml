@@ -39,6 +39,10 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+{{ if .fips_enabled }}
+fips_enabled: {{ .fips_enabled }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log
@@ -173,4 +177,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

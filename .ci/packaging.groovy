@@ -5,12 +5,14 @@
 pipeline {
   agent none
   environment {
-    BASE_DIR = 'src/github.com/elastic/beats'
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
   }
@@ -119,6 +121,7 @@ pipeline {
                     release()
                     pushCIDockerImages()
                   }
+                  runE2ETestForPackages()
                 }
               }
               stage('Package Mac OS'){
@@ -195,27 +198,95 @@ def tagAndPush(name){
     tagName = "pr-${env.CHANGE_ID}"
   }
 
-  def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
-  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${tagName}"
-  def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-  retry(3){
-    sh(label:'Change tag and push', script: """
-      docker tag ${oldName} ${newName}
-      docker push ${newName}
-      docker tag ${oldName} ${commitName}
-      docker push ${commitName}
-    """)
+
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
+    def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
+    def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
+
+    def iterations = 0
+    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+      iterations++
+      def status = sh(label:'Change tag and push', script: """
+        docker tag ${oldName} ${newName}
+        docker push ${newName}
+        docker tag ${oldName} ${commitName}
+        docker push ${commitName}
+      """, returnStatus: true)
+
+    if ( status > 0 && iterations < 3) {
+      error('tag and push failed, retry')
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+    }
+  }
+}
+
+def runE2ETestForPackages(){
+  def suite = ''
+
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
+    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
+      suite = 'helm,fleet'
+    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
+      suite = ''
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
+      suite = 'fleet'
+    } else {
+      echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
+      return
+    }
+
+    triggerE2ETests(suite)
   }
 }
 
 def release(){
   withBeatsEnv(){
-    dir("${env.BEATS_FOLDER}") {
-      sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+    withEnv([
+      "DEV=true"
+    ]) {
+      dir("${env.BEATS_FOLDER}") {
+        sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+      }
     }
     publishPackages("${env.BEATS_FOLDER}")
   }
+}
+
+def triggerE2ETests(String suite) {
+  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}.")
+
+  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
+  def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+
+  def parameters = [
+    booleanParam(name: 'forceSkipGitChecks', value: true),
+    booleanParam(name: 'forceSkipPresubmit', value: true),
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'runTestsSuites', value: suite),
+    string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
+    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+  ]
+  if (isPR()) {
+    def version = "pr-${env.CHANGE_ID}"
+    parameters.push(booleanParam(name: 'USE_CI_SNAPSHOTS', value: true))
+    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
+    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
+  }
+
+  build(job: "${e2eTestsPipeline}",
+    parameters: parameters,
+    propagate: false,
+    wait: false
+  )
+
+  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME} for ${env.BEATS_FOLDER}"
+  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){

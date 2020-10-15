@@ -22,26 +22,48 @@ func TestValidation(t *testing.T) {
 
 	var noId Config
 	assert.Error(t, ucfg.MustNewFrom(common.MapStr{
+		"api_address":   "https://api.dev.cfdev.sh",
 		"client_secret": "client_secret",
+		"shard_id":      "beats-test-1",
 	}).Unpack(&noId))
 
 	var noSecret Config
 	assert.Error(t, ucfg.MustNewFrom(common.MapStr{
-		"client_id": "client_id",
+		"api_address": "https://api.dev.cfdev.sh",
+		"client_id":   "client_id",
+		"shard_id":    "beats-test-1",
 	}).Unpack(&noSecret))
+
+	var noAPI Config
+	assert.Error(t, ucfg.MustNewFrom(common.MapStr{
+		"client_id":     "client_id",
+		"client_secret": "client_secret",
+		"shard_id":      "beats-test-1",
+	}).Unpack(&noAPI))
+
+	var noShardID Config
+	assert.Error(t, ucfg.MustNewFrom(common.MapStr{
+		"api_address":   "https://api.dev.cfdev.sh",
+		"client_id":     "client_id",
+		"client_secret": "client_secret",
+	}).Unpack(&noShardID))
 
 	var valid Config
 	assert.NoError(t, ucfg.MustNewFrom(common.MapStr{
+		"api_address":   "https://api.dev.cfdev.sh",
 		"client_id":     "client_id",
 		"client_secret": "client_secret",
+		"shard_id":      "beats-test-1",
 	}).Unpack(&valid))
 }
 
 func TestInitDefaults(t *testing.T) {
 	var cfCfg Config
 	assert.NoError(t, ucfg.MustNewFrom(common.MapStr{
+		"api_address":   "https://api.dev.cfdev.sh",
 		"client_id":     "client_id",
 		"client_secret": "client_secret",
+		"shard_id":      "beats-test-1",
 	}).Unpack(&cfCfg))
-	assert.Len(t, cfCfg.ShardID, 36)
+	assert.Equal(t, ConsumerVersionV1, cfCfg.Version)
 }

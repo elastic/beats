@@ -4669,6 +4669,16 @@ type: keyword
 
 --
 
+*`azure.application_id`*::
++
+--
+The application ID
+
+
+type: keyword
+
+--
+
 *`azure.dimensions.*`*::
 +
 --
@@ -4695,16 +4705,6 @@ type: object
 application insights
 
 
-
-*`azure.app_insights.application_id`*::
-+
---
-The application ID
-
-
-type: keyword
-
---
 
 *`azure.app_insights.start_date`*::
 +
@@ -4733,6 +4733,213 @@ The metrics
 
 
 type: object
+
+--
+
+[float]
+=== app_state
+
+application state
+
+
+
+*`azure.app_state.start_date`*::
++
+--
+The start date
+
+
+type: date
+
+--
+
+*`azure.app_state.end_date`*::
++
+--
+The end date
+
+
+type: date
+
+--
+
+*`azure.app_state.requests_count.sum`*::
++
+--
+Request count
+
+
+type: float
+
+--
+
+*`azure.app_state.requests_failed.sum`*::
++
+--
+Request failed count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_count.unique`*::
++
+--
+User count
+
+
+type: float
+
+--
+
+*`azure.app_state.sessions_count.unique`*::
++
+--
+Session count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_authenticated.unique`*::
++
+--
+Authenticated users count
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_network_duration.avg`*::
++
+--
+Browser timings network duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_send_duration.avg`*::
++
+--
+Browser timings send duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_receive_uration.avg`*::
++
+--
+Browser timings receive duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_processing_duration.avg`*::
++
+--
+Browser timings processing duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_total_duration.avg`*::
++
+--
+Browser timings total duration
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_count.sum`*::
++
+--
+Exception count
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_browser.sum`*::
++
+--
+Exception count at browser level
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_server.sum`*::
++
+--
+Exception count at server level
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_memory_available_bytes.avg`*::
++
+--
+Performance counters memory available bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_private_bytes.avg`*::
++
+--
+Performance counters process private bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage_total.avg`*::
++
+--
+Performance counters process cpu percentage total
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage.avg`*::
++
+--
+Performance counters process cpu percentage
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_processiobytes_per_second.avg`*::
++
+--
+Performance counters process IO bytes per second
+
+
+type: float
 
 --
 
@@ -9164,8 +9371,15 @@ Stats collected from Dropwizard.
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +
@@ -24656,16 +24870,6 @@ type: long
 
 --
 
-*`kafka.partition.partition.isr`*::
-+
---
-List of isr ids.
-
-
-type: keyword
-
---
-
 *`kafka.partition.partition.replica`*::
 +
 --
@@ -28953,6 +29157,7 @@ linux module
 [float]
 === linux
 
+linux system metrics
 
 
 
@@ -29051,6 +29256,147 @@ type: long
 --
 
 [float]
+=== iostat
+
+iostat
+
+
+
+*`linux.iostat.read.request.merges_per_sec`*::
++
+--
+The number of read requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.merges_per_sec`*::
++
+--
+The number of write requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.read.request.per_sec`*::
++
+--
+The number of read requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.per_sec`*::
++
+--
+The number of write requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.read.per_sec.bytes`*::
++
+--
+The number of Bytes read from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.read.await`*::
++
+--
+The average time spent for read requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.per_sec.bytes`*::
++
+--
+The number of Bytes write from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.write.await`*::
++
+--
+The average time spent for write requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.request.avg_size`*::
++
+--
+The average size (in bytes) of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.queue.avg_size`*::
++
+--
+The average queue length of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.await`*::
++
+--
+The average time spent for requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.service_time`*::
++
+--
+The average service time (in milliseconds) for I/O requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.busy`*::
++
+--
+Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+type: float
+
+--
+
+[float]
 === ksm
 
 ksm
@@ -29121,6 +29467,186 @@ Number of duplicated KSM pages.
 
 
 type: long
+
+--
+
+[float]
+=== memory
+
+Linux memory data
+
+
+
+[float]
+=== page_stats
+
+memory page statistics
+
+
+*`linux.memory.page_stats.pgscan_kswapd.pages`*::
++
+--
+pages scanned by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgscan_direct.pages`*::
++
+--
+pages scanned directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgfree.pages`*::
++
+--
+pages freed by the system
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_kswapd.pages`*::
++
+--
+number of pages reclaimed by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_direct.pages`*::
++
+--
+number of pages reclaimed directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.direct_efficiency.pct`*::
++
+--
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.page_stats.kswapd_efficiency.pct`*::
++
+--
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== hugepages
+
+This group contains statistics related to huge pages usage on the system.
+
+
+*`linux.memory.hugepages.total`*::
++
+--
+Number of huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.used.bytes`*::
++
+--
+Memory used in allocated huge pages.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.hugepages.used.pct`*::
++
+--
+Percentage of huge pages used.
+
+
+type: long
+
+format: percent
+
+--
+
+*`linux.memory.hugepages.free`*::
++
+--
+Number of available huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.reserved`*::
++
+--
+Number of reserved but not allocated huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.surplus`*::
++
+--
+Number of overcommited huge pages.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.default_size`*::
++
+--
+Default size for huge pages.
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -40495,7 +41021,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files.
+Total number of files. Not on Windows.
 
 type: long
 
@@ -41357,7 +41883,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes. Not available on Windows.
 
 
 type: long
@@ -41369,7 +41895,31 @@ format: bytes
 *`system.process.memory.rss.pct`*::
 +
 --
-The percentage of memory the process occupied in main memory (RAM).
+The percentage of memory the process occupied in main memory (RAM). Not available on Windows.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`system.process.memory.wss.bytes`*::
++
+--
+The Working Set Size. The amount of memory the process occupied in main memory (RAM). Windows only.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.memory.wss.pct`*::
++
+--
+The percentage of memory the process occupied in main memory (RAM). Windows only.
 
 
 type: scaled_float
@@ -41381,7 +41931,7 @@ format: percent
 *`system.process.memory.share`*::
 +
 --
-The shared memory the process uses.
+The shared memory the process uses. Not available on Windows.
 
 
 type: long
