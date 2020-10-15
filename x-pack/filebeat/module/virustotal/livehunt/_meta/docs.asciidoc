@@ -30,10 +30,6 @@ include::../include/configuring-intro.asciidoc[]
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
 [float]
 ==== `livehunt` fileset settings
 
@@ -53,7 +49,10 @@ include::../include/var-paths.asciidoc[]
 [float]
 === Example dashboard
 
+This module comes with several visualizations and a dashboard.
 
+[role="screenshot"]
+image::./images/kibana-virustotal-dashboard.png[]
 
 :has-dashboards!:
 
