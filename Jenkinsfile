@@ -184,7 +184,7 @@ def k8sTest(Map args = [:]) {
                   } catch(err) {
                     i++
                     sh(label: 'Delete cluster', script: 'kind delete cluster')
-                    if (i > 1) {
+                    if (i > 2) {
                       error("Setup kind failed with error '${err.toString()}'")
                     }
                   }
