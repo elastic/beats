@@ -128,7 +128,7 @@ pipeline {
     cleanup {
       notifyBuildResult(prComment: true,
                         slackComment: true, slackNotify: (isBranch() || isTag())
-                        analyzeFlakey: true, flakyReportIdx: "reporter-beats-pipeline-master")
+                        analyzeFlakey: true, flakyReportIdx: "reporter-beats-beats-master")
     }
   }
 }
