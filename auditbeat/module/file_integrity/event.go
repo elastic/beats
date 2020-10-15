@@ -257,7 +257,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 
 		if e.Info.Type == FileType {
 			if extension := filepath.Ext(e.Path); extension != "" {
-				file["extension"] = extension
+				file["extension"] = strings.TrimLeft(extension, ".")
 			}
 			if mimeType := getMimeType(e.Path); mimeType != "" {
 				file["mime_type"] = mimeType
