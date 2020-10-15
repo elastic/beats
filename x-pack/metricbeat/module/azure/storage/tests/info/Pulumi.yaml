@@ -1,3 +1,0 @@
-name: pulumi-azure
-runtime: go
-description: Pulumi for azure integration tests
