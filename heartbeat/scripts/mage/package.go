@@ -65,6 +65,9 @@ func dashboards() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	devtools.GenerateAllInOneFieldsGo()
-	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir())
+	err := devtools.GenerateFieldsYAML(devtools.OSSBeatDir())
+	if err != nil {
+		return err
+	}
+	return devtools.GenerateAllInOneFieldsGo()
 }
