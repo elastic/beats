@@ -80,6 +80,7 @@ type watcher struct {
 	containers     map[string]*Container
 	deleted        map[string]time.Time // deleted annotations key -> last access time
 	cleanupTimeout time.Duration
+	clock          clock
 	stopped        sync.WaitGroup
 	bus            bus.Bus
 	shortID        bool // whether to store short ID in "containers" too
@@ -155,6 +156,7 @@ func NewWatcherWithClient(log *logp.Logger, client Client, cleanupTimeout time.D
 		cleanupTimeout: cleanupTimeout,
 		bus:            bus.New(log, "docker"),
 		shortID:        storeShortID,
+		clock:          &systemClock{},
 	}, nil
 }
 
@@ -172,7 +174,7 @@ func (w *watcher) Container(ID string) *Container {
 	// Update last access time if it's deleted
 	if ok {
 		w.Lock()
-		w.deleted[container.ID] = time.Now()
+		w.deleted[container.ID] = w.clock.Now()
 		w.Unlock()
 	}
 
@@ -243,10 +245,10 @@ func (w *watcher) watch() {
 	tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
 	defer tickChan.Stop()
 
-	lastValidTimestamp := time.Now()
+	lastValidTimestamp := w.clock.Now()
 
 	watch := func() bool {
-		lastReceivedEventTime := time.Now()
+		lastReceivedEventTime := w.clock.Now()
 
 		w.log.Debugf("Fetching events since %s", lastValidTimestamp)
 
@@ -264,7 +266,7 @@ func (w *watcher) watch() {
 			case event := <-events:
 				w.log.Debugf("Got a new docker event: %v", event)
 				lastValidTimestamp = time.Unix(event.Time, event.TimeNano)
-				lastReceivedEventTime = time.Now()
+				lastReceivedEventTime = w.clock.Now()
 
 				switch event.Action {
 				case "start", "update":
@@ -338,16 +340,17 @@ func (w *watcher) containerUpdate(event events.Message) {
 
 func (w *watcher) containerDelete(event events.Message) {
 	container := w.Container(event.Actor.ID)
+
+	w.Lock()
+	w.deleted[event.Actor.ID] = w.clock.Now()
+	w.Unlock()
+
 	if container != nil {
 		w.bus.Publish(bus.Event{
 			"stop":      true,
 			"container": container,
 		})
 	}
-
-	w.Lock()
-	w.deleted[event.Actor.ID] = time.Now()
-	w.Unlock()
 }
 
 func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
@@ -404,48 +407,50 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 func (w *watcher) cleanupWorker() {
 	defer w.stopped.Done()
 
-	log := w.log
-
 	for {
 		select {
 		case <-w.ctx.Done():
 			return
 		// Wait a full period
 		case <-time.After(w.cleanupTimeout):
-			// Check entries for timeout
-			var toDelete []string
-			timeout := time.Now().Add(-w.cleanupTimeout)
-			w.RLock()
-			for key, lastSeen := range w.deleted {
-				if lastSeen.Before(timeout) {
-					log.Debugf("Removing container %s after cool down timeout", key)
-					toDelete = append(toDelete, key)
-				}
-			}
-			w.RUnlock()
-
-			// Delete timed out entries:
-			for _, key := range toDelete {
-				container := w.Container(key)
-				if container != nil {
-					w.bus.Publish(bus.Event{
-						"delete":    true,
-						"container": container,
-					})
-				}
-			}
-
-			w.Lock()
-			for _, key := range toDelete {
-				delete(w.deleted, key)
-				delete(w.containers, key)
-				if w.shortID {
-					delete(w.containers, key[:shortIDLen])
-				}
-			}
-			w.Unlock()
+			w.runCleanup()
 		}
 	}
+}
+
+func (w *watcher) runCleanup() {
+	// Check entries for timeout
+	var toDelete []string
+	timeout := w.clock.Now().Add(-w.cleanupTimeout)
+	w.RLock()
+	for key, lastSeen := range w.deleted {
+		if lastSeen.Before(timeout) {
+			w.log.Debugf("Removing container %s after cool down timeout", key)
+			toDelete = append(toDelete, key)
+		}
+	}
+	w.RUnlock()
+
+	// Delete timed out entries:
+	for _, key := range toDelete {
+		container := w.Container(key)
+		if container != nil {
+			w.bus.Publish(bus.Event{
+				"delete":    true,
+				"container": container,
+			})
+		}
+	}
+
+	w.Lock()
+	for _, key := range toDelete {
+		delete(w.deleted, key)
+		delete(w.containers, key)
+		if w.shortID {
+			delete(w.containers, key[:shortIDLen])
+		}
+	}
+	w.Unlock()
 }
 
 // ListenStart returns a bus listener to receive container started events, with a `container` key holding it
@@ -457,3 +462,11 @@ func (w *watcher) ListenStart() bus.Listener {
 func (w *watcher) ListenStop() bus.Listener {
 	return w.bus.Subscribe("stop")
 }
+
+type clock interface {
+	Now() time.Time
+}
+
+type systemClock struct{}
+
+func (*systemClock) Now() time.Time { return time.Now() }
