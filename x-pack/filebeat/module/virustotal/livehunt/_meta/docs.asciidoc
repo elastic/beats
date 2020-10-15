@@ -1,0 +1,62 @@
+[role="xpack"]
+
+:modulename: virustotal
+:has-dashboards: true
+
+== VirusTotal LiveHunt Module
+
+VirusTotal was founded as a free service that analyzes files and URLs for viruses, worms, trojans and other kinds of malicious content. In addition to the free services, VirusTotal offers several premium services. One of those premium services is LiveHunting.
+
+LiveHunt leverages customer provided YARA rules uploaded and applied to all files sent to VirusTotal from all around the world, live. Whenever there is a rule match you get an immediate notification. Notifications can be viewed via the web interface, email alerts or retrieved through a REST API.
+
+This module uses Filebeat's https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html[HTTP JSON input plugin] to query the notification queue and write the results, and companion metadata, to Elasticsearch. Additionally, this module leverages ECS fieldsets.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: livehunt
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been tested against `v3.0` of the https://developers.virustotal.com/v3.0/reference#hunting-notification-object[VirusTotal LiveHunt API Endpoint].
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: {livehunt}
+
+include::../include/config-option-intro.asciidoc[]
+
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
+[float]
+==== `livehunt` fileset settings
+
+[source,yaml]
+----
+- module: virustotal
+    livehunt:
+      enabled: true
+      # Set the VirusTotal private API key
+      var.apikey: ""
+      # Set retrieval limit, maximum 40, default 10
+      var.limit: 10
+----
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
