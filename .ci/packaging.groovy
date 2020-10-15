@@ -269,7 +269,7 @@ def release(){
 }
 
 def runE2ETests(){
-  if (e2eTestSuites.size()) {
+  if (e2eTestSuites.size() == 0) {
     echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
     return
   }
