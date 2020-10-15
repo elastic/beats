@@ -285,6 +285,10 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 		logp.Err("error getting group status: %v", err)
 		return
 	}
+	// GetStatsForProcess returns a nil selfStats and no error when there's no stats
+	if selfStats == nil {
+		return
+	}
 
 	if cpu := selfStats.CPU; cpu != nil {
 		monitoring.ReportNamespace(V, "cpu", func() {

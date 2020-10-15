@@ -55,7 +55,7 @@ processors:
         ignore_missing: true
   - append:
         field: related.hosts
-        value: '{{host.hostname server.domain}}'
+        value: '{{host.hostname}}'
         allow_duplicates: false
         if: ctx?.host?.hostname != null && ctx.host?.hostname != ''
   - append:

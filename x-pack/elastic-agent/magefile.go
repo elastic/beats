@@ -572,7 +572,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
+		packedBeats := []string{"filebeat", "metricbeat"}
 
 		for _, b := range packedBeats {
 			pwd, err := filepath.Abs(filepath.Join("..", b))
@@ -658,6 +658,7 @@ func buildVars() map[string]string {
 	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
 		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
 			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowUpgrade"] = "true"
 		}
 	}
 

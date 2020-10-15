@@ -146,37 +146,36 @@ processors:
       field: "json.errorMessage"
       target_field: "aws.cloudtrail.error_message"
       ignore_failure: true
-  - rename:
-      field: json.requestParameters
-      target_field: "aws.cloudtrail.flattened.request_parameters"
-      if: ctx?.json?.requestParameters != null
   - script:
       lang: painless
       source: |
-        if (ctx.aws.cloudtrail.flattened.request_parameters != null) {
-          ctx.aws.cloudtrail.request_parameters = ctx.aws.cloudtrail.flattened.request_parameters.toString();
+        if (ctx.aws.cloudtrail?.flattened == null) {
+            Map map = new HashMap();
+            ctx.aws.cloudtrail.put("flattened", map);
+          }
+        if (ctx.json.requestParameters != null) {
+          ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
+          if (ctx.aws.cloudtrail.request_parameters.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("request_parameters", ctx.json.requestParameters);
+          }
         }
-      ignore_failure: true
-  - rename:
-      field: json.responseElements
-      target_field: "aws.cloudtrail.flattened.response_elements"
-      if: ctx?.json?.responseElements != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.response_elements != null) {
-          ctx.aws.cloudtrail.response_elements = ctx.aws.cloudtrail.flattened.response_elements.toString();
+        if (ctx.json.responseElements != null) {
+          ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
+          if (ctx.aws.cloudtrail.response_elements.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("response_elements", ctx.json.responseElements);
+          }
         }
-      ignore_failure: true
-  - rename:
-      field: json.additionalEventData
-      target_field: "aws.cloudtrail.flattened.additional_eventdata"
-      if: ctx?.json?.additionalEventData != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.additional_eventdata != null) {
-          ctx.aws.cloudtrail.additional_eventdata = ctx.aws.cloudtrail.flattened.additional_eventdata.toString();
+        if (ctx.json.additionalEventData != null) {
+          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
+          if (ctx.aws.cloudtrail.additional_eventdata.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("additional_eventdata", ctx.json.additionalEventData);
+          }
+        }
+        if (ctx.json.serviceEventDetails != null) {
+          ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
+          if (ctx.aws.cloudtrail.service_event_details.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("service_event_details", ctx.json.serviceEventDetails);
+          }
         }
       ignore_failure: true
   - rename:
@@ -218,17 +217,6 @@ processors:
   - rename:
       field: "json.recipientAccountId"
       target_field: "aws.cloudtrail.recipient_account_id"
-      ignore_failure: true
-  - rename:
-      field: json.serviceEventDetails
-      target_field: "aws.cloudtrail.flattened.service_event_details"
-      if: ctx?.json?.serviceEventDetails != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.service_event_details != null) {
-          ctx.aws.cloudtrail.service_event_details = ctx.aws.cloudtrail.flattened.service_event_details.toString();
-        }
       ignore_failure: true
   - rename:
       field: "json.sharedEventId"
