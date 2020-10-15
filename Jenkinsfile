@@ -176,7 +176,19 @@ def k8sTest(Map args = [:]) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               try {
-                sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                // Add some environmental resilience when setup does not work the very first time.
+                def i = 0
+                retryWithSleep(retries: 3, seconds: 5, backoff: true){
+                  try {
+                    sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                  } catch(err) {
+                    i++
+                    sh(label: 'Delete cluster', script: 'kind delete cluster')
+                    if (i > 1) {
+                      error("Setup kind failed with error '${err.toString()}'")
+                    }
+                  }
+                }
                 sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
