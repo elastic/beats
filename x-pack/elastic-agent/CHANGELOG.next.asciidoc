@@ -17,6 +17,7 @@
 - Fix issue where inputs without processors defined would panic {pull}21628[21628]
 - Partial extracted beat result in failure to spawn beat {issue}21718[21718]
 - Use symlink path for reexecutions {pull}21835[21835]
+
 ==== New features
 
 - Prepare packaging for endpoint and asc files {pull}20186[20186]
