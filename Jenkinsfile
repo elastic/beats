@@ -167,8 +167,8 @@ def cloud(Map args = [:]) {
 
 def k8sTest(Map args = [:]) {
   def versions = args.versions
-  node(args.label) {
-    versions.each{ v ->
+  versions.each{ v ->
+    node(args.label) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
