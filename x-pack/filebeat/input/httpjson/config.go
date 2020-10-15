@@ -125,10 +125,15 @@ func (dc *dateCursorConfig) Validate() error {
 	if dc.DateFormat == "" {
 		return nil
 	}
-	now := time.Now().Format(dc.DateFormat)
-	if _, err := time.Parse(dc.DateFormat, now); err != nil {
+
+	const knownTimestamp = 1602601228 // 2020-10-13T15:00:28+00:00 RFC3339
+	knownDate := time.Unix(knownTimestamp, 0).UTC()
+
+	dateStr := knownDate.Format(dc.DateFormat)
+	if _, err := time.Parse(dc.DateFormat, dateStr); err != nil {
 		return errors.New("invalid configuration: date_format is not a valid date layout")
 	}
+
 	return nil
 }
 
