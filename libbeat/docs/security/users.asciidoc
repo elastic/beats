@@ -103,7 +103,7 @@ need to set up {beatname_uc}:
 
 ifdef::has_ml_jobs[]
 |`machine_learning_admin`
-|Provides full use of the machine learning APIs and grants read/write access to all machine learning indices
+|Provide full use of the machine learning APIs and grant read/write access to all machine learning indices
 endif::has_ml_jobs[]
 
 ifdef::apm-server[]
