@@ -130,7 +130,7 @@ endif::[]
 
 The Kubernetes autodiscover provider watches for Kubernetes nodes, pods, services to start, update, and stop.
 
-These are the available fields during within config templating. The `kubernetes.*` fields will be available on each emitted event.
+These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
 [float]
 ====== Generic fields:
