@@ -126,8 +126,9 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
+      // TODO analyzeFlakey does not support other release branches but the master branch.
       notifyBuildResult(prComment: true,
-                        slackComment: true, slackNotify: (isBranch() || isTag())
+                        slackComment: true, slackNotify: (isBranch() || isTag()),
                         analyzeFlakey: true, flakyReportIdx: "reporter-beats-beats-master")
     }
   }
