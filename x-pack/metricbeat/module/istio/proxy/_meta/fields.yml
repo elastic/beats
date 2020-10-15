@@ -1,4 +1,4 @@
-- name: istiod
+- name: proxy
   type: group
   release: beta
   fields:
