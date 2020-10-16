@@ -509,6 +509,38 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module. {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module. {pull}18058[18058]
 
+[[release-notes-7.7.1]]
+=== Beats version 7.7.1
+https://github.com/elastic/beats/compare/v7.7.0...v7.7.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `keystore add` command hanging on Windows. {issue}18649[18649] {pull}18654[18654]
+
+*Filebeat*
+
+- Unescape filenames in SQS messages to resolve file paths correctly. {pull}18370[18370]
+- Improve failure handler for Cisco ASA and FTD pipelines to avoid mapping temporary fields. {issue}18391[18391] {pull}18392[18392]
+- Fix `source.address` field not being set for the Nginx `ingress_controller` fileset. {pull}18511[18511]
+- Fix Google Cloud `audit` fileset to only take in fields that are explicitly defined by the fileset. {issue}18465[18465] {pull}18472[18472]
+- Fix rate limit related issue in the `httpjson` input for the Okta module. {issue}18530[18530] {pull}18534[18534]
+- Fix Cisco ASA and FTD parsing errors caused by NAT fields that contain a hostname instead of an IP. {issue}14034[14034] {pull}18376[18376]
+- Fix PANW module to use correct mappings for bytes and packets counters. {issue}18522[18522] {pull}18525[18525]
+- Fix Office 365 ingest failures caused by IP addresses surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
+
+*Metricbeat*
+
+- Fix `tags_filter` setting to work correctly for the AWS `cloudwatch` metricset. {pull}18524[18524]
+
+==== Added
+
+*Filebeat*
+
+- Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
+- Make `decode_cef` processor GA. {pull}17944[17944]
+
 [[release-notes-7.7.0]]
 === Beats version 7.7.0
 https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
@@ -780,6 +812,12 @@ https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
 *Functionbeat*
 
 - Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
+
+==== Added
+
+*Winlogbeat*
+
+- Made the event parser more lenient w.r.t. invalid event log definition version numbers. {issue}15838[15838]
 
 [[release-notes-7.6.0]]
 === Beats version 7.6.0
@@ -1153,7 +1191,6 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
-- Made the event parser more lenient w.r.t. invalid event log definition version numbers. {issue}15838[15838]
 
 ==== Deprecated
 
