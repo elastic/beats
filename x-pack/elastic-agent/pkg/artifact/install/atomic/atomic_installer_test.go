@@ -13,8 +13,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 func TestOKInstall(t *testing.T) {
