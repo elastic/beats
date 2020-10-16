@@ -374,7 +374,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		msgs = append(msgs, m)
 	}
 
-	e := buildMetricbeatEvent(msgs, defaultConfig)
+	e := buildMetricbeatEvent(msgs, &defaultConfig)
 	beatEvent := e.BeatEvent(moduleName, metricsetName, core.AddDatasetToEvent)
 	output, err := json.MarshalIndent(&beatEvent.Fields, "", "    ")
 	if err != nil {

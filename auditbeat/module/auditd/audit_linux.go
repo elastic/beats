@@ -216,7 +216,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 				case <-reporter.Done():
 					return
 				case msgs := <-out:
-					reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+					reporter.Event(buildMetricbeatEvent(msgs, &ms.config))
 				}
 			}
 		}()
@@ -557,7 +557,7 @@ func filterRecordType(typ auparse.AuditMessageType) bool {
 	return false
 }
 
-func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event {
+func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config *Config) mb.Event {
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.
