@@ -362,7 +362,6 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url": "localhost",
 			},
 		},
-		/* Flaky test: https://github.com/elastic/beats/issues/21748
 		{
 			name:        "date_cursor.date_format will fail if invalid",
 			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
@@ -371,7 +370,6 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url":         "localhost",
 			},
 		},
-		*/
 		{
 			name: "date_cursor must work with a valid date_format",
 			input: map[string]interface{}{
