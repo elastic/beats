@@ -173,15 +173,15 @@ pipeline {
 
 def pushCIDockerImages(){
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "auditbeat" || "${env.BEATS_FOLDER}" == "x-pack/auditbeat"){
+    if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
       tagAndPush('auditbeat')
-    } else if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
+    } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
       tagAndPush('filebeat')
-    } else if ("${env.BEATS_FOLDER}" == "heartbeat" || "${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
+    } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
       tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
+    } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush('metricbeat')
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush('packetbeat')
