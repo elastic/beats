@@ -208,7 +208,7 @@ def target(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${command}", script: "${command}")
+          cmd(label: "${env.STAGE_NAME} - ${command}", script: "${command}")
         }
       }
     }
@@ -313,7 +313,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
 */
 def fixPermissions(location) {
   if(isUnix()) {
-    sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+    sh(label: "${env.STAGE_NAME} - Fix permissions", script: """#!/usr/bin/env bash
       set +x
       source ./dev-tools/common.bash
       docker_setup
