@@ -43,7 +43,11 @@ type Harvester interface {
 
 // HarvesterGroup is responsible for running the
 // Harvesters started by the Prospector.
-type HarvesterGroup struct {
+type HarvesterGroup interface {
+	Run(input.Context, Source) error
+}
+
+type defaultHarvesterGroup struct {
 	manager      *InputManager
 	readers      map[string]context.CancelFunc
 	pipeline     beat.PipelineConnector
@@ -54,7 +58,7 @@ type HarvesterGroup struct {
 }
 
 // Run starts the Harvester for a Source.
-func (hg *HarvesterGroup) Run(ctx input.Context, s Source) error {
+func (hg *defaultHarvesterGroup) Run(ctx input.Context, s Source) error {
 	log := ctx.Logger.With("source", s.Name())
 	log.Debug("Starting harvester for file")
 
@@ -111,7 +115,7 @@ func (hg *HarvesterGroup) Run(ctx input.Context, s Source) error {
 }
 
 // Cancel stops the running Harvester for a given Source.
-func (hg *HarvesterGroup) Cancel(s Source) error {
+func (hg *defaultHarvesterGroup) Cancel(s Source) error {
 	if cancel, ok := hg.readers[s.Name()]; ok {
 		cancel()
 		return nil
