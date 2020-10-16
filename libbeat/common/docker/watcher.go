@@ -86,6 +86,11 @@ type watcher struct {
 	shortID        bool // whether to store short ID in "containers" too
 }
 
+// clock is an interface used to provide mocked time on testing
+type clock interface {
+	Now() time.Time
+}
+
 // Container info retrieved by the watcher
 type Container struct {
 	ID          string
@@ -461,10 +466,6 @@ func (w *watcher) ListenStart() bus.Listener {
 // ListenStop returns a bus listener to receive container stopped events, with a `container` key holding it
 func (w *watcher) ListenStop() bus.Listener {
 	return w.bus.Subscribe("stop")
-}
-
-type clock interface {
-	Now() time.Time
 }
 
 type systemClock struct{}
