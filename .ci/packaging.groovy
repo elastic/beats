@@ -327,10 +327,22 @@ def publishPackages(baseDir){
     bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
   }
   def beatsFolderName = getBeatsName(baseDir)
-  googleStorageUpload(bucket: "${bucketUri}/${beatsFolderName}",
+  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
+
+  // In order to run the beats-tester let's copy those files to another more predictable
+  // location where those files won't be uploaded while running the beats-tester
+  if (isBranch()) {
+    bucketUri = "gs://${JOB_GCS_BUCKET}/commit/${env.GIT_BASE_COMMIT}"
+    uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
+  }
+}
+
+def uploadPackages(bucketUri, baseDir, beatsFolderName){
+  def distributionsFolder = 'build/distributions'
+  googleStorageUpload(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
+    pathPrefix: "${baseDir}/${distributionsFolder}/",
+    pattern: "${baseDir}/${distributionsFolder}/**/*",
     sharedPublicly: true,
     showInline: true
   )
