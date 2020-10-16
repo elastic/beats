@@ -25,11 +25,14 @@ import (
 	"time"
 	"unsafe"
 
+	"golang.org/x/net/bpf"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/afpacket"
 	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
 )
 
 type afpacketHandle struct {
@@ -37,6 +40,7 @@ type afpacketHandle struct {
 	promiscPreviousState         bool
 	promiscPreviousStateDetected bool
 	device                       string
+	snaplen                      int
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
@@ -62,6 +66,7 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 		promiscPreviousState:         promiscEnabled,
 		device:                       device,
 		promiscPreviousStateDetected: autoPromiscMode && err == nil,
+		snaplen:                      snaplen,
 	}
 
 	if device == "any" {
@@ -86,8 +91,18 @@ func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo,
 	return h.TPacket.ReadPacketData()
 }
 
-func (h *afpacketHandle) SetBPFFilter(expr string) (_ error) {
-	return h.TPacket.SetBPFFilter(expr)
+// SetBPFFilter translates a BPF filter string into BPF RawInstruction and applies them.
+func (h *afpacketHandle) SetBPFFilter(expr string) (err error) {
+	// use pcap bpf compiler to get raw bpf instruction
+	pcapBPF, err := pcap.CompileBPFFilter(h.LinkType(), h.snaplen, expr)
+	if err != nil {
+		return err
+	}
+	rawBPF := make([]bpf.RawInstruction, len(pcapBPF))
+	for i, ri := range pcapBPF {
+		rawBPF[i] = bpf.RawInstruction{Op: ri.Code, Jt: ri.Jt, Jf: ri.Jf, K: ri.K}
+	}
+	return h.TPacket.SetBPF(rawBPF)
 }
 
 func (h *afpacketHandle) LinkType() layers.LinkType {
