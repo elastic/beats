@@ -2,6 +2,13 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the test suites we will use to trigger the E2E tests.
+*/
+@Field def e2eTestSuites = []
+
 pipeline {
   agent none
   environment {
@@ -121,7 +128,7 @@ pipeline {
                     release()
                     pushCIDockerImages()
                   }
-                  runE2ETestForPackages()
+                  prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
               }
               stage('Package Mac OS'){
@@ -152,6 +159,13 @@ pipeline {
             }
           }
         }
+        stage('Run E2E Tests for Packages'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          steps {
+            runE2ETests()
+          }
+        }
       }
     }
   }
@@ -159,30 +173,20 @@ pipeline {
 
 def pushCIDockerImages(){
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "auditbeat"){
-      tagAndPush('auditbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "filebeat") {
-      tagAndPush('filebeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
-      tagAndPush('heartbeat-oss')
+    if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
+      tagAndPush('auditbeat')
+    } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
+      tagAndPush('filebeat')
+    } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
+      tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
-      tagAndPush('journalbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
-      tagAndPush('metricbeat-oss')
+    } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
+      tagAndPush('metricbeat')
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush('packetbeat')
-      tagAndPush('packetbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/auditbeat"){
-      tagAndPush('auditbeat')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
       tagAndPush('elastic-agent')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
-      tagAndPush('filebeat')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
-        tagAndPush('heartbeat')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
-      tagAndPush('metricbeat')
     }
   }
 }
@@ -208,7 +212,7 @@ def tagAndPush(name){
     def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
 
     def iterations = 0
-    retryWithSleep(retries: 3, seconds: 5, backoff: true)
+    retryWithSleep(retries: 3, seconds: 5, backoff: true) {
       iterations++
       def status = sh(label:'Change tag and push', script: """
         docker tag ${oldName} ${newName}
@@ -217,30 +221,27 @@ def tagAndPush(name){
         docker push ${commitName}
       """, returnStatus: true)
 
-    if ( status > 0 && iterations < 3) {
-      error('tag and push failed, retry')
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      if ( status > 0 && iterations < 3) {
+        error('tag and push failed, retry')
+      } else if ( status > 0 ) {
+        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      }
     }
   }
 }
 
-def runE2ETestForPackages(){
-  def suite = ''
-
-  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "filebeat" || "${env.BEATS_FOLDER}" == "x-pack/filebeat") {
-      suite = 'helm,fleet'
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat" || "${env.BEATS_FOLDER}" == "x-pack/metricbeat") {
-      suite = ''
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      suite = 'fleet'
-    } else {
-      echo("Skipping E2E tests for ${env.BEATS_FOLDER}.")
-      return
-    }
-
-    triggerE2ETests(suite)
+def prepareE2ETestForPackage(String beat){
+  if ("${beat}" == "filebeat" || "${beat}" == "x-pack/filebeat") {
+    e2eTestSuites.push('fleet')
+    e2eTestSuites.push('helm')
+  } else if ("${beat}" == "metricbeat" || "${beat}" == "x-pack/metricbeat") {
+    e2eTestSuites.push('ALL')
+    echo("${beat} adds all test suites to the E2E tests job.")
+  } else if ("${beat}" == "x-pack/elastic-agent") {
+    e2eTestSuites.push('fleet')
+  } else {
+    echo("${beat} does not add any test suite to the E2E tests job.")
+    return
   }
 }
 
@@ -257,8 +258,29 @@ def release(){
   }
 }
 
+def runE2ETests(){
+  if (e2eTestSuites.size() == 0) {
+    echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
+    return
+  }
+
+  def suites = '' // empty value represents all suites in the E2E tests
+
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
+    def suitesSet = e2eTestSuites.toSet()
+
+    if (!suitesSet.contains('ALL')) {
+      suitesSet.each { suite ->
+        suites += "${suite},"
+      };
+    }
+
+    triggerE2ETests(suites)
+  }
+}
+
 def triggerE2ETests(String suite) {
-  echo("Triggering E2E tests for ${env.BEATS_FOLDER}. Test suite: ${suite}.")
+  echo("Triggering E2E tests for PR-${env.CHANGE_ID}. Test suites: ${suite}.")
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
@@ -285,7 +307,7 @@ def triggerE2ETests(String suite) {
     wait: false
   )
 
-  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME} for ${env.BEATS_FOLDER}"
+  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME}"
   githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
