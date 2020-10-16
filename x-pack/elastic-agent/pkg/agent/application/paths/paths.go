@@ -14,6 +14,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
+const (
+	tempSubdir = "tmp"
+)
+
 var (
 	topPath    string
 	configPath string
@@ -29,12 +33,20 @@ func init() {
 	fs.StringVar(&topPath, "path.home", topPath, "Agent root path")
 	fs.StringVar(&configPath, "path.config", configPath, "Config path is the directory Agent looks for its config file")
 	fs.StringVar(&logsPath, "path.logs", logsPath, "Logs path contains Agent log output")
+
+	// create tempdir as it probably don't exists
+	os.MkdirAll(TempDir(), 0750)
 }
 
 // Top returns the top directory for Elastic Agent, all the versioned
 // home directories live under this top-level/data/elastic-agent-${hash}
 func Top() string {
 	return topPath
+}
+
+// TempDir returns agent temp dir located within data dir.
+func TempDir() string {
+	return filepath.Join(Data(), tempSubdir)
 }
 
 // Home returns a directory where binary lives
