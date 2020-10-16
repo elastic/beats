@@ -14,10 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        cloud: "mage build test"
-        withModule: true       ## run the ITs only if the changeset affects a specific module.
-        dirs:                  ## run the cloud tests for the given modules.
-            - "x-pack/metricbeat/module/aws"
+        make: "RACE_DETECTOR=1 make -C x-pack/metricbeat clean check testsuite"
     windows:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.

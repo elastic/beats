@@ -14,9 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        mage: "mage build test"
-    crosscompile: 
-        make: "make -C auditbeat crosscompile"
+        make: "RACE_DETECTOR=1 make -C auditbeat clean check testsuite"
     windows:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.

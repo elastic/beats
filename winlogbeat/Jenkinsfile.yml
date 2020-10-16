@@ -13,8 +13,8 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
-    crosscompile:
-        make: "make -C winlogbeat crosscompile"
+    build:
+        make: "RACE_DETECTOR=1 make -C winlogbeat clean check testsuite"
     windows:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
