@@ -35,6 +35,8 @@ type readerLoopResponse struct {
 	frameCount uint64
 
 	// The number of bytes successfully read from the requested segment file.
+	// If this is less than (endOffset - startOffset) from the original request,
+	// then err is guaranteed to be non-nil.
 	byteCount uint64
 
 	// If there was an error in the segment file (i.e. inconsistent data), the
@@ -100,7 +102,8 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
-	_, err = handle.Seek(segmentHeaderSize+int64(request.startOffset), 0)
+	_, err = handle.Seek(
+		segmentHeaderSize+int64(request.startOffset), os.SEEK_SET)
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}
@@ -137,7 +140,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		}
 
 		// We are done with this request if:
-		// - there was an error reading the frame,
+		// - there was an error reading the frame
 		// - there are no more frames to read, or
 		// - we have reached the end of the requested region
 		if err != nil || frame == nil || byteCount >= targetLength {
@@ -166,6 +169,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 // nextFrame reads and decodes one frame from the given file handle, as long
 // it does not exceed the given length bound. The returned frame leaves the
 // segment and frame IDs unset.
+// The returned error will be set if and only if the returned frame is nil.
 func (rl *readerLoop) nextFrame(
 	handle *os.File, maxLength uint64,
 ) (*readFrame, error) {
