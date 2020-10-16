@@ -294,34 +294,38 @@ func TestRuleReload(t *testing.T) {
 		},
 	}
 
-	// Any commands executed by this process will generate events due to the
-	// PPID filter we applied to the rule.
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
-
-	ms := mbtest.NewPushMetricSetV2(t, c)
-	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
-	assertNoErrors(t, events)
-	assertHasNotBinCatExecve(t, events)
-
 	time.AfterFunc(time.Second, func() {
-		exec.Command(
-			"echo",
-			"'-a always,exit -F arch=b64 -F ppid=%d -S execve -k exec'",
-			">",
-			"/tmp/test.rules",
-		).Output()
+		rule := fmt.Sprintf(`
+		   -a always,exit -F arch=b64 -F ppid=%d -S execve -k exec
+		`, os.Getpid())
+		err := ioutil.WriteFile("/tmp/test.rules", []byte(rule), 0644)
+		if err != nil {
+			t.Error(err)
+		}
+		logp.Info("writed rule file")
 	})
 
-	// wait for rule reload
-	time.AfterFunc(time.Second, func() { exec.Command("sleep", "10").Output() })
+	defer func() {
+		e := os.Remove("/tmp/test.rules")
+		if e != nil {
+			t.Error(e)
+		}
+	}()
 
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
-	events = mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
+	time.AfterFunc(time.Second*7, func() {
+		exec.Command("cat", "/proc/self/status").Output()
+		logp.Info("run cat command")
+	})
+
+	logp.Info("start beat")
+	ms := mbtest.NewPushMetricSetV2(t, c)
+
+	events := mbtest.RunPushMetricSetV2(15*time.Second, 0, ms)
+	logp.Info("end beat")
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)
-	time.AfterFunc(time.Second, func() { exec.Command("rm", "/tmp/test.rules").Output() })
-}
 
+}
 func TestKernelVersion(t *testing.T) {
 	major, minor, full, err := kernelVersion()
 	if err != nil {
@@ -394,19 +398,6 @@ func assertHasBinCatExecve(t *testing.T, events []mb.Event) {
 		}
 	}
 	assert.Fail(t, "expected an execve event for /bin/cat")
-}
-
-func assertHasNotBinCatExecve(t *testing.T, events []mb.Event) {
-	t.Helper()
-
-	for _, e := range events {
-		v, err := e.RootFields.GetValue("process.executable")
-		if err == nil {
-			if exe, ok := v.(string); ok && exe == "/bin/cat" {
-				assert.Fail(t, "expected don't has execve event for /bin/cat")
-			}
-		}
-	}
 }
 
 func assertNoErrors(t *testing.T, events []mb.Event) {
