@@ -15,7 +15,5 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
-    metricbeat-test:
-        make: "make -C generator/_templates/metricbeat test test-package"
-    beat-test:
-        make: "make -C generator/_templates/beat test test-package"
+    generator-test:
+        make: "make -C generator/ test"
