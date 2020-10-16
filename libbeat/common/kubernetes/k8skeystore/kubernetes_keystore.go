@@ -79,16 +79,13 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 	}
 	if namespace != "" {
 		// either retrieve already stored keystore or create a new one for the namespace
-		kr.keystoreMapLock.RLock()
+		kr.keystoreMapLock.Lock()
+		defer kr.keystoreMapLock.Unlock()
 		if storedKeystore, ok := kr.kubernetesKeystores[namespace]; ok {
-			kr.keystoreMapLock.RUnlock()
 			return storedKeystore
 		}
-		kr.keystoreMapLock.RUnlock()
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
-		kr.keystoreMapLock.Lock()
 		kr.kubernetesKeystores[namespace] = k8sKeystore
-		kr.keystoreMapLock.Unlock()
 		return k8sKeystore
 	}
 	kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
