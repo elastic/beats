@@ -65,7 +65,7 @@
             - name: confirmed-timeout
               type: integer
               description: >
-                Number of AV engines that reach a timeout when analysing that file
+                Number of AV engines that reach a timeout when analyzing that file
             - name: harmless
               type: integer
               description: >
@@ -81,7 +81,7 @@
             - name: timeout
               type: integer
               description: >
-                number of timeouts when analysing this URL/file
+                number of timeouts when analyzing this URL/file
             - name: type-unsupported
               type: integer
               description: >
