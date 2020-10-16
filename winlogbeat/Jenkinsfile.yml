@@ -16,6 +16,6 @@ stages:
     crosscompile:
         make: "make -C winlogbeat crosscompile"
     windows:
-        mage: "mage build unitTest"
+        mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
+            - "windows-2008-r2"

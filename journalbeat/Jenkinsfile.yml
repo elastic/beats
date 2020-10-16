@@ -15,3 +15,7 @@ platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     unitTest:
         mage: "mage build unitTest"
+    windows:
+        mage: "mage fields build goTestUnit"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2008-r2"

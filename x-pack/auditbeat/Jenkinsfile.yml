@@ -17,6 +17,6 @@ stages:
         mage: "mage update build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
     windows:
-        mage: "mage build unitTest"
+        mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
+            - "windows-2008-r2"

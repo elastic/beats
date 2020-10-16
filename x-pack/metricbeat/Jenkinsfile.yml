@@ -19,6 +19,6 @@ stages:
         dirs:                  ## run the cloud tests for the given modules.
             - "x-pack/metricbeat/module/aws"
     windows:
-        mage: "mage build unitTest"
+        mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
+            - "windows-2008-r2"
