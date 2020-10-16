@@ -20,6 +20,7 @@ package k8skeystore
 import (
 	"context"
 	"strings"
+	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
@@ -38,6 +39,7 @@ type KubernetesKeystoresRegistry struct {
 	kubernetesKeystores KubernetesKeystores
 	logger              *logp.Logger
 	client              k8s.Interface
+	keystoreMapLock     sync.RWMutex
 }
 
 // KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace
@@ -59,6 +61,7 @@ func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) k
 		kubernetesKeystores: KubernetesKeystores{},
 		logger:              logger,
 		client:              client,
+		keystoreMapLock:     sync.RWMutex{},
 	}
 }
 
@@ -76,11 +79,16 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 	}
 	if namespace != "" {
 		// either retrieve already stored keystore or create a new one for the namespace
+		kr.keystoreMapLock.RLock()
 		if storedKeystore, ok := kr.kubernetesKeystores[namespace]; ok {
+			kr.keystoreMapLock.RUnlock()
 			return storedKeystore
 		}
+		kr.keystoreMapLock.RUnlock()
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
-		kr.kubernetesKeystores["namespace"] = k8sKeystore
+		kr.keystoreMapLock.Lock()
+		kr.kubernetesKeystores[namespace] = k8sKeystore
+		kr.keystoreMapLock.Unlock()
 		return k8sKeystore
 	}
 	kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
