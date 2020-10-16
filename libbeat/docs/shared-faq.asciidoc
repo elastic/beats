@@ -67,9 +67,12 @@ Failed to publish events caused by: write tcp ... write: connection reset by pee
 ----------------------------------------------------------------------
 
 
-You can solve the problem making sure the firewall is not closing connections between {beatname_uc} and {ls} or configuring the {ls}
-output adding a `ttl` value lower than the maximum allowed time by the firewall and `pipelining` set to 0 (as pipelining cannot be enabled
-when `ttl` is used).
+To solve the problem:
+
+* make sure the firewall is not closing connections between {beatname_uc} and {ls}, or
+* set the `ttl` value in the <<logstash-output,{ls} output>> to a value that's
+lower than the maximum time allowed by the firewall, and set `pipelining` to 0
+(pipelining cannot be enabled when `ttl` is used).
 endif::[]
 
 ifndef::no-output-logstash[]
