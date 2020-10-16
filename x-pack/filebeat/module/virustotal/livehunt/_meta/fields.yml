@@ -21,7 +21,7 @@
         - name: results
           description: >
             Contains each engine's resulting data about sample
-          type: group
+          type: nested
           fields:
             - name: method
               description: >

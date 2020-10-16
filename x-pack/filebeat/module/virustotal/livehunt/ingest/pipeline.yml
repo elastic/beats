@@ -64,6 +64,12 @@ processors:
     formats:
     - UNIX
 
+- date:
+    field: virustotal.analysis.results.engine_update
+    ignore_failure: True
+    formats:
+    - yyyyMMdd
+
 on_failure:
   - set:
       field: error.message

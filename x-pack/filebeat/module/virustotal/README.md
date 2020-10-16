@@ -95,3 +95,7 @@ kafkacat -b 127.0.0.1:9093 -C -t virustotal.raw | head | jq
 ```
 
 Configure filebeat to use the kafka input as show above, and run it until all events are replayed. After which, you can switch back to `httpjson` as the input type and stream new data.
+
+```shell
+./filebeat -c filebeat.dev.yml -e
+```
