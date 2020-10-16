@@ -31,15 +31,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type KubernetesKeystores map[string]keystore.Keystore
+//type KubernetesKeystores map[string]keystore.Keystore
+type KubernetesKeystores sync.Map
 
 // KubernetesKeystoresRegistry holds KubernetesKeystores for known namespaces. Once a Keystore for one k8s namespace
 // is initialized it will be reused every time it is needed.
 type KubernetesKeystoresRegistry struct {
-	kubernetesKeystores KubernetesKeystores
+	kubernetesKeystores sync.Map
 	logger              *logp.Logger
 	client              k8s.Interface
-	keystoreMapLock     sync.RWMutex
 }
 
 // KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace
@@ -58,10 +58,9 @@ func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.
 // NewKubernetesKeystoresRegistry initializes a KubernetesKeystoresRegistry
 func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) keystore.Provider {
 	return &KubernetesKeystoresRegistry{
-		kubernetesKeystores: KubernetesKeystores{},
+		kubernetesKeystores: sync.Map{},
 		logger:              logger,
 		client:              client,
-		keystoreMapLock:     sync.RWMutex{},
 	}
 }
 
@@ -79,14 +78,9 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 	}
 	if namespace != "" {
 		// either retrieve already stored keystore or create a new one for the namespace
-		kr.keystoreMapLock.Lock()
-		defer kr.keystoreMapLock.Unlock()
-		if storedKeystore, ok := kr.kubernetesKeystores[namespace]; ok {
-			return storedKeystore
-		}
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
-		kr.kubernetesKeystores[namespace] = k8sKeystore
-		return k8sKeystore
+		storedKeystore, _ := kr.kubernetesKeystores.LoadOrStore(namespace, k8sKeystore)
+		return storedKeystore.(keystore.Keystore)
 	}
 	kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
 	return nil
