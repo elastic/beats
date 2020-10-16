@@ -285,6 +285,13 @@ def withBeatsEnv(Map args = [:], Closure body) {
           fi''')
       }
       try {
+        // Add more stability when dependencies are not accessible temporarily
+        // See https://github.com/elastic/beats/issues/21609
+        // retry/try/catch approach reports errors, let's avoid it to keep the
+        // notifications cleaner.
+        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+        }
         body()
       } finally {
         if (archive) {
