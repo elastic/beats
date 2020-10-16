@@ -91,6 +91,12 @@ type clock interface {
 	Now() time.Time
 }
 
+// systemClock implements the clock interface using the system clock via the time package
+type systemClock struct{}
+
+// Now returns the current time
+func (*systemClock) Now() time.Time { return time.Now() }
+
 // Container info retrieved by the watcher
 type Container struct {
 	ID          string
@@ -467,7 +473,3 @@ func (w *watcher) ListenStart() bus.Listener {
 func (w *watcher) ListenStop() bus.Listener {
 	return w.bus.Subscribe("stop")
 }
-
-type systemClock struct{}
-
-func (*systemClock) Now() time.Time { return time.Now() }
