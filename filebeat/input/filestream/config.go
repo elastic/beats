@@ -30,10 +30,11 @@ import (
 
 // Config stores the options of a file stream.
 type config struct {
+	readerConfig
+
 	Paths          []string                `config:"paths"`
 	Close          closerConfig            `config:"close"`
-	FileWatcher    *common.ConfigNamespace `config:"file_watcher"`
-	Reader         readerConfig            `config:"readers"`
+	FileWatcher    *common.ConfigNamespace `config:"prospector"`
 	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
 	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
 	CleanRemoved   bool                    `config:"clean_removed"`
@@ -47,18 +48,17 @@ type closerConfig struct {
 }
 
 type readerCloserConfig struct {
-	AfterInterval time.Duration
-	Inactive      time.Duration
-	OnEOF         bool
+	AfterInterval time.Duration `config:"after_interval"`
+	OnEOF         bool          `config:"on_eof"`
 }
 
 type stateChangeCloserConfig struct {
-	CheckInterval time.Duration
-	Removed       bool
-	Renamed       bool
+	CheckInterval time.Duration `config:"check_interval" validate:"nonzero"`
+	Inactive      time.Duration `config:"inactive"`
+	Removed       bool          `config:"removed"`
+	Renamed       bool          `config:"renamed"`
 }
 
-// TODO should this be inline?
 type readerConfig struct {
 	Backoff        backoffConfig           `config:"backoff"`
 	BufferSize     int                     `config:"buffer_size"`
@@ -79,9 +79,9 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
+		readerConfig:   defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
-		Reader:         defaultReaderConfig(),
 		CleanInactive:  0,
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
@@ -94,11 +94,11 @@ func defaultCloserConfig() closerConfig {
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
 			Removed:       true, // TODO check clean_removed option
+			Inactive:      0 * time.Second,
 			Renamed:       false,
 		},
 		Reader: readerCloserConfig{
 			OnEOF:         false,
-			Inactive:      0 * time.Second,
 			AfterInterval: 0 * time.Second,
 		},
 	}

@@ -102,14 +102,18 @@ func (i *Installer) unzip(artifactPath string) error {
 				return err
 			}
 			defer func() {
-				if cerr := f.Close(); cerr != nil {
-					err = multierror.Append(err, cerr)
+				if closeErr := f.Close(); closeErr != nil {
+					err = multierror.Append(err, closeErr)
 				}
 			}()
 
 			if _, err = io.Copy(f, rc); err != nil {
 				return err
 			}
+
+			// sometimes we try executing binary too fast and run into text file busy after unpacking
+			// syncing prevents this
+			f.Sync()
 		}
 		return nil
 	}

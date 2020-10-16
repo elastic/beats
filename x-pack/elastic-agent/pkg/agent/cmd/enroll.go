@@ -36,7 +36,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		Args:  cobra.ExactArgs(2),
 		Run: func(c *cobra.Command, args []string) {
 			if err := enroll(streams, c, flags, args); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
 		},
@@ -119,7 +119,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	if fromInstall {
 		force = true
 	}
-	if !force {
+
+	// prompt only when it is not forced and is already enrolled
+	if !force && (cfg.Fleet != nil && cfg.Fleet.Enabled == true) {
 		confirm, err := c.Confirm("This will replace your current settings. Do you want to continue?", true)
 		if err != nil {
 			return errors.New(err, "problem reading prompt response")
@@ -191,7 +193,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	// skip restarting
 	noRestart, _ := cmd.Flags().GetBool("no-restart")
-	if noRestart {
+	if noRestart || fromInstall {
 		return nil
 	}
 
