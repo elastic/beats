@@ -1,7 +1,10 @@
 import os
 import sys
 
-sys.path.append('../../vendor/github.com/elastic/beats/libbeat/tests/system')
+# if the beats folder is removed use the one from the module cache
+# (output of go list -m -f '{{.Dir}}' github.com/elastic/beats/v7)
+sys.path.append('{es_beats}/libbeat/tests/system')
+
 from beat.beat import TestCase
 
 
