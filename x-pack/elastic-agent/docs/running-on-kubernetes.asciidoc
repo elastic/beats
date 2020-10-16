@@ -2,9 +2,6 @@
 [role="xpack"]
 === Run {agent} on Kubernetes
 
-//REVIEWERS: This topic is not hooked up to the docs anywhere. Should it be?
-//It needs to be edited.
-
 You can use {agent} https://www.docker.elastic.co/r/beats/elastic-agent[Docker images] on Kubernetes to
 retrieve cluster metrics.
 

@@ -4,9 +4,6 @@
 
 beta[]
 
-// REVIEWERS: Do we want to use "policy settings" instead of configuration
-// settings in this topic?
-
 // TODO: This topic assumes users know what standalone and fleet are. When we
 // add the settings reference, we should clean this up: describe the available
 // options, then show how to configure them manually for standalone. We should

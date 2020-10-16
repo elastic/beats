@@ -208,10 +208,6 @@ The environment in which the agent will run.
 
 //TODO: Clarify what we mean by environment by showing an example.
 
-// REVIEWERS: Do we need to remove the path settings here? It sounds like
-// we won't allow users to set custom paths because it won't allow them to
-// auto upgrade. Is that correct? 
-
 `--path.config <string>`::
 The directory where {agent} looks for its policy file. The default
 varies by platform.
