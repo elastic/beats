@@ -190,30 +190,20 @@ pipeline {
 
 def pushCIDockerImages(){
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    if ("${env.BEATS_FOLDER}" == "auditbeat"){
-      tagAndPush('auditbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "filebeat") {
-      tagAndPush('filebeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
-      tagAndPush('heartbeat-oss')
+    if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
+      tagAndPush('auditbeat')
+    } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
+      tagAndPush('filebeat')
+    } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
+      tagAndPush('heartbeat')
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
       tagAndPush('journalbeat')
-      tagAndPush('journalbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
-      tagAndPush('metricbeat-oss')
+    } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
+      tagAndPush('metricbeat')
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
       tagAndPush('packetbeat')
-      tagAndPush('packetbeat-oss')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/auditbeat"){
-      tagAndPush('auditbeat')
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
       tagAndPush('elastic-agent')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
-      tagAndPush('filebeat')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/heartbeat"){
-        tagAndPush('heartbeat')
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
-      tagAndPush('metricbeat')
     }
   }
 }
