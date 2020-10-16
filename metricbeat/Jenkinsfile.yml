@@ -11,7 +11,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "metricbeat"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     unitTest:
         mage: "mage build unitTest"
@@ -23,17 +23,6 @@ stages:
         withModule: true
     crosscompile:
         make: "make -C metricbeat crosscompile"
-    macos:
-        mage: "mage build unitTest"
-        platforms:             ## override default label in this specific stage.
-          - "macosx"
-        when:                  ## Aggregate when with the top-level one.
-            comments:
-                - "/test metricbeat for macos"
-            labels:
-                - "macOS"
-            parameters:
-                - "macosTest"
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

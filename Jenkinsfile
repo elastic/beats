@@ -9,7 +9,7 @@ import groovy.transform.Field
 @Field def stashedTestReports = [:]
 
 pipeline {
-  agent { label 'ubuntu-18 && immutable' }
+  agent { label 'ubuntu-16 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     BASE_DIR = 'src/github.com/elastic/beats'
@@ -39,11 +39,7 @@ pipeline {
     issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test\\W+.*$)')
   }
   parameters {
-    booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
-    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
-    string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
-    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
   }
   stages {
     stage('Checkout') {

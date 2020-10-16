@@ -11,21 +11,10 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-elastic-agent"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
         mage: "mage build test"
-    macos:
-        mage: "mage build unitTest"
-        platforms:             ## override default label in this specific stage.
-            - "macosx"
-        when:                  ## Aggregate when with the top-level one.
-            comments:
-                - "/test x-pack/elastic-agent for macos"
-            labels:
-                - "macOS"
-            parameters:
-                - "macosTest"
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

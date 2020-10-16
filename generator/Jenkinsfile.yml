@@ -13,31 +13,9 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "generator"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     metricbeat-test:
         make: "make -C generator/_templates/metricbeat test test-package"
     beat-test:
         make: "make -C generator/_templates/beat test test-package"
-    macos-metricbeat:
-        make: "make -C generator/_templates/metricbeat test"
-        platforms:             ## override default label in this specific stage.
-          - "macosx"
-        when:                  ## Aggregate when with the top-level one.
-            comments:
-                - "/test generator for macos"
-            labels:
-                - "macOS"
-            parameters:
-                - "macosTest"
-    macos-beat:
-        make: "make -C generator/_templates/beat test"
-        platforms:             ## override default label in this specific stage.
-            - "macosx"
-        when:                  ## Aggregate when with the top-level one.
-            comments:
-                - "/test generator for macos"
-            labels:
-                - "macOS"
-            parameters:
-                - "macosTest"
