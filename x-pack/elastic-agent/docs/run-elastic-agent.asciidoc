@@ -12,8 +12,8 @@ configure and manage the agent.
 == Run in {fleet} mode
 
 With _fleet mode_, you manage {agent} remotely. The agent uses a trusted {kib}
-instance to retrieve configurations and report agent events. This trusted {kib}
-instance must have {ingest-manager} and {fleet} enabled.
+instance to retrieve policies and report agent events. This trusted {kib}
+instance must have {fleet} enabled.
 
 To create a trusted communication channel between {agent} and {kib}, enroll the
 agent to {fleet}.
@@ -22,14 +22,14 @@ To enroll an {agent} to {fleet}:
 
 . Stop {agent}, if it's already running.
 
-. In {ingest-manager}, click **Settings** and change the defaults, if necessary.
+. In {fleet}, click **Settings** and change the defaults, if necessary.
 For self-managed installations, set the URLs for {es} and {kib}, including
 the http ports, then save your changes.
 +
 [role="screenshot"]
-image::images/kibana-ingest-manager-settings.png[{ingest-manager} settings]
+//image::images/kibana-fleet-settings.png[{fleet} settings]
 
-. Select **{fleet}**, then click **Add agent** to get an enrollment token. See
+. Select **Agents**, then click **Add agent** to get an enrollment token. See
 <<ingest-management-getting-started>> for detailed steps.
 
 . Change to the directory where {agent} is installed, and enroll the agent to
@@ -60,8 +60,8 @@ To start {agent} manually, run:
 
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-standalone-widget.asciidoc[]
 
-Use the `-c` flag to specify the configuration file. If no configuration file is
-specified, {agent} uses the default configuration, `elastic-agent.yml`, which is
+Use the `-c` flag to specify the policy file. If no policy file is
+specified, {agent} uses the default policy, `elastic-agent.yml`, which is
 located in the same directory as {agent}.
 
 For configuration options, see <<elastic-agent-configuration>>.
