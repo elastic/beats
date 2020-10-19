@@ -145,6 +145,11 @@ func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Messag
 	}
 	c.logger.Debugf("handleSQSMessage succeed and returned %v sets of S3 log info", len(s3Infos))
 
+	// Skip if there is no s3 log info from this message
+	if len(s3Infos) == 0 {
+		return nil
+	}
+
 	// read from s3 object and create event for each log line
 	err = c.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
@@ -245,7 +250,8 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 // handle message
 func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	if !json.Valid([]byte(*m.Body)) {
-		return nil, fmt.Errorf("sqs message body json.Valid failed: %s", *m.Body)
+		c.logger.Warnf("sqs message body %s json.Valid failed, skipping this message", *m.MessageId)
+		return nil, nil
 	}
 
 	var msg sqsMessage
