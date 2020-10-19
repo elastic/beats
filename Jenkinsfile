@@ -168,7 +168,6 @@ def k8sTest(Map args = [:]) {
         withEnv(["K8S_VERSION=${v}", "MINIKUBE_VERSION=v0.25.2", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
-              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               retryWithSleep(retries: 3, seconds: 5, backoff: true){
                 sh(label: "Setup minikube", script: ".ci/scripts/minikube-setup.sh")
               }
