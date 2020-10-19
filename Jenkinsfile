@@ -60,7 +60,6 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
