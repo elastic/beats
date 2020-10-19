@@ -77,6 +77,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
+	// TODO: Remove once merged
+	logp.Info("Please note, this is an experimental, unsupported version of heartbeat for the purpose of demonstrating synthetic journeys!")
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
 	err := bt.RunStaticMonitors(b)
