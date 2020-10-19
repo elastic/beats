@@ -191,7 +191,7 @@ def pushCIDockerImages(){
   }
 }
 
-def tagAndPush(name){
+def tagAndPush(beatName){
   def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
@@ -211,43 +211,37 @@ def tagAndPush(name){
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
-    def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
-    def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
-
-    def iterations = 0
-    retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-      iterations++
-      def status = sh(label:'Change tag and push', script: """
-        docker tag ${oldName} ${newName}
-        docker push ${newName}
-        docker tag ${oldName} ${commitName}
-        docker push ${commitName}
-      """, returnStatus: true)
-
-      if ( status > 0 && iterations < 3) {
-        error('tag and push failed, retry')
-      } else if ( status > 0 ) {
-        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-      }
-    }
+    doTagAndPush(beatName, variant, libbetaVer, tagName)
+    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
 
     if (aliasVersion != "") {
-      def aliasName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${aliasVersion}"
-      iterations = 0
-      retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-        iterations++
-        def status = sh(label:'Change tag and push', script: """
-          docker tag ${oldName} ${aliasName}
-          docker push ${aliasName}
-        """, returnStatus: true)
+      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    }
+  }
+}
 
-        if ( status > 0 && iterations < 3) {
-          error('tag and push failed, retry')
-        } else if ( status > 0 ) {
-          log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-        }
-      }
+/**
+* @param beatName name of the Beat
+* @param variant name of the variant used to build the docker image name
+* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
+* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
+*/
+def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+
+  def iterations = 0
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    iterations++
+    def status = sh(label: "Change tag and push ${targetName}", script: """
+      docker tag ${sourceName} ${targetName}
+      docker push ${targetName}
+    """, returnStatus: true)
+
+    if ( status > 0 && iterations < 3) {
+      error("tag and push failed for ${beatName}, retry")
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
     }
   }
 }
