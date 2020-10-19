@@ -1,6 +1,6 @@
 projects:
     - "auditbeat"
-    - "deploy/kubernetes"
+    ##- "deploy/kubernetes"   It's no yet in the 1.0 pipeline
     - "filebeat"
     - "generator"
     - "heartbeat"
@@ -10,8 +10,6 @@ projects:
     - "packetbeat"
     - "winlogbeat"
     - "x-pack/auditbeat"
-    - "x-pack/dockerlogbeat"
-    - "x-pack/elastic-agent"
     - "x-pack/filebeat"
     - "x-pack/functionbeat"
     - "x-pack/libbeat"

@@ -147,19 +147,6 @@ def generateStages(Map args = [:]) {
   return mapParallelStages
 }
 
-def cloud(Map args = [:]) {
-  node(args.label) {
-    startCloudTestEnv(name: args.directory, dirs: args.dirs)
-  }
-  withCloudTestEnv() {
-    try {
-      target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
-    } finally {
-      terraformCleanup(name: args.directory, dir: args.directory)
-    }
-  }
-}
-
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
@@ -366,111 +353,6 @@ def archiveTestOutput(Map args = [:]) {
 }
 
 /**
-* This method executes a closure with credentials for cloud test
-* environments.
-*/
-def withCloudTestEnv(Closure body) {
-  def maskedVars = []
-  def testTags = "${env.TEST_TAGS}"
-
-  // AWS
-  if (params.allCloudTests || params.awsCloudTests) {
-    testTags = "${testTags},aws"
-    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
-    if (!aws.containsKey('access_key')) {
-      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
-    }
-    if (!aws.containsKey('secret_key')) {
-      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
-    }
-    maskedVars.addAll([
-      [var: "AWS_REGION", password: params.awsRegion],
-      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
-      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
-    ])
-  }
-
-  withEnv([
-    "TEST_TAGS=${testTags}",
-  ]) {
-    withEnvMask(vars: maskedVars) {
-      body()
-    }
-  }
-}
-
-/**
-* Start testing environment on cloud using terraform. Terraform files are
-* stashed so they can be used by other stages. They are also archived in
-* case manual cleanup is needed.
-*
-* Example:
-*   startCloudTestEnv(name: 'x-pack-metricbeat', dirs: ['x-pack/metricbeat/module/aws'])
-*   ...
-*   terraformCleanup(name: 'x-pack-metricbeat', dir: 'x-pack/metricbeat')
-*/
-def startCloudTestEnv(Map args = [:]) {
-  String name = normalise(args.name)
-  def dirs = args.get('dirs',[])
-  stage("${name}-prepare-cloud-env"){
-    withCloudTestEnv() {
-      withBeatsEnv(archive: false, withModule: false) {
-        try {
-          for (folder in dirs) {
-            retryWithSleep(retries: 2, seconds: 5, backoff: true){
-              terraformApply(folder)
-            }
-          }
-        } finally {
-          // Archive terraform states in case manual cleanup is needed.
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
-        }
-        stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
-      }
-    }
-  }
-}
-
-/**
-* Run terraform in the given directory
-*/
-def terraformApply(String directory) {
-  terraformInit(directory)
-  dir(directory) {
-    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
-  }
-}
-
-/**
-* Tear down the terraform environments, by looking for all terraform states in directory 
-* then it runs terraform destroy for each one.
-* It uses terraform states previously stashed by startCloudTestEnv.
-*/
-def terraformCleanup(Map args = [:]) {
-  String name = normalise(args.name)
-  String directory = args.dir
-  stage("${name}-tear-down-cloud-env"){
-    withCloudTestEnv() {
-      withBeatsEnv(archive: false, withModule: false) {
-        unstash("terraform-${name}")
-        retryWithSleep(retries: 2, seconds: 5, backoff: true) {
-          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
-        }
-      }
-    }
-  }
-}
-
-/**
-* Prepare the terraform context in the given directory
-*/
-def terraformInit(String directory) {
-  dir(directory) {
-    sh(label: "Terraform Init on ${directory}", script: "terraform init")
-  }
-}
-
-/**
 * Replace the slashes in the directory in case there are nested folders.
 */
 def normalise(String directory) {
@@ -583,9 +465,6 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
-    }
-    if(args?.content?.containsKey('cloud')) {
-      steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
     }
   }
 }
