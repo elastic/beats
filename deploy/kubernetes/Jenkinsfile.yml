@@ -12,4 +12,4 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     k8sTest:
-        k8sTest: "v1.18.2,v1.17.2,v1.16.4,v1.15.7,v1.14.10"
+        k8sTest: "v1.10.0,v1.9.4,v1.18.2,v1.17.2,v1.16.4,v1.15.7,v1.14.10"

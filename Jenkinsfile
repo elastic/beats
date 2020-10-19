@@ -165,32 +165,17 @@ def k8sTest(Map args = [:]) {
   versions.each{ v ->
     node(args.label) {
       stage("${args.context} ${v}"){
-        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+        withEnv(["K8S_VERSION=${v}", "MINIKUBE_VERSION=v0.25.2", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
-              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               try {
                 // Add some environmental resilience when setup does not work the very first time.
                 def i = 0
                 retryWithSleep(retries: 3, seconds: 5, backoff: true){
-                  try {
-                    sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
-                  } catch(err) {
-                    i++
-                    sh(label: 'Delete cluster', script: 'kind delete cluster')
-                    if (i > 2) {
-                      error("Setup kind failed with error '${err.toString()}'")
-                    }
-                  }
+                  sh(label: "Setup minikube", script: ".ci/scripts/minikube-setup.sh")
                 }
-                sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
-              } finally {
-                sh(label: 'Delete cluster', script: 'kind delete cluster')
-              }
-              steps {
-                mageTargetWin("Functionbeat Windows Unit test", "-d x-pack/functionbeat goUnitTest")
               }
             }
           }
