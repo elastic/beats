@@ -18,13 +18,11 @@
 package beater
 
 import (
+	"context"
 	"fmt"
 	"time"
-
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
-
 	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -79,6 +77,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
+	// TODO: Remove once merged
+	logp.Info("Please note, this is an experimental, unsupported version of heartbeat for the purpose of demonstrating synthetic journeys!")
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
 	err := bt.RunStaticMonitors(b)
@@ -95,6 +95,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors(b)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(bt.config.SyntheticSuites) > 0 {
+		err := bt.RunSyntheticSuiteMonitors(b)
 		if err != nil {
 			return err
 		}
@@ -153,6 +160,49 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Execute the monitor
 	go bt.monitorReloader.Run(bt.dynamicFactory)
 
+	return nil
+}
+
+// Provide hook to define journey list discovery from x-pack
+type JourneyLister func (ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+var mainJourneyLister JourneyLister
+
+func RegisterJourneyLister(jl JourneyLister) {
+	mainJourneyLister = jl
+}
+
+func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
+	// If we are running without XPack this will be nil
+	if mainJourneyLister == nil {
+		return nil
+	}
+	for _, suite := range bt.config.SyntheticSuites {
+		logp.Warn("Listing suite", suite.Path)
+		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
+		if err != nil {
+			return err
+		}
+		factory := monitors.NewFactory(b.Info, bt.scheduler, false)
+		for _, name := range journeyNames {
+			cfg, err := common.NewConfigFrom(map[string]interface{}{
+				"type":         "browser",
+				"path":         suite.Path,
+				"schedule":     suite.Schedule,
+				"params": suite.Params,
+				"journey_name": name,
+				"name":         name,
+				"id":           name,
+			})
+			if err != nil {
+				return err
+			}
+			created, err := factory.Create(b.Publisher, cfg)
+			if err != nil {
+				return errors.Wrap(err, "could not create monitor")
+			}
+			created.Start()
+		}
+	}
 	return nil
 }
 
