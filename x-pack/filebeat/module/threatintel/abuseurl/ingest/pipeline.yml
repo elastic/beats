@@ -30,6 +30,10 @@ processors:
     field: json.host
     target_field: url.domain
     ignore_missing: true
+- convert:
+    field: json.larted
+    type: boolean
+    ignore_missing: true
 - rename:
     field: json
     target_field: threatintel

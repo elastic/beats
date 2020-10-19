@@ -13,7 +13,7 @@
         ],
         "threatintel.blacklists.spamhaus_dbl": "not listed",
         "threatintel.blacklists.surbl": "not listed",
-        "threatintel.larted": "true",
+        "threatintel.larted": true,
         "threatintel.reporter": "zbetcheckin",
         "threatintel.tags": [
             "elf"
@@ -39,7 +39,7 @@
         ],
         "threatintel.blacklists.spamhaus_dbl": "not listed",
         "threatintel.blacklists.surbl": "not listed",
-        "threatintel.larted": "true",
+        "threatintel.larted": true,
         "threatintel.reporter": "zbetcheckin",
         "threatintel.tags": [
             "elf",
