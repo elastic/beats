@@ -72,7 +72,7 @@ func newFileProspector(
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.HarvesterGroup) {
+func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
@@ -100,8 +100,12 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.
 
 			src := p.identifier.GetSource(fe)
 			switch fe.Op {
-			case loginp.OpCreate:
-				log.Debugf("A new file %s has been found", fe.NewPath)
+			case loginp.OpCreate, loginp.OpWrite:
+				if fe.Op == loginp.OpCreate {
+					log.Debugf("A new file %s has been found", fe.NewPath)
+				} else if fe.Op == loginp.OpWrite {
+					log.Debugf("File %s has been updated", fe.NewPath)
+				}
 
 				if p.ignoreOlder > 0 {
 					now := time.Now()
@@ -110,11 +114,6 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg *loginp.
 						break
 					}
 				}
-
-				hg.Run(ctx, src)
-
-			case loginp.OpWrite:
-				log.Debugf("File %s has been updated", fe.NewPath)
 
 				hg.Run(ctx, src)
 
