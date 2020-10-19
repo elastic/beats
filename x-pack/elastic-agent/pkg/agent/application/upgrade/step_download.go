@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	download "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
+	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -27,12 +27,12 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	}
 
 	allowEmptyPgp, pgp := release.PGP()
-	verifier, err := download.NewVerifier(u.log, &settings, allowEmptyPgp, pgp, true)
+	verifier, err := downloader.NewVerifier(u.log, &settings, allowEmptyPgp, pgp, true)
 	if err != nil {
 		return "", errors.New(err, "initiating verifier")
 	}
 
-	fetcher := download.NewDownloader(u.log, &settings, true)
+	fetcher := downloader.NewDownloader(u.log, &settings, true)
 	path, err := fetcher.Download(ctx, agentName, agentArtifactName, version)
 	if err != nil {
 		return "", errors.New(err, "failed upgrade of agent binary")
