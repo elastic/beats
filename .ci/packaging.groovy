@@ -234,7 +234,7 @@ def tagAndPush(name){
 
     if (aliasVersion != "") {
       def aliasName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${aliasVersion}"
-      def iterations = 0
+      iterations = 0
       retryWithSleep(retries: 3, seconds: 5, backoff: true) {
         iterations++
         def status = sh(label:'Change tag and push', script: """
