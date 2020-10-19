@@ -21,6 +21,7 @@ package diskio
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
@@ -114,7 +115,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		diskWriteBytes += counters.WriteBytes
 
 		//Add linux-only data if agent is off as not to make breaking changes.
-		if !m.IsAgent {
+		if !m.IsAgent && runtime.GOOS == "linux" {
 			result, err := m.statistics.CalcIOStatistics(counters)
 			if err != nil {
 				return errors.Wrap(err, "error calculating iostat")
