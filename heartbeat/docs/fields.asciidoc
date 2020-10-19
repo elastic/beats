@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
+* <<exported-fields-script>>
 * <<exported-fields-socks5>>
 * <<exported-fields-summary>>
 * <<exported-fields-tcp>>
@@ -9093,6 +9094,42 @@ Duration required to resolve an IP from hostname.
 Duration in microseconds
 
 type: long
+
+--
+
+[[exported-fields-script]]
+== HTTP monitor fields
+
+None
+
+
+[float]
+=== script
+
+Script related fields.
+
+
+
+*`script.stderr`*::
++
+--
+type: text
+
+--
+
+*`script.stdout`*::
++
+--
+type: text
+
+--
+
+*`script.journey`*::
++
+--
+type: object
+
+Object is not enabled.
 
 --
 
