@@ -190,9 +190,7 @@ func (b *dockerBuilder) dockerBuild() (string, error) {
 	}
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
-		if b.Snapshot {
-				aliasTag = fmt.Sprintf("%s/%s", repository, aliasTag)
-		}
+		aliasTag = fmt.Sprintf("%s/%s", repository, aliasTag)
 	}
 
 	args := []string{
