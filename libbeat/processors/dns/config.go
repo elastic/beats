@@ -31,7 +31,7 @@ import (
 type Config struct {
 	CacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
-	Timeout      time.Duration `conifg:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
+	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
 	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
