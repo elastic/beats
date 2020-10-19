@@ -113,6 +113,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 			return err
 		}
 
+		response.header = resp.Header
 		responseData, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read http response: %w", err)
@@ -165,10 +166,10 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 		if err != nil {
 			return err
 		}
-	}
 
-	if lastObj != nil && r.dateCursor.enabled {
-		r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
+		if lastObj != nil && r.dateCursor.enabled {
+			r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
+		}
 	}
 
 	return nil

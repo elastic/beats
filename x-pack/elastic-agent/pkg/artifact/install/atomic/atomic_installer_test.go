@@ -14,6 +14,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 func TestOKInstall(t *testing.T) {
@@ -25,7 +27,7 @@ func TestOKInstall(t *testing.T) {
 	assert.NoError(t, err)
 
 	ctx := context.Background()
-	installDir := filepath.Join(os.TempDir(), "install_dir")
+	installDir := filepath.Join(paths.TempDir(), "install_dir")
 
 	wg.Add(1)
 	go func() {
@@ -59,7 +61,7 @@ func TestContextCancelledInstall(t *testing.T) {
 	assert.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	installDir := filepath.Join(os.TempDir(), "install_dir")
+	installDir := filepath.Join(paths.TempDir(), "install_dir")
 
 	wg.Add(1)
 	go func() {
