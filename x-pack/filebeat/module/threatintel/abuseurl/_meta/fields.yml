@@ -31,10 +31,10 @@
 - name: reporter
   type: keyword
   description: >
-    The Twitter handle of the repoter that has reported this malware URL (or anonymous).
+    The Twitter handle of the reporter that has reported this malware URL (or anonymous).
 
 - name: larted
-  type: keyword
+  type: boolean
   description: >
     Indicates whether the malware URL has been reported to the hosting provider (true or false)
 

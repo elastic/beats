@@ -20,9 +20,9 @@
         ],
         "threatintel.threat": "malware_download",
         "threatintel.url_status": "offline",
-        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/223622/",
-        "url.domain": "45.61.49.78",
-        "url.full": "http://45.61.49.78/razor/r4z0r.mips",
+        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/123urlref/",
+        "url.domain": "8.8.8.8",
+        "url.full": "http://8.8.8.8/malicious/link",
         "url.scheme": "http"
     },
     {
@@ -31,7 +31,7 @@
         "event.module": "threatintel",
         "fileset.name": "abuseurl",
         "input.type": "log",
-        "log.offset": 350,
+        "log.offset": 343,
         "service.type": "threatintel",
         "tags": [
             "threatintel",
@@ -47,9 +47,9 @@
         ],
         "threatintel.threat": "malware_download",
         "threatintel.url_status": "offline",
-        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/223621/",
-        "url.domain": "45.61.49.78",
-        "url.full": "http://45.61.49.78/razor/r4z0r.sh4",
+        "threatintel.urlhaus_reference": "https://urlhaus.abuse.ch/url/123urlref/",
+        "url.domain": "8.8.8.8",
+        "url.full": "http://8.8.8.8/malicious/link",
         "url.scheme": "http"
     }
 ]

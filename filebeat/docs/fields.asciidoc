@@ -151081,7 +151081,7 @@ type: keyword
 *`threatintel.reporter`*::
 +
 --
-The Twitter handle of the repoter that has reported this malware URL (or anonymous).
+The Twitter handle of the reporter that has reported this malware URL (or anonymous).
 
 
 type: keyword
@@ -151094,7 +151094,7 @@ type: keyword
 Indicates whether the malware URL has been reported to the hosting provider (true or false)
 
 
-type: keyword
+type: boolean
 
 --
 
