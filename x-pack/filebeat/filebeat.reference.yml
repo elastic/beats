@@ -547,7 +547,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -556,7 +556,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-
+  
   falcon:
     enabled: true
 
@@ -643,7 +643,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -1121,6 +1121,19 @@ filebeat.modules:
 
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  m365_defender:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
   dhcp:
     enabled: true
 
@@ -1152,7 +1165,7 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
-
+   
     # You can also pass SSL options. For example:
     #var.ssl: |-
     #  {
@@ -1665,7 +1678,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true
+    enabled: true    
   irc:
     enabled: true
   kerberos:
