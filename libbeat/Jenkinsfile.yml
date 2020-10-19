@@ -13,7 +13,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        make: "RACE_DETECTOR=1 make -C libbeat clean check testsuite"
+        make: "RACE_DETECTOR=1 make -C libbeat check testsuite integration-tests-environment"
     crosscompile:
         make: "make -C libbeat crosscompile"
     windows:

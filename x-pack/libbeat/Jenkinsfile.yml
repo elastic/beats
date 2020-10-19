@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        make: "RACE_DETECTOR=1 make -C x-pack/libbeat clean check testsuite"
+        make: "RACE_DETECTOR=1 make -C x-pack/libbeat check testsuite integration-tests-environment"
     windows:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
