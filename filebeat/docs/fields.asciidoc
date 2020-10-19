@@ -65,6 +65,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-o365>>
 * <<exported-fields-okta>>
+* <<exported-fields-oracle>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -108267,6 +108268,157 @@ Geolocation information.
 
 
 type: geo_point
+
+--
+
+[[exported-fields-oracle]]
+== Oracle fields
+
+Oracle Module
+
+
+
+[float]
+=== oracle
+
+Fields from Oracle logs.
+
+
+
+[float]
+=== database_audit
+
+Module for parsing Oracle Database audit logs
+
+
+
+*`oracle.database_audit.status`*::
++
+--
+Status.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.sessionid`*::
++
+--
+Session ID.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client_terminal`*::
++
+--
+terminal.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client_address`*::
++
+--
+terminal.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client_user`*::
++
+--
+client user.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.database_user`*::
++
+--
+DB User.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.privilege`*::
++
+--
+Priv something
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.entryid`*::
++
+--
+EntryID
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.userhost`*::
++
+--
+USERHOST
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.action`*::
++
+--
+Action type
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.action_number`*::
++
+--
+Action number
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.dbid`*::
++
+--
+DBID
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.length`*::
++
+--
+Length
+
+
+type: keyword
 
 --
 

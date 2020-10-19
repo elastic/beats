@@ -3,3 +3,8 @@
   description: >
     Oracle Module
   fields:
+    - name: oracle
+      type: group
+      description: >
+        Fields from Oracle logs.
+      fields:
