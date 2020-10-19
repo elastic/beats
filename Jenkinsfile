@@ -384,7 +384,7 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tar(file: "test-build-artifacts-${args.id}.tgz", dir: '.', archive: true, allowMissing: true)
+      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
@@ -393,10 +393,23 @@ def archiveTestOutput(Map args = [:]) {
         // TODO: nodeOS() should support ARM
         def os_suffix = isArm() ? 'linux' : nodeOS()
         def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tar(file: "${name}.tgz", archive: true, dir: folder)
+        tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
       }
     }
   }
+}
+
+/**
+* Wrapper to tar and upload artifacts to Google Storage to avoid killing the
+* disk space of the jenkins instance
+*/
+def tarAndUploadArtifacts(Map args = [:]) {
+  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                      credentialsId: "${JOB_GCS_CREDENTIALS}",
+                      pattern: "${args.file}",
+                      sharedPublicly: true,
+                      showInline: true)
 }
 
 /**
