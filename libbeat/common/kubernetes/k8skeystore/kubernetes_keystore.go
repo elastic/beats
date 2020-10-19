@@ -70,7 +70,6 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 		namespace = ns.(string)
 	}
 	if namespace != "" {
-		// either retrieve already stored keystore or create a new one for the namespace
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
 		return k8sKeystore
 	}
