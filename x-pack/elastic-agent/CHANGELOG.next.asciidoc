@@ -15,6 +15,7 @@
 - Copy Action store on upgrade {pull}21298[21298]
 - Include inputs in action store actions {pull}21298[21298]
 - Fix issue where inputs without processors defined would panic {pull}21628[21628]
+- Prevent reporting ecs version twice {pull}21616[21616]
 - Partial extracted beat result in failure to spawn beat {issue}21718[21718]
 
 ==== New features
