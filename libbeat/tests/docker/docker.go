@@ -20,6 +20,7 @@ package docker
 import (
 	"context"
 	"io"
+	"io/ioutil"
 
 	"github.com/pkg/errors"
 
@@ -77,7 +78,7 @@ func (c Client) imagePull(image string) (err error) {
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
-			_, err = io.Copy(io.MultiWriter(), respBody)
+			_, err = io.Copy(ioutil.Discard, respBody)
 			if err != nil {
 				return errors.Wrapf(err, "reading response for image %s", image)
 			}
