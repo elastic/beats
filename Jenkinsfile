@@ -169,14 +169,10 @@ def k8sTest(Map args = [:]) {
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
-              try {
-                // Add some environmental resilience when setup does not work the very first time.
-                def i = 0
-                retryWithSleep(retries: 3, seconds: 5, backoff: true){
-                  sh(label: "Setup minikube", script: ".ci/scripts/minikube-setup.sh")
-                }
-                sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
+              retryWithSleep(retries: 3, seconds: 5, backoff: true){
+                sh(label: "Setup minikube", script: ".ci/scripts/minikube-setup.sh")
               }
+              sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             }
           }
         }
