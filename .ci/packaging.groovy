@@ -239,7 +239,7 @@ def tagAndPush(name){
         iterations++
         def status = sh(label:'Change tag and push', script: """
           docker tag ${oldName} ${aliasName}
-          docker push ${newName}
+          docker push ${aliasName}
         """, returnStatus: true)
 
         if ( status > 0 && iterations < 3) {
