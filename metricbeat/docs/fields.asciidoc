@@ -24870,16 +24870,6 @@ type: long
 
 --
 
-*`kafka.partition.partition.isr`*::
-+
---
-List of isr ids.
-
-
-type: keyword
-
---
-
 *`kafka.partition.partition.replica`*::
 +
 --

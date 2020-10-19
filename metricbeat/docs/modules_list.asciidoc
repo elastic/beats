@@ -132,12 +132,14 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-iis-application_pool,application_pool>> beta[]  
 |<<metricbeat-metricset-iis-webserver,webserver>> beta[]  
 |<<metricbeat-metricset-iis-website,website>> beta[]  
-|<<metricbeat-module-istio,Istio>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.5+| .5+|  |<<metricbeat-metricset-istio-citadel,citadel>> beta[]  
+|<<metricbeat-module-istio,Istio>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.7+| .7+|  |<<metricbeat-metricset-istio-citadel,citadel>> beta[]  
 |<<metricbeat-metricset-istio-galley,galley>> beta[]  
+|<<metricbeat-metricset-istio-istiod,istiod>> beta[]  
 |<<metricbeat-metricset-istio-mesh,mesh>> beta[]  
 |<<metricbeat-metricset-istio-mixer,mixer>> beta[]  
 |<<metricbeat-metricset-istio-pilot,pilot>> beta[]  
+|<<metricbeat-metricset-istio-proxy,proxy>> beta[]  
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
 |<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
