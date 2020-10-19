@@ -457,6 +457,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   }
   public run(Map args = [:]){
     def withModule = args.content.get('withModule', false)
+    if(args?.content?.containsKey('script')) {
+      steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+    }
     if(args?.content?.containsKey('make')) {
       steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
     }

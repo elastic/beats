@@ -16,6 +16,6 @@ stages:
     build:
         make: "RACE_DETECTOR=1 make -C x-pack/filebeat check testsuite integration-tests-environment"
     windows:
-        mage: "mage fields build goTestUnit"
+        script: "dev-tools/jenkins_ci.ps1"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
