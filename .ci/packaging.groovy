@@ -214,7 +214,7 @@ def tagAndPush(beatName){
     doTagAndPush(beatName, variant, libbetaVer, tagName)
     doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
 
-    if (aliasVersion != "") {
+    if (!isPR() && aliasVersion != "") {
       doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
     }
   }
