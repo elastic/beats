@@ -101,10 +101,10 @@ func (r *Reader) initAppPools() error {
 			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value)
-				continue
 			} else {
-				return errors.Wrapf(err, `failed to expand counter (query="%v")`, value)
+				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
 			}
+			continue
 		}
 		newQueries = append(newQueries, childQueries...)
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.

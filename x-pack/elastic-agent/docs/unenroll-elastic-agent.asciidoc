@@ -4,7 +4,7 @@
 
 You can unenroll an agent to invalidate the API key used to connect to {es}.
 
-. In {ingest-manager}, select **{fleet}**.
+. In {fleet}, select **Agents**.
 
 . Under Agents, choose **Unenroll** from the **Actions** menu next to the agent
 you want to unenroll.

@@ -31,6 +31,11 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "localhost",
+            "target.destination.hostname.local",
+            "Prod-host.name.addr"
+        ],
         "service.type": "cisco",
         "source.domain": "Prod-host.name.addr",
         "source.nat.ip": "10.0.55.66",
@@ -73,6 +78,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "MYHOSTNAME"
+        ],
         "related.ip": [
             "192.0.2.134",
             "192.0.2.15"

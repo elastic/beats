@@ -66,7 +66,7 @@ func (o *operationVerify) Run(_ context.Context, application Application) (err e
 		}
 	}()
 
-	isVerified, err := o.verifier.Verify(o.program.BinaryName(), o.program.Version())
+	isVerified, err := o.verifier.Verify(o.program.BinaryName(), o.program.Version(), o.program.ArtifactName(), true)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("operation '%s' failed to verify %s.%s", o.Name(), o.program.BinaryName(), o.program.Version()),

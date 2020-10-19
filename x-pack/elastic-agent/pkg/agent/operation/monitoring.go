@@ -161,7 +161,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 			ProgramSpec: program.Spec{
 				Name:     metricsProcessName,
 				Cmd:      metricsProcessName,
-				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, logsProcessName),
+				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, metricsProcessName),
 			},
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,

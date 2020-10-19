@@ -1086,6 +1086,11 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default journalbeat uses the legacy index templates.
+#setup.template.type: legacy
+
 # Template name. By default the template name is "journalbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "journalbeat-%{[agent.version]}"
