@@ -193,8 +193,12 @@ def pushCIDockerImages(){
 
 def tagAndPush(name){
   def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
+  def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
+    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+
     libbetaVer += "-SNAPSHOT"
+    aliasVersion += "-SNAPSHOT"
   }
 
   def tagName = "${libbetaVer}"
@@ -225,6 +229,24 @@ def tagAndPush(name){
         error('tag and push failed, retry')
       } else if ( status > 0 ) {
         log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      }
+    }
+
+    if (aliasVersion != "") {
+      def aliasName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${aliasVersion}"
+      def iterations = 0
+      retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+        iterations++
+        def status = sh(label:'Change tag and push', script: """
+          docker tag ${oldName} ${aliasName}
+          docker push ${newName}
+        """, returnStatus: true)
+
+        if ( status > 0 && iterations < 3) {
+          error('tag and push failed, retry')
+        } else if ( status > 0 ) {
+          log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+        }
       }
     }
   }
