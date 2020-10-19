@@ -4,19 +4,19 @@ go 1.14
 
 require (
 	4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b
-	cloud.google.com/go v0.51.0
-	cloud.google.com/go/bigquery v1.0.1
-	cloud.google.com/go/pubsub v1.0.1
-	cloud.google.com/go/storage v1.0.0
+	cloud.google.com/go v0.58.0
+	cloud.google.com/go/bigquery v1.8.0
+	cloud.google.com/go/pubsub v1.3.1
+	cloud.google.com/go/storage v1.9.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
 	github.com/Azure/azure-sdk-for-go v37.1.0+incompatible
-	github.com/Azure/azure-storage-blob-go v0.8.0
+	github.com/Azure/azure-storage-blob-go v0.9.0
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Azure/go-autorest/autorest v0.9.4
-	github.com/Azure/go-autorest/autorest/adal v0.8.1
+	github.com/Azure/go-autorest/autorest v0.10.0
+	github.com/Azure/go-autorest/autorest/adal v0.8.3
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
@@ -41,7 +41,7 @@ require (
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
 	github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	github.com/coreos/go-systemd/v22 v22.0.0
-	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
+	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
@@ -73,13 +73,13 @@ require (
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.10.6-0.20200715000138-f115143bb233
-	github.com/fatih/color v1.5.0
+	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/garyburd/redigo v1.0.1-0.20160525165706-b8dc90050f24
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-	github.com/go-sql-driver/mysql v1.4.1
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.10.4
@@ -89,12 +89,11 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/golang/snappy v0.0.1
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
-	github.com/google/go-cmp v0.4.0
+	github.com/google/go-cmp v0.4.1
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2-0.20190416172445-c2e93f3ae59f // indirect
 	github.com/googleapis/gnostic v0.3.1-0.20190624222214-25d8b0b66985 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20161205141322-d520615e531a
-	github.com/gorilla/mux v1.7.2 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/h2non/filetype v1.0.12
@@ -113,9 +112,7 @@ require (
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
 	github.com/magefile/mage v1.10.0
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/mattn/go-colorable v0.0.8
-	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
-	github.com/mattn/go-isatty v0.0.2 // indirect
+	github.com/mattn/go-colorable v0.1.6
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/miekg/dns v1.1.15
 	github.com/mitchellh/gox v1.0.1
@@ -135,6 +132,9 @@ require (
 	github.com/prometheus/common v0.7.0
 	github.com/prometheus/procfs v0.0.11
 	github.com/prometheus/prometheus v2.5.0+incompatible
+	github.com/pulumi/pulumi-azure/sdk/v3 v3.24.1
+	github.com/pulumi/pulumi/pkg/v2 v2.11.2
+	github.com/pulumi/pulumi/sdk/v2 v2.11.2
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
 	github.com/reviewdog/reviewdog v0.9.17
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
@@ -143,7 +143,7 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/shopspring/decimal v1.2.0
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.6.1
@@ -160,22 +160,22 @@ require (
 	go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.4
-	go.uber.org/atomic v1.5.0
+	go.uber.org/atomic v1.6.0
 	go.uber.org/multierr v1.3.0
 	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
-	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
+	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200904185747-39188db58858
-	google.golang.org/api v0.15.0
-	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
+	google.golang.org/api v0.26.0
+	google.golang.org/genproto v0.0.0-20200608115520-7c474a2e3482
 	google.golang.org/grpc v1.29.1
-	google.golang.org/protobuf v1.23.0
+	google.golang.org/protobuf v1.24.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528

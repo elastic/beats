@@ -1,0 +1,9 @@
+name: azure-pulumi
+description: Creates an Azure Kubernetes Service (AKS) cluster
+runtime: go
+template:
+  config:
+    azure:location:
+      description: The Azure location to use
+      default: westeurope
+
