@@ -384,7 +384,7 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", dir: '.')
+      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
@@ -393,7 +393,7 @@ def archiveTestOutput(Map args = [:]) {
         // TODO: nodeOS() should support ARM
         def os_suffix = isArm() ? 'linux' : nodeOS()
         def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tarAndUploadArtifacts(file: "${name}.tgz", dir: folder)
+        tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
       }
     }
   }
