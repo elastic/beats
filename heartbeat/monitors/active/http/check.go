@@ -137,10 +137,10 @@ func checkHeaders(headers map[string]string) respValidator {
 func parseBody(b interface{}) ([]match.Matcher, []match.Matcher) {
 	var (
 		pm, nm []match.Matcher
+		positive = "positive"
+		negative = "negative"
 	)
-	positive := "positive"
-	negative := "negative"
-	// run through this block if there is no positive or negative keyword under body namespace
+	// run through this code block if there is no positive or negative keyword in response body
 	// in this case, there's only plain body
 	p, ok := b.([]interface{})
 	if ok {
@@ -152,15 +152,15 @@ func parseBody(b interface{}) ([]match.Matcher, []match.Matcher) {
 		}
 	}
 
-	// run through this part if there is positive/negative keyword
+	// run through this part if there exists positive/negative keyword in response body
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
-	k, ok := b.(map[string]interface{})
+	m, ok := b.(map[string]interface{})
 	if ok {
-		for checkType, kk := range k {
-			kkk, ok := kk.([]interface{})
+		for checkType, v := range m {
+			params, ok := v.([]interface{})
 			if ok {
-				for _, kkkk := range kkk {
-					pat, ok := kkkk.(string)
+				for _, param := range params {
+					pat, ok := param.(string)
 					if ok {
 						if checkType == positive {
 							pm = append(pm, match.MustCompile(pat))
