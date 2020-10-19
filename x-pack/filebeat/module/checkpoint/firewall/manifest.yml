@@ -9,6 +9,7 @@ var:
     default: 9001
   - name: input
     default: syslog
+  - name: ssl
 
 ingest_pipeline:
   - ingest/pipeline.yml
