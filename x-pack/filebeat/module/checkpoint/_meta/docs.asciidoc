@@ -65,6 +65,18 @@ A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[checkpoint-firewall, forwarded]`.
 
+*`var.ssl`*::
+
+The SSL/TLS configuration for the filebeat instance. This can be used to enforce mutual TLS.
+```yaml
+ssl:
+  enabled: true
+  certificate_authorities: ["my-ca.pem"]
+  certificate: "filebeat-cert.pem"
+  key: "filebeat-key.pem"
+  client_authentication: "required"
+```
+
 [float]
 ==== Check Point devices
 
