@@ -83,9 +83,9 @@ type s3Context struct {
 }
 
 var (
-	// The maximum number of messages to return. Amazon SQS never returns more messages
-	// than this value (however, fewer messages might be returned).
-	maxNumberOfMessage uint8 = 10
+	//// The maximum number of messages to return. Amazon SQS never returns more messages
+	//// than this value (however, fewer messages might be returned).
+	//maxNumberOfMessage uint8 = 10
 
 	// The duration (in seconds) for which the call waits for a message to arrive
 	// in the queue before returning. If a message is available, the call returns
@@ -205,7 +205,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 		&sqs.ReceiveMessageInput{
 			QueueUrl:              &c.config.QueueURL,
 			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   awssdk.Int64(int64(maxNumberOfMessage)),
+			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
 			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
 		})
