@@ -213,7 +213,10 @@ func (d *addDockerMetadata) Close() error {
 	if d.cgroups != nil {
 		d.cgroups.StopJanitor()
 	}
-	d.watcher.Stop()
+	// Watcher can be nil if processor failed on creation
+	if d.watcher != nil {
+		d.watcher.Stop()
+	}
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
 		return errors.Wrap(err, "closing source processor of add_docker_metadata")
