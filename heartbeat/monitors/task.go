@@ -122,11 +122,9 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 				Meta:      event.Meta.Clone(),
 				Fields:    event.Fields.Clone(),
 			}
-			logp.Warn("PUBLISH TO LIBBEAT")
 			client.Publish(clone)
 		} else {
 			// no clone needed if no continuations
-			logp.Warn("PUBLISH TO LIBBEAT")
 			client.Publish(*event)
 		}
 	}
