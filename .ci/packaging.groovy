@@ -329,18 +329,17 @@ def publishPackages(baseDir){
   def beatsFolderName = getBeatsName(baseDir)
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
 
-  // In order to run the beats-tester let's copy those files to another more predictable
-  // location where those files won't be uploaded while running the beats-tester
-  bucketUri = "${bucketUri}/commit/${env.GIT_BASE_COMMIT}"
+  // Copy those files to another location with the sha commit to test them
+  // aftewords.
+  bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
 }
 
 def uploadPackages(bucketUri, baseDir, beatsFolderName){
-  def distributionsFolder = 'build/distributions'
   googleStorageUpload(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/${distributionsFolder}/",
-    pattern: "${baseDir}/${distributionsFolder}/**/*",
+    pathPrefix: "${baseDir}/build/distributions/",
+    pattern: "${baseDir}/build/distributions/**/*",
     sharedPublicly: true,
     showInline: true
   )
