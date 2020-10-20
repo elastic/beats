@@ -842,7 +842,7 @@
       fields:
         - name: dhash
           description: >
-            TODO
+            Difference Hash for a given PE file.
           type: keyword
           release: beta
         - name: md5
@@ -853,11 +853,11 @@
     - name: compiler_product_versions
       type: keyword
       description: >
-        TODO
+        Version of the compiler product.
     - name: rich_pe_header_hash
       type: keyword
       description: >
-        TODO
+        Hash of the PE header.
     - name: entry_point
       description: >
         Entry point of the PE file.

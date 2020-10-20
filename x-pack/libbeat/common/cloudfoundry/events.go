@@ -494,8 +494,17 @@ func baseMap(evt Event) common.MapStr {
 		"cloudfoundry": common.MapStr{
 			"type":     evt.String(),
 			"envelope": envelopMap(evt),
+			"tags":     dedotedTags(evt.Tags()),
 		},
 	}
+}
+
+func dedotedTags(tags map[string]string) common.MapStr {
+	result := common.MapStr{}
+	for name, value := range tags {
+		result[common.DeDot(name)] = value
+	}
+	return result
 }
 
 func baseMapWithApp(evt EventWithAppID) common.MapStr {

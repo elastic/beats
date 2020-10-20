@@ -1,3 +1,8 @@
 dashboards:
+<<<<<<< HEAD
 - id: Filebeat-virustotal-livehunt-Dashboard
   file: livehunt/_meta/kibana/7/dashboard/filebeat-virustotal-livehunt.ndjson
+=======
+- id: bd059c90-0e56-11eb-9aef-8b55a4ae31c5
+  file: livehunt-overview.json
+>>>>>>> 819be3135e5c7899844116225cf795a0e616d5e8

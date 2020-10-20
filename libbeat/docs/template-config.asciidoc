@@ -26,6 +26,11 @@ existing one.
 *`setup.template.enabled`*:: Set to false to disable template loading. If set this to false,
 you must <<load-template-manually,load the template manually>>.
 
+*`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
+before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `composite`
+and `index`. Selecting `component` loads a component template which can be included in new index templates.
+The option `index` loads the new index template.
+
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
 name, so the final name is +{beatname_lc}-%{[{beat_version_key}]}+.

@@ -1,0 +1,48 @@
+projects:
+    - "auditbeat"
+    - "deploy/kubernetes"
+    - "filebeat"
+    - "generator"
+    - "heartbeat"
+    - "journalbeat"
+    - "libbeat"
+    - "metricbeat"
+    - "packetbeat"
+    - "winlogbeat"
+    - "x-pack/auditbeat"
+    - "x-pack/dockerlogbeat"
+    - "x-pack/elastic-agent"
+    - "x-pack/filebeat"
+    - "x-pack/functionbeat"
+    - "x-pack/libbeat"
+    - "x-pack/metricbeat"
+    - "x-pack/winlogbeat"
+    ##- "x-pack/heartbeat"    It's not yet in the 1.0 pipeline.
+    ##- "x-pack/journalbeat"  It's not yet in the 1.0 pipeline.
+    ##- "x-pack/packetbeat"   It's not yet in the 1.0 pipeline.
+
+## Changeset macros that are defined here and used in each specific 2.0 pipeline.
+changeset:
+    ci:
+        - "^Jenkinsfile"
+        - "^\\.ci/scripts/.*"
+    oss:
+        - "^go.mod"
+        - "^pytest.ini"
+        - "^dev-tools/.*"
+        - "^libbeat/.*"
+        - "^testing/.*"
+    xpack:
+        - "^go.mod"
+        - "^pytest.ini"
+        - "^dev-tools/.*"
+        - "^libbeat/.*"
+        - "^testing/.*"
+        - "^x-pack/libbeat/.*"
+
+disabled:
+    when:
+        labels:      ## Skip the GitHub Pull Request builds if any of the given GitHub labels match with the assigned labels in the PR.
+            - skip-ci
+        ## TODO: This will allow to configure what to do based on the PR configuration
+        draft: true  ## Skip the GitHub Pull Request builds with Draft PRs.

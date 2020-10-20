@@ -53,6 +53,21 @@ processors:
         field: destination.as.organization_name
         target_field: destination.as.organization.name
         ignore_missing: true
+  - append:
+        field: related.hosts
+        value: '{{rsa.web.fqdn}}'
+        allow_duplicates: false
+        if: ctx?.rsa?.web?.fqdn != null && ctx.rsa?.web?.fqdn != ''
+  - append:
+        field: related.hosts
+        value: '{{rsa.web.web_ref_domain}}'
+        allow_duplicates: false
+        if: ctx?.rsa?.web?.web_ref_domain != null && ctx.rsa?.web?.web_ref_domain != ''
+  - append:
+        field: related.hosts
+        value: '{{url.domain}}'
+        allow_duplicates: false
+        if: ctx?.url?.domain != null && ctx.url?.domain != ''
 on_failure:
   - append:
         field: error.message
