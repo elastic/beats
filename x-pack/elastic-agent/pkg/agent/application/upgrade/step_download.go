@@ -27,12 +27,12 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	}
 
 	allowEmptyPgp, pgp := release.PGP()
-	verifier, err := downloader.NewVerifier(u.log, &settings, allowEmptyPgp, pgp)
+	verifier, err := downloader.NewVerifier(u.log, &settings, allowEmptyPgp, pgp, true)
 	if err != nil {
 		return "", errors.New(err, "initiating verifier")
 	}
 
-	fetcher := downloader.NewDownloader(u.log, &settings)
+	fetcher := downloader.NewDownloader(u.log, &settings, true)
 	path, err := fetcher.Download(ctx, agentName, agentArtifactName, version)
 	if err != nil {
 		return "", errors.New(err, "failed upgrade of agent binary")
