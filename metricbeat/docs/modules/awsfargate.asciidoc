@@ -1,0 +1,43 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-awsfargate]]
+[role="xpack"]
+== AWS Fargate module
+
+experimental[]
+
+Amazon ECS on Fargate provides a method to retrieve various metadata, network
+metrics, and Docker stats about tasks and containers. This is referred to as the
+https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html[task metadata endpoint]
+and this endpoint is available per container.
+
+The awsfargate module is a Metricbeat module which collects AWS fargate metrics
+from task metadata endpoint.
+
+
+[float]
+=== Example configuration
+
+The AWS Fargate module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: awsfargate
+  period: 5m
+  metricsets:
+    - task_stats
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-awsfargate-task_stats,task_stats>>
+
+include::awsfargate/task_stats.asciidoc[]
+

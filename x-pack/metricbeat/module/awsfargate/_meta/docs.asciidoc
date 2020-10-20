@@ -1,0 +1,7 @@
+Amazon ECS on Fargate provides a method to retrieve various metadata, network
+metrics, and Docker stats about tasks and containers. This is referred to as the
+https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html[task metadata endpoint]
+and this endpoint is available per container.
+
+The awsfargate module is a Metricbeat module which collects AWS fargate metrics
+from task metadata endpoint.

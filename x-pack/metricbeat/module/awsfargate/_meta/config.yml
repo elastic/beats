@@ -1,0 +1,4 @@
+- module: awsfargate
+  period: 5m
+  metricsets:
+    - task_stats

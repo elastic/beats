@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
+* <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
@@ -4588,6 +4589,19 @@ The bytes sent through the VPN tunnel.
 type: double
 
 --
+
+[[exported-fields-awsfargate]]
+== AWS Fargate fields
+
+`awsfargate` module collects AWS fargate metrics from task metadata endpoint.
+
+
+
+[float]
+=== task_stats
+
+`task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
+
 
 [[exported-fields-azure]]
 == Azure fields
