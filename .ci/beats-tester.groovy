@@ -54,7 +54,6 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch 'master' }
           steps {
-            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -62,7 +61,6 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch '*.x' }
           steps {
-            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -96,11 +94,23 @@ pipeline {
 }
 
 def runBeatsTesterJob(Map args = [:]) {
-  if (args.apm && args.beats) {
+  def apm = args.get('apm', '')
+  def beats = args.get('beats', '')
+
+  if (isUpstreamTrigger()) {
+    copyArtifacts(filter: 'beats-tester.properties',
+                  flatten: true,
+                  projectName: "Beats/packaging/${env.JOB_BASE_NAME}",
+                  selector: upstream(fallbackToLastSuccessful: true))
+    def props = readProperties('beats-tester.properties')
+    apm = props.get('APM_URL_BASE', '')
+    beats = props.get('BEATS_URL_BASE', '')
+  }
+  if (apm?.trim() || beats?.trim()) {
     build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
           parameters: [
-            string(name: 'APM_URL_BASE', value: args.apm),
-            string(name: 'BEATS_URL_BASE', value: args.beats),
+            string(name: 'APM_URL_BASE', value: apm),
+            string(name: 'BEATS_URL_BASE', value: beats),
             string(name: 'VERSION', value: args.version)
           ])
   } else {

@@ -120,6 +120,12 @@ pipeline {
     }
   }
   post {
+    success {
+      writeFile file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
+COMMIT=${env.GIT_BASE_COMMIT}
+VERSION=${BRANCH_NAME}-SNAPSHOT"""
+      archiveArtifacts artifacts: 'packaging.properties'
+    }
     always {
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
