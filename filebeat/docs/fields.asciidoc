@@ -108295,7 +108295,7 @@ Module for parsing Oracle Database audit logs
 *`oracle.database_audit.status`*::
 +
 --
-Status.
+Database Audit Status.
 
 
 type: keyword
@@ -108305,7 +108305,7 @@ type: keyword
 *`oracle.database_audit.sessionid`*::
 +
 --
-Session ID.
+Session ID related to the audit event.
 
 
 type: keyword
@@ -108315,7 +108315,7 @@ type: keyword
 *`oracle.database_audit.client_terminal`*::
 +
 --
-terminal.
+If available, the client terminal type, for example "pty"
 
 
 type: keyword
@@ -108325,7 +108325,7 @@ type: keyword
 *`oracle.database_audit.client_address`*::
 +
 --
-terminal.
+The IP Address or Domain used by the client.
 
 
 type: keyword
@@ -108335,7 +108335,7 @@ type: keyword
 *`oracle.database_audit.client_user`*::
 +
 --
-client user.
+The user running the client or connection to the database
 
 
 type: keyword
@@ -108345,7 +108345,7 @@ type: keyword
 *`oracle.database_audit.database_user`*::
 +
 --
-DB User.
+The database user used to authenticate.
 
 
 type: keyword
@@ -108355,7 +108355,7 @@ type: keyword
 *`oracle.database_audit.privilege`*::
 +
 --
-Priv something
+The privilege group related to the database user
 
 
 type: keyword
@@ -108375,7 +108375,7 @@ type: keyword
 *`oracle.database_audit.userhost`*::
 +
 --
-USERHOST
+The host in which the database is running.
 
 
 type: keyword
@@ -108385,7 +108385,7 @@ type: keyword
 *`oracle.database_audit.action`*::
 +
 --
-Action type
+The type of action logged in the audit event.
 
 
 type: keyword
@@ -108395,7 +108395,7 @@ type: keyword
 *`oracle.database_audit.action_number`*::
 +
 --
-Action number
+Action number related to the audit event
 
 
 type: keyword
@@ -108405,7 +108405,7 @@ type: keyword
 *`oracle.database_audit.dbid`*::
 +
 --
-DBID
+The ID of the DB/container accessed.
 
 
 type: keyword
@@ -108415,7 +108415,7 @@ type: keyword
 *`oracle.database_audit.length`*::
 +
 --
-Length
+The duration length.
 
 
 type: keyword

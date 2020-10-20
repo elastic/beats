@@ -7,37 +7,37 @@
     - name: status
       type: keyword
       description: >
-        Status.
+        Database Audit Status.
 
     - name: sessionid
       type: keyword
       description: >
-        Session ID.
+        Session ID related to the audit event.
 
     - name: client_terminal
       type: keyword
       description: >
-        terminal.
+        If available, the client terminal type, for example "pty"
 
     - name: client_address
       type: keyword
       description: >
-        terminal.
+        The IP Address or Domain used by the client.
 
     - name: client_user
       type: keyword
       description: >
-        client user.
+        The user running the client or connection to the database
 
     - name: database_user
       type: keyword
       description: >
-        DB User.
+        The database user used to authenticate.
 
     - name: privilege
       type: keyword
       description: >
-        Priv something
+        The privilege group related to the database user
 
     - name: entryid
       type: keyword
@@ -47,24 +47,24 @@
     - name: userhost
       type: keyword
       description: >
-        USERHOST
+        The host in which the database is running.
 
     - name: action
       type: keyword
       description: >
-        Action type
+        The type of action logged in the audit event.
 
     - name: action_number
       type: keyword
       description: >
-        Action number
+        Action number related to the audit event
 
     - name: dbid
       type: keyword
       description: >
-        DBID
+        The ID of the DB/container accessed.
 
     - name: length
       type: keyword
       description: >
-        Length
+        The duration length.
