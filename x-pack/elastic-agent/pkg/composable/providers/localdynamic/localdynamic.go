@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func init() {
@@ -37,7 +38,7 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(c *config.Config) (composable.DynamicProvider, error) {
+func DynamicProviderBuilder(_ *logger.Logger, c *config.Config) (composable.DynamicProvider, error) {
 	p := &dynamicProvider{}
 	if c != nil {
 		err := c.Unpack(p)

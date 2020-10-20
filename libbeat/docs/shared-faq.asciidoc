@@ -98,8 +98,8 @@ telnet <hostname or IP> 5044
 +
 TIP: For testing purposes only, you can set `verification_mode: none` to disable hostname checking.
 
-* Use OpenSSL to test connectivity to the {ls} server and diagnose problems. See the https://www.openssl.org/docs/manmaster/apps/s_client.html[OpenSSL documentation] for more info.
-* Make sure that you have enabled SSL (set `ssl => true`) when configuring the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for {ls}].
+* Use OpenSSL to test connectivity to the {ls} server and diagnose problems. See the https://www.openssl.org/docs/manmaster/man1/openssl-s_client.html[OpenSSL documentation] for more info.
+* Make sure that you have enabled SSL (set `ssl => true`) when configuring the {logstash-ref}/plugins-inputs-beats.html[Beats input plugin for {ls}].
 
 ==== Common SSL-Related Errors and Resolutions
 

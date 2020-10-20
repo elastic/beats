@@ -8,6 +8,7 @@ var:
     default: "SSWS"
   - name: http_client_timeout
   - name: http_method
+    default: GET
   - name: http_headers
   - name: http_request_body
   - name: interval
@@ -31,6 +32,8 @@ var:
   - name: tags
     default: [forwarded]
   - name: url
+  - name: initial_interval
+    default: 24h
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.yml

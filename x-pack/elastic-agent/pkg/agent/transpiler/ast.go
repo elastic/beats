@@ -15,10 +15,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
+
 	"github.com/elastic/go-ucfg"
 )
 
-const selectorSep = "."
+const (
+	selectorSep = "."
+	// conditionKey is the name of the reserved key that will be computed using EQL to a boolean result.
+	//
+	// This makes the key "condition" inside of a dictionary a reserved name.
+	conditionKey = "condition"
+)
 
 // Selector defines a path to access an element in the Tree, currently selectors only works when the
 // target is a Dictionary, accessing list values are not currently supported by any methods using
@@ -51,7 +59,7 @@ type Node interface {
 	Hash() []byte
 
 	// Apply apply the current vars, returning the new value for the node.
-	Apply(Vars) (Node, error)
+	Apply(*Vars) (Node, error)
 
 	// Processors returns any attached processors, because of variable substitution.
 	Processors() Processors
@@ -133,14 +141,27 @@ func (d *Dict) Hash() []byte {
 }
 
 // Apply applies the vars to all the nodes in the dictionary.
-func (d *Dict) Apply(vars Vars) (Node, error) {
-	nodes := make([]Node, len(d.value))
-	for i, v := range d.value {
-		n, err := v.Apply(vars)
+func (d *Dict) Apply(vars *Vars) (Node, error) {
+	nodes := make([]Node, 0, len(d.value))
+	for _, v := range d.value {
+		k := v.(*Key)
+		n, err := k.Apply(vars)
 		if err != nil {
 			return nil, err
 		}
-		nodes[i] = n
+		if n == nil {
+			continue
+		}
+		if k.name == conditionKey {
+			b := n.Value().(*BoolVal)
+			if !b.value {
+				// condition failed; whole dictionary should be removed
+				return nil, nil
+			}
+			// condition successful, but don't include condition in result
+			continue
+		}
+		nodes = append(nodes, n)
 	}
 	return &Dict{nodes, nil}, nil
 }
@@ -230,13 +251,29 @@ func (k *Key) Hash() []byte {
 }
 
 // Apply applies the vars to the value.
-func (k *Key) Apply(vars Vars) (Node, error) {
+func (k *Key) Apply(vars *Vars) (Node, error) {
 	if k.value == nil {
 		return k, nil
+	}
+	if k.name == conditionKey {
+		switch v := k.value.(type) {
+		case *BoolVal:
+			return k, nil
+		case *StrVal:
+			cond, err := eql.Eval(v.value, vars)
+			if err != nil {
+				return nil, fmt.Errorf(`condition "%s" evaluation failed: %s`, v.value, err)
+			}
+			return &Key{k.name, NewBoolVal(cond)}, nil
+		}
+		return nil, fmt.Errorf("condition key's value must be a string; recieved %T", k.value)
 	}
 	v, err := k.value.Apply(vars)
 	if err != nil {
 		return nil, err
+	}
+	if v == nil {
+		return nil, nil
 	}
 	return &Key{k.name, v}, nil
 }
@@ -319,14 +356,17 @@ func (l *List) Clone() Node {
 }
 
 // Apply applies the vars to all nodes in the list.
-func (l *List) Apply(vars Vars) (Node, error) {
-	nodes := make([]Node, len(l.value))
-	for i, v := range l.value {
+func (l *List) Apply(vars *Vars) (Node, error) {
+	nodes := make([]Node, 0, len(l.value))
+	for _, v := range l.value {
 		n, err := v.Apply(vars)
 		if err != nil {
 			return nil, err
 		}
-		nodes[i] = n
+		if n == nil {
+			continue
+		}
+		nodes = append(nodes, n)
 	}
 	return NewList(nodes), nil
 }
@@ -386,7 +426,7 @@ func (s *StrVal) Hash() []byte {
 }
 
 // Apply applies the vars to the string value.
-func (s *StrVal) Apply(vars Vars) (Node, error) {
+func (s *StrVal) Apply(vars *Vars) (Node, error) {
 	return vars.Replace(s.value)
 }
 
@@ -432,7 +472,7 @@ func (s *IntVal) Clone() Node {
 }
 
 // Apply does nothing.
-func (s *IntVal) Apply(_ Vars) (Node, error) {
+func (s *IntVal) Apply(_ *Vars) (Node, error) {
 	return s, nil
 }
 
@@ -488,7 +528,7 @@ func (s *UIntVal) Hash() []byte {
 }
 
 // Apply does nothing.
-func (s *UIntVal) Apply(_ Vars) (Node, error) {
+func (s *UIntVal) Apply(_ *Vars) (Node, error) {
 	return s, nil
 }
 
@@ -540,7 +580,7 @@ func (s *FloatVal) Hash() []byte {
 }
 
 // Apply does nothing.
-func (s *FloatVal) Apply(_ Vars) (Node, error) {
+func (s *FloatVal) Apply(_ *Vars) (Node, error) {
 	return s, nil
 }
 
@@ -597,7 +637,7 @@ func (s *BoolVal) Hash() []byte {
 }
 
 // Apply does nothing.
-func (s *BoolVal) Apply(_ Vars) (Node, error) {
+func (s *BoolVal) Apply(_ *Vars) (Node, error) {
 	return s, nil
 }
 
@@ -771,13 +811,33 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 }
 
 // Apply applies the variables to the replacement in the AST.
-func (a *AST) Apply(vars Vars) error {
+func (a *AST) Apply(vars *Vars) error {
 	n, err := a.root.Apply(vars)
 	if err != nil {
 		return err
 	}
 	a.root = n
 	return nil
+}
+
+// Lookup looks for a value from the AST.
+//
+// Return type is in the native form and not in the Node types from the AST.
+func (a *AST) Lookup(name string) (interface{}, bool) {
+	node, ok := Lookup(a, name)
+	if !ok {
+		return nil, false
+	}
+	_, isKey := node.(*Key)
+	if isKey {
+		// matched on a key, return the value
+		node = node.Value().(Node)
+	}
+
+	m := &MapVisitor{}
+	a.dispatch(node, m)
+
+	return m.Content, true
 }
 
 func splitPath(s Selector) []string {

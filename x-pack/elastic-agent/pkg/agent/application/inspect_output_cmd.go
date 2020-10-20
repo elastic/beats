@@ -8,12 +8,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -38,14 +38,19 @@ func NewInspectOutputCmd(configPath, output, program string) (*InspectOutputCmd,
 
 // Execute tries to enroll the agent into Fleet.
 func (c *InspectOutputCmd) Execute() error {
-	if c.output == "" {
-		return c.inspectOutputs()
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		return err
 	}
 
-	return c.inspectOutput()
+	if c.output == "" {
+		return c.inspectOutputs(agentInfo)
+	}
+
+	return c.inspectOutput(agentInfo)
 }
 
-func (c *InspectOutputCmd) inspectOutputs() error {
+func (c *InspectOutputCmd) inspectOutputs(agentInfo *info.AgentInfo) error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -62,7 +67,7 @@ func (c *InspectOutputCmd) inspectOutputs() error {
 	}
 
 	if isStandalone(cfg.Fleet) {
-		return listOutputsFromConfig(l, rawConfig)
+		return listOutputsFromConfig(l, agentInfo, rawConfig)
 	}
 
 	fleetConfig, err := loadFleetConfig(rawConfig)
@@ -72,11 +77,11 @@ func (c *InspectOutputCmd) inspectOutputs() error {
 		return fmt.Errorf("no fleet config retrieved yet")
 	}
 
-	return listOutputsFromMap(l, fleetConfig)
+	return listOutputsFromMap(l, agentInfo, fleetConfig)
 }
 
-func listOutputsFromConfig(log *logger.Logger, cfg *config.Config) error {
-	programsGroup, err := getProgramsFromConfig(log, cfg)
+func listOutputsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *config.Config) error {
+	programsGroup, err := getProgramsFromConfig(log, agentInfo, cfg)
 	if err != nil {
 		return err
 
@@ -89,16 +94,16 @@ func listOutputsFromConfig(log *logger.Logger, cfg *config.Config) error {
 	return nil
 }
 
-func listOutputsFromMap(log *logger.Logger, cfg map[string]interface{}) error {
+func listOutputsFromMap(log *logger.Logger, agentInfo *info.AgentInfo, cfg map[string]interface{}) error {
 	c, err := config.NewConfigFrom(cfg)
 	if err != nil {
 		return err
 	}
 
-	return listOutputsFromConfig(log, c)
+	return listOutputsFromConfig(log, agentInfo, c)
 }
 
-func (c *InspectOutputCmd) inspectOutput() error {
+func (c *InspectOutputCmd) inspectOutput(agentInfo *info.AgentInfo) error {
 	rawConfig, err := loadConfig(c.cfgPath)
 	if err != nil {
 		return err
@@ -115,7 +120,7 @@ func (c *InspectOutputCmd) inspectOutput() error {
 	}
 
 	if isStandalone(cfg.Fleet) {
-		return printOutputFromConfig(l, c.output, c.program, rawConfig)
+		return printOutputFromConfig(l, agentInfo, c.output, c.program, rawConfig)
 	}
 
 	fleetConfig, err := loadFleetConfig(rawConfig)
@@ -125,11 +130,11 @@ func (c *InspectOutputCmd) inspectOutput() error {
 		return fmt.Errorf("no fleet config retrieved yet")
 	}
 
-	return printOutputFromMap(l, c.output, c.program, fleetConfig)
+	return printOutputFromMap(l, agentInfo, c.output, c.program, fleetConfig)
 }
 
-func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *config.Config) error {
-	programsGroup, err := getProgramsFromConfig(log, cfg)
+func printOutputFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, output, programName string, cfg *config.Config) error {
+	programsGroup, err := getProgramsFromConfig(log, agentInfo, cfg)
 	if err != nil {
 		return err
 
@@ -165,21 +170,21 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 
 }
 
-func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[string]interface{}) error {
+func printOutputFromMap(log *logger.Logger, agentInfo *info.AgentInfo, output, programName string, cfg map[string]interface{}) error {
 	c, err := config.NewConfigFrom(cfg)
 	if err != nil {
 		return err
 	}
 
-	return printOutputFromConfig(log, output, programName, c)
+	return printOutputFromConfig(log, agentInfo, output, programName, c)
 }
 
-func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][]program.Program, error) {
+func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *config.Config) (map[string][]program.Program, error) {
 	monitor := noop.NewMonitor()
 	router := &inmemRouter{}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	composableCtrl, err := composable.New(cfg)
+	composableCtrl, err := composable.New(log, cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -187,11 +192,11 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 	emit, err := emitter(
 		ctx,
 		log,
+		agentInfo,
 		composableWaiter,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.ConstraintFilter},
 		},
 		monitor,
 	)
@@ -232,7 +237,7 @@ func newWaitForCompose(wrapped composable.Controller) *waitForCompose {
 }
 
 func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) error {
-	err := w.controller.Run(ctx, func(vars []transpiler.Vars) {
+	err := w.controller.Run(ctx, func(vars []*transpiler.Vars) {
 		cb(vars)
 		w.done <- true
 	})

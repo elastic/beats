@@ -83,6 +83,7 @@ type Harvester struct {
 
 	// shutdown handling
 	done     chan struct{}
+	doneWg   *sync.WaitGroup
 	stopOnce sync.Once
 	stopWg   *sync.WaitGroup
 	stopLock sync.Mutex
@@ -138,6 +139,7 @@ func NewHarvester(
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
+		doneWg:        &sync.WaitGroup{},
 		id:            id,
 		outletFactory: outletFactory,
 	}
@@ -299,7 +301,11 @@ func (h *Harvester) Run() error {
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
-	go h.monitorFileSize()
+	h.doneWg.Add(1)
+	go func() {
+		h.monitorFileSize()
+		h.doneWg.Done()
+	}()
 
 	for {
 		select {
@@ -378,7 +384,8 @@ func (h *Harvester) monitorFileSize() {
 func (h *Harvester) stop() {
 	h.stopOnce.Do(func() {
 		close(h.done)
-
+		// Wait for goroutines monitoring h.done to terminate before closing source.
+		h.doneWg.Wait()
 		filesMetrics.Remove(h.id.String())
 	})
 }

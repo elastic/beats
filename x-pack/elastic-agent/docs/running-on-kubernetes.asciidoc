@@ -44,7 +44,7 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kuber
 
 By default, {agent} is enrolled to an existing Kibana deployment,
 if present using the specified credentials. FLEET_ENROLLMENT_TOKEN parameter is used to connect Agent to the
-corresponding Ingest Management configuration. It is suggested to connect Daemonset Agents to a node scope configuration
+corresponding {agent} policy. It is suggested to connect Daemonset Agents to a node scope configuration
 and Deployment Agent to a cluster scope configuration. Then Kubernetes package will be deployed enabling cluster scope
 datasets using cluster scope configuration while node scope datasets will be enabled under node scope configuration.
 
