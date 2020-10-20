@@ -28,7 +28,7 @@ import (
 type Prospector interface {
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
-	Run(input.Context, *statestore.Store, *HarvesterGroup)
+	Run(input.Context, *statestore.Store, HarvesterGroup)
 	// Test checks if the Prospector is able to run the configuration
 	// specified by the user.
 	Test() error
