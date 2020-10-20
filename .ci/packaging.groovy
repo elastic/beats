@@ -331,10 +331,8 @@ def publishPackages(baseDir){
 
   // In order to run the beats-tester let's copy those files to another more predictable
   // location where those files won't be uploaded while running the beats-tester
-  if (isBranch()) {
-    bucketUri = "gs://${JOB_GCS_BUCKET}/commit/${env.GIT_BASE_COMMIT}"
-    uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
-  }
+  bucketUri = "${bucketUri}/commit/${env.GIT_BASE_COMMIT}"
+  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir, beatsFolderName)
 }
 
 def uploadPackages(bucketUri, baseDir, beatsFolderName){
