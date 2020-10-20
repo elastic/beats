@@ -113,7 +113,6 @@ func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSideca
 		logFile = fmt.Sprintf("%s-json.log", logFile)
 		appendix = append(appendix,
 			"-E", "logging.json=true",
-			"-E", "logging.ecs=true",
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
