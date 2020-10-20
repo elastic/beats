@@ -14,7 +14,7 @@ import (
 
 func TestGetNextLinkFromHeader(t *testing.T) {
 	header := make(http.Header)
-	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs>; rel=\"self\"")
+	header.Add("link", "<https://dev-168980.okta.com/api/v1/logs>; rel=\"self\"")
 	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1>; rel=\"next\"")
 	re, _ := regexp.Compile("<([^>]+)>; *rel=\"next\"(?:,|$)")
 	url, err := getNextLinkFromHeader(header, "Link", re)

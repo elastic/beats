@@ -33,10 +33,6 @@
           type: long
           description: >
             Leader id (broker).
-        - name: isr
-          type: keyword
-          description: >
-            List of isr ids.
         - name: replica
           type: long
           description: >
