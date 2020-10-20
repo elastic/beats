@@ -1,4 +1,4 @@
-package httpjsonv2
+package v2
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjsonv2/internal/transforms"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms"
 )
 
 type retryConfig struct {
@@ -70,9 +70,9 @@ type requestConfig struct {
 	Transforms transforms.Config `config:"transforms"`
 }
 
-func (c requestConfig) Validate() error {
-
-	switch strings.ToUpper(c.Method) {
+func (c *requestConfig) Validate() error {
+	c.Method = strings.ToUpper(c.Method)
+	switch c.Method {
 	case "POST":
 	case "GET":
 		if c.Body != nil {
@@ -86,7 +86,7 @@ func (c requestConfig) Validate() error {
 		return errors.New("timeout must be greater than 0")
 	}
 
-	if _, err := transforms.New(c.Transforms, "request"); err != nil {
+	if _, err := transforms.New(c.Transforms, requestNamespace); err != nil {
 		return err
 	}
 

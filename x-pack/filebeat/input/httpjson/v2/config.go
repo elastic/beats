@@ -1,4 +1,4 @@
-package httpjsonv2
+package v2
 
 import (
 	"errors"
@@ -6,10 +6,10 @@ import (
 )
 
 type config struct {
-	Interval time.Duration  `config:"interval" validate:"required"`
-	Auth     *authConfig    `config:"auth"`
-	Request  *requestConfig `config:"request" validate:"required"`
-	// Response *responseConfig `config:"response"`
+	Interval time.Duration   `config:"interval" validate:"required"`
+	Auth     *authConfig     `config:"auth"`
+	Request  *requestConfig  `config:"request" validate:"required"`
+	Response *responseConfig `config:"response"`
 }
 
 func (c config) Validate() error {

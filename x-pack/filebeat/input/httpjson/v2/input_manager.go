@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package httpjsonv2
+package v2
 
 import (
 	"github.com/elastic/go-concert/unison"

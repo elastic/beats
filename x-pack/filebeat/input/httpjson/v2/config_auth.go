@@ -1,4 +1,4 @@
-package httpjsonv2
+package v2
 
 import (
 	"context"
