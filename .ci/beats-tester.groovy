@@ -54,6 +54,7 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch 'master' }
           steps {
+            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -61,6 +62,7 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch '*.x' }
           steps {
+            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -84,6 +86,7 @@ pipeline {
             }
            }
           steps {
+            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
