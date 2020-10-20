@@ -42,6 +42,7 @@ class Test(AuditbeatXPackTest):
         # Metricset is beta and that generates a warning, TODO: remove later
         self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
 
+    @unittest.skip("1/20 build fails https://github.com/elastic/beats/issues/21308")
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform.startswith('linux') and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
                      "Only implemented for dpkg and rpm")
