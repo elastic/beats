@@ -1,5 +1,6 @@
 import os
 import time
+import unittest
 from filebeat import BaseTest
 
 
@@ -249,6 +250,7 @@ class Test(BaseTest):
         assert output[0]["message"] == first_line
         assert output[1]["message"] == second_line
 
+    @unittest.skip("1/20 build fails https://github.com/elastic/beats/issues/21307")
     def test_reload_same_config(self):
         """
         Test reload same config with same file but different config. Makes sure reloading also works on conflicts.
