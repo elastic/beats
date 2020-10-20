@@ -425,7 +425,7 @@ metricbeat.modules:
 
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
-  
+
   # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
   #ssl.key_passphrase: "yourKeyPassphrase"
 
