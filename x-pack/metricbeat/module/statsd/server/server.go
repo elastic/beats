@@ -5,12 +5,14 @@
 package server
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/go-concert/timed"
 )
 
 // init registers the MetricSet with the central registry.
@@ -23,6 +25,8 @@ func init() {
 type Config struct {
 	TTL time.Duration `config:"ttl"`
 }
+
+var setupRetryInterval = 1 * time.Minute
 
 func defaultConfig() Config {
 	return Config{
@@ -88,17 +92,19 @@ func (m *MetricSet) getEvents() []*mb.Event {
 }
 
 // Run method provides the module with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporterV2) {
+func (m *MetricSet) Run(ctx context.Context, reporter mb.ReporterV2) {
 	period := m.Module().Config().Period
 
 	// Start event watcher
-	m.server.Start()
-	defer m.server.Stop()
+	if err := m.startServer(ctx); err != nil {
+		return
+	}
+	defer m.stopServer()
 
 	reportPeriod := time.NewTicker(period)
 	for {
 		select {
-		case <-reporter.Done():
+		case <-ctx.Done():
 			return
 		case <-reportPeriod.C:
 			for _, e := range m.getEvents() {
@@ -111,4 +117,22 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			}
 		}
 	}
+}
+
+func (m *MetricSet) startServer(ctx context.Context) error {
+	for ctx.Err() == nil {
+		err := m.server.Start()
+		if err == nil {
+			return nil
+		}
+
+		m.Logger().Errorf("Unable to start statsd server metricset: %v", err)
+		timed.Wait(ctx, setupRetryInterval)
+	}
+
+	return ctx.Err()
+}
+
+func (m *MetricSet) stopServer() {
+	m.server.Stop()
 }
