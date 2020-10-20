@@ -65,7 +65,18 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             deleteDir()
-            gitCheckout(basedir: "${BASE_DIR}")
+            script {
+              if(isUpstreamTrigger()) {
+                copyArtifacts(filter: 'packaging.properties',
+                              flatten: true,
+                              projectName: "Beats/beats/${env.JOB_BASE_NAME}",
+                              selector: upstream(fallbackToLastSuccessful: true))
+                def props = readProperties('packaging.properties')
+                gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
+              } else {
+                gitCheckout(basedir: "${BASE_DIR}")
+              }
+            }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
