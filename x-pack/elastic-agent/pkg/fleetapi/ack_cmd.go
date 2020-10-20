@@ -45,12 +45,10 @@ func (e *AckRequest) Validate() error {
 // AckResponse is the response send back from the server.
 // 200
 // {
-// 	 "action": "acks",
-// 	 "success": true
+// 	 "action": "acks"
 // }
 type AckResponse struct {
-	Action  string `json:"action"`
-	Success bool   `json:"success"`
+	Action string `json:"action"`
 }
 
 // Validate validates the response send from the server.

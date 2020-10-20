@@ -21,8 +21,9 @@ class TestExportsMixin:
         if len(extra) != 0:
             args += extra
         exit_code = self.run_beat(extra_args=args, logging_args=[])
-        assert exit_code == 0
         output = self.get_log()
+        if exit_code != 0:
+            raise Exception("export command returned with an error: {}".format(output))
         trailer = "\nPASS\n"
         pos = output.rfind(trailer)
         if pos == -1:
@@ -55,9 +56,9 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "objects" in js
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < 1024 * 1024, "Kibana index pattern must be less than 1MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_index_pattern_migration(self):
         """
@@ -67,9 +68,9 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "objects" in js
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < 1024 * 1024, "Kibana index pattern must be less than 1MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_config(self):
         """

@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -56,7 +55,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	warn.PrintNotGA(streams.Out)
 	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),

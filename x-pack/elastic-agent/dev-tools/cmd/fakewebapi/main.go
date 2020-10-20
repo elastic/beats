@@ -27,12 +27,11 @@ var (
 	mutex  sync.Mutex
 
 	pathCheckin     = regexp.MustCompile(`^/api/fleet/agents/(.+)/checkin`)
-	checkinResponse = response{Actions: make([]action, 0), Success: true}
+	checkinResponse = response{Actions: make([]action, 0)}
 )
 
 type response struct {
 	Actions []action `json:"actions"`
-	Success bool     `json:"success"`
 }
 
 type action interface{}
@@ -78,8 +77,7 @@ func handlerEnroll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := &fleetapi.EnrollResponse{
-		Action:  "created",
-		Success: true,
+		Action: "created",
 		Item: fleetapi.EnrollItemResponse{
 			ID:                   "a4937110-e53e-11e9-934f-47a8e38a522c",
 			Active:               true,
@@ -147,7 +145,6 @@ func handlerAction(w http.ResponseWriter, r *http.Request) {
 
 	checkinResponse = resp
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(`{ "success": true }`))
 	log.Println("Action request: ", string(c))
 }
 

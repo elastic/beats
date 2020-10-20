@@ -3,6 +3,52 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.9.1]]
+=== Beats version 7.9.1
+https://github.com/elastic/beats/compare/v7.9.0...v7.9.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Removed experimental modules `citrix`, `kaspersky`, `rapid7` and `tenable`. {pull}20706[20706]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update replicaset group to apps/v1 {pull}15854[15854]
+- Rename cloud.provider `az` value to `azure` inside the add_cloud_metadata processor. {pull}20689[20689]
+- Add missing country_name geo field in `add_host_metadata` and `add_observer_metadata` processors. {issue}20796[20796] {pull}20811[20811]
+
+*Filebeat*
+
+- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
+- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
+- Update documentation in the azure module filebeat. {pull}20815[20815]
+
+*Heartbeat*
+
+- Stop rescheduling tasks of stopped monitors. {pull}20570[20570]
+
+*Metricbeat*
+
+- Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
+- Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
+- Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
+- Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
+
+*Winlogbeat*
+
+- Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
+- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[20564]
+
+==== Added
+
+*Affecting all Beats*
+
+- Added support for more message types for Cisco ASA and FTD. {pull}20565[20565]
+
 [[release-notes-7.9.0]]
 === Beats version 7.9.0
 https://github.com/elastic/beats/compare/v7.8.1...v7.9.0[View commits]

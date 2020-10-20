@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -102,16 +103,26 @@ func newLocal(
 	}
 	localApplication.router = router
 
+	composableCtrl, err := composable.New(log, rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	emit := emitter(
+	emit, err := emitter(
+		localApplication.bgContext,
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker},
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {

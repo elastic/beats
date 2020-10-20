@@ -25,7 +25,7 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
-INSTALL_CMD?=get
+INSTALL_CMD?=install
 export INSTALL_FLAG
 export INSTALL_CMD
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)

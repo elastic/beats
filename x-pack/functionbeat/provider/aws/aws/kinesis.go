@@ -70,7 +70,7 @@ func (s *startingPosition) Unpack(str string) error {
 func (s *startingPosition) String() string {
 	v, ok := mapStartingPositionReverse[*s]
 	if !ok {
-		panic("unknown starting position: " + string(*s))
+		panic("unknown starting position: " + fmt.Sprint(*s))
 	}
 	return v
 }

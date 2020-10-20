@@ -1,10 +1,10 @@
+from os import listdir
+from os.path import abspath, isdir, join
+
 comment = """Package defaults imports all Monitor packages so that they
 register with the global monitor registry. This package can be imported in the
 main package to automatically register all of the standard supported Heartbeat
 modules."""
-
-from os.path import abspath, isdir, join
-from os import listdir
 
 
 blacklist = [

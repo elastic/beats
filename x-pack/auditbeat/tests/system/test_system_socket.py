@@ -638,7 +638,7 @@ class DNSTestCase:
                 "user.id": str(os.getuid()),
             }, {
                 "agent.type": "auditbeat",
-                "client.bytes":  client_bytes,
+                "client.bytes": client_bytes,
                 "client.ip": self.client_addr[0],
                 "client.packets": client_packets,
                 "client.port": self.client_addr[1],
@@ -664,7 +664,7 @@ class DNSTestCase:
                 "server.packets": server_packets,
                 "server.port": self.server_addr[1],
                 "service.type": "system",
-                "source.bytes":  client_bytes,
+                "source.bytes": client_bytes,
                 "source.ip": self.client_addr[0],
                 "source.packets": client_packets,
                 "source.port": self.client_addr[1],

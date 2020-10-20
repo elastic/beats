@@ -38,6 +38,7 @@ pipeline {
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -61,6 +62,7 @@ pipeline {
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
+    string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {
     /**
@@ -1125,6 +1127,7 @@ def isChangedOSSCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
@@ -1138,6 +1141,7 @@ def isChangedXPackCode(patterns) {
   def allPatterns = [
     "^Jenkinsfile",
     "^go.mod",
+    "^pytest.ini",
     "^libbeat/.*",
     "^dev-tools/.*",
     "^testing/.*",

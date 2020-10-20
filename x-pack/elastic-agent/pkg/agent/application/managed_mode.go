@@ -11,12 +11,15 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/go-sysinfo"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -112,6 +115,13 @@ func newManaged(
 			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
 	}
 
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to get system information",
+			errors.TypeUnexpected)
+	}
+
 	managedApplication := &Managed{
 		log:       log,
 		agentInfo: agentInfo,
@@ -147,15 +157,25 @@ func newManaged(
 	}
 	managedApplication.router = router
 
-	emit := emitter(
+	composableCtrl, err := composable.New(log, rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
+	emit, err := emitter(
+		managedApplication.bgContext,
 		log,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config), filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info())},
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err

@@ -8,18 +8,20 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
+RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
+    rm {{ $beatBinary }} && \
+    ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
+    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs
 
 FROM {{ .from }}
 

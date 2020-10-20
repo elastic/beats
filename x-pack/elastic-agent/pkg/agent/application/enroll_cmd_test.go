@@ -54,7 +54,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -108,7 +107,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -170,7 +168,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -231,7 +228,6 @@ func TestEnroll(t *testing.T) {
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,

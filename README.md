@@ -50,6 +50,10 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
 * [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)
 
+## Documentation and Getting Started information for the Elastic Agent
+
+You can find the documentation and getting started guides for the Elastic Agent
+on the [elastic.co site](https://www.elastic.co/downloads/elastic-agent)
 
 ## Getting Help
 

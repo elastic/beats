@@ -76,6 +76,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16418,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.207",
@@ -180,6 +182,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -287,6 +291,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51990,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.207",
@@ -391,6 +397,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -498,6 +506,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 15252,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.196",
@@ -602,6 +612,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 40763,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
         "related.ip": [
             "192.168.15.224",
@@ -706,6 +718,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -810,6 +824,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52881,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -914,6 +930,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 26654,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1018,6 +1036,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2486,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1122,6 +1142,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42021,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.207",
@@ -1226,6 +1248,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24377,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1330,6 +1354,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 48792,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1434,6 +1460,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2987,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1538,6 +1566,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6945,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -1642,6 +1672,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -1746,6 +1778,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42208,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -1850,6 +1884,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14660,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
         "related.ip": [
             "192.168.15.224",
@@ -1954,6 +1990,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16483,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
         "related.ip": [
             "192.168.15.224",
@@ -2058,6 +2096,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.196",
@@ -2162,6 +2202,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5570,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -2266,6 +2308,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24430,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.207",
@@ -2373,6 +2417,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12122,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -2478,6 +2524,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49145,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "drop",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -2582,6 +2630,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "deny",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -2683,6 +2733,7 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33110,
         "panw.panos.source.zone": "trust",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.210",
@@ -2784,6 +2835,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 9299,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "test",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -2888,6 +2941,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 47194,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -2995,6 +3050,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 62921,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3099,6 +3156,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3203,6 +3262,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.210",
@@ -3307,6 +3368,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 41958,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
         "related.ip": [
             "192.168.15.224",
@@ -3411,6 +3474,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51374,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3516,6 +3581,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 25566,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3623,6 +3690,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63757,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3730,6 +3799,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3803,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -3834,6 +3905,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 34994,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -3938,6 +4011,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38064,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -4045,6 +4120,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42924,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
         "related.ip": [
             "192.168.15.224",
@@ -4148,6 +4225,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58977,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
         "related.ip": [
             "192.168.15.224",
@@ -4255,6 +4334,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64732,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -4359,6 +4440,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58292,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -4466,6 +4549,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32209,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -4573,6 +4658,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38822,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -4677,6 +4764,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16044,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -4781,6 +4870,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 56614,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -4888,6 +4979,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53168,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -4992,6 +5085,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28012,
         "panw.panos.source.zone": "xtrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -5095,6 +5190,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16050,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -5195,6 +5292,8 @@
         "panw.panos.source.interface": "ethernet1/2",
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5299,6 +5398,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5403,6 +5504,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14247,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5507,6 +5610,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33580,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5611,6 +5716,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13498,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5715,6 +5822,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20365,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5819,6 +5928,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61464,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -5923,6 +6034,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42877,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.196",
@@ -6027,6 +6140,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5918,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6131,6 +6246,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28944,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6235,6 +6352,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13415,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6339,6 +6458,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2489,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6443,6 +6564,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49328,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6547,6 +6670,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 36036,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6654,6 +6779,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33744,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6758,6 +6885,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 45809,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6862,6 +6991,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3675,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -6966,6 +7097,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5787,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7070,6 +7203,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12342,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7174,6 +7309,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 18729,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7281,6 +7418,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57858,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
         "related.ip": [
             "192.168.15.224",
@@ -7385,6 +7524,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7489,6 +7630,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6674,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7596,6 +7739,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37427,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7700,6 +7845,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22408,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7804,6 +7951,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 27899,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -7908,6 +8057,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52939,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8012,6 +8163,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42907,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.195",
@@ -8115,6 +8268,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19658,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.196",
@@ -8218,6 +8373,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64352,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8321,6 +8478,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60126,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8426,6 +8585,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 59771,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -8530,6 +8691,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 35748,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8634,6 +8797,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63701,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8738,6 +8903,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57872,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -8845,6 +9012,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37581,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -8952,6 +9121,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19226,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -9059,6 +9230,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61721,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -9163,6 +9336,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10098,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
         "related.ip": [
             "192.168.15.224",
@@ -9270,6 +9445,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 4564,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.15.224",
@@ -9377,6 +9554,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32104,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -9484,6 +9663,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14172,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -9591,6 +9772,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10286,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -9698,6 +9881,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 30799,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -9802,6 +9987,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13490,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -9906,6 +10093,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -10010,6 +10199,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53751,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -10114,6 +10305,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 21643,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -10218,6 +10411,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22446,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -10322,6 +10517,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22301,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",
@@ -10426,6 +10623,8 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58124,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.15.224",

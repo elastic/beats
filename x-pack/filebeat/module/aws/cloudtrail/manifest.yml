@@ -15,6 +15,12 @@ var:
   - name: role_arn
   - name: tags
     default: [forwarded]
+  - name: process_cloudtrail_logs
+    default: true
+  - name: process_digest_logs
+    default: true
+  - name: process_insight_logs
+    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

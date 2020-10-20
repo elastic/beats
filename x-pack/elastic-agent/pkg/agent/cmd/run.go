@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -39,9 +38,30 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 	}
 }
 
-func run(flags *globalFlags, streams *cli.IOStreams) error {
+func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+	// After this is run, the service is considered by the OS to be stopped.
+	// This must be the first deferred cleanup task (last to execute).
+	defer service.NotifyTermination()
+
+	locker := application.NewAppLocker(paths.Data())
+	if err := locker.TryLock(); err != nil {
+		return err
+	}
+	defer locker.Unlock()
+
+	service.BeforeRun()
+	defer service.Cleanup()
+
+	// register as a service
+	stop := make(chan bool)
+	_, cancel := context.WithCancel(context.Background())
+	var stopBeat = func() {
+		close(stop)
+	}
+	service.HandleSignals(stopBeat, cancel)
+
 	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
@@ -61,20 +81,6 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 	if err != nil {
 		return err
 	}
-
-	// Windows: Mark service as stopped.
-	// After this is run, the service is considered by the OS to be stopped.
-	// This must be the first deferred cleanup task (last to execute).
-	defer service.NotifyTermination()
-
-	locker := application.NewAppLocker(paths.Data())
-	if err := locker.TryLock(); err != nil {
-		return err
-	}
-	defer locker.Unlock()
-
-	service.BeforeRun()
-	defer service.Cleanup()
 
 	execPath, err := os.Executable()
 	if err != nil {
@@ -99,14 +105,6 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
-	// register as a service
-	stop := make(chan bool)
-	_, cancel := context.WithCancel(context.Background())
-	var stopBeat = func() {
-		close(stop)
-	}
-	service.HandleSignals(stopBeat, cancel)
-
 	// listen for signals
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
@@ -128,12 +126,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 			}
 		}
 		if breakout {
+			if !reexecing {
+				logger.Info("Shutting down Elastic Agent and sending last events...")
+			}
 			break
 		}
 	}
 
 	err = app.Stop()
 	if !reexecing {
+		logger.Info("Shutting down completed.")
 		return err
 	}
 	rex.ShutdownComplete()

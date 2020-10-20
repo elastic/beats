@@ -45,3 +45,9 @@
           object_type_mapping_type: "*"
           description: >
             Azure metric dimensions.
+        - name: metrics.*.*
+          type: object
+          object_type: float
+          object_type_mapping_type: "*"
+          description: >
+            Metrics returned.

@@ -73,16 +73,17 @@ func TestCreateEvent(t *testing.T) {
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
+	resource := Resource{
+		Id:           "resId",
+		Name:         "res",
+		Location:     "west_europe",
+		Type:         "resType",
+		Group:        "resGroup",
+		Tags:         nil,
+		Subscription: "subId",
+	}
 	metric := Metric{
-		Resource: Resource{
-			Id:           "resId",
-			Name:         "res",
-			Location:     "west_europe",
-			Type:         "resType",
-			Group:        "resGroup",
-			Tags:         nil,
-			Subscription: "subId",
-		},
+		ResourceId:   "resId",
 		Namespace:    "namespace1",
 		Names:        []string{"Percentage CPU"},
 		Aggregations: "",
@@ -103,7 +104,7 @@ func TestCreateEvent(t *testing.T) {
 			dimensions: nil,
 		},
 	}
-	event, list := createEvent(createTime, metric, metricValues)
+	event, list := createEvent(createTime, metric, resource, metricValues)
 	assert.NotNil(t, event)
 	assert.NotNil(t, list)
 	assert.Equal(t, event.Timestamp, createTime)
@@ -111,7 +112,7 @@ func TestCreateEvent(t *testing.T) {
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
-	assert.Equal(t, sub, metric.Resource.Subscription)
+	assert.Equal(t, sub, resource.Subscription)
 	namespace, err := event.ModuleFields.GetValue("namespace")
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
