@@ -75,7 +75,7 @@ func (b *dockerBuilder) Build() error {
 		fmt.Println(">> Building docker images again (after 10 seconds)")
 		// This sleep is to avoid hitting the docker build issues when resources are not available.
 		time.Sleep(10)
-		tag, err := b.dockerBuild()
+		tag, err = b.dockerBuild()
 		if err != nil {
 			return errors.Wrap(err, "failed to build docker")
 		}
