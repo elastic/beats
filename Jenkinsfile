@@ -73,7 +73,7 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: true, id: 'lint') {
+          withBeatsEnv(archive: false, id: 'lint') {
             dumpVariables()
             cmd(label: 'make check', script: 'make check')
           }
@@ -166,8 +166,8 @@ def cloud(Map args = [:]) {
 
 def k8sTest(Map args = [:]) {
   def versions = args.versions
-  node(args.label) {
-    versions.each{ v ->
+  versions.each{ v ->
+    node(args.label) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -175,7 +175,19 @@ def k8sTest(Map args = [:]) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               try {
-                sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                // Add some environmental resilience when setup does not work the very first time.
+                def i = 0
+                retryWithSleep(retries: 3, seconds: 5, backoff: true){
+                  try {
+                    sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                  } catch(err) {
+                    i++
+                    sh(label: 'Delete cluster', script: 'kind delete cluster')
+                    if (i > 2) {
+                      error("Setup kind failed with error '${err.toString()}'")
+                    }
+                  }
+                }
                 sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
@@ -207,7 +219,7 @@ def target(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${command}", script: "${command}")
+          cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
       }
     }
@@ -371,7 +383,7 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tar(file: "test-build-artifacts-${args.id}.tgz", dir: '.', archive: true, allowMissing: true)
+      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
       def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
@@ -380,10 +392,23 @@ def archiveTestOutput(Map args = [:]) {
         // TODO: nodeOS() should support ARM
         def os_suffix = isArm() ? 'linux' : nodeOS()
         def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tar(file: "${name}.tgz", archive: true, dir: folder)
+        tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
       }
     }
   }
+}
+
+/**
+* Wrapper to tar and upload artifacts to Google Storage to avoid killing the
+* disk space of the jenkins instance
+*/
+def tarAndUploadArtifacts(Map args = [:]) {
+  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                      credentialsId: "${JOB_GCS_CREDENTIALS}",
+                      pattern: "${args.file}",
+                      sharedPublicly: true,
+                      showInline: true)
 }
 
 /**
@@ -463,7 +488,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */

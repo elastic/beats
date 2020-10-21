@@ -156,10 +156,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		// There's some more Windows memory quirks we need to deal with.
 		// "rss" is a linux concept, but "wss" is a direct match on Windows.
 		// "share" is also unavailable on Windows.
+		if runtime.GOOS == "windows" {
+			proc.Delete("memory.share")
+		}
 
 		if m.IsAgent {
 			if runtime.GOOS == "windows" {
-				proc.Delete("memory.share")
 				if setSize := getAndRemove(proc, "memory.rss"); setSize != nil {
 					proc.Put("memory.wss", setSize)
 				}

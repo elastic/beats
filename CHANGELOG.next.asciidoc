@@ -415,8 +415,12 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix timestamp handling in remote_write. {pull}21166[21166]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
+- Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 - Report the correct windows events for system/filesystem {pull}21758[21758]
+- Fix azure storage event format. {pull}21845[21845]
+- Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
+- [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 
 *Packetbeat*
 

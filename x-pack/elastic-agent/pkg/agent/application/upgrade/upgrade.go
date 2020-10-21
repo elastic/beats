@@ -183,9 +183,6 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 }
 
 func (u *Upgrader) sourceURI(version, retrievedURI string) (string, error) {
-	if strings.HasSuffix(version, "-SNAPSHOT") && retrievedURI == "" {
-		return "", errors.New("snapshot upgrade requires source uri", errors.TypeConfig)
-	}
 	if retrievedURI != "" {
 		return retrievedURI, nil
 	}
