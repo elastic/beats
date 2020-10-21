@@ -27,6 +27,7 @@
 - Improve GRPC stop to be more relaxed {pull}20118[20118]
 - Fix Windows service installation script {pull}20203[20203]
 - Fix timeout issue stopping service applications {pull}20256[20256]
+- Install the elastic-agent wrapper in /usr/bin on macOS. {issues}22037[22037]
 
 ==== New features
 
