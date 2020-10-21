@@ -196,7 +196,6 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	}
 
 	// Try to build the docker images
-	var stderr bytes.Buffer
 	build := d.cmd(ctx, "build", "--pull", service)
 	build.Stdout = nil
 	build.Stderr = &stderr
