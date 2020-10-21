@@ -10,10 +10,14 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+const (
+	ML_SYSTEM_RID = 0x4000
+)
+
 // RunningUnderSupervisor returns true when executing Agent is running under
 // the supervisor processes of the OS.
 func RunningUnderSupervisor() bool {
-	serviceSid, err := allocSid(windows.SECURITY_SERVICE_RID)
+	serviceSid, err := allocSid(ML_SYSTEM_RID)
 	if err != nil {
 		return false
 	}
@@ -40,7 +44,7 @@ func RunningUnderSupervisor() bool {
 
 func allocSid(subAuth0 uint32) (*windows.SID, error) {
 	var sid *windows.SID
-	err := windows.AllocateAndInitializeSid(&windows.SECURITY_NT_AUTHORITY,
+	err := windows.AllocateAndInitializeSid(&windows.SECURITY_MANDATORY_LABEL_AUTHORITY,
 		1, subAuth0, 0, 0, 0, 0, 0, 0, 0, &sid)
 	if err != nil {
 		return nil, err
