@@ -5,6 +5,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -36,8 +37,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -67,6 +68,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -89,8 +91,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -101,8 +103,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -132,6 +134,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -155,8 +158,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -167,8 +170,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -220,8 +223,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -273,8 +276,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -304,6 +307,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -338,8 +342,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -368,6 +372,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -389,8 +394,8 @@
             "www.google-analytics.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "66.102.9.147"
+            "66.102.9.147",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -401,8 +406,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -432,6 +437,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -455,8 +461,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -467,8 +473,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -498,6 +504,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -521,8 +528,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -533,8 +540,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -564,6 +571,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -652,8 +660,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -683,6 +691,7 @@
         "destination.geo.city_name": "Dallas",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 32.9379,
         "destination.geo.location.lon": -96.8384,
         "destination.geo.region_iso_code": "US-TX",
@@ -706,8 +715,8 @@
             "as.casalemedia.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "209.85.16.38"
+            "209.85.16.38",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -746,6 +755,7 @@
         "@timestamp": "2006-09-08T04:22:06.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -766,8 +776,8 @@
             "us.bc.yahoo.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "68.142.213.132"
+            "68.142.213.132",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -777,8 +787,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -807,6 +817,7 @@
         "destination.as.organization.name": "Telia Company AB",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
         "destination.geo.location.lat": 59.3247,
         "destination.geo.location.lon": 18.056,
         "destination.ip": [
@@ -840,8 +851,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -871,6 +882,7 @@
         "destination.geo.city_name": "Los Angeles",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 34.0675,
         "destination.geo.location.lon": -118.3521,
         "destination.geo.region_iso_code": "US-CA",
@@ -894,8 +906,8 @@
             "4.adbrite.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "206.169.136.22"
+            "206.169.136.22",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -959,8 +971,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -990,6 +1002,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -1013,8 +1026,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -1025,8 +1038,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1056,6 +1069,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -1079,8 +1093,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -1119,6 +1133,7 @@
         "@timestamp": "2006-09-08T04:22:10.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1140,8 +1155,8 @@
             "4.adbrite.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "64.127.126.178"
+            "64.127.126.178",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1152,8 +1167,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1183,6 +1198,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -1206,8 +1222,8 @@
             "ff.connextra.com"
         ],
         "related.ip": [
-            "213.160.98.161",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.161"
         ],
         "related.user": [
             "badeyek"
@@ -1218,8 +1234,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "302",
@@ -1249,6 +1265,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -1284,8 +1301,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1336,8 +1353,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1366,6 +1383,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1397,8 +1415,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1480,6 +1498,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1542,6 +1561,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1607,6 +1627,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1630,8 +1651,8 @@
             "hi5.com"
         ],
         "related.ip": [
-            "10.105.47.218",
-            "204.13.51.238"
+            "204.13.51.238",
+            "10.105.47.218"
         ],
         "related.user": [
             "nazsoau"
@@ -1672,6 +1693,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1692,8 +1714,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -1809,8 +1831,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -1862,8 +1884,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -1893,6 +1915,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1915,8 +1938,8 @@
             "hi5.com"
         ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1958,6 +1981,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1993,8 +2017,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -2023,6 +2047,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2054,8 +2079,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2082,6 +2107,7 @@
         "@timestamp": "2006-09-08T04:22:33.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2102,8 +2128,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.194.14"
+            "68.142.194.14",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2114,8 +2140,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2144,6 +2170,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2165,8 +2192,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2177,8 +2204,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2207,6 +2234,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2266,6 +2294,7 @@
         "@timestamp": "2006-09-08T04:22:35.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2330,6 +2359,7 @@
         "destination.geo.city_name": "Sacramento",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.6415,
         "destination.geo.location.lon": -121.5114,
         "destination.geo.region_iso_code": "US-CA",
@@ -2395,6 +2425,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2455,6 +2486,7 @@
         "@timestamp": "2006-09-08T04:22:37.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2487,8 +2519,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -2538,8 +2570,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2642,8 +2674,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2723,6 +2755,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2837,6 +2870,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2900,6 +2934,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2920,8 +2955,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2961,6 +2996,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2994,8 +3030,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3024,6 +3060,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3057,8 +3094,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3109,8 +3146,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3161,8 +3198,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3191,6 +3228,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3224,8 +3262,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3254,6 +3292,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3287,8 +3326,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3317,6 +3356,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3338,8 +3378,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3350,8 +3390,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3380,6 +3420,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3401,8 +3442,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3413,8 +3454,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3466,8 +3507,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3519,8 +3560,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3572,8 +3613,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3602,6 +3643,7 @@
         "destination.as.organization.name": "BBC",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.4964,
         "destination.geo.location.lon": -0.1224,
         "destination.ip": [
@@ -3623,8 +3665,8 @@
             "newsrss.bbc.co.uk"
         ],
         "related.ip": [
-            "212.58.226.33",
-            "10.105.21.199"
+            "10.105.21.199",
+            "212.58.226.33"
         ],
         "related.user": [
             "badeyek"
@@ -3665,6 +3707,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3834,6 +3877,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3855,8 +3899,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3866,8 +3910,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -3897,6 +3941,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -3962,6 +4007,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3983,8 +4029,8 @@
             "radio.music.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3995,8 +4041,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4025,6 +4071,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4046,8 +4093,8 @@
             "radio.music.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4058,8 +4105,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4088,6 +4135,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4121,8 +4169,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4227,8 +4275,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -4258,6 +4306,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4281,8 +4330,8 @@
             "us.news1.yimg.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4293,8 +4342,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4323,6 +4372,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4344,8 +4394,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4386,6 +4436,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4450,6 +4501,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4473,8 +4525,8 @@
             "us.a2.yimg.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.152"
+            "213.160.98.152",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4515,6 +4567,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4536,8 +4589,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4576,6 +4629,7 @@
         "@timestamp": "2006-09-08T04:22:54.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4597,8 +4651,8 @@
             "us.bc.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.213.132"
+            "68.142.213.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4637,6 +4691,7 @@
         "@timestamp": "2006-09-08T04:22:56.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4698,6 +4753,7 @@
         "@timestamp": "2006-09-08T04:22:57.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4782,8 +4838,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "304",
@@ -4813,6 +4869,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4836,8 +4893,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4879,6 +4936,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4914,8 +4972,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4944,6 +5002,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4964,8 +5023,8 @@
             "login.yahoo.com"
         ],
         "related.ip": [
-            "209.73.177.115",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.73.177.115"
         ],
         "related.user": [
             "badeyek"
@@ -4975,8 +5034,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5006,6 +5065,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5072,6 +5132,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5095,8 +5156,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5191,6 +5252,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5257,6 +5319,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5323,6 +5386,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5346,8 +5410,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.167"
+            "213.160.98.167",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5358,8 +5422,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5411,8 +5475,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5492,6 +5556,7 @@
         "@timestamp": "2006-09-08T04:23:01.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -5513,8 +5578,8 @@
             "launch.adserver.yahoo.com"
         ],
         "related.ip": [
-            "216.109.125.112",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.109.125.112"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5525,8 +5590,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5555,6 +5620,7 @@
         "destination.as.organization.name": "Yahoo! UK Services Limited",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.4964,
         "destination.geo.location.lon": -0.1224,
         "destination.ip": [
@@ -5576,8 +5642,8 @@
             "uk.f250.mail.yahoo.com"
         ],
         "related.ip": [
-            "217.12.10.96",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.12.10.96"
         ],
         "related.user": [
             "badeyek"
@@ -5639,8 +5705,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5670,6 +5736,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5693,8 +5760,8 @@
             "us.js2.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.169",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.169"
         ],
         "related.user": [
             "badeyek"
@@ -5789,6 +5856,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",

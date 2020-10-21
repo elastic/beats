@@ -45,7 +45,7 @@ require (
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
-	github.com/dgraph-io/badger/v2 v2.2007.2
+	github.com/dgraph-io/badger/v2 v2.2007.3-0.20201012072640-f5a7e0a1c83b
 	github.com/dgrijalva/jwt-go v3.2.1-0.20190620180102-5e25c22bd5d6+incompatible // indirect
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
 	github.com/dlclark/regexp2 v1.1.7-0.20171009020623-7632a260cbaf // indirect
@@ -188,6 +188,7 @@ require (
 
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
+	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20200629123429-0e7b69039eec
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725

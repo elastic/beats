@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/dir"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/atomic"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/hooks"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/tar"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/zip"
@@ -60,5 +61,10 @@ func NewInstaller(config *artifact.Config) (InstallerChecker, error) {
 		return nil, err
 	}
 
-	return hooks.NewInstallerChecker(installer, dir.NewChecker())
+	atomicInstaller, err := atomic.NewInstaller(installer)
+	if err != nil {
+		return nil, err
+	}
+
+	return hooks.NewInstallerChecker(atomicInstaller, dir.NewChecker())
 }

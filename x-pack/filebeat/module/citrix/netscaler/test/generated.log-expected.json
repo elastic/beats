@@ -101,8 +101,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.72.11.247",
-            "10.134.175.248"
+            "10.134.175.248",
+            "10.72.11.247"
         ],
         "rsa.counters.dclass_c1": 1279,
         "rsa.db.index": "antium",
@@ -185,10 +185,10 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.96.119.12",
+            "10.156.210.168",
             "10.21.92.218",
-            "10.83.234.60",
             "10.109.68.21",
-            "10.156.210.168"
+            "10.83.234.60"
         ],
         "related.user": [
             "picia"
@@ -1332,11 +1332,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.45.114.111",
-            "10.180.83.140",
-            "10.243.226.122",
             "10.117.94.131",
-            "10.3.23.172"
+            "10.180.83.140",
+            "10.3.23.172",
+            "10.45.114.111",
+            "10.243.226.122"
         ],
         "related.user": [
             "ehender"
@@ -2085,8 +2085,8 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.225.146.5",
-            "10.41.65.89",
-            "10.80.5.101"
+            "10.80.5.101",
+            "10.41.65.89"
         ],
         "related.user": [
             "picia"
@@ -2209,8 +2209,8 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.33.231.173",
-            "10.183.26.222",
-            "10.22.34.206"
+            "10.22.34.206",
+            "10.183.26.222"
         ],
         "related.user": [
             "abill"
@@ -2585,10 +2585,10 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.148.244.55",
+            "10.76.129.136",
             "10.133.153.174",
-            "10.8.82.22",
             "10.113.135.78",
-            "10.76.129.136"
+            "10.8.82.22"
         ],
         "related.user": [
             "asiar"
@@ -2662,8 +2662,8 @@
         "rsa.db.index": "aturE",
         "rsa.internal.messageid": "APPFW_REFERER_HEADER",
         "rsa.misc.action": [
-            "remip",
-            "cancel"
+            "cancel",
+            "remip"
         ],
         "rsa.misc.policy_name": "oNemoeni",
         "rsa.misc.rule": "citation",
@@ -2938,9 +2938,9 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.29.202.248",
-            "10.161.218.47",
+            "10.206.5.50",
             "10.247.251.223",
-            "10.206.5.50"
+            "10.161.218.47"
         ],
         "rsa.internal.event_desc": "A Server side and a Client side TCP connection is delinked. This is not tracked by Netscaler",
         "rsa.internal.messageid": "TCP_OTHERCONN_DELINK",
@@ -3076,8 +3076,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.148.72.78",
-            "10.37.99.189"
+            "10.37.99.189",
+            "10.148.72.78"
         ],
         "rsa.crypto.cipher_src": "ritatis",
         "rsa.crypto.ssl_ver_src": "ugitsed",

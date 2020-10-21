@@ -59,7 +59,7 @@ func (inp *managedInput) Run(
 	store.Retain()
 	defer store.Release()
 
-	hg := &HarvesterGroup{
+	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      make(map[string]context.CancelFunc),
 		manager:      inp.manager,

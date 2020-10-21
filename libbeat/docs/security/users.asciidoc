@@ -71,6 +71,10 @@ endif::has_ml_jobs[]
 |`manage` on +{beat_default_index_prefix}-*+ indices
 |Set up aliases used by ILM
 
+|Index
+|`write` on +{beat_default_index_prefix}-*+ indices
+|Write {beatname_uc} indices in order to index, update, and delete documents
+
 ifdef::has_ml_jobs[]
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
@@ -96,6 +100,11 @@ need to set up {beatname_uc}:
 
 |`ingest_admin`
 |Set up index templates and, if available, ingest pipelines
+
+ifdef::has_ml_jobs[]
+|`machine_learning_admin`
+|Provide full use of the machine learning APIs and grant read/write access to all machine learning indices
+endif::has_ml_jobs[]
 
 ifdef::apm-server[]
 |`ingest_admin`
