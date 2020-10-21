@@ -116,11 +116,15 @@ func newPathIdentifier(_ *common.Config) (fileIdentifier, error) {
 }
 
 func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	path := e.NewPath
+	if e.Op == loginp.OpDelete {
+		path = e.OldPath
+	}
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                pluginName + identitySep + p.name + identitySep + e.NewPath,
+		name:                pluginName + identitySep + p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}
 }
