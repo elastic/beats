@@ -184,11 +184,11 @@ inputs:
     type: file
     processors:
       - add_fields:
-          target: elastic
+          target: elastic_agent
           fields:
-            agent.id: agent-id
-            agent.snapshot: false
-            agent.version: 8.0.0
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
   - name: With processors
     type: file
     processors:
@@ -197,11 +197,11 @@ inputs:
           fields:
             data: more
       - add_fields:
-          target: elastic
+          target: elastic_agent
           fields:
-            agent.id: agent-id
-            agent.snapshot: false
-            agent.version: 8.0.0
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
 `,
 			rule: &RuleList{
 				Rules: []Rule{
