@@ -715,11 +715,11 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) error {
 
 		// elastic.agent
 		processorMap := &Dict{value: make([]Node, 0)}
-		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic"}})
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
 		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
-			&Key{name: "agent.id", value: &StrVal{value: agentInfo.AgentID()}},
-			&Key{name: "agent.version", value: &StrVal{value: agentInfo.Version()}},
-			&Key{name: "agent.snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+			&Key{name: "version", value: &StrVal{value: agentInfo.Version()}},
+			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
 		}}})
 		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
