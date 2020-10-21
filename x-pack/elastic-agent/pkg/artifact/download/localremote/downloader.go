@@ -17,12 +17,12 @@ import (
 
 // NewDownloader creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewDownloader(log *logger.Logger, config *artifact.Config) download.Downloader {
+func NewDownloader(log *logger.Logger, config *artifact.Config, forceSnapshot bool) download.Downloader {
 	downloaders := make([]download.Downloader, 0, 3)
 	downloaders = append(downloaders, fs.NewDownloader(config))
 
 	// try snapshot repo before official
-	if release.Snapshot() {
+	if release.Snapshot() || forceSnapshot {
 		snapDownloader, err := snapshot.NewDownloader(config)
 		if err != nil {
 			log.Error(err)

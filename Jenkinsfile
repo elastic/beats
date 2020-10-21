@@ -490,7 +490,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */
