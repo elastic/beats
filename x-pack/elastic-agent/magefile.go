@@ -630,7 +630,7 @@ func copyAll(from, to string) error {
 	})
 }
 
-func dockerBuild(tag string) string {
+func dockerBuild(tag string) error {
 	return sh.Run("docker", "build", "-t", tag, ".")
 }
 
