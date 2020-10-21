@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -43,6 +44,7 @@ type Operator struct {
 	bgContext     context.Context
 	pipelineID    string
 	logger        *logger.Logger
+	agentInfo     *info.AgentInfo
 	config        *configuration.SettingsConfig
 	handlers      map[string]handleFunc
 	stateResolver *stateresolver.StateResolver
@@ -66,6 +68,7 @@ type Operator struct {
 func NewOperator(
 	ctx context.Context,
 	logger *logger.Logger,
+	agentInfo *info.AgentInfo,
 	pipelineID string,
 	config *configuration.SettingsConfig,
 	fetcher download.Downloader,
@@ -85,6 +88,7 @@ func NewOperator(
 		config:        config,
 		pipelineID:    pipelineID,
 		logger:        logger,
+		agentInfo:     agentInfo,
 		downloader:    fetcher,
 		verifier:      verifier,
 		installer:     installer,
