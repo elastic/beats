@@ -207,7 +207,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		build.Stdout = nil
 		build.Stderr = &stderr
 		if err := build.Run(); err != nil {
-			fmt.Println(">> Building docker images failed using docker-compose (let's try now with docker-compose up --build): %s", stderr.String())
+			fmt.Printf(">> Building docker images failed using docker-compose (let's try now with docker-compose up --build): %s", stderr.String())
 		}
 	}
 
