@@ -121,9 +121,9 @@ pipeline {
   }
   post {
     success {
-      writeFile file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
+      writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
 COMMIT=${env.GIT_BASE_COMMIT}
-VERSION=${BRANCH_NAME}-SNAPSHOT"""
+VERSION=${BRANCH_NAME}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
     always {

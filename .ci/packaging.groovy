@@ -179,12 +179,13 @@ pipeline {
         }
       }
     }
-  } post {
+  }
+  post {
     success {
-      writeFile file: 'beats-tester.properties', text: """## To be consumed by the beats-tester pipeline
+      writeFile(file: 'beats-tester.properties', text: """## To be consumed by the beats-tester pipeline
 COMMIT=${env.GIT_BASE_COMMIT}
 BEATS_URL_BASE=https://storage.googleapis.com/beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}
-VERSION=${env.JOB_BASE_NAME}-SNAPSHOT"""
+VERSION=${env.JOB_BASE_NAME}-SNAPSHOT""")
       archiveArtifacts artifacts: 'beats-tester.properties'
     }
   }
