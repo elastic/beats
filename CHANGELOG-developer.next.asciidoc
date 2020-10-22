@@ -60,6 +60,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 
 ==== Added
 
+- Add VirusTotal Intelligence Live Hunt module. {issue}21541[21541] {pull}21815[21815]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
