@@ -32,6 +32,8 @@ var:
   - name: tags
     default: [forwarded]
   - name: url
+  - name: keep_state
+    default: false
   - name: initial_interval
     default: 24h
 

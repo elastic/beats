@@ -44,9 +44,13 @@ ssl: {{ .ssl | tojson }}
 url: {{ .url }}
 {{ end }}
 
+{{ if .keep_state }}
 date_cursor.field: published
 date_cursor.url_field: since
+  {{ if .initial_interval }}
 date_cursor.initial_interval: {{ .initial_interval }}
+  {{ end }}
+{{ end }}
 
 {{ else if eq .input "file" }}
 
