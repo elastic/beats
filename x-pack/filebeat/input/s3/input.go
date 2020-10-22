@@ -5,6 +5,7 @@
 package s3
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -67,7 +68,12 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	defer collector.publisher.Close()
 	collector.run()
-	return ctx.Cancelation.Err()
+
+	if ctx.Cancelation.Err() == context.Canceled {
+		return nil
+	} else {
+		return ctx.Cancelation.Err()
+	}
 }
 
 func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
