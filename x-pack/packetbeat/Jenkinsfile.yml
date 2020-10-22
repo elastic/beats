@@ -16,9 +16,9 @@ stages:
 # TODO confirm this works
     Lint:
         make: |
-          make check;
-          make update;
-          make -C ../.. check-no-changes;
+          make -C x-pack/packetbeat check;
+          make -C x-pack/packetbeat update;
+          make check-no-changes;
     windows:
         mage: "mage build unitTest"
         withModule: true

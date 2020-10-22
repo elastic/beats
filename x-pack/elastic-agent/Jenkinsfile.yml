@@ -15,9 +15,9 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         make: |
-          make check;
-          make update;
-          make -C .. check-no-changes;
+          make -C x-pack/elastic-agent check;
+          make -C x-pack/elastic-agent update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

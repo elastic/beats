@@ -15,9 +15,9 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         make: |
-          make check;
-          make update;
-          make -C .. check-no-changes;
+          make -C winlogbeat check;
+          make -C winlogbeat update;
+          make check-no-changes;
     crosscompile:
         make: "make -C winlogbeat crosscompile"
     windows:

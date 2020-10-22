@@ -15,9 +15,11 @@ platform: "windows-2019"       ## default label for all the stages
 stages:
     Lint:
         make: |
-          make check;
-          make update;
-          make -C ../.. check-no-changes;
+          make -C x-pack/winlogbeat check;
+          make -C x-pack/winlogbeat update;
+          make check-no-changes;
+        platforms:             ## override default labels in this specific stage.
+            - "linux && ubuntu-18"
     build:
         mage: "mage build unitTest"
         withModule: true

@@ -15,9 +15,9 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         make: |
-          make check;
-          make update;
-          make -C ../.. check-no-changes;
+          make -C x-pack/dockerlogbeat check;
+          make -C x-pack/dockerlogbeat update;
+          make check-no-changes;
     build:
         mage: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.

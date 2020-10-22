@@ -15,9 +15,9 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         make: |
-          make check;
-          make update;
-          make -C .. check-no-changes;
+          make -C metricbeat check;
+          make -C metricbeat update;
+          make check-no-changes;
     unitTest:
         mage: "mage build unitTest"
     goIntegTest:
