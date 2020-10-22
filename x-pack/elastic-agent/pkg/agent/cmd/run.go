@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -24,6 +25,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	agentName = "elastic-agent"
 )
 
 func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -87,7 +92,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
 	}
 
-	execPath, err := os.Executable()
+	execPath, err := reexecPath()
 	if err != nil {
 		return err
 	}
@@ -145,4 +150,17 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	rex.ShutdownComplete()
 	return err
+}
+
+func reexecPath() (string, error) {
+	// set executable path to symlink instead of binary
+	// in case of updated symlinks we should spin up new agent
+	potentialReexec := filepath.Join(paths.Top(), agentName)
+
+	// in case it does not exists fallback to executable
+	if _, err := os.Stat(potentialReexec); os.IsNotExist(err) {
+		return os.Executable()
+	}
+
+	return potentialReexec, nil
 }
