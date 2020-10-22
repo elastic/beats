@@ -15,6 +15,7 @@ var:
   - name: role_arn
   - name: tags
     default: [forwarded]
+  - name: fips_enabled
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

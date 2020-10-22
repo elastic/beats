@@ -142,6 +142,9 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
   cloudwatch:
     enabled: false
 
@@ -175,6 +178,9 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
 
   ec2:
     enabled: false
@@ -210,6 +216,9 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
   elb:
     enabled: false
 
@@ -243,6 +252,9 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
 
   s3access:
     enabled: false
@@ -278,6 +290,9 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
   vpcflow:
     enabled: false
 
@@ -311,6 +326,9 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
