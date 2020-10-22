@@ -2899,6 +2899,46 @@ https://github.com/elastic/beats/compare/v6.5.0\...v7.0.0-alpha1[View commits]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
 
+[[release-notes-6.8.13]]
+=== Beats version 6.8.13
+https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
+
+==== Added
+
+*Filebeat*
+
+- Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+
+[[release-notes-6.8.12]]
+=== Beats version 6.8.12
+https://github.com/elastic/beats/compare/v6.8.11...v6.8.12[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
+
+[[release-notes-6.8.11]]
+=== Beats version 6.8.11
+https://github.com/elastic/beats/compare/v6.8.10...v6.8.11[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Fix bug incorrect parsing of float numbers as integers in Couchbase module {issue}18949[18949] {pull}19055[19055]
+
+[[release-notes-6.8.10]]
+=== Beats version 6.8.10
+https://github.com/elastic/beats/compare/v6.8.9...v6.8.10[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
+
 [[release-notes-6.8.9]]
 === Beats version 6.8.9
 https://github.com/elastic/beats/compare/v6.8.8\...v6.8.9[View commits]
