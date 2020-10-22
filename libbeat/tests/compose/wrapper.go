@@ -195,22 +195,6 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
 	}
 
-	// Try to build the docker images
-	build := d.cmd(ctx, "build", "--pull", service)
-	build.Stdout = nil
-	build.Stderr = &stderr
-	if err := build.Run(); err != nil {
-		fmt.Println(">> Building docker images again (after 10 seconds)")
-		// This sleep is to avoid hitting the docker build issues when resources are not available.
-		time.Sleep(10)
-		build := d.cmd(ctx, "build", service)
-		build.Stdout = nil
-		build.Stderr = &stderr
-		if err := build.Run(); err != nil {
-			fmt.Printf(">> Building docker images failed using docker-compose (let's try now with docker-compose up --build): %s", stderr.String())
-		}
-	}
-
 	err := d.cmd(ctx, "up", args...).Run()
 	if err != nil {
 		return err
