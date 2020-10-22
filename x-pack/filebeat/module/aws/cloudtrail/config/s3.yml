@@ -55,6 +55,10 @@ role_arn: {{ .role_arn }}
 fips_enabled: {{ .fips_enabled }}
 {{ end }}
 
+{{ if .max_number_of_messages }}
+max_number_of_messages: {{ .max_number_of_messages }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
