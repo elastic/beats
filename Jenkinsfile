@@ -67,7 +67,7 @@ pipeline {
         }
       }
     }
-    stage('Lint-single-node'){
+    stage('Lint'){
       options { skipDefaultCheckout() }
       environment {
         GOFLAGS = '-mod=readonly'
@@ -79,37 +79,6 @@ pipeline {
             cmd(label: "make check-python", script: "make check-python")
             cmd(label: "make check-go", script: "make check-go")
             cmd(label: "Check for changes", script: "make check-no-changes")
-          }
-        }
-      }
-    }
-    stage('Lint-parallel'){
-      options { skipDefaultCheckout() }
-      environment {
-        GOFLAGS = '-mod=readonly'
-      }
-      matrix {
-        agent { label 'ubuntu-18 && immutable' }
-        axes {
-          axis {
-            name MAKE_TARGET
-            values (
-              'check-python',
-              'check-go'
-              )
-          }
-        }
-        stages {
-          stage('Run lint'){
-            steps {
-              withGithubNotify(context: "Lint: ${MAKE_TARGET}") {
-                withBeatsEnv(archive: false, id: "lint-${MAKE_TARGET}") {
-                  dumpVariables()
-                  cmd(label: "make ${MAKE_TARGET}", script: "make ${MAKE_TARGET}")
-                  cmd(label: "Check for changes", script: "make check-no-changes")
-                }
-              }
-            }
           }
         }
       }
