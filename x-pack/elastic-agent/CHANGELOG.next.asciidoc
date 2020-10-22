@@ -16,6 +16,7 @@
 - Include inputs in action store actions {pull}21298[21298]
 - Fix issue where inputs without processors defined would panic {pull}21628[21628]
 - Partial extracted beat result in failure to spawn beat {issue}21718[21718]
+- Use ML_SYSTEM to detect if agent is running as a service {pull}21884[21884]
 - Use local temp instead of system one {pull}21883[21883]
 - Fix issue with named pipes on Windows 7 {pull}21931[21931]
 - Rename monitoring index from `elastic.agent` to `elastic_agent` {pull}21932[21932]
