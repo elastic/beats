@@ -94,7 +94,7 @@ clean: mage
 
 ## check : TBD.
 .PHONY: check
-check: python-env
+check:
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	$(MAKE) check-python
 	# check if vendor folder does not exists
@@ -119,7 +119,7 @@ check-no-changes:
 
 ## check-python : Python Linting.
 .PHONY: check-python
-check-python:
+check-python: python-env
 	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 
