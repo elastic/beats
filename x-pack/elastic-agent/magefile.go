@@ -513,8 +513,13 @@ func runAgent(env map[string]string) error {
 		}
 
 		// build docker image
-		if err := sh.Run("docker", "build", "-t", tag, "."); err != nil {
-			return err
+		if err := dockerBuild(tag); err != nil {
+			fmt.Println(">> Building docker images again (after 10 seconds)")
+			// This sleep is to avoid hitting the docker build issues when resources are not available.
+			time.Sleep(10)
+			if err := dockerBuild(tag); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -623,6 +628,10 @@ func copyAll(from, to string) error {
 		// overwrites with current build
 		return sh.Copy(targetFile, path)
 	})
+}
+
+func dockerBuild(tag string) error {
+	return sh.Run("docker", "build", "-t", tag, ".")
 }
 
 func dockerTag() string {

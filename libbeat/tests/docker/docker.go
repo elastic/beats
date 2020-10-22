@@ -19,6 +19,8 @@ package docker
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
 
 	"github.com/pkg/errors"
 
@@ -42,13 +44,12 @@ func NewClient() (Client, error) {
 
 // ContainerStart pulls and starts the given container
 func (c Client) ContainerStart(image string, cmd []string, labels map[string]string) (string, error) {
-	ctx := context.Background()
-	respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	err := c.imagePull(image)
 	if err != nil {
-		return "", errors.Wrapf(err, "pullling image %s", image)
+		return "", err
 	}
-	defer respBody.Close()
 
+	ctx := context.Background()
 	resp, err := c.cli.ContainerCreate(ctx, &container.Config{
 		Image:  image,
 		Cmd:    cmd,
@@ -63,6 +64,36 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 	}
 
 	return resp.ID, nil
+}
+
+// imagePull pulls an image
+func (c Client) imagePull(image string) (err error) {
+	ctx := context.Background()
+	_, _, err = c.cli.ImageInspectWithRaw(ctx, image)
+	if err == nil {
+		// Image already available, do nothing
+		return nil
+	}
+	for retry := 0; retry < 3; retry++ {
+		err = func() error {
+			respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
+			if err != nil {
+				return errors.Wrapf(err, "pullling image %s", image)
+			}
+			defer respBody.Close()
+
+			// Read all the response, to be sure that the pull has finished before returning.
+			_, err = io.Copy(ioutil.Discard, respBody)
+			if err != nil {
+				return errors.Wrapf(err, "reading response for image %s", image)
+			}
+			return nil
+		}()
+		if err == nil {
+			break
+		}
+	}
+	return
 }
 
 // ContainerWait waits for a container to finish
@@ -89,7 +120,7 @@ func (c Client) ContainerKill(ID string) error {
 	return c.cli.ContainerKill(ctx, ID, "KILL")
 }
 
-// ContainerRemove kills and removed the given container
+// ContainerRemove kills and removes the given container
 func (c Client) ContainerRemove(ID string) error {
 	ctx := context.Background()
 	return c.cli.ContainerRemove(ctx, ID, types.ContainerRemoveOptions{
