@@ -73,6 +73,7 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       matrix {
+        agent { label 'ubuntu-18 && immutable' }
         axes {
           axis {
             name MAKE_TARGET
