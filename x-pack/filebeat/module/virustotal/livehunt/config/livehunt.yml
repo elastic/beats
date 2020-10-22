@@ -9,6 +9,15 @@ json_objects_array: data
 interval: 1m
 {{ end }}
 
+{{ if eq .input "file" }}
+type: log
+paths:
+  {{ range $i, $path := .paths }}
+- {{$path}}
+  {{ end }}
+exclude_files: [".gz$"]
+{{ end }}
+
 {{ if eq .input "kafka" }}
 type: kafka
 hosts:
@@ -23,6 +32,11 @@ group_id: "{{ .kafka_groupid }}"
 {{ end }}
 
 processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.6.0
+
   - rename:
       fields:
         - {from: message, to: event.original}
@@ -64,6 +78,7 @@ processors:
         - {from: virustotal.attributes.sha1,   to: file.hash.sha1}
         - {from: virustotal.attributes.sha256, to: file.hash.sha256}
         - {from: virustotal.attributes.ssdeep, to: file.hash.ssdeep}
+        - {from: virustotal.attributes.tlsh,   to: file.hash.tlsh}
 
         # Notification Info
         - {from: virustotal.context_attributes.notification_snippet, to: virustotal.notification.snippet}
@@ -127,17 +142,6 @@ processors:
         - virustotal.attributes.creation_date
         - virustotal.attributes.meaningful_name
         - virustotal.links
-
-  # - drop_fields:
-  #     ignore_missing: True
-  #     fields:
-  #       - rule.tags
-  #     when:
-  #       or:
-  #         - equals:
-  #             rule.tags: []
-  #         - equals:
-  #             rule.tags: ""
 
   - if:
       has_fields: ["virustotal.attributes.elf_info"]
