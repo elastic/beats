@@ -14,6 +14,8 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
+        ## Integration Testing is broken https://github.com/elastic/beats/issues/21961
+        #make: "RACE_DETECTOR=1 make -C metricbeat check testsuite integration-tests-environment"
         make: "RACE_DETECTOR=1 make -C metricbeat check testsuite integration-tests-environment"
     crosscompile:
         make: "make -C metricbeat crosscompile"
