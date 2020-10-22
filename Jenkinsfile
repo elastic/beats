@@ -67,7 +67,23 @@ pipeline {
         }
       }
     }
-    stage('Lint'){
+    stage('Lint-single-node'){
+      options { skipDefaultCheckout() }
+      environment {
+        GOFLAGS = '-mod=readonly'
+      }
+      steps {
+        withGithubNotify(context: "Lint: 02") {
+          withBeatsEnv(archive: false, id: "lint-02") {
+            dumpVariables()
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
+          }
+        }
+      }
+    }
+    stage('Lint-parallel'){
       options { skipDefaultCheckout() }
       environment {
         GOFLAGS = '-mod=readonly'
@@ -78,8 +94,6 @@ pipeline {
           axis {
             name MAKE_TARGET
             values (
-              '-C deploy/kubernetes all',
-              '-C dev-tools check',
               'check-python',
               'check-go'
               )
