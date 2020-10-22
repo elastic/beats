@@ -51,7 +51,12 @@ var exif_lookup = {
     "CPUCount": "cpu_count",
     "CPUType": "cpu_type",
     "CPUSubtype": "cpu_subtype",
-    "ObjectFlags": "object_flags"
+    "ObjectFlags": "object_flags",
+    // Text files
+    "LineCount": "line_count",
+    "MIMEEncoding": "mime_encoding",
+    "WordCount": "word_count",
+    "NewLines": "new_lines"
 };
 
 var type_lookup = {
@@ -170,6 +175,7 @@ var type_lookup = {
     "dyalog": "text/x-dyalog",
     "fortran": "text/x-fortran",
     "java-bytecode": "application/java-vm",
+    "vba": "text/x-vba",
 
     // Apple
     "mac": "application/macbinary",
