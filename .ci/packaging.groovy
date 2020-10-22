@@ -43,7 +43,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -98,7 +98,7 @@ pipeline {
             }
             stages {
               stage('Package Linux'){
-                agent { label 'ubuntu && immutable' }
+                agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
                 when {
                   beforeAgent true
@@ -160,7 +160,7 @@ pipeline {
           }
         }
         stage('Run E2E Tests for Packages'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           steps {
             runE2ETests()
