@@ -15809,7 +15809,7 @@ alias to: elasticsearch.node.name
 
 --
 
-*`job.stats.job_id`*::
+*`job_stats.job_id`*::
 +
 --
 type: alias
