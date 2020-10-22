@@ -13,6 +13,12 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
+# TODO confirm this works
+    Lint:
+        make: |
+          make check;
+          make update;
+          make -C ../.. check-no-changes;
     windows:
         mage: "mage build unitTest"
         withModule: true

@@ -96,17 +96,32 @@ clean: mage
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	$(MAKE) check-python
 	# check if vendor folder does not exists
 	[ ! -d vendor ]
-	@# Validate that all updates were committed
+	# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
-	go mod tidy
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
+## ccheck-go : Check there is no changes in Go modules.
+.PHONY: check-go
+check-go:
+	@go mod tidy
+
+## ccheck-no-changes : Check there is no local changes.
+.PHONY: check-no-changes
+check-no-changes:
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
+
+## check-python : Python Linting.
+.PHONY: check-python
+check-python:
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 
 ## check-headers : Check the license headers.
 .PHONY: check-headers

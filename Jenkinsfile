@@ -72,11 +72,29 @@ pipeline {
       environment {
         GOFLAGS = '-mod=readonly'
       }
-      steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
-            dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+      matrix {
+        axes {
+          axis {
+            name MAKE_TARGET
+            values (
+              '-C deploy/kubernetes all',
+              '-C dev-tools check',
+              'check-python',
+              'check-go'
+              )
+          }
+        }
+        stages {
+          stage('Run lint'){
+            steps {
+              withGithubNotify(context: "Lint: ${MAKE_TARGET}") {
+                withBeatsEnv(archive: false, id: "lint-${MAKE_TARGET}") {
+                  dumpVariables()
+                  cmd(label: "make ${MAKE_TARGET}", script: "make ${MAKE_TARGET}")
+                  cmd(label: "Check for changes", script: "make check-no-changes")
+                }
+              }
+            }
           }
         }
       }
@@ -489,7 +507,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */
