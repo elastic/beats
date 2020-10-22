@@ -83,6 +83,9 @@ pipeline {
               }
             }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+            dir("${BASE_DIR}"){
+              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+            }
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
         }
@@ -142,7 +145,9 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    pushCIDockerImages()
+                    dir("${BASE_DIR}") {
+                      pushCIDockerImages()
+                    }
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
@@ -188,7 +193,7 @@ pipeline {
           writeFile(file: 'beats-tester.properties', text: """## To be consumed by the beats-tester pipeline
     COMMIT=${env.GIT_BASE_COMMIT}
     BEATS_URL_BASE=https://storage.googleapis.com/beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}
-    VERSION=${env.JOB_BASE_NAME}-SNAPSHOT""")
+    VERSION=${env.VERSION}-SNAPSHOT""")
           archiveArtifacts artifacts: 'beats-tester.properties'
         }
       }
@@ -217,7 +222,7 @@ def pushCIDockerImages(){
 }
 
 def tagAndPush(beatName){
-  def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
+  def libbetaVer = sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim()
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
     aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version

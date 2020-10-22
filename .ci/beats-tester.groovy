@@ -96,6 +96,7 @@ pipeline {
 def runBeatsTesterJob(Map args = [:]) {
   def apm = args.get('apm', '')
   def beats = args.get('beats', '')
+  def version = args.version
 
   if (isUpstreamTrigger()) {
     copyArtifacts(filter: 'beats-tester.properties',
@@ -105,15 +106,16 @@ def runBeatsTesterJob(Map args = [:]) {
     def props = readProperties(file: 'beats-tester.properties')
     apm = props.get('APM_URL_BASE', '')
     beats = props.get('BEATS_URL_BASE', '')
+    version = props.get('VERSION', '8.0.0-SNAPSHOT')
   }
   if (apm?.trim() || beats?.trim()) {
     build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
           parameters: [
             string(name: 'APM_URL_BASE', value: apm),
             string(name: 'BEATS_URL_BASE', value: beats),
-            string(name: 'VERSION', value: args.version)
+            string(name: 'VERSION', value: version)
           ])
   } else {
-    build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false, parameters: [ string(name: 'VERSION', value: args.version) ])
+    build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false, parameters: [ string(name: 'VERSION', value: version) ])
   }
 }
