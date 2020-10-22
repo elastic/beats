@@ -102,7 +102,7 @@ def runBeatsTesterJob(Map args = [:]) {
                   flatten: true,
                   projectName: "Beats/packaging/${env.JOB_BASE_NAME}",
                   selector: upstream(fallbackToLastSuccessful: true))
-    def props = readProperties('beats-tester.properties')
+    def props = readProperties(file: 'beats-tester.properties')
     apm = props.get('APM_URL_BASE', '')
     beats = props.get('BEATS_URL_BASE', '')
   }

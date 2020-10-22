@@ -67,12 +67,17 @@ pipeline {
             deleteDir()
             script {
               if(isUpstreamTrigger()) {
-                copyArtifacts(filter: 'packaging.properties',
-                              flatten: true,
-                              projectName: "Beats/beats/${env.JOB_BASE_NAME}",
-                              selector: upstream(fallbackToLastSuccessful: true))
-                def props = readProperties('packaging.properties')
-                gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
+                try {
+                  copyArtifacts(filter: 'packaging.properties',
+                                flatten: true,
+                                projectName: "Beats/beats/${env.JOB_BASE_NAME}",
+                                selector: upstream(fallbackToLastSuccessful: true))
+                  def props = readProperties(file: 'packaging.properties')
+                  gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
+                } catch(err) {
+                  // Fallback to the head of the branch as used to be.
+                  gitCheckout(basedir: "${BASE_DIR}")
+                }
               } else {
                 gitCheckout(basedir: "${BASE_DIR}")
               }
