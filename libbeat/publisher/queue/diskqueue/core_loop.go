@@ -330,10 +330,7 @@ func (dq *diskQueue) maybeWritePending() {
 	// Remove everything from pendingFrames and forward it to the writer loop.
 	frames := dq.pendingFrames
 	dq.pendingFrames = nil
-
-	dq.writerLoop.requestChan <- writerLoopRequest{
-		frames: frames,
-	}
+	dq.writerLoop.requestChan <- writerLoopRequest{frames: frames}
 
 	// Compute the size of the request so we know how full the queue is going
 	// to be.
@@ -437,7 +434,6 @@ func (dq *diskQueue) enqueueWriteFrame(frame *writeFrame) {
 		segment = dq.segments.writing[len(dq.segments.writing)-1]
 	}
 	frameLen := segmentOffset(frame.sizeOnDisk())
-
 	// If segment is nil, or the new segment exceeds its bounds,
 	// we need to create a new writing segment.
 	if segment == nil ||
