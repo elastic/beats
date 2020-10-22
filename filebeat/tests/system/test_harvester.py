@@ -18,6 +18,7 @@ Test Harvesters
 class Test(BaseTest):
 
     def test_close_renamed(self):
+        t.Fatal("for testing the flaky test reporting for an existing flaky test")
         """
         Checks that a file is closed when its renamed / rotated
         """
