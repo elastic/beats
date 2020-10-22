@@ -7,14 +7,13 @@
 package pkg
 
 import (
+	"debug/elf"
 	"errors"
 	"fmt"
 	"runtime"
 	"strings"
 	"time"
 	"unsafe"
-
-	"debug/elf"
 
 	"github.com/coreos/pkg/dlopen"
 )
@@ -257,7 +256,7 @@ func openLibrpm() (*librpm, error) {
 
 	librpm.handle, err = dlopen.GetHandle(librpmNames)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't open %v", librpmNames)
+		return nil, fmt.Errorf("couldn't open %v: %v", librpmNames, err)
 	}
 
 	librpm.rpmtsCreate, err = librpm.handle.GetSymbolPointer("rpmtsCreate")
