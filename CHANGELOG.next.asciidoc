@@ -378,6 +378,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix azure storage event format. {pull}21845[21845]
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
+- Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
+- Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
 
 *Packetbeat*
 
@@ -820,3 +822,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
