@@ -32,6 +32,8 @@ type mqttInputConfig struct {
 	Username string `config:"username"`
 	Password string `config:"password"`
 
+	CleanSession bool `config:"cleansession"`
+
 	TLS *tlscommon.Config `config:"ssl"`
 }
 
