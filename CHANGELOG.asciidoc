@@ -2907,7 +2907,7 @@ https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
 
 *Filebeat*
 
-- Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add container image in Kubernetes metadata. {pull}13356[13356] {issue}12688[12688]
 
 [[release-notes-6.8.12]]
 === Beats version 6.8.12
