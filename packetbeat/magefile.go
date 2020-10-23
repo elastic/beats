@@ -100,12 +100,12 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseElasticBeatPackaging()
+	devtools.UseElasticBeatOSSPackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	packetbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
