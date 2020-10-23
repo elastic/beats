@@ -159,8 +159,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 	for {
 		select {
 		case <-c.cancellation.Done():
+			fmt.Println("------- c.cancellation.Done()")
 			return nil
 		case err := <-errC:
+			fmt.Println("------- err = ", err)
 			if err != nil {
 				if err == context.DeadlineExceeded {
 					c.logger.Info("Context deadline exceeded, updating visibility timeout")
