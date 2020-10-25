@@ -142,6 +142,7 @@ func New(
 	queueFactory queueFactory,
 	out outputs.Group,
 	settings Settings,
+	cfg *common.Config,
 ) (*Pipeline, error) {
 	var err error
 
@@ -184,7 +185,7 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(beat, monitors, p.observer, p.queue)
+	p.output = newOutputController(beat, monitors, p.observer, p.queue, cfg)
 	p.output.Set(out)
 
 	return p, nil

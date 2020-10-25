@@ -342,6 +342,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		b.Config.Pipeline,
 		b.processing,
 		b.makeOutputFactory(b.Config.Output),
+		b.RawConfig,
 	)
 
 	if err != nil {

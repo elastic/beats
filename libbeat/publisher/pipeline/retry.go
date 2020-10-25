@@ -19,6 +19,9 @@ package pipeline
 
 import (
 	"sync"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // retryer is responsible for accepting and managing failed send attempts. It
@@ -40,6 +43,9 @@ type retryer struct {
 	out        workQueue
 	in         retryQueue
 	doneWaiter sync.WaitGroup
+
+	MaxBackoff      time.Duration `config:"maxbackoff"`
+	lastBackoffTime time.Time
 }
 
 type interruptor interface {
@@ -79,6 +85,7 @@ func newRetryer(
 	observer outputObserver,
 	out workQueue,
 	c interruptor,
+	cfg *common.Config,
 ) *retryer {
 	r := &retryer{
 		logger:     log,
@@ -90,6 +97,12 @@ func newRetryer(
 		consumer:   c,
 		doneWaiter: sync.WaitGroup{},
 	}
+	if cfg.Enabled() {
+		if rcfg, err := cfg.Child("retryer", -1); err == nil && rcfg.Enabled() {
+			rcfg.Unpack(&r)
+		}
+	}
+
 	r.doneWaiter.Add(1)
 	go r.loop()
 	return r
@@ -129,6 +142,8 @@ func (r *retryer) loop() {
 		numOutputs int
 
 		log = r.logger
+
+		currentBackoff = time.Duration(1) * time.Second
 	)
 
 	for {
@@ -166,6 +181,7 @@ func (r *retryer) loop() {
 				activeSize = len(active.Events())
 				if !consumerBlocked {
 					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
+					r.backoff(&currentBackoff)
 				}
 			}
 
@@ -224,6 +240,21 @@ func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	}
 
 	return consumerBlocked
+}
+
+func (r *retryer) backoff(currentBackoff *time.Duration) {
+	// after working properly for a good while, reset current backoff second
+	if time.Now().Unix()-r.lastBackoffTime.Unix() > int64(2*r.MaxBackoff) {
+		*currentBackoff = 1 * time.Second
+	}
+	time.Sleep(*currentBackoff)
+	if *currentBackoff < r.MaxBackoff {
+		*currentBackoff *= 2                // 1,2,4,8...
+		if *currentBackoff > r.MaxBackoff { // up to maxBackoffSec
+			*currentBackoff = time.Duration(r.MaxBackoff.Nanoseconds())
+		}
+	}
+	r.lastBackoffTime = time.Now()
 }
 
 func blockConsumer(numOutputs, numBatches int) bool {

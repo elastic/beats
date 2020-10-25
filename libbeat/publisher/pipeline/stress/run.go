@@ -79,6 +79,7 @@ func RunTests(
 			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
+		nil,
 	)
 	if err != nil {
 		return fmt.Errorf("loading pipeline failed: %+v", err)

@@ -66,6 +66,7 @@ func newOutputController(
 	monitors Monitors,
 	observer outputObserver,
 	queue queue.Queue,
+	cfg *common.Config,
 ) *outputController {
 	c := &outputController{
 		beat:      beat,
@@ -77,7 +78,8 @@ func newOutputController(
 
 	ctx := &batchContext{}
 	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer)
+	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer, cfg)
+
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 

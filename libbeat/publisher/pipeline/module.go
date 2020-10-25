@@ -65,6 +65,7 @@ func Load(
 	config Config,
 	processors processing.Supporter,
 	makeOutput func(outputs.Observer) (string, outputs.Group, error),
+	cfg *common.Config,
 ) (*Pipeline, error) {
 
 	settings := Settings{
@@ -73,7 +74,7 @@ func Load(
 		Processors:    processors,
 	}
 
-	return LoadWithSettings(beatInfo, monitors, config, makeOutput, settings)
+	return LoadWithSettings(beatInfo, monitors, config, makeOutput, settings, cfg)
 }
 
 // LoadWithSettings is the same as Load, but it exposes a Settings object that includes processors and WaitClose behavior
@@ -83,6 +84,7 @@ func LoadWithSettings(
 	config Config,
 	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 	settings Settings,
+	cfg *common.Config,
 ) (*Pipeline, error) {
 	log := monitors.Logger
 	if log == nil {
@@ -105,7 +107,7 @@ func LoadWithSettings(
 		return nil, err
 	}
 
-	p, err := New(beatInfo, monitors, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, queueBuilder, out, settings, cfg)
 	if err != nil {
 		return nil, err
 	}

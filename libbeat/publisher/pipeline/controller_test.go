@@ -76,6 +76,7 @@ func TestOutputReload(t *testing.T) {
 					queueFactory,
 					outputs.Group{},
 					Settings{},
+					nil,
 				)
 				require.NoError(t, err)
 				defer pipeline.Close()

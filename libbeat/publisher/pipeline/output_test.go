@@ -30,6 +30,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -53,7 +54,8 @@ func TestMakeClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logger, nilObserver, wqu, nil)
+				common.NewConfig()
+				retryer := newRetryer(logger, nilObserver, wqu, nil, nil)
 				defer retryer.close()
 
 				var published atomic.Uint
@@ -115,7 +117,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logger, nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu, nil, nil)
 				defer retryer.close()
 
 				var batches []publisher.Batch
@@ -215,7 +217,7 @@ func TestMakeClientTracer(t *testing.T) {
 	logger := makeBufLogger(t)
 
 	wqu := makeWorkQueue()
-	retryer := newRetryer(logger, nilObserver, wqu, nil)
+	retryer := newRetryer(logger, nilObserver, wqu, nil, nil)
 	defer retryer.close()
 
 	var published atomic.Uint
