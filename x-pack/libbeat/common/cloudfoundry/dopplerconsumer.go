@@ -31,6 +31,10 @@ type DopplerConsumer struct {
 	consumer       *consumer.Consumer
 	tokenRefresher consumer.TokenRefresher
 
+	bufferSize      int
+	consumerWorkers int
+	handlerWorkers  int
+
 	log     *logp.Logger
 	wg      sync.WaitGroup
 	stop    chan struct{}
@@ -48,11 +52,15 @@ func newDopplerConsumer(address string, id string, log *logp.Logger, client *htt
 	c.SetDebugPrinter(newLogpDebugPrinter(log))
 
 	return &DopplerConsumer{
+		log:            log,
 		subscriptionID: id,
 		consumer:       c,
 		tokenRefresher: tr,
 		callbacks:      callbacks,
-		log:            log,
+
+		bufferSize:      2048,
+		consumerWorkers: 16,
+		handlerWorkers:  4,
 	}, nil
 }
 
@@ -65,33 +73,46 @@ func (c *DopplerConsumer) Run() {
 	c.stop = make(chan struct{})
 
 	if c.callbacks.Log != nil {
-		c.wg.Add(1)
-		go func() {
-			defer c.wg.Done()
-			c.logsFirehose()
-		}()
+		c.logsFirehose()
 	}
 
 	if c.callbacks.Metric != nil {
-		c.wg.Add(1)
-		go func() {
-			defer c.wg.Done()
-			c.metricsFirehose()
-		}()
+		c.metricsFirehose()
 	}
 
 	c.started = true
 }
 
 func (c *DopplerConsumer) logsFirehose() {
-	c.firehose(c.callbacks.Log, consumer.LogMessages)
+	c.firehoseWorkers(c.callbacks.Log, consumer.LogMessages)
 }
 
 func (c *DopplerConsumer) metricsFirehose() {
-	c.firehose(c.callbacks.Metric, consumer.Metrics)
+	c.firehoseWorkers(c.callbacks.Metric, consumer.Metrics)
 }
 
-func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeFilter) {
+func (c *DopplerConsumer) firehoseWorkers(cb func(evt Event), filter consumer.EnvelopeFilter) {
+	msgChan := make(chan *events.Envelope, c.bufferSize)
+	errChan := make(chan error)
+
+	for i := 0; i < c.consumerWorkers; i++ {
+		c.wg.Add(1)
+		go func() {
+			defer c.wg.Done()
+			c.firehoseConsumer(filter, msgChan, errChan)
+		}()
+	}
+
+	for i := 0; i < c.handlerWorkers; i++ {
+		c.wg.Add(1)
+		go func() {
+			defer c.wg.Done()
+			c.firehoseHandler(cb, msgChan, errChan)
+		}()
+	}
+}
+
+func (c *DopplerConsumer) firehoseConsumer(filter consumer.EnvelopeFilter, dstMsgChan chan<- *events.Envelope, dstErrChan chan<- error) {
 	var msgChan <-chan *events.Envelope
 	var errChan <-chan error
 	filterFn := filterNoFilter
@@ -105,12 +126,26 @@ func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeF
 	} else {
 		msgChan, errChan = c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
 	}
+
 	for {
 		select {
 		case env := <-msgChan:
 			if !filterFn(env) {
 				continue
 			}
+			dstMsgChan <- env
+		case err := <-errChan:
+			dstErrChan <- err
+		case <-c.stop:
+			return
+		}
+	}
+}
+
+func (c *DopplerConsumer) firehoseHandler(cb func(evt Event), msgChan <-chan *events.Envelope, errChan <-chan error) {
+	for {
+		select {
+		case env := <-msgChan:
 			event := envelopeToEvent(env)
 			if event == nil {
 				c.log.Debugf("Envelope couldn't be converted to event: %+v", env)
@@ -131,6 +166,7 @@ func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeF
 			return
 		}
 	}
+
 }
 
 func filterNoFilter(*events.Envelope) bool { return true }
