@@ -77,6 +77,7 @@ pipeline {
           withBeatsEnv(archive: false, id: 'lint') {
             dumpVariables()
             cmd(label: 'make check', script: 'make check')
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
           }
         }
       }
@@ -121,12 +122,9 @@ pipeline {
   }
   post {
     success {
-      dir("${BASE_DIR}"){
-        setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-      }
       writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
 COMMIT=${env.GIT_BASE_COMMIT}
-VERSION=${VERSION}-SNAPSHOT""")
+VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
     always {
