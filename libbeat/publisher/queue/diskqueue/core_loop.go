@@ -93,10 +93,10 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
 	frameSize := request.frame.sizeOnDisk()
-	if dq.settings.MaxSegmentSize < frameSize {
+	if dq.settings.maxSegmentOffset() < segmentOffset(frameSize) {
 		dq.logger.Warnf(
-			"Rejecting event with size %v because the maximum segment size is %v",
-			frameSize, dq.settings.MaxSegmentSize)
+			"Rejecting event with size %v because the segment buffer limit is %v",
+			frameSize, dq.settings.maxSegmentOffset())
 		request.responseChan <- false
 		return
 	}
@@ -326,13 +326,19 @@ func (dq *diskQueue) maybeWritePending() {
 		// Nothing to do right now
 		return
 	}
+
 	// Remove everything from pendingFrames and forward it to the writer loop.
 	frames := dq.pendingFrames
 	dq.pendingFrames = nil
+	dq.writerLoop.requestChan <- writerLoopRequest{frames: frames}
 
-	dq.writerLoop.requestChan <- writerLoopRequest{
-		frames: frames,
+	// Compute the size of the request so we know how full the queue is going
+	// to be.
+	totalSize := uint64(0)
+	for _, sf := range frames {
+		totalSize += sf.frame.sizeOnDisk()
 	}
+	dq.writeRequestSize = totalSize
 	dq.writing = true
 }
 
@@ -471,8 +477,12 @@ func (dq *diskQueue) canAcceptFrameOfSize(frameSize uint64) bool {
 	// left in the queue after accounting for the existing segments and the
 	// pending writes that were already accepted.
 	pendingBytes := uint64(0)
-	for _, request := range dq.pendingFrames {
-		pendingBytes += request.frame.sizeOnDisk()
+	for _, sf := range dq.pendingFrames {
+		pendingBytes += sf.frame.sizeOnDisk()
+	}
+	// If a writing request is outstanding, include it in the size total.
+	if dq.writing {
+		pendingBytes += dq.writeRequestSize
 	}
 	currentSize := pendingBytes + dq.segments.sizeOnDisk()
 

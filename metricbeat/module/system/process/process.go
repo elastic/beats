@@ -150,22 +150,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			rootFields.Put("process.args", args)
 		}
 
-		// This is a temporary fix until we make these changes global across libbeat
-		// This logic should happen in libbeat getProcessEvent()
-
-		// There's some more Windows memory quirks we need to deal with.
-		// "rss" is a linux concept, but "wss" is a direct match on Windows.
-		// "share" is also unavailable on Windows.
+		// "share" is unavailable on Windows.
 		if runtime.GOOS == "windows" {
 			proc.Delete("memory.share")
-		}
-
-		if m.IsAgent {
-			if runtime.GOOS == "windows" {
-				if setSize := getAndRemove(proc, "memory.rss"); setSize != nil {
-					proc.Put("memory.wss", setSize)
-				}
-			}
 		}
 
 		e := mb.Event{
