@@ -33,7 +33,14 @@ func init() {
 }
 
 // Update updates the generated files.
-func Update() {}
+func Update() {
+	mg.SerialDeps(packetbeat.FieldsYML, Dashboards)
+}
+
+// Dashboards packages kibana dashboards
+func Dashboards() error {
+	return devtools.KibanaDashboards("protos")
+}
 
 // Build builds the Beat binary.
 func Build() error {
