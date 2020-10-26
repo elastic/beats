@@ -1,0 +1,60 @@
+name: Packetbeat
+cmd: packetbeat
+args: ['-E', 'setup.ilm.enabled=false', '-E', 'setup.template.enabled=false', '-E', 'management.mode=x-pack-fleet', '-E', 'management.enabled=true', '-E', 'logging.level=debug']
+artifact: beats/packetbeat
+rules:
+  - fix_stream: {}
+  - inject_index:
+      type: logs
+
+  - inject_stream_processor:
+      on_conflict: insert_after
+      type: logs
+
+  - rename:
+      from: inputs
+      to: inputsstreams
+
+  - map:
+      path: inputsstreams
+      rules:
+        - copy_all_to_list:
+            to: streams
+            on_conflict: noop
+            except: ['streams', 'id', 'enabled', 'processors']
+        - copy_to_list:
+            item: processors
+            to: streams
+            on_conflict: insert_before
+
+  - extract_list_items:
+      path: inputsstreams
+      item: streams
+      to: inputs
+
+  - filter_values_with_regexp:
+      key: type
+      re: ^network/.+
+      selector: inputs
+
+  - filter_values:
+      selector: inputs
+      key: enabled
+      values:
+        - true
+
+  - inject_agent_info: {}
+
+  - copy:
+      from: inputs
+      to: packetbeat
+
+  - filter:
+      selectors:
+        - packetbeat
+        - output
+        - keystore
+
+when: length(${packetbeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
+  'kafka', 'logstash')
+

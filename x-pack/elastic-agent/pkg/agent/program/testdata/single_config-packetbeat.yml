@@ -1,0 +1,66 @@
+packetbeat:
+  inputs:
+  - type: network/flow
+    id: network/flows-flow.network
+    index: logs-flow.network-default
+    timeout: 10s
+    period: 10s
+    keep_null: false
+    data_stream:
+      dataset: flow.network
+      type: logs
+    processors:
+      - add_fields:
+          target: 'data_stream'
+          fields:
+            type: logs
+            dataset: flow.network
+            namespace: default
+      - add_fields:
+          target: 'event'
+          fields:
+            dataset: flow.network
+      - add_fields:
+          target: 'elastic_agent'
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
+  - type: network/icmp
+    id: network/icmp-icmp.network
+    index: logs-icmp.network-default
+    data_stream:
+      dataset: icmp.network
+      type: logs
+    meta:
+      package:
+        name: icmp
+        version: 0.2.4
+    name: icmp-1
+    revision: 1
+    processors:
+      - add_fields:
+          target: 'data_stream'
+          fields:
+            type: logs
+            dataset: icmp.network
+            namespace: default
+      - add_fields:
+          target: 'event'
+          fields:
+            dataset: icmp.network
+      - add_fields:
+          target: 'elastic_agent'
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
+output:
+  elasticsearch:
+    hosts:
+      - 127.0.0.1:9200
+      - 127.0.0.1:9300
+    username: elastic
+    password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
