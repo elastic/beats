@@ -20,6 +20,10 @@ Each event is annotated with:
 * Organization ID
 * Organization Name
 
+Some Cloud Foundry deployments include this metadata in all events from
+the firehose. In these cases the `add_cloudfoundry_metadata` processor doesn't
+modify these fields.
+
 
 [source,yaml]
 -------------------------------------------------------------------------------
