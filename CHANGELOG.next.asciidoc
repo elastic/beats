@@ -442,6 +442,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
 - Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
 - Fix catchall bucket config errors by adding more validation. {issue}17572[16282] {pull}20887[16287]
+- Fix Google Cloud Function configuration issue. {issue}20864[20864] {pull}22156[22156]
 
 ==== Added
 
