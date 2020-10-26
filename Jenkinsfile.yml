@@ -8,7 +8,7 @@ projects:
     - "libbeat"
     - "metricbeat"
     - "packetbeat"
-    ##- "winlogbeat"          See https://github.com/elastic/beats/issues/22046
+    - "winlogbeat"
     - "x-pack/auditbeat"
     - "x-pack/dockerlogbeat"
     - "x-pack/elastic-agent"
