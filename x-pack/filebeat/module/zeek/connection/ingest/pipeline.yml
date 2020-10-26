@@ -115,7 +115,7 @@ processors:
           - connection
           - start
           - end
-      REG:
+      REJ:
         conn_str: "Connection attempt rejected."
         types:
           - connection
