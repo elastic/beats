@@ -36,7 +36,7 @@ func (m inputManager) Init(grp unison.Group, mode v2.Mode) error {
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
 func (m inputManager) Create(cfg *common.Config) (v2.Input, error) {
-	var config config
+	config := newDefaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
