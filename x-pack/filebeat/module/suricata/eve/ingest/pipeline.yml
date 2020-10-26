@@ -247,27 +247,27 @@ processors:
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.C
-      target_field: file.x509.issuer.country
+      target_field: tls.server.x509.issuer.country
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.CN
-      target_field: file.x509.issuer.common_name
+      target_field: tls.server.x509.issuer.common_name
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.L
-      target_field: file.x509.issuer.locality
+      target_field: tls.server.x509.issuer.locality
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.O
-      target_field: file.x509.issuer.organization
+      target_field: tls.server.x509.issuer.organization
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.OU
-      target_field: file.x509.issuer.organizational_unit
+      target_field: tls.server.x509.issuer.organizational_unit
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.ST
-      target_field: file.x509.issuer.state_or_province
+      target_field: tls.server.x509.issuer.state_or_province
       ignore_missing: true
   - gsub:
       field: suricata.eve.tls.subject
@@ -282,34 +282,34 @@ processors:
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.C
-      target_field: file.x509.subject.country
+      target_field: tls.server.x509.subject.country
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.CN
-      target_field: file.x509.subject.common_name
+      target_field: tls.server.x509.subject.common_name
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.L
-      target_field: file.x509.subject.locality
+      target_field: tls.server.x509.subject.locality
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.O
-      target_field: file.x509.subject.organization
+      target_field: tls.server.x509.subject.organization
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.OU
-      target_field: file.x509.subject.organizational_unit
+      target_field: tls.server.x509.subject.organizational_unit
       ignore_missing: true
   - rename:
       field: suricata.eve.tls.kv_subject.ST
-      target_field: file.x509.subject.state_or_province
+      target_field: tls.server.x509.subject.state_or_province
       ignore_missing: true
   - set:
-      field: file.x509.serial_number
+      field: tls.server.x509.serial_number
       value: '{{suricata.eve.tls.serial}}'
       ignore_empty_value: true
   - gsub:
-      field: file.x509.serial_number
+      field: tls.server.x509.serial_number
       pattern: ':'
       replacement: ''
       ignore_missing: true
@@ -326,11 +326,11 @@ processors:
         - ISO8601
       if: ctx.suricata?.eve?.tls?.notbefore != null
   - set:
-      field: file.x509.not_after
+      field: tls.server.x509.not_after
       value: '{{tls.server.not_after}}'
       ignore_empty_value: true
   - set:
-      field: file.x509.not_before
+      field: tls.server.x509.not_before
       value: '{{tls.server.not_before}}'
       ignore_empty_value: true
   - append:

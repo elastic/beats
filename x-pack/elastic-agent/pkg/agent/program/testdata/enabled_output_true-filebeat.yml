@@ -17,11 +17,11 @@ filebeat:
           fields:
             dataset: generic
       - add_fields:
-          target: "elastic"
+          target: "elastic_agent"
           fields:
-            agent.id: agent-id
-            agent.version: 8.0.0
-            agent.snapshot: false
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
 output:
   elasticsearch:
     enabled: true
