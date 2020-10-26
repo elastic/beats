@@ -415,6 +415,8 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add keystore support for autodiscover static configurations. {pull}16306[16306]
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
+- Add `urlparse` processor for parsing URL fields. {pull}22147[22147]
+
 
 *Auditbeat*
 
