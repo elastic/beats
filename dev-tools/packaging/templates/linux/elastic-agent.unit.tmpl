@@ -10,8 +10,7 @@ User={{ .BeatUser }}
 Group={{ .BeatUser }}
 {{- end }}
 Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
-Environment="BEAT_PATH_OPTS=--path.home /var/lib/{{.BeatName}} --path.config /etc/{{.BeatName}} --path.logs /var/log/{{.BeatName}}"
-ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} run --environment systemd $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+ExecStart=/usr/bin/{{.BeatName}} run --environment systemd $BEAT_CONFIG_OPTS
 Restart=always
 
 [Install]
