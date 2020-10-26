@@ -83,8 +83,10 @@ pipeline {
               }
             }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-            dir("${BASE_DIR}"){
-              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+            withMageEnv(){
+              dir("${BASE_DIR}"){
+                setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              }
             }
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
