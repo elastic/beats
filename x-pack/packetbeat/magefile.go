@@ -23,6 +23,7 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -44,7 +45,7 @@ func Config() error {
 
 // Dashboards packages kibana dashboards
 func Dashboards() error {
-	return devtools.KibanaDashboards("protos")
+	return devtools.KibanaDashboards(devtools.OSSBeatDir("protos"))
 }
 
 // Build builds the Beat binary.
@@ -98,15 +99,4 @@ func Package() {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
-}
-
-func configYML() error {
-	return devtools.Config(devtools.AllConfigTypes, packetbeat.ConfigFileParams(), ".")
-}
-
-func includeList() error {
-	options := devtools.DefaultIncludeListOptions()
-	options.ImportDirs = []string{"protos/*"}
-	options.ModuleDirs = nil
-	return devtools.GenerateIncludeListGo(options)
 }
