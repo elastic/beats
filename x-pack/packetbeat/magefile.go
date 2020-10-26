@@ -34,7 +34,12 @@ func init() {
 
 // Update updates the generated files.
 func Update() {
-	mg.SerialDeps(packetbeat.FieldsYML, Dashboards)
+	mg.SerialDeps(packetbeat.FieldsYML, Dashboards, Config)
+}
+
+// Config generates the config files.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, packetbeat.ConfigFileParams(), ".")
 }
 
 // Dashboards packages kibana dashboards
