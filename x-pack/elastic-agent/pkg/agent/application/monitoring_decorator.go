@@ -94,7 +94,6 @@ func getMonitoringRule(outputName string) *transpiler.RuleList {
 	return transpiler.NewRuleList(
 		transpiler.Copy(monitoringOutputSelector, outputKey),
 		transpiler.Rename(fmt.Sprintf("%s.%s", outputsKey, outputName), elasticsearchKey),
-		transpiler.InjectAgentInfo(),
 		transpiler.Filter(monitoringKey, programsKey, outputKey),
 	)
 }

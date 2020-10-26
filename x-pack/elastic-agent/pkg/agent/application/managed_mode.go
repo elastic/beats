@@ -154,7 +154,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
