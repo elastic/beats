@@ -391,15 +391,16 @@ func TestEventTagsWithMetadata(t *testing.T) {
 	sourceType := "source_type"
 	sourceInstance := "source_instance"
 	cfEvt := makeEnvelope(&eventType)
-	cfEvt.Tags = map[string]string{
-		"app.id":            appID,
-		"app.name":          "some-app",
-		"space.id":          "e1114e92-155c-11eb-ada9-27b81025a657",
-		"space.name":        "some-space",
-		"organization.id":   "baeef1ba-155c-11eb-a1af-8f14964c35d2",
-		"organization.name": "some-org",
+	tags := map[string]string{
+		"app_id":            appID,
+		"app_name":          "some-app",
+		"space_id":          "e1114e92-155c-11eb-ada9-27b81025a657",
+		"space_name":        "some-space",
+		"organization_id":   "baeef1ba-155c-11eb-a1af-8f14964c35d2",
+		"organization_name": "some-org",
 		"custom_tag":        "foo",
 	}
+	cfEvt.Tags = tags
 	cfEvt.LogMessage = &events.LogMessage{
 		Message:        []byte(message),
 		MessageType:    &messageType,
@@ -418,7 +419,7 @@ func TestEventTagsWithMetadata(t *testing.T) {
 	assert.Equal(t, "job", evt.Job())
 	assert.Equal(t, "index", evt.Index())
 	assert.Equal(t, "ip", evt.IP())
-	assert.Equal(t, map[string]string{"custom_tag": "foo"}, evt.Tags())
+	assert.Equal(t, tags, evt.Tags())
 	assert.Equal(t, "f47ac10b-58cc-4372-a567-0e02b2c3d479", evt.AppGuid())
 	assert.Equal(t, "log message", evt.Message())
 	assert.Equal(t, EventLogMessageTypeStdout, evt.MessageType())
