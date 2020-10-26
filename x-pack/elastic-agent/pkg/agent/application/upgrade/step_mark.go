@@ -59,14 +59,33 @@ func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) 
 		return errors.New(err, errors.TypeConfig, "failed to parse marker file")
 	}
 
-	markerPath := filepath.Join(paths.Data(), markerFilename)
+	markerPath := markerFilePath()
 	if err := ioutil.WriteFile(markerPath, markerBytes, 0600); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to create update marker file", errors.M(errors.MetaKeyPath, markerPath))
 	}
 
+	if err := UpdateActiveCommit(hash); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateActiveCommit updates active.commit file to point to active version.
+func UpdateActiveCommit(hash string) error {
 	activeCommitPath := filepath.Join(paths.Top(), agentCommitFile)
 	if err := ioutil.WriteFile(activeCommitPath, []byte(hash), 0644); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to update active commit", errors.M(errors.MetaKeyPath, activeCommitPath))
+	}
+
+	return nil
+}
+
+// CleanMarker removes a marker from disk.
+func CleanMarker() error {
+	markerFile := markerFilePath()
+	if err := os.Remove(markerFile); !os.IsNotExist(err) {
+		return err
 	}
 
 	return nil

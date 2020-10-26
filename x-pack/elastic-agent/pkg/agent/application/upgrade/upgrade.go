@@ -131,7 +131,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 		return errors.New(err, "failed to copy action store")
 	}
 
-	if err := u.changeSymlink(ctx, newHash); err != nil {
+	if err := ChangeSymlink(ctx, newHash); err != nil {
 		rollbackInstall(newHash)
 		return err
 	}

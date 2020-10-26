@@ -4,7 +4,12 @@
 
 package rollback
 
-import "context"
+import (
+	"context"
+	"sync"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+)
 
 // CrashChecker checks agent for crash pattern in Elastic Agent lifecycle.
 type CrashChecker struct {
@@ -27,4 +32,39 @@ func (ch CrashChecker) Run(ctx context.Context) {
 func getAgentServicePid() int {
 	// TODO: finish me
 	return 0
+}
+
+type disctintQueue struct {
+	q    []int
+	size int
+	lock sync.Mutex
+}
+
+func newDistinctQueue(size int) (*disctintQueue, error) {
+	if size < 1 {
+		return nil, errors.New("invalid size", errors.TypeUnexpected)
+	}
+	return &disctintQueue{
+		q:    make([]int, 0, size),
+		size: size,
+	}, nil
+}
+
+func (dq *disctintQueue) Push(id int) {
+	dq.lock.Lock()
+	defer dq.lock.Unlock()
+	dq.q = append([]int{id}, dq.q[:dq.size-1]...)
+}
+
+func (dq *disctintQueue) Disctinct() int {
+	dq.lock.Lock()
+	defer dq.lock.Unlock()
+
+	dm := make(map[int]int)
+
+	for _, id := range dq.q {
+		dm[id] = 1
+	}
+
+	return len(dm)
 }

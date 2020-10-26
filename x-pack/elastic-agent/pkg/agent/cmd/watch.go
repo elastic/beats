@@ -18,6 +18,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
+const (
+	// period during which we monitor for failures resulting in a rollback
+	gracePeriod = 10 * time.Minute
+)
+
 func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "watch",
@@ -63,7 +68,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 	ctx := context.Background()
 
 	if err := watch(ctx, tilGrace); err != nil {
-		return rollback.Rollback(marker.PrevHash, marker.Hash)
+		return rollback.Rollback(ctx, marker.PrevHash, marker.Hash)
 	}
 
 	return rollback.Cleanup(marker.PrevHash)
@@ -111,7 +116,5 @@ WATCHLOOP:
 // otherwise it returns false and 0
 func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 	// TODO: finish
-	return true, 10 * time.Minute
+	return true, gracePeriod
 }
-
-func InvokeWatcher() error { return nil }
