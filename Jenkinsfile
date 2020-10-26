@@ -12,6 +12,7 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
+    AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
@@ -415,7 +416,7 @@ def withCloudTestEnv(Closure body) {
       error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
     }
     maskedVars.addAll([
-      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_REGION", password: "${env.AWS_REGION}"],
       [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
       [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
     ])
