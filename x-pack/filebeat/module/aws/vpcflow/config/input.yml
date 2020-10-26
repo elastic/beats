@@ -43,6 +43,10 @@ role_arn: {{ .role_arn }}
 fips_enabled: {{ .fips_enabled }}
 {{ end }}
 
+{{ if .max_number_of_messages }}
+max_number_of_messages: {{ .max_number_of_messages }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log
