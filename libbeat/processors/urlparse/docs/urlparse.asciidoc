@@ -1,0 +1,57 @@
+[[urlparse]]
+=== URL Decode
+
+++++
+<titleabbrev>urlparse</titleabbrev>
+++++
+
+The `urlparse` processor specifies a list of fields to decode from URL encoded format. Under the `fields`
+key, each entry contains a `from: source-field` and a `to: target-field` pair, where:
+
+* `from` is the source field name
+* `to` is the target field name (defaults to the `from` value)
+
+[source,yaml]
+-------
+processors:
+  - urlparse:
+      fields:
+        - from: "field1"
+          to: "field2"
+      ignore_missing: false
+      fail_on_error: true
+-------
+
+In the example above:
+
+- field1 is parsed in field2
+
+The `urlparse` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be URL-parsed is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the URL-decoding
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+The fields added to the event look like the following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "from": "https://hello.world.com:8999/index.html?hello=world#main",
+   "to": {
+        "scheme": "https",
+        "opaque": "",
+        "hostname": "hello.world.com",
+        "port": "8999",
+        "path": "/index.html",
+        "raw_path": "",
+        "raw_query": "hello=world",
+        "fragment": "main"
+    }
+}
+-------------------------------------------------------------------------------

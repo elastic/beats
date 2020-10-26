@@ -328,6 +328,39 @@ class Test(BaseTest):
             "correct data",
         ], field="decoded")
 
+    def test_urlparse_defaults(self):
+        """
+        Check URL-parsing using defaults
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "urldecode": {
+                    "fields": [{
+                        "from": "message",
+                        "to": "parsed"
+                    }]
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            "https://hello.world.com\n",
+        ])
+
+        self._assert_expected_lines([
+            {
+                "scheme": "https",
+                "opaque": "",
+                "hostname": "hello.world.com",
+                "port": "",
+                "path": "",
+                "raw_path": "",
+                "raw_query": "",
+                "fragment": "",
+            }
+        ], field="parsed")
+
     def test_javascript_processor_add_host_metadata(self):
         """
         Check JS processor with add_host_metadata

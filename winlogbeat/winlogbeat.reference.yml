@@ -311,6 +311,16 @@ winlogbeat.event_logs:
 #          to: "field2"
 #      ignore_missing: false
 #      fail_on_error: true
+#
+# The following example URL-parses the value of field1 to field2
+#
+#processors:
+#  - urlparse:
+#      fields:
+#        - from: "field1"
+#          to: "field2"
+#      ignore_missing: false
+#      fail_on_error: true
 
 # =============================== Elastic Cloud ================================
 
