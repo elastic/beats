@@ -138,7 +138,7 @@ func TestInstanceNameRegexp(t *testing.T) {
 	for _, path := range queryPaths {
 		matches := instanceNameRegexp.FindStringSubmatch(path)
 		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
-			assert.Equal(t, matches[1], "*")
+			assert.Equal(t, matches[1], "(*)")
 		}
 	}
 }
