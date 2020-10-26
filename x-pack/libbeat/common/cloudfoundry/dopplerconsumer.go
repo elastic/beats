@@ -93,13 +93,12 @@ func (c *DopplerConsumer) metricsFirehose() {
 
 func (c *DopplerConsumer) firehoseWorkers(cb func(evt Event), filter consumer.EnvelopeFilter) {
 	msgChan := make(chan *events.Envelope, c.bufferSize)
-	errChan := make(chan error)
 
 	for i := 0; i < c.consumerWorkers; i++ {
 		c.wg.Add(1)
 		go func() {
 			defer c.wg.Done()
-			c.firehoseConsumer(filter, msgChan, errChan)
+			c.firehoseConsumer(filter, msgChan)
 		}()
 	}
 
@@ -107,12 +106,12 @@ func (c *DopplerConsumer) firehoseWorkers(cb func(evt Event), filter consumer.En
 		c.wg.Add(1)
 		go func() {
 			defer c.wg.Done()
-			c.firehoseHandler(cb, msgChan, errChan)
+			c.firehoseHandler(cb, msgChan)
 		}()
 	}
 }
 
-func (c *DopplerConsumer) firehoseConsumer(filter consumer.EnvelopeFilter, dstMsgChan chan<- *events.Envelope, dstErrChan chan<- error) {
+func (c *DopplerConsumer) firehoseConsumer(filter consumer.EnvelopeFilter, dstMsgChan chan<- *events.Envelope) {
 	var msgChan <-chan *events.Envelope
 	var errChan <-chan error
 	filterFn := filterNoFilter
@@ -135,14 +134,18 @@ func (c *DopplerConsumer) firehoseConsumer(filter consumer.EnvelopeFilter, dstMs
 			}
 			dstMsgChan <- env
 		case err := <-errChan:
-			dstErrChan <- err
+			if err != nil {
+				// This error is an error on the connection, not a cloud foundry
+				// error envelope. Firehose should be able to reconnect, so just log it.
+				c.log.Infof("Error received on firehose: %v", err)
+			}
 		case <-c.stop:
 			return
 		}
 	}
 }
 
-func (c *DopplerConsumer) firehoseHandler(cb func(evt Event), msgChan <-chan *events.Envelope, errChan <-chan error) {
+func (c *DopplerConsumer) firehoseHandler(cb func(evt Event), msgChan <-chan *events.Envelope) {
 	for {
 		select {
 		case env := <-msgChan:
@@ -156,12 +159,6 @@ func (c *DopplerConsumer) firehoseHandler(cb func(evt Event), msgChan <-chan *ev
 				continue
 			}
 			cb(event)
-		case err := <-errChan:
-			if err != nil {
-				// This error is an error on the connection, not a cloud foundry
-				// error envelope. Firehose should be able to reconnect, so just log it.
-				c.log.Infof("Error received on firehose: %v", err)
-			}
 		case <-c.stop:
 			return
 		}
