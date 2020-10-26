@@ -12,7 +12,7 @@ GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
+REVIEWDOG_REPO=github.com/reviewdog/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support

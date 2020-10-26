@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
+- Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
 
 *Heartbeat*
 
@@ -286,6 +287,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checkpoint module when logs contain time field. {pull}20567[20567]
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
+- Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
 
 *Heartbeat*
 
@@ -378,6 +380,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix azure storage event format. {pull}21845[21845]
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
+- Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
+- Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
 
 *Packetbeat*
 
@@ -397,6 +401,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Do not need Google credentials if not required for the operation. {issue}17329[17329] {pull}21072[21072]
 - Fix dependency issues of GCP functions. {issue}20830[20830] {pull}21070[21070]
 - Fix catchall bucket config errors by adding more validation. {issue}17572[16282] {pull}20887[16287]
+- Fix Google Cloud Function configuration issue. {issue}20864[20864] {pull}22156[22156]
 
 ==== Added
 
@@ -820,3 +825,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
