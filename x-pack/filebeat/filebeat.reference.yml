@@ -142,6 +142,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   cloudwatch:
     enabled: false
 
@@ -175,6 +181,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   ec2:
     enabled: false
@@ -210,6 +222,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   elb:
     enabled: false
 
@@ -243,6 +261,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   s3access:
     enabled: false
@@ -278,6 +302,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   vpcflow:
     enabled: false
 
@@ -311,6 +341,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -2374,8 +2410,8 @@ filebeat.inputs:
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-s3-input
 
-  # Queue urls (required) to receive queue messages from
-  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+  # Queue url (required) to receive queue messages from
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"
 
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
