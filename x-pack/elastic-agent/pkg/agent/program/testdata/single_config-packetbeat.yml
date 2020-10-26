@@ -1,25 +1,25 @@
 packetbeat:
   inputs:
   - type: network/flow
-    id: network/flows-flow.network
-    index: logs-flow.network-default
+    index: logs-network.flow-default
     timeout: 10s
     period: 10s
     keep_null: false
     data_stream:
-      dataset: flow.network
+      dataset: network.flow
       type: logs
+    name: flow-1
     processors:
       - add_fields:
           target: 'data_stream'
           fields:
             type: logs
-            dataset: flow.network
+            dataset: network.flow
             namespace: default
       - add_fields:
           target: 'event'
           fields:
-            dataset: flow.network
+            dataset: network.flow
       - add_fields:
           target: 'elastic_agent'
           fields:
@@ -27,28 +27,22 @@ packetbeat:
             version: 8.0.0
             snapshot: false
   - type: network/icmp
-    id: network/icmp-icmp.network
-    index: logs-icmp.network-default
+    index: logs-network.icmp-default
     data_stream:
-      dataset: icmp.network
+      dataset: network.icmp
       type: logs
-    meta:
-      package:
-        name: icmp
-        version: 0.2.4
     name: icmp-1
-    revision: 1
     processors:
       - add_fields:
           target: 'data_stream'
           fields:
             type: logs
-            dataset: icmp.network
+            dataset: network.icmp
             namespace: default
       - add_fields:
           target: 'event'
           fields:
-            dataset: icmp.network
+            dataset: network.icmp
       - add_fields:
           target: 'elastic_agent'
           fields:
