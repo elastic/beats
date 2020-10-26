@@ -55,6 +55,7 @@ func TestGetMachineGUID(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
+	t.Fatal("for testing the flaky test reporting for an existing flaky test")
 	reader, err := NewReader()
 	assert.NoError(t, err)
 	result, err := reader.Read()

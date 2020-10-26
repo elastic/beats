@@ -26,6 +26,7 @@ import (
 )
 
 func TestGetServiceStates(t *testing.T) {
+	t.Fatal("for testing the flaky test reporting for an existing flaky test")
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
