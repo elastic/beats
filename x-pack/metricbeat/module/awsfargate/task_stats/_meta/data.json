@@ -1,0 +1,139 @@
+{
+    "@timestamp": "2020-10-27T01:20:51.801Z",
+    "event": {
+        "dataset": "awsfargate.task_stats",
+        "module": "awsfargate",
+        "duration": 2869164
+    },
+    "metricset": {
+        "period": 30000,
+        "name": "task_stats"
+    },
+    "service": {
+        "type": "awsfargate"
+    },
+    "awsfargate": {
+        "task_stats": {
+            "memory_stats": {
+                "max_usage": 20094976,
+                "limit": 3937787904,
+                "stats": {
+                    "pgmajfault": 0,
+                    "total_inactive_file": 5808128,
+                    "total_unevictable": 0,
+                    "mapped_file": 0,
+                    "pgpgout": 1784,
+                    "total_pgfault": 8584,
+                    "pgfault": 8584,
+                    "unevictable": 0,
+                    "inactive_anon": 0,
+                    "total_pgpgin": 6361,
+                    "hierarchical_memory_limit": 2147483648,
+                    "dirty": 0,
+                    "active_anon": 12939264,
+                    "rss": 18743296,
+                    "total_inactive_anon": 0,
+                    "rss_huge": 0,
+                    "total_mapped_file": 0,
+                    "hierarchical_memsw_limit": 9223372036854772000,
+                    "total_pgmajfault": 0,
+                    "total_pgpgout": 1784,
+                    "total_dirty": 0,
+                    "inactive_file": 5808128,
+                    "writeback": 0,
+                    "total_active_anon": 12939264,
+                    "pgpgin": 6361,
+                    "total_rss": 18743296,
+                    "active_file": 0,
+                    "cache": 4096,
+                    "total_cache": 4096,
+                    "total_active_file": 0,
+                    "total_rss_huge": 0,
+                    "total_writeback": 0
+                }
+            },
+            "networks": {
+                "eth0": {
+                    "tx_dropped": 0,
+                    "rx_bytes": 137371227,
+                    "rx_packets": 94522,
+                    "rx_errors": 0,
+                    "rx_dropped": 0,
+                    "tx_bytes": 1178772,
+                    "tx_packets": 16090,
+                    "tx_errors": 0
+                }
+            },
+            "metadata": {
+                "image": "kaiyansheng/metricbeat-system:v1",
+                "known_status": "RUNNING",
+                "labels": {
+                    "com_amazonaws_ecs_task-definition-version": "9",
+                    "com_amazonaws_ecs_cluster": "arn:aws:ecs:us-east-1:428152502467:cluster/nginx",
+                    "com_amazonaws_ecs_container-name": "metricbeat-system",
+                    "com_amazonaws_ecs_task-arn": "arn:aws:ecs:us-east-1:428152502467:task/nginx/8f4ea89897a147bd817cbbbbcedbe5b6",
+                    "com_amazonaws_ecs_task-definition-family": "metricbeat-awsfargate"
+                },
+                "type": "NORMAL",
+                "docker_name": "ecs-metricbeat-awsfargate-9-metricbeat-system-daa7ba8df88c9d815b00",
+                "image_iD": "sha256:7d934425642aea9efe11986f700eb4ce76bc15298fbeea447f73f36bcf670caf",
+                "desired_status": "RUNNING",
+                "limits": {
+                    "CPU": 0,
+                    "Memory": 0
+                },
+                "docker_id": "391d452352edac82cd3d12b3b8af10d630fcd9940eb6e47bb36f3f4fe2a30e04",
+                "name": "metricbeat-system"
+            },
+            "cpu": {
+                "cores": 15,
+                "total": {
+                    "norm": {
+                        "pct": 0.0023051834170854275
+                    }
+                }
+            },
+            "name": "/ecs-metricbeat-awsfargate-9-metricbeat-system-daa7ba8df88c9d815b00",
+            "id": "391d452352edac82cd3d12b3b8af10d630fcd9940eb6e47bb36f3f4fe2a30e04",
+            "cpu_stats": {
+                "cpu_usage": {
+                    "usage_in_kernelmode": 60000000,
+                    "usage_in_usermode": 430000000,
+                    "total_usage": 596709532
+                },
+                "throttling_data": {
+                    "periods": 0,
+                    "throttled_periods": 0,
+                    "throttled_time": 0
+                },
+                "system_cpu_usage": 1837500000000
+            },
+            "precpu_stats": {
+                "throttling_data": {
+                    "throttled_periods": 0,
+                    "throttled_time": 0,
+                    "periods": 0
+                },
+                "system_cpu_usage": 1835510000000,
+                "cpu_usage": {
+                    "usage_in_kernelmode": 60000000,
+                    "usage_in_usermode": 430000000,
+                    "total_usage": 596403711
+                }
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.6.0"
+    },
+    "host": {
+        "name": "ip-172-31-69-90.ec2.internal"
+    },
+    "agent": {
+        "ephemeral_id": "7069b4ae-16ae-40a9-aa16-96ddf3c75410",
+        "id": "9142cfe4-9dc3-4520-946e-aba84a3358d5",
+        "name": "ip-172-31-69-90.ec2.internal",
+        "type": "metricbeat",
+        "version": "8.0.0"
+    }
+}

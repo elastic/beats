@@ -69,18 +69,26 @@ var (
 	}
 
 	schemaCPUStats = s.Schema{
-		"cpu_stats": s.Object{
-			"cpu_usage":       c.Dict("cpu_usage", schemaCPUUsage),
-			"throttling_data": c.Dict("throttling_data", schemaThrottlingData),
-		},
+		"cpu_usage":        c.Dict("cpu_usage", schemaCPUUsage),
+		"throttling_data":  c.Dict("throttling_data", schemaThrottlingData),
+		"system_cpu_usage": c.Int("system_cpu_usage"),
 	}
 
 	schemaMemoryStats = s.Schema{
-		"memory_stats": s.Object{
-			"usage":     c.Int("total_usage"),
-			"max_usage": c.Int("max_usage"),
-			"limit":     c.Int("limit"),
-			"stats":     c.Dict("stats", schemaMemoryStatsStats),
-		},
+		"usage":     c.Int("total_usage"),
+		"max_usage": c.Int("max_usage"),
+		"limit":     c.Int("limit"),
+		"stats":     c.Dict("stats", schemaMemoryStatsStats),
+	}
+
+	schemaContainer = s.Schema{
+		"docker_id":      c.Str("DockerId"),
+		"name":           c.Str("Name"),
+		"docker_name":    c.Str("DockerName"),
+		"image":          c.Str("Image"),
+		"image_iD":       c.Str("ImageID"),
+		"desired_status": c.Str("DesiredStatus"),
+		"known_status":   c.Str("KnownStatus"),
+		"type":           c.Str("Type"),
 	}
 )

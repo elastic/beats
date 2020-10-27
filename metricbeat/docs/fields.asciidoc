@@ -4603,6 +4603,31 @@ type: double
 `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
 
 
+
+[float]
+=== cpu_stats
+
+Runtime CPU metrics.
+
+
+
+[float]
+=== cpu_usage
+
+CPU usage stats.
+
+
+
+*`task_stats.cpu_stats.cpu_usage.total_usage`*::
++
+--
+Total CPU time used per container.
+
+
+type: long
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 

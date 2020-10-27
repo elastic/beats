@@ -4,3 +4,17 @@
     `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
   release: experimental
   fields:
+    - name: cpu_stats
+      type: group
+      description: >
+        Runtime CPU metrics.
+      fields:
+        - name: cpu_usage
+          type: group
+          description: >
+            CPU usage stats.
+          fields:
+            - name: total_usage
+              type: long
+              description: >
+                Total CPU time used per container.

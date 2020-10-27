@@ -96,8 +96,7 @@ func TestMappingEvent(t *testing.T) {
 		logp.NewLogger("test"),
 	}
 
-	event := m.createEvent("/ecs-test-metricbeat", taskMetadata["/ecs-test-metricbeat"])
-	event.MetricSetFields.HasKey("name")
+	event := m.createEvent(taskMetadata["/ecs-test-metricbeat"])
 	name, err := event.MetricSetFields.GetValue("name")
 	assert.NoError(t, err)
 	assert.Equal(t, "query-metadata", name)

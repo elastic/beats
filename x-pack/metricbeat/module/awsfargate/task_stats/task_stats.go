@@ -61,7 +61,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
 	ecsURI, ok := os.LookupEnv("ECS_CONTAINER_METADATA_URI_V4")
 	if !ok {
 		err := fmt.Errorf("lookup $ECS_CONTAINER_METADATA_URI_V4 failed")
@@ -69,30 +68,31 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("%s/task/stats", ecsURI))
+	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
+	taskStatsEndpoint := fmt.Sprintf("%s/task/stats", ecsURI)
+	taskStatsOutput, err := queryTaskMetadataEndpoint(taskStatsEndpoint)
 	if err != nil {
-		err := fmt.Errorf("http.Get failed: %w", err)
+		err = fmt.Errorf("queryTaskMetadataEndpoint %s failed: %w", taskStatsEndpoint, err)
 		m.logger.Error(err)
 		return err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
+	taskEndpoint := fmt.Sprintf("%s/task", ecsURI)
+	taskOutput, err := queryTaskMetadataEndpoint(taskEndpoint)
 	if err != nil {
-		err := fmt.Errorf("ioutil.ReadAll failed: %w", err)
+		err = fmt.Errorf("queryTaskMetadataEndpoint %s failed: %w", taskEndpoint, err)
 		m.logger.Error(err)
 		return err
 	}
 
-	var output map[string]interface{}
-	err = json.Unmarshal(body, &output)
-	if err != nil {
-		err := fmt.Errorf("json.Unmarshal failed: %w", err)
-		m.logger.Error(err)
-		return err
-	}
+	containersMetadata := collectContainerMetadata(taskOutput)
 
-	for queryID, taskStats := range output {
-		event := m.createEvent(queryID, taskStats)
+	// Create events for all containers in the same task
+	for id, taskStats := range taskStatsOutput {
+		metadata := containersMetadata[id]
+		event := m.createEvent(taskStats, metadata)
+
 		// report events
 		if reported := report.Event(event); !reported {
 			m.logger.Debug("Fetch interrupted, failed to emit event")
@@ -102,9 +102,57 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) createEvent(queryID string, taskStats interface{}) mb.Event {
+func queryTaskMetadataEndpoint(taskMetadataEndpoint string) (map[string]interface{}, error) {
+	resp, err := http.Get(taskMetadataEndpoint)
+	if err != nil {
+		return nil, fmt.Errorf("http.Get failed: %w", err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
+	}
+
+	var output map[string]interface{}
+	err = json.Unmarshal(body, &output)
+	if err != nil {
+		return nil, fmt.Errorf("json.Unmarshal failed: %w", err)
+	}
+	return output, nil
+}
+
+func collectContainerMetadata(taskOutput map[string]interface{}) map[string]common.MapStr {
+	containersMetadata := make(map[string]common.MapStr)
+	for _, container := range taskOutput["Containers"].([]interface{}) {
+		// basic metadata
+		containerMap := container.(map[string]interface{})
+		resultContainer, err := schemaContainer.Apply(containerMap, s.FailOnRequired)
+		if err != nil {
+			continue
+		}
+
+		// labels
+		labels := containerMap["Labels"].(map[string]interface{})
+		labelsMap := map[string]interface{}{}
+		for k, v := range labels {
+			labelsMap[common.DeDot(k)] = v
+		}
+		resultContainer.Put("labels", labelsMap)
+
+		// limits
+		resultContainer.Put("limits", containerMap["Limits"].(map[string]interface{}))
+
+		dockerID, err := resultContainer.GetValue("docker_id")
+		if err != nil {
+			continue
+		}
+		containersMetadata[dockerID.(string)] = resultContainer
+	}
+	return containersMetadata
+}
+
+func (m *MetricSet) createEvent(taskStats interface{}, metadata common.MapStr) mb.Event {
 	event := mb.Event{
-		ID:              queryID,
 		MetricSetFields: common.MapStr{},
 	}
 
@@ -121,15 +169,21 @@ func (m *MetricSet) createEvent(queryID string, taskStats interface{}) mb.Event 
 	event.MetricSetFields.Put("name", taskMeta["name"])
 	event.MetricSetFields.Put("id", taskMeta["id"])
 
-	// cpu
-	resultCPUStats, err := schemaCPUStats.Apply(taskMeta["cpu_stats"].(map[string]interface{}), s.FailOnRequired)
+	// cpu stats
+	cpuStats := taskMeta["cpu_stats"].(map[string]interface{})
+	resultCPUStats, err := schemaCPUStats.Apply(cpuStats, s.FailOnRequired)
 	event.MetricSetFields.Put("cpu_stats", resultCPUStats)
 
-	// memory
+	// precpu stats
+	preCpuStats := taskMeta["precpu_stats"].(map[string]interface{})
+	resultPreCPUStats, err := schemaCPUStats.Apply(preCpuStats, s.FailOnRequired)
+	event.MetricSetFields.Put("precpu_stats", resultPreCPUStats)
+
+	// memory stats
 	resultMemoryStats, err := schemaMemoryStats.Apply(taskMeta["memory_stats"].(map[string]interface{}), s.FailOnRequired)
 	event.MetricSetFields.Put("memory_stats", resultMemoryStats)
 
-	// network
+	// networks
 	networks := taskMeta["networks"]
 	resultNetworkStats := common.MapStr{}
 	for name, network := range networks.(map[string]interface{}) {
@@ -141,5 +195,29 @@ func (m *MetricSet) createEvent(queryID string, taskStats interface{}) mb.Event 
 		resultNetworkStats.Put(name, resultNetwork)
 	}
 	event.MetricSetFields.Put("networks", resultNetworkStats)
+
+	// add container metadata
+	event.MetricSetFields.Put("metadata", metadata)
+
+	// calculate cpu.total.norm.pct
+	event = calculateCPU(cpuStats, preCpuStats, resultCPUStats, resultPreCPUStats, event)
+	return event
+}
+
+func calculateCPU(cpuStats map[string]interface{}, preCpuStats map[string]interface{}, resultCPUStats common.MapStr, resultPreCPUStats common.MapStr, event mb.Event) mb.Event {
+	cpuUsage := cpuStats["cpu_usage"].(map[string]interface{})
+	if cpuUsage != nil && cpuUsage["percpu_usage"] != nil {
+		numCores := float64(len(cpuUsage["percpu_usage"].([]interface{})))
+		event.MetricSetFields.Put("cpu.cores", numCores)
+
+		cpuUsage := resultCPUStats["cpu_usage"].(common.MapStr)
+		preCpuUsage := resultPreCPUStats["cpu_usage"].(common.MapStr)
+
+		if cpuUsage["total_usage"] != nil && preCpuUsage["total_usage"] != nil && cpuStats["system_cpu_usage"] != nil && preCpuStats["system_cpu_usage"] != nil {
+			deltaTotalUsage := cpuUsage["total_usage"].(int64) - preCpuUsage["total_usage"].(int64)
+			deltaSystemUsage := cpuStats["system_cpu_usage"].(float64) - preCpuStats["system_cpu_usage"].(float64)
+			event.MetricSetFields.Put("cpu.total.norm.pct", float64(deltaTotalUsage)/deltaSystemUsage*numCores)
+		}
+	}
 	return event
 }
