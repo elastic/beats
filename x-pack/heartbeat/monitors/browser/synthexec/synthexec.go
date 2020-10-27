@@ -132,6 +132,9 @@ type readResultsState struct {
 	errorCount int
 	lastError error
 	stepCount int
+	// The first URL we visit is the URL for this journey, which is set on the summary event.
+	// We store the URL fields here for use on the summary event.
+	urlFields interface{}
 }
 
 // readResultsJob creates adapts the output of an ExecMultiplexer into a Job, that uses continuations
@@ -143,13 +146,17 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			// No more events? In this case this is the summary event
 			if se == nil {
 				if state.journeyComplete {
+					event.PutValue("url", state.urlFields)
 					return nil, state.lastError
 				}
 				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
 			}
+
+			// Set timestamp, which comes as a float of millis
 			if se.TimestampEpochMillis != 0 {
 				event.Timestamp = time.Unix(int64(se.TimestampEpochMillis/1000), (int64(se.TimestampEpochMillis) % 1000)*1000000)
 			}
+
 			switch se.Type {
 			case "journey/end":
 				state.journeyComplete = true
@@ -158,6 +165,13 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			}
 
 			eventext.MergeEventFields(event, se.ToMap())
+
+			if state.urlFields == nil {
+				if urlFields, err := event.GetValue("url"); err == nil && urlFields != nil {
+					state.urlFields = urlFields
+				}
+			}
+
 			var jobErr error
 			if se.Error != nil {
 				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
