@@ -25,11 +25,13 @@ type State int
 const (
 	Inactive State = iota
 	Active
+	Expired
 )
 
 var stateLookup = map[string]State{
 	"inactive": Inactive,
 	"active":   Active,
+	"expired":  Expired,
 }
 
 var licenseLookup = map[string]LicenseType{

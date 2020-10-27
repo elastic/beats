@@ -23,6 +23,7 @@
 - Rename monitoring index from `elastic.agent` to `elastic_agent` {pull}21932[21932]
 - Fix issue with named pipes on Windows 7 {pull}21931[21931]
 - Fix missing elastic_agent event data {pull}21994[21994]
+- Ensure shell wrapper path exists before writing wrapper on install {pull}22144[22144]
 - Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
 
 ==== New features
