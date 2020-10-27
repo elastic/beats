@@ -82,6 +82,62 @@ func TestCFAppNotFound(t *testing.T) {
 	assert.Equal(t, evt, *observed)
 }
 
+func TestCFAppMetadataAlreadyPresent(t *testing.T) {
+	guid := mustCreateFakeGuid()
+	app := cloudfoundry.AppMeta{
+		Guid:      guid,
+		Name:      "My Fake App",
+		SpaceGuid: mustCreateFakeGuid(),
+		SpaceName: "My Fake Space",
+		OrgGuid:   mustCreateFakeGuid(),
+		OrgName:   "My Fake Org",
+	}
+	p := addCloudFoundryMetadata{
+		log:    logp.NewLogger("add_cloudfoundry_metadata"),
+		client: &fakeClient{app},
+	}
+
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"cloudfoundry": common.MapStr{
+				"app": common.MapStr{
+					"id":   guid,
+					"name": "Other App Name",
+				},
+				"space": common.MapStr{
+					"id":   app.SpaceGuid,
+					"name": app.SpaceName,
+				},
+				"org": common.MapStr{
+					"id":   app.OrgGuid,
+					"name": app.OrgName,
+				},
+			},
+		},
+	}
+	expected := beat.Event{
+		Fields: common.MapStr{
+			"cloudfoundry": common.MapStr{
+				"app": common.MapStr{
+					"id":   guid,
+					"name": "Other App Name",
+				},
+				"space": common.MapStr{
+					"id":   app.SpaceGuid,
+					"name": app.SpaceName,
+				},
+				"org": common.MapStr{
+					"id":   app.OrgGuid,
+					"name": app.OrgName,
+				},
+			},
+		},
+	}
+	observed, err := p.Run(&evt)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, *observed)
+}
+
 func TestCFAppUpdated(t *testing.T) {
 	guid := mustCreateFakeGuid()
 	app := cloudfoundry.AppMeta{
