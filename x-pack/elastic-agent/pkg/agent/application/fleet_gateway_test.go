@@ -100,7 +100,7 @@ func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
 }
 
 func newTestingDispatcher() *testingDispatcher {
-	return &testingDispatcher{received: make(chan struct{}, 1)}
+	return &testingDispatcher{received: make(chan struct{}, 10)}
 }
 
 type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
@@ -202,24 +202,24 @@ func TestFleetGateway(t *testing.T) {
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `
-{
-	"actions": [
-		{
-			"type": "POLICY_CHANGE",
-			"id": "id1",
-			"data": {
-				"policy": {
-					"id": "policy-id"
+	{
+		"actions": [
+			{
+				"type": "POLICY_CHANGE",
+				"id": "id1",
+				"data": {
+					"policy": {
+						"id": "policy-id"
+					}
 				}
+			},
+			{
+				"type": "ANOTHER_ACTION",
+				"id": "id2"
 			}
-		},
-		{
-			"type": "ANOTHER_ACTION",
-			"id": "id2"
-		}
-	]
-}
-`)
+		]
+	}
+	`)
 				return resp, nil
 			}),
 			dispatcher.Answer(func(actions ...action) error {
@@ -234,7 +234,7 @@ func TestFleetGateway(t *testing.T) {
 
 	// Test the normal time based execution.
 	t.Run("Periodically communicates with Fleet", func(t *testing.T) {
-		scheduler := scheduler.NewPeriodic(1 * time.Second)
+		scheduler := scheduler.NewPeriodic(150 * time.Millisecond)
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
@@ -272,7 +272,7 @@ func TestFleetGateway(t *testing.T) {
 
 			waitFn()
 			count++
-			if count == 5 {
+			if count == 4 {
 				return
 			}
 		}
@@ -379,7 +379,7 @@ func TestRetriesOnFailures(t *testing.T) {
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
 		Duration: 5 * time.Second,
-		Backoff:  backoffSettings{Init: 1 * time.Second, Max: 5 * time.Second},
+		Backoff:  backoffSettings{Init: 100 * time.Millisecond, Max: 5 * time.Second},
 	}
 
 	t.Run("When the gateway fails to communicate with the checkin API we will retry",
