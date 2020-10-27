@@ -79,7 +79,7 @@ pipeline {
             }
           }
           steps {
-            package()
+            packageTask()
           }
         }
         stage('Run E2E Tests for Packages'){
@@ -95,7 +95,7 @@ pipeline {
 }
 
 def beats(){
-  return (
+  return [
     'auditbeat',
     'filebeat',
     'heartbeat',
@@ -113,11 +113,11 @@ def beats(){
     'x-pack/metricbeat',
     'x-pack/packetbeat',
     'x-pack/winlogbeat'
-  )
+  ]
 }
 
 def platform(){
-  return (
+  return [
     'linux/amd64',
     'linux/386',
     'linux/arm64',
@@ -128,14 +128,14 @@ def platform(){
     'windows/amd64',
     'windows/386',
     'darwin/amd64',
-    )
+    ]
 }
 
 def singOnMacOS(){
   return params.macos && env.PLATFORM == 'darwin/amd64'
 }
 
-def package(){
+def packageTask(){
   tasks = [:]
   beats().each{ beat ->
     platform().each{ platform ->
@@ -152,15 +152,16 @@ def package(){
 def packageMacOS(beats, platform){
   if(singOnMacOS()){
     node('macosx-10.12'){
-    withEnv([
-      "HOME=${env.WORKSPACE}",
-      "PLATFORMS=+all ${platform}",
-      "BEATS_FOLDER=${beat}"
-    ]){
-      withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-        deleteDir()
-        withMacOSEnv(){
-          release()
+      withEnv([
+        "HOME=${env.WORKSPACE}",
+        "PLATFORMS=+all ${platform}",
+        "BEATS_FOLDER=${beat}"
+      ]){
+        withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+          deleteDir()
+          withMacOSEnv(){
+            release()
+          }
         }
       }
     }
@@ -168,15 +169,19 @@ def packageMacOS(beats, platform){
 }
 
 def packageLinux(beats, platform){
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "PLATFORMS=+all ${platform}",
-    "BEATS_FOLDER=${beat}"
-  ]){
-    withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
-      deleteDir()
-      release()
-      pushCIDockerImages()
+  if(!singOnMacOS()){
+    node('ubuntu-18 && immutable'){
+      withEnv([
+        "HOME=${env.WORKSPACE}",
+        "PLATFORMS=+all ${platform}",
+        "BEATS_FOLDER=${beat}"
+      ]){
+        withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+          deleteDir()
+          release()
+          pushCIDockerImages()
+        }
+      }
     }
   }
 }
