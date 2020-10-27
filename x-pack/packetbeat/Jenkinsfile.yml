@@ -15,9 +15,9 @@ platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         mage: |
-          mage -d x-pack/packetbeat check;
-          mage -d x-pack/packetbeat update;
-          make check-no-changes;
+          mage check;
+          mage update;
+        make: "make check-no-changes"
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
