@@ -139,17 +139,17 @@ def packageTask(){
   tasks = [:]
   beats().each{ beat ->
     platform().each{ platform ->
-      tasks["Packaging ${beats}-${platform}"] = {
-        packageMacOS(beats, platform)
-        packageLinux(beats, platform)
-        prepareE2ETestForPackage("${beats}")
+      tasks["Packaging ${beat}-${platform}"] = {
+        packageMacOS(beat, platform)
+        packageLinux(beat, platform)
+        prepareE2ETestForPackage("${beat}")
       }
     }
   }
   parallel tasks
 }
 
-def packageMacOS(beats, platform){
+def packageMacOS(beat, platform){
   if(singOnMacOS()){
     node('macosx-10.12'){
       withEnv([
@@ -168,7 +168,7 @@ def packageMacOS(beats, platform){
   }
 }
 
-def packageLinux(beats, platform){
+def packageLinux(beat, platform){
   if(!singOnMacOS()){
     node('ubuntu-18 && immutable'){
       withEnv([
