@@ -32,8 +32,8 @@ The metricset that you created is already a functioning metricset and can be com
 +
 [source,bash]
 ----
-make collect
-make
+mage update
+mage build
 ----
 +
 The first command, `make collect`, updates all generated files with the most recent files, data, and meta information from the metricset. The second command,
