@@ -139,7 +139,7 @@ def packageTask(){
   tasks = [:]
   beats().each{ beat ->
     platform().each{ platform ->
-      task["Packaging ${beats}-${platform}"] = {
+      tasks["Packaging ${beats}-${platform}"] = {
         packageMacOS(beats, platform)
         packageLinux(beats, platform)
         prepareE2ETestForPackage("${beats}")
