@@ -189,6 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Orderly close processors when processing pipelines are not needed anymore to release their resources. {pull}16349[16349]
 - Fix memory leak and events duplication in docker autodiscover and add_docker_metadata. {pull}21851[21851]
 - Fixed documentation for commands in beats dev guide {pull}22194[22194]
+- Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 
 *Auditbeat*
 
@@ -641,6 +642,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adding support for FIPS in s3 input {pull}21446[21446]
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
+- Update Okta documentation for new stateful restarts. {pull}22091[22091]
 
 *Heartbeat*
 
@@ -781,6 +783,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 - Add 100-continue support {issue}15830[15830] {pull}19349[19349]
 - Add initial SIP protocol support {pull}21221[21221]
+- Change build process for x-pack distribution {pull}21979[21979]
 
 
 *Functionbeat*

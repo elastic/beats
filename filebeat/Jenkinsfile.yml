@@ -68,5 +68,3 @@ stages:
                 - "windows-10"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
