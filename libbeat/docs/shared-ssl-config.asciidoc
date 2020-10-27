@@ -104,7 +104,7 @@ NOTE: SSL settings are disabled if either `enabled` is set to `false` or the
 [float]
 ==== `certificate_authorities`
 
-The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used. If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 
 [float]
 [[certificate]]
