@@ -74,6 +74,9 @@ func (Update) VendorBeats() error {
 				Exclude: []string{
 					".*_test.go$",
 					".*.yml",
+					// XXX GCP function metadata lib must be removed to avoid build failures
+					// GH issue: https://github.com/googleapis/google-cloud-go/issues/1947
+					".*cloud.google.com/go.*/functions/metadata.*",
 				},
 			}
 			err = cp.Execute()
