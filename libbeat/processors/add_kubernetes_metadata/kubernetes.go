@@ -157,7 +157,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 
-		config.Host = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		nodeMeta := kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Host = nodeMeta.Name
 
 		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 

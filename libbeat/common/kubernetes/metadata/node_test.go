@@ -59,8 +59,9 @@ func TestNode_Generate(t *testing.T) {
 			},
 			output: common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -70,7 +71,7 @@ func TestNode_Generate(t *testing.T) {
 	}
 
 	cfg := common.NewConfig()
-	metagen := NewNodeMetadataGenerator(cfg, nil)
+	metagen := NewNodeMetadataGenerator(cfg, nil, "node1")
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -104,8 +105,9 @@ func TestNode_GenerateFromName(t *testing.T) {
 			},
 			output: common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -118,7 +120,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 		cfg := common.NewConfig()
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.input)
-		metagen := NewNodeMetadataGenerator(cfg, nodes)
+		metagen := NewNodeMetadataGenerator(cfg, nodes, "node1")
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)

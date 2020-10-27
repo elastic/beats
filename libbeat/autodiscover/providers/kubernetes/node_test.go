@@ -245,7 +245,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil, "node1")
 			config := defaultConfig()
 			p := &Provider{
 				config:    config,

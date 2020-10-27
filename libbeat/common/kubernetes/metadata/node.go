@@ -27,13 +27,15 @@ import (
 type node struct {
 	store    cache.Store
 	resource *Resource
+	hostname string
 }
 
 // NewNodeMetadataGenerator creates a metagen for service resources
-func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
+func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store, hostname string) MetaGen {
 	return &node{
 		resource: NewResourceMetadataGenerator(cfg),
 		store:    nodes,
+		hostname: hostname,
 	}
 }
 
@@ -46,6 +48,7 @@ func (n *node) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Ma
 
 	meta := n.resource.Generate("node", obj, opts...)
 	// TODO: Add extra fields in here if need be
+	meta.Put("node.hostname", n.hostname)
 	return meta
 }
 

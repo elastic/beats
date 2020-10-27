@@ -345,6 +345,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					"labels": common.MapStr{
 						"nodekey": "nodevalue",
 					},
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -366,7 +367,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.node)
-		nodeMeta := NewNodeMetadataGenerator(config, nodes)
+		nodeMeta := NewNodeMetadataGenerator(config, nodes, "node1")
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)
