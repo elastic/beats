@@ -5,19 +5,16 @@ heartbeat.config.monitors:
   reload.period: 5s
 
 heartbeat.synthetic_suites:
-- name: Sample appp
-  path: "/home/andrewvc/projects/synthetics/examples/sample-app/journeys/dist"
-  schedule: "@every 1m"
-- name: Docs Suite
-  path: "/home/andrewvc/projects/synthetics/examples/elastic-docs/dist"
+- name: Todos suite
+  path: "/home/andrewvc/projects/synthetics/examples/todos"
   schedule: "@every 1m"
 
 heartbeat.monitors:
 - type: http
-  id: testh
+  id: SimpleHTTP
   urls: http://www.google.com
-  schedule: "@every 1s"
-  name: blah
+  schedule: "@every 15s"
+  name: Simple HTTP
 - type: browser
   id: my-monitor
   name: My Monitor
@@ -34,7 +31,7 @@ heartbeat.monitors:
     step("skip me", async () => {
         // noop
     });
-  schedule: "@every 20s"
+  schedule: "@every 1m"
 
 setup.template.settings:
   index.number_of_shards: 1
