@@ -88,20 +88,9 @@ information.
       supported_protocols: [TLSv1.2]
 ----
 
-*`var.keep_state`*::
-
-By default, this module does not persist the timestamp of the last read event. When you restart the module will read events from the beginning of the
-log. To minimize duplicates documents the module uses the event's Okta UUID
-value as the Elasticsearch `_id`. To use the last read event timestamp between restarts, `var.keep_state` can be set to `true`. It defaults to `false`.
-+
-[source,yaml]
-----
-    var.keep_state: true
-----
-
 *`var.initial_interval`*::
 
-When `var.keep_state` is set to `true`, an initial interval can be defined. The first time the module starts, will fetch events from the current moment minus the initial interval value. It defaults to `24h`.
+An initial interval can be defined. The first time the module starts, will fetch events from the current moment minus the initial interval value. Following restarts will fetch events starting from the last event read. It defaults to `24h`.
 +
 [source,yaml]
 ----
