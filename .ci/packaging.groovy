@@ -71,6 +71,13 @@ pipeline {
           }
         }
         stage('Build Packages'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.linux && !singOnMacOS()
+            }
+          }
           matrix {
             axes {
               axis {
@@ -95,65 +102,28 @@ pipeline {
                   'x-pack/winlogbeat'
                 )
               }
+              axis {
+                name 'PLATFORM'
+                values (
+                  'linux/amd64',
+                  'linux/386',
+                  // 'linux/arm64',
+                  // 'linux/armv7',
+                  // 'linux/ppc64le',
+                  // 'linux/mips64',
+                  // 'linux/s390x',
+                  'windows/amd64',
+                  'windows/386',
+                  'darwin/amd64',
+                  )
+              }
             }
             stages {
               stage('Package Linux'){
                 agent { label 'ubuntu-18 && immutable' }
-                options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.linux
-                  }
-                }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'linux/amd64',
-                    'linux/386',
-                    'linux/arm64',
-                    'linux/armv7',
-                    'linux/ppc64le',
-                    'linux/mips64',
-                    'linux/s390x',
-                    'windows/amd64',
-                    'windows/386',
-                    (params.macos ? '' : 'darwin/amd64'),
-                  ].join(' ')
-                }
                 steps {
-                  withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
-                    deleteDir()
-                    release()
-                    pushCIDockerImages()
-                  }
+                  packageLinux()
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
-                }
-              }
-              stage('Package Mac OS'){
-                agent { label 'macosx-10.12' }
-                options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.macos
-                  }
-                }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'darwin/amd64',
-                  ].join(' ')
-                }
-                steps {
-                  withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-                    deleteDir()
-                    withMacOSEnv(){
-                      release()
-                    }
-                  }
                 }
               }
             }
@@ -167,6 +137,51 @@ pipeline {
           }
         }
       }
+    }
+  }
+}
+
+/*
+stage('Package Mac OS'){
+  agent { label 'macosx-10.12' }
+  when {
+    beforeAgent true
+    expression {
+      return singOnMacOS()
+    }
+  }
+  steps {
+    packageMacOS()
+  }
+}
+*/
+def singOnMacOS(){
+  return params.macos && env.PLATFORM == 'darwin/amd64'
+}
+
+def packageMacOS(){
+  withEnv([
+    "HOME=${env.WORKSPACE}",
+    "PLATFORMS=+all ${env.PLATFORM}"
+  ]){
+    withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+      deleteDir()
+      withMacOSEnv(){
+        release()
+      }
+    }
+  }
+}
+
+def packageLinux(){
+  withEnv([
+    "HOME=${env.WORKSPACE}",
+    "PLATFORMS=+all ${env.PLATFORM}"
+  ]){
+    withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+      deleteDir()
+      release()
+      pushCIDockerImages()
     }
   }
 }
