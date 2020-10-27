@@ -57,9 +57,9 @@ func streamFactory(ctx context.Context, agentInfo *info.AgentInfo, cfg *configur
 }
 
 func newOperator(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, id routingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) (*operation.Operator, error) {
-	fetcher := downloader.NewDownloader(log, config.DownloadConfig, false)
+	fetcher := downloader.NewDownloader(log, config.DownloadConfig)
 	allowEmptyPgp, pgp := release.PGP()
-	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp, false)
+	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp)
 	if err != nil {
 		return nil, errors.New(err, "initiating verifier")
 	}
