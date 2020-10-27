@@ -327,7 +327,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 // contains a superset of new's hashes then false is returned.
 func diffEvents(old, new *Event) (Action, bool) {
 	if old == new {
-		return 0, false
+		return None, false
 	}
 
 	if old == nil && new != nil {

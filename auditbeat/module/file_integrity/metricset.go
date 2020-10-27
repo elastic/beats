@@ -246,14 +246,15 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 	}
 
 	action, changed := diffEvents(lastEvent, event)
-	if event.Action == 0 {
+	if event.Action != InitialScan {
 		event.Action = action
 	}
 
 	if changed {
 		ms.log.Debugw("File changed since it was last seen",
 			"file_path", event.Path, "took", event.rtt,
-			logp.Namespace("event"), "old", lastEvent, "new", event)
+			logp.Namespace("event"), "action", event.Action,
+			"old", lastEvent, "new", event)
 	}
 	return changed, lastEvent
 }
