@@ -17,7 +17,7 @@ import (
 
 // NewVerifier creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewVerifier(log *logger.Logger, config *artifact.Config, allowEmptyPgp bool, pgp []byte, forceSnapshot bool) (download.Verifier, error) {
+func NewVerifier(log *logger.Logger, config *artifact.Config, allowEmptyPgp bool, pgp []byte) (download.Verifier, error) {
 	verifiers := make([]download.Verifier, 0, 3)
 
 	fsVer, err := fs.NewVerifier(config, allowEmptyPgp, pgp)
@@ -27,8 +27,8 @@ func NewVerifier(log *logger.Logger, config *artifact.Config, allowEmptyPgp bool
 	verifiers = append(verifiers, fsVer)
 
 	// try snapshot repo before official
-	if release.Snapshot() || forceSnapshot {
-		snapshotVerifier, err := snapshot.NewVerifier(config, allowEmptyPgp, pgp)
+	if release.Snapshot() {
+		snapshotVerifier, err := snapshot.NewVerifier(config, allowEmptyPgp, pgp, "")
 		if err != nil {
 			log.Error(err)
 		} else {
