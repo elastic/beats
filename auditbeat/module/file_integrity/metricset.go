@@ -246,7 +246,7 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 	}
 
 	action, changed := diffEvents(lastEvent, event)
-	if event.Action != InitialScan {
+	if event.Action == None || event.Action&Updated > 0 {
 		event.Action = action
 	}
 
