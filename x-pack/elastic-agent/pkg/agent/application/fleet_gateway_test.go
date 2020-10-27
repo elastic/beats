@@ -60,7 +60,7 @@ func (t *testingClient) Answer(fn clientCallbackFunc) <-chan struct{} {
 }
 
 func newTestingClient() *testingClient {
-	return &testingClient{received: make(chan struct{})}
+	return &testingClient{received: make(chan struct{}, 1)}
 }
 
 type testingDispatcherFunc func(...action) error
@@ -100,7 +100,7 @@ func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
 }
 
 func newTestingDispatcher() *testingDispatcher {
-	return &testingDispatcher{received: make(chan struct{})}
+	return &testingDispatcher{received: make(chan struct{}, 1)}
 }
 
 type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
@@ -128,7 +128,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			newNoopAcker(),
 		)
 
-		go gateway.Start()
+		gateway.Start()
 		defer cancel()
 
 		require.NoError(t, err)
@@ -137,15 +137,12 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 	}
 }
 
-func ackSeq(channels ...<-chan struct{}) <-chan struct{} {
-	comm := make(chan struct{})
-	go func(comm chan struct{}) {
+func ackSeq(channels ...<-chan struct{}) func() {
+	return func() {
 		for _, c := range channels {
 			<-c
 		}
-		comm <- struct{}{}
-	}(comm)
-	return comm
+	}
 }
 
 func wrapStrToResp(code int, body string) *http.Response {
@@ -177,7 +174,7 @@ func TestFleetGateway(t *testing.T) {
 		scheduler *scheduler.Stepper,
 		rep repo.Backend,
 	) {
-		received := ackSeq(
+		waitFn := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
@@ -190,7 +187,7 @@ func TestFleetGateway(t *testing.T) {
 
 		// Synchronize scheduler and acking of calls from the worker go routine.
 		scheduler.Next()
-		<-received
+		waitFn()
 	}))
 
 	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
@@ -201,7 +198,7 @@ func TestFleetGateway(t *testing.T) {
 		scheduler *scheduler.Stepper,
 		rep repo.Backend,
 	) {
-		received := ackSeq(
+		waitFn := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				// TODO: assert no events
 				resp := wrapStrToResp(http.StatusOK, `
@@ -232,7 +229,7 @@ func TestFleetGateway(t *testing.T) {
 		)
 
 		scheduler.Next()
-		<-received
+		waitFn()
 	}))
 
 	// Test the normal time based execution.
@@ -255,14 +252,14 @@ func TestFleetGateway(t *testing.T) {
 			newNoopAcker(),
 		)
 
-		go gateway.Start()
+		gateway.Start()
 		defer cancel()
 
 		require.NoError(t, err)
 
 		var count int
 		for {
-			received := ackSeq(
+			waitFn := ackSeq(
 				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 					resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 					return resp, nil
@@ -273,7 +270,7 @@ func TestFleetGateway(t *testing.T) {
 				}),
 			)
 
-			<-received
+			waitFn()
 			count++
 			if count == 5 {
 				return
@@ -290,7 +287,7 @@ func TestFleetGateway(t *testing.T) {
 		rep repo.Backend,
 	) {
 		rep.Report(context.Background(), &testStateEvent{})
-		received := ackSeq(
+		waitFn := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				cr := &request{}
 				content, err := ioutil.ReadAll(body)
@@ -315,7 +312,7 @@ func TestFleetGateway(t *testing.T) {
 
 		// Synchronize scheduler and acking of calls from the worker go routine.
 		scheduler.Next()
-		<-received
+		waitFn()
 	}))
 
 	t.Run("Test the wait loop is interruptible", func(t *testing.T) {
@@ -345,7 +342,7 @@ func TestFleetGateway(t *testing.T) {
 
 		require.NoError(t, err)
 
-		go gateway.Start()
+		gateway.Start()
 
 		// Silently dispatch action.
 		ch1 := dispatcher.Answer(func(actions ...action) error { return nil })
@@ -401,7 +398,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			}
 
 			// Initial tick is done out of bound so we can block on channels.
-			go scheduler.Next()
+			scheduler.Next()
 
 			// Simulate a 500 errors for the next 3 calls.
 			<-client.Answer(fail)
@@ -409,7 +406,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			<-client.Answer(fail)
 
 			// API recover
-			received := ackSeq(
+			waitFn := ackSeq(
 				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 					cr := &request{}
 					content, err := ioutil.ReadAll(body)
@@ -433,7 +430,7 @@ func TestRetriesOnFailures(t *testing.T) {
 				}),
 			)
 
-			<-received
+			waitFn()
 		}))
 
 	t.Run("The retry loop is interruptible",
@@ -455,7 +452,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			}
 
 			// Initial tick is done out of bound so we can block on channels.
-			go scheduler.Next()
+			scheduler.Next()
 
 			// Fail to enter retry loop, all other calls will fails and will force to wait on big initial
 			// delay.
