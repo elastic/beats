@@ -716,6 +716,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
 - Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
 - Adding support for FIPS in s3 input {pull}21446[21446]
+- Update Okta documentation for new stateful restarts. {pull}22091[22091]
 
 *Heartbeat*
 
