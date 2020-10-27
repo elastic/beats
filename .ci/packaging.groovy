@@ -78,55 +78,8 @@ pipeline {
               return params.linux && !singOnMacOS()
             }
           }
-          matrix {
-            axes {
-              axis {
-                name 'BEATS_FOLDER'
-                values (
-                  'auditbeat',
-                  'filebeat',
-                  'heartbeat',
-                  'journalbeat',
-                  'metricbeat',
-                  'packetbeat',
-                  'winlogbeat',
-                  'x-pack/auditbeat',
-                  'x-pack/elastic-agent',
-                  'x-pack/dockerlogbeat',
-                  'x-pack/filebeat',
-                  'x-pack/functionbeat',
-                   'x-pack/heartbeat',
-                  // 'x-pack/journalbeat',
-                  'x-pack/metricbeat',
-                  // 'x-pack/packetbeat',
-                  'x-pack/winlogbeat'
-                )
-              }
-              axis {
-                name 'PLATFORM'
-                values (
-                  'linux/amd64',
-                  'linux/386',
-                  // 'linux/arm64',
-                  // 'linux/armv7',
-                  // 'linux/ppc64le',
-                  // 'linux/mips64',
-                  // 'linux/s390x',
-                  'windows/amd64',
-                  'windows/386',
-                  'darwin/amd64',
-                  )
-              }
-            }
-            stages {
-              stage('Package Linux'){
-                agent { label 'ubuntu-18 && immutable' }
-                steps {
-                  packageLinux()
-                  prepareE2ETestForPackage("${BEATS_FOLDER}")
-                }
-              }
-            }
+          steps {
+            package()
           }
         }
         stage('Run E2E Tests for Packages'){
@@ -141,42 +94,84 @@ pipeline {
   }
 }
 
-/*
-stage('Package Mac OS'){
-  agent { label 'macosx-10.12' }
-  when {
-    beforeAgent true
-    expression {
-      return singOnMacOS()
-    }
-  }
-  steps {
-    packageMacOS()
-  }
+def beats(){
+  return (
+    'auditbeat',
+    'filebeat',
+    'heartbeat',
+    'journalbeat',
+    'metricbeat',
+    'packetbeat',
+    'winlogbeat',
+    'x-pack/auditbeat',
+    'x-pack/elastic-agent',
+    'x-pack/dockerlogbeat',
+    'x-pack/filebeat',
+    'x-pack/functionbeat',
+    'x-pack/heartbeat',
+    // 'x-pack/journalbeat',
+    'x-pack/metricbeat',
+    // 'x-pack/packetbeat',
+    'x-pack/winlogbeat'
+  )
 }
-*/
+
+def platform(){
+  return (
+    'linux/amd64',
+    'linux/386',
+    'linux/arm64',
+    'linux/armv7',
+    'linux/ppc64le',
+    'linux/mips64',
+    'linux/s390x',
+    'windows/amd64',
+    'windows/386',
+    'darwin/amd64',
+    )
+}
+
 def singOnMacOS(){
   return params.macos && env.PLATFORM == 'darwin/amd64'
 }
 
-def packageMacOS(){
-  withEnv([
-    "HOME=${env.WORKSPACE}",
-    "PLATFORMS=+all ${env.PLATFORM}"
-  ]){
-    withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-      deleteDir()
-      withMacOSEnv(){
-        release()
+def package(){
+  tasks = [:]
+  beats().each{ beat ->
+    platform().each{ platform ->
+      task["Packaging ${beats}-${platform}"] = {
+        packageMacOS(beats, platform)
+        packageLinux(beats, platform)
+        prepareE2ETestForPackage("${beats}")
+      }
+    }
+  }
+  parallel tasks
+}
+
+def packageMacOS(beats, platform){
+  if(singOnMacOS()){
+    node('macosx-10.12'){
+    withEnv([
+      "HOME=${env.WORKSPACE}",
+      "PLATFORMS=+all ${platform}",
+      "BEATS_FOLDER=${beat}"
+    ]){
+      withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
+        deleteDir()
+        withMacOSEnv(){
+          release()
+        }
       }
     }
   }
 }
 
-def packageLinux(){
+def packageLinux(beats, platform){
   withEnv([
     "HOME=${env.WORKSPACE}",
-    "PLATFORMS=+all ${env.PLATFORM}"
+    "PLATFORMS=+all ${platform}",
+    "BEATS_FOLDER=${beat}"
   ]){
     withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
       deleteDir()
