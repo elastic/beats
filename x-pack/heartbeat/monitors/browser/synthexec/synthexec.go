@@ -27,6 +27,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -53,6 +54,10 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		suiteFile,
 		"--dry-run",
 	)
+	cmd.Dir, err = getSuiteDir(suiteFile)
+	if err != nil {
+		return nil, err
+	}
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
 Outer:
@@ -73,18 +78,25 @@ Outer:
 }
 
 // SuiteJob will run a single journey by name from the given suite file.
-func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) jobs.Job {
+func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) (jobs.Job, error) {
+	dir, err := getSuiteDir(suiteFile)
+	if err != nil {
+		return nil, err
+	}
+
 	newCmd := func() *exec.Cmd {
-		return exec.Command(
+		cmd := exec.Command(
 			"npx",
 			"@elastic/synthetics",
 			suiteFile,
 			"--screenshots",
 			"--journey-name", journeyName,
 		)
+		cmd.Dir = dir
+		return cmd
 	}
 
-	return startCmdJob(ctx, newCmd, nil, params)
+	return startCmdJob(ctx, newCmd, nil, params), nil
 }
 
 // JourneyJob returns a job that runs the given source as a single journey.
@@ -180,16 +192,16 @@ func runCmd(
 	cmd.Args = append(cmd.Args,
 		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
 		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
-		"--outfd", "3",
 		"--json",
 		"--network",
+		"--outfd", "3",
 	)
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
 	}
 
-	logp.Info("Running command: %s", cmd.String())
+	logp.Info("Running command: %s in directory: '%s'", cmd.String(), cmd.Dir)
 
 	if stdinStr != nil {
 		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
@@ -232,9 +244,12 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := cmd.Wait()
+		if err != nil {
+			logp.Err("Error waiting for command %s: %s", cmd.String(), err)
+		}
 		jsonWriter.Close()
 		jsonReader.Close()
-		logp.Debug(debugSelector, "Command has completed %d", cmd.ProcessState.ExitCode())
+		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd.String())
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(&SynthEvent{
@@ -314,3 +329,21 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	}
 	return
 }
+
+func getSuiteDir(suiteFile string) (string, error) {
+	path, err := filepath.Abs(suiteFile)
+	if err != nil {
+		return "", err
+	}
+	stat, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if stat.IsDir() {
+		return suiteFile, nil
+	}
+
+	return filepath.Dir(suiteFile), nil
+}
+
