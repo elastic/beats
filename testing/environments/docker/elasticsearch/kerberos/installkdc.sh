@@ -25,8 +25,6 @@ set -e
 LOCALSTATEDIR=/etc
 LOGDIR=/var/log/krb5
 
-#MARKER_FILE=/etc/marker
-
 # Transfer and interpolate krb5.conf
 cp /config/krb5.conf.template $LOCALSTATEDIR/krb5.conf
 sed -i 's/${REALM_NAME}/'$REALM_NAME'/g' $LOCALSTATEDIR/krb5.conf
@@ -48,12 +46,6 @@ mkdir -p $LOGDIR
 touch $LOGDIR/kadmin.log
 touch $LOGDIR/krb5kdc.log
 touch $LOGDIR/krb5lib.log
-
-# Update package manager
-yum update -qqy
-
-# Install krb5 packages
-yum install -qqy krb5-{server,libs,workstation}
 
 # Create kerberos database with stash file and garbage password
 kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876
