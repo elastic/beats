@@ -200,6 +200,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `libbeat.output.write.bytes` and `libbeat.output.read.bytes` metrics of the Elasticsearch output. {issue}20752[20752] {pull}21197[21197]
 - The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 - Orderly close processors when processing pipelines are not needed anymore to release their resources. {pull}16349[16349]
+- Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 
 *Auditbeat*
 
