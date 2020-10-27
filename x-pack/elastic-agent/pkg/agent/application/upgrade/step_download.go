@@ -7,15 +7,26 @@ package upgrade
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/composed"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/fs"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/http"
 	downloader "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/localremote"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/snapshot"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
 	// do not update source config
 	settings := *u.settings
+
+	// agent binaries are a bit larger and do not fit into normal timeout on slower connections
+	settings.Timeout = 120 * time.Second
 	if sourceURI != "" {
 		if strings.HasPrefix(sourceURI, "file://") {
 			// update the DropPath so the fs.Downloader can download from this
@@ -26,13 +37,16 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		}
 	}
 
-	allowEmptyPgp, pgp := release.PGP()
-	verifier, err := downloader.NewVerifier(u.log, &settings, allowEmptyPgp, pgp, true)
+	verifier, err := newVerifier(version, u.log, &settings)
 	if err != nil {
 		return "", errors.New(err, "initiating verifier")
 	}
 
-	fetcher := downloader.NewDownloader(u.log, &settings, true)
+	fetcher, err := newDownloader(version, u.log, &settings)
+	if err != nil {
+		return "", errors.New(err, "initiating fetcher")
+	}
+
 	path, err := fetcher.Download(ctx, agentName, agentArtifactName, version)
 	if err != nil {
 		return "", errors.New(err, "failed upgrade of agent binary")
@@ -47,4 +61,46 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	}
 
 	return path, nil
+}
+
+func newDownloader(version string, log *logger.Logger, settings *artifact.Config) (download.Downloader, error) {
+	if !strings.HasSuffix(version, "-SNAPSHOT") {
+		return downloader.NewDownloader(log, settings), nil
+	}
+
+	// try snapshot repo before official
+	snapDownloader, err := snapshot.NewDownloader(settings, version)
+	if err != nil {
+		return nil, err
+	}
+
+	return composed.NewDownloader(
+		fs.NewDownloader(settings),
+		snapDownloader,
+		http.NewDownloader(settings),
+	), nil
+}
+
+func newVerifier(version string, log *logger.Logger, settings *artifact.Config) (download.Verifier, error) {
+	allowEmptyPgp, pgp := release.PGP()
+	if !strings.HasSuffix(version, "-SNAPSHOT") {
+		return downloader.NewVerifier(log, settings, allowEmptyPgp, pgp)
+	}
+
+	fsVerifier, err := fs.NewVerifier(settings, allowEmptyPgp, pgp)
+	if err != nil {
+		return nil, err
+	}
+
+	snapshotVerifier, err := snapshot.NewVerifier(settings, allowEmptyPgp, pgp, version)
+	if err != nil {
+		return nil, err
+	}
+
+	remoteVerifier, err := http.NewVerifier(settings, allowEmptyPgp, pgp)
+	if err != nil {
+		return nil, err
+	}
+
+	return composed.NewVerifier(fsVerifier, snapshotVerifier, remoteVerifier), nil
 }
