@@ -127,7 +127,13 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
+      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
+      dir("${BASE_DIR}"){
+        // TODO analyzeFlakey does not support other release branches but the master branch.
+        notifyBuildResult(prComment: true,
+                          slackComment: true, slackNotify: (isBranch() || isTag()),
+                          analyzeFlakey: true, flakyReportIdx: "reporter-beats-beats-master")
+      }
     }
   }
 }
