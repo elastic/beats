@@ -2,26 +2,39 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "app": {
-            "id": "3ce55e14-de73-49af-836d-adc93f3fee39"
+            "id": "8d165a12-fbd8-40cb-b71a-5bc6086df04c",
+            "name": "log-gen"
         },
         "container": {
-            "cpu.pct": 0.19431789913648675,
-            "disk.bytes": 16678912,
-            "disk.quota.bytes": 33554432,
-            "instance_index": 0,
-            "memory.bytes": 8529920,
-            "memory.quota.bytes": 33554432
+            "cpu.pct": 4.231873716293137,
+            "disk.bytes": 122691584,
+            "disk.quota.bytes": 1073741824,
+            "instance_index": 3,
+            "memory.bytes": 52250065,
+            "memory.quota.bytes": 1073741824
         },
         "envelope": {
-            "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "c2bcf5d6-7ff9-4876-890f-6f8fc6c58668",
-            "ip": "192.168.16.51",
+            "deployment": "cf-9c11cd01425665e2ed6d",
+            "index": "9e1a45be-f8a4-44ef-9c34-22f6e51ce4c7",
+            "ip": "192.168.16.37",
             "job": "diego_cell",
             "origin": "rep"
         },
+        "org": {
+            "id": "4af89198-dd33-4542-9915-f489542bc058",
+            "name": "elastic-logging-org"
+        },
+        "space": {
+            "id": "10ed1559-e399-4034-babf-6424ef888dc1",
+            "name": "logging-space"
+        },
         "tags": {
-            "product": "Pivotal Application Service",
-            "source_id": "3ce55e14-de73-49af-836d-adc93f3fee39"
+            "instance_id": "3",
+            "process_id": "8d165a12-fbd8-40cb-b71a-5bc6086df04c",
+            "process_instance_id": "75568c86-b9e0-4330-4784-928b",
+            "process_type": "web",
+            "product": "VMware Tanzu Application Service",
+            "source_id": "8d165a12-fbd8-40cb-b71a-5bc6086df04c"
         },
         "type": "container"
     },
