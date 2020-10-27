@@ -159,8 +159,6 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
-	t.Skip("Flaky when CI is slower")
-
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
 		Duration: 5 * time.Second,
@@ -408,7 +406,7 @@ func TestRetriesOnFailures(t *testing.T) {
 
 			// API recover
 			waitFn := ackSeq(
-				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+				client.Answer(func(_ http.Header, body io.Reader) (*http.Response, error) {
 					cr := &request{}
 					content, err := ioutil.ReadAll(body)
 					if err != nil {
