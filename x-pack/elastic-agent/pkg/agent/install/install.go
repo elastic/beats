@@ -53,7 +53,10 @@ func Install() error {
 
 	// place shell wrapper, if present on platform
 	if ShellWrapperPath != "" {
-		err = ioutil.WriteFile(ShellWrapperPath, []byte(ShellWrapper), 0755)
+		err = os.MkdirAll(filepath.Dir(ShellWrapperPath), 0755)
+		if err == nil {
+			err = ioutil.WriteFile(ShellWrapperPath, []byte(ShellWrapper), 0755)
+		}
 		if err != nil {
 			return errors.New(
 				err,
