@@ -78,7 +78,8 @@ func newOutputController(
 
 	ctx := &batchContext{}
 	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer, cfg)
+	rcfg, _ := cfg.Child("retryer", -1)
+	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer, rcfg)
 
 	ctx.observer = observer
 	ctx.retryer = c.retryer

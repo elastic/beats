@@ -98,9 +98,7 @@ func newRetryer(
 		doneWaiter: sync.WaitGroup{},
 	}
 	if cfg.Enabled() {
-		if rcfg, err := cfg.Child("retryer", -1); err == nil && rcfg.Enabled() {
-			rcfg.Unpack(&r)
-		}
+		cfg.Unpack(&r)
 	}
 
 	r.doneWaiter.Add(1)
@@ -184,7 +182,6 @@ func (r *retryer) loop() {
 					r.backoff(&currentBackoff)
 				}
 			}
-
 		case out <- active:
 			r.observer.eventsRetry(activeSize)
 
