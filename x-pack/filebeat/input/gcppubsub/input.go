@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package googlepubsub
+package gcppubsub
 
 import (
 	"context"
@@ -26,13 +26,19 @@ import (
 )
 
 const (
-	inputName = "google-pubsub"
+	inputName = "gcp-pubsub"
+	oldInputName = "google-pubsub"
 )
 
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+	}
+
+	err = input.Register(oldInputName, NewInput)
+	if err != nil {
+		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
 	}
 }
 
@@ -81,7 +87,7 @@ func NewInput(
 
 	in := &pubsubInput{
 		config: conf,
-		log: logp.NewLogger("google.pubsub").With(
+		log: logp.NewLogger("gcp.pubsub").With(
 			"pubsub_project", conf.ProjectID,
 			"pubsub_topic", conf.Topic,
 			"pubsub_subscription", conf.Subscription),
@@ -109,7 +115,7 @@ func NewInput(
 	if err != nil {
 		return nil, err
 	}
-	in.log.Info("Initialized Google Pub/Sub input.")
+	in.log.Info("Initialized GCP Pub/Sub input.")
 	return in, nil
 }
 
