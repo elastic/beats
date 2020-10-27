@@ -11,20 +11,21 @@ https://github.com/elastic/beats/compare/v7.9.2...v7.9.3[View commits]
 
 *Affecting all Beats*
 
-- The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
+- The `o365audit` input and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 
 *Auditbeat*
 
-- system/socket: Fixed a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
+- system/socket: Fix a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
 
 *Filebeat*
 
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
+
 *Metricbeat*
 
-- Fix remote_write flaky test. {pull}21173[21173]
-- Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
-- [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
+- Fix `remote_write` flaky test. {pull}21173[21173]
+- Fix panic in Kubernetes autodiscovery caused by storing stateless keystores. {issue}21843[21843] {pull}21880[21880]
+- Remove redundant dockersock volume mount to avoid problems on Kubernetes deployments that do not use docker as the container runtime. {pull}22009[22009]
 
 
 [[release-notes-7.9.2]]
@@ -2607,7 +2608,7 @@ https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
 
 *Filebeat*
 
-- Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add container image in Kubernetes metadata. {pull}13356[13356] {issue}12688[12688]
 
 [[release-notes-6.8.12]]
 === Beats version 6.8.12

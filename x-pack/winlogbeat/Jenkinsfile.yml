@@ -47,3 +47,14 @@ stages:
                 - "windows-2012"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+    windows-10:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-10"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/winlogbeat for windows-10"
+            labels:
+                - "windows-10"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
