@@ -162,7 +162,7 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
-	t.Fatal("for testing the flaky test reporting for an existing flaky test")
+
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
 		Duration: 5 * time.Second,
@@ -379,7 +379,6 @@ func TestFleetGateway(t *testing.T) {
 }
 
 func TestRetriesOnFailures(t *testing.T) {
-	t.Fatal("for testing the flaky test reporting for an existing flaky test")
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
 		Duration: 5 * time.Second,
