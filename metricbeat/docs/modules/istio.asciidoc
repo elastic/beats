@@ -84,7 +84,7 @@ metricbeat.modules:
 - module: istio
   metricsets: ["citadel"]
   period: 10s
-  # use istio-citadel.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
 # Istio istiod to monitor the Istio Daemon for versions after 1.5 of Istio.
