@@ -7,7 +7,6 @@ package upgrade
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -24,9 +23,6 @@ import (
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
 	// do not update source config
 	settings := *u.settings
-
-	// agent binaries are a bit larger and do not fit into normal timeout on slower connections
-	settings.Timeout = 120 * time.Second
 	if sourceURI != "" {
 		if strings.HasPrefix(sourceURI, "file://") {
 			// update the DropPath so the fs.Downloader can download from this
