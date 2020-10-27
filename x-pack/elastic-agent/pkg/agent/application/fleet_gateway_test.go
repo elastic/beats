@@ -100,7 +100,7 @@ func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
 }
 
 func newTestingDispatcher() *testingDispatcher {
-	return &testingDispatcher{received: make(chan struct{}, 10)}
+	return &testingDispatcher{received: make(chan struct{}, 1)}
 }
 
 type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
