@@ -40,6 +40,7 @@ pipeline {
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
+    booleanParam(name: 'dry_run', defaultValue: false, description: 'Execute the pipeline without generate packages.')
   }
   stages {
     stage('Filter build') {
@@ -49,7 +50,7 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
-            def ret = isUserTrigger() || isUpstreamTrigger()
+            def ret = isUserTrigger() || isUpstreamTrigger() || params.dry_run
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
               currentBuild.description = "The build has been skipped"
@@ -72,12 +73,6 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return params.linux && !singOnMacOS()
-            }
-          }
           steps {
             packageTask()
           }
@@ -245,6 +240,10 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
 
+  if(params.dry_run){
+    return
+  }
+
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
@@ -332,6 +331,10 @@ def triggerE2ETests(String suite) {
     parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
   }
 
+  if(params.dry_run){
+    return
+  }
+
   build(job: "${e2eTestsPipeline}",
     parameters: parameters,
     propagate: false,
@@ -348,6 +351,9 @@ def withMacOSEnv(Closure body){
       [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
       [var: "APPLE_SIGNING_ENABLED", password: "true"],
   ]){
+    if(params.dry_run){
+      return
+    }
     body()
   }
 }
@@ -394,6 +400,9 @@ def withBeatsEnv(Closure body) {
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+      if(params.dry_run){
+        return
+      }
       dir("${env.BASE_DIR}"){
         body()
       }
