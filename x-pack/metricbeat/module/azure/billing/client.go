@@ -6,8 +6,9 @@ package billing
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
 	"github.com/pkg/errors"
 
