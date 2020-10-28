@@ -96,7 +96,7 @@ This metricset will collect metrics from the storage accounts, these metrics wil
 so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
 
 [float]
-=== `container_instance`
+=== `container_instance`a
 This metricset will collect metrics from specified container groups, these metrics will have a timegrain every 5 minutes,
 so the `period` for `container_instance` metricset  should be `300s` or multiples of `300s`.
 
