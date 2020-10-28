@@ -1,0 +1,5 @@
+- key: mysql
+  title: mysql
+  description: >
+    Some mysql module
+  fields:

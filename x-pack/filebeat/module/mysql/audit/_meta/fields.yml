@@ -1,0 +1,11 @@
+- name: mysql
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing Checkpoint syslog.
+  fields:
+    - name: json.connection_id
+      type: flattened
+      description: >
+        test
