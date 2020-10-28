@@ -74,22 +74,18 @@ inputs:
   host: "http://localhost:80/service/status"
   timeout: 16s
   wait: 1s
-- type: network/flow
-  name: flow-1
-  timeout: 10s
-  period: 10s
-  keep_null: false
+- type: packet
   streams:
-    - type: network/flow
+    - type: flow
+      timeout: 10s
+      period: 10s
+      keep_null: false
       data_stream:
-        dataset: network.flow
+        dataset: packet.flow
         type: logs
-- type: network/icmp
-  name: icmp-1
-  streams:
-    - type: network/icmp
+    - type: icmp
       data_stream:
-        dataset: network.icmp
+        dataset: packet.icmp
         type: logs
 - id: endpoint-id
   type: endpoint
