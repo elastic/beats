@@ -131,14 +131,40 @@ pipeline {
     cleanup {
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
-        // TODO analyzeFlakey does not support other release branches but the master branch.
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: true, flakyReportIdx: "reporter-beats-beats-master")
+                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
       }
     }
   }
 }
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getIdSuffix() {
+  if(isPR()) {
+    return getBranchIndice(env.CHANGE_TARGET)
+  }
+  if(isBranch()) {
+    return getBranchIndice(env.BRANCH_NAME)
+  }
+}
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getBranchIndice(String compare) {
+  if (compare?.equals('master') || compare.equals('7.x')) {
+    return compare
+  } else {
+    if (compare.startsWith('7.')) {
+      return '7.x'
+    }
+  }
+  return 'master'
+}
+
 
 /**
 * This method is the one used for running the parallel stages, therefore
@@ -304,6 +330,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.name "beatsmachine"
           fi''')
       }
+      // Skip to upload the generated files by default.
+      def upload = false
       try {
         // Add more stability when dependencies are not accessible temporarily
         // See https://github.com/elastic/beats/issues/21609
@@ -313,9 +341,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
           cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
         }
         body()
+      } catch(err) {
+        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+        upload = true
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id)
+          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         // Tear down the setup for the permamnent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
@@ -393,16 +424,20 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
+      if (args.upload) {
+        tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
+      }
     }
-    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
-      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
-      if (folder.trim()) {
-        // TODO: nodeOS() should support ARM
-        def os_suffix = isArm() ? 'linux' : nodeOS()
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+    if (args.upload) {
+      catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+        def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+        log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+        if (folder.trim()) {
+          // TODO: nodeOS() should support ARM
+          def os_suffix = isArm() ? 'linux' : nodeOS()
+          def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
+          tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+        }
       }
     }
   }
