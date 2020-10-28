@@ -279,18 +279,21 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
     return
   }
 
-  def iterations = 0
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    iterations++
-    def status = sh(label: "Change tag and push ${targetName}", script: """
-      docker tag ${sourceName} ${targetName}
-      docker push ${targetName}
-    """, returnStatus: true)
+  def exists = sh(label: "Check if ${targetName} Docker image exist", script: "docker inspect ${sourceName}", returnStatus: true)
+  if(exists == 0){
+    def iterations = 0
+    retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+      iterations++
+      def status = sh(label: "Change tag and push ${targetName}", script: """
+        docker tag ${sourceName} ${targetName}
+        docker push ${targetName}
+      """, returnStatus: true)
 
-    if ( status > 0 && iterations < 3) {
-      error("tag and push failed for ${beatName}, retry")
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      if ( status > 0 && iterations < 3) {
+        error("tag and push failed for ${beatName}, retry")
+      } else if ( status > 0 ) {
+        log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+      }
     }
   }
 }
