@@ -48,13 +48,35 @@ func init() {
 
 // ListJourneys takes the given suite perfors a dry run, capturing the Journey names, and returns the list.
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
+	dir, err := getSuiteDir(suiteFile)
+
+	if os.Getenv("HEARTBEAT_SYNTHETICS_TGZ") != "" {
+		cmd := exec.Command("npm", "install", os.Getenv("HEARTBEAT_SYNTHETICS_TGZ"))
+		cmd.Dir = dir
+		logp.Info("Running %s", cmd)
+		output, err := cmd.CombinedOutput()
+		logp.Info("Ran %s, got: %s", cmd, string(output))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		cmd := exec.Command("npm", "install")
+		cmd.Dir = dir
+		logp.Info("Running %s", cmd)
+		output, err := cmd.CombinedOutput()
+		logp.Info("Ran %s got %s", cmd, string(output))
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	cmd := exec.Command(
 		"npx",
 		"@elastic/synthetics",
 		suiteFile,
 		"--dry-run",
 	)
-	cmd.Dir, err = getSuiteDir(suiteFile)
+	cmd.Dir = dir
 	if err != nil {
 		return nil, err
 	}
