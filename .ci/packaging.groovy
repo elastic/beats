@@ -110,31 +110,31 @@ pipeline {
 def beats(){
   beatsList = []
   if(params.auditbeat){
-    beatsList << ['auditbeat', 'x-pack/auditbeat']
+    beatsList << 'auditbeat' << 'x-pack/auditbeat'
   }
   if(params.filebeat){
-    beatsList << ['filebeat', 'x-pack/filebeat']
+    beatsList << 'filebeat' << 'x-pack/filebeat'
   }
   if(params.heartbeat){
-    beatsList << ['heartbeat', 'x-pack/heartbeat']
+    beatsList << 'heartbeat' << 'x-pack/heartbeat'
   }
   if(params.journalbeat){
-    beatsList << ['journalbeat']
+    beatsList << 'journalbeat'
   }
   if(params.metricbeat){
-    beatsList << ['metricbeat', 'x-pack/metricbeat']
+    beatsList << 'metricbeat' << 'x-pack/metricbeat'
   }
   if(params.packetbeat){
-    beatsList << ['packetbeat', 'x-pack/packetbeat']
+    beatsList << 'packetbeat' << 'x-pack/packetbeat'
   }
   if(params.elastic_agent){
-    beatsList << ['x-pack/elastic-agent']
+    beatsList << 'x-pack/elastic-agent'
   }
   if(params.dockerlogbeat){
-    beatsList << ['x-pack/dockerlogbeat']
+    beatsList << 'x-pack/dockerlogbeat'
   }
   if(params.functionbeat){
-    beatsList << ['x-pack/functionbeat']
+    beatsList << 'x-pack/functionbeat'
   }
   return beatsList
 }
@@ -143,20 +143,20 @@ def platform(){
   platformsList = []
   if(params.linux){
     if(params.i386_amd64) {
-      platformsList << ['linux/amd64 linux/386']
+      platformsList << 'linux/amd64 linux/386'
     }
     if(params.arm) {
-      platformsList << ['linux/arm64 linux/armv7']
+      platformsList << 'linux/arm64 linux/armv7'
     }
     if(params.ppc_mips_x390s) {
-      platformsList << ['linux/ppc64le linux/mips64 linux/s390x']
+      platformsList << 'linux/ppc64le linux/mips64 linux/s390x'
     }
   }
   if(params.windows){
-    platformsList << ['windows/amd64 windows/386']
+    platformsList << 'windows/amd64 windows/386'
   }
   if(params.macos){
-    platformsList << ['darwin/amd64']
+    platformsList << 'darwin/amd64'
   }
   return platformsList
 }
