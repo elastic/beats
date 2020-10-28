@@ -8,6 +8,32 @@
       type: keyword
       description: >
         Cluster status (green, yellow, red).
+    - name: nodes
+      type: group
+      description: >
+        Nodes statistics.
+      fields:
+      - name: count
+        type: alias
+        path: elasticsearch.cluster.stats.nodes.count.total
+      - name: count.total
+        type: long
+        description: >
+          Total number of nodes in cluster.
+      - name: master
+        type: alias
+        path: elasticsearch.cluster.stats.nodes.count.master
+      - name: count.master
+        type: long
+        description: >
+          Number of master-eligible nodes in cluster.
+      - name: data
+        type: long
+        path: elasticsearch.cluster.stats.nodes.count.data
+      - name: count.data
+        type: long
+        description: >
+          Number of data nodes in cluster.
     - name: indices
       type: group
       description: >
