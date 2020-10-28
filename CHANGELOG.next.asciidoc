@@ -441,6 +441,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
 - Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
+- Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 
 *Functionbeat*
 

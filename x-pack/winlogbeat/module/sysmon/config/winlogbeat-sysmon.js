@@ -303,6 +303,9 @@ var sysmon = (function () {
             return;
         }
         var exe = evt.Get(pathField);
+        if (!exe) {
+            return;
+        }
         evt.Put(nameField, path.basename(exe));
     };
 
@@ -327,7 +330,11 @@ var sysmon = (function () {
     };
 
     var addUser = function (evt) {
-        var userParts = evt.Get("winlog.event_data.User").split("\\");
+        var userParts = evt.Get("winlog.event_data.User");
+        if (!userParts) {
+            return;
+        }
+        userParts = userParts.split("\\");
         if (userParts.length === 2) {
             evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
@@ -406,6 +413,9 @@ var sysmon = (function () {
     // in the specified namespace. It also adds all the hashes to 'related.hash'.
     var addHashes = function (evt, namespace, hashField) {
         var hashes = evt.Get(hashField);
+        if (!hashes) {
+            return;
+        }
         evt.Delete(hashField);
         hashes.split(",").forEach(function (hash) {
             var parts = hash.split("=");
