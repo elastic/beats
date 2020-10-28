@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	inputName = "aws-cloudwatch"
+	inputName    = "aws-cloudwatch"
 	oldInputName = "awscloudwatch"
 )
 
@@ -79,7 +79,7 @@ func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new aws-cloudwatch input
 func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
-	cfgwarn.Beta("awsclouwatch input type is used")
+	cfgwarn.Beta("aws-clouwatch input type is used")
 	logger := logp.NewLogger(inputName)
 
 	// Extract and validate the input's configuration.
@@ -88,6 +88,10 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 	logger.Debug("aws-cloudwatch input config = ", config)
+
+	if config.Type == oldInputName {
+		logger.Warnf("%s input name is deprecated, please use %s instead", oldInputName, inputName)
+	}
 
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
