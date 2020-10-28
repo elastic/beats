@@ -36,28 +36,10 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"count": c.Int("count.total"),
-			"master": c.Int("count.master"),
-			"data": c.Int("count.data"),
-			"coordinating_only": s.Object{
-				"total": c.Int("count.coordinating_only"),
-			},
-			"ml": s.Object{
-				"total": c.Int("count.ml"),
-			},
-			"remote_cluster_client": s.Object{
-				"total": c.Int("count.remote_cluster_client"),
-			},
-			"transform": s.Object{
-				"total": c.Int("count.transform"),
-			},
-			"voting_only": s.Object{
-				"total": c.Int("count.voting_only"),
-			},
+			"count": c.Ifc("count"),
 			"ingest": s.Object{
-				"total": c.Int("count.ingest"),
 				"pipelines": s.Object{
-					"total": c.Int("ingest.number_of_pipelines"),
+					"count": c.Int("ingest.number_of_pipelines"),
 				},
 				//TODO Not sure if to remove this one
 				"processor_stats": c.Ifc("ingest.processor_stats"),

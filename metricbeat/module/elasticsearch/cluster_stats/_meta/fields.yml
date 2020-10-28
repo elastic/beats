@@ -8,23 +8,6 @@
       type: keyword
       description: >
         Cluster status (green, yellow, red).
-    - name: nodes
-      type: group
-      description: >
-        Nodes statistics.
-      fields:
-      - name: count
-        type: long
-        description: >
-          Total number of nodes in cluster.
-      - name: master
-        type: long
-        description: >
-          Number of master-eligible nodes in cluster.
-      - name: data
-        type: long
-        description: >
-          Number of data nodes in cluster.
     - name: indices
       type: group
       description: >

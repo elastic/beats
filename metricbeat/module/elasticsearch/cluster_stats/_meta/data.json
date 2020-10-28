@@ -1,455 +1,451 @@
 {
-    "@timestamp": "2020-10-28T11:51:03.492Z",
-    "@metadata": {
-      "beat": "metricbeat",
-      "type": "_doc",
-      "version": "8.0.0"
-    },
-    "metricset": {
-      "name": "cluster_stats",
-      "period": 10000
-    },
-    "service": {
-      "address": "localhost:9200",
-      "type": "elasticsearch"
-    },
-    "elasticsearch": {
-      "cluster": {
-        "name": "docker-cluster",
-        "id": "NbXypChqTKqZgsXigm38lg",
-        "stats": {
-          "status": "green",
-          "nodes": {
-            "fs": {
-              "available": {
-                "bytes": 57686257664
-              },
-              "total": {
-                "bytes": 958613114880
-              },
-              "free": {
-                "bytes": 106452590592
-              }
+  "@timestamp": "2020-10-28T15:55:41.493Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "_doc",
+    "version": "8.0.0"
+  },
+  "service": {
+    "type": "elasticsearch",
+    "address": "localhost:9200"
+  },
+  "event": {
+    "dataset": "elasticsearch.cluster.stats",
+    "module": "elasticsearch",
+    "duration": 56492559
+  },
+  "elasticsearch": {
+    "cluster": {
+      "name": "docker-cluster",
+      "id": "izHz76JkQDG-4sL2G5EQug",
+      "stats": {
+        "status": "yellow",
+        "nodes": {
+          "count": {
+            "data_hot": 0,
+            "coordinating_only": 0,
+            "data": 1,
+            "data_content": 0,
+            "data_warm": 0,
+            "ml": 1,
+            "data_cold": 0,
+            "voting_only": 0,
+            "ingest": 1,
+            "master": 1,
+            "remote_cluster_client": 1,
+            "transform": 1,
+            "total": 1
+          },
+          "ingest": {
+            "pipelines": {
+              "count": 1
             },
-            "jvm": {
-              "threads": {
-                "total": 78
+            "processor_stats": {
+              "gsub": {
+                "failed": 0,
+                "current": 0,
+                "time_in_millis": 0,
+                "count": 0
               },
-              "max_uptime": {
-                "ms": 639337
-              },
-              "memory": {
-                "heap": {
-                  "used": {
-                    "bytes": 329323512
-                  },
-                  "max": {
-                    "bytes": 1073741824
-                  }
+              "script": {
+                "count": 0,
+                "failed": 0,
+                "current": 0,
+                "time_in_millis": 0
+              }
+            }
+          },
+          "jvm": {
+            "max_uptime": {
+              "ms": 4540123
+            },
+            "memory": {
+              "heap": {
+                "used": {
+                  "bytes": 684951040
+                },
+                "max": {
+                  "bytes": 1073741824
                 }
               }
             },
-            "data": 1,
-            "count": 1,
-            "ml": {
-              "total": 1
+            "threads": {
+              "total": 100
+            }
+          },
+          "fs": {
+            "available": {
+              "bytes": 175976210432
             },
-            "master": 1,
-            "ingest": {
-              "total": 1,
-              "pipelines": {
+            "total": {
+              "bytes": 958613114880
+            },
+            "free": {
+              "bytes": 224742543360
+            }
+          }
+        },
+        "indices": {
+          "count": 8,
+          "shards": {
+            "count": 8,
+            "primaries": 8,
+            "replication": 0,
+            "index": {
+              "shards": {
+                "avg": 1,
+                "min": 1,
+                "max": 1
+              },
+              "primaries": {
+                "max": 1,
+                "avg": 1,
+                "min": 1
+              },
+              "replication": {
+                "avg": 0,
+                "min": 0,
+                "max": 0
+              }
+            }
+          },
+          "store": {
+            "size": {
+              "bytes": 11966732
+            },
+            "reserved": {
+              "bytes": 0
+            }
+          },
+          "query_cache": {
+            "evictions": 0,
+            "cache_size": {
+              "bytes": 0
+            },
+            "memory_size": {
+              "bytes": 0
+            },
+            "total": 0,
+            "hit": {
+              "total": 0
+            },
+            "miss": {
+              "total": 0
+            },
+            "cache": {
+              "total": 0
+            }
+          },
+          "segments": {
+            "memory": {
+              "index_writer": {
+                "bytes": 0
+              },
+              "terms": {
+                "vectors": {
+                  "bytes": 0
+                },
+                "bytes": 156960
+              },
+              "stored_fields": {
+                "bytes": 13208
+              },
+              "points": {
+                "bytes": 0
+              },
+              "version_map": {
+                "bytes": 0
+              },
+              "bytes": 187916,
+              "doc_values": {
+                "bytes": 14868
+              },
+              "fixed_bit_set": {
+                "bytes": 688
+              },
+              "norms": {
+                "bytes": 2880
+              }
+            },
+            "max_unsafe_auto_id": {
+              "ms": -1
+            },
+            "total": 27
+          },
+          "fielddata": {
+            "memory": {
+              "bytes": 0
+            }
+          },
+          "docs": {
+            "deleted": {
+              "total": 144
+            },
+            "total": 196
+          }
+        },
+        "stack": {
+          "xpack": {
+            "security": {
+              "available": true,
+              "enabled": false
+            },
+            "logstash": {
+              "available": false,
+              "enabled": true
+            },
+            "vectors": {
+              "dense_vector_fields_count": 0,
+              "dense_vector_dims_avg_count": 0,
+              "available": true,
+              "enabled": true
+            },
+            "spatial": {
+              "available": true,
+              "enabled": true
+            },
+            "ml": {
+              "jobs": {
+                "total": 0
+              },
+              "node": {
                 "total": 1
               },
-              "processor_stats": {
-                "gsub": {
-                  "current": 0,
-                  "time_in_millis": 0,
-                  "count": 0,
-                  "failed": 0
-                },
-                "script": {
-                  "time_in_millis": 0,
-                  "count": 0,
-                  "failed": 0,
-                  "current": 0
-                }
-              }
+              "available": false,
+              "enabled": true
+            },
+            "data_streams": {
+              "available": true,
+              "enabled": true,
+              "data_streams": 0,
+              "indices_count": 0
+            },
+            "frozen_indices": {
+              "available": true,
+              "enabled": true,
+              "indices_count": 0
             },
             "voting_only": {
-              "total": 0
+              "available": true,
+              "enabled": true
             },
-            "remote_cluster_client": {
-              "total": 1
-            },
-            "coordinating_only": {
-              "total": 0
+            "ccr": {
+              "enabled": true,
+              "follower_indices_count": 0,
+              "auto_follow_patterns_count": 0,
+              "available": false
             },
             "transform": {
-              "total": 1
-            }
-          },
-          "indices": {
-            "shards": {
-              "count": 6,
-              "primaries": 6,
-              "replication": 0,
-              "index": {
-                "shards": {
-                  "max": 1,
-                  "avg": 1,
-                  "min": 1
-                },
-                "primaries": {
-                  "max": 1,
-                  "avg": 1,
-                  "min": 1
-                },
-                "replication": {
-                  "min": 0,
-                  "max": 0,
-                  "avg": 0
-                }
-              }
+              "enabled": true,
+              "available": true
             },
-            "store": {
-              "size": {
-                "bytes": 10960637
-              },
-              "reserved": {
-                "bytes": 0
-              }
-            },
-            "query_cache": {
-              "miss": {
-                "total": 0
-              },
-              "cache": {
-                "total": 0
-              },
-              "evictions": 0,
-              "cache_size": {
-                "bytes": 0
-              },
-              "memory_size": {
-                "bytes": 0
-              },
-              "total": 0,
-              "hit": {
-                "total": 0
-              }
-            },
-            "segments": {
-              "memory": {
-                "bytes": 26928,
-                "doc_values": {
-                  "bytes": 2336
-                },
-                "index_writer": {
-                  "bytes": 766308
-                },
-                "norms": {
-                  "bytes": 1152
-                },
-                "stored_fields": {
-                  "bytes": 4880
-                },
-                "version_map": {
-                  "bytes": 0
-                },
-                "points": {
-                  "bytes": 0
-                },
-                "fixed_bit_set": {
-                  "bytes": 384
-                },
-                "terms": {
-                  "bytes": 18560,
-                  "vectors": {
-                    "bytes": 0
-                  }
-                }
-              },
-              "max_unsafe_auto_id": {
-                "ms": -1
-              },
-              "total": 10
-            },
-            "fielddata": {
-              "memory": {
-                "bytes": 0
-              }
-            },
-            "docs": {
-              "deleted": {
-                "total": 42
-              },
-              "total": 22
-            },
-            "count": 6
-          },
-          "stack": {
-            "apm": {
-              "found": false
-            },
-            "xpack": {
-              "searchable_snapshots": {
-                "available": false,
-                "enabled": true,
-                "indices_count": 0
-              },
-              "slm": {
-                "available": true,
-                "enabled": true
-              },
-              "vectors": {
-                "available": true,
-                "enabled": true,
-                "dense_vector_fields_count": 0,
-                "dense_vector_dims_avg_count": 0
-              },
-              "security": {
-                "available": true,
-                "enabled": false
-              },
-              "ccr": {
-                "available": false,
-                "enabled": true,
-                "follower_indices_count": 0,
-                "auto_follow_patterns_count": 0
-              },
-              "rollup": {
-                "available": true,
-                "enabled": true
-              },
-              "transform": {
-                "available": true,
-                "enabled": true
-              },
-              "frozen_indices": {
-                "indices_count": 0,
-                "available": true,
-                "enabled": true
-              },
-              "graph": {
-                "available": false,
-                "enabled": true
-              },
-              "monitoring": {
-                "enabled": true,
-                "collection_enabled": false,
-                "enabled_exporters": {
-                  "local": 1
-                },
-                "available": true
-              },
-              "data_streams": {
-                "available": true,
-                "enabled": true,
-                "data_streams": 0,
-                "indices_count": 0
-              },
-              "voting_only": {
-                "available": true,
-                "enabled": true
-              },
-              "logstash": {
-                "available": false,
-                "enabled": true
-              },
-              "ml": {
-                "node": {
-                  "total": 1
-                },
-                "available": false,
-                "enabled": true,
-                "jobs": {
-                  "total": 0
-                }
-              },
-              "ilm": {
-                "policy": {
-                  "stats": [
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        },
-                        "delete": {
-                          "actions": [
-                            "delete"
-                          ],
-                          "min_age": 7.776e+09
-                        }
+            "ilm": {
+              "policy": {
+                "total": 9,
+                "stats": [
+                  {
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
                       },
-                      "indices_managed": 1
-                    },
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        }
-                      },
-                      "indices_managed": 0
-                    },
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        }
-                      },
-                      "indices_managed": 0
-                    },
-                    {
-                      "phases": {
-                        "delete": {
-                          "actions": [
-                            "delete"
-                          ],
-                          "min_age": 6.048e+08
-                        }
-                      },
-                      "indices_managed": 0
-                    },
-                    {
-                      "indices_managed": 1,
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        },
-                        "delete": {
-                          "min_age": 7.776e+09,
-                          "actions": [
-                            "delete"
-                          ]
-                        }
+                      "delete": {
+                        "min_age": 7.776e+09,
+                        "actions": [
+                          "delete"
+                        ]
                       }
                     },
-                    {
-                      "indices_managed": 0,
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        }
+                    "indices_managed": 1
+                  },
+                  {
+                    "indices_managed": 0,
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
                       }
-                    },
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        }
-                      },
-                      "indices_managed": 0
-                    },
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        }
-                      },
-                      "indices_managed": 0
-                    },
-                    {
-                      "phases": {
-                        "hot": {
-                          "min_age": 0,
-                          "actions": [
-                            "rollover"
-                          ]
-                        },
-                        "delete": {
-                          "min_age": 7.776e+09,
-                          "actions": [
-                            "delete"
-                          ]
-                        }
-                      },
-                      "indices_managed": 0
                     }
-                  ],
-                  "total": 9
-                }
-              },
-              "spatial": {
-                "available": true,
-                "enabled": true
-              }
-            }
-          },
-          "license": {
-            "type": "basic",
-            "issued_to": "docker-cluster",
-            "cluster_needs_tls": false,
-            "issue_date": "2020-10-28T11:40:49.967Z",
-            "start_date_in_millis": -1,
-            "max_nodes": 1000,
-            "uid": "57de8d4d-8186-48db-94cc-20f3930cabd0",
-            "issue_date_in_millis": 1603885249967,
-            "status": "active",
-            "issuer": "elasticsearch"
-          },
-          "version": "8.0.0-SNAPSHOT",
-          "cluster_name": "docker-cluster",
-          "state": {
-            "cluster_uuid": "NbXypChqTKqZgsXigm38lg",
-            "version": 79,
-            "state_uuid": "qga7zh1iRSWHtzjGqNf8jw",
-            "master_node": "gRwfLijcQHKkBT6Gu97Dtg",
-            "nodes": {
-              "gRwfLijcQHKkBT6Gu97Dtg": {
-                "attributes": {
-                  "xpack.installed": "true",
-                  "transform.node": "true",
-                  "ml.max_open_jobs": "20",
-                  "ml.machine_memory": "33300463616"
-                },
-                "name": "5ee826db8c8e",
-                "ephemeral_id": "qL61BHr9SUCSsB66Kpmu0A",
-                "transport_address": "127.0.0.1:9300"
+                  },
+                  {
+                    "indices_managed": 1,
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "phases": {
+                      "delete": {
+                        "actions": [
+                          "delete"
+                        ],
+                        "min_age": 6.048e+08
+                      }
+                    },
+                    "indices_managed": 0
+                  },
+                  {
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
+                      },
+                      "delete": {
+                        "min_age": 7.776e+09,
+                        "actions": [
+                          "delete"
+                        ]
+                      }
+                    },
+                    "indices_managed": 1
+                  },
+                  {
+                    "indices_managed": 0,
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "phases": {
+                      "hot": {
+                        "min_age": 0,
+                        "actions": [
+                          "rollover"
+                        ]
+                      }
+                    },
+                    "indices_managed": 0
+                  },
+                  {
+                    "phases": {
+                      "hot": {
+                        "actions": [
+                          "rollover"
+                        ],
+                        "min_age": 0
+                      }
+                    },
+                    "indices_managed": 0
+                  },
+                  {
+                    "phases": {
+                      "hot": {
+                        "actions": [
+                          "rollover"
+                        ],
+                        "min_age": 0
+                      },
+                      "delete": {
+                        "min_age": 7.776e+09,
+                        "actions": [
+                          "delete"
+                        ]
+                      }
+                    },
+                    "indices_managed": 0
+                  }
+                ]
               }
             },
-            "nodes_hash": 1291240343,
-            "status": "green"
+            "graph": {
+              "available": false,
+              "enabled": true
+            },
+            "monitoring": {
+              "available": true,
+              "enabled": true,
+              "collection_enabled": false,
+              "enabled_exporters": {
+                "local": 1
+              }
+            },
+            "searchable_snapshots": {
+              "available": false,
+              "enabled": true,
+              "indices_count": 0
+            },
+            "rollup": {
+              "available": true,
+              "enabled": true
+            },
+            "slm": {
+              "enabled": true,
+              "available": true
+            }
+          },
+          "apm": {
+            "found": false
           }
+        },
+        "license": {
+          "type": "basic",
+          "start_date_in_millis": -1,
+          "status": "active",
+          "issuer": "elasticsearch",
+          "issue_date": "2020-10-28T14:40:19.029Z",
+          "uid": "d1033cee-430a-4112-b854-6a179c4c2962",
+          "max_nodes": 1000,
+          "cluster_needs_tls": false,
+          "issue_date_in_millis": 1603896019029,
+          "issued_to": "docker-cluster"
+        },
+        "version": "8.0.0-SNAPSHOT",
+        "cluster_name": "docker-cluster",
+        "state": {
+          "nodes": {
+            "1NErpEFwQ22u3RxUXqX-yg": {
+              "ephemeral_id": "t7UULXcYTVqJA9PC4uLuGw",
+              "transport_address": "127.0.0.1:9300",
+              "attributes": {
+                "ml.machine_memory": "33300463616",
+                "xpack.installed": "true",
+                "transform.node": "true",
+                "ml.max_open_jobs": "20"
+              },
+              "name": "8bf7046f3843"
+            }
+          },
+          "nodes_hash": -1167628108,
+          "status": "yellow",
+          "cluster_uuid": "izHz76JkQDG-4sL2G5EQug",
+          "version": 107,
+          "state_uuid": "AAOkrzAKTeGCZzmbTeQTag",
+          "master_node": "1NErpEFwQ22u3RxUXqX-yg"
         }
       }
-    },
-    "ecs": {
-      "version": "1.5.0"
-    },
-    "host": {
-      "name": "mcastro"
-    },
-    "agent": {
-      "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-      "name": "mcastro",
-      "type": "metricbeat",
-      "version": "8.0.0",
-      "ephemeral_id": "e748e3e2-bdd6-4122-bb2a-0446ac7a01da"
-    },
-    "event": {
-      "duration": 60698626,
-      "dataset": "elasticsearch.cluster.stats",
-      "module": "elasticsearch"
     }
+  },
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "host": {
+    "name": "mcastro"
+  },
+  "agent": {
+    "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+    "name": "mcastro",
+    "type": "metricbeat",
+    "version": "8.0.0",
+    "ephemeral_id": "c74204a0-6e7e-4301-8e41-cdddcfe75b36"
+  },
+  "metricset": {
+    "name": "cluster_stats",
+    "period": 10000
   }
+}
