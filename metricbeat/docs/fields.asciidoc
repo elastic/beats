@@ -17712,7 +17712,7 @@ alias to: elasticsearch.index.primaries.indexing.index_total
 --
 type: alias
 
-alias to: elasticsearch.index.primaries.indexing.index_time.ms
+alias to: elasticsearch.index.primaries.indexing.index_time_in_millis
 
 --
 
@@ -17721,7 +17721,7 @@ alias to: elasticsearch.index.primaries.indexing.index_time.ms
 --
 type: alias
 
-alias to: elasticsearch.index.primaries.indexing.throttle_time.ms
+alias to: elasticsearch.index.primaries.indexing.throttle_time_in_millis
 
 --
 
