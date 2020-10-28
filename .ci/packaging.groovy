@@ -378,7 +378,7 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 
   // Copy those files to another location with the sha commit to test them
-  // afterwords.
+  // afterward.
   bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }
