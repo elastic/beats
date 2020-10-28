@@ -3,6 +3,18 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.action
+    value: database_audit
+- set:
+    field: event.category
+    value: database
+- set:
+    field: event.type
+    value: access
+- set:
+    field: event.outcome
+    value: success
 - grok:
     field: message
     patterns:
@@ -50,7 +62,7 @@ processors:
               handleList(x);
           }
         }
-      map.values().removeIf(v -> v == null);
+        map.values().removeIf(v -> v instanceof String && v.isEmpty() == true);
       }
       void handleList(List list) {
         for (def x : list) {
@@ -63,13 +75,18 @@ processors:
       }
       handleMap(ctx);
 - remove:
-    field: '@timestamp'
+    field:
+      - '@timestamp'
     ignore_missing: true
 - date:
     field: tmp_timestamp
     target_field: '@timestamp'
     formats:
     - EEE MMM  d HH:mm:ss uuuu XXX
+- grok:
+    field: tmp_timestamp
+    patterns:
+    - "%{ISO8601_TIMEZONE:event.timezone}$"
 - rename:
     field: oracle.database_audit.privilege
     target_field: host.user.roles

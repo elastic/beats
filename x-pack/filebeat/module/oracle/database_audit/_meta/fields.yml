@@ -65,6 +65,6 @@
         The ID of the DB/container accessed.
 
     - name: length
-      type: keyword
+      type: long
       description: >
         The duration length.

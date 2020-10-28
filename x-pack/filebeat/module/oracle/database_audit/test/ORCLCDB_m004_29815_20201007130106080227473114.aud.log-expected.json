@@ -1,12 +1,13 @@
 [
     {
         "@timestamp": "2020-10-07T17:01:06.000Z",
-        "client.address": "",
-        "client.domain": "",
-        "client.user.name": "",
+        "event.action": "database_audit",
+        "event.category": "database",
         "event.dataset": "oracle.database_audit",
         "event.module": "oracle",
-        "event.timezone": "-02:00",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
         "fileset.name": "database_audit",
         "host.user.roles": "NONE",
         "input.type": "log",
