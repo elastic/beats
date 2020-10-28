@@ -108418,7 +108418,7 @@ type: keyword
 The duration length.
 
 
-type: keyword
+type: long
 
 --
 

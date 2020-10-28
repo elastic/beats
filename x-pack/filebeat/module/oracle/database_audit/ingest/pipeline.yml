@@ -111,6 +111,10 @@ processors:
     field: oracle.database_audit.database_user
     target_field: server.user.name
     ignore_missing: true
+- convert:
+    field: oracle.database_audit.length
+    type: long
+    ignore_missing: true
 - grok:
     field: client.address
     patterns:
