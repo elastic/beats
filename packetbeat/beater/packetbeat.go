@@ -79,17 +79,17 @@ type packetbeat struct {
 }
 
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	config := initialConfig()
-	err := rawConfig.Unpack(&config)
+	cfg := initialConfig()
+	err := rawConfig.Unpack(&cfg)
 	if err != nil {
-		logp.Err("fails to read the beat config: %v, %v", err, config)
+		logp.Err("fails to read the beat config: %v, %v", err, cfg)
 		return nil, err
 	}
 
 	watcher := procs.ProcessesWatcher{}
 	// Enable the process watcher only if capturing live traffic
-	if config.Interfaces.File == "" {
-		err = watcher.Init(config.Procs)
+	if cfg.Interfaces.File == "" {
+		err = watcher.Init(cfg.Procs)
 		if err != nil {
 			logp.Critical(err.Error())
 			return nil, err
@@ -101,21 +101,26 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	publisher, err := publish.NewTransactionPublisher(
 		b.Info.Name,
 		b.Publisher,
-		config.IgnoreOutgoing,
-		config.Interfaces.File == "",
+		cfg.IgnoreOutgoing,
+		cfg.Interfaces.File == "",
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	factory := newProcessorFactory(b.Info.Name, make(chan error, 1), publisher)
+	configurator := config.NewAgentConfig
+	if !b.Manager.Enabled() {
+		configurator = cfg.FromStatic
+	}
+
+	factory := newProcessorFactory(b.Info.Name, make(chan error, 1), publisher, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
 	return &packetbeat{
 		config:          rawConfig,
-		shutdownTimeout: config.ShutdownTimeout,
+		shutdownTimeout: cfg.ShutdownTimeout,
 		factory:         factory,
 		publisher:       publisher,
 		done:            make(chan struct{}),
@@ -165,7 +170,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegister(b.Info.Beat, runner)
+	reload.Register.MustRegisterList("inputs", runner)
 	defer runner.Stop()
 
 	logp.Debug("main", "Waiting for the runner to finish")

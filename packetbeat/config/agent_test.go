@@ -27,7 +27,6 @@ import (
 
 func TestAgentInputNormalization(t *testing.T) {
 	cfg, err := common.NewConfigFrom(`
-inputs:
 - type: network/flows
   timeout: 10s
   period: 10s
@@ -38,10 +37,7 @@ inputs:
   data_stream.namespace: default
 `)
 	require.NoError(t, err)
-	config := Config{}
-	require.NoError(t, cfg.Unpack(&config))
-
-	config, err = config.Normalize()
+	config, err := NewAgentConfig(cfg)
 	require.NoError(t, err)
 
 	require.Equal(t, config.Flows.Timeout, "10s")

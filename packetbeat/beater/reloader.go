@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"sort"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -31,12 +32,24 @@ import (
 )
 
 type reloader struct {
-	mutex      sync.Mutex
-	factory    cfgfile.RunnerFactory
-	runner     cfgfile.Runner
-	configHash uint64
-	pipeline   beat.PipelineConnector
-	logger     *logp.Logger
+	mutex        sync.Mutex
+	factory      cfgfile.RunnerFactory
+	runner       cfgfile.Runner
+	configHashes []uint64
+	pipeline     beat.PipelineConnector
+	logger       *logp.Logger
+}
+
+func equalHashes(a, b []uint64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func newReloader(name string, factory cfgfile.RunnerFactory, pipeline beat.PipelineConnector) *reloader {
@@ -55,24 +68,37 @@ func (r *reloader) Stop() {
 	}
 }
 
-func (r *reloader) Reload(config *reload.ConfigWithMeta) error {
+func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	r.logger.Debug("Starting reload procedure")
 
-	hash, err := cfgfile.HashConfig(config.Config)
+	hashes := make([]uint64, len(configs))
+	combined := make([]*common.Config, len(configs))
+	for i, c := range configs {
+		combined[i] = c.Config
+		hash, err := cfgfile.HashConfig(c.Config)
+		if err != nil {
+			r.logger.Errorf("Unable to hash given config: %s", err)
+			return errors.Wrap(err, "unable to hash given config")
+		}
+		hashes[i] = hash
+	}
+	sort.Slice(hashes, func(i, j int) bool { return hashes[i] < hashes[j] })
+
+	config, err := common.NewConfigFrom(combined)
 	if err != nil {
-		r.logger.Errorf("Unable to hash given config: %s", err)
-		return errors.Wrap(err, "Unable to hash given config")
+		r.logger.Errorf("Unable to combine configurations: %s", err)
+		return errors.Wrap(err, "unable to combine configurations")
 	}
 
-	if hash == r.configHash {
+	if equalHashes(hashes, r.configHashes) {
 		// we have the same config reloaded
 		return nil
 	}
 	// reinitialize config hash
-	r.configHash = 0
+	r.configHashes = nil
 
 	if r.runner != nil {
 		go r.runner.Stop()
@@ -80,19 +106,14 @@ func (r *reloader) Reload(config *reload.ConfigWithMeta) error {
 	// reinitialize runner
 	r.runner = nil
 
-	c, err := common.NewConfigFrom(config.Config)
-	if err != nil {
-		r.logger.Errorf("Unable to create new configuration for factory: %s", err)
-		return errors.Wrap(err, "Unable to create new configuration for factory")
-	}
-	runner, err := r.factory.Create(pipetool.WithDynamicFields(r.pipeline, config.Meta), c)
+	runner, err := r.factory.Create(pipetool.WithDynamicFields(r.pipeline, nil), config)
 	if err != nil {
 		r.logger.Errorf("Unable to create new runner: %s", err)
-		return errors.Wrap(err, "Unable to create new runner")
+		return errors.Wrap(err, "unable to create new runner")
 	}
 
 	r.logger.Debugf("Starting runner: %s", runner)
-	r.configHash = hash
+	r.configHashes = hashes
 	r.runner = runner
 	runner.Start()
 

@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
+	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -63,7 +64,8 @@ func (p *processor) Start() {
 
 		err := p.sniffer.Run()
 		if err != nil {
-			p.err <- fmt.Errorf("Sniffer loop failed: %v", err)
+			p.err <- fmt.Errorf("sniffer loop failed: %v", err)
+			return
 		}
 		p.err <- nil
 	}()
@@ -78,31 +80,25 @@ func (p *processor) Stop() {
 }
 
 type processorFactory struct {
-	name      string
-	err       chan error
-	publisher *publish.TransactionPublisher
+	name         string
+	err          chan error
+	publisher    *publish.TransactionPublisher
+	configurator func(*common.Config) (config.Config, error)
 }
 
-func newProcessorFactory(name string, err chan error, publisher *publish.TransactionPublisher) *processorFactory {
+func newProcessorFactory(name string, err chan error, publisher *publish.TransactionPublisher, configurator func(*common.Config) (config.Config, error)) *processorFactory {
 	return &processorFactory{
-		name:      name,
-		err:       err,
-		publisher: publisher,
+		name:         name,
+		err:          err,
+		publisher:    publisher,
+		configurator: configurator,
 	}
 }
 
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
-	config := initialConfig()
-	err := cfg.Unpack(&config)
+	config, err := p.configurator(cfg)
 	if err != nil {
-		logp.Err("fails to read the beat config: %v, %v", err, config)
-		return nil, err
-	}
-
-	// normalize agent-based configuration
-	config, err = config.Normalize()
-	if err != nil {
-		logp.Err("failed to normalize the beat config: %v, %v", err, config)
+		logp.Err("Failed to read the beat config: %v, %v", err, config)
 		return nil, err
 	}
 

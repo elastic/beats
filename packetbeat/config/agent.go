@@ -38,43 +38,48 @@ func defaultDevice() string {
 	return "0"
 }
 
-// Normalize allows the packetbeat configuration to understand
+// NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
-func (c Config) Normalize() (Config, error) {
+func NewAgentConfig(cfg *common.Config) (Config, error) {
 	logp.Debug("agent", "Normalizing agent configuration")
-	if len(c.Inputs) > 0 {
-		// override everything, we're managed by agent
-		c.Flows = nil
-		c.Protocols = nil
-		c.ProtocolsList = []*common.Config{}
-		// TODO: make this configurable rather than just using the default device in
-		// managed mode
-		c.Interfaces.Device = defaultDevice()
+	var configMap []map[string]interface{}
+	config := Config{
+		Interfaces: InterfacesConfig{
+			// TODO: make this configurable rather than just using the default device
+			Device: defaultDevice(),
+		},
+	}
+	if err := cfg.Unpack(&configMap); err != nil {
+		return config, err
 	}
 
-	for _, input := range c.Inputs {
+	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(configMap)))
+	for _, input := range configMap {
 		if rawInputType, ok := input["type"]; ok {
 			inputType, ok := rawInputType.(string)
-			if ok && strings.HasPrefix(inputType, "network/") {
-				config, err := common.NewConfigFrom(input)
+			if !ok {
+				return config, fmt.Errorf("invalid input type of: '%T'", rawInputType)
+			}
+			logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", inputType))
+			if strings.HasPrefix(inputType, "network/") {
+				cfg, err := common.NewConfigFrom(input)
 				if err != nil {
-					return c, err
+					return config, err
 				}
 				protocol := strings.TrimPrefix(inputType, "network/")
-				logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", protocol))
 				switch protocol {
 				case "flows":
-					if err := config.Unpack(&c.Flows); err != nil {
-						return c, err
+					if err := cfg.Unpack(&config.Flows); err != nil {
+						return config, err
 					}
 				default:
-					if err = config.SetString("type", -1, protocol); err != nil {
-						return c, err
+					if err = cfg.SetString("type", -1, protocol); err != nil {
+						return config, err
 					}
-					c.ProtocolsList = append(c.ProtocolsList, config)
+					config.ProtocolsList = append(config.ProtocolsList, cfg)
 				}
 			}
 		}
 	}
-	return c, nil
+	return config, nil
 }

@@ -34,9 +34,15 @@ type Config struct {
 	Procs           procs.ProcsConfig         `config:"procs"`
 	IgnoreOutgoing  bool                      `config:"ignore_outgoing"`
 	ShutdownTimeout time.Duration             `config:"shutdown_timeout"`
+}
 
-	// agent configuration
-	Inputs []map[string]interface{} `config:"inputs"`
+// FromStatic initializes a configuration given a common.Config
+func (c Config) FromStatic(cfg *common.Config) (Config, error) {
+	err := cfg.Unpack(&c)
+	if err != nil {
+		return c, err
+	}
+	return c, nil
 }
 
 // ICMP returns the ICMP configuration
@@ -60,7 +66,7 @@ func (c Config) ICMP() (*common.Config, error) {
 		}
 
 		if icmp != nil {
-			return nil, errors.New("More then one icmp configurations found")
+			return nil, errors.New("more than one icmp configuration found")
 		}
 
 		icmp = cfg
