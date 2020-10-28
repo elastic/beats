@@ -58,6 +58,8 @@ pipeline {
     booleanParam(name: 'functionbeat', defaultValue: true, description: 'Build functionbeat binaries.')
 
     booleanParam(name: 'sign_on_macos', defaultValue: false, description: 'Sign macOS binaries.')
+    booleanParam(name: 'archive_on_gcp', defaultValue: true, description: 'Enable/Disable the archive of binaries on GCP.')
+    booleanParam(name: 'push_docker', defaultValue: true, description: 'Enable/Disable the push of the Docker images.')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Execute the pipeline without generate packages.')
   }
   stages {
@@ -275,7 +277,7 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
 
-  if(params.dry_run){
+  if(params.dry_run || !params.push_docker){
     return
   }
 
@@ -411,7 +413,7 @@ def publishPackages(baseDir){
 }
 
 def uploadPackages(bucketUri, baseDir){
-  if(params.dry_run){
+  if(params.dry_run || !params.archive_on_gcp){
     return
   }
   googleStorageUpload(bucket: bucketUri,
