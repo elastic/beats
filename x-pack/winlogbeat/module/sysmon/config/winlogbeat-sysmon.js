@@ -677,8 +677,34 @@ var sysmon = (function () {
                     from: "winlog.event_data.ParentCommandLine",
                     to: "process.parent.command_line",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "process.pe.original_file_name",
+                },
             ],
             mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Convert({
+            fields: [{
+                    from: "winlog.event_data.Company",
+                    to: "process.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "process.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "process.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "process.pe.product",
+                },
+            ],
+            mode: "copy",
             ignore_missing: true,
             fail_on_error: false,
         })
@@ -951,6 +977,11 @@ var sysmon = (function () {
                     from: "winlog.event_data.ImageLoaded",
                     to: "file.path",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "file.pe.original_file_name",
+                },
+
             ],
             mode: "rename",
             ignore_missing: true,
@@ -965,7 +996,24 @@ var sysmon = (function () {
                     from: "winlog.event_data.SignatureStatus",
                     to: "file.code_signature.status",
                 },
+                {
+                    from: "winlog.event_data.Company",
+                    to: "file.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "file.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "file.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "file.pe.product",
+                },
             ],
+            ignore_missing: true,
             fail_on_error: false,
         })
         .Add(setRuleName)
