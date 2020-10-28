@@ -373,6 +373,9 @@ def publishPackages(baseDir){
 }
 
 def uploadPackages(bucketUri, baseDir){
+  if(params.dry_run){
+    return
+  }
   googleStorageUpload(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pathPrefix: "${baseDir}/build/distributions/",
