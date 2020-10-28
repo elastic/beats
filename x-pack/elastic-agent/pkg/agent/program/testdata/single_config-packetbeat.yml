@@ -1,54 +1,53 @@
-packetbeat:
-  inputs:
-  - type: network/flow
-    index: logs-network.flow-default
-    timeout: 10s
-    period: 10s
-    keep_null: false
-    data_stream:
-      dataset: network.flow
-      type: logs
-    name: flow-1
-    processors:
-      - add_fields:
-          target: 'data_stream'
-          fields:
-            type: logs
-            dataset: network.flow
-            namespace: default
-      - add_fields:
-          target: 'event'
-          fields:
-            dataset: network.flow
-      - add_fields:
-          target: 'elastic_agent'
-          fields:
-            id: agent-id
-            version: 8.0.0
-            snapshot: false
-  - type: network/icmp
-    index: logs-network.icmp-default
-    data_stream:
-      dataset: network.icmp
-      type: logs
-    name: icmp-1
-    processors:
-      - add_fields:
-          target: 'data_stream'
-          fields:
-            type: logs
-            dataset: network.icmp
-            namespace: default
-      - add_fields:
-          target: 'event'
-          fields:
-            dataset: network.icmp
-      - add_fields:
-          target: 'elastic_agent'
-          fields:
-            id: agent-id
-            version: 8.0.0
-            snapshot: false
+inputs:
+- type: network/flow
+  index: logs-network.flow-default
+  timeout: 10s
+  period: 10s
+  keep_null: false
+  data_stream:
+    dataset: network.flow
+    type: logs
+  name: flow-1
+  processors:
+    - add_fields:
+        target: 'data_stream'
+        fields:
+          type: logs
+          dataset: network.flow
+          namespace: default
+    - add_fields:
+        target: 'event'
+        fields:
+          dataset: network.flow
+    - add_fields:
+        target: 'elastic_agent'
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+- type: network/icmp
+  index: logs-network.icmp-default
+  data_stream:
+    dataset: network.icmp
+    type: logs
+  name: icmp-1
+  processors:
+    - add_fields:
+        target: 'data_stream'
+        fields:
+          type: logs
+          dataset: network.icmp
+          namespace: default
+    - add_fields:
+        target: 'event'
+        fields:
+          dataset: network.icmp
+    - add_fields:
+        target: 'elastic_agent'
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
 output:
   elasticsearch:
     hosts:

@@ -37,24 +37,14 @@ rules:
       re: ^network/.+
       selector: inputs
 
-  - filter_values:
-      selector: inputs
-      key: enabled
-      values:
-        - true
-
   - inject_agent_info: {}
-
-  - copy:
-      from: inputs
-      to: packetbeat
 
   - filter:
       selectors:
-        - packetbeat
+        - inputs
         - output
         - keystore
 
-when: length(${packetbeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')
 
