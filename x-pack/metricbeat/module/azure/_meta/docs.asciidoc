@@ -70,8 +70,7 @@ Users can use the azure credentials keys if configured `AZURE_CLIENT_ID`, `AZURE
 [float]
 === `monitor`
 This metricset allows users to retrieve metrics from specified resources. Added filters can apply here as the interval of retrieving these metrics, metric names,
-aggregation list, namespaces and metric dimensions. The monitor metrics will have a minimum timegrain of 5 minutes,
-so the `period` for `monitor` metricset  should be `300s` or multiples of `300s`.
+aggregation list, namespaces and metric dimensions. The monitor metrics will have a minimum timegrain of 5 minutes, so the `period` for `monitor` metricset should be `300s` or multiples of `300s`.
 
 [float]
 === `compute_vm`
@@ -89,7 +88,7 @@ This metricset will collect metrics from the storage accounts, these metrics wil
 so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
 
 [float]
-=== `container_instance`
+=== `container_instance`a
 This metricset will collect metrics from specified container groups, these metrics will have a timegrain every 5 minutes,
 so the `period` for `container_instance` metricset  should be `300s` or multiples of `300s`.
 
