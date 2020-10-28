@@ -214,6 +214,9 @@ func (f *flow) Timestamp() time.Time {
 }
 
 type process struct {
+	// RWMutex is used to arbitrate reads and writes to resolvedDomains.
+	sync.RWMutex
+
 	pid                  uint32
 	name, path           string
 	args                 []string
@@ -229,6 +232,8 @@ type process struct {
 }
 
 func (p *process) addTransaction(tr dns.Transaction) {
+	p.Lock()
+	defer p.Unlock()
 	if p.resolvedDomains == nil {
 		p.resolvedDomains = make(map[string]string)
 	}
@@ -239,6 +244,8 @@ func (p *process) addTransaction(tr dns.Transaction) {
 
 // ResolveIP returns the domain associated with the given IP.
 func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
+	p.RLock()
+	defer p.RUnlock()
 	domain, found = p.resolvedDomains[ip.String()]
 	return
 }
@@ -542,13 +549,13 @@ func (s *state) ExpireOlder() {
 	s.dns.CleanUp()
 }
 
-func (s *state) CreateProcess(p process) error {
+func (s *state) CreateProcess(p *process) error {
 	if p.pid == 0 {
 		return errors.New("can't create process with PID 0")
 	}
 	s.Lock()
 	defer s.Unlock()
-	s.processes[p.pid] = &p
+	s.processes[p.pid] = p
 	if p.createdTime == (time.Time{}) {
 		p.createdTime = s.kernTimestampToTime(p.created)
 	}

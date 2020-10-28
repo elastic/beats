@@ -18,12 +18,15 @@ type Resource struct {
 	Tags         map[string]string
 	Subscription string
 	Type         string
-	Vm           VmResource
+	// will be filled if cloud data is necessary, atm only in case of compute_vm and compute_vm_scaleset
+	Vms []VmResource
 }
 
+// VmResource contains details specific to a vm type of resource
 type VmResource struct {
 	Size string
 	Id   string
+	Name string
 }
 
 // Metric will contain the main azure metric details

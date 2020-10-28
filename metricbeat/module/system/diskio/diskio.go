@@ -20,9 +20,15 @@
 package diskio
 
 import (
+	"fmt"
+	"runtime"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/linux/iostat"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 
 	"github.com/pkg/errors"
 )
@@ -36,8 +42,16 @@ func init() {
 // MetricSet for fetching system disk IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	statistics     *DiskIOStat
+	statistics     *diskio.IOStat
 	includeDevices []string
+	prevCounters   diskCounter
+	IsAgent        bool
+}
+
+// diskCounter stores previous disk counter values for calculating gauges in next collection
+type diskCounter struct {
+	prevDiskReadBytes  uint64
+	prevDiskWriteBytes uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -50,16 +64,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
+	}
+
 	return &MetricSet{
 		BaseMetricSet:  base,
-		statistics:     NewDiskIOStat(),
+		statistics:     diskio.NewDiskIOStat(),
 		includeDevices: config.IncludeDevices,
+		prevCounters:   diskCounter{},
+		IsAgent:        systemModule.IsAgent,
 	}, nil
 }
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := IOCounters(m.includeDevices...)
+	stats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
 		return errors.Wrap(err, "disk io counters")
 	}
@@ -70,6 +91,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Store the last cpu counter when finished
 	defer m.statistics.CloseSampling()
 
+	var diskReadBytes, diskWriteBytes uint64
 	for _, counters := range stats {
 		event := common.MapStr{
 			"name": counters.Name,
@@ -87,40 +109,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				"time": counters.IoTime,
 			},
 		}
-		var extraMetrics DiskIOMetric
-		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
-		if err == nil {
-			event["iostat"] = common.MapStr{
-				"read": common.MapStr{
-					"request": common.MapStr{
-						"merges_per_sec": extraMetrics.ReadRequestMergeCountPerSec,
-						"per_sec":        extraMetrics.ReadRequestCountPerSec,
-					},
-					"per_sec": common.MapStr{
-						"bytes": extraMetrics.ReadBytesPerSec,
-					},
-					"await": extraMetrics.AvgReadAwaitTime,
-				},
-				"write": common.MapStr{
-					"request": common.MapStr{
-						"merges_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
-						"per_sec":        extraMetrics.WriteRequestCountPerSec,
-					},
-					"per_sec": common.MapStr{
-						"bytes": extraMetrics.WriteBytesPerSec,
-					},
-					"await": extraMetrics.AvgWriteAwaitTime,
-				},
-				"queue": common.MapStr{
-					"avg_size": extraMetrics.AvgQueueSize,
-				},
-				"request": common.MapStr{
-					"avg_size": extraMetrics.AvgRequestSize,
-				},
-				"await":        extraMetrics.AvgAwaitTime,
-				"service_time": extraMetrics.AvgServiceTime,
-				"busy":         extraMetrics.BusyPct,
+
+		// accumulate values from all interfaces
+		diskReadBytes += counters.ReadBytes
+		diskWriteBytes += counters.WriteBytes
+
+		//Add linux-only data if agent is off as not to make breaking changes.
+		if !m.IsAgent && runtime.GOOS == "linux" {
+			result, err := m.statistics.CalcIOStatistics(counters)
+			if err != nil {
+				return errors.Wrap(err, "error calculating iostat")
 			}
+			event["iostat"] = iostat.AddLinuxIOStat(result)
 		}
 
 		if counters.SerialNumber != "" {
@@ -134,6 +134,24 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			return nil
 		}
 	}
+
+	if m.prevCounters != (diskCounter{}) {
+		// convert network metrics from counters to gauges
+		r.Event(mb.Event{
+			RootFields: common.MapStr{
+				"host": common.MapStr{
+					"disk": common.MapStr{
+						"read.bytes":  diskReadBytes - m.prevCounters.prevDiskReadBytes,
+						"write.bytes": diskWriteBytes - m.prevCounters.prevDiskWriteBytes,
+					},
+				},
+			},
+		})
+	}
+
+	// update prevCounters
+	m.prevCounters.prevDiskReadBytes = diskReadBytes
+	m.prevCounters.prevDiskWriteBytes = diskWriteBytes
 
 	return nil
 }

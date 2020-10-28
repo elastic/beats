@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
@@ -18,7 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
+type decoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
 type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
 type reloadable interface {
@@ -36,16 +37,18 @@ type programsDispatcher interface {
 
 type emitterController struct {
 	logger      *logger.Logger
+	agentInfo   *info.AgentInfo
 	controller  composable.Controller
 	router      programsDispatcher
 	modifiers   *configModifiers
 	reloadables []reloadable
 
 	// state
-	lock   sync.RWMutex
-	config *config.Config
-	ast    *transpiler.AST
-	vars   []transpiler.Vars
+	lock       sync.RWMutex
+	updateLock sync.Mutex
+	config     *config.Config
+	ast        *transpiler.AST
+	vars       []*transpiler.Vars
 }
 
 func (e *emitterController) Update(c *config.Config) error {
@@ -68,38 +71,6 @@ func (e *emitterController) Update(c *config.Config) error {
 		}
 	}
 
-	// sanitary check that nothing in the config is wrong when it comes to variable syntax
-	ast := rawAst.Clone()
-	inputs, ok := transpiler.Lookup(ast, "inputs")
-	if ok {
-		renderedInputs, err := renderInputs(inputs, []transpiler.Vars{
-			{
-				Mapping: map[string]interface{}{},
-			},
-		})
-		if err != nil {
-			return err
-		}
-		err = transpiler.Insert(ast, renderedInputs, "inputs")
-		if err != nil {
-			return err
-		}
-	}
-
-	programsToRun, err := program.Programs(ast)
-	if err != nil {
-		return err
-	}
-
-	for _, decorator := range e.modifiers.Decorators {
-		for outputType, ptr := range programsToRun {
-			programsToRun[outputType], err = decorator(outputType, ast, ptr)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	e.lock.Lock()
 	e.config = c
 	e.ast = rawAst
@@ -108,7 +79,7 @@ func (e *emitterController) Update(c *config.Config) error {
 	return e.update()
 }
 
-func (e *emitterController) Set(vars []transpiler.Vars) {
+func (e *emitterController) Set(vars []*transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
@@ -123,6 +94,10 @@ func (e *emitterController) Set(vars []transpiler.Vars) {
 }
 
 func (e *emitterController) update() error {
+	// locking whole update because it can be called concurrently via Set and Update method
+	e.updateLock.Lock()
+	defer e.updateLock.Unlock()
+
 	e.lock.RLock()
 	cfg := e.config
 	rawAst := e.ast
@@ -144,14 +119,14 @@ func (e *emitterController) update() error {
 
 	e.logger.Debug("Converting single configuration into specific programs configuration")
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(e.agentInfo, ast)
 	if err != nil {
 		return err
 	}
 
 	for _, decorator := range e.modifiers.Decorators {
 		for outputType, ptr := range programsToRun {
-			programsToRun[outputType], err = decorator(outputType, ast, ptr)
+			programsToRun[outputType], err = decorator(e.agentInfo, outputType, ast, ptr)
 			if err != nil {
 				return err
 			}
@@ -167,22 +142,20 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
+	init, _ := transpiler.NewVars(map[string]interface{}{})
 	ctrl := &emitterController{
 		logger:      log,
+		agentInfo:   agentInfo,
 		controller:  controller,
 		router:      router,
 		modifiers:   modifiers,
 		reloadables: reloadables,
-		vars: []transpiler.Vars{
-			{
-				Mapping: map[string]interface{}{},
-			},
-		},
+		vars:        []*transpiler.Vars{init},
 	}
-	err := controller.Run(ctx, func(vars []transpiler.Vars) {
+	err := controller.Run(ctx, func(vars []*transpiler.Vars) {
 		ctrl.Set(vars)
 	})
 	if err != nil {
@@ -202,7 +175,7 @@ func readfiles(files []string, emitter emitterFunc) error {
 	return emitter(c)
 }
 
-func renderInputs(inputs transpiler.Node, varsArray []transpiler.Vars) (transpiler.Node, error) {
+func renderInputs(inputs transpiler.Node, varsArray []*transpiler.Vars) (transpiler.Node, error) {
 	l, ok := inputs.Value().(*transpiler.List)
 	if !ok {
 		return nil, fmt.Errorf("inputs must be an array")
@@ -224,6 +197,10 @@ func renderInputs(inputs transpiler.Node, varsArray []transpiler.Vars) (transpil
 				// another error that needs to be reported
 				return nil, err
 			}
+			if n == nil {
+				// condition removed it
+				continue
+			}
 			dict = n.(*transpiler.Dict)
 			dict = promoteProcessors(dict)
 			hash := string(dict.Hash())
@@ -242,17 +219,20 @@ func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
 	if p == nil {
 		return dict
 	}
+	var currentList *transpiler.List
 	current, ok := dict.Find("processors")
-	currentList, isList := current.Value().(*transpiler.List)
-	if !isList {
-		return dict
+	if ok {
+		currentList, ok = current.Value().(*transpiler.List)
+		if !ok {
+			return dict
+		}
 	}
 	ast, _ := transpiler.NewAST(map[string]interface{}{
 		"processors": p,
 	})
 	procs, _ := transpiler.Lookup(ast, "processors")
 	nodes := nodesFromList(procs.Value().(*transpiler.List))
-	if ok {
+	if ok && currentList != nil {
 		nodes = append(nodes, nodesFromList(currentList)...)
 	}
 	dictNodes := dict.Value().([]transpiler.Node)

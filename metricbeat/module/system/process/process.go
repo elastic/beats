@@ -46,9 +46,10 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *process.Stats
-	cgroup *cgroup.Reader
-	perCPU bool
+	stats   *process.Stats
+	cgroup  *cgroup.Reader
+	perCPU  bool
+	IsAgent bool
 }
 
 // New creates and returns a new MetricSet.
@@ -56,6 +57,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
 	}
 
 	m := &MetricSet{
@@ -67,7 +73,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			CacheCmdLine: config.CacheCmdLine,
 			IncludeTop:   config.IncludeTop,
 		},
-		perCPU: config.IncludePerCPU,
+		perCPU:  config.IncludePerCPU,
+		IsAgent: systemModule.IsAgent,
 	}
 	err := m.stats.Init()
 	if err != nil {
@@ -75,11 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if runtime.GOOS == "linux" {
-		systemModule, ok := base.Module().(*system.Module)
-		if !ok {
-			return nil, fmt.Errorf("unexpected module type")
-		}
-
 		if config.Cgroups == nil || *config.Cgroups {
 			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
@@ -146,6 +148,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		if args := getAndRemove(proc, "args"); args != nil {
 			rootFields.Put("process.args", args)
+		}
+
+		// "share" is unavailable on Windows.
+		if runtime.GOOS == "windows" {
+			proc.Delete("memory.share")
 		}
 
 		e := mb.Event{

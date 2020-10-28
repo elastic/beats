@@ -18,16 +18,14 @@ func TestRenderInputs(t *testing.T) {
 	testcases := map[string]struct {
 		input     transpiler.Node
 		expected  transpiler.Node
-		varsArray []transpiler.Vars
+		varsArray []*transpiler.Vars
 		err       bool
 	}{
 		"inputs not list": {
 			input: transpiler.NewKey("inputs", transpiler.NewStrVal("not list")),
 			err:   true,
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{},
-				},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{}),
 			},
 		},
 		"bad variable error": {
@@ -37,14 +35,12 @@ func TestRenderInputs(t *testing.T) {
 				}),
 			})),
 			err: true,
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
-				},
+				}),
 			},
 		},
 		"basic single var": {
@@ -58,14 +54,12 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
-				},
+				}),
 			},
 		},
 		"duplicate result is removed": {
@@ -82,15 +76,13 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value1",
 					},
-				},
+				}),
 			},
 		},
 		"missing var removes input": {
@@ -110,15 +102,13 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value1")),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value1",
 					},
-				},
+				}),
 			},
 		},
 		"duplicate var result but unique input not removed": {
@@ -142,15 +132,13 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("unique", transpiler.NewStrVal("1")),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value1",
 					},
-				},
+				}),
 			},
 		},
 		"duplicates across vars array handled": {
@@ -176,47 +164,37 @@ func TestRenderInputs(t *testing.T) {
 					transpiler.NewKey("key", transpiler.NewStrVal("value4")),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value1",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value2",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value2",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value3",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value3",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value2",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value2",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-							"diff": "value4",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+						"diff": "value4",
 					},
-				},
+				}),
 			},
 		},
 		"nested in streams": {
@@ -274,49 +252,37 @@ func TestRenderInputs(t *testing.T) {
 					})),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value2",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value2",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value3",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value3",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value4",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value4",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"missing": "other",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"missing": "other",
 					},
-				},
+				}),
 			},
 		},
 		"inputs with processors": {
@@ -384,21 +350,17 @@ func TestRenderInputs(t *testing.T) {
 					})),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
-				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value2",
-						},
+				}),
+				mustMakeVars(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
 					},
-				},
+				}),
 			},
 		},
 		"vars with processors": {
@@ -482,15 +444,14 @@ func TestRenderInputs(t *testing.T) {
 					})),
 				}),
 			}),
-			varsArray: []transpiler.Vars{
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value1",
-						},
+			varsArray: []*transpiler.Vars{
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
-					ProcessorsKey: "var1",
-					Processors: []map[string]interface{}{
+				},
+					"var1",
+					[]map[string]interface{}{
 						{
 							"add_fields": map[string]interface{}{
 								"fields": map[string]interface{}{
@@ -499,16 +460,14 @@ func TestRenderInputs(t *testing.T) {
 								"to": "dynamic",
 							},
 						},
+					}),
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
 					},
 				},
-				{
-					Mapping: map[string]interface{}{
-						"var1": map[string]interface{}{
-							"name": "value2",
-						},
-					},
-					ProcessorsKey: "var1",
-					Processors: []map[string]interface{}{
+					"var1",
+					[]map[string]interface{}{
 						{
 							"add_fields": map[string]interface{}{
 								"fields": map[string]interface{}{
@@ -517,8 +476,182 @@ func TestRenderInputs(t *testing.T) {
 								"to": "dynamic",
 							},
 						},
+					}),
+			},
+		},
+		"inputs without processors and vars with processors": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
+							})),
+						}),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("custom", transpiler.NewStrVal("value1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value2.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("custom", transpiler.NewStrVal("value2")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+					})),
+				}),
+			}),
+			varsArray: []*transpiler.Vars{
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
 					},
 				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value1",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
+					},
+				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value2",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
+			},
+		},
+		"processors incorrectly a map": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewDict([]transpiler.Node{
+						transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("invalid", transpiler.NewStrVal("value")),
+						})),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewDict([]transpiler.Node{
+						transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("invalid", transpiler.NewStrVal("value")),
+						})),
+					})),
+				}),
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value2.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewDict([]transpiler.Node{
+						transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("invalid", transpiler.NewStrVal("value")),
+						})),
+					})),
+				}),
+			}),
+			varsArray: []*transpiler.Vars{
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+					},
+				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value1",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value2",
+					},
+				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value2",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
 			},
 		},
 	}
@@ -534,4 +667,20 @@ func TestRenderInputs(t *testing.T) {
 			}
 		})
 	}
+}
+
+func mustMakeVars(mapping map[string]interface{}) *transpiler.Vars {
+	v, err := transpiler.NewVars(mapping)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func mustMakeVarsP(mapping map[string]interface{}, processorKey string, processors transpiler.Processors) *transpiler.Vars {
+	v, err := transpiler.NewVarsWithProcessors(mapping, processorKey, processors)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }

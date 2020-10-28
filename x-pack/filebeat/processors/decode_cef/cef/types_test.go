@@ -21,6 +21,7 @@ func TestToTimestamp(t *testing.T) {
 		"Jun 23 17:37:24.000 +05",
 		"Jun 23 17:37:24.000 +0500",
 		"Jun 23 17:37:24.000 +05:00",
+		"Jun 23 17:37:24.000 GMT+05:00",
 
 		// MMM dd HH:mm:sss.SSS
 		"Jun 23 17:37:24.000",
@@ -31,6 +32,7 @@ func TestToTimestamp(t *testing.T) {
 		"Jun 23 17:37:24 +05",
 		"Jun 23 17:37:24 +0500",
 		"Jun 23 17:37:24 +05:00",
+		"Jun 23 17:37:24 GMT+05:00",
 
 		// MMM dd HH:mm:ss
 		"Jun 23 17:37:24",
@@ -41,6 +43,7 @@ func TestToTimestamp(t *testing.T) {
 		"Jun 23 2020 17:37:24.000 +05",
 		"Jun 23 2020 17:37:24.000 +0500",
 		"Jun 23 2020 17:37:24.000 +05:00",
+		"Jun 23 2020 17:37:24.000 GMT+05:00",
 
 		// MMM dd yyyy HH:mm:ss.SSS
 		"Jun 23 2020 17:37:24.000",
@@ -51,6 +54,7 @@ func TestToTimestamp(t *testing.T) {
 		"Jun 23 2020 17:37:24 +05",
 		"Jun 23 2020 17:37:24 +0500",
 		"Jun 23 2020 17:37:24 +05:00",
+		"Jun 23 2020 17:37:24 GMT+05:00",
 
 		// MMM dd yyyy HH:mm:ss
 		"Jun 23 2020 17:37:24",

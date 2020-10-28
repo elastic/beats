@@ -108,3 +108,4 @@
 - Pick up version from libbeat {pull}18350[18350]
 - More clear output of inspect command {pull}18405[18405]
 - When not port are specified and the https is used fallback to 443 {pull}18844[18844]
+- Basic upgrade process {pull}21002[21002]
