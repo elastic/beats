@@ -8,6 +8,7 @@ import groovy.transform.Field
  This is required to store the test suites we will use to trigger the E2E tests.
 */
 @Field def e2eTestSuites = []
+@Field def lock = false
 
 pipeline {
   agent none
@@ -422,17 +423,23 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }
 
+@NonCPS
 def uploadPackages(bucketUri, baseDir){
   if(params.dry_run || !params.archive_on_gcp){
     return
   }
-  googleStorageUpload(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+
+  synchronized(lock) {
+    lock = true
+    googleStorageUpload(bucket: bucketUri,
+      credentialsId: "${JOB_GCS_CREDENTIALS}",
+      pathPrefix: "${baseDir}/build/distributions/",
+      pattern: "${baseDir}/build/distributions/**/*",
+      sharedPublicly: true,
+      showInline: true
+    )
+    lock = false
+  }
 }
 
 /**
