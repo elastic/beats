@@ -74,10 +74,12 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
@@ -127,7 +129,13 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
+      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
+      dir("${BASE_DIR}"){
+        // TODO analyzeFlakey does not support other release branches but the master branch.
+        notifyBuildResult(prComment: true,
+                          slackComment: true, slackNotify: (isBranch() || isTag()),
+                          analyzeFlakey: true, flakyReportIdx: "reporter-beats-beats-master")
+      }
     }
   }
 }
@@ -490,7 +498,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */

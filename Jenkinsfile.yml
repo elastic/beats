@@ -17,6 +17,7 @@ projects:
     - "x-pack/libbeat"
     - "x-pack/metricbeat"
     - "x-pack/winlogbeat"
+    - "dev-tools"
     ##- "x-pack/heartbeat"    It's not yet in the 1.0 pipeline.
     ##- "x-pack/journalbeat"  It's not yet in the 1.0 pipeline.
     ##- "x-pack/packetbeat"   It's not yet in the 1.0 pipeline.
