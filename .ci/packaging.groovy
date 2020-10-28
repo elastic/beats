@@ -163,18 +163,28 @@ def platform(){
   return platformsList
 }
 
+def excludes(){
+  excludeList = [:]
+  excludeList['x-pack/elastic-agent:linux/ppc64le linux/mips64 linux/s390x'] = true
+  return excludeList
+}
+
 def signOnMacOS(){
   return params.macos && params.sign_on_macos && env.PLATFORM == 'darwin/amd64'
 }
 
 def packageTask(){
-  tasks = [:]
+  def tasks = [:]
+  def excludes = excludes()
   beats().each{ beat ->
     platform().each{ platform ->
-      tasks["Packaging ${beat}-${platform}"] = {
-        packageMacOS(beat, platform)
-        packageLinux(beat, platform)
-        prepareE2ETestForPackage("${beat}")
+      def key = "${beat}:${platform}"
+      if(!excludes.conatins(key)){
+        tasks["Packaging ${key}"] = {
+          packageMacOS(beat, platform)
+          packageLinux(beat, platform)
+          prepareE2ETestForPackage("${beat}")
+        }
       }
     }
   }
