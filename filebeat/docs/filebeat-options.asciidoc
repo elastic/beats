@@ -62,6 +62,7 @@ subdirectories of a directory.
 
 You can configure {beatname_uc} to use the following inputs:
 
+* <<{beatname_lc}-input-aws-cloudwatch>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
@@ -84,7 +85,7 @@ You can configure {beatname_uc} to use the following inputs:
 
 include::multiline.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-awscloudwatch.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
