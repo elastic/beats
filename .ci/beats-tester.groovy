@@ -77,7 +77,7 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             not {
-              allOf {
+              anyOf {
                 branch comparator: 'REGEXP', pattern: '(master|.*x)'
                 changeRequest()
               }
