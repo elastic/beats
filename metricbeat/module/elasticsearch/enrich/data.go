@@ -98,7 +98,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		event.ModuleFields.Put("node.id", nodeID)
 		fields.Delete("node_id")
 
-		event.MetricSetFields = fields
+		event.MetricSetFields = common.MapStr{
+			"coordinator_stats": fields,
+		}
 
 		r.Event(event)
 	}
@@ -137,8 +139,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			continue
 		}
 
-		event.MetricSetFields.Put("policy.name", policyName)
-		event.MetricSetFields.Put("policy.task", fields)
+		event.MetricSetFields.Put("executing_policy.name", policyName)
+		event.MetricSetFields.Put("executing_policy.task", fields)
 
 		r.Event(event)
 	}

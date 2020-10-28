@@ -23,3 +23,54 @@
       type: long
       description: >
         Number of search requests that enrich processors have executed since node startup.
+    - name: coordinator_stats
+      type: group
+      fields:
+        - name: queue.size
+          type: long
+          description: TODO
+        - name: remote_requests
+          type: group
+          fields:
+            - name: current
+              type: long
+              description: TODO
+            - name: count
+              type: long
+              description: TODO
+        - name: executed_searches.count
+          type: long
+          description: TODO
+    - name: executing_policy
+      type: group
+      fields:
+        - name: name
+          type: keyword
+          description: TODO
+        - name: task
+          type: group
+          fields:
+            - name: id
+              type: long
+              description: TODO
+            - name: type
+              type: keyword
+              description: TODO
+            - name: action
+              type: keyword
+              description: TODO
+            - name: time
+              type: group
+              fields:
+                - name: start.ms
+                  type: long
+                  description: TODO
+                - name: running.nano
+                  type: long
+                  description: TODO
+            - name: cancellable
+              type: boolean
+              description: TODO
+            - name: parent_task_id
+              type: keyword
+              description: TODO

@@ -1,55 +1,57 @@
 {
-    "@timestamp": "2020-08-27T11:22:47.838Z",
+    "@timestamp": "2020-10-28T10:59:36.815Z",
     "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "service": {
-        "address": "localhost:9200",
-        "type": "elasticsearch"
-    },
-    "event": {
-        "module": "elasticsearch",
-        "duration": 10042779,
-        "dataset": "elasticsearch.enrich"
-    },
-    "elasticsearch": {
-        "cluster": {
-            "name": "docker-cluster",
-            "id": "giRKn5pZQ0afY0YrRiXdxQ"
-        },
-        "node": {
-            "id": "9kDCSqOSQRqY9Fwu8tQLSQ"
-        },
-        "enrich": {
-            "remote_requests": {
-                "current": 0,
-                "count": 0
-            },
-            "executed_searches": {
-                "count": 0
-            },
-            "queue": {
-                "size": 0
-            }
-        }
-    },
-    "metricset": {
-        "period": 10000,
-        "name": "enrich"
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
     },
     "ecs": {
-        "version": "1.5.0"
+      "version": "1.5.0"
     },
     "host": {
-        "name": "mcastro"
+      "name": "mcastro"
     },
     "agent": {
-        "ephemeral_id": "5718ae04-fb41-4df2-af35-90ba52d3c181",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro",
-        "type": "metricbeat",
-        "version": "8.0.0"
+      "version": "8.0.0",
+      "ephemeral_id": "6cabc132-5c4c-40dc-91d4-2b18cae42017",
+      "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+      "name": "mcastro",
+      "type": "metricbeat"
+    },
+    "event": {
+      "dataset": "elasticsearch.enrich",
+      "module": "elasticsearch",
+      "duration": 14751446
+    },
+    "metricset": {
+      "name": "enrich",
+      "period": 10000
+    },
+    "service": {
+      "address": "localhost:9200",
+      "type": "elasticsearch"
+    },
+    "elasticsearch": {
+      "cluster": {
+        "name": "docker-cluster",
+        "id": "d4VpgavMRlmVoAZ8AJ-syw"
+      },
+      "node": {
+        "id": "KcEGpHVpRRaCpD4eiKHIsA"
+      },
+      "enrich": {
+        "coordinator_stats": {
+          "queue": {
+            "size": 0
+          },
+          "remote_requests": {
+            "current": 0,
+            "count": 0
+          },
+          "executed_searches": {
+            "count": 0
+          }
+        }
+      }
     }
-}
+  }
