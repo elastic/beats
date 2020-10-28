@@ -1,9 +1,9 @@
-- key: googlecloud
-  title: Google Cloud
+- key: gcp
+  title: GCP
   description: >
     Module for handling logs from Google Cloud.
   fields:
-    - name: googlecloud
+    - name: gcp
       type: group
       description: >
         Fields from Google Cloud logs.
