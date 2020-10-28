@@ -108,16 +108,16 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-etcd-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
+|<<metricbeat-module-gcp,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.6+| .6+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
+|<<metricbeat-metricset-gcp-compute,compute>> beta[]  
+|<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>> beta[]  
+|<<metricbeat-metricset-gcp-metrics,metrics>> beta[]  
+|<<metricbeat-metricset-gcp-pubsub,pubsub>> beta[]  
+|<<metricbeat-metricset-gcp-storage,storage>> beta[]  
 |<<metricbeat-module-golang,Golang>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
-|<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.6+| .6+|  |<<metricbeat-metricset-googlecloud-billing,billing>> beta[]  
-|<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
-|<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
-|<<metricbeat-metricset-googlecloud-metrics,metrics>> beta[]  
-|<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
-|<<metricbeat-metricset-googlecloud-storage,storage>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   
 |<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -310,8 +310,8 @@ include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
+include::modules/gcp.asciidoc[]
 include::modules/golang.asciidoc[]
-include::modules/googlecloud.asciidoc[]
 include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/http.asciidoc[]
