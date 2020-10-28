@@ -76,12 +76,12 @@ func (conf *Config) Validate() error {
 	if conf.ActiveDirectoryEndpoint == "" {
 		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
 		}
 		if ok {
 			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
 			}
 			conf.ActiveDirectoryEndpoint = add.(string)
 		}
