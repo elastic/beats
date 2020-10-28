@@ -38,8 +38,26 @@ pipeline {
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   parameters {
-    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
-    booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
+    booleanParam(name: 'linux', defaultValue: true, description: 'Build linux binaries.')
+    booleanParam(name: 'macos', defaultValue: true, description: 'Build macOS binaries.')
+    booleanParam(name: 'windows', defaultValue: true, description: 'Build windows binaries.')
+
+    booleanParam(name: 'i386_amd64', defaultValue: true, description: 'Build i386/amd64 binaries.')
+    booleanParam(name: 'arm', defaultValue: true, description: 'Build ARM binaries.')
+    booleanParam(name: 'ppc_mips_x390s', defaultValue: true, description: 'Build PPC/MIPS/x390s binaries.')
+
+    booleanParam(name: 'auditbeat', defaultValue: true, description: 'Build auditbeat binaries.')
+    booleanParam(name: 'filebeat', defaultValue: true, description: 'Build filebeat binaries.')
+    booleanParam(name: 'heartbeat', defaultValue: true, description: 'Build heartbeat binaries.')
+    booleanParam(name: 'journalbeat', defaultValue: true, description: 'Build journalbeat binaries.')
+    booleanParam(name: 'metricbeat', defaultValue: true, description: 'Build metricbeat binaries.')
+    booleanParam(name: 'packetbeat', defaultValue: true, description: 'Build packetbeat binaries.')
+    booleanParam(name: 'winlogbeat', defaultValue: true, description: 'Build winlogbeat binaries.')
+    booleanParam(name: 'elastic_agent', defaultValue: true, description: 'Build elastic-agent binaries.')
+    booleanParam(name: 'dockerlogbeat', defaultValue: true, description: 'Build dockerlogbeat binaries.')
+    booleanParam(name: 'functionbeat', defaultValue: true, description: 'Build functionbeat binaries.')
+
+    booleanParam(name: 'sign_on_macos', defaultValue: false, description: 'Sign macOS binaries.')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Execute the pipeline without generate packages.')
   }
   stages {
@@ -90,39 +108,61 @@ pipeline {
 }
 
 def beats(){
-  return [
-    'auditbeat',
-    'filebeat',
-    'heartbeat',
-    'journalbeat',
-    'metricbeat',
-    'packetbeat',
-    'winlogbeat',
-    'x-pack/auditbeat',
-    'x-pack/elastic-agent',
-    'x-pack/dockerlogbeat',
-    'x-pack/filebeat',
-    'x-pack/functionbeat',
-    'x-pack/heartbeat',
-    // 'x-pack/journalbeat',
-    'x-pack/metricbeat',
-    'x-pack/packetbeat',
-    'x-pack/winlogbeat'
-  ]
+  beatsList = []
+  if(params.auditbeat){
+    beatsList << ['auditbeat', 'x-pack/auditbeat']
+  }
+  if(params.filebeat){
+    beatsList << ['filebeat', 'x-pack/filebeat']
+  }
+  if(params.heartbeat){
+    beatsList << ['heartbeat', 'x-pack/heartbeat']
+  }
+  if(params.journalbeat){
+    beatsList << ['journalbeat']
+  }
+  if(params.metricbeat){
+    beatsList << ['metricbeat', 'x-pack/metricbeat']
+  }
+  if(params.packetbeat){
+    beatsList << ['packetbeat', 'x-pack/packetbeat']
+  }
+  if(params.elastic_agent){
+    beatsList << ['x-pack/elastic-agent']
+  }
+  if(params.dockerlogbeat){
+    beatsList << ['x-pack/dockerlogbeat']
+  }
+  if(params.functionbeat){
+    beatsList << ['x-pack/functionbeat']
+  }
+  return beatsList
 }
 
 def platform(){
-  return [
-    'linux/amd64 linux/386',
-    'linux/arm64 linux/armv7',
-    'linux/ppc64le linux/mips64 linux/s390x',
-    'windows/amd64 windows/386',
-    'darwin/amd64',
-    ]
+  platformsList = []
+  if(params.linux){
+    if(params.i386_amd64) {
+      platformsList << ['linux/amd64 linux/386']
+    }
+    if(params.arm) {
+      platformsList << ['linux/arm64 linux/armv7']
+    }
+    if(params.ppc_mips_x390s) {
+      platformsList << ['linux/ppc64le linux/mips64 linux/s390x']
+    }
+  }
+  if(params.windows){
+    platformsList << ['windows/amd64 windows/386']
+  }
+  if(params.macos){
+    platformsList << ['darwin/amd64']
+  }
+  return platformsList
 }
 
-def singOnMacOS(){
-  return params.macos && env.PLATFORM == 'darwin/amd64'
+def signOnMacOS(){
+  return params.macos && params.sign_on_macos && env.PLATFORM == 'darwin/amd64'
 }
 
 def packageTask(){
@@ -140,7 +180,7 @@ def packageTask(){
 }
 
 def packageMacOS(beat, platform){
-  if(singOnMacOS()){
+  if(signOnMacOS()){
     node('macosx-10.12'){
       withEnv([
         "HOME=${env.WORKSPACE}",
@@ -159,7 +199,7 @@ def packageMacOS(beat, platform){
 }
 
 def packageLinux(beat, platform){
-  if(!singOnMacOS()){
+  if(!signOnMacOS()){
     node('ubuntu-18 && immutable'){
       withEnv([
         "HOME=${env.WORKSPACE}",
