@@ -1,11 +1,15 @@
 ---
 description: Pipeline for parsing Linux auditd logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     pattern_definitions:
-      AUDIT_TYPE: "^type=%{NOTSPACE:auditd.log.record_type}"
-      AUDIT_PREFIX: "%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
+      AUDIT_TYPE: "type=%{NOTSPACE:auditd.log.record_type}"
+      AUDIT_NODE: "node=%{IPORHOST:auditd.log.node} "
+      AUDIT_PREFIX: "^(?:%{AUDIT_NODE})?%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
       AUDIT_KEY_VALUES: "%{WORD}=%{GREEDYDATA}"
     patterns:
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid}
@@ -137,24 +141,44 @@ processors:
     value: event
 - set:
     if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
-    field: event.type
+    field: event.category
     value: authentication
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'KERN_MODULE'"
+    field: event.category
+    value: driver
 - set:
     if: "ctx.auditd.log?.record_type == 'KERN_MODULE'"
     field: event.type
-    value: driver
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'SOFTWARE_UPDATE'"
+    field: event.category
+    value: package
 - set:
     if: "ctx.auditd.log?.record_type == 'SOFTWARE_UPDATE'"
     field: event.type
-    value: package
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
+    field: event.category
+    value: host
 - set:
     if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
     field: event.type
-    value: host
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSCALL' && ctx.auditd.log?.syscall == 'execve'"
+    field: event.category
+    value: process
 - set:
     if: "ctx.auditd.log?.record_type == 'SYSCALL' && ctx.auditd.log?.syscall == 'execve'"
     field: event.type
-    value: process
+    value: info
 - set:
     if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' || ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
     field: event.category

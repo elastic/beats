@@ -246,8 +246,9 @@ func TestEmitEvent_Node(t *testing.T) {
 			}
 
 			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
+			config := defaultConfig()
 			p := &Provider{
-				config:    defaultConfig(),
+				config:    config,
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
@@ -261,7 +262,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.no"),
 			}
 
-			p.eventer = no
+			p.eventManager = NewMockNodeEventerManager(no)
 
 			listener := p.bus.Subscribe()
 
@@ -277,6 +278,12 @@ func TestEmitEvent_Node(t *testing.T) {
 			}
 		})
 	}
+}
+
+func NewMockNodeEventerManager(no *node) EventManager {
+	em := &eventerManager{}
+	em.eventer = no
+	return em
 }
 
 func TestNode_isUpdated(t *testing.T) {

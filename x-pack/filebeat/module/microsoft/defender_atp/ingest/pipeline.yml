@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing microsoft atp logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - remove:
     field:
       - message
@@ -76,9 +79,6 @@ processors:
 - set:
     field: event.provider
     value: defender_atp
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
 - set:
     field: event.created
     value: '{{json.alertCreationTime}}'
@@ -279,12 +279,17 @@ processors:
     field: related.hash
     value: '{{file.hash.sha256}}'
     if: ctx.file?.hash?.sha256 != null
+- append:
+    field: related.hosts
+    value: '{{host.hostname}}'
+    if: ctx.host?.hostname != null && ctx.host?.hostname != ''
+    allow_duplicates: false
 
 #############
 ## Cleanup ##
 #############
 - remove:
-    field: 
+    field:
       - json.alertCreationTime
       - json.severity
       - json.relatedUser

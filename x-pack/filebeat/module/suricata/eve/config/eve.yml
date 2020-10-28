@@ -384,8 +384,6 @@ processors:
         - {from: suricata.eve.tls.fingerprint, to: tls.server.hash.sha1}
         - {from: suricata.eve.tls.sni, to: tls.client.server_name}
         - {from: suricata.eve.tls.sni, to: destination.domain}
-        - {from: suricata.eve.tls.notbefore, to: tls.server.not_before}
-        - {from: suricata.eve.tls.notafter, to: tls.server.not_after}
         - {from: suricata.eve.tls.ja3s.hash, to: tls.server.ja3s}
         - {from: suricata.eve.tls.ja3.hash, to: tls.client.ja3}
         - {from: suricata.eve.tls.certificate, to: tls.server.certificate}
@@ -404,4 +402,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

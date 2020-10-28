@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -112,6 +113,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	l := getLogger()
+	agentInfo, _ := info.NewAgentInfo()
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -122,13 +124,13 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, ":0", &ApplicationStatusHandler{})
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}

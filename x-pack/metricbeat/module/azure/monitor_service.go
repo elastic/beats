@@ -55,16 +55,24 @@ func NewService(clientId string, clientSecret string, tenantId string, subscript
 }
 
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
-func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) (resources.ListResultPage, error) {
+func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResource, error) {
 	var resourceQuery string
+	var resourceList []resources.GenericResource
 	if len(id) > 0 {
-		var filterList []string
-		// listing resourceID conditions does not seem to work with the API but querying by name or resource types will work
+		// listing multiple resourceId conditions does not seem to work with the API, extracting the name and resource type does not work as the position of the `resourceType` can move if a parent resource is involved, filtering by resource name and resource group (if extracted) is also not possible as
+		// different types of resources can contain the same name.
 		for _, id := range id {
-			filterList = append(filterList, fmt.Sprintf("name eq '%s'", getResourceNameFromId(id)))
+			resource, err := service.resourceClient.List(service.context, fmt.Sprintf("resourceId eq '%s'", id), "", nil)
+			if err != nil {
+				return nil, err
+			}
+			if len(resource.Values()) > 0 {
+				resourceList = append(resourceList, resource.Values()...)
+			}
 		}
-		resourceQuery = fmt.Sprintf("(%s) AND resourceType eq '%s'", strings.Join(filterList, " OR "), getResourceTypeFromId(id[0]))
-	} else if len(group) > 0 {
+		return resourceList, nil
+	}
+	if len(group) > 0 {
 		var filterList []string
 		for _, gr := range group {
 			filterList = append(filterList, fmt.Sprintf("resourceGroup eq '%s'", gr))
@@ -76,7 +84,11 @@ func (service MonitorService) GetResourceDefinitions(id []string, group []string
 	} else if query != "" {
 		resourceQuery = query
 	}
-	return service.resourceClient.List(service.context, resourceQuery, "", nil)
+	result, err := service.resourceClient.List(service.context, resourceQuery, "", nil)
+	if err == nil {
+		resourceList = result.Values()
+	}
+	return resourceList, err
 }
 
 // GetResourceDefinitionById will retrieve the azure resource based on the resource Id
@@ -123,4 +135,25 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 
 	}
 	return metrics, interval, nil
+}
+
+// getResourceNameFormId maps resource group from resource ID
+func getResourceNameFromId(path string) string {
+	params := strings.Split(path, "/")
+	if strings.HasSuffix(path, "/") {
+		return params[len(params)-2]
+	}
+	return params[len(params)-1]
+
+}
+
+// getResourceTypeFromId maps resource group from resource ID
+func getResourceTypeFromId(path string) string {
+	params := strings.Split(path, "/")
+	for i, param := range params {
+		if param == "providers" {
+			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
+		}
+	}
+	return ""
 }

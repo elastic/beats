@@ -127,42 +127,7 @@
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
-  #ssl.enabled: true
-
-  # Optional SSL configuration options. SSL is off by default.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
-  #ssl.verification_mode: full
-
-  # List of supported/valid TLS versions. By default all TLS versions from 1.1
-  # up to 1.3 are enabled.
-  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-  # Optional passphrase for decrypting the Certificate Key.
-  #ssl.key_passphrase: ''
-
-  # Configure cipher suites to be used for SSL connections
-  #ssl.cipher_suites: []
-
-  # Configure curve types for ECDHE-based cipher suites
-  #ssl.curve_types: []
-
-  # Configure what types of renegotiation are supported. Valid options are
-  # never, once, and freely. Default is never.
-  #ssl.renegotiation: never
-
+{{include "ssl.reference.yml.tmpl" . | indent 2 }}
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 

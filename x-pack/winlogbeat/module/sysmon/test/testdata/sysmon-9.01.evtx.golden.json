@@ -99,9 +99,6 @@
         "process_start"
       ]
     },
-    "hash": {
-      "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
-    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -187,9 +184,6 @@
         "start",
         "process_start"
       ]
-    },
-    "hash": {
-      "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -379,9 +373,6 @@
         "start",
         "process_start"
       ]
-    },
-    "hash": {
-      "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
     },
     "host": {
       "name": "vagrant-2012-r2"

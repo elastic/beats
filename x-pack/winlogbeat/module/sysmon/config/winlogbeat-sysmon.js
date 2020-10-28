@@ -15,7 +15,7 @@ if (!String.prototype.startsWith) {
 var sysmon = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
     var net = require("net");
 
     // Windows error codes for DNS. This list was generated using
@@ -311,7 +311,7 @@ var sysmon = (function () {
         if (!commandLine) {
             return;
         }
-        evt.Put(target, winlogbeat.splitCommandLine(commandLine));
+        evt.Put(target, windows.splitCommandLine(commandLine));
     };
 
     var splitProcessArgs = function (evt) {
@@ -424,9 +424,6 @@ var sysmon = (function () {
 
             evt.Put(path, value);
             evt.AppendTo("related.hash", value);
-
-            // TODO: remove in 8.0, see (https://github.com/elastic/beats/issues/18364).
-            evt.Put("hash." + key, value);
         });
     };
 

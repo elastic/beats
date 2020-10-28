@@ -60,4 +60,8 @@ class Test(BaseTest):
                 os.mkdir(directory)
 
         copytree(self.beat_path + "/tests/system/input/template-test-module", modules_path + "/template-test-module")
-        copyfile(self.beat_path + "/tests/system/input/template-test-module/_meta/config.yml", modules_d_path + "/test.yml")
+        copyfile(
+            self.beat_path +
+            "/tests/system/input/template-test-module/_meta/config.yml",
+            modules_d_path +
+            "/test.yml")

@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"strings"
 	"testing"
@@ -97,7 +98,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(buffer, Config{codec, 1024, LineFeed, unlimited})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited})
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -157,7 +158,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(buffer, Config{codec, 1024, terminator, unlimited})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited})
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -229,7 +230,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(buffer, Config{codec, buffer.Len(), LineFeed, unlimited})
+	reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, buffer.Len(), LineFeed, unlimited})
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -349,7 +350,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Create line reader
-	reader, err := NewLineReader(strings.NewReader(input), Config{codec, bufferSize, LineFeed, lineMaxLimit})
+	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit})
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}

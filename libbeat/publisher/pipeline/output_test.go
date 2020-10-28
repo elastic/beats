@@ -95,6 +95,8 @@ func TestMakeClientWorker(t *testing.T) {
 }
 
 func TestReplaceClientWorker(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/17965")
+
 	tests := map[string]func(mockPublishFn) outputs.Client{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
@@ -120,6 +122,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				var numEvents int
 				for i := uint(0); i < numBatches; i++ {
 					batch := randomBatch(minEventsInBatch, maxEventsInBatch).withRetryer(retryer)
+					batch.events[0].Content.Private = i
 					numEvents += batch.Len()
 					batches = append(batches, batch)
 				}
@@ -129,6 +132,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				go func() {
 					defer wg.Done()
 					for _, batch := range batches {
+						t.Logf("publish batch: %v", batch.(*mockBatch).events[0].Content.Private)
 						wqu <- batch
 					}
 				}()
@@ -145,7 +149,9 @@ func TestReplaceClientWorker(t *testing.T) {
 						<-blockCtrl
 					}
 
-					publishedFirst.Add(uint(len(batch.Events())))
+					count := len(batch.Events())
+					publishedFirst.Add(uint(count))
+					t.Logf("#1 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
 					return nil
 				}
 
@@ -170,7 +176,9 @@ func TestReplaceClientWorker(t *testing.T) {
 				// Start new worker to drain work queue
 				var publishedLater atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
-					publishedLater.Add(uint(len(batch.Events())))
+					count := len(batch.Events())
+					publishedLater.Add(uint(count))
+					t.Logf("#2 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
 					return nil
 				}
 

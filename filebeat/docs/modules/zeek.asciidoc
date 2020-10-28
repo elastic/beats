@@ -10,8 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Zeek (Bro) Module
 
-This is a module for Zeek, which used to be called Bro. It parses logs that are in the
-https://www.zeek.org/manual/release/logs/index.html[Zeek JSON format].
+This is a module for https://zeek.org/[Zeek], which used to be called Bro. It
+parses logs that are in the Zeek JSON format.
 
 include::../include/gs-link.asciidoc[]
 
@@ -21,8 +21,8 @@ include::../include/gs-link.asciidoc[]
 This module has been developed against Zeek 2.6.1, but is expected to work
 with other versions of Zeek.
 
-Zeek requires a Unix-like platform, and it currently supports Linux, FreeBSD, and Mac OS X.
-Find out how to use Zeek here: https://www.zeek.org/
+Zeek requires a Unix-like platform, and it currently supports Linux, FreeBSD,
+and Mac OS X.
 
 [float]
 === Example dashboard

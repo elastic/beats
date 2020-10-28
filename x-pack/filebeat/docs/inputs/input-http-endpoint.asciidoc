@@ -70,6 +70,18 @@ Basic auth and SSL example:
   password: somepassword
 ----
 
+Authentication or checking that a specific header includes a specific value
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  secret.header: someheadername
+  secret.value: secretheadertoken
+----
+
 
 ==== Configuration options
 
@@ -90,6 +102,16 @@ If `basic_auth` is enabled, this is the username used for authentication against
 ==== `password`
 
 If `basic_auth` is eanbled, this is the password used for authentication against the HTTP listener. Requires `username` to also be set.
+
+[float]
+==== `secret.header`
+
+The header to check for a specific value specified by `secret.value`. Certain webhooks provide the possibility to include a special header and secret to identify the source.
+
+[float]
+==== `secret.value`
+
+The secret stored in the header name specified by `secret.header`. Certain webhooks provide the possibility to include a special header and secret to identify the source.
 
 [float]
 ==== `content_type`

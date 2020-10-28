@@ -1,0 +1,112 @@
+[
+    {
+        "event.action": "account.created",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLohghhRgfgrbTayCX6r2Q_qQsQ",
+            "e2ZHO5RSGqyfrmFnElxw"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account.owner_email": "thesubaccountowneremail@somemail.com",
+        "zoom.account.owner_id": "e2ZHO5RSGqyfrmFnElxw",
+        "zoom.master_account_id": "lq8KK_EoRCq6ByEyA73qCA",
+        "zoom.operator": "youramazingemailhere@somemail.com",
+        "zoom.operator_id": "uLohghhRgfgrbTayCX6r2Q_qQsQ",
+        "zoom.sub_account_id": "aIxE1yiRR8WghhUIO6eu9L"
+    },
+    {
+        "event.action": "account.updated",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 297,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "iKoRgfbaTazDX6r2Q_eQsQL"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account.account_alias": "MH",
+        "zoom.account.account_name": "Michael Harris",
+        "zoom.master_account_id": "abKKcd_IGRCq63yEy673lCA",
+        "zoom.old_values.account_alias": "",
+        "zoom.old_values.account_name": "Mike Harris",
+        "zoom.old_values.id": "eFs_EGRCq6ByEyA73qCA",
+        "zoom.operator": "theoperatoremail@someemail.com",
+        "zoom.operator_id": "iKoRgfbaTazDX6r2Q_eQsQL",
+        "zoom.sub_account_id": "eFs_EGRCq6ByEyA73qCA"
+    },
+    {
+        "event.action": "account.disassociated",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 670,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "gdjfdhjLsuhfvhjd",
+            "eZbcHO5RSGqyKAUmFnElxw"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account.owner_email": "theowneremail@someemail.com",
+        "zoom.account.owner_id": "eZbcHO5RSGqyKAUmFnElxw",
+        "zoom.master_account_id": "aBcd_dgfoeq6ByEyA73qCA",
+        "zoom.operator": "youremail@someemail.com",
+        "zoom.operator_id": "gdjfdhjLsuhfvhjd",
+        "zoom.sub_account_id": "LdjkfxE1yiRR8Wdfggeu9LfBQ"
+    }
+]

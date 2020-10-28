@@ -486,6 +486,6 @@ locally for a specific module, using the following procedure under Filebeat dire
 
 . Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
 . Create python env: `make python-env`
-. Source python env: `./build/python-env/bin/activate`
+. Source python env: `source ./build/python-env/bin/activate`
 . Create the testing binary: `make filebeat.test`
-. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx nosetests tests/system/test_modules.py`
+. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx pytest tests/system/test_modules.py`

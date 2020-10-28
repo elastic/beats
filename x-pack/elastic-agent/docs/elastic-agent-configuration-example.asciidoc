@@ -1,10 +1,10 @@
-[[elastic-agent-configuration-example]]
+[[elastic-agent-policy-example]]
 [role="xpack"]
-= Configuration example
+= Policy example
 
-experimental[]
+beta[]
 
-The following example shows a full list of configuration options:
+The following example shows a full list of policy options:
 
 [source,yaml]
 ----

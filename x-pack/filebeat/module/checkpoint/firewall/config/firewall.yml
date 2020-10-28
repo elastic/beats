@@ -1,8 +1,13 @@
-{{ if eq .input "syslog" }}
+{{ if .ssl }}
 
-type: syslog
-protocol.udp:
-  host: "{{.syslog_host}}:{{.syslog_port}}"
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
+
+{{ else if eq .input "syslog" }}
+
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
 
 {{ else if eq .input "file" }}
 
@@ -23,4 +28,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

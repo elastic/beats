@@ -5,15 +5,16 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7692260917184259934",
-            "name": "instance-test-ks"
+            "id": "2438671519308240892",
+            "name": "heartbeat-mumbai"
         },
         "machine": {
-            "type": "e2-standard-2"
+            "type": "f1-micro"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "asia-south1-c",
+    "cloud.region": "asia-south1",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,50 +24,37 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 171
+                    "value": 435
                 },
                 "dropped_packets_count": {
-                    "value": 4
+                    "value": 7
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 2
+                        "value": 0.2
                     },
                     "usage_time": {
-                        "value": 0.1803964574089818
+                        "value": 0.8653667340986431
                     },
                     "utilization": {
-                        "value": 0.001503303811741515
-                    }
-                },
-                "memory": {
-                    "balloon": {
-                        "ram_size": {
-                            "value": 7896264704
-                        },
-                        "ram_used": {
-                            "value": 416518144
-                        },
-                        "swap_in_bytes_count": {
-                            "value": 0
-                        },
-                        "swap_out_bytes_count": {
-                            "value": 0
-                        }
+                        "value": 0.07211389450822024
                     }
                 },
                 "uptime": {
-                    "value": 60.000000000000455
+                    "value": 60
                 }
             }
         },
-        "labels": {
-            "user": {
-                "created-by": "ks"
-            }
-        }
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.07211389450822024
+        },
+        "id": "2438671519308240892",
+        "name": "heartbeat-mumbai"
     },
     "metricset": {
         "name": "compute",

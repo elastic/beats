@@ -6,5 +6,5 @@ package download
 
 // Verifier is an interface verifying GPG key of a downloaded artifact
 type Verifier interface {
-	Verify(programName, version string) (bool, error)
+	Verify(programName, version, artifactName string, removeOnFailure bool) (bool, error)
 }

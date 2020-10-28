@@ -23,7 +23,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("Successful enroll", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 
@@ -43,8 +43,7 @@ func TestEnroll(t *testing.T) {
 				require.Equal(t, "linux", req.Metadata.Local.OS.Name)
 
 				response := &EnrollResponse{
-					Action:  "created",
-					Success: true,
+					Action: "created",
 					Item: EnrollItemResponse{
 						ID:                   "a4937110-e53e-11e9-934f-47a8e38a522c",
 						Active:               true,
@@ -87,14 +86,13 @@ func TestEnroll(t *testing.T) {
 
 			require.Equal(t, "my-access-api-key", resp.Item.AccessAPIKey)
 			require.Equal(t, "created", resp.Action)
-			require.True(t, resp.Success)
 		},
 	))
 
 	t.Run("Raise back any server errors", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(`{"statusCode": 500, "error":"Something is really bad here"}`))
