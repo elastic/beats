@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	inputName = "gcp-pubsub"
+	inputName    = "gcp-pubsub"
 	oldInputName = "google-pubsub"
 )
 
@@ -70,6 +70,15 @@ func NewInput(
 		return nil, err
 	}
 
+	logger := logp.NewLogger("gcp.pubsub").With(
+		"pubsub_project", conf.ProjectID,
+		"pubsub_topic", conf.Topic,
+		"pubsub_subscription", conf.Subscription)
+
+	if conf.Type == oldInputName {
+		logger.Warnf("%s input name is deprecated, please use %s instead", oldInputName, inputName)
+	}
+
 	// Wrap input.Context's Done channel with a context.Context. This goroutine
 	// stops with the parent closes the Done channel.
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -86,11 +95,8 @@ func NewInput(
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
 	in := &pubsubInput{
-		config: conf,
-		log: logp.NewLogger("gcp.pubsub").With(
-			"pubsub_project", conf.ProjectID,
-			"pubsub_topic", conf.Topic,
-			"pubsub_subscription", conf.Subscription),
+		config:       conf,
+		log:          logger,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,

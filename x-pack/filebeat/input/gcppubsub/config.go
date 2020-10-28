@@ -9,11 +9,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/v7/filebeat/harvester"
+
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
 )
 
 type config struct {
+	harvester.ForwarderConfig `config:",inline"`
 	// Google Cloud project name.
 	ProjectID string `config:"project_id" validate:"required"`
 
@@ -62,6 +65,9 @@ func (c *config) Validate() error {
 
 func defaultConfig() config {
 	var c config
+	c.ForwarderConfig = harvester.ForwarderConfig{
+		Type: "gcp-pubsub",
+	}
 	c.Subscription.NumGoroutines = 1
 	c.Subscription.MaxOutstandingMessages = 1000
 	c.Subscription.Create = true
