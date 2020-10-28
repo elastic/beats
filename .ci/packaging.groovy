@@ -147,9 +147,7 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    dir("${BASE_DIR}") {
-                      pushCIDockerImages()
-                    }
+                    pushCIDockerImages()
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
