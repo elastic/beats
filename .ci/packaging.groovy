@@ -180,8 +180,9 @@ def packageTask(){
   beats().each{ beat ->
     platform().each{ platform ->
       def key = "${beat}:${platform}"
-      echo "'${key}' -> '${excludes}'"
-      if(!excludes.containsKey(key)){
+      echo "Looking for  -> '${key}' -> '${excludes}'"
+      echo "Exclude value: ${excludes[key]}"
+      if(excludes[key] == null){
         tasks["Packaging ${key}"] = {
           packageMacOS(beat, platform)
           packageLinux(beat, platform)
