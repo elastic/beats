@@ -46,28 +46,25 @@ func init() {
 	beater.RegisterJourneyLister(ListJourneys)
 }
 
-// ListJourneys takes the given suite perfors a dry run, capturing the Journey names, and returns the list.
+// ListJourneys takes the given suite performs a dry run, capturing the Journey names, and returns the list.
 func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
 	dir, err := getSuiteDir(suiteFile)
+	if err != nil {
+		return nil, err
+	}
 
+	// Override the synthetics package if desired
 	if os.Getenv("HEARTBEAT_SYNTHETICS_TGZ") != "" {
-		cmd := exec.Command("npm", "install", os.Getenv("HEARTBEAT_SYNTHETICS_TGZ"))
-		cmd.Dir = dir
-		logp.Info("Running %s", cmd)
-		output, err := cmd.CombinedOutput()
-		logp.Info("Ran %s, got: %s", cmd, string(output))
+		err = runSimpleCommand(exec.Command("npm", "install", os.Getenv("HEARTBEAT_SYNTHETICS_TGZ")), dir)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		cmd := exec.Command("npm", "install")
-		cmd.Dir = dir
-		logp.Info("Running %s", cmd)
-		output, err := cmd.CombinedOutput()
-		logp.Info("Ran %s got %s", cmd, string(output))
-		if err != nil {
-			return nil, err
-		}
+	}
+
+	// Ensure all deps installed
+	err = runSimpleCommand(exec.Command("npm", "install"), dir)
+	if err != nil {
+		return nil, err
 	}
 
 	cmd := exec.Command(
@@ -77,9 +74,6 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		"--dry-run",
 	)
 	cmd.Dir = dir
-	if err != nil {
-		return nil, err
-	}
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
 Outer:
@@ -383,3 +377,10 @@ func getSuiteDir(suiteFile string) (string, error) {
 	return filepath.Dir(suiteFile), nil
 }
 
+func runSimpleCommand(cmd *exec.Cmd, dir string) error {
+	cmd.Dir = dir
+	logp.Info("Running %s in %s", cmd, dir)
+	output, err := cmd.CombinedOutput()
+	logp.Info("Ran %s got %s", cmd, string(output))
+	return err
+}
