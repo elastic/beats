@@ -1,43 +1,455 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "elasticsearch": {
-        "cluster": {
-            "id": "6UTQ_iuNSzWP49zv99vxDg",
-            "name": "elasticsearch",
-            "stats": {
-                "indices": {
-                    "fielddata": {
-                        "memory": {
-                            "bytes": 1208
-                        }
-                    },
-                    "shards": {
-                        "count": 18,
-                        "primaries": 18
-                    },
-                    "total": 18
-                },
-                "nodes": {
-                    "count": 1,
-                    "data": 1,
-                    "master": 1
-                },
-                "status": "yellow"
-            }
-        }
+    "@timestamp": "2020-10-28T11:51:03.492Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
     },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
-        "name": "cluster_stats",
-        "namespace": "elasticsearch.cluster.stats",
-        "rtt": 115
+      "name": "cluster_stats",
+      "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+      "address": "localhost:9200",
+      "type": "elasticsearch"
+    },
+    "elasticsearch": {
+      "cluster": {
+        "name": "docker-cluster",
+        "id": "NbXypChqTKqZgsXigm38lg",
+        "stats": {
+          "status": "green",
+          "nodes": {
+            "fs": {
+              "available": {
+                "bytes": 57686257664
+              },
+              "total": {
+                "bytes": 958613114880
+              },
+              "free": {
+                "bytes": 106452590592
+              }
+            },
+            "jvm": {
+              "threads": {
+                "total": 78
+              },
+              "max_uptime": {
+                "ms": 639337
+              },
+              "memory": {
+                "heap": {
+                  "used": {
+                    "bytes": 329323512
+                  },
+                  "max": {
+                    "bytes": 1073741824
+                  }
+                }
+              }
+            },
+            "data": 1,
+            "count": 1,
+            "ml": {
+              "total": 1
+            },
+            "master": 1,
+            "ingest": {
+              "total": 1,
+              "pipelines": {
+                "total": 1
+              },
+              "processor_stats": {
+                "gsub": {
+                  "current": 0,
+                  "time_in_millis": 0,
+                  "count": 0,
+                  "failed": 0
+                },
+                "script": {
+                  "time_in_millis": 0,
+                  "count": 0,
+                  "failed": 0,
+                  "current": 0
+                }
+              }
+            },
+            "voting_only": {
+              "total": 0
+            },
+            "remote_cluster_client": {
+              "total": 1
+            },
+            "coordinating_only": {
+              "total": 0
+            },
+            "transform": {
+              "total": 1
+            }
+          },
+          "indices": {
+            "shards": {
+              "count": 6,
+              "primaries": 6,
+              "replication": 0,
+              "index": {
+                "shards": {
+                  "max": 1,
+                  "avg": 1,
+                  "min": 1
+                },
+                "primaries": {
+                  "max": 1,
+                  "avg": 1,
+                  "min": 1
+                },
+                "replication": {
+                  "min": 0,
+                  "max": 0,
+                  "avg": 0
+                }
+              }
+            },
+            "store": {
+              "size": {
+                "bytes": 10960637
+              },
+              "reserved": {
+                "bytes": 0
+              }
+            },
+            "query_cache": {
+              "miss": {
+                "total": 0
+              },
+              "cache": {
+                "total": 0
+              },
+              "evictions": 0,
+              "cache_size": {
+                "bytes": 0
+              },
+              "memory_size": {
+                "bytes": 0
+              },
+              "total": 0,
+              "hit": {
+                "total": 0
+              }
+            },
+            "segments": {
+              "memory": {
+                "bytes": 26928,
+                "doc_values": {
+                  "bytes": 2336
+                },
+                "index_writer": {
+                  "bytes": 766308
+                },
+                "norms": {
+                  "bytes": 1152
+                },
+                "stored_fields": {
+                  "bytes": 4880
+                },
+                "version_map": {
+                  "bytes": 0
+                },
+                "points": {
+                  "bytes": 0
+                },
+                "fixed_bit_set": {
+                  "bytes": 384
+                },
+                "terms": {
+                  "bytes": 18560,
+                  "vectors": {
+                    "bytes": 0
+                  }
+                }
+              },
+              "max_unsafe_auto_id": {
+                "ms": -1
+              },
+              "total": 10
+            },
+            "fielddata": {
+              "memory": {
+                "bytes": 0
+              }
+            },
+            "docs": {
+              "deleted": {
+                "total": 42
+              },
+              "total": 22
+            },
+            "count": 6
+          },
+          "stack": {
+            "apm": {
+              "found": false
+            },
+            "xpack": {
+              "searchable_snapshots": {
+                "available": false,
+                "enabled": true,
+                "indices_count": 0
+              },
+              "slm": {
+                "available": true,
+                "enabled": true
+              },
+              "vectors": {
+                "available": true,
+                "enabled": true,
+                "dense_vector_fields_count": 0,
+                "dense_vector_dims_avg_count": 0
+              },
+              "security": {
+                "available": true,
+                "enabled": false
+              },
+              "ccr": {
+                "available": false,
+                "enabled": true,
+                "follower_indices_count": 0,
+                "auto_follow_patterns_count": 0
+              },
+              "rollup": {
+                "available": true,
+                "enabled": true
+              },
+              "transform": {
+                "available": true,
+                "enabled": true
+              },
+              "frozen_indices": {
+                "indices_count": 0,
+                "available": true,
+                "enabled": true
+              },
+              "graph": {
+                "available": false,
+                "enabled": true
+              },
+              "monitoring": {
+                "enabled": true,
+                "collection_enabled": false,
+                "enabled_exporters": {
+                  "local": 1
+                },
+                "available": true
+              },
+              "data_streams": {
+                "available": true,
+                "enabled": true,
+                "data_streams": 0,
+                "indices_count": 0
+              },
+              "voting_only": {
+                "available": true,
+                "enabled": true
+              },
+              "logstash": {
+                "available": false,
+                "enabled": true
+              },
+              "ml": {
+                "node": {
+                  "total": 1
+                },
+                "available": false,
+                "enabled": true,
+                "jobs": {
+                  "total": 0
+                }
+              },
+              "ilm": {
+                "policy": {
+                  "stats": [
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        },
+                        "delete": {
+                          "actions": [
+                            "delete"
+                          ],
+                          "min_age": 7.776e+09
+                        }
+                      },
+                      "indices_managed": 1
+                    },
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        }
+                      },
+                      "indices_managed": 0
+                    },
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        }
+                      },
+                      "indices_managed": 0
+                    },
+                    {
+                      "phases": {
+                        "delete": {
+                          "actions": [
+                            "delete"
+                          ],
+                          "min_age": 6.048e+08
+                        }
+                      },
+                      "indices_managed": 0
+                    },
+                    {
+                      "indices_managed": 1,
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        },
+                        "delete": {
+                          "min_age": 7.776e+09,
+                          "actions": [
+                            "delete"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "indices_managed": 0,
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        }
+                      },
+                      "indices_managed": 0
+                    },
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        }
+                      },
+                      "indices_managed": 0
+                    },
+                    {
+                      "phases": {
+                        "hot": {
+                          "min_age": 0,
+                          "actions": [
+                            "rollover"
+                          ]
+                        },
+                        "delete": {
+                          "min_age": 7.776e+09,
+                          "actions": [
+                            "delete"
+                          ]
+                        }
+                      },
+                      "indices_managed": 0
+                    }
+                  ],
+                  "total": 9
+                }
+              },
+              "spatial": {
+                "available": true,
+                "enabled": true
+              }
+            }
+          },
+          "license": {
+            "type": "basic",
+            "issued_to": "docker-cluster",
+            "cluster_needs_tls": false,
+            "issue_date": "2020-10-28T11:40:49.967Z",
+            "start_date_in_millis": -1,
+            "max_nodes": 1000,
+            "uid": "57de8d4d-8186-48db-94cc-20f3930cabd0",
+            "issue_date_in_millis": 1603885249967,
+            "status": "active",
+            "issuer": "elasticsearch"
+          },
+          "version": "8.0.0-SNAPSHOT",
+          "cluster_name": "docker-cluster",
+          "state": {
+            "cluster_uuid": "NbXypChqTKqZgsXigm38lg",
+            "version": 79,
+            "state_uuid": "qga7zh1iRSWHtzjGqNf8jw",
+            "master_node": "gRwfLijcQHKkBT6Gu97Dtg",
+            "nodes": {
+              "gRwfLijcQHKkBT6Gu97Dtg": {
+                "attributes": {
+                  "xpack.installed": "true",
+                  "transform.node": "true",
+                  "ml.max_open_jobs": "20",
+                  "ml.machine_memory": "33300463616"
+                },
+                "name": "5ee826db8c8e",
+                "ephemeral_id": "qL61BHr9SUCSsB66Kpmu0A",
+                "transport_address": "127.0.0.1:9300"
+              }
+            },
+            "nodes_hash": 1291240343,
+            "status": "green"
+          }
+        }
+      }
+    },
+    "ecs": {
+      "version": "1.5.0"
+    },
+    "host": {
+      "name": "mcastro"
+    },
+    "agent": {
+      "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+      "name": "mcastro",
+      "type": "metricbeat",
+      "version": "8.0.0",
+      "ephemeral_id": "e748e3e2-bdd6-4122-bb2a-0446ac7a01da"
+    },
+    "event": {
+      "duration": 60698626,
+      "dataset": "elasticsearch.cluster.stats",
+      "module": "elasticsearch"
     }
-}
+  }

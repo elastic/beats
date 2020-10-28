@@ -21,6 +21,12 @@
         - name: name
           type: alias
           path: elasticsearch.node.name
+    - name: cluster_stats
+      type: group
+      fields:
+        - name: nodes.count
+          type: alias
+          path: elasticsearch.cluster.stats.nodes.count
     - name: node_stats
       type: group
       fields:
@@ -315,6 +321,7 @@
     - name: elasticsearch
       type: group
       description: >
+                TODO
       fields:
         - name: cluster.name
           type: keyword

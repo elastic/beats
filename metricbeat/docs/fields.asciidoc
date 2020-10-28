@@ -17642,6 +17642,16 @@ alias to: elasticsearch.node.name
 --
 
 
+*`cluster_stats.nodes.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.count
+
+--
+
+
 
 
 *`node_stats.fs.total.available_in_bytes`*::
@@ -18189,6 +18199,7 @@ alias to: elasticsearch.index.summary.total.indexing.index.count
 [float]
 === elasticsearch
 
+TODO
 
 
 
@@ -18366,7 +18377,7 @@ Nodes statistics.
 
 
 
-*`elasticsearch.cluster.stats.nodes.total`*::
+*`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
 Total number of nodes in cluster.
@@ -18403,7 +18414,7 @@ Indices statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.total`*::
+*`elasticsearch.cluster.stats.indices.count`*::
 +
 --
 Total number of indices in cluster.
@@ -18420,7 +18431,7 @@ Shard statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.shards.total`*::
+*`elasticsearch.cluster.stats.indices.shards.count`*::
 +
 --
 Total number of shards in cluster.

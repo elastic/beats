@@ -13,7 +13,7 @@
       description: >
         Nodes statistics.
       fields:
-      - name: total
+      - name: count
         type: long
         description: >
           Total number of nodes in cluster.
@@ -30,7 +30,7 @@
       description: >
         Indices statistics.
       fields:
-      - name: total
+      - name: count
         type: long
         description: >
           Total number of indices in cluster.
@@ -39,7 +39,7 @@
         description: >
           Shard statistics.
         fields:
-        - name: total
+        - name: count
           type: long
           description: >
             Total number of shards in cluster.

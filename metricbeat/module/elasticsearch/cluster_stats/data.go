@@ -36,7 +36,7 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"total": c.Int("count.total"),
+			"count": c.Int("count.total"),
 			"master": c.Int("count.master"),
 			"data": c.Int("count.data"),
 			"coordinating_only": s.Object{
@@ -99,9 +99,9 @@ var (
 					"total": c.Int("deleted"),
 				},
 			}),
-			"total": c.Int("count"),
+			"count": c.Int("count"),
 			"shards": c.Dict("shards", s.Schema{
-				"total":       c.Int("total"),
+				"count":       c.Int("total"),
 				"primaries":   c.Int("primaries"),
 				"replication": c.Int("replication"),
 				"index":       c.Ifc("index"),
