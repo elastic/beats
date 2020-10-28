@@ -379,6 +379,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 - Report the correct windows events for system/filesystem {pull}21758[21758]
+- Fix regular expression in windows/permfon. {pull}22146[22146] {issue}21125[21125]
 - Fix azure storage event format. {pull}21845[21845]
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
@@ -799,6 +800,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
 - Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
+- Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
