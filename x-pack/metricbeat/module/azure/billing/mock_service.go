@@ -7,6 +7,8 @@ package billing
 import (
 	"github.com/stretchr/testify/mock"
 
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
@@ -27,7 +29,7 @@ type MockService struct {
 func NewMockClient() *Client {
 	return &Client{
 		new(MockService),
-		Config{},
+		azure.Config{},
 		logp.NewLogger("test azure monitor"),
 	}
 }
