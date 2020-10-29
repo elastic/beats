@@ -47,7 +47,7 @@ import (
 // It checks .go source files using 'go vet'.
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
-
+	asdf
 	mg.Deps(GoVet, CheckPythonTestNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
@@ -61,7 +61,7 @@ func Check() error {
 		}
 
 		return errors.Errorf("some files are not up-to-date. "+
-			"Run 'mage fmt update' then review and commit the changes. "+
+			"Run 'make update' then review and commit the changes. "+
 			"Modified: %v", changes)
 	}
 	return nil
