@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        make: "RACE_DETECTOR=1 make -C x-pack/filebeat check testsuite integration-tests-environment"
+        make: "RACE_DETECTOR=1 make -C x-pack/filebeat check testsuite"
     windows:
         script: "dev-tools/jenkins_ci.ps1"
         platforms:             ## override default labels in this specific stage.
