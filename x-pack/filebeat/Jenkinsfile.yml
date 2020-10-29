@@ -19,3 +19,5 @@ stages:
         script: "dev-tools/jenkins_ci.ps1"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
+        when:
+            disabled: true     ## https://github.com/elastic/beats/issues/21963
