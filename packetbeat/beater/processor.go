@@ -20,6 +20,7 @@ package beater
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -36,19 +37,21 @@ import (
 )
 
 type processor struct {
-	wg        sync.WaitGroup
-	publisher *publish.TransactionPublisher
-	flows     *flows.Flows
-	sniffer   *sniffer.Sniffer
-	err       chan error
+	wg              sync.WaitGroup
+	publisher       *publish.TransactionPublisher
+	flows           *flows.Flows
+	sniffer         *sniffer.Sniffer
+	shutdownTimeout time.Duration
+	err             chan error
 }
 
-func newProcessor(publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error) *processor {
+func newProcessor(shutdownTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error) *processor {
 	return &processor{
-		publisher: publisher,
-		flows:     flows,
-		sniffer:   sniffer,
-		err:       err,
+		publisher:       publisher,
+		flows:           flows,
+		sniffer:         sniffer,
+		err:             err,
+		shutdownTimeout: shutdownTimeout,
 	}
 }
 
@@ -79,6 +82,11 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
+	// wait for shutdownTimeout to let the publisher flush
+	// whatever pending events
+	if p.shutdownTimeout > 0 {
+		time.Sleep(p.shutdownTimeout)
+	}
 	p.publisher.Stop()
 }
 
@@ -142,7 +150,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 		return nil, err
 	}
 
-	return newProcessor(publisher, flows, sniffer, p.err), nil
+	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
 }
 
 func (p *processorFactory) CheckConfig(config *common.Config) error {

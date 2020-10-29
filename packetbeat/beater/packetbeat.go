@@ -79,23 +79,15 @@ func initialConfig() config.Config {
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config          *common.Config
-	factory         *processorFactory
-	shutdownTimeout time.Duration
-	done            chan struct{}
+	config  *common.Config
+	factory *processorFactory
+	done    chan struct{}
 }
 
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	cfg := initialConfig()
-	err := rawConfig.Unpack(&cfg)
-	if err != nil {
-		logp.Err("fails to read the beat config: %v, %v", err, cfg)
-		return nil, err
-	}
-
 	configurator := config.NewAgentConfig
 	if !b.Manager.Enabled() {
-		configurator = cfg.FromStatic
+		configurator = initialConfig().FromStatic
 	}
 
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
@@ -104,10 +96,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	return &packetbeat{
-		config:          rawConfig,
-		shutdownTimeout: cfg.ShutdownTimeout,
-		factory:         factory,
-		done:            make(chan struct{}),
+		config:  rawConfig,
+		factory: factory,
+		done:    make(chan struct{}),
 	}, nil
 }
 
@@ -119,11 +110,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
-
-	timeout := pb.shutdownTimeout
-	if timeout > 0 {
-		defer time.Sleep(timeout)
-	}
 
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
