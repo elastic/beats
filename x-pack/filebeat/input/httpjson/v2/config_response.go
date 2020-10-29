@@ -1,15 +1,15 @@
 package v2
 
-import (
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms"
-)
-
 type responseConfig struct {
-	Transforms transforms.Config `config:"transforms"`
+	Transforms transformsConfig `config:"transforms"`
+	Pagination transformsConfig `config:"pagination"`
 }
 
 func (c *responseConfig) Validate() error {
-	if _, err := transforms.New(c.Transforms, responseNamespace); err != nil {
+	if _, err := newResponseTransformsFromConfig(c.Transforms); err != nil {
+		return err
+	}
+	if _, err := newPaginationTransformsFromConfig(c.Transforms); err != nil {
 		return err
 	}
 

@@ -20,11 +20,14 @@ func (c config) Validate() error {
 }
 
 func defaultConfig() config {
+	timeout := 30 * time.Second
 	return config{
 		Interval: time.Minute,
 		Auth:     &authConfig{},
 		Request: &requestConfig{
-			Method: "GET",
+			Timeout: &timeout,
+			Method:  "GET",
 		},
+		Response: &responseConfig{},
 	}
 }

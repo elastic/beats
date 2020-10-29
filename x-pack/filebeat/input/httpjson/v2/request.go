@@ -5,31 +5,60 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms/append"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms/delete"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms/set"
 )
 
 const requestNamespace = "request"
 
 func registerRequestTransforms() {
-	transforms.RegisterTransform(requestNamespace, set.Name, set.New)
-	transforms.RegisterTransform(requestNamespace, append.Name, append.New)
-	transforms.RegisterTransform(requestNamespace, delete.Name, delete.New)
+	registerTransform(requestNamespace, appendName, newAppendRequest)
+	registerTransform(requestNamespace, deleteName, newDeleteRequest)
+	registerTransform(requestNamespace, setName, newSetRequest)
+}
+
+type request struct {
+	body   common.MapStr
+	header http.Header
+	url    *url.URL
+}
+
+func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []requestTransform) (*request, error) {
+	req := &request{
+		body:   common.MapStr{},
+		header: http.Header{},
+	}
+
+	clonedURL, err := url.Parse(url.String())
+	if err != nil {
+		return nil, err
+	}
+	req.url = clonedURL
+
+	if body != nil {
+		req.body.DeepUpdate(*body)
+	}
+
+	for _, t := range trs {
+		req, err = t.run(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return req, nil
 }
 
 type requestFactory struct {
 	url        url.URL
 	method     string
 	body       *common.MapStr
-	transforms []transforms.Transform
+	transforms []requestTransform
 	user       string
 	password   string
 	log        *logp.Logger
@@ -37,12 +66,12 @@ type requestFactory struct {
 
 func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
-	ts, _ := transforms.New(config.Transforms, requestNamespace)
+	ts, _ := newRequestTransformsFromConfig(config.Transforms)
 	rf := &requestFactory{
 		url:        *config.URL.URL,
 		method:     config.Method,
 		body:       config.Body,
-		transforms: ts.List,
+		transforms: ts,
 		log:        log,
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
@@ -52,33 +81,17 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 	return rf
 }
 
-func (rf *requestFactory) newRequest(ctx context.Context) (*http.Request, error) {
-	var err error
-
-	trReq := transforms.NewEmptyTransformable()
-
-	clonedURL, err := url.Parse(rf.url.String())
+func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transformContext) (*http.Request, error) {
+	trReq, err := newRequest(trCtx, rf.body, rf.url, rf.transforms)
 	if err != nil {
 		return nil, err
 	}
-	trReq.URL = *clonedURL
-
-	if rf.body != nil {
-		trReq.Body = rf.body.Clone()
-	}
-
-	for _, t := range rf.transforms {
-		trReq, err = t.Run(trReq)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	var body []byte
-	if len(trReq.Body) > 0 {
+	if len(trReq.body) > 0 {
 		switch rf.method {
 		case "POST":
-			body, err = json.Marshal(trReq.Body)
+			body, err = json.Marshal(trReq.body)
 			if err != nil {
 				return nil, err
 			}
@@ -87,19 +100,19 @@ func (rf *requestFactory) newRequest(ctx context.Context) (*http.Request, error)
 		}
 	}
 
-	req, err := http.NewRequest(rf.method, trReq.URL.String(), bytes.NewBuffer(body))
+	req, err := http.NewRequest(rf.method, trReq.url.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
-	req = req.WithContext(ctx)
+	req = req.WithContext(stdCtx)
 
-	req.Header = trReq.Headers
+	req.Header = trReq.header
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", userAgent)
 	if rf.method == "POST" {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	req.Header.Set("User-Agent", userAgent)
 
 	if rf.user != "" || rf.password != "" {
 		req.SetBasicAuth(rf.user, rf.password)
@@ -109,23 +122,21 @@ func (rf *requestFactory) newRequest(ctx context.Context) (*http.Request, error)
 }
 
 type requester struct {
-	log               *logp.Logger
-	client            *http.Client
-	requestFactory    *requestFactory
-	responseProcessor *responseProcessor
+	log            *logp.Logger
+	client         *http.Client
+	requestFactory *requestFactory
 }
 
-func newRequester(client *http.Client, requestFactory *requestFactory, responseProcessor *responseProcessor, log *logp.Logger) *requester {
+func newRequester(client *http.Client, requestFactory *requestFactory, log *logp.Logger) *requester {
 	return &requester{
-		log:               log,
-		client:            client,
-		requestFactory:    requestFactory,
-		responseProcessor: responseProcessor,
+		log:            log,
+		client:         client,
+		requestFactory: requestFactory,
 	}
 }
 
-func (r *requester) processRequest(ctx context.Context, publisher cursor.Publisher) error {
-	req, err := r.requestFactory.newRequest(ctx)
+func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, publisher cursor.Publisher) error {
+	req, err := r.requestFactory.newHTTPRequest(stdCtx, trCtx)
 	if err != nil {
 		return fmt.Errorf("failed to create http request: %w", err)
 	}
@@ -134,22 +145,9 @@ func (r *requester) processRequest(ctx context.Context, publisher cursor.Publish
 	if err != nil {
 		return fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
 
-	events, err := r.responseProcessor.getEventsFromResponse(ctx, resp)
-	if err != nil {
-		return err
-	}
-
-	for e := range events {
-		if e.failed() {
-			r.log.Errorf("failed to create event: %v", e.err)
-			continue
-		}
-
-		if err := publisher.Publish(e.event, nil); err != nil {
-			return err
-		}
-	}
-
+	fmt.Println(string(body))
 	return nil
 }

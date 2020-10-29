@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/v2/internal/transforms"
 )
 
 type retryConfig struct {
@@ -30,10 +29,31 @@ func (c retryConfig) Validate() error {
 	return nil
 }
 
+func (c retryConfig) getMaxAttempts() int {
+	if c.MaxAttempts == nil {
+		return 0
+	}
+	return *c.MaxAttempts
+}
+
+func (c retryConfig) getWaitMin() time.Duration {
+	if c.WaitMin == nil {
+		return 0
+	}
+	return *c.WaitMin
+}
+
+func (c retryConfig) getWaitMax() time.Duration {
+	if c.WaitMax == nil {
+		return 0
+	}
+	return *c.WaitMax
+}
+
 type rateLimitConfig struct {
-	Limit     *transforms.Template `config:"limit"`
-	Reset     *transforms.Template `config:"reset"`
-	Remaining *transforms.Template `config:"remaining"`
+	Limit     *valueTpl `config:"limit"`
+	Reset     *valueTpl `config:"reset"`
+	Remaining *valueTpl `config:"remaining"`
 }
 
 func (c rateLimitConfig) Validate() error {
@@ -67,7 +87,14 @@ type requestConfig struct {
 	SSL        *tlscommon.Config `config:"ssl"`
 	Retry      retryConfig       `config:"retry"`
 	RateLimit  *rateLimitConfig  `config:"rate_limit"`
-	Transforms transforms.Config `config:"transforms"`
+	Transforms transformsConfig  `config:"transforms"`
+}
+
+func (c requestConfig) getTimeout() time.Duration {
+	if c.Timeout == nil {
+		return 0
+	}
+	return *c.Timeout
 }
 
 func (c *requestConfig) Validate() error {
@@ -86,7 +113,7 @@ func (c *requestConfig) Validate() error {
 		return errors.New("timeout must be greater than 0")
 	}
 
-	if _, err := transforms.New(c.Transforms, requestNamespace); err != nil {
+	if _, err := newRequestTransformsFromConfig(c.Transforms); err != nil {
 		return err
 	}
 

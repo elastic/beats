@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"reflect"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -71,6 +70,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 
 	registerRequestTransforms()
 	registerResponseTransforms()
+	registerPaginationTransforms()
 
 	return v2.Plugin{
 		Name:       inputName,
@@ -132,23 +132,20 @@ func run(
 	}
 
 	requestFactory := newRequestFactory(config.Request, config.Auth, log)
-	responseProcessor := newResponseProcessor(config.Response)
+	requester := newRequester(httpClient, requestFactory, log)
 
-	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
-
+	// loadContextFromCursor
+	trCtx := transformContext{}
 	err = timed.Periodic(stdCtx, config.Interval, func() error {
 		log.Info("Process another repeated request.")
 
-		err := requester.processRequest(stdCtx, publisher)
-		if err == nil {
-			return nil
+		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+			log.Errorf("Error while processing http request: %v", err)
 		}
 
 		if stdCtx.Err() != nil {
 			return err
 		}
-
-		log.Errorf("Error while processing http request: %v", err)
 
 		return nil
 	})
@@ -159,7 +156,7 @@ func run(
 }
 
 func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig) (*http.Client, error) {
-	timeout := getValFromPtr(config.Request.Timeout, time.Duration(0)).(time.Duration)
+	timeout := config.Request.getTimeout()
 
 	// Make retryable HTTP client
 	client := &retryablehttp.Client{
@@ -174,9 +171,9 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 			Timeout: timeout,
 		},
 		Logger:       newRetryLogger(),
-		RetryWaitMin: getValFromPtr(config.Request.Retry.WaitMin, time.Duration(0)).(time.Duration),
-		RetryWaitMax: getValFromPtr(config.Request.Retry.WaitMax, time.Duration(0)).(time.Duration),
-		RetryMax:     getValFromPtr(config.Request.Retry.MaxAttempts, 0).(int),
+		RetryWaitMin: config.Request.Retry.getWaitMin(),
+		RetryWaitMax: config.Request.Retry.getWaitMax(),
+		RetryMax:     config.Request.Retry.getMaxAttempts(),
 		CheckRetry:   retryablehttp.DefaultRetryPolicy,
 		Backoff:      retryablehttp.DefaultBackoff,
 	}
@@ -186,17 +183,6 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 	}
 
 	return client.StandardClient(), nil
-}
-
-func getValFromPtr(ptr, defaultVal interface{}) interface{} {
-	switch {
-	case reflect.ValueOf(ptr).Kind() != reflect.Ptr,
-		!reflect.ValueOf(ptr).IsValid(),
-		reflect.ValueOf(ptr).IsNil():
-		return defaultVal
-	}
-
-	return reflect.Indirect(reflect.ValueOf(ptr))
 }
 
 func makeEvent(body string) beat.Event {

@@ -1,4 +1,4 @@
-package transforms
+package v2
 
 import (
 	"errors"
@@ -9,26 +9,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type Constructor func(config *common.Config) (Transform, error)
+type constructor func(config *common.Config) (transform, error)
 
 var registeredTransforms = newRegistry()
 
 type registry struct {
-	namespaces map[string]map[string]Constructor
+	namespaces map[string]map[string]constructor
 }
 
 func newRegistry() *registry {
-	return &registry{namespaces: make(map[string]map[string]Constructor)}
+	return &registry{namespaces: make(map[string]map[string]constructor)}
 }
 
-func (reg *registry) register(namespace, transform string, constructor Constructor) error {
-	if constructor == nil {
+func (reg *registry) register(namespace, transform string, cons constructor) error {
+	if cons == nil {
 		return errors.New("constructor can't be nil")
 	}
 
 	m, found := reg.namespaces[namespace]
 	if !found {
-		reg.namespaces[namespace] = make(map[string]Constructor)
+		reg.namespaces[namespace] = make(map[string]constructor)
 		m = reg.namespaces[namespace]
 	}
 
@@ -36,7 +36,7 @@ func (reg *registry) register(namespace, transform string, constructor Construct
 		return errors.New("already registered")
 	}
 
-	m[transform] = constructor
+	m[transform] = cons
 
 	return nil
 }
@@ -58,7 +58,7 @@ func (reg registry) String() string {
 	return str
 }
 
-func (reg registry) get(namespace, transform string) (Constructor, bool) {
+func (reg registry) get(namespace, transform string) (constructor, bool) {
 	m, found := reg.namespaces[namespace]
 	if !found {
 		return nil, false
@@ -67,7 +67,7 @@ func (reg registry) get(namespace, transform string) (Constructor, bool) {
 	return c, found
 }
 
-func RegisterTransform(namespace, transform string, constructor Constructor) {
+func registerTransform(namespace, transform string, constructor constructor) {
 	logp.L().Named(logName).Debugf("Register transform %s:%s", namespace, transform)
 
 	err := registeredTransforms.register(namespace, transform, constructor)
