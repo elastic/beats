@@ -4,6 +4,7 @@ Please label this PR with one of the following labels, depending on the scope of
 - Enhancement
 - Breaking change
 - Deprecation
+- Cleanup
 - Docs
 -->
 
