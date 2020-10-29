@@ -204,6 +204,8 @@ def packageMacOS(beat, platform){
           deleteDir()
           withMacOSEnv(){
             release()
+            pushCIDockerImages()
+            publishPackages("${env.BEATS_FOLDER}")
           }
         }
       }
@@ -223,6 +225,7 @@ def packageLinux(beat, platform){
           deleteDir()
           release()
           pushCIDockerImages()
+          publishPackages("${env.BEATS_FOLDER}")
         }
       }
     }
@@ -335,7 +338,6 @@ def release(){
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
       }
     }
-    publishPackages("${env.BEATS_FOLDER}")
   }
 }
 
