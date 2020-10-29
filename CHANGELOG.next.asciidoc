@@ -385,6 +385,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Fix instance name in perfmon metricset. {issue}22218[22218] {pull}22261[22261]
 
 *Packetbeat*
 
