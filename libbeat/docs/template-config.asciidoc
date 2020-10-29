@@ -23,7 +23,7 @@ endif::[]
 You can adjust the following settings to load your own template or overwrite an
 existing one.
 
-*`setup.template.enabled`*:: Set to false to disable template loading. If set this to false,
+*`setup.template.enabled`*:: Set to false to disable template loading. If this is set to false,
 you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
