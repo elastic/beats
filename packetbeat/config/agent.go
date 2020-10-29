@@ -20,11 +20,24 @@ package config
 import (
 	"fmt"
 	"runtime"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/go-ucfg"
 )
+
+type datastream struct {
+	Namespace string `config:"namespace"`
+	Dataset   string `config:"dataset"`
+	Type      string `config:"type"`
+}
+
+type agentInput struct {
+	Type       string                   `config:"type"`
+	Datastream datastream               `config:"data_stream"`
+	Processors []common.MapStr          `config:"processors"`
+	Streams    []map[string]interface{} `config:"streams"`
+}
 
 var osDefaultDevices = map[string]string{
 	"darwin": "en0",
@@ -38,46 +51,87 @@ func defaultDevice() string {
 	return "0"
 }
 
+func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, error) {
+	namespace := i.Datastream.Namespace
+	if namespace == "" {
+		namespace = "default"
+	}
+	datastreamConfig := struct {
+		Datastream datastream `config:"data_stream"`
+	}{}
+	if err := cfg.Unpack(&datastreamConfig); err != nil {
+		return nil, err
+	}
+	mergeConfig, err := common.NewConfigFrom(common.MapStr{
+		"index": datastreamConfig.Datastream.Type + "-" + datastreamConfig.Datastream.Dataset + "-" + namespace,
+		"processors": append([]common.MapStr{
+			common.MapStr{
+				"add_fields": common.MapStr{
+					"target": "data_stream",
+					"fields": common.MapStr{
+						"type":      datastreamConfig.Datastream.Type,
+						"dataset":   datastreamConfig.Datastream.Dataset,
+						"namespace": namespace,
+					},
+				},
+			},
+			common.MapStr{
+				"add_fields": common.MapStr{
+					"target": "event",
+					"fields": common.MapStr{
+						"dataset": datastreamConfig.Datastream.Dataset,
+					},
+				},
+			},
+		}, i.Processors...),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := cfg.MergeWithOpts(mergeConfig, ucfg.FieldAppendValues("processors")); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
 func NewAgentConfig(cfg *common.Config) (Config, error) {
 	logp.Debug("agent", "Normalizing agent configuration")
-	var configMap []map[string]interface{}
+	var input agentInput
 	config := Config{
 		Interfaces: InterfacesConfig{
 			// TODO: make this configurable rather than just using the default device
 			Device: defaultDevice(),
 		},
 	}
-	if err := cfg.Unpack(&configMap); err != nil {
+	if err := cfg.Unpack(&input); err != nil {
 		return config, err
 	}
 
-	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(configMap)))
-	for _, input := range configMap {
-		if rawInputType, ok := input["type"]; ok {
-			inputType, ok := rawInputType.(string)
+	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(input.Streams)))
+	for _, stream := range input.Streams {
+		if rawStreamType, ok := stream["type"]; ok {
+			streamType, ok := rawStreamType.(string)
 			if !ok {
-				return config, fmt.Errorf("invalid input type of: '%T'", rawInputType)
+				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
-			logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", inputType))
-			if strings.HasPrefix(inputType, "network/") {
-				cfg, err := common.NewConfigFrom(input)
-				if err != nil {
+			logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", streamType))
+			cfg, err := common.NewConfigFrom(stream)
+			if err != nil {
+				return config, err
+			}
+			cfg, err = input.addProcessorsAndIndex(cfg)
+			if err != nil {
+				return config, err
+			}
+			switch streamType {
+			case "flow":
+				if err := cfg.Unpack(&config.Flows); err != nil {
 					return config, err
 				}
-				protocol := strings.TrimPrefix(inputType, "network/")
-				switch protocol {
-				case "flows":
-					if err := cfg.Unpack(&config.Flows); err != nil {
-						return config, err
-					}
-				default:
-					if err = cfg.SetString("type", -1, protocol); err != nil {
-						return config, err
-					}
-					config.ProtocolsList = append(config.ProtocolsList, cfg)
-				}
+			default:
+				config.ProtocolsList = append(config.ProtocolsList, cfg)
 			}
 		}
 	}
