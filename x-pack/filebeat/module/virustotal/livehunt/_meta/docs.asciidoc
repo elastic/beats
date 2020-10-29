@@ -44,6 +44,72 @@ include::../include/config-option-intro.asciidoc[]
       var.limit: 10
 ----
 
+[float]
+==== `VirusTotal` fields
+
+[source,yaml]
+----
+- top-level field: virustotal
+  description: Main fieldset for all VirusTotal events
+
+  - field: analysis
+    description: Information about the sample analysis.
+
+  - field: attributes
+    description: File-level attributes about the sample.
+
+  - field: bytehero_info
+    description: ByteHero heuristic detection engine information.
+
+  - field: capabilities
+    description: Capabilities of the sample.
+
+  - field: community
+    description: Community information and votes about the sample.
+
+  - field: downloadable
+    description: The sample is or is not downloadable from VirusTotal.
+
+  - field: exiftool
+    description: Exif metadata provided about the sample.
+
+  - field: hash
+    description: Hashing algorithm provided by VirusTotal to identify similar samples.
+
+  - field: id
+    description: VirusTotal identification number for the sample.
+
+  - field: last_modified
+    description: UTC date when the sample itself was last modified.
+
+  - field: magic
+    description: Magic number of the sample.
+
+  - field: notification
+    description: UTC date when the LiveHunt notification was generated.
+
+  - field: packers
+    description: Type of packers used by the sample.
+
+  - field: sigma_analysis
+    description: Analysis of sandbox generated sysmon logs.
+
+  - field: submission
+    description: UTC date when the sample itself was submitted to VirusTotal.
+
+  - field: tags
+    description: VirusTotal applied tags about the sample.
+
+  - field: trid
+    description: TrID is an utility designed to identify file types from their binary signatures
+
+  - field: type_description
+    description: File architecture description about the sample.
+
+  - field: type_tag
+    description: File architecture tag about the sample.
+----
+
 include::../include/var-paths.asciidoc[]
 
 [float]
@@ -52,7 +118,8 @@ include::../include/var-paths.asciidoc[]
 This module comes with several visualizations and a dashboard.
 
 [role="screenshot"]
-image::./images/kibana-virustotal-dashboard.png[]
+image::./images/kibana-virustotal-dashboard-1.png[]
+image::./images/kibana-virustotal-dashboard-2.png[]
 
 :has-dashboards!:
 
