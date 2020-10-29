@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
+- Rename googlecloud module to gcp module. {pull}22246[22246]
 
 *Packetbeat*
 
