@@ -29,7 +29,7 @@ endif::[]
 ifeval::["{release-state}"!="unreleased"]
 
 IMPORTANT: To simplify upgrading to future versions of {agent}, we recommended
-that you use the tarball distribution instead of the DEB distribution.
+that you use the tarball distribution instead of the RPM distribution.
 
 ["source","sh",subs="attributes"]
 ----
