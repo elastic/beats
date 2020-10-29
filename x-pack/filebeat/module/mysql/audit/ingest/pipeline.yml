@@ -1,11 +1,109 @@
-description: Pipeline for parsing checkpoint firewall logs
+description: Pipeline for parsing MySQL Enterprise Audit logs
 processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
 - json:
     field: message
-    target_field: json
+    target_field: mysql.audit
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: database
+- append:
+    field: event.type
+    value: access
+    if: ctx?.mysql?.audit?.class != 'audit'
+- append:
+    field: event.type
+    value: start
+    if: ctx?.mysql?.audit?.event == 'connect'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.mysql?.audit?.event == 'disconnect'
+- set:
+    field: event.outcome
+    value: success
+    if: ctx?.mysql?.audit?.connection_data?.status != null && ctx?.mysql?.audit?.connection_data?.status == 0 || ctx?.mysql?.audit?.general_data?.status != null && ctx?.mysql?.audit?.general_data?.status == 0
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx?.mysql?.audit?.connection_data?.status != null && ctx?.mysql?.audit?.connection_data?.status > 0 || ctx?.mysql?.audit?.general_data?.status != null && ctx?.mysql?.audit?.general_data?.status > 0
+- set:
+    field: event.outcome
+    value: unknown
+    if: ctx?.event?.outcome == null
+- set:
+    field: event.action
+    value: mysql-{{ mysql.audit.event }}
+    if: ctx?.mysql?.audit?.event != null
+- script:
+    lang: painless
+    if: ctx?.mysql?.audit != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v instanceof String && v.isEmpty() == true);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+- rename:
+    field: mysql.audit.account.user
+    target_field: server.user.name
+    ignore_missing: true
+- rename:
+    field: mysql.audit.account.host
+    target_field: client.domain
+    ignore_missing: true
+- rename:
+    field: mysql.audit.login.os
+    target_field: client.user.name
+    ignore_missing: true
+- rename:
+    field: mysql.audit.login.ip
+    target_field: client.ip
+    ignore_missing: true
+- rename:
+    field: mysql.audit.startup_data.os_version
+    target_field: host.os.full
+    ignore_missing: true
+- rename:
+    field: mysql.audit.startup_data.args
+    target_field: process.args
+    ignore_missing: true
+# Attributes starting with _ is only supported by MySQL 8.0.19 and above.
+- rename:
+    field: mysql.audit.connection_data.connection_attributes._pid
+    target_field: process.pid
+    ignore_missing: true
+- date:
+    field: mysql.audit.timestamp
+    formats:
+    - YYYY-MM-DD HH:mm:ss
+    if: ctx?.mysql?.audit?.timestamp != null
+- remove:
+    field:
+    - message
+    - mysql.audit.event
+    - mysql.audit.timestamp
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

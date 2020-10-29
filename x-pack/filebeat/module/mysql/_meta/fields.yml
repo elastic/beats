@@ -3,3 +3,8 @@
   description: >
     Some mysql module
   fields:
+    - name: mysql
+      type: group
+      description: >
+        Fields from MySQL Logs
+      fields:
