@@ -303,6 +303,9 @@ var sysmon = (function () {
             return;
         }
         var exe = evt.Get(pathField);
+        if (!exe) {
+            return;
+        }
         evt.Put(nameField, path.basename(exe));
     };
 
@@ -327,7 +330,11 @@ var sysmon = (function () {
     };
 
     var addUser = function (evt) {
-        var userParts = evt.Get("winlog.event_data.User").split("\\");
+        var userParts = evt.Get("winlog.event_data.User");
+        if (!userParts) {
+            return;
+        }
+        userParts = userParts.split("\\");
         if (userParts.length === 2) {
             evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
@@ -406,6 +413,9 @@ var sysmon = (function () {
     // in the specified namespace. It also adds all the hashes to 'related.hash'.
     var addHashes = function (evt, namespace, hashField) {
         var hashes = evt.Get(hashField);
+        if (!hashes) {
+            return;
+        }
         evt.Delete(hashField);
         hashes.split(",").forEach(function (hash) {
             var parts = hash.split("=");
@@ -677,8 +687,34 @@ var sysmon = (function () {
                     from: "winlog.event_data.ParentCommandLine",
                     to: "process.parent.command_line",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "process.pe.original_file_name",
+                },
             ],
             mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Convert({
+            fields: [{
+                    from: "winlog.event_data.Company",
+                    to: "process.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "process.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "process.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "process.pe.product",
+                },
+            ],
+            mode: "copy",
             ignore_missing: true,
             fail_on_error: false,
         })
@@ -951,6 +987,11 @@ var sysmon = (function () {
                     from: "winlog.event_data.ImageLoaded",
                     to: "file.path",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "file.pe.original_file_name",
+                },
+
             ],
             mode: "rename",
             ignore_missing: true,
@@ -965,7 +1006,24 @@ var sysmon = (function () {
                     from: "winlog.event_data.SignatureStatus",
                     to: "file.code_signature.status",
                 },
+                {
+                    from: "winlog.event_data.Company",
+                    to: "file.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "file.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "file.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "file.pe.product",
+                },
             ],
+            ignore_missing: true,
             fail_on_error: false,
         })
         .Add(setRuleName)

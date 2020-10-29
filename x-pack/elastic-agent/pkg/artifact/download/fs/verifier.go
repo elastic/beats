@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	ascSuffix = ".asc"
+	ascSuffix    = ".asc"
+	sha512Length = 128
 )
 
 // Verifier verifies a downloaded package by comparing with public ASC
@@ -93,7 +94,9 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 			continue
 		}
 
-		expectedHash = strings.TrimSpace(strings.TrimSuffix(line, filename))
+		if len(line) > sha512Length {
+			expectedHash = strings.TrimSpace(line[:sha512Length])
+		}
 	}
 
 	if expectedHash == "" {
