@@ -19,7 +19,7 @@
         "log.offset": 562,
         "oracle.database_audit.action": "CONNECT",
         "oracle.database_audit.action_number": "100",
-        "oracle.database_audit.client_terminal": "pts/0",
+        "oracle.database_audit.client.terminal": "pts/0",
         "oracle.database_audit.length": 228,
         "oracle.database_audit.status": "0",
         "process.pid": "13448",

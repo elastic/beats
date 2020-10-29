@@ -108302,27 +108302,27 @@ type: keyword
 
 --
 
-*`oracle.database_audit.sessionid`*::
+*`oracle.database_audit.session_id`*::
 +
 --
-Session ID related to the audit event.
+Indicates the audit session ID number.
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.client_terminal`*::
+*`oracle.database_audit.client.terminal`*::
 +
 --
-If available, the client terminal type, for example "pty"
+If available, the client terminal type, for example "pty".
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.client_address`*::
+*`oracle.database_audit.client.address`*::
 +
 --
 The IP Address or Domain used by the client.
@@ -108332,17 +108332,17 @@ type: keyword
 
 --
 
-*`oracle.database_audit.client_user`*::
+*`oracle.database_audit.client.user`*::
 +
 --
-The user running the client or connection to the database
+The user running the client or connection to the database.
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.database_user`*::
+*`oracle.database_audit.database.user`*::
 +
 --
 The database user used to authenticate.
@@ -108355,27 +108355,27 @@ type: keyword
 *`oracle.database_audit.privilege`*::
 +
 --
-The privilege group related to the database user
+The privilege group related to the database user.
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.entryid`*::
+*`oracle.database_audit.entry.id`*::
 +
 --
-EntryID
+Indicates the current audit entry number, assigned to each audit trail record. The audit entry.id sequence number is shared between fine-grained audit records and regular audit records.
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.userhost`*::
+*`oracle.database_audit.database.host`*::
 +
 --
-The host in which the database is running.
+Client host machine name.
 
 
 type: keyword
@@ -108385,7 +108385,7 @@ type: keyword
 *`oracle.database_audit.action`*::
 +
 --
-The type of action logged in the audit event.
+The action performed during the audit event. This could for example be the raw query.
 
 
 type: keyword
@@ -108395,17 +108395,17 @@ type: keyword
 *`oracle.database_audit.action_number`*::
 +
 --
-Action number related to the audit event
+Action is a numeric value representing the action the user performed. The corresponding name of the action type is in the AUDIT_ACTIONS table. For example, action 100 refers to LOGON.
 
 
 type: keyword
 
 --
 
-*`oracle.database_audit.dbid`*::
+*`oracle.database_audit.database.id`*::
 +
 --
-The ID of the DB/container accessed.
+Database identifier calculated when the database is created. It corresponds to the DBID column of the V$DATABASE data dictionary view.
 
 
 type: keyword
@@ -108415,7 +108415,7 @@ type: keyword
 *`oracle.database_audit.length`*::
 +
 --
-The duration length.
+Refers to the total number of bytes used in this audit record. This number includes the trailing newline bytes (\n), if any, at the end of the audit record.
 
 
 type: long

@@ -9,27 +9,27 @@
       description: >
         Database Audit Status.
 
-    - name: sessionid
+    - name: session_id
       type: keyword
       description: >
-        Session ID related to the audit event.
+        Indicates the audit session ID number.
 
-    - name: client_terminal
+    - name: client.terminal
       type: keyword
       description: >
-        If available, the client terminal type, for example "pty"
+        If available, the client terminal type, for example "pty".
 
-    - name: client_address
+    - name: client.address
       type: keyword
       description: >
         The IP Address or Domain used by the client.
 
-    - name: client_user
+    - name: client.user
       type: keyword
       description: >
-        The user running the client or connection to the database
+        The user running the client or connection to the database.
 
-    - name: database_user
+    - name: database.user
       type: keyword
       description: >
         The database user used to authenticate.
@@ -37,34 +37,34 @@
     - name: privilege
       type: keyword
       description: >
-        The privilege group related to the database user
+        The privilege group related to the database user.
 
-    - name: entryid
+    - name: entry.id
       type: keyword
       description: >
-        EntryID
+        Indicates the current audit entry number, assigned to each audit trail record. The audit entry.id sequence number is shared between fine-grained audit records and regular audit records.
 
-    - name: userhost
+    - name: database.host
       type: keyword
       description: >
-        The host in which the database is running.
+        Client host machine name.
 
     - name: action
       type: keyword
       description: >
-        The type of action logged in the audit event.
+        The action performed during the audit event. This could for example be the raw query.
 
     - name: action_number
       type: keyword
       description: >
-        Action number related to the audit event
+        Action is a numeric value representing the action the user performed. The corresponding name of the action type is in the AUDIT_ACTIONS table. For example, action 100 refers to LOGON.
 
-    - name: dbid
+    - name: database.id
       type: keyword
       description: >
-        The ID of the DB/container accessed.
+        Database identifier calculated when the database is created. It corresponds to the DBID column of the V$DATABASE data dictionary view.
 
     - name: length
       type: long
       description: >
-        The duration length.
+        Refers to the total number of bytes used in this audit record. This number includes the trailing newline bytes (\n), if any, at the end of the audit record.

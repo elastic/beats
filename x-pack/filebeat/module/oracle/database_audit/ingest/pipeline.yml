@@ -130,6 +130,36 @@ processors:
       - "(?:%{IP:server.ip}|%{GREEDYDATA:server.domain})"
     ignore_failure: true
     ignore_missing: true
+# Renaming certain fields for better data structure
+- rename:
+    field: oracle.database_audit.sessionid
+    target_field: oracle.database_audit.session_id
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.client_terminal
+    target_field: oracle.database_audit.client.terminal
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.client_address
+    target_field: oracle.database_audit.client.address
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.database_user
+    target_field: oracle.database_audit.database.user
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.userhost
+    target_field: oracle.database_audit.database.host
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.dbid
+    target_field: oracle.database_audit.database.id
+    ignore_missing: true
+- rename:
+    field: oracle.database_audit.entry_id
+    target_field: oracle.database_audit.entry.id
+    ignore_missing: true
+
 - remove:
     field:
     - tmp_timestamp

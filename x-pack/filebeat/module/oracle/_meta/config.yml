@@ -8,12 +8,3 @@
     # Set paths for the log files when file input is used.
     # Should only be used together with file input
     # var.paths: /home/user/oracleauditlogs/*.aud
-
-    # The interface to listen to UDP based syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    # Should only be used together with syslog input
-    #var.syslog_host: localhost
-
-    # The UDP port to listen for syslog traffic. Defaults to 9001.
-    # Should only be used together with syslog input
-    #var.syslog_port: 9001
