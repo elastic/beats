@@ -132,6 +132,12 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
 
+	destinationFile, err := os.OpenFile(fullPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, packagePermissions)
+	if err != nil {
+		return "", errors.New(err, "creating package file failed", errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
+	}
+	defer destinationFile.Close()
+
 	resp, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
@@ -141,12 +147,6 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 	if resp.StatusCode != 200 {
 		return "", errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", sourceURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
-
-	destinationFile, err := os.OpenFile(fullPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, packagePermissions)
-	if err != nil {
-		return "", errors.New(err, "creating package file failed", errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
-	}
-	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, resp.Body)
 	return fullPath, nil
