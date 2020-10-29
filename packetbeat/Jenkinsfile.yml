@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        make: "RACE_DETECTOR=1 make -C packetbeat check testsuite integration-tests-environment"
+        make: "RACE_DETECTOR=1 make -C packetbeat check testsuite"    ## See https://github.com/elastic/beats/issues/22266
     windows:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
