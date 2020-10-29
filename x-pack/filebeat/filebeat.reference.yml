@@ -798,7 +798,7 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#----------------------------- Google Cloud Module -----------------------------
+#--------------------------------- GCP Module ---------------------------------
 - module: gcp
   vpcflow:
     enabled: true
