@@ -27,7 +27,7 @@ For self-managed installations, set the URLs for {es} and {kib}, including
 the http ports, then save your changes.
 +
 [role="screenshot"]
-//image::images/kibana-fleet-settings.png[{fleet} settings]
+image::images/kibana-fleet-settings.png[{fleet} settings]
 
 . Select **Agents**, then click **Add agent** to get an enrollment token. See
 <<ingest-management-getting-started>> for detailed steps.

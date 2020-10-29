@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-var processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
+var processRegexp = regexp.MustCompile(`(.+?[^\s])(?:#\d+|$)`)
 
 func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
 	eventMap := make(map[string]*mb.Event)
@@ -73,7 +73,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 						Error:           errors.Wrapf(val.Err.Error, "failed on query=%v", counterPath),
 					}
 					if val.Instance != "" {
-						//will ignore instance counter
+						//will ignore instance index
 						if ok, match := matchesParentProcess(val.Instance); ok {
 							eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, match)
 						} else {

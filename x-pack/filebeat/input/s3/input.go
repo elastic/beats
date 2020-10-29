@@ -5,6 +5,7 @@
 package s3
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -67,7 +68,12 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	defer collector.publisher.Close()
 	collector.run()
-	return ctx.Cancelation.Err()
+
+	if ctx.Cancelation.Err() == context.Canceled {
+		return nil
+	} else {
+		return ctx.Cancelation.Err()
+	}
 }
 
 func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
@@ -106,7 +112,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	}
 
 	log.Debug("s3 service name = ", s3Servicename)
-
+	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,

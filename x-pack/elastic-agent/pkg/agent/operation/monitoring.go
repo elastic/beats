@@ -206,6 +206,16 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 						},
 					},
 				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
+						},
+					},
+				},
 			},
 		},
 	}
@@ -237,6 +247,16 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							"target": "event",
 							"fields": map[string]interface{}{
 								"dataset": fmt.Sprintf("elastic_agent.%s", name),
+							},
+						},
+					},
+					{
+						"add_fields": map[string]interface{}{
+							"target": "elastic_agent",
+							"fields": map[string]interface{}{
+								"id":       o.agentInfo.AgentID(),
+								"version":  o.agentInfo.Version(),
+								"snapshot": o.agentInfo.Snapshot(),
 							},
 						},
 					},
@@ -287,6 +307,16 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 						"target": "event",
 						"fields": map[string]interface{}{
 							"dataset": fmt.Sprintf("elastic_agent.%s", name),
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
 						},
 					},
 				},

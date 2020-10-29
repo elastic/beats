@@ -82,17 +82,11 @@ type s3Context struct {
 	errC chan error
 }
 
-var (
-	// The maximum number of messages to return. Amazon SQS never returns more messages
-	// than this value (however, fewer messages might be returned).
-	maxNumberOfMessage uint8 = 10
-
-	// The duration (in seconds) for which the call waits for a message to arrive
-	// in the queue before returning. If a message is available, the call returns
-	// sooner than WaitTimeSeconds. If no messages are available and the wait time
-	// expires, the call returns successfully with an empty list of messages.
-	waitTimeSecond uint8 = 10
-)
+// The duration (in seconds) for which the call waits for a message to arrive
+// in the queue before returning. If a message is available, the call returns
+// sooner than WaitTimeSeconds. If no messages are available and the wait time
+// expires, the call returns successfully with an empty list of messages.
+var waitTimeSecond uint8 = 10
 
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
@@ -159,8 +153,10 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 	for {
 		select {
 		case <-c.cancellation.Done():
+			fmt.Println("------- c.cancellation.Done()")
 			return nil
 		case err := <-errC:
+			fmt.Println("------- err = ", err)
 			if err != nil {
 				if err == context.DeadlineExceeded {
 					c.logger.Info("Context deadline exceeded, updating visibility timeout")
@@ -205,7 +201,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 		&sqs.ReceiveMessageInput{
 			QueueUrl:              &c.config.QueueURL,
 			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   awssdk.Int64(int64(maxNumberOfMessage)),
+			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
 			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
 		})
