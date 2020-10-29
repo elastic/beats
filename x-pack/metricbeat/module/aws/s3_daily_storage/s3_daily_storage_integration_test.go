@@ -33,7 +33,6 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("aws.dimensions.StorageType", "string", event, t)
 		mtest.CheckEventField("aws.s3.metrics.BucketSizeBytes.avg", "float", event, t)
 		mtest.CheckEventField("aws.s3.metrics.NumberOfObjects.avg", "float", event, t)
-		break
 	}
 }
 

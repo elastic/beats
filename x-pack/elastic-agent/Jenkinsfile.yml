@@ -13,6 +13,11 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        make: |
+          make -C x-pack/elastic-agent check;
+          make -C x-pack/elastic-agent update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -65,6 +70,28 @@ stages:
                 - "/test x-pack/elastic-agent for windows-2012"
             labels:
                 - "windows-2012"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    windows-10:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-10"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/elastic-agent for windows-10"
+            labels:
+                - "windows-10"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    windows-2008:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2008-r2"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/elastic-agent for windows-2008"
+            labels:
+                - "windows-2008"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
     windows-7:

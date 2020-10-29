@@ -12,6 +12,7 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
+    AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
@@ -73,10 +74,12 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: true, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
@@ -126,10 +129,42 @@ pipeline {
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
+      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
+      dir("${BASE_DIR}"){
+        notifyBuildResult(prComment: true,
+                          slackComment: true, slackNotify: (isBranch() || isTag()),
+                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+      }
     }
   }
 }
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getIdSuffix() {
+  if(isPR()) {
+    return getBranchIndice(env.CHANGE_TARGET)
+  }
+  if(isBranch()) {
+    return getBranchIndice(env.BRANCH_NAME)
+  }
+}
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getBranchIndice(String compare) {
+  if (compare?.equals('master') || compare.equals('7.x')) {
+    return compare
+  } else {
+    if (compare.startsWith('7.')) {
+      return '7.x'
+    }
+  }
+  return 'master'
+}
+
 
 /**
 * This method is the one used for running the parallel stages, therefore
@@ -167,8 +202,8 @@ def cloud(Map args = [:]) {
 
 def k8sTest(Map args = [:]) {
   def versions = args.versions
-  node(args.label) {
-    versions.each{ v ->
+  versions.each{ v ->
+    node(args.label) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -176,7 +211,19 @@ def k8sTest(Map args = [:]) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
               try {
-                sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                // Add some environmental resilience when setup does not work the very first time.
+                def i = 0
+                retryWithSleep(retries: 3, seconds: 5, backoff: true){
+                  try {
+                    sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+                  } catch(err) {
+                    i++
+                    sh(label: 'Delete cluster', script: 'kind delete cluster')
+                    if (i > 2) {
+                      error("Setup kind failed with error '${err.toString()}'")
+                    }
+                  }
+                }
                 sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
@@ -208,7 +255,7 @@ def target(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${command}", script: "${command}")
+          cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
       }
     }
@@ -283,6 +330,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.name "beatsmachine"
           fi''')
       }
+      // Skip to upload the generated files by default.
+      def upload = false
       try {
         // Add more stability when dependencies are not accessible temporarily
         // See https://github.com/elastic/beats/issues/21609
@@ -292,9 +341,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
           cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
         }
         body()
+      } catch(err) {
+        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+        upload = true
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id)
+          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         // Tear down the setup for the permamnent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
@@ -372,19 +424,36 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tar(file: "test-build-artifacts-${args.id}.tgz", dir: '.', archive: true, allowMissing: true)
+      if (args.upload) {
+        tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
+      }
     }
-    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
-      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
-      if (folder.trim()) {
-        // TODO: nodeOS() should support ARM
-        def os_suffix = isArm() ? 'linux' : nodeOS()
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tar(file: "${name}.tgz", archive: true, dir: folder)
+    if (args.upload) {
+      catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+        def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+        log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+        if (folder.trim()) {
+          // TODO: nodeOS() should support ARM
+          def os_suffix = isArm() ? 'linux' : nodeOS()
+          def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
+          tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+        }
       }
     }
   }
+}
+
+/**
+* Wrapper to tar and upload artifacts to Google Storage to avoid killing the
+* disk space of the jenkins instance
+*/
+def tarAndUploadArtifacts(Map args = [:]) {
+  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                      credentialsId: "${JOB_GCS_CREDENTIALS}",
+                      pattern: "${args.file}",
+                      sharedPublicly: true,
+                      showInline: true)
 }
 
 /**
@@ -406,7 +475,7 @@ def withCloudTestEnv(Closure body) {
       error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
     }
     maskedVars.addAll([
-      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_REGION", password: "${env.AWS_REGION}"],
       [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
       [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
     ])
@@ -464,7 +533,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */

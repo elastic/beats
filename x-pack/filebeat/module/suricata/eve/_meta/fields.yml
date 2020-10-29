@@ -176,10 +176,6 @@
       - name: http_content_type
         type: keyword
 
-    - name: timestamp
-      type: alias
-      path: '@timestamp'
-
     - name: in_iface
       type: keyword
 
