@@ -424,25 +424,46 @@ def publishPackages(baseDir){
 }
 
 @NonCPS
+def setLock(){
+  synchronized(lock) {
+    lock = true
+  }
+}
+
+@NonCPS
+def setUnlock(){
+  synchronized(lock) {
+    lock = false
+  }
+}
+
+@NonCPS
+def isLock(){
+  synchronized(lock) {
+    return lock
+  }
+}
+
+def waitForUnlock(){
+  while(isLock()){
+    sleep 10
+  }
+}
+
 def uploadPackages(bucketUri, baseDir){
   if(params.dry_run || !params.archive_on_gcp){
     return
   }
-
-  while(lock){
-    sleep 10
-  }
-  synchronized(lock) {
-    lock = true
-    googleStorageUpload(bucket: bucketUri,
-      credentialsId: "${JOB_GCS_CREDENTIALS}",
-      pathPrefix: "${baseDir}/build/distributions/",
-      pattern: "${baseDir}/build/distributions/**/*",
-      sharedPublicly: true,
-      showInline: true
-    )
-    lock = false
-  }
+  waitForUnlock()
+  setLock()
+  googleStorageUpload(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pathPrefix: "${baseDir}/build/distributions/",
+    pattern: "${baseDir}/build/distributions/**/*",
+    sharedPublicly: true,
+    showInline: true
+  )
+  setUnlock()
 }
 
 /**
