@@ -412,17 +412,19 @@ def withMacOSEnv(Closure body){
 }
 
 def publishPackages(baseDir){
-  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
-  if (isPR()) {
-    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
-  }
-  def beatsFolderName = getBeatsName(baseDir)
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+  dir("${env.BASE_DIR}"){
+    def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
+    if (isPR()) {
+      bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
+    }
+    def beatsFolderName = getBeatsName(baseDir)
+    uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 
-  // Copy those files to another location with the sha commit to test them
-  // aftewords.
-  bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+    // Copy those files to another location with the sha commit to test them
+    // aftewords.
+    bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
+    uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+  }
 }
 
 @NonCPS
