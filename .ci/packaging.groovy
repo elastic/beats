@@ -429,6 +429,9 @@ def uploadPackages(bucketUri, baseDir){
     return
   }
 
+  while(lock){
+    sleep 10
+  }
   synchronized(lock) {
     lock = true
     googleStorageUpload(bucket: bucketUri,
