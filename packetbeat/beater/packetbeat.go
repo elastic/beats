@@ -29,13 +29,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
-	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/beats/v7/packetbeat/publish"
 
 	// Add packetbeat default processors
 	_ "github.com/elastic/beats/v7/packetbeat/processor/add_kubernetes_metadata"
 )
+
+// this is mainly a limitation to ensure that we never deadlock
+// after exiting the main select loop in centrally managed packetbeat
+// in order to ensure we don't block on a channel write we make sure
+// that the errors channel propagated back from the sniffers has a buffer
+// that's equal to the number of sniffers that we can run, that way, if
+// exiting and we throw a whole bunch of errors for some reason, each
+// sniffer can write out the error even though the main loop has already
+// exited with the result of the first error
+var maxSniffers = 100
 
 type flags struct {
 	file       *string
@@ -73,7 +81,6 @@ func initialConfig() config.Config {
 type packetbeat struct {
 	config          *common.Config
 	factory         *processorFactory
-	publisher       *publish.TransactionPublisher
 	shutdownTimeout time.Duration
 	done            chan struct{}
 }
@@ -86,34 +93,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	watcher := procs.ProcessesWatcher{}
-	// Enable the process watcher only if capturing live traffic
-	if cfg.Interfaces.File == "" {
-		err = watcher.Init(cfg.Procs)
-		if err != nil {
-			logp.Critical(err.Error())
-			return nil, err
-		}
-	} else {
-		logp.Info("Process watcher disabled when file input is used")
-	}
-
-	publisher, err := publish.NewTransactionPublisher(
-		b.Info.Name,
-		b.Publisher,
-		cfg.IgnoreOutgoing,
-		cfg.Interfaces.File == "",
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	configurator := config.NewAgentConfig
 	if !b.Manager.Enabled() {
 		configurator = cfg.FromStatic
 	}
 
-	factory := newProcessorFactory(b.Info.Name, make(chan error, 1), publisher, configurator)
+	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
 	}
@@ -122,7 +107,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:          rawConfig,
 		shutdownTimeout: cfg.ShutdownTimeout,
 		factory:         factory,
-		publisher:       publisher,
 		done:            make(chan struct{}),
 	}, nil
 }
@@ -135,8 +119,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
-
-	defer pb.publisher.Stop()
 
 	timeout := pb.shutdownTimeout
 	if timeout > 0 {
@@ -181,7 +163,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 			return nil
 		case err := <-factory.err:
 			// when we're managed we don't want
-			// to stop if the sniffer exited without an error
+			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload
 			if err != nil {
 				close(pb.done)

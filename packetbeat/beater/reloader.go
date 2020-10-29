@@ -18,7 +18,7 @@
 package beater
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -29,15 +29,15 @@ type reloader struct {
 	*cfgfile.RunnerList
 }
 
-func newReloader(name string, factory cfgfile.RunnerFactory, pipeline beat.PipelineConnector) *reloader {
+func newReloader(name string, factory *processorFactory, pipeline beat.PipelineConnector) *reloader {
 	return &reloader{
 		RunnerList: cfgfile.NewRunnerList(name, factory, pipeline),
 	}
 }
 
 func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
-	if len(configs) > 1 {
-		return errors.New("only a single input is currently supported")
+	if len(configs) > maxSniffers {
+		return fmt.Errorf("only %d inputs are currently supported", maxSniffers)
 	}
 	return r.RunnerList.Reload(configs)
 }

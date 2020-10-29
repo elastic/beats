@@ -36,17 +36,19 @@ import (
 )
 
 type processor struct {
-	wg      sync.WaitGroup
-	flows   *flows.Flows
-	sniffer *sniffer.Sniffer
-	err     chan error
+	wg        sync.WaitGroup
+	publisher *publish.TransactionPublisher
+	flows     *flows.Flows
+	sniffer   *sniffer.Sniffer
+	err       chan error
 }
 
-func newProcessor(flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error) *processor {
+func newProcessor(publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error) *processor {
 	return &processor{
-		flows:   flows,
-		sniffer: sniffer,
-		err:     err,
+		publisher: publisher,
+		flows:     flows,
+		sniffer:   sniffer,
+		err:       err,
 	}
 }
 
@@ -77,20 +79,21 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
+	p.publisher.Stop()
 }
 
 type processorFactory struct {
 	name         string
 	err          chan error
-	publisher    *publish.TransactionPublisher
+	beat         *beat.Beat
 	configurator func(*common.Config) (config.Config, error)
 }
 
-func newProcessorFactory(name string, err chan error, publisher *publish.TransactionPublisher, configurator func(*common.Config) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*common.Config) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
-		publisher:    publisher,
+		beat:         beat,
 		configurator: configurator,
 	}
 }
@@ -99,6 +102,16 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 	config, err := p.configurator(cfg)
 	if err != nil {
 		logp.Err("Failed to read the beat config: %v, %v", err, config)
+		return nil, err
+	}
+
+	publisher, err := publish.NewTransactionPublisher(
+		p.beat.Info.Name,
+		p.beat.Publisher,
+		config.IgnoreOutgoing,
+		config.Interfaces.File == "",
+	)
+	if err != nil {
 		return nil, err
 	}
 
@@ -116,7 +129,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 
 	logp.Debug("main", "Initializing protocol plugins")
 	protocols := protos.NewProtocols()
-	err = protocols.Init(false, p.publisher, watcher, config.Protocols, config.ProtocolsList)
+	err = protocols.Init(false, publisher, watcher, config.Protocols, config.ProtocolsList)
 	if err != nil {
 		return nil, fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -124,15 +137,19 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, workerFactory(p.publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(config, protocols, workerFactory(publisher, protocols, watcher, flows, config))
 	if err != nil {
 		return nil, err
 	}
 
-	return newProcessor(flows, sniffer, p.err), nil
+	return newProcessor(publisher, flows, sniffer, p.err), nil
 }
 
 func (p *processorFactory) CheckConfig(config *common.Config) error {
-	_, err := p.Create(pipeline.NewNilPipeline(), config)
-	return err
+	runner, err := p.Create(pipeline.NewNilPipeline(), config)
+	if err != nil {
+		return err
+	}
+	runner.Stop()
+	return nil
 }
