@@ -23,3 +23,5 @@ stages:
         mage: "mage fields build goTestUnit"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
+        when:
+            disabled: true     ## Test failure. See https://github.com/elastic/beats/issues/22257
