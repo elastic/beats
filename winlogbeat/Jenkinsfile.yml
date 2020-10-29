@@ -14,7 +14,7 @@ when:
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
     build:
-        make: "RACE_DETECTOR=1 make -C winlogbeat check testsuite integration-tests-environment"
+        make: "RACE_DETECTOR=1 make -C winlogbeat check testsuite"
     crosscompile:
         make: "make -C winlogbeat crosscompile"
     windows:
