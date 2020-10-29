@@ -62,6 +62,7 @@ pipeline {
     booleanParam(name: 'archive_on_gcp', defaultValue: true, description: 'Enable/Disable the archive of binaries on GCP.')
     booleanParam(name: 'push_docker', defaultValue: true, description: 'Enable/Disable the push of the Docker images.')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Execute the pipeline without generate packages.')
+    booleanParam(name: 'force', defaultValue: false, description: 'Force to Execute the pipeline.')
   }
   stages {
     stage('Filter build') {
@@ -71,7 +72,7 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
-            def ret = isUserTrigger() || isUpstreamTrigger() || params.dry_run
+            def ret = isUserTrigger() || isUpstreamTrigger() || params.dry_run || params.force
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
               currentBuild.description = "The build has been skipped"
