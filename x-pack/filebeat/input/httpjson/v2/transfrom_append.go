@@ -159,7 +159,7 @@ func newAppend(cfg *common.Config) (appendt, error) {
 }
 
 func (append *appendt) runAppend(ctx transformContext, transformable *transformable) error {
-	value := append.value.Execute(append.defaultValue)
+	value := append.value.Execute(ctx, transformable, append.defaultValue)
 	return append.run(ctx, transformable, append.targetInfo.Name, value)
 }
 

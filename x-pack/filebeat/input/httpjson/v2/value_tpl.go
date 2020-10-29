@@ -5,6 +5,7 @@
 package v2
 
 import (
+	"bytes"
 	"text/template"
 	"time"
 )
@@ -32,29 +33,29 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(defaultVal string) (val string) {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		// really ugly
-	// 		val = defaultVal
-	// 	}
-	// }()
+func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string) (val string) {
+	defer func() {
+		if r := recover(); r != nil {
+			// TODO: find alternative to this ugliness
+			val = defaultVal
+		}
+	}()
 
-	// buf := new(bytes.Buffer)
-	// data := map[string]interface{}{
-	// 	"header":     tr.Headers.Clone(),
-	// 	"body":       tr.Body.Clone(),
-	// 	"url.value":  tr.URL.String(),
-	// 	"url.params": tr.URL.Query(),
-	// 	// "cursor":        tr.Cursor.Clone(),
-	// 	// "last_event":    tr.LastEvent,
-	// 	// "last_response": tr.LastResponse.Clone(),
-	// }
-	// if err := t.Template.Execute(buf, data); err != nil {
-	// 	return defaultVal
-	// }
-	// return buf.String()
-	return ""
+	buf := new(bytes.Buffer)
+	data := map[string]interface{}{
+		"header":        tr.header.Clone(),
+		"body":          tr.body.Clone(),
+		"url.value":     tr.url.String(),
+		"url.params":    tr.url.Query(),
+		"cursor":        trCtx.cursor.Clone(),
+		"last_event":    trCtx.lastEvent.Clone(),
+		"last_response": trCtx.lastResponse.Clone(),
+	}
+	if err := t.Template.Execute(buf, data); err != nil {
+		return defaultVal
+	}
+
+	return buf.String()
 }
 
 var (

@@ -157,7 +157,7 @@ func newSet(cfg *common.Config) (set, error) {
 }
 
 func (set *set) runSet(ctx transformContext, transformable *transformable) error {
-	value := set.value.Execute(set.defaultValue)
+	value := set.value.Execute(ctx, transformable, set.defaultValue)
 	return set.run(ctx, transformable, set.targetInfo.Name, value)
 }
 
@@ -178,7 +178,9 @@ func setHeader(ctx transformContext, transformable *transformable, key, value st
 }
 
 func setURLParams(ctx transformContext, transformable *transformable, key, value string) error {
-	transformable.url.Query().Add(key, value)
+	q := transformable.url.Query()
+	q.Add(key, value)
+	transformable.url.RawQuery = q.Encode()
 	return nil
 }
 
