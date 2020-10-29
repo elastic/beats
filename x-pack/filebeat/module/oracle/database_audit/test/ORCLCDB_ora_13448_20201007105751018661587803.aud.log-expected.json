@@ -5,6 +5,7 @@
         "event.action": "database_audit",
         "event.category": "database",
         "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
         "event.module": "oracle",
         "event.outcome": "success",
         "event.timezone": "-04:00",

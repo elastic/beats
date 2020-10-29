@@ -7,6 +7,9 @@ processors:
     field: event.action
     value: database_audit
 - set:
+    field: event.kind
+    value: event
+- set:
     field: event.category
     value: database
 - set:
