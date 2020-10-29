@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
-// +build googlecloud
+// +build gcp
 
 package metrics
 

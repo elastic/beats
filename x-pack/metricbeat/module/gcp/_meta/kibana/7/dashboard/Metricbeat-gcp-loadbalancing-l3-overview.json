@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of Googlecloud Load Balancing L3 Metrics",
+        "description": "Overview of GCP Load Balancing L3 Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -100,7 +100,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] Load Balancing L3 Overview",
+        "title": "[Metricbeat GCP] Load Balancing L3 Overview",
         "version": 1
       },
       "id": "8f9c6cc0-909d-11ea-8180-7b0dacd9df87",
@@ -144,7 +144,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing L3 Filters [Metricbeat Googlecloud]",
+        "title": "Load Balancing L3 Filters [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -152,7 +152,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "googlecloud.labels.resource.backend_name",
+                "fieldName": "gcp.labels.resource.backend_name",
                 "id": "1588881306802",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "Backend Name",
@@ -167,7 +167,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.client_zone",
+                "fieldName": "gcp.labels.metrics.client_zone",
                 "id": "1588881320708",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "Client Zone",
@@ -182,7 +182,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.client_network",
+                "fieldName": "gcp.labels.metrics.client_network",
                 "id": "1588881383318",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Client Network",
@@ -197,7 +197,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.client_subnetwork",
+                "fieldName": "gcp.labels.metrics.client_subnetwork",
                 "id": "1588881498842",
                 "indexPatternRefName": "control_3_index_pattern",
                 "label": "Client Sub-network",
@@ -216,7 +216,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Load Balancing L3 Filters [Metricbeat Googlecloud]",
+          "title": "Load Balancing L3 Filters [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -256,7 +256,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing L3 Egress Packets [Metricbeat Googlecloud]",
+        "title": "Load Balancing L3 Egress Packets [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -270,7 +270,7 @@
             "drop_last_bucket": 1,
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.l3.internal.egress_packets_count.value : * "
+              "query": "gcp.loadbalancing.l3.internal.egress_packets_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -288,7 +288,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.l3.internal.egress_packets_count.value",
+                    "field": "gcp.loadbalancing.l3.internal.egress_packets_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -298,7 +298,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -308,7 +308,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing L3 Egress Packets [Metricbeat Googlecloud]",
+          "title": "Load Balancing L3 Egress Packets [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -327,7 +327,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing L3 Egress Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing L3 Egress Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -341,7 +341,7 @@
             "drop_last_bucket": 1,
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.l3.internal.egress_bytes_count.value : * "
+              "query": "gcp.loadbalancing.l3.internal.egress_bytes_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -359,7 +359,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.l3.internal.egress_bytes_count.value",
+                    "field": "gcp.loadbalancing.l3.internal.egress_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -369,7 +369,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -379,7 +379,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing L3 Egress Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing L3 Egress Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -398,7 +398,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing L3 Ingress Packets [Metricbeat Googlecloud]",
+        "title": "Load Balancing L3 Ingress Packets [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -412,7 +412,7 @@
             "drop_last_bucket": 1,
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.l3.internal.ingress_packets_count.value : * "
+              "query": "gcp.loadbalancing.l3.internal.ingress_packets_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -430,7 +430,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.l3.internal.ingress_packets_count.value",
+                    "field": "gcp.loadbalancing.l3.internal.ingress_packets_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -440,7 +440,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -450,7 +450,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing L3 Ingress Packets [Metricbeat Googlecloud]",
+          "title": "Load Balancing L3 Ingress Packets [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -469,7 +469,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing L3 Ingress Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing L3 Ingress Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -483,7 +483,7 @@
             "drop_last_bucket": 1,
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.l3.internal.ingress_bytes_count.value : * "
+              "query": "gcp.loadbalancing.l3.internal.ingress_bytes_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -501,7 +501,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.l3.internal.ingress_bytes_count.value",
+                    "field": "gcp.loadbalancing.l3.internal.ingress_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -511,7 +511,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -521,7 +521,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing L3 Ingress Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing L3 Ingress Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },

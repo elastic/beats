@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
-// +build googlecloud
+// +build gcp
 
 package storage
 
@@ -11,10 +11,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func TestData(t *testing.T) {
@@ -29,10 +28,10 @@ func TestData(t *testing.T) {
 		metricPrefix string
 		path         string
 	}{
-		{"googlecloud.storage", "./_meta/data.json"},
-		{"googlecloud.storage.authz", "./_meta/data_authz.json"},
-		{"googlecloud.storage.network", "./_meta/data_network.json"},
-		{"googlecloud.storage.storage", "./_meta/data_storage.json"},
+		{"gcp.storage", "./_meta/data.json"},
+		{"gcp.storage.authz", "./_meta/data_authz.json"},
+		{"gcp.storage.network", "./_meta/data_network.json"},
+		{"gcp.storage.storage", "./_meta/data_storage.json"},
 	}
 
 	config := metrics.GetConfigForTest(t, "storage")

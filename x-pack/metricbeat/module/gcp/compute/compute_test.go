@@ -10,8 +10,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func init() {

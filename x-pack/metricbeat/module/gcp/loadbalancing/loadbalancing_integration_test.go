@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
-// +build googlecloud
+// +build gcp
 
 package loadbalancing
 
@@ -11,10 +11,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func TestData(t *testing.T) {
@@ -29,10 +28,10 @@ func TestData(t *testing.T) {
 		metricPrefix string
 		path         string
 	}{
-		{"googlecloud.loadbalancing", "./_meta/data.json"},
-		{"googlecloud.loadbalancing.https", "./_meta/data_https.json"},
-		{"googlecloud.loadbalancing.l3", "./_meta/data_l3.json"},
-		{"googlecloud.loadbalancing.tcp_ssl_proxy", "./_meta/data_tcp_ssl_proxy.json"},
+		{"gcp.loadbalancing", "./_meta/data.json"},
+		{"gcp.loadbalancing.https", "./_meta/data_https.json"},
+		{"gcp.loadbalancing.l3", "./_meta/data_l3.json"},
+		{"gcp.loadbalancing.tcp_ssl_proxy", "./_meta/data_tcp_ssl_proxy.json"},
 	}
 
 	config := metrics.GetConfigForTest(t, "loadbalancing")

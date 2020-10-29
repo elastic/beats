@@ -116,7 +116,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] Load Balancing TCP SSL Proxy Overview",
+        "title": "[Metricbeat GCP] Load Balancing TCP SSL Proxy Overview",
         "version": 1
       },
       "id": "6041d970-a6ae-11ea-950e-d57608e3aa51",
@@ -171,7 +171,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy Filters [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy Filters [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -179,7 +179,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "googlecloud.labels.resource.backend_name",
+                "fieldName": "gcp.labels.resource.backend_name",
                 "id": "1588881306802",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "Backend Name",
@@ -194,7 +194,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.client_country",
+                "fieldName": "gcp.labels.metrics.client_country",
                 "id": "1588881320708",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "Client Country",
@@ -209,7 +209,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.proxy_continent",
+                "fieldName": "gcp.labels.metrics.proxy_continent",
                 "id": "1588881383318",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Proxy Continent",
@@ -228,7 +228,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Load Balancing TCP SSL Proxy Filters [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy Filters [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -269,7 +269,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy Open Connections [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy Open Connections [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -306,7 +306,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.tcp_ssl_proxy.open_connections.value",
+                    "field": "gcp.loadbalancing.tcp_ssl_proxy.open_connections.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -316,7 +316,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -326,7 +326,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Load Balancing TCP SSL Proxy Open Connections [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy Open Connections [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -351,7 +351,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy Closed Connections [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy Closed Connections [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -388,7 +388,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.tcp_ssl_proxy.closed_connections.value",
+                    "field": "gcp.loadbalancing.tcp_ssl_proxy.closed_connections.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -398,7 +398,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -408,7 +408,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Load Balancing TCP SSL Proxy Closed Connections [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy Closed Connections [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -433,7 +433,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -470,7 +470,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.tcp_ssl_proxy.new_connections.value",
+                    "field": "gcp.loadbalancing.tcp_ssl_proxy.new_connections.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -480,7 +480,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -490,7 +490,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -515,7 +515,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy Egress Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy Egress Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -552,7 +552,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value",
+                    "field": "gcp.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -562,7 +562,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -572,7 +572,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing TCP SSL Proxy Egress Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy Egress Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -597,7 +597,7 @@
             }
           }
         },
-        "title": "Load Balancing TCP SSL Proxy Ingress Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing TCP SSL Proxy Ingress Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -634,7 +634,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value",
+                    "field": "gcp.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -644,7 +644,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.backend_name",
+                "terms_field": "gcp.labels.resource.backend_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -654,7 +654,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Load Balancing TCP SSL Proxy Ingress Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing TCP SSL Proxy Ingress Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },

@@ -6,8 +6,8 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "8358623250631840944",
-            "name": "rhodes-spacetime-1"
+            "id": "5754458766588945165",
+            "name": "ks-instance1"
         },
         "machine": {
             "type": "e2-micro"
@@ -25,31 +25,31 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 72
+                    "value": 838
                 },
                 "dropped_packets_count": {
-                    "value": 1
+                    "value": 7
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 0.5
+                        "value": 1
                     },
                     "usage_time": {
-                        "value": 1.851312024924482
+                        "value": 3.7590914278189302
                     },
                     "utilization": {
-                        "value": 0.06171040083081607
+                        "value": 0.06265152379698218
                     }
                 },
                 "memory": {
                     "balloon": {
                         "ram_size": {
-                            "value": 2092478464
+                            "value": 4140253184
                         },
                         "ram_used": {
-                            "value": 1155657728
+                            "value": 841588736
                         },
                         "swap_in_bytes_count": {
                             "value": 0
@@ -60,7 +60,7 @@
                     }
                 },
                 "uptime": {
-                    "value": 60
+                    "value": 60.00000000023283
                 }
             }
         },
@@ -72,10 +72,10 @@
     },
     "host": {
         "cpu": {
-            "pct": 0.06171040083081607
+            "pct": 0.06265152379698218
         },
-        "id": "8358623250631840944",
-        "name": "rhodes-spacetime-1"
+        "id": "5754458766588945165",
+        "name": "ks-instance1"
     },
     "metricset": {
         "name": "compute",

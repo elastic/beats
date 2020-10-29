@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
-// +build googlecloud
+// +build gcp
 
 package pubsub
 
@@ -11,10 +11,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func TestData(t *testing.T) {
@@ -29,10 +28,10 @@ func TestData(t *testing.T) {
 		metricPrefix string
 		path         string
 	}{
-		{"googlecloud.pubsub", "./_meta/data.json"},
-		{"googlecloud.pubsub.snapshot", "./_meta/data_snapshot.json"},
-		{"googlecloud.pubsub.subscription", "./_meta/data_subscription.json"},
-		{"googlecloud.pubsub.topic", "./_meta/data_topic.json"},
+		{"gcp.pubsub", "./_meta/data.json"},
+		{"gcp.pubsub.snapshot", "./_meta/data_snapshot.json"},
+		{"gcp.pubsub.subscription", "./_meta/data_subscription.json"},
+		{"gcp.pubsub.topic", "./_meta/data_topic.json"},
 	}
 
 	config := metrics.GetConfigForTest(t, "pubsub")

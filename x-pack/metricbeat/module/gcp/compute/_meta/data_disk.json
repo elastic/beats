@@ -2,19 +2,20 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability"
+            "id": "elastic-observability",
+            "name": "elastic-observability"
         },
         "instance": {
-            "id": "7925831082803123728",
-            "name": "heartbeat-tokyo"
+            "id": "6635562622940154046",
+            "name": "rhodes-spacetime-2"
         },
         "machine": {
-            "type": "f1-micro"
+            "type": "e2-micro"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "asia-northeast1-b",
-    "cloud.region": "asia-northeast1",
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,
@@ -25,39 +26,42 @@
             "instance": {
                 "disk": {
                     "read_bytes_count": {
-                        "value": 0
+                        "value": 241290
                     },
                     "read_ops_count": {
-                        "value": 0
+                        "value": 5
                     },
                     "write_bytes_count": {
-                        "value": 0
+                        "value": 3655733
                     },
                     "write_ops_count": {
-                        "value": 0
+                        "value": 69
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "disk-1",
+                "device_name": "rhodes-spacetime-2",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
+            },
+            "user": {
+                "created-by": "ks"
             }
         }
     },
     "host": {
         "disk": {
             "read": {
-                "bytes": 0
+                "bytes": 241290
             },
             "write": {
-                "bytes": 0
+                "bytes": 3655733
             }
         },
-        "id": "7925831082803123728",
-        "name": "heartbeat-tokyo"
+        "id": "6635562622940154046",
+        "name": "rhodes-spacetime-2"
     },
     "metricset": {
         "name": "compute",

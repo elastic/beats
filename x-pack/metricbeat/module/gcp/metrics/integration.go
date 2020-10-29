@@ -24,7 +24,7 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 		t.Fatal("$GCP_CREDENTIALS_FILE_PATH not set or set to empty")
 	} else {
 		config = map[string]interface{}{
-			"module":                "googlecloud",
+			"module":                "gcp",
 			"period":                "1m",
 			"metricsets":            []string{metricSetName},
 			"project_id":            projectID,

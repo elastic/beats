@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
-// +build googlecloud
+// +build gcp
 
 package compute
 
@@ -11,10 +11,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/metrics"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func TestData(t *testing.T) {
@@ -29,12 +28,12 @@ func TestData(t *testing.T) {
 		metricPrefix string
 		path         string
 	}{
-		{"googlecloud.compute.instance", "./_meta/data.json"},
-		{"googlecloud.compute.instance.disk", "./_meta/data_disk.json"},
-		{"googlecloud.compute.instance.network", "./_meta/data_network.json"},
-		{"googlecloud.compute.instance.cpu", "./_meta/data_cpu.json"},
-		{"googlecloud.compute.firewall", "./_meta/data_firewall.json"},
-		{"googlecloud.compute.instance.memory", "./_meta/data_memory.json"},
+		{"gcp.compute.instance", "./_meta/data.json"},
+		{"gcp.compute.instance.disk", "./_meta/data_disk.json"},
+		{"gcp.compute.instance.network", "./_meta/data_network.json"},
+		{"gcp.compute.instance.cpu", "./_meta/data_cpu.json"},
+		{"gcp.compute.firewall", "./_meta/data_firewall.json"},
+		{"gcp.compute.instance.memory", "./_meta/data_memory.json"},
 	}
 
 	config := metrics.GetConfigForTest(t, "compute")

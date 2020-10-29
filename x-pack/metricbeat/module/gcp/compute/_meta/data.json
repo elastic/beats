@@ -2,19 +2,20 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability"
+            "id": "elastic-observability",
+            "name": "elastic-observability"
         },
         "instance": {
-            "id": "2438671519308240892",
-            "name": "heartbeat-mumbai"
+            "id": "8358623250631840944",
+            "name": "rhodes-spacetime-1"
         },
         "machine": {
-            "type": "f1-micro"
+            "type": "e2-micro"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "asia-south1-c",
-    "cloud.region": "asia-south1",
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,
@@ -22,39 +23,45 @@
     },
     "gcp": {
         "compute": {
-            "firewall": {
-                "dropped_bytes_count": {
-                    "value": 435
-                },
-                "dropped_packets_count": {
-                    "value": 7
-                }
-            },
             "instance": {
-                "cpu": {
-                    "reserved_cores": {
-                        "value": 0.2
+                "network": {
+                    "received_bytes_count": {
+                        "value": 49837
                     },
-                    "usage_time": {
-                        "value": 0.8653667340986431
+                    "received_packets_count": {
+                        "value": 229
                     },
-                    "utilization": {
-                        "value": 0.07211389450822024
+                    "sent_bytes_count": {
+                        "value": 1018967
+                    },
+                    "sent_packets_count": {
+                        "value": 752
                     }
-                },
-                "uptime": {
-                    "value": 60
                 }
             }
         },
-        "labels": {}
+        "labels": {
+            "metrics": {
+                "loadbalanced": "false"
+            },
+            "user": {
+                "created-by": "ks"
+            }
+        }
     },
     "host": {
-        "cpu": {
-            "pct": 0.07211389450822024
-        },
-        "id": "2438671519308240892",
-        "name": "heartbeat-mumbai"
+        "id": "8358623250631840944",
+        "name": "rhodes-spacetime-1",
+        "network": {
+            "in": {
+                "bytes": 1018967,
+                "packets": 752
+            },
+            "out": {
+                "bytes": 49837,
+                "packets": 229
+            }
+        }
     },
     "metricset": {
         "name": "compute",

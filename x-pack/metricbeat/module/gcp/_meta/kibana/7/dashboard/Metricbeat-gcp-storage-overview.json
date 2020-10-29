@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of Googlecloud Storage Metrics",
+        "description": "Overview of GCP Storage Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -116,7 +116,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] Storage Overview",
+        "title": "[Metricbeat GCP] Storage Overview",
         "version": 1
       },
       "id": "ca401040-8e52-11ea-9fa6-4d675d5290dc",
@@ -165,7 +165,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage Filters [Metricbeat GoogleCloud]",
+        "title": "Storage Filters [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -173,7 +173,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "googlecloud.labels.resource.bucket_name",
+                "fieldName": "gcp.labels.resource.bucket_name",
                 "id": "1588628954328",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "Bucket Name",
@@ -188,7 +188,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.resource.location",
+                "fieldName": "gcp.labels.resource.location",
                 "id": "1588628981768",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "Location",
@@ -203,7 +203,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.storage_class",
+                "fieldName": "gcp.labels.metrics.storage_class",
                 "id": "1588629001851",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Storage Class",
@@ -222,7 +222,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Storage Filters [Metricbeat GoogleCloud]",
+          "title": "Storage Filters [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -257,7 +257,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage Total Bytes [Metricbeat GoogleCloud]",
+        "title": "Storage Total Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -291,7 +291,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.storage.storage.total_bytes.value : * "
+                  "query": "gcp.storage.storage.total_bytes.value : * "
                 },
                 "formatter": "bytes",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -299,7 +299,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.storage.storage.total_bytes.value",
+                    "field": "gcp.storage.storage.total_bytes.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -309,7 +309,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_field": "gcp.labels.resource.bucket_name",
                 "terms_include": "",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
@@ -321,7 +321,7 @@
             "time_range_mode": "last_value",
             "type": "top_n"
           },
-          "title": "Storage Total Bytes [Metricbeat GoogleCloud]",
+          "title": "Storage Total Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -340,7 +340,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage Object Count [Metricbeat GoogleCloud]",
+        "title": "Storage Object Count [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -376,7 +376,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.storage.storage.object_count.value : * "
+                  "query": "gcp.storage.storage.object_count.value : * "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -384,7 +384,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.storage.storage.object_count.value",
+                    "field": "gcp.storage.storage.object_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -394,7 +394,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_field": "gcp.labels.resource.bucket_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -404,7 +404,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Storage Object Count [Metricbeat GoogleCloud]",
+          "title": "Storage Object Count [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -423,7 +423,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage API Request Count [Metricbeat GoogleCloud]",
+        "title": "Storage API Request Count [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -450,7 +450,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.storage.api.request_count.value",
+                    "field": "gcp.storage.api.request_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -460,7 +460,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_field": "gcp.labels.resource.bucket_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -470,7 +470,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Storage API Request Count [Metricbeat GoogleCloud]",
+          "title": "Storage API Request Count [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -489,7 +489,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage Network Received Bytes [Metricbeat GoogleCloud]",
+        "title": "Storage Network Received Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -516,7 +516,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.storage.network.received_bytes_count.value",
+                    "field": "gcp.storage.network.received_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -526,7 +526,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_field": "gcp.labels.resource.bucket_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -536,7 +536,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Storage Network Received Bytes [Metricbeat GoogleCloud]",
+          "title": "Storage Network Received Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -555,7 +555,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Storage Network Sent Bytes [Metricbeat GoogleCloud]",
+        "title": "Storage Network Sent Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -582,7 +582,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.storage.network.sent_bytes_count.value",
+                    "field": "gcp.storage.network.sent_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -592,7 +592,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_field": "gcp.labels.resource.bucket_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -602,7 +602,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Storage Network Sent Bytes [Metricbeat GoogleCloud]",
+          "title": "Storage Network Sent Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },

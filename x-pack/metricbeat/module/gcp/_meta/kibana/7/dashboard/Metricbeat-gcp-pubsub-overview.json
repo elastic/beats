@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of Googlecloud PubSub Metrics",
+        "description": "Overview of GCP PubSub Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -180,7 +180,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] PubSub Overview",
+        "title": "[Metricbeat GCP] PubSub Overview",
         "version": 1
       },
       "id": "2b0fd7b0-feac-11ea-b032-d59f894a5072",
@@ -258,7 +258,7 @@
             }
           }
         },
-        "title": "PubSub Filter [Metricbeat Googlecloud]",
+        "title": "PubSub Filter [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -266,7 +266,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "googlecloud.labels.resource.subscription_id",
+                "fieldName": "gcp.labels.resource.subscription_id",
                 "id": "1600984143264",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "Subscription ID",
@@ -281,7 +281,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.resource.topic_id",
+                "fieldName": "gcp.labels.resource.topic_id",
                 "id": "1600984164459",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "Topic ID",
@@ -296,7 +296,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.resource.snapshot_id",
+                "fieldName": "gcp.labels.resource.snapshot_id",
                 "id": "1601305675297",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Snapshot ID",
@@ -311,7 +311,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.region",
+                "fieldName": "gcp.labels.metrics.region",
                 "id": "1601307561260",
                 "indexPatternRefName": "control_3_index_pattern",
                 "label": "Region",
@@ -330,7 +330,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "PubSub Filter [Metricbeat Googlecloud]",
+          "title": "PubSub Filter [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -370,7 +370,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.topic_id\\\",\\\"orderBy\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.topic.send_request_count.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-4f8dae5f-b49c-4a10-8f94-a29039f93919\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.resource.topic_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.topic_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\"},\\\"col-2-f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\"},\\\"col-3-27a71166-d245-471d-b550-ee0b1899ea88\\\":{\\\"label\\\":\\\"Topic Send Request Count\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.topic.send_request_count.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Send Request Count\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"4f8dae5f-b49c-4a10-8f94-a29039f93919\"  seriesType=\"line\" accessors=\"27a71166-d245-471d-b550-ee0b1899ea88\" columnToLabel=\"{\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\":\\\"Topic Send Request Count\\\",\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\":\\\"Top values of googlecloud.labels.resource.topic_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.topic_id\\\",\\\"orderBy\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.topic.send_request_count.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-4f8dae5f-b49c-4a10-8f94-a29039f93919\\\":{\\\"label\\\":\\\"Top values of gcp.labels.resource.topic_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.topic_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\"},\\\"col-2-f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\"},\\\"col-3-27a71166-d245-471d-b550-ee0b1899ea88\\\":{\\\"label\\\":\\\"Topic Send Request Count\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.topic.send_request_count.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Send Request Count\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"4f8dae5f-b49c-4a10-8f94-a29039f93919\"  seriesType=\"line\" accessors=\"27a71166-d245-471d-b550-ee0b1899ea88\" columnToLabel=\"{\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\":\\\"Topic Send Request Count\\\",\\\"4f8dae5f-b49c-4a10-8f94-a29039f93919\\\":\\\"Top values of gcp.labels.resource.topic_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -398,13 +398,13 @@
                       "label": "Topic Send Request Count",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.topic.send_request_count.value",
+                      "sourceField": "gcp.pubsub.topic.send_request_count.value",
                       "suggestedPriority": 0
                     },
                     "4f8dae5f-b49c-4a10-8f94-a29039f93919": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.topic_id",
+                      "label": "Top values of gcp.labels.resource.topic_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -415,7 +415,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.topic_id"
+                      "sourceField": "gcp.labels.resource.topic_id"
                     },
                     "f0d11f8d-e2f9-408a-9114-a0b9b18142d4": {
                       "dataType": "date",
@@ -459,7 +459,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Topic Send Request [Metricbeat Googlecloud]",
+        "title": "Topic Send Request [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "bd399790-01a2-11eb-b032-d59f894a5072",
@@ -477,7 +477,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.metrics.region\\\",\\\"orderBy\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\"},\\\"col-2-89c8d41d-6896-470d-8318-c0a691fa638e\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.metrics.region\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.metrics.region\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\"},\\\"col-3-27a71166-d245-471d-b550-ee0b1899ea88\\\":{\\\"label\\\":\\\"Topic Oldest Retained Acked Message Age By Region\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Oldest Retained Acked Message Age By Region\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"89c8d41d-6896-470d-8318-c0a691fa638e\"  seriesType=\"line\" accessors=\"27a71166-d245-471d-b550-ee0b1899ea88\" columnToLabel=\"{\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\":\\\"Topic Oldest Retained Acked Message Age By Region\\\",\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\":\\\"Top values of googlecloud.labels.metrics.region\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.metrics.region\\\",\\\"orderBy\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.topic.oldest_retained_acked_message_age_by_region.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\\\"},\\\"col-2-89c8d41d-6896-470d-8318-c0a691fa638e\\\":{\\\"label\\\":\\\"Top values of gcp.labels.metrics.region\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.metrics.region\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\"},\\\"col-3-27a71166-d245-471d-b550-ee0b1899ea88\\\":{\\\"label\\\":\\\"Topic Oldest Retained Acked Message Age By Region\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.topic.oldest_retained_acked_message_age_by_region.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Oldest Retained Acked Message Age By Region\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"f0d11f8d-e2f9-408a-9114-a0b9b18142d4\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"89c8d41d-6896-470d-8318-c0a691fa638e\"  seriesType=\"line\" accessors=\"27a71166-d245-471d-b550-ee0b1899ea88\" columnToLabel=\"{\\\"27a71166-d245-471d-b550-ee0b1899ea88\\\":\\\"Topic Oldest Retained Acked Message Age By Region\\\",\\\"89c8d41d-6896-470d-8318-c0a691fa638e\\\":\\\"Top values of gcp.labels.metrics.region\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -505,13 +505,13 @@
                       "label": "Topic Oldest Retained Acked Message Age By Region",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.value",
+                      "sourceField": "gcp.pubsub.topic.oldest_retained_acked_message_age_by_region.value",
                       "suggestedPriority": 0
                     },
                     "89c8d41d-6896-470d-8318-c0a691fa638e": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.metrics.region",
+                      "label": "Top values of gcp.labels.metrics.region",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -522,7 +522,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.metrics.region"
+                      "sourceField": "gcp.labels.metrics.region"
                     },
                     "f0d11f8d-e2f9-408a-9114-a0b9b18142d4": {
                       "dataType": "date",
@@ -566,7 +566,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Topic Oldest Retained Acked Message Age By Region [Metricbeat Googlecloud]",
+        "title": "Topic Oldest Retained Acked Message Age By Region [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "25b76dc0-01a2-11eb-b032-d59f894a5072",
@@ -584,7 +584,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.metrics.region\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-ed36f31e-ed2a-460a-a881-18e191f75d04\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.metrics.region\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.metrics.region\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\"},\\\"col-2-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Topic Oldest Unacked Message Age By Region\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Oldest Unacked Message Age By Region\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"ed36f31e-ed2a-460a-a881-18e191f75d04\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Topic Oldest Unacked Message Age By Region\\\",\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\":\\\"Top values of googlecloud.labels.metrics.region\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.metrics.region\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.topic.oldest_unacked_message_age_by_region.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-ed36f31e-ed2a-460a-a881-18e191f75d04\\\":{\\\"label\\\":\\\"Top values of gcp.labels.metrics.region\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.metrics.region\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\"},\\\"col-2-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Topic Oldest Unacked Message Age By Region\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.topic.oldest_unacked_message_age_by_region.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Topic Oldest Unacked Message Age By Region\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"ed36f31e-ed2a-460a-a881-18e191f75d04\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Topic Oldest Unacked Message Age By Region\\\",\\\"ed36f31e-ed2a-460a-a881-18e191f75d04\\\":\\\"Top values of gcp.labels.metrics.region\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -608,7 +608,7 @@
                     "0888bf93-1ecf-467a-b0b5-9e0deee6545c": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.topic_id",
+                      "label": "Top values of gcp.labels.resource.topic_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -619,7 +619,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.topic_id"
+                      "sourceField": "gcp.labels.resource.topic_id"
                     },
                     "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
                       "customLabel": true,
@@ -628,7 +628,7 @@
                       "label": "Topic Oldest Unacked Message Age By Region",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.value",
+                      "sourceField": "gcp.pubsub.topic.oldest_unacked_message_age_by_region.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -645,7 +645,7 @@
                     "ed36f31e-ed2a-460a-a881-18e191f75d04": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.metrics.region",
+                      "label": "Top values of gcp.labels.metrics.region",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -656,7 +656,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.metrics.region"
+                      "sourceField": "gcp.labels.metrics.region"
                     }
                   },
                   "indexPatternId": "metricbeat-*"
@@ -691,7 +691,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Topic Oldest Unacked Message Age By Region [Metricbeat Googlecloud]",
+        "title": "Topic Oldest Unacked Message Age By Region [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "5f97d300-01a1-11eb-b032-d59f894a5072",
@@ -709,7 +709,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.subscription.oldest_unacked_message_age.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Oldest Unacked Message Age\\\",\\\"operationType\\\":\\\"avg\\\",\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"googlecloud.pubsub.subscription.oldest_unacked_message_age.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Oldest Unacked Message Age\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Oldest Unacked Message Age\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.subscription.oldest_unacked_message_age.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Oldest Unacked Message Age\\\",\\\"operationType\\\":\\\"avg\\\",\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"gcp.pubsub.subscription.oldest_unacked_message_age.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Oldest Unacked Message Age\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Oldest Unacked Message Age\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -733,7 +733,7 @@
                     "2251f8b6-6091-4386-890b-4d0d33e79a96": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.subscription_id",
+                      "label": "Top values of gcp.labels.resource.subscription_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -744,7 +744,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.subscription_id"
+                      "sourceField": "gcp.labels.resource.subscription_id"
                     },
                     "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
                       "customLabel": true,
@@ -753,7 +753,7 @@
                       "label": "Subscription Oldest Unacked Message Age",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.subscription.oldest_unacked_message_age.value",
+                      "sourceField": "gcp.pubsub.subscription.oldest_unacked_message_age.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -800,7 +800,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Subscription Oldest Unacked Message [Metricbeat Googlecloud]",
+        "title": "Subscription Oldest Unacked Message [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "403d81e0-01a0-11eb-b032-d59f894a5072",
@@ -818,7 +818,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.subscription.num_undelivered_messages.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Number of Undelivered Messages\\\",\\\"operationType\\\":\\\"avg\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"googlecloud.pubsub.subscription.num_undelivered_messages.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Number of Undelivered Messages\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Number of Undelivered Messages\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.subscription.num_undelivered_messages.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Number of Undelivered Messages\\\",\\\"operationType\\\":\\\"avg\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"gcp.pubsub.subscription.num_undelivered_messages.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Number of Undelivered Messages\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Number of Undelivered Messages\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -842,7 +842,7 @@
                     "2251f8b6-6091-4386-890b-4d0d33e79a96": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.subscription_id",
+                      "label": "Top values of gcp.labels.resource.subscription_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -853,7 +853,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.subscription_id"
+                      "sourceField": "gcp.labels.resource.subscription_id"
                     },
                     "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
                       "customLabel": true,
@@ -870,7 +870,7 @@
                         }
                       },
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.subscription.num_undelivered_messages.value",
+                      "sourceField": "gcp.pubsub.subscription.num_undelivered_messages.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -917,7 +917,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Subscription Number of Undelivered Messages [Metricbeat Googlecloud]",
+        "title": "Subscription Number of Undelivered Messages [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "11d06fc0-01a0-11eb-b032-d59f894a5072",
@@ -935,7 +935,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.snapshot.oldest_message_age.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-921ee447-0c37-4e9d-9f42-a491f412baef\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Oldest Message\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.snapshot.oldest_message_age.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Oldest Message\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"921ee447-0c37-4e9d-9f42-a491f412baef\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Oldest Message\\\",\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.snapshot.oldest_message_age.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-921ee447-0c37-4e9d-9f42-a491f412baef\\\":{\\\"label\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Oldest Message\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.snapshot.oldest_message_age.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Oldest Message\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"921ee447-0c37-4e9d-9f42-a491f412baef\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Oldest Message\\\",\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -963,7 +963,7 @@
                       "label": "Snapshot Oldest Message",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.snapshot.oldest_message_age.value",
+                      "sourceField": "gcp.pubsub.snapshot.oldest_message_age.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -980,7 +980,7 @@
                     "921ee447-0c37-4e9d-9f42-a491f412baef": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.snapshot_id",
+                      "label": "Top values of gcp.labels.resource.snapshot_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -991,7 +991,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.snapshot_id"
+                      "sourceField": "gcp.labels.resource.snapshot_id"
                     }
                   },
                   "indexPatternId": "metricbeat-*"
@@ -1026,7 +1026,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Snapshot Oldest Message [Metricbeat Googlecloud]",
+        "title": "Snapshot Oldest Message [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "f3e92c10-019d-11eb-b032-d59f894a5072",
@@ -1044,7 +1044,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"_key\\\",\\\"order\\\":\\\"asc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.snapshot.num_messages.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"alphabetical\\\"},\\\"orderDirection\\\":\\\"asc\\\"},\\\"id\\\":\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Number of Messages\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.snapshot.num_messages.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Number of Messages\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Number of Messages\\\",\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"_key\\\",\\\"order\\\":\\\"asc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.snapshot.num_messages.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\":{\\\"label\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"alphabetical\\\"},\\\"orderDirection\\\":\\\"asc\\\"},\\\"id\\\":\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Number of Messages\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.snapshot.num_messages.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Number of Messages\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Number of Messages\\\",\\\"ef2fc668-040b-4c82-9f65-5d3fb25c9536\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -1072,7 +1072,7 @@
                       "label": "Snapshot Number of Messages",
                       "operationType": "avg",
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.snapshot.num_messages.value",
+                      "sourceField": "gcp.pubsub.snapshot.num_messages.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -1089,7 +1089,7 @@
                     "ef2fc668-040b-4c82-9f65-5d3fb25c9536": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.snapshot_id",
+                      "label": "Top values of gcp.labels.resource.snapshot_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -1099,7 +1099,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.snapshot_id"
+                      "sourceField": "gcp.labels.resource.snapshot_id"
                     }
                   },
                   "indexPatternId": "metricbeat-*"
@@ -1134,7 +1134,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Snapshot Number of Messages [Metricbeat Googlecloud]",
+        "title": "Snapshot Number of Messages [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "6de1f430-019d-11eb-b032-d59f894a5072",
@@ -1152,7 +1152,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.snapshot.backlog_bytes.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-921ee447-0c37-4e9d-9f42-a491f412baef\\\":{\\\"label\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Backlog Bytes\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"googlecloud.pubsub.snapshot.backlog_bytes.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Backlog Bytes\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"921ee447-0c37-4e9d-9f42-a491f412baef\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Backlog Bytes\\\",\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\":\\\"Top values of googlecloud.labels.resource.snapshot_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"auto\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.snapshot.backlog_bytes.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"auto\\\"},\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-921ee447-0c37-4e9d-9f42-a491f412baef\\\":{\\\"label\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.snapshot_id\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":3,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"label\\\":\\\"Snapshot Backlog Bytes\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"gcp.pubsub.snapshot.backlog_bytes.value\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"customLabel\\\":true,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Snapshot Backlog Bytes\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"921ee447-0c37-4e9d-9f42-a491f412baef\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Snapshot Backlog Bytes\\\",\\\"921ee447-0c37-4e9d-9f42-a491f412baef\\\":\\\"Top values of gcp.labels.resource.snapshot_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -1188,7 +1188,7 @@
                         }
                       },
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.snapshot.backlog_bytes.value",
+                      "sourceField": "gcp.pubsub.snapshot.backlog_bytes.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -1205,7 +1205,7 @@
                     "921ee447-0c37-4e9d-9f42-a491f412baef": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.snapshot_id",
+                      "label": "Top values of gcp.labels.resource.snapshot_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -1216,7 +1216,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.snapshot_id"
+                      "sourceField": "gcp.labels.resource.snapshot_id"
                     }
                   },
                   "indexPatternId": "metricbeat-*"
@@ -1251,7 +1251,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Snapshot Backlog Bytes [Metricbeat Googlecloud]",
+        "title": "Snapshot Backlog Bytes [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "0776dbf0-019f-11eb-b032-d59f894a5072",
@@ -1269,7 +1269,7 @@
     {
       "attributes": {
         "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"googlecloud.pubsub.subscription.backlog_bytes.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"googlecloud.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Backlog Bytes\\\",\\\"operationType\\\":\\\"avg\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"googlecloud.pubsub.subscription.backlog_bytes.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Backlog Bytes\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Backlog Bytes\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of googlecloud.labels.resource.subscription_id\\\"}\"}",
+        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"91e62734-6524-424c-b2b5-3974c835dd6c\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1m\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"orderBy\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":3,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"gcp.pubsub.subscription.backlog_bytes.value\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-6be62612-437b-448d-9631-c6cc0938225d\\\":{\\\"dataType\\\":\\\"date\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"@timestamp\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"params\\\":{\\\"interval\\\":\\\"1m\\\"},\\\"scale\\\":\\\"interval\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"id\\\":\\\"6be62612-437b-448d-9631-c6cc0938225d\\\"},\\\"col-2-2251f8b6-6091-4386-890b-4d0d33e79a96\\\":{\\\"dataType\\\":\\\"string\\\",\\\"isBucketed\\\":true,\\\"label\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\",\\\"operationType\\\":\\\"terms\\\",\\\"params\\\":{\\\"orderBy\\\":{\\\"columnId\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\",\\\"type\\\":\\\"column\\\"},\\\"orderDirection\\\":\\\"desc\\\",\\\"size\\\":3},\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"gcp.labels.resource.subscription_id\\\",\\\"id\\\":\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\"},\\\"col-3-5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":{\\\"customLabel\\\":true,\\\"dataType\\\":\\\"number\\\",\\\"isBucketed\\\":false,\\\"label\\\":\\\"Subscription Backlog Bytes\\\",\\\"operationType\\\":\\\"avg\\\",\\\"params\\\":{\\\"format\\\":{\\\"id\\\":\\\"bytes\\\",\\\"params\\\":{\\\"decimals\\\":0}}},\\\"scale\\\":\\\"ratio\\\",\\\"sourceField\\\":\\\"gcp.pubsub.subscription.backlog_bytes.value\\\",\\\"suggestedPriority\\\":0,\\\"id\\\":\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\"}}\" | lens_format_column format=\"bytes\" columnId=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" decimals=0}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Subscription Backlog Bytes\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"91e62734-6524-424c-b2b5-3974c835dd6c\" hide=false xAccessor=\"6be62612-437b-448d-9631-c6cc0938225d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"2251f8b6-6091-4386-890b-4d0d33e79a96\"  seriesType=\"line\" accessors=\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\" columnToLabel=\"{\\\"5424865c-c988-4e26-b00b-b3cf90e1e4cf\\\":\\\"Subscription Backlog Bytes\\\",\\\"2251f8b6-6091-4386-890b-4d0d33e79a96\\\":\\\"Top values of gcp.labels.resource.subscription_id\\\"}\"}",
         "state": {
           "datasourceMetaData": {
             "filterableIndexPatterns": [
@@ -1293,7 +1293,7 @@
                     "2251f8b6-6091-4386-890b-4d0d33e79a96": {
                       "dataType": "string",
                       "isBucketed": true,
-                      "label": "Top values of googlecloud.labels.resource.subscription_id",
+                      "label": "Top values of gcp.labels.resource.subscription_id",
                       "operationType": "terms",
                       "params": {
                         "orderBy": {
@@ -1304,7 +1304,7 @@
                         "size": 3
                       },
                       "scale": "ordinal",
-                      "sourceField": "googlecloud.labels.resource.subscription_id"
+                      "sourceField": "gcp.labels.resource.subscription_id"
                     },
                     "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
                       "customLabel": true,
@@ -1321,7 +1321,7 @@
                         }
                       },
                       "scale": "ratio",
-                      "sourceField": "googlecloud.pubsub.subscription.backlog_bytes.value",
+                      "sourceField": "gcp.pubsub.subscription.backlog_bytes.value",
                       "suggestedPriority": 0
                     },
                     "6be62612-437b-448d-9631-c6cc0938225d": {
@@ -1368,7 +1368,7 @@
             "preferredSeriesType": "line"
           }
         },
-        "title": "Subscription Backlog [Metricbeat Googlecloud]",
+        "title": "Subscription Backlog [Metricbeat GCP]",
         "visualizationType": "lnsXY"
       },
       "id": "79d80f10-01a0-11eb-b032-d59f894a5072",

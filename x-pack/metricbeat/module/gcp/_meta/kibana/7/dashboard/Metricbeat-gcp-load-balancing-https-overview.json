@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of Googlecloud Load Balancing HTTPS Metrics",
+        "description": "Overview of GCP Load Balancing HTTPS Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -132,7 +132,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] Load Balancing HTTPS Overview",
+        "title": "[Metricbeat GCP] Load Balancing HTTPS Overview",
         "version": 1
       },
       "id": "aa5b8bd0-9157-11ea-8180-7b0dacd9df87",
@@ -186,7 +186,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Filters [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Filters [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -194,7 +194,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "googlecloud.labels.resource.url_map_name",
+                "fieldName": "gcp.labels.resource.url_map_name",
                 "id": "1588961027791",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "URL Map Name",
@@ -209,7 +209,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.resource.region",
+                "fieldName": "gcp.labels.resource.region",
                 "id": "1588961077426",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "Region",
@@ -224,7 +224,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "googlecloud.labels.metrics.client_country",
+                "fieldName": "gcp.labels.metrics.client_country",
                 "id": "1588961157559",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Client Country",
@@ -243,7 +243,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Load Balancing HTTPS Filters [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Filters [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -278,7 +278,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Backend Request Count [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Backend Request Count [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -301,7 +301,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.loadbalancing.https.backend_request_count.value : * "
+                  "query": "gcp.loadbalancing.https.backend_request_count.value : * "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -309,7 +309,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.backend_request_count.value",
+                    "field": "gcp.loadbalancing.https.backend_request_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -318,7 +318,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -328,7 +328,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Backend Request Count [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Backend Request Count [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -347,7 +347,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Request Count [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Request Count [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -360,7 +360,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.https.request_count.value : * "
+              "query": "gcp.loadbalancing.https.request_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -374,7 +374,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.loadbalancing.https.request_count.value : * "
+                  "query": "gcp.loadbalancing.https.request_count.value : * "
                 },
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -382,7 +382,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.request_count.value",
+                    "field": "gcp.loadbalancing.https.request_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -391,7 +391,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -401,7 +401,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Request Count [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Request Count [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -420,7 +420,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Backend Request Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Backend Request Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -443,7 +443,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.loadbalancing.https.backend_request_bytes_count.value : * "
+                  "query": "gcp.loadbalancing.https.backend_request_bytes_count.value : * "
                 },
                 "formatter": "bytes",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -451,7 +451,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.backend_request_bytes_count.value",
+                    "field": "gcp.loadbalancing.https.backend_request_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -460,7 +460,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -470,7 +470,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Backend Request Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Backend Request Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -489,7 +489,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Request Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Request Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -502,7 +502,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.https.request_bytes_count.value : * "
+              "query": "gcp.loadbalancing.https.request_bytes_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -520,7 +520,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.request_bytes_count.value",
+                    "field": "gcp.loadbalancing.https.request_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -529,7 +529,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -539,7 +539,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Request Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Request Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -558,7 +558,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Backend Response Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Backend Response Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -571,7 +571,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.https.backend_response_bytes_count.value : * "
+              "query": "gcp.loadbalancing.https.backend_response_bytes_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -589,7 +589,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.backend_response_bytes_count.value",
+                    "field": "gcp.loadbalancing.https.backend_response_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -598,7 +598,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -608,7 +608,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Backend Response Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Backend Response Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -627,7 +627,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Load Balancing HTTPS Response Bytes [Metricbeat Googlecloud]",
+        "title": "Load Balancing HTTPS Response Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -640,7 +640,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "googlecloud.loadbalancing.https.response_bytes_count.value : * "
+              "query": "gcp.loadbalancing.https.response_bytes_count.value : * "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
@@ -654,7 +654,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
-                  "query": "googlecloud.loadbalancing.https.response_bytes_count.value : * "
+                  "query": "gcp.loadbalancing.https.response_bytes_count.value : * "
                 },
                 "formatter": "bytes",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
@@ -662,7 +662,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.loadbalancing.https.response_bytes_count.value",
+                    "field": "gcp.loadbalancing.https.response_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -671,7 +671,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "googlecloud.labels.resource.url_map_name",
+                "terms_field": "gcp.labels.resource.url_map_name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -681,7 +681,7 @@
             "time_field": null,
             "type": "timeseries"
           },
-          "title": "Load Balancing HTTPS Response Bytes [Metricbeat Googlecloud]",
+          "title": "Load Balancing HTTPS Response Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },

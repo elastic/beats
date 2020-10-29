@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of Googlecloud Compute Metrics",
+        "description": "Overview of GCP Compute Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -164,7 +164,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Googlecloud] Compute Overview",
+        "title": "[Metricbeat GCP] Compute Overview",
         "version": 1
       },
       "id": "f40ee870-5e4a-11ea-a4f6-717338406083",
@@ -237,7 +237,7 @@
             }
           }
         },
-        "title": "az-instance-account Filter [Metricbeat Googlecloud]",
+        "title": "az-instance-account Filter [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -294,7 +294,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "az-instance-account Filter [Metricbeat Googlecloud]",
+          "title": "az-instance-account Filter [Metricbeat GCP]",
           "type": "input_control_vis"
         }
       },
@@ -338,7 +338,7 @@
             }
           }
         },
-        "title": "Compute Instance Uptime Gauge [Metricbeat Googlecloud]",
+        "title": "Compute Instance Uptime Gauge [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -395,9 +395,9 @@
                 "metrics": [
                   {
                     "denominator": "60",
-                    "field": "googlecloud.compute.instance.uptime.value",
+                    "field": "gcp.compute.instance.uptime.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "numerator": "googlecloud.compute.instance.uptime.value",
+                    "numerator": "gcp.compute.instance.uptime.value",
                     "type": "avg",
                     "values": [
                       "60"
@@ -434,7 +434,7 @@
             "tooltip_mode": "show_all",
             "type": "gauge"
           },
-          "title": "Compute Instance Uptime Gauge [Metricbeat Googlecloud]",
+          "title": "Compute Instance Uptime Gauge [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -456,7 +456,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
+        "title": "Compute CPU Utilization [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -484,7 +484,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.cpu.utilization.value",
+                    "field": "gcp.compute.instance.cpu.utilization.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -504,7 +504,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
+          "title": "Compute CPU Utilization [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -526,7 +526,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Read I/O [Metricbeat Googlecloud]",
+        "title": "Compute Read I/O [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -554,7 +554,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.disk.read_ops_count.value",
+                    "field": "gcp.compute.instance.disk.read_ops_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -573,7 +573,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Read I/O [Metricbeat Googlecloud]",
+          "title": "Compute Read I/O [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -595,7 +595,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Write I/O [Metricbeat Googlecloud]",
+        "title": "Compute Write I/O [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -623,7 +623,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.disk.write_ops_count.value",
+                    "field": "gcp.compute.instance.disk.write_ops_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -642,7 +642,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Write I/O [Metricbeat Googlecloud]",
+          "title": "Compute Write I/O [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -664,7 +664,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Network Sent Bytes [Metricbeat Googlecloud]",
+        "title": "Compute Network Sent Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -692,7 +692,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.network.sent_bytes_count.value",
+                    "field": "gcp.compute.instance.network.sent_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -711,7 +711,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Network Sent Bytes [Metricbeat Googlecloud]",
+          "title": "Compute Network Sent Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -733,7 +733,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Network Received Bytes [Metricbeat Googlecloud]",
+        "title": "Compute Network Received Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -761,7 +761,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.instance.network.received_bytes_count.value",
+                    "field": "gcp.compute.instance.network.received_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -780,7 +780,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Network Received Bytes [Metricbeat Googlecloud]",
+          "title": "Compute Network Received Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -802,7 +802,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Firewall Dropped Bytes [Metricbeat Googlecloud]",
+        "title": "Compute Firewall Dropped Bytes [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -848,7 +848,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.firewall.dropped_bytes_count.value",
+                    "field": "gcp.compute.firewall.dropped_bytes_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -868,7 +868,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Compute Firewall Dropped Bytes [Metricbeat Googlecloud]",
+          "title": "Compute Firewall Dropped Bytes [Metricbeat GCP]",
           "type": "metrics"
         }
       },
@@ -890,7 +890,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Compute Firewall Dropped Packets [Metricbeat Googlecloud]",
+        "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -936,7 +936,7 @@
                 "line_width": "3",
                 "metrics": [
                   {
-                    "field": "googlecloud.compute.firewall.dropped_packets_count.value",
+                    "field": "gcp.compute.firewall.dropped_packets_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -957,7 +957,7 @@
             "time_range_mode": "entire_time_range",
             "type": "top_n"
           },
-          "title": "Compute Firewall Dropped Packets [Metricbeat Googlecloud]",
+          "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
           "type": "metrics"
         }
       },

@@ -278,7 +278,7 @@ func createEvents(rowItems []bigquery.Value, accountID string) mb.Event {
 	}
 
 	event.RootFields = common.MapStr{
-		"cloud.provider":     "googlecloud",
+		"cloud.provider":     "gcp",
 		"cloud.account.id":   accountID,
 		"cloud.account.name": accountID,
 	}

@@ -6,8 +6,8 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "2029454349697438698",
-            "name": "nchaulet-loadtest-elasticsearch"
+            "id": "4049989596327614796",
+            "name": "nchaulet-loadtest-horde-master"
         },
         "machine": {
             "type": "n1-standard-8"
@@ -25,15 +25,15 @@
         "labels": {},
         "metrics": {
             "instance": {
-                "uptime": {
-                    "value": 60.00000000093132
+                "uptime_total": {
+                    "value": 791820
                 }
             }
         }
     },
     "host": {
-        "id": "2029454349697438698",
-        "name": "nchaulet-loadtest-elasticsearch"
+        "id": "4049989596327614796",
+        "name": "nchaulet-loadtest-horde-master"
     },
     "metricset": {
         "name": "metrics",
