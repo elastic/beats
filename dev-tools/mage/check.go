@@ -47,6 +47,7 @@ import (
 // It checks .go source files using 'go vet'.
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
+
 	mg.Deps(GoVet, CheckPythonTestNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
