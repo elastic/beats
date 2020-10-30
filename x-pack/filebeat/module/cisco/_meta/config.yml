@@ -89,3 +89,18 @@
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+  umbrella:
+    enabled: true
+
+    #var.input: s3
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    # Access ID to authenticate with the S3 input
+    #var.access_key_id: 123456
+    # Access key to authenticate with the S3 input
+    #var.secret_access_key: PASSWORD
+    # The duration that the received messages are hidden from ReceiveMessage request
+    #var.visibility_timeout: 300s
+    # Maximum duration before AWS API request will be interrupted
+    #var.api_timeout: 120s
