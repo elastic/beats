@@ -3208,6 +3208,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178",
             "192.168.2.2"
@@ -3258,6 +3261,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.138",
             "192.168.2.2"
@@ -3315,6 +3321,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178",
             "192.168.2.2"
@@ -3372,6 +3381,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178",
             "192.168.2.2"
@@ -3425,6 +3437,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178",
             "192.168.2.2"
@@ -3481,6 +3496,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178",
             "192.168.2.2"
@@ -3537,6 +3555,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.128.1.1"
         ],
@@ -3579,6 +3600,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.64.157.61"
         ],
@@ -3623,6 +3647,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.128.1.1"
         ],
@@ -3667,6 +3694,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -3698,6 +3728,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -3732,6 +3765,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -3766,6 +3802,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.128.1.1"
         ],
