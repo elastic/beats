@@ -88,23 +88,7 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             deleteDir()
-            script {
-              if(isUpstreamTrigger()) {
-                try {
-                  copyArtifacts(filter: 'packaging.properties',
-                                flatten: true,
-                                projectName: "Beats/beats/${env.JOB_BASE_NAME}",
-                                selector: upstream(fallbackToLastSuccessful: true))
-                  def props = readProperties(file: 'packaging.properties')
-                  gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
-                } catch(err) {
-                  // Fallback to the head of the branch as used to be.
-                  gitCheckout(basedir: "${BASE_DIR}")
-                }
-              } else {
-                gitCheckout(basedir: "${BASE_DIR}")
-              }
-            }
+            checkoutComitId()
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
             withMageEnv(){
               dir("${BASE_DIR}"){
@@ -130,6 +114,28 @@ pipeline {
       }
     }
   }
+}
+
+def checkoutComitId(){
+  if(isUpstreamTrigger()) {
+    try {
+      gitCheckout(basedir: "${BASE_DIR}", branch: getCommitId())
+    } catch(err) {
+      // Fallback to the head of the branch as used to be.
+      gitCheckout(basedir: "${BASE_DIR}")
+    }
+  } else {
+    gitCheckout(basedir: "${BASE_DIR}")
+  }
+}
+
+def getCommitId(){
+  copyArtifacts(filter: 'packaging.properties',
+                flatten: true,
+                projectName: "Beats/beats/${env.JOB_BASE_NAME}",
+                selector: upstream(fallbackToLastSuccessful: true))
+  def props = readProperties(file: 'packaging.properties')
+  return props.COMMIT
 }
 
 def beats(){
