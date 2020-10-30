@@ -39,6 +39,9 @@
           type: long
           description: >
             Filtered events counter.
+        - name: duration_in_millis
+          type: long
+          description: TODO
     - name: logstash
       type: group
       fields:
@@ -100,18 +103,101 @@
       type: double
       description: >
         TODO
-    - name: queue.events_count
-      type: long
-      description: >
-        TODO
     - name: pipelines
       type: group
       fields:
-        - name: main.id
+        - name: id
           type: keyword
           description: >
             TODO
-        - name: main.hash
+        - name: hash
           type: keyword
           description: >
             TODO
+        - name: queue
+          type: group
+          fields:
+            - name: events_count
+              type: long
+              description: TODO
+            - name: type
+              type: keyword
+              description: TODO
+            - name: queue_size_in_bytes
+              type: long
+              description: TODO
+            - name: max_queue_size_in_bytes
+              type: long
+              description: TODO
+        - name: events
+          type: group
+          fields:
+            - name: out
+              type: long
+              description: TODO
+            - name: duration_in_millis
+              type: long
+              description: TODO
+        - name: vertices
+          type: group
+          fields:
+            - name: duration_in_millis
+              type: long
+              description: TODO
+            - name: events_in
+              type: long
+              description: TODO
+            - name: pipeline_ephemeral_id
+              type: keyword
+              description: pipeline_ephemeral_id
+            - name: events_out
+              type: long
+              description: events_out
+            - name: id
+              type: keyword
+              description: id
+            - name: queue_push_duration_in_millis
+              type: float
+              description: queue_push_duration_in_millis
+    - name: os
+      type: group
+      fields:
+        - name: cpu
+          type: group
+          fields:
+            - name: load_average
+              type: group
+              fields:
+                - name: 15m
+                  type: long
+                  description: TODO
+                - name: 1m
+                  type: long
+                  description: TODO
+                - name: 5m
+                  type: long
+                  description: TODO
+        - name: cgroup
+          type: group
+          fields:
+            - name: cpuacct.usage_nanos
+              type: long
+              description: TODO
+            - name: cpu
+              type: group
+              fields:
+                - name: stat
+                  type: group
+                  fields:
+                    - name: number_of_elapsed_periods
+                      type: long
+                      description: TODO
+                    - name: time_throttled_nanos
+                      type: long
+                      description: TODO
+                    - name: number_of_times_throttled
+                      type: long
+                      description: TODO
+    - name: queue.events_count
+      type: long
+      description: TODO
