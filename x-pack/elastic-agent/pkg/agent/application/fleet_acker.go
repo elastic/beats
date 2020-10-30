@@ -39,6 +39,10 @@ func newActionAcker(
 	}, nil
 }
 
+func (f *actionAcker) SetClient(client clienter) {
+	f.client = client
+}
+
 func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
 	agentID := f.agentInfo.AgentID()

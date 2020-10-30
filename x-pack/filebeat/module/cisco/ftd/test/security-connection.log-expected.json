@@ -65,6 +65,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -154,6 +157,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -252,6 +258,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -357,6 +366,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -450,6 +462,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -561,6 +576,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -657,6 +675,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -764,6 +785,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -849,6 +873,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -947,6 +974,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"

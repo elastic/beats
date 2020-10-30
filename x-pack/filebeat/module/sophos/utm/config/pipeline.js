@@ -105,8 +105,7 @@ var dup17 = setc("eventcategory","1702000000");
 
 var dup18 = setc("comments","server certificate has a different hostname from actual hostname");
 
-var dup19 = // "Pattern{Field(p0,false)}"
-match_copy("MESSAGE#44:reverseproxy:07/1_0", "nwparser.p0", "p0");
+var dup19 = match_copy("MESSAGE#44:reverseproxy:07/1_0", "nwparser.p0", "p0");
 
 var dup20 = setc("eventcategory","1603060000");
 
@@ -170,35 +169,29 @@ var dup46 = lookup({
 	key: dup15,
 });
 
-var hdr1 = // "Pattern{Field(hfld1,true), Constant(' '), Field(messageid,false), Constant('['), Field(process_id,false), Constant(']: '), Field(payload,false)}"
-match("HEADER#0:0001", "message", "%{hfld1->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hfld1->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0001"),
 ]));
 
-var hdr2 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hostname,true), Constant(' '), Field(messageid,false), Constant('['), Field(process_id,false), Constant(']: '), Field(payload,false)}"
-match("HEADER#1:0002", "message", "%{hfld1->} %{hostname->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hfld1->} %{hostname->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0002"),
 ]));
 
-var hdr3 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hostname,true), Constant(' reverseproxy: '), Field(payload,false)}"
-match("HEADER#2:0003", "message", "%{hfld1->} %{hostname->} reverseproxy: %{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "%{hfld1->} %{hostname->} reverseproxy: %{payload}", processor_chain([
 	setc("header_id","0003"),
 	setc("messageid","reverseproxy"),
 ]));
 
-var hdr4 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hostname,true), Constant(' '), Field(messageid,false), Constant(': '), Field(payload,false)}"
-match("HEADER#3:0005", "message", "%{hfld1->} %{hostname->} %{messageid}: %{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0005", "message", "%{hfld1->} %{hostname->} %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0005"),
 ]));
 
-var hdr5 = // "Pattern{Field(hfld1,true), Constant(' '), Field(id,false), Constant('['), Field(process_id,false), Constant(']: '), Field(payload,false)}"
-match("HEADER#4:0004", "message", "%{hfld1->} %{id}[%{process_id}]: %{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0004", "message", "%{hfld1->} %{id}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0004"),
 	setc("messageid","astarosg_TVM"),
 ]));
 
-var hdr6 = // "Pattern{Constant('device="'), Field(product,false), Constant('" date='), Field(hdate,true), Constant(' time='), Field(htime,true), Constant(' timezone="'), Field(timezone,false), Constant('" device_name="'), Field(device,false), Constant('" device_id='), Field(hardware_id,true), Constant(' log_id='), Field(id,true), Constant(' '), Field(payload,false)}"
-match("HEADER#5:0006", "message", "device=\"%{product}\" date=%{hdate->} time=%{htime->} timezone=\"%{timezone}\" device_name=\"%{device}\" device_id=%{hardware_id->} log_id=%{id->} %{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0006", "message", "device=\"%{product}\" date=%{hdate->} time=%{htime->} timezone=\"%{timezone}\" device_name=\"%{device}\" device_id=%{hardware_id->} log_id=%{id->} %{payload}", processor_chain([
 	setc("header_id","0006"),
 	setc("messageid","Sophos_Firewall"),
 ]));
@@ -212,8 +205,7 @@ var select1 = linear_select([
 	hdr6,
 ]);
 
-var part1 = // "Pattern{Constant('received control channel command ''), Field(action,false), Constant(''')}"
-match("MESSAGE#0:named:01", "nwparser.payload", "received control channel command '%{action}'", processor_chain([
+var part1 = match("MESSAGE#0:named:01", "nwparser.payload", "received control channel command '%{action}'", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -221,8 +213,7 @@ match("MESSAGE#0:named:01", "nwparser.payload", "received control channel comman
 
 var msg1 = msg("named:01", part1);
 
-var part2 = // "Pattern{Constant('flushing caches in all views '), Field(disposition,false)}"
-match("MESSAGE#1:named:02", "nwparser.payload", "flushing caches in all views %{disposition}", processor_chain([
+var part2 = match("MESSAGE#1:named:02", "nwparser.payload", "flushing caches in all views %{disposition}", processor_chain([
 	dup1,
 	dup2,
 	dup3,
@@ -230,8 +221,7 @@ match("MESSAGE#1:named:02", "nwparser.payload", "flushing caches in all views %{
 
 var msg2 = msg("named:02", part2);
 
-var part3 = // "Pattern{Constant('error ('), Field(result,false), Constant(') resolving ''), Field(dhost,false), Constant('': '), Field(daddr,false), Constant('#'), Field(dport,false)}"
-match("MESSAGE#2:named:03", "nwparser.payload", "error (%{result}) resolving '%{dhost}': %{daddr}#%{dport}", processor_chain([
+var part3 = match("MESSAGE#2:named:03", "nwparser.payload", "error (%{result}) resolving '%{dhost}': %{daddr}#%{dport}", processor_chain([
 	dup4,
 	dup2,
 	dup3,
@@ -239,8 +229,7 @@ match("MESSAGE#2:named:03", "nwparser.payload", "error (%{result}) resolving '%{
 
 var msg3 = msg("named:03", part3);
 
-var part4 = // "Pattern{Constant('received '), Field(action,true), Constant(' signal to '), Field(fld3,false)}"
-match("MESSAGE#3:named:04", "nwparser.payload", "received %{action->} signal to %{fld3}", processor_chain([
+var part4 = match("MESSAGE#3:named:04", "nwparser.payload", "received %{action->} signal to %{fld3}", processor_chain([
 	dup5,
 	dup2,
 	dup3,
@@ -248,8 +237,7 @@ match("MESSAGE#3:named:04", "nwparser.payload", "received %{action->} signal to 
 
 var msg4 = msg("named:04", part4);
 
-var part5 = // "Pattern{Constant('loading configuration from ''), Field(filename,false), Constant(''')}"
-match("MESSAGE#4:named:05", "nwparser.payload", "loading configuration from '%{filename}'", processor_chain([
+var part5 = match("MESSAGE#4:named:05", "nwparser.payload", "loading configuration from '%{filename}'", processor_chain([
 	dup6,
 	dup2,
 	dup3,
@@ -257,8 +245,7 @@ match("MESSAGE#4:named:05", "nwparser.payload", "loading configuration from '%{f
 
 var msg5 = msg("named:05", part5);
 
-var part6 = // "Pattern{Constant('no '), Field(protocol,true), Constant(' interfaces found')}"
-match("MESSAGE#5:named:06", "nwparser.payload", "no %{protocol->} interfaces found", processor_chain([
+var part6 = match("MESSAGE#5:named:06", "nwparser.payload", "no %{protocol->} interfaces found", processor_chain([
 	setc("eventcategory","1804000000"),
 	dup2,
 	dup3,
@@ -266,8 +253,7 @@ match("MESSAGE#5:named:06", "nwparser.payload", "no %{protocol->} interfaces fou
 
 var msg6 = msg("named:06", part6);
 
-var part7 = // "Pattern{Constant('sizing zone task pool based on '), Field(fld3,true), Constant(' zones')}"
-match("MESSAGE#6:named:07", "nwparser.payload", "sizing zone task pool based on %{fld3->} zones", processor_chain([
+var part7 = match("MESSAGE#6:named:07", "nwparser.payload", "sizing zone task pool based on %{fld3->} zones", processor_chain([
 	dup7,
 	dup2,
 	dup3,
@@ -275,8 +261,7 @@ match("MESSAGE#6:named:07", "nwparser.payload", "sizing zone task pool based on 
 
 var msg7 = msg("named:07", part7);
 
-var part8 = // "Pattern{Constant('automatic empty zone: view '), Field(fld3,false), Constant(': '), Field(dns_ptr_record,false)}"
-match("MESSAGE#7:named:08", "nwparser.payload", "automatic empty zone: view %{fld3}: %{dns_ptr_record}", processor_chain([
+var part8 = match("MESSAGE#7:named:08", "nwparser.payload", "automatic empty zone: view %{fld3}: %{dns_ptr_record}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -284,8 +269,7 @@ match("MESSAGE#7:named:08", "nwparser.payload", "automatic empty zone: view %{fl
 
 var msg8 = msg("named:08", part8);
 
-var part9 = // "Pattern{Constant('reloading '), Field(obj_type,true), Constant(' '), Field(disposition,false)}"
-match("MESSAGE#8:named:09", "nwparser.payload", "reloading %{obj_type->} %{disposition}", processor_chain([
+var part9 = match("MESSAGE#8:named:09", "nwparser.payload", "reloading %{obj_type->} %{disposition}", processor_chain([
 	dup7,
 	dup2,
 	dup3,
@@ -294,8 +278,7 @@ match("MESSAGE#8:named:09", "nwparser.payload", "reloading %{obj_type->} %{dispo
 
 var msg9 = msg("named:09", part9);
 
-var part10 = // "Pattern{Constant('zone '), Field(dhost,false), Constant('/'), Field(fld3,false), Constant(': loaded serial '), Field(operation_id,false)}"
-match("MESSAGE#9:named:10", "nwparser.payload", "zone %{dhost}/%{fld3}: loaded serial %{operation_id}", processor_chain([
+var part10 = match("MESSAGE#9:named:10", "nwparser.payload", "zone %{dhost}/%{fld3}: loaded serial %{operation_id}", processor_chain([
 	dup7,
 	dup9,
 	dup2,
@@ -304,8 +287,7 @@ match("MESSAGE#9:named:10", "nwparser.payload", "zone %{dhost}/%{fld3}: loaded s
 
 var msg10 = msg("named:10", part10);
 
-var part11 = // "Pattern{Constant('all zones loaded'), Field(,false)}"
-match("MESSAGE#10:named:11", "nwparser.payload", "all zones loaded%{}", processor_chain([
+var part11 = match("MESSAGE#10:named:11", "nwparser.payload", "all zones loaded%{}", processor_chain([
 	dup7,
 	dup9,
 	dup2,
@@ -315,8 +297,7 @@ match("MESSAGE#10:named:11", "nwparser.payload", "all zones loaded%{}", processo
 
 var msg11 = msg("named:11", part11);
 
-var part12 = // "Pattern{Constant('running'), Field(,false)}"
-match("MESSAGE#11:named:12", "nwparser.payload", "running%{}", processor_chain([
+var part12 = match("MESSAGE#11:named:12", "nwparser.payload", "running%{}", processor_chain([
 	dup7,
 	setc("disposition","running"),
 	dup2,
@@ -326,8 +307,7 @@ match("MESSAGE#11:named:12", "nwparser.payload", "running%{}", processor_chain([
 
 var msg12 = msg("named:12", part12);
 
-var part13 = // "Pattern{Constant('using built-in root key for view '), Field(fld3,false)}"
-match("MESSAGE#12:named:13", "nwparser.payload", "using built-in root key for view %{fld3}", processor_chain([
+var part13 = match("MESSAGE#12:named:13", "nwparser.payload", "using built-in root key for view %{fld3}", processor_chain([
 	dup7,
 	setc("context","built-in root key"),
 	dup2,
@@ -336,8 +316,7 @@ match("MESSAGE#12:named:13", "nwparser.payload", "using built-in root key for vi
 
 var msg13 = msg("named:13", part13);
 
-var part14 = // "Pattern{Constant('zone '), Field(dns_ptr_record,false), Constant('/'), Field(fld3,false), Constant(': ('), Field(username,false), Constant(') '), Field(action,false)}"
-match("MESSAGE#13:named:14", "nwparser.payload", "zone %{dns_ptr_record}/%{fld3}: (%{username}) %{action}", processor_chain([
+var part14 = match("MESSAGE#13:named:14", "nwparser.payload", "zone %{dns_ptr_record}/%{fld3}: (%{username}) %{action}", processor_chain([
 	dup8,
 	dup2,
 	dup3,
@@ -345,8 +324,7 @@ match("MESSAGE#13:named:14", "nwparser.payload", "zone %{dns_ptr_record}/%{fld3}
 
 var msg14 = msg("named:14", part14);
 
-var part15 = // "Pattern{Constant('too many timeouts resolving ''), Field(fld3,false), Constant('' ('), Field(fld4,false), Constant('): disabling EDNS')}"
-match("MESSAGE#14:named:15", "nwparser.payload", "too many timeouts resolving '%{fld3}' (%{fld4}): disabling EDNS", processor_chain([
+var part15 = match("MESSAGE#14:named:15", "nwparser.payload", "too many timeouts resolving '%{fld3}' (%{fld4}): disabling EDNS", processor_chain([
 	dup10,
 	setc("event_description","named:too many timeouts resolving DNS."),
 	dup11,
@@ -355,8 +333,7 @@ match("MESSAGE#14:named:15", "nwparser.payload", "too many timeouts resolving '%
 
 var msg15 = msg("named:15", part15);
 
-var part16 = // "Pattern{Constant('FORMERR resolving ''), Field(hostname,false), Constant('': '), Field(saddr,false), Constant('#'), Field(fld3,false)}"
-match("MESSAGE#15:named:16", "nwparser.payload", "FORMERR resolving '%{hostname}': %{saddr}#%{fld3}", processor_chain([
+var part16 = match("MESSAGE#15:named:16", "nwparser.payload", "FORMERR resolving '%{hostname}': %{saddr}#%{fld3}", processor_chain([
 	dup10,
 	setc("event_description","named:FORMERR resolving DNS."),
 	dup11,
@@ -365,8 +342,7 @@ match("MESSAGE#15:named:16", "nwparser.payload", "FORMERR resolving '%{hostname}
 
 var msg16 = msg("named:16", part16);
 
-var part17 = // "Pattern{Constant('unexpected RCODE (SERVFAIL) resolving ''), Field(hostname,false), Constant('': '), Field(saddr,false), Constant('#'), Field(fld3,false)}"
-match("MESSAGE#16:named:17", "nwparser.payload", "unexpected RCODE (SERVFAIL) resolving '%{hostname}': %{saddr}#%{fld3}", processor_chain([
+var part17 = match("MESSAGE#16:named:17", "nwparser.payload", "unexpected RCODE (SERVFAIL) resolving '%{hostname}': %{saddr}#%{fld3}", processor_chain([
 	dup10,
 	setc("event_description","named:unexpected RCODE (SERVFAIL) resolving DNS."),
 	dup11,
@@ -395,8 +371,7 @@ var select2 = linear_select([
 	msg17,
 ]);
 
-var part18 = // "Pattern{Constant('Integrated HTTP-Proxy '), Field(version,false)}"
-match("MESSAGE#17:httpproxy:09", "nwparser.payload", "Integrated HTTP-Proxy %{version}", processor_chain([
+var part18 = match("MESSAGE#17:httpproxy:09", "nwparser.payload", "Integrated HTTP-Proxy %{version}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:Integrated HTTP-Proxy."),
 	dup11,
@@ -405,8 +380,7 @@ match("MESSAGE#17:httpproxy:09", "nwparser.payload", "Integrated HTTP-Proxy %{ve
 
 var msg18 = msg("httpproxy:09", part18);
 
-var part19 = // "Pattern{Constant('['), Field(fld2,false), Constant('] parse_address ('), Field(fld3,false), Constant(') getaddrinfo: passthrough.fw-notify.net: Name or service not known')}"
-match("MESSAGE#18:httpproxy:10", "nwparser.payload", "[%{fld2}] parse_address (%{fld3}) getaddrinfo: passthrough.fw-notify.net: Name or service not known", processor_chain([
+var part19 = match("MESSAGE#18:httpproxy:10", "nwparser.payload", "[%{fld2}] parse_address (%{fld3}) getaddrinfo: passthrough.fw-notify.net: Name or service not known", processor_chain([
 	dup10,
 	setc("event_description","httpproxy:Name or service not known."),
 	dup11,
@@ -415,8 +389,7 @@ match("MESSAGE#18:httpproxy:10", "nwparser.payload", "[%{fld2}] parse_address (%
 
 var msg19 = msg("httpproxy:10", part19);
 
-var part20 = // "Pattern{Constant('['), Field(fld2,false), Constant('] confd_config_filter ('), Field(fld3,false), Constant(') failed to resolve passthrough.fw-notify.net, using '), Field(saddr,false)}"
-match("MESSAGE#19:httpproxy:11", "nwparser.payload", "[%{fld2}] confd_config_filter (%{fld3}) failed to resolve passthrough.fw-notify.net, using %{saddr}", processor_chain([
+var part20 = match("MESSAGE#19:httpproxy:11", "nwparser.payload", "[%{fld2}] confd_config_filter (%{fld3}) failed to resolve passthrough.fw-notify.net, using %{saddr}", processor_chain([
 	dup10,
 	setc("event_description","httpproxy:failed to resolve passthrough."),
 	dup11,
@@ -425,8 +398,7 @@ match("MESSAGE#19:httpproxy:11", "nwparser.payload", "[%{fld2}] confd_config_fil
 
 var msg20 = msg("httpproxy:11", part20);
 
-var part21 = // "Pattern{Constant('['), Field(fld2,false), Constant('] ssl_log_errors ('), Field(fld3,false), Constant(') '), Field(fld4,false), Constant('ssl handshake failure'), Field(fld5,false)}"
-match("MESSAGE#20:httpproxy:12", "nwparser.payload", "[%{fld2}] ssl_log_errors (%{fld3}) %{fld4}ssl handshake failure%{fld5}", processor_chain([
+var part21 = match("MESSAGE#20:httpproxy:12", "nwparser.payload", "[%{fld2}] ssl_log_errors (%{fld3}) %{fld4}ssl handshake failure%{fld5}", processor_chain([
 	dup10,
 	setc("event_description","httpproxy:ssl handshake failure."),
 	dup11,
@@ -435,8 +407,7 @@ match("MESSAGE#20:httpproxy:12", "nwparser.payload", "[%{fld2}] ssl_log_errors (
 
 var msg21 = msg("httpproxy:12", part21);
 
-var part22 = // "Pattern{Constant('['), Field(fld2,false), Constant('] sc_decrypt ('), Field(fld3,false), Constant(') EVP_DecryptFinal failed')}"
-match("MESSAGE#21:httpproxy:13", "nwparser.payload", "[%{fld2}] sc_decrypt (%{fld3}) EVP_DecryptFinal failed", processor_chain([
+var part22 = match("MESSAGE#21:httpproxy:13", "nwparser.payload", "[%{fld2}] sc_decrypt (%{fld3}) EVP_DecryptFinal failed", processor_chain([
 	dup10,
 	setc("event_description","httpproxy:EVP_DecryptFinal failed."),
 	dup11,
@@ -445,8 +416,7 @@ match("MESSAGE#21:httpproxy:13", "nwparser.payload", "[%{fld2}] sc_decrypt (%{fl
 
 var msg22 = msg("httpproxy:13", part22);
 
-var part23 = // "Pattern{Constant('['), Field(fld2,false), Constant('] sc_server_cmd ('), Field(fld3,false), Constant(') decrypt failed')}"
-match("MESSAGE#22:httpproxy:14", "nwparser.payload", "[%{fld2}] sc_server_cmd (%{fld3}) decrypt failed", processor_chain([
+var part23 = match("MESSAGE#22:httpproxy:14", "nwparser.payload", "[%{fld2}] sc_server_cmd (%{fld3}) decrypt failed", processor_chain([
 	dup10,
 	setc("event_description","httpproxy:decrypt failed."),
 	dup11,
@@ -455,8 +425,7 @@ match("MESSAGE#22:httpproxy:14", "nwparser.payload", "[%{fld2}] sc_server_cmd (%
 
 var msg23 = msg("httpproxy:14", part23);
 
-var part24 = // "Pattern{Constant('['), Field(fld2,false), Constant('] clamav_reload ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#23:httpproxy:15", "nwparser.payload", "[%{fld2}] clamav_reload (%{fld3}) %{info}", processor_chain([
+var part24 = match("MESSAGE#23:httpproxy:15", "nwparser.payload", "[%{fld2}] clamav_reload (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:reloading av pattern"),
 	dup11,
@@ -465,8 +434,7 @@ match("MESSAGE#23:httpproxy:15", "nwparser.payload", "[%{fld2}] clamav_reload (%
 
 var msg24 = msg("httpproxy:15", part24);
 
-var part25 = // "Pattern{Constant('['), Field(fld2,false), Constant('] sc_check_servers ('), Field(fld3,false), Constant(') server ''), Field(hostname,false), Constant('' access time: '), Field(fld4,false)}"
-match("MESSAGE#24:httpproxy:16", "nwparser.payload", "[%{fld2}] sc_check_servers (%{fld3}) server '%{hostname}' access time: %{fld4}", processor_chain([
+var part25 = match("MESSAGE#24:httpproxy:16", "nwparser.payload", "[%{fld2}] sc_check_servers (%{fld3}) server '%{hostname}' access time: %{fld4}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:sc_check_servers.Server checked."),
 	dup11,
@@ -475,8 +443,7 @@ match("MESSAGE#24:httpproxy:16", "nwparser.payload", "[%{fld2}] sc_check_servers
 
 var msg25 = msg("httpproxy:16", part25);
 
-var part26 = // "Pattern{Constant('['), Field(fld2,false), Constant('] main ('), Field(fld3,false), Constant(') shutdown finished, exiting')}"
-match("MESSAGE#25:httpproxy:17", "nwparser.payload", "[%{fld2}] main (%{fld3}) shutdown finished, exiting", processor_chain([
+var part26 = match("MESSAGE#25:httpproxy:17", "nwparser.payload", "[%{fld2}] main (%{fld3}) shutdown finished, exiting", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:shutdown finished, exiting."),
 	dup11,
@@ -485,8 +452,7 @@ match("MESSAGE#25:httpproxy:17", "nwparser.payload", "[%{fld2}] main (%{fld3}) s
 
 var msg26 = msg("httpproxy:17", part26);
 
-var part27 = // "Pattern{Constant('['), Field(fld2,false), Constant('] main ('), Field(fld3,false), Constant(') reading configuration')}"
-match("MESSAGE#26:httpproxy:18", "nwparser.payload", "[%{fld2}] main (%{fld3}) reading configuration", processor_chain([
+var part27 = match("MESSAGE#26:httpproxy:18", "nwparser.payload", "[%{fld2}] main (%{fld3}) reading configuration", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:"),
 	dup11,
@@ -495,8 +461,7 @@ match("MESSAGE#26:httpproxy:18", "nwparser.payload", "[%{fld2}] main (%{fld3}) r
 
 var msg27 = msg("httpproxy:18", part27);
 
-var part28 = // "Pattern{Constant('['), Field(fld2,false), Constant('] main ('), Field(fld3,false), Constant(') reading profiles')}"
-match("MESSAGE#27:httpproxy:19", "nwparser.payload", "[%{fld2}] main (%{fld3}) reading profiles", processor_chain([
+var part28 = match("MESSAGE#27:httpproxy:19", "nwparser.payload", "[%{fld2}] main (%{fld3}) reading profiles", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:reading profiles"),
 	dup11,
@@ -505,8 +470,7 @@ match("MESSAGE#27:httpproxy:19", "nwparser.payload", "[%{fld2}] main (%{fld3}) r
 
 var msg28 = msg("httpproxy:19", part28);
 
-var part29 = // "Pattern{Constant('['), Field(fld2,false), Constant('] main ('), Field(fld3,false), Constant(') finished startup')}"
-match("MESSAGE#28:httpproxy:20", "nwparser.payload", "[%{fld2}] main (%{fld3}) finished startup", processor_chain([
+var part29 = match("MESSAGE#28:httpproxy:20", "nwparser.payload", "[%{fld2}] main (%{fld3}) finished startup", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:finished startup"),
 	dup11,
@@ -515,8 +479,7 @@ match("MESSAGE#28:httpproxy:20", "nwparser.payload", "[%{fld2}] main (%{fld3}) f
 
 var msg29 = msg("httpproxy:20", part29);
 
-var part30 = // "Pattern{Constant('['), Field(fld2,false), Constant('] read_request_headers ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#29:httpproxy:21", "nwparser.payload", "[%{fld2}] read_request_headers (%{fld3}) %{info}", processor_chain([
+var part30 = match("MESSAGE#29:httpproxy:21", "nwparser.payload", "[%{fld2}] read_request_headers (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:read_request_headers related message."),
 	dup11,
@@ -525,8 +488,7 @@ match("MESSAGE#29:httpproxy:21", "nwparser.payload", "[%{fld2}] read_request_hea
 
 var msg30 = msg("httpproxy:21", part30);
 
-var part31 = // "Pattern{Constant('['), Field(fld2,false), Constant('] epoll_loop ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#30:httpproxy:22", "nwparser.payload", "[%{fld2}] epoll_loop (%{fld3}) %{info}", processor_chain([
+var part31 = match("MESSAGE#30:httpproxy:22", "nwparser.payload", "[%{fld2}] epoll_loop (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:epoll_loop related message."),
 	dup11,
@@ -535,8 +497,7 @@ match("MESSAGE#30:httpproxy:22", "nwparser.payload", "[%{fld2}] epoll_loop (%{fl
 
 var msg31 = msg("httpproxy:22", part31);
 
-var part32 = // "Pattern{Constant('['), Field(fld2,false), Constant('] scan_exit ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#31:httpproxy:23", "nwparser.payload", "[%{fld2}] scan_exit (%{fld3}) %{info}", processor_chain([
+var part32 = match("MESSAGE#31:httpproxy:23", "nwparser.payload", "[%{fld2}] scan_exit (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:scan_exit related message."),
 	dup11,
@@ -545,8 +506,7 @@ match("MESSAGE#31:httpproxy:23", "nwparser.payload", "[%{fld2}] scan_exit (%{fld
 
 var msg32 = msg("httpproxy:23", part32);
 
-var part33 = // "Pattern{Constant('['), Field(fld2,false), Constant('] epoll_exit ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#32:httpproxy:24", "nwparser.payload", "[%{fld2}] epoll_exit (%{fld3}) %{info}", processor_chain([
+var part33 = match("MESSAGE#32:httpproxy:24", "nwparser.payload", "[%{fld2}] epoll_exit (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:epoll_exit related message."),
 	dup11,
@@ -555,8 +515,7 @@ match("MESSAGE#32:httpproxy:24", "nwparser.payload", "[%{fld2}] epoll_exit (%{fl
 
 var msg33 = msg("httpproxy:24", part33);
 
-var part34 = // "Pattern{Constant('['), Field(fld2,false), Constant('] disk_cache_exit ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#33:httpproxy:25", "nwparser.payload", "[%{fld2}] disk_cache_exit (%{fld3}) %{info}", processor_chain([
+var part34 = match("MESSAGE#33:httpproxy:25", "nwparser.payload", "[%{fld2}] disk_cache_exit (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:disk_cache_exit related message."),
 	dup11,
@@ -565,8 +524,7 @@ match("MESSAGE#33:httpproxy:25", "nwparser.payload", "[%{fld2}] disk_cache_exit 
 
 var msg34 = msg("httpproxy:25", part34);
 
-var part35 = // "Pattern{Constant('['), Field(fld2,false), Constant('] disk_cache_zap ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#34:httpproxy:26", "nwparser.payload", "[%{fld2}] disk_cache_zap (%{fld3}) %{info}", processor_chain([
+var part35 = match("MESSAGE#34:httpproxy:26", "nwparser.payload", "[%{fld2}] disk_cache_zap (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:disk_cache_zap related message."),
 	dup11,
@@ -575,8 +533,7 @@ match("MESSAGE#34:httpproxy:26", "nwparser.payload", "[%{fld2}] disk_cache_zap (
 
 var msg35 = msg("httpproxy:26", part35);
 
-var part36 = // "Pattern{Constant('['), Field(fld2,false), Constant('] scanner_init ('), Field(fld3,false), Constant(') '), Field(info,false)}"
-match("MESSAGE#35:httpproxy:27", "nwparser.payload", "[%{fld2}] scanner_init (%{fld3}) %{info}", processor_chain([
+var part36 = match("MESSAGE#35:httpproxy:27", "nwparser.payload", "[%{fld2}] scanner_init (%{fld3}) %{info}", processor_chain([
 	dup12,
 	setc("event_description","httpproxy:scanner_init related message."),
 	dup11,
@@ -663,8 +620,7 @@ var select3 = linear_select([
 	msg37,
 ]);
 
-var part38 = // "Pattern{Constant('T='), Field(fld3,true), Constant(' ------ 1 - [exit] '), Field(action,false), Constant(': '), Field(disposition,false)}"
-match("MESSAGE#37:URID:01", "nwparser.payload", "T=%{fld3->} ------ 1 - [exit] %{action}: %{disposition}", processor_chain([
+var part38 = match("MESSAGE#37:URID:01", "nwparser.payload", "T=%{fld3->} ------ 1 - [exit] %{action}: %{disposition}", processor_chain([
 	dup16,
 	dup2,
 	dup3,
@@ -711,8 +667,7 @@ var part39 = tagval("MESSAGE#38:ulogd:01", "nwparser.payload", tvm, {
 
 var msg39 = msg("ulogd:01", part39);
 
-var part40 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] ModSecurity for Apache/'), Field(fld5,true), Constant(' ('), Field(fld6,false), Constant(') configured.')}"
-match("MESSAGE#39:reverseproxy:01", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity for Apache/%{fld5->} (%{fld6}) configured.", processor_chain([
+var part40 = match("MESSAGE#39:reverseproxy:01", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity for Apache/%{fld5->} (%{fld6}) configured.", processor_chain([
 	dup6,
 	setc("disposition","configured"),
 	dup2,
@@ -721,8 +676,7 @@ match("MESSAGE#39:reverseproxy:01", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg40 = msg("reverseproxy:01", part40);
 
-var part41 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] ModSecurity: '), Field(fld5,true), Constant(' compiled version="'), Field(fld6,false), Constant('"; loaded version="'), Field(fld7,false), Constant('"')}"
-match("MESSAGE#40:reverseproxy:02", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity: %{fld5->} compiled version=\"%{fld6}\"; loaded version=\"%{fld7}\"", processor_chain([
+var part41 = match("MESSAGE#40:reverseproxy:02", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity: %{fld5->} compiled version=\"%{fld6}\"; loaded version=\"%{fld7}\"", processor_chain([
 	dup17,
 	dup2,
 	dup3,
@@ -730,8 +684,7 @@ match("MESSAGE#40:reverseproxy:02", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg41 = msg("reverseproxy:02", part41);
 
-var part42 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] ModSecurity: '), Field(fld5,true), Constant(' compiled version="'), Field(fld6,false), Constant('"')}"
-match("MESSAGE#41:reverseproxy:03", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity: %{fld5->} compiled version=\"%{fld6}\"", processor_chain([
+var part42 = match("MESSAGE#41:reverseproxy:03", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] ModSecurity: %{fld5->} compiled version=\"%{fld6}\"", processor_chain([
 	dup17,
 	dup2,
 	dup3,
@@ -739,8 +692,7 @@ match("MESSAGE#41:reverseproxy:03", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg42 = msg("reverseproxy:03", part42);
 
-var part43 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] '), Field(fld5,true), Constant(' configured -- '), Field(disposition,true), Constant(' normal operations')}"
-match("MESSAGE#42:reverseproxy:04", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] %{fld5->} configured -- %{disposition->} normal operations", processor_chain([
+var part43 = match("MESSAGE#42:reverseproxy:04", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] %{fld5->} configured -- %{disposition->} normal operations", processor_chain([
 	dup17,
 	setc("event_id","AH00292"),
 	dup2,
@@ -749,8 +701,7 @@ match("MESSAGE#42:reverseproxy:04", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg43 = msg("reverseproxy:04", part43);
 
-var part44 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] ['), Field(fld5,false), Constant('] Hostname in '), Field(network_service,true), Constant(' request ('), Field(fld6,false), Constant(') does not match the server name ('), Field(ddomain,false), Constant(')')}"
-match("MESSAGE#43:reverseproxy:06", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [%{fld5}] Hostname in %{network_service->} request (%{fld6}) does not match the server name (%{ddomain})", processor_chain([
+var part44 = match("MESSAGE#43:reverseproxy:06", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [%{fld5}] Hostname in %{network_service->} request (%{fld6}) does not match the server name (%{ddomain})", processor_chain([
 	setc("eventcategory","1805010000"),
 	dup18,
 	dup2,
@@ -759,15 +710,13 @@ match("MESSAGE#43:reverseproxy:06", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg44 = msg("reverseproxy:06", part44);
 
-var part45 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00297: '), Field(action,true), Constant(' received. Doing'), Field(p0,false)}"
-match("MESSAGE#44:reverseproxy:07/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00297: %{action->} received. Doing%{p0}");
+var part45 = match("MESSAGE#44:reverseproxy:07/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00297: %{action->} received. Doing%{p0}");
 
 var select4 = linear_select([
 	dup19,
 ]);
 
-var part46 = // "Pattern{Field(,false), Constant('graceful '), Field(disposition,false)}"
-match("MESSAGE#44:reverseproxy:07/2", "nwparser.p0", "%{}graceful %{disposition}");
+var part46 = match("MESSAGE#44:reverseproxy:07/2", "nwparser.p0", "%{}graceful %{disposition}");
 
 var all1 = all_match({
 	processors: [
@@ -785,8 +734,7 @@ var all1 = all_match({
 
 var msg45 = msg("reverseproxy:07", all1);
 
-var part47 = // "Pattern{Constant('AH00112: Warning: DocumentRoot ['), Field(web_root,false), Constant('] does not exist')}"
-match("MESSAGE#45:reverseproxy:08", "nwparser.payload", "AH00112: Warning: DocumentRoot [%{web_root}] does not exist", processor_chain([
+var part47 = match("MESSAGE#45:reverseproxy:08", "nwparser.payload", "AH00112: Warning: DocumentRoot [%{web_root}] does not exist", processor_chain([
 	dup4,
 	setc("event_id","AH00112"),
 	dup2,
@@ -795,8 +743,7 @@ match("MESSAGE#45:reverseproxy:08", "nwparser.payload", "AH00112: Warning: Docum
 
 var msg46 = msg("reverseproxy:08", part47);
 
-var part48 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00094: Command line: ''), Field(web_root,false), Constant(''')}"
-match("MESSAGE#46:reverseproxy:09", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00094: Command line: '%{web_root}'", processor_chain([
+var part48 = match("MESSAGE#46:reverseproxy:09", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00094: Command line: '%{web_root}'", processor_chain([
 	setc("eventcategory","1605010000"),
 	setc("event_id","AH00094"),
 	dup2,
@@ -805,8 +752,7 @@ match("MESSAGE#46:reverseproxy:09", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg47 = msg("reverseproxy:09", part48);
 
-var part49 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00291: long lost child came home! (pid '), Field(fld5,false), Constant(')')}"
-match("MESSAGE#47:reverseproxy:10", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00291: long lost child came home! (pid %{fld5})", processor_chain([
+var part49 = match("MESSAGE#47:reverseproxy:10", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00291: long lost child came home! (pid %{fld5})", processor_chain([
 	dup12,
 	setc("event_id","AH00291"),
 	dup2,
@@ -815,8 +761,7 @@ match("MESSAGE#47:reverseproxy:10", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg48 = msg("reverseproxy:10", part49);
 
-var part50 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH02572: Failed to configure at least one certificate and key for '), Field(fld5,false), Constant(':'), Field(fld6,false)}"
-match("MESSAGE#48:reverseproxy:11", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH02572: Failed to configure at least one certificate and key for %{fld5}:%{fld6}", processor_chain([
+var part50 = match("MESSAGE#48:reverseproxy:11", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH02572: Failed to configure at least one certificate and key for %{fld5}:%{fld6}", processor_chain([
 	dup20,
 	setc("event_id","AH02572"),
 	dup2,
@@ -825,8 +770,7 @@ match("MESSAGE#48:reverseproxy:11", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg49 = msg("reverseproxy:11", part50);
 
-var part51 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] SSL Library Error: error:'), Field(resultcode,false), Constant(':'), Field(result,false)}"
-match("MESSAGE#49:reverseproxy:12", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] SSL Library Error: error:%{resultcode}:%{result}", processor_chain([
+var part51 = match("MESSAGE#49:reverseproxy:12", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] SSL Library Error: error:%{resultcode}:%{result}", processor_chain([
 	dup20,
 	setc("context","SSL Library Error"),
 	dup2,
@@ -835,8 +779,7 @@ match("MESSAGE#49:reverseproxy:12", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg50 = msg("reverseproxy:12", part51);
 
-var part52 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH02312: Fatal error initialising mod_ssl, '), Field(disposition,false), Constant('.')}"
-match("MESSAGE#50:reverseproxy:13", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH02312: Fatal error initialising mod_ssl, %{disposition}.", processor_chain([
+var part52 = match("MESSAGE#50:reverseproxy:13", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH02312: Fatal error initialising mod_ssl, %{disposition}.", processor_chain([
 	dup20,
 	setc("result","Fatal error"),
 	setc("event_id","AH02312"),
@@ -846,8 +789,7 @@ match("MESSAGE#50:reverseproxy:13", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg51 = msg("reverseproxy:13", part52);
 
-var part53 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00020: Configuration Failed, '), Field(disposition,false)}"
-match("MESSAGE#51:reverseproxy:14", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00020: Configuration Failed, %{disposition}", processor_chain([
+var part53 = match("MESSAGE#51:reverseproxy:14", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00020: Configuration Failed, %{disposition}", processor_chain([
 	dup20,
 	setc("result","Configuration Failed"),
 	setc("event_id","AH00020"),
@@ -857,8 +799,7 @@ match("MESSAGE#51:reverseproxy:14", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg52 = msg("reverseproxy:14", part53);
 
-var part54 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00098: pid file '), Field(filename,true), Constant(' overwritten -- Unclean shutdown of previous Apache run?')}"
-match("MESSAGE#52:reverseproxy:15", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00098: pid file %{filename->} overwritten -- Unclean shutdown of previous Apache run?", processor_chain([
+var part54 = match("MESSAGE#52:reverseproxy:15", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00098: pid file %{filename->} overwritten -- Unclean shutdown of previous Apache run?", processor_chain([
 	setc("eventcategory","1609000000"),
 	setc("context","Unclean shutdown"),
 	setc("event_id","AH00098"),
@@ -868,8 +809,7 @@ match("MESSAGE#52:reverseproxy:15", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg53 = msg("reverseproxy:15", part54);
 
-var part55 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00295: caught '), Field(action,false), Constant(', '), Field(disposition,false)}"
-match("MESSAGE#53:reverseproxy:16", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00295: caught %{action}, %{disposition}", processor_chain([
+var part55 = match("MESSAGE#53:reverseproxy:16", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00295: caught %{action}, %{disposition}", processor_chain([
 	dup16,
 	setc("event_id","AH00295"),
 	dup2,
@@ -878,19 +818,16 @@ match("MESSAGE#53:reverseproxy:16", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg54 = msg("reverseproxy:16", part55);
 
-var part56 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(result,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ModSecurity: Warning. '), Field(rulename,true), Constant(' [file "'), Field(filename,false), Constant('"] [line "'), Field(fld5,false), Constant('"] [id "'), Field(rule,false), Constant('"]'), Field(p0,false)}"
-match("MESSAGE#54:reverseproxy:17/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{result}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"]%{p0}");
+var part56 = match("MESSAGE#54:reverseproxy:17/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{result}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"]%{p0}");
 
-var part57 = // "Pattern{Constant(' [rev "'), Field(fld6,false), Constant('"]'), Field(p0,false)}"
-match("MESSAGE#54:reverseproxy:17/1_0", "nwparser.p0", " [rev \"%{fld6}\"]%{p0}");
+var part57 = match("MESSAGE#54:reverseproxy:17/1_0", "nwparser.p0", " [rev \"%{fld6}\"]%{p0}");
 
 var select5 = linear_select([
 	part57,
 	dup19,
 ]);
 
-var part58 = // "Pattern{Field(,false), Constant('[msg "'), Field(comments,false), Constant('"] [data "'), Field(daddr,false), Constant('"] [severity "'), Field(severity,false), Constant('"] [ver "'), Field(policyname,false), Constant('"] [maturity "'), Field(fld7,false), Constant('"] [accuracy "'), Field(fld8,false), Constant('"] '), Field(context,true), Constant(' [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#54:reverseproxy:17/2", "nwparser.p0", "%{}[msg \"%{comments}\"] [data \"%{daddr}\"] [severity \"%{severity}\"] [ver \"%{policyname}\"] [maturity \"%{fld7}\"] [accuracy \"%{fld8}\"] %{context->} [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]");
+var part58 = match("MESSAGE#54:reverseproxy:17/2", "nwparser.p0", "%{}[msg \"%{comments}\"] [data \"%{daddr}\"] [severity \"%{severity}\"] [ver \"%{policyname}\"] [maturity \"%{fld7}\"] [accuracy \"%{fld8}\"] %{context->} [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]");
 
 var all2 = all_match({
 	processors: [
@@ -907,8 +844,7 @@ var all2 = all_match({
 
 var msg55 = msg("reverseproxy:17", all2);
 
-var part59 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] No signature found, cookie: '), Field(fld5,false)}"
-match("MESSAGE#55:reverseproxy:18", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] No signature found, cookie: %{fld5}", processor_chain([
+var part59 = match("MESSAGE#55:reverseproxy:18", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] No signature found, cookie: %{fld5}", processor_chain([
 	dup4,
 	dup22,
 	dup2,
@@ -917,8 +853,7 @@ match("MESSAGE#55:reverseproxy:18", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg56 = msg("reverseproxy:18", part59);
 
-var part60 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] '), Field(disposition,true), Constant(' ''), Field(fld5,false), Constant('' from request due to missing/invalid signature')}"
-match("MESSAGE#56:reverseproxy:19", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] %{disposition->} '%{fld5}' from request due to missing/invalid signature", processor_chain([
+var part60 = match("MESSAGE#56:reverseproxy:19", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] %{disposition->} '%{fld5}' from request due to missing/invalid signature", processor_chain([
 	dup23,
 	dup22,
 	dup2,
@@ -927,8 +862,7 @@ match("MESSAGE#56:reverseproxy:19", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg57 = msg("reverseproxy:19", part60);
 
-var part61 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ModSecurity: Warning. '), Field(rulename,true), Constant(' [file "'), Field(filename,false), Constant('"] [line "'), Field(fld5,false), Constant('"] [id "'), Field(rule,false), Constant('"] [msg "'), Field(comments,false), Constant('"] [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#57:reverseproxy:20", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"] [msg \"%{comments}\"] [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
+var part61 = match("MESSAGE#57:reverseproxy:20", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"] [msg \"%{comments}\"] [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
 	dup21,
 	dup2,
 	dup3,
@@ -936,8 +870,7 @@ match("MESSAGE#57:reverseproxy:20", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg58 = msg("reverseproxy:20", part61);
 
-var part62 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH01909: '), Field(daddr,false), Constant(':'), Field(dport,false), Constant(':'), Field(fld5,true), Constant(' server certificate does NOT include an ID which matches the server name')}"
-match("MESSAGE#58:reverseproxy:21", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH01909: %{daddr}:%{dport}:%{fld5->} server certificate does NOT include an ID which matches the server name", processor_chain([
+var part62 = match("MESSAGE#58:reverseproxy:21", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH01909: %{daddr}:%{dport}:%{fld5->} server certificate does NOT include an ID which matches the server name", processor_chain([
 	dup20,
 	dup18,
 	setc("event_id","AH01909"),
@@ -947,8 +880,7 @@ match("MESSAGE#58:reverseproxy:21", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg59 = msg("reverseproxy:21", part62);
 
-var part63 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH01915: Init: ('), Field(daddr,false), Constant(':'), Field(dport,false), Constant(') You configured '), Field(network_service,false), Constant('('), Field(fld5,false), Constant(') on the '), Field(fld6,false), Constant('('), Field(fld7,false), Constant(') port!')}"
-match("MESSAGE#59:reverseproxy:22", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH01915: Init: (%{daddr}:%{dport}) You configured %{network_service}(%{fld5}) on the %{fld6}(%{fld7}) port!", processor_chain([
+var part63 = match("MESSAGE#59:reverseproxy:22", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH01915: Init: (%{daddr}:%{dport}) You configured %{network_service}(%{fld5}) on the %{fld6}(%{fld7}) port!", processor_chain([
 	dup20,
 	setc("comments","Invalid port configuration"),
 	dup2,
@@ -957,8 +889,7 @@ match("MESSAGE#59:reverseproxy:22", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg60 = msg("reverseproxy:22", part63);
 
-var part64 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ModSecurity: Rule '), Field(rulename,true), Constant(' [id "'), Field(rule,false), Constant('"][file "'), Field(filename,false), Constant('"][line "'), Field(fld5,false), Constant('"] - Execution error - PCRE limits exceeded ('), Field(fld6,false), Constant('): ('), Field(fld7,false), Constant('). [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#60:reverseproxy:23", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Rule %{rulename->} [id \"%{rule}\"][file \"%{filename}\"][line \"%{fld5}\"] - Execution error - PCRE limits exceeded (%{fld6}): (%{fld7}). [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
+var part64 = match("MESSAGE#60:reverseproxy:23", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: Rule %{rulename->} [id \"%{rule}\"][file \"%{filename}\"][line \"%{fld5}\"] - Execution error - PCRE limits exceeded (%{fld6}): (%{fld7}). [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
 	dup21,
 	dup2,
 	dup3,
@@ -966,8 +897,7 @@ match("MESSAGE#60:reverseproxy:23", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg61 = msg("reverseproxy:23", part64);
 
-var part65 = // "Pattern{Constant('rManage\\x22,\\x22manageLiveSystemSettings\\x22,\\x22accessViewJobs\\x22,\\x22exportList\\..."] [ver "'), Field(policyname,false), Constant('"] [maturity "'), Field(fld3,false), Constant('"] [accuracy "'), Field(fld4,false), Constant('"] '), Field(context,true), Constant(' [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#61:reverseproxy:24", "nwparser.payload", "rManage\\\\x22,\\\\x22manageLiveSystemSettings\\\\x22,\\\\x22accessViewJobs\\\\x22,\\\\x22exportList\\\\...\"] [ver \"%{policyname}\"] [maturity \"%{fld3}\"] [accuracy \"%{fld4}\"] %{context->} [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
+var part65 = match("MESSAGE#61:reverseproxy:24", "nwparser.payload", "rManage\\\\x22,\\\\x22manageLiveSystemSettings\\\\x22,\\\\x22accessViewJobs\\\\x22,\\\\x22exportList\\\\...\"] [ver \"%{policyname}\"] [maturity \"%{fld3}\"] [accuracy \"%{fld4}\"] %{context->} [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
 	dup21,
 	dup2,
 	dup3,
@@ -975,8 +905,7 @@ match("MESSAGE#61:reverseproxy:24", "nwparser.payload", "rManage\\\\x22,\\\\x22m
 
 var msg62 = msg("reverseproxy:24", part65);
 
-var part66 = // "Pattern{Constant('ARGS:userPermissions: [\\x22dashletAccessAlertingRecentAlertsPanel\\x22,\\x22dashletAccessAlerterTopAlertsDashlet\\x22,\\x22accessViewRules\\x22,\\x22deployLiveResources\\x22,\\x22vi..."] [severity [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#62:reverseproxy:25", "nwparser.payload", "ARGS:userPermissions: [\\\\x22dashletAccessAlertingRecentAlertsPanel\\\\x22,\\\\x22dashletAccessAlerterTopAlertsDashlet\\\\x22,\\\\x22accessViewRules\\\\x22,\\\\x22deployLiveResources\\\\x22,\\\\x22vi...\"] [severity [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
+var part66 = match("MESSAGE#62:reverseproxy:25", "nwparser.payload", "ARGS:userPermissions: [\\\\x22dashletAccessAlertingRecentAlertsPanel\\\\x22,\\\\x22dashletAccessAlerterTopAlertsDashlet\\\\x22,\\\\x22accessViewRules\\\\x22,\\\\x22deployLiveResources\\\\x22,\\\\x22vi...\"] [severity [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]", processor_chain([
 	dup21,
 	dup2,
 	dup3,
@@ -984,33 +913,27 @@ match("MESSAGE#62:reverseproxy:25", "nwparser.payload", "ARGS:userPermissions: [
 
 var msg63 = msg("reverseproxy:25", part66);
 
-var part67 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ModSecurity: '), Field(disposition,true), Constant(' with code '), Field(resultcode,true), Constant(' ('), Field(fld5,false), Constant('). '), Field(rulename,true), Constant(' [file "'), Field(filename,false), Constant('"] [line "'), Field(fld6,false), Constant('"] [id "'), Field(rule,false), Constant('"]'), Field(p0,false)}"
-match("MESSAGE#63:reverseproxy:26/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: %{disposition->} with code %{resultcode->} (%{fld5}). %{rulename->} [file \"%{filename}\"] [line \"%{fld6}\"] [id \"%{rule}\"]%{p0}");
+var part67 = match("MESSAGE#63:reverseproxy:26/0", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] ModSecurity: %{disposition->} with code %{resultcode->} (%{fld5}). %{rulename->} [file \"%{filename}\"] [line \"%{fld6}\"] [id \"%{rule}\"]%{p0}");
 
-var part68 = // "Pattern{Constant(' [rev "'), Field(fld7,false), Constant('"]'), Field(p0,false)}"
-match("MESSAGE#63:reverseproxy:26/1_0", "nwparser.p0", " [rev \"%{fld7}\"]%{p0}");
+var part68 = match("MESSAGE#63:reverseproxy:26/1_0", "nwparser.p0", " [rev \"%{fld7}\"]%{p0}");
 
 var select6 = linear_select([
 	part68,
 	dup19,
 ]);
 
-var part69 = // "Pattern{Field(,false), Constant('[msg "'), Field(comments,false), Constant('"] [data "Last Matched Data: '), Field(p0,false)}"
-match("MESSAGE#63:reverseproxy:26/2", "nwparser.p0", "%{}[msg \"%{comments}\"] [data \"Last Matched Data: %{p0}");
+var part69 = match("MESSAGE#63:reverseproxy:26/2", "nwparser.p0", "%{}[msg \"%{comments}\"] [data \"Last Matched Data: %{p0}");
 
-var part70 = // "Pattern{Field(daddr,false), Constant(':'), Field(dport,false), Constant('"] [hostname "'), Field(p0,false)}"
-match("MESSAGE#63:reverseproxy:26/3_0", "nwparser.p0", "%{daddr}:%{dport}\"] [hostname \"%{p0}");
+var part70 = match("MESSAGE#63:reverseproxy:26/3_0", "nwparser.p0", "%{daddr}:%{dport}\"] [hostname \"%{p0}");
 
-var part71 = // "Pattern{Field(daddr,false), Constant('"] [hostname "'), Field(p0,false)}"
-match("MESSAGE#63:reverseproxy:26/3_1", "nwparser.p0", "%{daddr}\"] [hostname \"%{p0}");
+var part71 = match("MESSAGE#63:reverseproxy:26/3_1", "nwparser.p0", "%{daddr}\"] [hostname \"%{p0}");
 
 var select7 = linear_select([
 	part70,
 	part71,
 ]);
 
-var part72 = // "Pattern{Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]')}"
-match("MESSAGE#63:reverseproxy:26/4", "nwparser.p0", "%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]");
+var part72 = match("MESSAGE#63:reverseproxy:26/4", "nwparser.p0", "%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]");
 
 var all3 = all_match({
 	processors: [
@@ -1029,8 +952,7 @@ var all3 = all_match({
 
 var msg64 = msg("reverseproxy:26", all3);
 
-var part73 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] '), Field(disposition,true), Constant(' while reading reply from cssd, referer: '), Field(web_referer,false)}"
-match("MESSAGE#64:reverseproxy:27", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] %{disposition->} while reading reply from cssd, referer: %{web_referer}", processor_chain([
+var part73 = match("MESSAGE#64:reverseproxy:27", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] %{disposition->} while reading reply from cssd, referer: %{web_referer}", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1038,8 +960,7 @@ match("MESSAGE#64:reverseproxy:27", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg65 = msg("reverseproxy:27", part73);
 
-var part74 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] virus daemon error found in request '), Field(web_root,false), Constant(', referer: '), Field(web_referer,false)}"
-match("MESSAGE#65:reverseproxy:28", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon error found in request %{web_root}, referer: %{web_referer}", processor_chain([
+var part74 = match("MESSAGE#65:reverseproxy:28", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon error found in request %{web_root}, referer: %{web_referer}", processor_chain([
 	dup26,
 	setc("result","virus daemon error"),
 	dup2,
@@ -1048,8 +969,7 @@ match("MESSAGE#65:reverseproxy:28", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg66 = msg("reverseproxy:28", part74);
 
-var part75 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] mod_avscan_input_filter: virus found, referer: '), Field(web_referer,false)}"
-match("MESSAGE#66:reverseproxy:29", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] mod_avscan_input_filter: virus found, referer: %{web_referer}", processor_chain([
+var part75 = match("MESSAGE#66:reverseproxy:29", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] mod_avscan_input_filter: virus found, referer: %{web_referer}", processor_chain([
 	dup27,
 	setc("result","virus found"),
 	dup2,
@@ -1058,8 +978,7 @@ match("MESSAGE#66:reverseproxy:29", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg67 = msg("reverseproxy:29", part75);
 
-var part76 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] (13)'), Field(result,false), Constant(': [client '), Field(gateway,false), Constant('] AH01095: prefetch request body failed to '), Field(saddr,false), Constant(':'), Field(sport,true), Constant(' ('), Field(fld5,false), Constant(') from '), Field(fld6,true), Constant(' (), referer: '), Field(web_referer,false)}"
-match("MESSAGE#67:reverseproxy:30", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (13)%{result}: [client %{gateway}] AH01095: prefetch request body failed to %{saddr}:%{sport->} (%{fld5}) from %{fld6->} (), referer: %{web_referer}", processor_chain([
+var part76 = match("MESSAGE#67:reverseproxy:30", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (13)%{result}: [client %{gateway}] AH01095: prefetch request body failed to %{saddr}:%{sport->} (%{fld5}) from %{fld6->} (), referer: %{web_referer}", processor_chain([
 	dup24,
 	dup28,
 	dup2,
@@ -1068,8 +987,7 @@ match("MESSAGE#67:reverseproxy:30", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg68 = msg("reverseproxy:30", part76);
 
-var part77 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] cannot read reply: Operation now in progress (115), referer: '), Field(web_referer,false)}"
-match("MESSAGE#68:reverseproxy:31", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot read reply: Operation now in progress (115), referer: %{web_referer}", processor_chain([
+var part77 = match("MESSAGE#68:reverseproxy:31", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot read reply: Operation now in progress (115), referer: %{web_referer}", processor_chain([
 	dup25,
 	setc("result","Cannot read reply"),
 	dup2,
@@ -1078,8 +996,7 @@ match("MESSAGE#68:reverseproxy:31", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg69 = msg("reverseproxy:31", part77);
 
-var part78 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] cannot connect: '), Field(result,true), Constant(' (111), referer: '), Field(web_referer,false)}"
-match("MESSAGE#69:reverseproxy:32", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot connect: %{result->} (111), referer: %{web_referer}", processor_chain([
+var part78 = match("MESSAGE#69:reverseproxy:32", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot connect: %{result->} (111), referer: %{web_referer}", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1087,8 +1004,7 @@ match("MESSAGE#69:reverseproxy:32", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg70 = msg("reverseproxy:32", part78);
 
-var part79 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] cannot connect: '), Field(result,true), Constant(' (111)')}"
-match("MESSAGE#70:reverseproxy:33", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot connect: %{result->} (111)", processor_chain([
+var part79 = match("MESSAGE#70:reverseproxy:33", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] cannot connect: %{result->} (111)", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1096,8 +1012,7 @@ match("MESSAGE#70:reverseproxy:33", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg71 = msg("reverseproxy:33", part79);
 
-var part80 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] virus daemon connection problem found in request '), Field(url,false), Constant(', referer: '), Field(web_referer,false)}"
-match("MESSAGE#71:reverseproxy:34", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon connection problem found in request %{url}, referer: %{web_referer}", processor_chain([
+var part80 = match("MESSAGE#71:reverseproxy:34", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon connection problem found in request %{url}, referer: %{web_referer}", processor_chain([
 	dup26,
 	dup29,
 	dup2,
@@ -1106,8 +1021,7 @@ match("MESSAGE#71:reverseproxy:34", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg72 = msg("reverseproxy:34", part80);
 
-var part81 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] virus daemon connection problem found in request '), Field(url,false)}"
-match("MESSAGE#72:reverseproxy:35", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon connection problem found in request %{url}", processor_chain([
+var part81 = match("MESSAGE#72:reverseproxy:35", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] virus daemon connection problem found in request %{url}", processor_chain([
 	dup26,
 	dup29,
 	dup2,
@@ -1116,8 +1030,7 @@ match("MESSAGE#72:reverseproxy:35", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg73 = msg("reverseproxy:35", part81);
 
-var part82 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] mod_avscan_input_filter: virus found')}"
-match("MESSAGE#73:reverseproxy:36", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] mod_avscan_input_filter: virus found", processor_chain([
+var part82 = match("MESSAGE#73:reverseproxy:36", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] mod_avscan_input_filter: virus found", processor_chain([
 	dup27,
 	setc("result","Virus found"),
 	dup2,
@@ -1126,8 +1039,7 @@ match("MESSAGE#73:reverseproxy:36", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg74 = msg("reverseproxy:36", part82);
 
-var part83 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] (13)'), Field(result,false), Constant(': [client '), Field(gateway,false), Constant('] AH01095: prefetch request body failed to '), Field(saddr,false), Constant(':'), Field(sport,true), Constant(' ('), Field(fld5,false), Constant(') from '), Field(fld6,true), Constant(' ()')}"
-match("MESSAGE#74:reverseproxy:37", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (13)%{result}: [client %{gateway}] AH01095: prefetch request body failed to %{saddr}:%{sport->} (%{fld5}) from %{fld6->} ()", processor_chain([
+var part83 = match("MESSAGE#74:reverseproxy:37", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (13)%{result}: [client %{gateway}] AH01095: prefetch request body failed to %{saddr}:%{sport->} (%{fld5}) from %{fld6->} ()", processor_chain([
 	dup24,
 	dup28,
 	dup2,
@@ -1136,8 +1048,7 @@ match("MESSAGE#74:reverseproxy:37", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg75 = msg("reverseproxy:37", part83);
 
-var part84 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] Invalid signature, cookie: JSESSIONID')}"
-match("MESSAGE#75:reverseproxy:38", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] Invalid signature, cookie: JSESSIONID", processor_chain([
+var part84 = match("MESSAGE#75:reverseproxy:38", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] Invalid signature, cookie: JSESSIONID", processor_chain([
 	dup25,
 	dup2,
 	dup3,
@@ -1145,8 +1056,7 @@ match("MESSAGE#75:reverseproxy:38", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg76 = msg("reverseproxy:38", part84);
 
-var part85 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] Form validation failed: Received unhardened form data, referer: '), Field(web_referer,false)}"
-match("MESSAGE#76:reverseproxy:39", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] Form validation failed: Received unhardened form data, referer: %{web_referer}", processor_chain([
+var part85 = match("MESSAGE#76:reverseproxy:39", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] Form validation failed: Received unhardened form data, referer: %{web_referer}", processor_chain([
 	dup23,
 	setc("result","Form validation failed"),
 	dup2,
@@ -1155,8 +1065,7 @@ match("MESSAGE#76:reverseproxy:39", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg77 = msg("reverseproxy:39", part85);
 
-var part86 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] sending trickle failed: 103')}"
-match("MESSAGE#77:reverseproxy:40", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] sending trickle failed: 103", processor_chain([
+var part86 = match("MESSAGE#77:reverseproxy:40", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] sending trickle failed: 103", processor_chain([
 	dup25,
 	setc("result","Sending trickle failed"),
 	dup2,
@@ -1165,8 +1074,7 @@ match("MESSAGE#77:reverseproxy:40", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg78 = msg("reverseproxy:40", part86);
 
-var part87 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] client requesting '), Field(web_root,true), Constant(' has '), Field(disposition,false)}"
-match("MESSAGE#78:reverseproxy:41", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] client requesting %{web_root->} has %{disposition}", processor_chain([
+var part87 = match("MESSAGE#78:reverseproxy:41", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] client requesting %{web_root->} has %{disposition}", processor_chain([
 	dup30,
 	dup2,
 	dup3,
@@ -1174,8 +1082,7 @@ match("MESSAGE#78:reverseproxy:41", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg79 = msg("reverseproxy:41", part87);
 
-var part88 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] mod_avscan_check_file_single_part() called with parameter filename='), Field(filename,false)}"
-match("MESSAGE#79:reverseproxy:42", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] mod_avscan_check_file_single_part() called with parameter filename=%{filename}", processor_chain([
+var part88 = match("MESSAGE#79:reverseproxy:42", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] mod_avscan_check_file_single_part() called with parameter filename=%{filename}", processor_chain([
 	setc("eventcategory","1603050000"),
 	dup2,
 	dup3,
@@ -1183,8 +1090,7 @@ match("MESSAGE#79:reverseproxy:42", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg80 = msg("reverseproxy:42", part88);
 
-var part89 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] (70007)The '), Field(disposition,true), Constant(' specified has expired: [client '), Field(gateway,false), Constant('] AH01110: error reading response')}"
-match("MESSAGE#80:reverseproxy:43", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (70007)The %{disposition->} specified has expired: [client %{gateway}] AH01110: error reading response", processor_chain([
+var part89 = match("MESSAGE#80:reverseproxy:43", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (70007)The %{disposition->} specified has expired: [client %{gateway}] AH01110: error reading response", processor_chain([
 	dup30,
 	setc("event_id","AH01110"),
 	setc("result","Error reading response"),
@@ -1194,8 +1100,7 @@ match("MESSAGE#80:reverseproxy:43", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg81 = msg("reverseproxy:43", part89);
 
-var part90 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] (22)'), Field(result,false), Constant(': [client '), Field(gateway,false), Constant('] No form context found when parsing '), Field(fld5,true), Constant(' tag, referer: '), Field(web_referer,false)}"
-match("MESSAGE#81:reverseproxy:44", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (22)%{result}: [client %{gateway}] No form context found when parsing %{fld5->} tag, referer: %{web_referer}", processor_chain([
+var part90 = match("MESSAGE#81:reverseproxy:44", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (22)%{result}: [client %{gateway}] No form context found when parsing %{fld5->} tag, referer: %{web_referer}", processor_chain([
 	setc("eventcategory","1601020000"),
 	setc("result","No form context found"),
 	dup2,
@@ -1204,8 +1109,7 @@ match("MESSAGE#81:reverseproxy:44", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg82 = msg("reverseproxy:44", part90);
 
-var part91 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] (111)'), Field(result,false), Constant(': AH00957: '), Field(network_service,false), Constant(': attempt to connect to '), Field(daddr,false), Constant(':'), Field(dport,true), Constant(' ('), Field(fld5,false), Constant(') failed')}"
-match("MESSAGE#82:reverseproxy:45", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (111)%{result}: AH00957: %{network_service}: attempt to connect to %{daddr}:%{dport->} (%{fld5}) failed", processor_chain([
+var part91 = match("MESSAGE#82:reverseproxy:45", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] (111)%{result}: AH00957: %{network_service}: attempt to connect to %{daddr}:%{dport->} (%{fld5}) failed", processor_chain([
 	dup25,
 	setc("event_id","AH00957"),
 	dup2,
@@ -1214,8 +1118,7 @@ match("MESSAGE#82:reverseproxy:45", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg83 = msg("reverseproxy:45", part91);
 
-var part92 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] AH00959: ap_proxy_connect_backend disabling worker for ('), Field(daddr,false), Constant(') for '), Field(processing_time,false), Constant('s')}"
-match("MESSAGE#83:reverseproxy:46", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00959: ap_proxy_connect_backend disabling worker for (%{daddr}) for %{processing_time}s", processor_chain([
+var part92 = match("MESSAGE#83:reverseproxy:46", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] AH00959: ap_proxy_connect_backend disabling worker for (%{daddr}) for %{processing_time}s", processor_chain([
 	dup16,
 	setc("event_id","AH00959"),
 	setc("result","disabling worker"),
@@ -1225,8 +1128,7 @@ match("MESSAGE#83:reverseproxy:46", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg84 = msg("reverseproxy:46", part92);
 
-var part93 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ['), Field(fld5,false), Constant('] not all the file sent to the client: '), Field(fld6,false), Constant(', referer: '), Field(web_referer,false)}"
-match("MESSAGE#84:reverseproxy:47", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] not all the file sent to the client: %{fld6}, referer: %{web_referer}", processor_chain([
+var part93 = match("MESSAGE#84:reverseproxy:47", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] [%{fld5}] not all the file sent to the client: %{fld6}, referer: %{web_referer}", processor_chain([
 	setc("eventcategory","1801000000"),
 	setc("context","Not all file sent to client"),
 	dup2,
@@ -1235,8 +1137,7 @@ match("MESSAGE#84:reverseproxy:47", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg85 = msg("reverseproxy:47", part93);
 
-var part94 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] AH01114: '), Field(network_service,false), Constant(': failed to make connection to backend: '), Field(daddr,false), Constant(', referer: '), Field(web_referer,false)}"
-match("MESSAGE#85:reverseproxy:48", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] AH01114: %{network_service}: failed to make connection to backend: %{daddr}, referer: %{web_referer}", processor_chain([
+var part94 = match("MESSAGE#85:reverseproxy:48", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] AH01114: %{network_service}: failed to make connection to backend: %{daddr}, referer: %{web_referer}", processor_chain([
 	dup25,
 	dup31,
 	dup32,
@@ -1246,8 +1147,7 @@ match("MESSAGE#85:reverseproxy:48", "nwparser.payload", "[%{fld3}] [%{event_log}
 
 var msg86 = msg("reverseproxy:48", part94);
 
-var part95 = // "Pattern{Constant('['), Field(fld3,false), Constant('] ['), Field(event_log,false), Constant(':'), Field(severity,false), Constant('] [pid '), Field(process_id,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] AH01114: '), Field(network_service,false), Constant(': failed to make connection to backend: '), Field(daddr,false)}"
-match("MESSAGE#86:reverseproxy:49", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] AH01114: %{network_service}: failed to make connection to backend: %{daddr}", processor_chain([
+var part95 = match("MESSAGE#86:reverseproxy:49", "nwparser.payload", "[%{fld3}] [%{event_log}:%{severity}] [pid %{process_id}:%{fld4}] [client %{gateway}] AH01114: %{network_service}: failed to make connection to backend: %{daddr}", processor_chain([
 	dup25,
 	dup31,
 	dup32,
@@ -1376,8 +1276,7 @@ var part98 = tagval("MESSAGE#89:confd:01", "nwparser.payload", tvm, {
 
 var msg90 = msg("confd:01", part98);
 
-var part99 = // "Pattern{Constant('Frox started'), Field(,false)}"
-match("MESSAGE#90:frox", "nwparser.payload", "Frox started%{}", processor_chain([
+var part99 = match("MESSAGE#90:frox", "nwparser.payload", "Frox started%{}", processor_chain([
 	dup12,
 	setc("event_description","frox:FTP Proxy Frox started."),
 	dup11,
@@ -1386,8 +1285,7 @@ match("MESSAGE#90:frox", "nwparser.payload", "Frox started%{}", processor_chain(
 
 var msg91 = msg("frox", part99);
 
-var part100 = // "Pattern{Constant('Listening on '), Field(saddr,false), Constant(':'), Field(sport,false)}"
-match("MESSAGE#91:frox:01", "nwparser.payload", "Listening on %{saddr}:%{sport}", processor_chain([
+var part100 = match("MESSAGE#91:frox:01", "nwparser.payload", "Listening on %{saddr}:%{sport}", processor_chain([
 	dup12,
 	setc("event_description","frox:FTP Proxy listening on port."),
 	dup11,
@@ -1396,8 +1294,7 @@ match("MESSAGE#91:frox:01", "nwparser.payload", "Listening on %{saddr}:%{sport}"
 
 var msg92 = msg("frox:01", part100);
 
-var part101 = // "Pattern{Constant('Dropped privileges'), Field(,false)}"
-match("MESSAGE#92:frox:02", "nwparser.payload", "Dropped privileges%{}", processor_chain([
+var part101 = match("MESSAGE#92:frox:02", "nwparser.payload", "Dropped privileges%{}", processor_chain([
 	dup12,
 	setc("event_description","frox:FTP Proxy dropped priveleges."),
 	dup11,
@@ -1412,8 +1309,7 @@ var select9 = linear_select([
 	msg93,
 ]);
 
-var part102 = // "Pattern{Constant('Classifier configuration reloaded successfully'), Field(,false)}"
-match("MESSAGE#93:afcd", "nwparser.payload", "Classifier configuration reloaded successfully%{}", processor_chain([
+var part102 = match("MESSAGE#93:afcd", "nwparser.payload", "Classifier configuration reloaded successfully%{}", processor_chain([
 	dup12,
 	setc("event_description","afcd: IM/P2P Classifier configuration reloaded successfully."),
 	dup11,
@@ -1422,8 +1318,7 @@ match("MESSAGE#93:afcd", "nwparser.payload", "Classifier configuration reloaded 
 
 var msg94 = msg("afcd", part102);
 
-var part103 = // "Pattern{Constant('Starting strongSwan '), Field(fld2,true), Constant(' IPsec [starter]...')}"
-match("MESSAGE#94:ipsec_starter", "nwparser.payload", "Starting strongSwan %{fld2->} IPsec [starter]...", processor_chain([
+var part103 = match("MESSAGE#94:ipsec_starter", "nwparser.payload", "Starting strongSwan %{fld2->} IPsec [starter]...", processor_chain([
 	dup12,
 	setc("event_description","ipsec_starter: Starting strongSwan 4.2.3 IPsec [starter]..."),
 	dup11,
@@ -1432,8 +1327,7 @@ match("MESSAGE#94:ipsec_starter", "nwparser.payload", "Starting strongSwan %{fld
 
 var msg95 = msg("ipsec_starter", part103);
 
-var part104 = // "Pattern{Constant('IP address or index of physical interface changed -> reinit of ipsec interface'), Field(,false)}"
-match("MESSAGE#95:ipsec_starter:01", "nwparser.payload", "IP address or index of physical interface changed -> reinit of ipsec interface%{}", processor_chain([
+var part104 = match("MESSAGE#95:ipsec_starter:01", "nwparser.payload", "IP address or index of physical interface changed -> reinit of ipsec interface%{}", processor_chain([
 	dup12,
 	setc("event_description","ipsec_starter: IP address or index of physical interface changed."),
 	dup11,
@@ -1447,8 +1341,7 @@ var select10 = linear_select([
 	msg96,
 ]);
 
-var part105 = // "Pattern{Constant('Starting Pluto ('), Field(info,false), Constant(')')}"
-match("MESSAGE#96:pluto", "nwparser.payload", "Starting Pluto (%{info})", processor_chain([
+var part105 = match("MESSAGE#96:pluto", "nwparser.payload", "Starting Pluto (%{info})", processor_chain([
 	dup12,
 	setc("event_description","pluto: Starting Pluto."),
 	dup11,
@@ -1457,8 +1350,7 @@ match("MESSAGE#96:pluto", "nwparser.payload", "Starting Pluto (%{info})", proces
 
 var msg97 = msg("pluto", part105);
 
-var part106 = // "Pattern{Constant('including NAT-Traversal patch ('), Field(info,false), Constant(')')}"
-match("MESSAGE#97:pluto:01", "nwparser.payload", "including NAT-Traversal patch (%{info})", processor_chain([
+var part106 = match("MESSAGE#97:pluto:01", "nwparser.payload", "including NAT-Traversal patch (%{info})", processor_chain([
 	dup12,
 	setc("event_description","pluto: including NAT-Traversal patch."),
 	dup11,
@@ -1467,8 +1359,7 @@ match("MESSAGE#97:pluto:01", "nwparser.payload", "including NAT-Traversal patch 
 
 var msg98 = msg("pluto:01", part106);
 
-var part107 = // "Pattern{Constant('ike_alg: Activating '), Field(info,true), Constant(' encryption: Ok')}"
-match("MESSAGE#98:pluto:02", "nwparser.payload", "ike_alg: Activating %{info->} encryption: Ok", processor_chain([
+var part107 = match("MESSAGE#98:pluto:02", "nwparser.payload", "ike_alg: Activating %{info->} encryption: Ok", processor_chain([
 	dup33,
 	setc("event_description","pluto: Activating encryption algorithm."),
 	dup11,
@@ -1477,8 +1368,7 @@ match("MESSAGE#98:pluto:02", "nwparser.payload", "ike_alg: Activating %{info->} 
 
 var msg99 = msg("pluto:02", part107);
 
-var part108 = // "Pattern{Constant('ike_alg: Activating '), Field(info,true), Constant(' hash: Ok')}"
-match("MESSAGE#99:pluto:03", "nwparser.payload", "ike_alg: Activating %{info->} hash: Ok", processor_chain([
+var part108 = match("MESSAGE#99:pluto:03", "nwparser.payload", "ike_alg: Activating %{info->} hash: Ok", processor_chain([
 	dup33,
 	setc("event_description","pluto: Activating hash algorithm."),
 	dup11,
@@ -1487,8 +1377,7 @@ match("MESSAGE#99:pluto:03", "nwparser.payload", "ike_alg: Activating %{info->} 
 
 var msg100 = msg("pluto:03", part108);
 
-var part109 = // "Pattern{Constant('Testing registered IKE encryption algorithms:'), Field(,false)}"
-match("MESSAGE#100:pluto:04", "nwparser.payload", "Testing registered IKE encryption algorithms:%{}", processor_chain([
+var part109 = match("MESSAGE#100:pluto:04", "nwparser.payload", "Testing registered IKE encryption algorithms:%{}", processor_chain([
 	dup12,
 	setc("event_description","pluto: Testing registered IKE encryption algorithms"),
 	dup11,
@@ -1497,8 +1386,7 @@ match("MESSAGE#100:pluto:04", "nwparser.payload", "Testing registered IKE encryp
 
 var msg101 = msg("pluto:04", part109);
 
-var part110 = // "Pattern{Field(info,true), Constant(' self-test not available')}"
-match("MESSAGE#101:pluto:05", "nwparser.payload", "%{info->} self-test not available", processor_chain([
+var part110 = match("MESSAGE#101:pluto:05", "nwparser.payload", "%{info->} self-test not available", processor_chain([
 	dup12,
 	setc("event_description","pluto: Algorithm self-test not available."),
 	dup11,
@@ -1507,8 +1395,7 @@ match("MESSAGE#101:pluto:05", "nwparser.payload", "%{info->} self-test not avail
 
 var msg102 = msg("pluto:05", part110);
 
-var part111 = // "Pattern{Field(info,true), Constant(' self-test passed')}"
-match("MESSAGE#102:pluto:06", "nwparser.payload", "%{info->} self-test passed", processor_chain([
+var part111 = match("MESSAGE#102:pluto:06", "nwparser.payload", "%{info->} self-test passed", processor_chain([
 	dup12,
 	setc("event_description","pluto: Algorithm self-test passed."),
 	dup11,
@@ -1517,8 +1404,7 @@ match("MESSAGE#102:pluto:06", "nwparser.payload", "%{info->} self-test passed", 
 
 var msg103 = msg("pluto:06", part111);
 
-var part112 = // "Pattern{Constant('Using KLIPS IPsec interface code'), Field(,false)}"
-match("MESSAGE#103:pluto:07", "nwparser.payload", "Using KLIPS IPsec interface code%{}", processor_chain([
+var part112 = match("MESSAGE#103:pluto:07", "nwparser.payload", "Using KLIPS IPsec interface code%{}", processor_chain([
 	dup12,
 	setc("event_description","pluto: Using KLIPS IPsec interface code"),
 	dup11,
@@ -1527,8 +1413,7 @@ match("MESSAGE#103:pluto:07", "nwparser.payload", "Using KLIPS IPsec interface c
 
 var msg104 = msg("pluto:07", part112);
 
-var part113 = // "Pattern{Constant('adding interface '), Field(interface,true), Constant(' '), Field(saddr,false), Constant(':'), Field(sport,false)}"
-match("MESSAGE#104:pluto:08", "nwparser.payload", "adding interface %{interface->} %{saddr}:%{sport}", processor_chain([
+var part113 = match("MESSAGE#104:pluto:08", "nwparser.payload", "adding interface %{interface->} %{saddr}:%{sport}", processor_chain([
 	dup12,
 	setc("event_description","pluto: adding interface"),
 	dup11,
@@ -1537,8 +1422,7 @@ match("MESSAGE#104:pluto:08", "nwparser.payload", "adding interface %{interface-
 
 var msg105 = msg("pluto:08", part113);
 
-var part114 = // "Pattern{Constant('loading secrets from "'), Field(filename,false), Constant('"')}"
-match("MESSAGE#105:pluto:09", "nwparser.payload", "loading secrets from \"%{filename}\"", processor_chain([
+var part114 = match("MESSAGE#105:pluto:09", "nwparser.payload", "loading secrets from \"%{filename}\"", processor_chain([
 	dup34,
 	setc("event_description","pluto: loading secrets"),
 	dup11,
@@ -1547,8 +1431,7 @@ match("MESSAGE#105:pluto:09", "nwparser.payload", "loading secrets from \"%{file
 
 var msg106 = msg("pluto:09", part114);
 
-var part115 = // "Pattern{Constant('loaded private key file ''), Field(filename,false), Constant('' ('), Field(filename_size,true), Constant(' bytes)')}"
-match("MESSAGE#106:pluto:10", "nwparser.payload", "loaded private key file '%{filename}' (%{filename_size->} bytes)", processor_chain([
+var part115 = match("MESSAGE#106:pluto:10", "nwparser.payload", "loaded private key file '%{filename}' (%{filename_size->} bytes)", processor_chain([
 	dup34,
 	setc("event_description","pluto: loaded private key file"),
 	dup11,
@@ -1557,8 +1440,7 @@ match("MESSAGE#106:pluto:10", "nwparser.payload", "loaded private key file '%{fi
 
 var msg107 = msg("pluto:10", part115);
 
-var part116 = // "Pattern{Constant('added connection description "'), Field(fld2,false), Constant('"')}"
-match("MESSAGE#107:pluto:11", "nwparser.payload", "added connection description \"%{fld2}\"", processor_chain([
+var part116 = match("MESSAGE#107:pluto:11", "nwparser.payload", "added connection description \"%{fld2}\"", processor_chain([
 	dup12,
 	setc("event_description","pluto: added connection description"),
 	dup11,
@@ -1567,8 +1449,7 @@ match("MESSAGE#107:pluto:11", "nwparser.payload", "added connection description 
 
 var msg108 = msg("pluto:11", part116);
 
-var part117 = // "Pattern{Constant('"'), Field(fld2,false), Constant('" #'), Field(fld3,false), Constant(': initiating Main Mode')}"
-match("MESSAGE#108:pluto:12", "nwparser.payload", "\"%{fld2}\" #%{fld3}: initiating Main Mode", processor_chain([
+var part117 = match("MESSAGE#108:pluto:12", "nwparser.payload", "\"%{fld2}\" #%{fld3}: initiating Main Mode", processor_chain([
 	dup12,
 	dup35,
 	dup11,
@@ -1577,8 +1458,7 @@ match("MESSAGE#108:pluto:12", "nwparser.payload", "\"%{fld2}\" #%{fld3}: initiat
 
 var msg109 = msg("pluto:12", part117);
 
-var part118 = // "Pattern{Constant('"'), Field(fld2,false), Constant('" #'), Field(fld3,false), Constant(': max number of retransmissions ('), Field(fld4,false), Constant(') reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message')}"
-match("MESSAGE#109:pluto:13", "nwparser.payload", "\"%{fld2}\" #%{fld3}: max number of retransmissions (%{fld4}) reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message", processor_chain([
+var part118 = match("MESSAGE#109:pluto:13", "nwparser.payload", "\"%{fld2}\" #%{fld3}: max number of retransmissions (%{fld4}) reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message", processor_chain([
 	dup10,
 	dup36,
 	dup11,
@@ -1587,8 +1467,7 @@ match("MESSAGE#109:pluto:13", "nwparser.payload", "\"%{fld2}\" #%{fld3}: max num
 
 var msg110 = msg("pluto:13", part118);
 
-var part119 = // "Pattern{Constant('"'), Field(fld2,false), Constant('" #'), Field(fld3,false), Constant(': starting keying attempt '), Field(fld4,true), Constant(' of an unlimited number')}"
-match("MESSAGE#110:pluto:14", "nwparser.payload", "\"%{fld2}\" #%{fld3}: starting keying attempt %{fld4->} of an unlimited number", processor_chain([
+var part119 = match("MESSAGE#110:pluto:14", "nwparser.payload", "\"%{fld2}\" #%{fld3}: starting keying attempt %{fld4->} of an unlimited number", processor_chain([
 	dup12,
 	dup37,
 	dup11,
@@ -1597,8 +1476,7 @@ match("MESSAGE#110:pluto:14", "nwparser.payload", "\"%{fld2}\" #%{fld3}: startin
 
 var msg111 = msg("pluto:14", part119);
 
-var part120 = // "Pattern{Constant('forgetting secrets'), Field(,false)}"
-match("MESSAGE#111:pluto:15", "nwparser.payload", "forgetting secrets%{}", processor_chain([
+var part120 = match("MESSAGE#111:pluto:15", "nwparser.payload", "forgetting secrets%{}", processor_chain([
 	dup12,
 	setc("event_description","pluto:forgetting secrets"),
 	dup11,
@@ -1607,8 +1485,7 @@ match("MESSAGE#111:pluto:15", "nwparser.payload", "forgetting secrets%{}", proce
 
 var msg112 = msg("pluto:15", part120);
 
-var part121 = // "Pattern{Constant('Changing to directory ''), Field(directory,false), Constant(''')}"
-match("MESSAGE#112:pluto:17", "nwparser.payload", "Changing to directory '%{directory}'", processor_chain([
+var part121 = match("MESSAGE#112:pluto:17", "nwparser.payload", "Changing to directory '%{directory}'", processor_chain([
 	dup12,
 	setc("event_description","pluto:Changing to directory"),
 	dup11,
@@ -1617,8 +1494,7 @@ match("MESSAGE#112:pluto:17", "nwparser.payload", "Changing to directory '%{dire
 
 var msg113 = msg("pluto:17", part121);
 
-var part122 = // "Pattern{Constant('| *time to handle event'), Field(,false)}"
-match("MESSAGE#113:pluto:18", "nwparser.payload", "| *time to handle event%{}", processor_chain([
+var part122 = match("MESSAGE#113:pluto:18", "nwparser.payload", "| *time to handle event%{}", processor_chain([
 	dup12,
 	setc("event_description","pluto:*time to handle event"),
 	dup11,
@@ -1627,8 +1503,7 @@ match("MESSAGE#113:pluto:18", "nwparser.payload", "| *time to handle event%{}", 
 
 var msg114 = msg("pluto:18", part122);
 
-var part123 = // "Pattern{Constant('| *received kernel message'), Field(,false)}"
-match("MESSAGE#114:pluto:19", "nwparser.payload", "| *received kernel message%{}", processor_chain([
+var part123 = match("MESSAGE#114:pluto:19", "nwparser.payload", "| *received kernel message%{}", processor_chain([
 	dup12,
 	setc("event_description","pluto:*received kernel message"),
 	dup11,
@@ -1637,8 +1512,7 @@ match("MESSAGE#114:pluto:19", "nwparser.payload", "| *received kernel message%{}
 
 var msg115 = msg("pluto:19", part123);
 
-var part124 = // "Pattern{Constant('| rejected packet:'), Field(,false)}"
-match("MESSAGE#115:pluto:20", "nwparser.payload", "| rejected packet:%{}", processor_chain([
+var part124 = match("MESSAGE#115:pluto:20", "nwparser.payload", "| rejected packet:%{}", processor_chain([
 	dup25,
 	setc("event_description","pluto:rejected packet"),
 	dup11,
@@ -1647,8 +1521,7 @@ match("MESSAGE#115:pluto:20", "nwparser.payload", "| rejected packet:%{}", proce
 
 var msg116 = msg("pluto:20", part124);
 
-var part125 = // "Pattern{Constant('| next event '), Field(event_type,true), Constant(' in '), Field(fld2,true), Constant(' seconds for #'), Field(fld3,false)}"
-match("MESSAGE#116:pluto:21", "nwparser.payload", "| next event %{event_type->} in %{fld2->} seconds for #%{fld3}", processor_chain([
+var part125 = match("MESSAGE#116:pluto:21", "nwparser.payload", "| next event %{event_type->} in %{fld2->} seconds for #%{fld3}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1656,8 +1529,7 @@ match("MESSAGE#116:pluto:21", "nwparser.payload", "| next event %{event_type->} 
 
 var msg117 = msg("pluto:21", part125);
 
-var part126 = // "Pattern{Constant('| next event '), Field(event_type,true), Constant(' in '), Field(fld2,true), Constant(' seconds')}"
-match("MESSAGE#117:pluto:22", "nwparser.payload", "| next event %{event_type->} in %{fld2->} seconds", processor_chain([
+var part126 = match("MESSAGE#117:pluto:22", "nwparser.payload", "| next event %{event_type->} in %{fld2->} seconds", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1665,8 +1537,7 @@ match("MESSAGE#117:pluto:22", "nwparser.payload", "| next event %{event_type->} 
 
 var msg118 = msg("pluto:22", part126);
 
-var part127 = // "Pattern{Constant('| inserting event '), Field(event_type,true), Constant(' in '), Field(fld2,true), Constant(' seconds for #'), Field(fld3,false)}"
-match("MESSAGE#118:pluto:23", "nwparser.payload", "| inserting event %{event_type->} in %{fld2->} seconds for #%{fld3}", processor_chain([
+var part127 = match("MESSAGE#118:pluto:23", "nwparser.payload", "| inserting event %{event_type->} in %{fld2->} seconds for #%{fld3}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1674,8 +1545,7 @@ match("MESSAGE#118:pluto:23", "nwparser.payload", "| inserting event %{event_typ
 
 var msg119 = msg("pluto:23", part127);
 
-var part128 = // "Pattern{Constant('| event after this is '), Field(event_type,true), Constant(' in '), Field(fld2,true), Constant(' seconds')}"
-match("MESSAGE#119:pluto:24", "nwparser.payload", "| event after this is %{event_type->} in %{fld2->} seconds", processor_chain([
+var part128 = match("MESSAGE#119:pluto:24", "nwparser.payload", "| event after this is %{event_type->} in %{fld2->} seconds", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1683,8 +1553,7 @@ match("MESSAGE#119:pluto:24", "nwparser.payload", "| event after this is %{event
 
 var msg120 = msg("pluto:24", part128);
 
-var part129 = // "Pattern{Constant('| recent '), Field(action,true), Constant(' activity '), Field(fld2,true), Constant(' seconds ago, '), Field(info,false)}"
-match("MESSAGE#120:pluto:25", "nwparser.payload", "| recent %{action->} activity %{fld2->} seconds ago, %{info}", processor_chain([
+var part129 = match("MESSAGE#120:pluto:25", "nwparser.payload", "| recent %{action->} activity %{fld2->} seconds ago, %{info}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1692,8 +1561,7 @@ match("MESSAGE#120:pluto:25", "nwparser.payload", "| recent %{action->} activity
 
 var msg121 = msg("pluto:25", part129);
 
-var part130 = // "Pattern{Constant('| *received '), Field(rbytes,true), Constant(' bytes from '), Field(saddr,false), Constant(':'), Field(sport,true), Constant(' on '), Field(dinterface,false)}"
-match("MESSAGE#121:pluto:26", "nwparser.payload", "| *received %{rbytes->} bytes from %{saddr}:%{sport->} on %{dinterface}", processor_chain([
+var part130 = match("MESSAGE#121:pluto:26", "nwparser.payload", "| *received %{rbytes->} bytes from %{saddr}:%{sport->} on %{dinterface}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1701,8 +1569,7 @@ match("MESSAGE#121:pluto:26", "nwparser.payload", "| *received %{rbytes->} bytes
 
 var msg122 = msg("pluto:26", part130);
 
-var part131 = // "Pattern{Constant('| received '), Field(action,true), Constant(' notification '), Field(msg,true), Constant(' with seqno = '), Field(fld2,false)}"
-match("MESSAGE#122:pluto:27", "nwparser.payload", "| received %{action->} notification %{msg->} with seqno = %{fld2}", processor_chain([
+var part131 = match("MESSAGE#122:pluto:27", "nwparser.payload", "| received %{action->} notification %{msg->} with seqno = %{fld2}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1710,8 +1577,7 @@ match("MESSAGE#122:pluto:27", "nwparser.payload", "| received %{action->} notifi
 
 var msg123 = msg("pluto:27", part131);
 
-var part132 = // "Pattern{Constant('| sent '), Field(action,true), Constant(' notification '), Field(msg,true), Constant(' with seqno = '), Field(fld2,false)}"
-match("MESSAGE#123:pluto:28", "nwparser.payload", "| sent %{action->} notification %{msg->} with seqno = %{fld2}", processor_chain([
+var part132 = match("MESSAGE#123:pluto:28", "nwparser.payload", "| sent %{action->} notification %{msg->} with seqno = %{fld2}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1719,8 +1585,7 @@ match("MESSAGE#123:pluto:28", "nwparser.payload", "| sent %{action->} notificati
 
 var msg124 = msg("pluto:28", part132);
 
-var part133 = // "Pattern{Constant('| inserting event '), Field(event_type,false), Constant(', timeout in '), Field(fld2,true), Constant(' seconds')}"
-match("MESSAGE#124:pluto:29", "nwparser.payload", "| inserting event %{event_type}, timeout in %{fld2->} seconds", processor_chain([
+var part133 = match("MESSAGE#124:pluto:29", "nwparser.payload", "| inserting event %{event_type}, timeout in %{fld2->} seconds", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1728,8 +1593,7 @@ match("MESSAGE#124:pluto:29", "nwparser.payload", "| inserting event %{event_typ
 
 var msg125 = msg("pluto:29", part133);
 
-var part134 = // "Pattern{Constant('| handling event '), Field(event_type,true), Constant(' for '), Field(saddr,true), Constant(' "'), Field(fld2,false), Constant('" #'), Field(fld3,false)}"
-match("MESSAGE#125:pluto:30", "nwparser.payload", "| handling event %{event_type->} for %{saddr->} \"%{fld2}\" #%{fld3}", processor_chain([
+var part134 = match("MESSAGE#125:pluto:30", "nwparser.payload", "| handling event %{event_type->} for %{saddr->} \"%{fld2}\" #%{fld3}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1737,8 +1601,7 @@ match("MESSAGE#125:pluto:30", "nwparser.payload", "| handling event %{event_type
 
 var msg126 = msg("pluto:30", part134);
 
-var part135 = // "Pattern{Constant('| '), Field(event_description,false)}"
-match("MESSAGE#126:pluto:31", "nwparser.payload", "| %{event_description}", processor_chain([
+var part135 = match("MESSAGE#126:pluto:31", "nwparser.payload", "| %{event_description}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -1746,8 +1609,7 @@ match("MESSAGE#126:pluto:31", "nwparser.payload", "| %{event_description}", proc
 
 var msg127 = msg("pluto:31", part135);
 
-var part136 = // "Pattern{Field(fld2,false), Constant(': asynchronous network error report on '), Field(interface,true), Constant(' for message to '), Field(daddr,true), Constant(' port '), Field(dport,false), Constant(', complainant '), Field(saddr,false), Constant(': Connection refused [errno '), Field(fld4,false), Constant(', origin ICMP type '), Field(icmptype,true), Constant(' code '), Field(icmpcode,true), Constant(' (not authenticated)]')}"
-match("MESSAGE#127:pluto:32", "nwparser.payload", "%{fld2}: asynchronous network error report on %{interface->} for message to %{daddr->} port %{dport}, complainant %{saddr}: Connection refused [errno %{fld4}, origin ICMP type %{icmptype->} code %{icmpcode->} (not authenticated)]", processor_chain([
+var part136 = match("MESSAGE#127:pluto:32", "nwparser.payload", "%{fld2}: asynchronous network error report on %{interface->} for message to %{daddr->} port %{dport}, complainant %{saddr}: Connection refused [errno %{fld4}, origin ICMP type %{icmptype->} code %{icmpcode->} (not authenticated)]", processor_chain([
 	dup12,
 	setc("event_description","not authenticated"),
 	dup11,
@@ -1756,8 +1618,7 @@ match("MESSAGE#127:pluto:32", "nwparser.payload", "%{fld2}: asynchronous network
 
 var msg128 = msg("pluto:32", part136);
 
-var part137 = // "Pattern{Constant('"'), Field(fld2,false), Constant('"['), Field(fld4,false), Constant('] '), Field(saddr,true), Constant(' #'), Field(fld3,false), Constant(': initiating Main Mode')}"
-match("MESSAGE#128:pluto:33", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: initiating Main Mode", processor_chain([
+var part137 = match("MESSAGE#128:pluto:33", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: initiating Main Mode", processor_chain([
 	dup12,
 	dup35,
 	dup11,
@@ -1766,8 +1627,7 @@ match("MESSAGE#128:pluto:33", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr-
 
 var msg129 = msg("pluto:33", part137);
 
-var part138 = // "Pattern{Constant('"'), Field(fld2,false), Constant('"['), Field(fld4,false), Constant('] '), Field(saddr,true), Constant(' #'), Field(fld3,false), Constant(': max number of retransmissions ('), Field(fld5,false), Constant(') reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message')}"
-match("MESSAGE#129:pluto:34", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: max number of retransmissions (%{fld5}) reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message", processor_chain([
+var part138 = match("MESSAGE#129:pluto:34", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: max number of retransmissions (%{fld5}) reached STATE_MAIN_I1. No response (or no acceptable response) to our first IKE message", processor_chain([
 	dup12,
 	dup36,
 	dup11,
@@ -1776,8 +1636,7 @@ match("MESSAGE#129:pluto:34", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr-
 
 var msg130 = msg("pluto:34", part138);
 
-var part139 = // "Pattern{Constant('"'), Field(fld2,false), Constant('"['), Field(fld4,false), Constant('] '), Field(saddr,true), Constant(' #'), Field(fld3,false), Constant(': starting keying attempt '), Field(fld5,true), Constant(' of an unlimited number')}"
-match("MESSAGE#130:pluto:35", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: starting keying attempt %{fld5->} of an unlimited number", processor_chain([
+var part139 = match("MESSAGE#130:pluto:35", "nwparser.payload", "\"%{fld2}\"[%{fld4}] %{saddr->} #%{fld3}: starting keying attempt %{fld5->} of an unlimited number", processor_chain([
 	dup12,
 	dup37,
 	dup11,
@@ -1824,8 +1683,7 @@ var select11 = linear_select([
 	msg131,
 ]);
 
-var part140 = // "Pattern{Constant('This binary does not support kernel L2TP.'), Field(,false)}"
-match("MESSAGE#131:xl2tpd", "nwparser.payload", "This binary does not support kernel L2TP.%{}", processor_chain([
+var part140 = match("MESSAGE#131:xl2tpd", "nwparser.payload", "This binary does not support kernel L2TP.%{}", processor_chain([
 	setc("eventcategory","1607000000"),
 	setc("event_description","xl2tpd:This binary does not support kernel L2TP."),
 	dup11,
@@ -1834,8 +1692,7 @@ match("MESSAGE#131:xl2tpd", "nwparser.payload", "This binary does not support ke
 
 var msg132 = msg("xl2tpd", part140);
 
-var part141 = // "Pattern{Constant('xl2tpd version '), Field(version,true), Constant(' started on PID:'), Field(fld2,false)}"
-match("MESSAGE#132:xl2tpd:01", "nwparser.payload", "xl2tpd version %{version->} started on PID:%{fld2}", processor_chain([
+var part141 = match("MESSAGE#132:xl2tpd:01", "nwparser.payload", "xl2tpd version %{version->} started on PID:%{fld2}", processor_chain([
 	dup12,
 	setc("event_description","xl2tpd:xl2tpd started."),
 	dup11,
@@ -1844,8 +1701,7 @@ match("MESSAGE#132:xl2tpd:01", "nwparser.payload", "xl2tpd version %{version->} 
 
 var msg133 = msg("xl2tpd:01", part141);
 
-var part142 = // "Pattern{Constant('Written by '), Field(info,false)}"
-match("MESSAGE#133:xl2tpd:02", "nwparser.payload", "Written by %{info}", processor_chain([
+var part142 = match("MESSAGE#133:xl2tpd:02", "nwparser.payload", "Written by %{info}", processor_chain([
 	dup12,
 	dup38,
 	dup11,
@@ -1854,8 +1710,7 @@ match("MESSAGE#133:xl2tpd:02", "nwparser.payload", "Written by %{info}", process
 
 var msg134 = msg("xl2tpd:02", part142);
 
-var part143 = // "Pattern{Constant('Forked by '), Field(info,false)}"
-match("MESSAGE#134:xl2tpd:03", "nwparser.payload", "Forked by %{info}", processor_chain([
+var part143 = match("MESSAGE#134:xl2tpd:03", "nwparser.payload", "Forked by %{info}", processor_chain([
 	dup12,
 	dup38,
 	dup11,
@@ -1864,8 +1719,7 @@ match("MESSAGE#134:xl2tpd:03", "nwparser.payload", "Forked by %{info}", processo
 
 var msg135 = msg("xl2tpd:03", part143);
 
-var part144 = // "Pattern{Constant('Inherited by '), Field(info,false)}"
-match("MESSAGE#135:xl2tpd:04", "nwparser.payload", "Inherited by %{info}", processor_chain([
+var part144 = match("MESSAGE#135:xl2tpd:04", "nwparser.payload", "Inherited by %{info}", processor_chain([
 	dup12,
 	dup38,
 	dup11,
@@ -1874,8 +1728,7 @@ match("MESSAGE#135:xl2tpd:04", "nwparser.payload", "Inherited by %{info}", proce
 
 var msg136 = msg("xl2tpd:04", part144);
 
-var part145 = // "Pattern{Constant('Listening on IP address '), Field(saddr,false), Constant(', port '), Field(sport,false)}"
-match("MESSAGE#136:xl2tpd:05", "nwparser.payload", "Listening on IP address %{saddr}, port %{sport}", processor_chain([
+var part145 = match("MESSAGE#136:xl2tpd:05", "nwparser.payload", "Listening on IP address %{saddr}, port %{sport}", processor_chain([
 	dup12,
 	dup38,
 	dup11,
@@ -1893,8 +1746,7 @@ var select12 = linear_select([
 	msg137,
 ]);
 
-var part146 = // "Pattern{Constant('Exiting'), Field(,false)}"
-match("MESSAGE#137:barnyard:01", "nwparser.payload", "Exiting%{}", processor_chain([
+var part146 = match("MESSAGE#137:barnyard:01", "nwparser.payload", "Exiting%{}", processor_chain([
 	dup12,
 	setc("event_description","barnyard: Exiting"),
 	dup11,
@@ -1903,8 +1755,7 @@ match("MESSAGE#137:barnyard:01", "nwparser.payload", "Exiting%{}", processor_cha
 
 var msg138 = msg("barnyard:01", part146);
 
-var part147 = // "Pattern{Constant('Initializing daemon mode'), Field(,false)}"
-match("MESSAGE#138:barnyard:02", "nwparser.payload", "Initializing daemon mode%{}", processor_chain([
+var part147 = match("MESSAGE#138:barnyard:02", "nwparser.payload", "Initializing daemon mode%{}", processor_chain([
 	dup12,
 	setc("event_description","barnyard:Initializing daemon mode"),
 	dup11,
@@ -1913,8 +1764,7 @@ match("MESSAGE#138:barnyard:02", "nwparser.payload", "Initializing daemon mode%{
 
 var msg139 = msg("barnyard:02", part147);
 
-var part148 = // "Pattern{Constant('Opened spool file ''), Field(filename,false), Constant(''')}"
-match("MESSAGE#139:barnyard:03", "nwparser.payload", "Opened spool file '%{filename}'", processor_chain([
+var part148 = match("MESSAGE#139:barnyard:03", "nwparser.payload", "Opened spool file '%{filename}'", processor_chain([
 	dup12,
 	setc("event_description","barnyard:Opened spool file."),
 	dup11,
@@ -1923,8 +1773,7 @@ match("MESSAGE#139:barnyard:03", "nwparser.payload", "Opened spool file '%{filen
 
 var msg140 = msg("barnyard:03", part148);
 
-var part149 = // "Pattern{Constant('Waiting for new data'), Field(,false)}"
-match("MESSAGE#140:barnyard:04", "nwparser.payload", "Waiting for new data%{}", processor_chain([
+var part149 = match("MESSAGE#140:barnyard:04", "nwparser.payload", "Waiting for new data%{}", processor_chain([
 	dup12,
 	setc("event_description","barnyard:Waiting for new data"),
 	dup11,
@@ -1940,8 +1789,7 @@ var select13 = linear_select([
 	msg141,
 ]);
 
-var part150 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' SMTP connection from localhost ('), Field(hostname,false), Constant(') ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' closed by QUIT')}"
-match("MESSAGE#141:exim:01", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP connection from localhost (%{hostname}) [%{saddr}]:%{sport->} closed by QUIT", processor_chain([
+var part150 = match("MESSAGE#141:exim:01", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP connection from localhost (%{hostname}) [%{saddr}]:%{sport->} closed by QUIT", processor_chain([
 	dup12,
 	setc("event_description","exim:SMTP connection from localhost closed by QUIT"),
 	dup11,
@@ -1950,8 +1798,7 @@ match("MESSAGE#141:exim:01", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg142 = msg("exim:01", part150);
 
-var part151 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' ['), Field(saddr,false), Constant('] F=<<'), Field(from,false), Constant('> R=<<'), Field(to,false), Constant('> Accepted: '), Field(info,false)}"
-match("MESSAGE#142:exim:02", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} [%{saddr}] F=\u003c\u003c%{from}> R=\u003c\u003c%{to}> Accepted: %{info}", processor_chain([
+var part151 = match("MESSAGE#142:exim:02", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} [%{saddr}] F=\u003c\u003c%{from}> R=\u003c\u003c%{to}> Accepted: %{info}", processor_chain([
 	setc("eventcategory","1207010000"),
 	setc("event_description","exim:e-mail accepted from relay."),
 	dup11,
@@ -1960,8 +1807,7 @@ match("MESSAGE#142:exim:02", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg143 = msg("exim:02", part151);
 
-var part152 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' '), Field(fld8,true), Constant(' <<= '), Field(from,true), Constant(' H=localhost ('), Field(hostname,false), Constant(') ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' P='), Field(protocol,true), Constant(' S='), Field(fld9,true), Constant(' id='), Field(info,false)}"
-match("MESSAGE#143:exim:03", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} \u003c\u003c= %{from->} H=localhost (%{hostname}) [%{saddr}]:%{sport->} P=%{protocol->} S=%{fld9->} id=%{info}", processor_chain([
+var part152 = match("MESSAGE#143:exim:03", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} \u003c\u003c= %{from->} H=localhost (%{hostname}) [%{saddr}]:%{sport->} P=%{protocol->} S=%{fld9->} id=%{info}", processor_chain([
 	setc("eventcategory","1207000000"),
 	setc("event_description","exim: e-mail sent."),
 	dup11,
@@ -1970,8 +1816,7 @@ match("MESSAGE#143:exim:03", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg144 = msg("exim:03", part152);
 
-var part153 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' '), Field(fld8,true), Constant(' == '), Field(from,true), Constant(' R=dnslookup defer ('), Field(fld9,false), Constant('): host lookup did not complete')}"
-match("MESSAGE#144:exim:04", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} == %{from->} R=dnslookup defer (%{fld9}): host lookup did not complete", processor_chain([
+var part153 = match("MESSAGE#144:exim:04", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} == %{from->} R=dnslookup defer (%{fld9}): host lookup did not complete", processor_chain([
 	dup39,
 	setc("event_description","exim: e-mail host lookup did not complete in DNS."),
 	dup11,
@@ -1980,8 +1825,7 @@ match("MESSAGE#144:exim:04", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg145 = msg("exim:04", part153);
 
-var part154 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' '), Field(fld8,true), Constant(' == '), Field(from,true), Constant(' routing defer ('), Field(fld9,false), Constant('): retry time not reached')}"
-match("MESSAGE#145:exim:05", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} == %{from->} routing defer (%{fld9}): retry time not reached", processor_chain([
+var part154 = match("MESSAGE#145:exim:05", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld8->} == %{from->} routing defer (%{fld9}): retry time not reached", processor_chain([
 	dup39,
 	setc("event_description","exim: e-mail routing defer:retry time not reached."),
 	dup11,
@@ -1990,8 +1834,7 @@ match("MESSAGE#145:exim:05", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg146 = msg("exim:05", part154);
 
-var part155 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' exim '), Field(version,true), Constant(' daemon started: pid='), Field(fld8,false), Constant(', no queue runs, listening for SMTP on port '), Field(sport,true), Constant(' ('), Field(info,false), Constant(') port '), Field(fld9,true), Constant(' ('), Field(fld10,false), Constant(') and for SMTPS on port '), Field(fld11,true), Constant(' ('), Field(fld12,false), Constant(')')}"
-match("MESSAGE#146:exim:06", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} exim %{version->} daemon started: pid=%{fld8}, no queue runs, listening for SMTP on port %{sport->} (%{info}) port %{fld9->} (%{fld10}) and for SMTPS on port %{fld11->} (%{fld12})", processor_chain([
+var part155 = match("MESSAGE#146:exim:06", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} exim %{version->} daemon started: pid=%{fld8}, no queue runs, listening for SMTP on port %{sport->} (%{info}) port %{fld9->} (%{fld10}) and for SMTPS on port %{fld11->} (%{fld12})", processor_chain([
 	dup12,
 	setc("event_description","exim: exim daemon started."),
 	dup11,
@@ -2000,8 +1843,7 @@ match("MESSAGE#146:exim:06", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg147 = msg("exim:06", part155);
 
-var part156 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' Start queue run: pid='), Field(fld8,false)}"
-match("MESSAGE#147:exim:07", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} Start queue run: pid=%{fld8}", processor_chain([
+var part156 = match("MESSAGE#147:exim:07", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} Start queue run: pid=%{fld8}", processor_chain([
 	dup12,
 	setc("event_description","exim: Start queue run."),
 	dup11,
@@ -2010,8 +1852,7 @@ match("MESSAGE#147:exim:07", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg148 = msg("exim:07", part156);
 
-var part157 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' pid '), Field(fld8,false), Constant(': SIGHUP received: re-exec daemon')}"
-match("MESSAGE#148:exim:08", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} pid %{fld8}: SIGHUP received: re-exec daemon", processor_chain([
+var part157 = match("MESSAGE#148:exim:08", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} pid %{fld8}: SIGHUP received: re-exec daemon", processor_chain([
 	dup12,
 	setc("event_description","exim: SIGHUP received: re-exec daemon."),
 	dup11,
@@ -2020,8 +1861,7 @@ match("MESSAGE#148:exim:08", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg149 = msg("exim:08", part157);
 
-var part158 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' SMTP connection from ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#149:exim:09", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP connection from [%{saddr}]:%{sport->} %{info}", processor_chain([
+var part158 = match("MESSAGE#149:exim:09", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP connection from [%{saddr}]:%{sport->} %{info}", processor_chain([
 	dup12,
 	setc("event_description","exim: SMTP connection from host."),
 	dup11,
@@ -2030,8 +1870,7 @@ match("MESSAGE#149:exim:09", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg150 = msg("exim:09", part158);
 
-var part159 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' rejected EHLO from ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#150:exim:10", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} rejected EHLO from [%{saddr}]:%{sport->} %{info}", processor_chain([
+var part159 = match("MESSAGE#150:exim:10", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} rejected EHLO from [%{saddr}]:%{sport->} %{info}", processor_chain([
 	dup12,
 	setc("event_description","exim:rejected EHLO from host."),
 	dup11,
@@ -2040,8 +1879,7 @@ match("MESSAGE#150:exim:10", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg151 = msg("exim:10", part159);
 
-var part160 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' SMTP protocol synchronization error ('), Field(result,false), Constant('): '), Field(fld8,true), Constant(' H=['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#151:exim:11", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP protocol synchronization error (%{result}): %{fld8->} H=[%{saddr}]:%{sport->} %{info}", processor_chain([
+var part160 = match("MESSAGE#151:exim:11", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} SMTP protocol synchronization error (%{result}): %{fld8->} H=[%{saddr}]:%{sport->} %{info}", processor_chain([
 	dup12,
 	setc("event_description","exim:SMTP protocol synchronization error rejected connection from host."),
 	dup11,
@@ -2050,8 +1888,7 @@ match("MESSAGE#151:exim:11", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg152 = msg("exim:11", part160);
 
-var part161 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' TLS error on connection from ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#152:exim:12", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} TLS error on connection from [%{saddr}]:%{sport->} %{info}", processor_chain([
+var part161 = match("MESSAGE#152:exim:12", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} TLS error on connection from [%{saddr}]:%{sport->} %{info}", processor_chain([
 	dup12,
 	setc("event_description","exim:TLS error on connection from host."),
 	dup11,
@@ -2060,8 +1897,7 @@ match("MESSAGE#152:exim:12", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg153 = msg("exim:12", part161);
 
-var part162 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' '), Field(fld10,true), Constant(' == '), Field(hostname,true), Constant(' R='), Field(fld8,true), Constant(' T='), Field(fld9,false), Constant(': '), Field(info,false)}"
-match("MESSAGE#153:exim:13", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld10->} == %{hostname->} R=%{fld8->} T=%{fld9}: %{info}", processor_chain([
+var part162 = match("MESSAGE#153:exim:13", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld10->} == %{hostname->} R=%{fld8->} T=%{fld9}: %{info}", processor_chain([
 	dup12,
 	dup40,
 	dup11,
@@ -2070,8 +1906,7 @@ match("MESSAGE#153:exim:13", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg154 = msg("exim:13", part162);
 
-var part163 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' '), Field(fld10,true), Constant(' '), Field(hostname,true), Constant(' ['), Field(saddr,false), Constant(']:'), Field(sport,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#154:exim:14", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld10->} %{hostname->} [%{saddr}]:%{sport->} %{info}", processor_chain([
+var part163 = match("MESSAGE#154:exim:14", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} %{fld10->} %{hostname->} [%{saddr}]:%{sport->} %{info}", processor_chain([
 	dup12,
 	dup40,
 	dup11,
@@ -2080,8 +1915,7 @@ match("MESSAGE#154:exim:14", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg155 = msg("exim:14", part163);
 
-var part164 = // "Pattern{Field(fld2,false), Constant('-'), Field(fld3,false), Constant('-'), Field(fld4,true), Constant(' '), Field(fld5,false), Constant(':'), Field(fld6,false), Constant(':'), Field(fld7,true), Constant(' End queue run: '), Field(info,false)}"
-match("MESSAGE#155:exim:15", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} End queue run: %{info}", processor_chain([
+var part164 = match("MESSAGE#155:exim:15", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fld5}:%{fld6}:%{fld7->} End queue run: %{info}", processor_chain([
 	dup12,
 	dup40,
 	dup11,
@@ -2090,8 +1924,7 @@ match("MESSAGE#155:exim:15", "nwparser.payload", "%{fld2}-%{fld3}-%{fld4->} %{fl
 
 var msg156 = msg("exim:15", part164);
 
-var part165 = // "Pattern{Field(fld2,true), Constant(' '), Field(fld3,false)}"
-match("MESSAGE#156:exim:16", "nwparser.payload", "%{fld2->} %{fld3}", processor_chain([
+var part165 = match("MESSAGE#156:exim:16", "nwparser.payload", "%{fld2->} %{fld3}", processor_chain([
 	dup12,
 	dup11,
 	dup2,
@@ -2118,8 +1951,7 @@ var select14 = linear_select([
 	msg157,
 ]);
 
-var part166 = // "Pattern{Constant('QMGR['), Field(fld2,false), Constant(']: '), Field(fld3,true), Constant(' moved to work queue')}"
-match("MESSAGE#157:smtpd:01", "nwparser.payload", "QMGR[%{fld2}]: %{fld3->} moved to work queue", processor_chain([
+var part166 = match("MESSAGE#157:smtpd:01", "nwparser.payload", "QMGR[%{fld2}]: %{fld3->} moved to work queue", processor_chain([
 	dup12,
 	setc("event_description","smtpd: Process moved to work queue."),
 	dup11,
@@ -2128,8 +1960,7 @@ match("MESSAGE#157:smtpd:01", "nwparser.payload", "QMGR[%{fld2}]: %{fld3->} move
 
 var msg158 = msg("smtpd:01", part166);
 
-var part167 = // "Pattern{Constant('SCANNER['), Field(fld3,false), Constant(']: id="1000" severity="'), Field(severity,false), Constant('" sys="'), Field(fld4,false), Constant('" sub="'), Field(service,false), Constant('" name="'), Field(event_description,false), Constant('" srcip="'), Field(saddr,false), Constant('" from="'), Field(from,false), Constant('" to="'), Field(to,false), Constant('" subject="'), Field(subject,false), Constant('" queueid="'), Field(fld5,false), Constant('" size="'), Field(rbytes,false), Constant('"')}"
-match("MESSAGE#158:smtpd:02", "nwparser.payload", "SCANNER[%{fld3}]: id=\"1000\" severity=\"%{severity}\" sys=\"%{fld4}\" sub=\"%{service}\" name=\"%{event_description}\" srcip=\"%{saddr}\" from=\"%{from}\" to=\"%{to}\" subject=\"%{subject}\" queueid=\"%{fld5}\" size=\"%{rbytes}\"", processor_chain([
+var part167 = match("MESSAGE#158:smtpd:02", "nwparser.payload", "SCANNER[%{fld3}]: id=\"1000\" severity=\"%{severity}\" sys=\"%{fld4}\" sub=\"%{service}\" name=\"%{event_description}\" srcip=\"%{saddr}\" from=\"%{from}\" to=\"%{to}\" subject=\"%{subject}\" queueid=\"%{fld5}\" size=\"%{rbytes}\"", processor_chain([
 	setc("eventcategory","1207010100"),
 	dup11,
 	dup2,
@@ -2137,8 +1968,7 @@ match("MESSAGE#158:smtpd:02", "nwparser.payload", "SCANNER[%{fld3}]: id=\"1000\"
 
 var msg159 = msg("smtpd:02", part167);
 
-var part168 = // "Pattern{Constant('SCANNER['), Field(fld3,false), Constant(']: Nothing to do, exiting.')}"
-match("MESSAGE#159:smtpd:03", "nwparser.payload", "SCANNER[%{fld3}]: Nothing to do, exiting.", processor_chain([
+var part168 = match("MESSAGE#159:smtpd:03", "nwparser.payload", "SCANNER[%{fld3}]: Nothing to do, exiting.", processor_chain([
 	dup12,
 	setc("event_description","smtpd: SCANNER: Nothing to do,exiting."),
 	dup11,
@@ -2147,8 +1977,7 @@ match("MESSAGE#159:smtpd:03", "nwparser.payload", "SCANNER[%{fld3}]: Nothing to 
 
 var msg160 = msg("smtpd:03", part168);
 
-var part169 = // "Pattern{Constant('MASTER['), Field(fld3,false), Constant(']: QR globally disabled, status two set to 'disabled'')}"
-match("MESSAGE#160:smtpd:04", "nwparser.payload", "MASTER[%{fld3}]: QR globally disabled, status two set to 'disabled'", processor_chain([
+var part169 = match("MESSAGE#160:smtpd:04", "nwparser.payload", "MASTER[%{fld3}]: QR globally disabled, status two set to 'disabled'", processor_chain([
 	dup12,
 	setc("event_description","smtpd: MASTER:QR globally disabled, status two set to disabled."),
 	dup11,
@@ -2157,8 +1986,7 @@ match("MESSAGE#160:smtpd:04", "nwparser.payload", "MASTER[%{fld3}]: QR globally 
 
 var msg161 = msg("smtpd:04", part169);
 
-var part170 = // "Pattern{Constant('MASTER['), Field(fld3,false), Constant(']: QR globally disabled, status one set to 'disabled'')}"
-match("MESSAGE#161:smtpd:07", "nwparser.payload", "MASTER[%{fld3}]: QR globally disabled, status one set to 'disabled'", processor_chain([
+var part170 = match("MESSAGE#161:smtpd:07", "nwparser.payload", "MASTER[%{fld3}]: QR globally disabled, status one set to 'disabled'", processor_chain([
 	dup12,
 	setc("event_description","smtpd: MASTER:QR globally disabled, status one set to disabled."),
 	dup11,
@@ -2167,8 +1995,7 @@ match("MESSAGE#161:smtpd:07", "nwparser.payload", "MASTER[%{fld3}]: QR globally 
 
 var msg162 = msg("smtpd:07", part170);
 
-var part171 = // "Pattern{Constant('MASTER['), Field(fld3,false), Constant(']: (Re-)loading configuration from Confd')}"
-match("MESSAGE#162:smtpd:05", "nwparser.payload", "MASTER[%{fld3}]: (Re-)loading configuration from Confd", processor_chain([
+var part171 = match("MESSAGE#162:smtpd:05", "nwparser.payload", "MASTER[%{fld3}]: (Re-)loading configuration from Confd", processor_chain([
 	dup12,
 	setc("event_description","smtpd: MASTER:(Re-)loading configuration from Confd."),
 	dup11,
@@ -2177,8 +2004,7 @@ match("MESSAGE#162:smtpd:05", "nwparser.payload", "MASTER[%{fld3}]: (Re-)loading
 
 var msg163 = msg("smtpd:05", part171);
 
-var part172 = // "Pattern{Constant('MASTER['), Field(fld3,false), Constant(']: Sending QR one')}"
-match("MESSAGE#163:smtpd:06", "nwparser.payload", "MASTER[%{fld3}]: Sending QR one", processor_chain([
+var part172 = match("MESSAGE#163:smtpd:06", "nwparser.payload", "MASTER[%{fld3}]: Sending QR one", processor_chain([
 	dup12,
 	setc("event_description","smtpd: MASTER:Sending QR one."),
 	dup11,
@@ -2197,8 +2023,7 @@ var select15 = linear_select([
 	msg164,
 ]);
 
-var part173 = // "Pattern{Constant('Did not receive identification string from '), Field(fld18,false)}"
-match("MESSAGE#164:sshd:01", "nwparser.payload", "Did not receive identification string from %{fld18}", processor_chain([
+var part173 = match("MESSAGE#164:sshd:01", "nwparser.payload", "Did not receive identification string from %{fld18}", processor_chain([
 	dup10,
 	setc("event_description","sshd: Did not receive identification string."),
 	dup11,
@@ -2207,8 +2032,7 @@ match("MESSAGE#164:sshd:01", "nwparser.payload", "Did not receive identification
 
 var msg165 = msg("sshd:01", part173);
 
-var part174 = // "Pattern{Constant('Received SIGHUP; restarting.'), Field(,false)}"
-match("MESSAGE#165:sshd:02", "nwparser.payload", "Received SIGHUP; restarting.%{}", processor_chain([
+var part174 = match("MESSAGE#165:sshd:02", "nwparser.payload", "Received SIGHUP; restarting.%{}", processor_chain([
 	dup12,
 	setc("event_description","sshd:Received SIGHUP restarting."),
 	dup11,
@@ -2217,8 +2041,7 @@ match("MESSAGE#165:sshd:02", "nwparser.payload", "Received SIGHUP; restarting.%{
 
 var msg166 = msg("sshd:02", part174);
 
-var part175 = // "Pattern{Constant('Server listening on '), Field(saddr,true), Constant(' port '), Field(sport,false), Constant('.')}"
-match("MESSAGE#166:sshd:03", "nwparser.payload", "Server listening on %{saddr->} port %{sport}.", processor_chain([
+var part175 = match("MESSAGE#166:sshd:03", "nwparser.payload", "Server listening on %{saddr->} port %{sport}.", processor_chain([
 	dup12,
 	setc("event_description","sshd:Server listening; restarting."),
 	dup11,
@@ -2227,8 +2050,7 @@ match("MESSAGE#166:sshd:03", "nwparser.payload", "Server listening on %{saddr->}
 
 var msg167 = msg("sshd:03", part175);
 
-var part176 = // "Pattern{Constant('Invalid user admin from '), Field(fld18,false)}"
-match("MESSAGE#167:sshd:04", "nwparser.payload", "Invalid user admin from %{fld18}", processor_chain([
+var part176 = match("MESSAGE#167:sshd:04", "nwparser.payload", "Invalid user admin from %{fld18}", processor_chain([
 	dup41,
 	setc("event_description","sshd:Invalid user admin."),
 	dup11,
@@ -2237,8 +2059,7 @@ match("MESSAGE#167:sshd:04", "nwparser.payload", "Invalid user admin from %{fld1
 
 var msg168 = msg("sshd:04", part176);
 
-var part177 = // "Pattern{Constant('Failed none for invalid user admin from '), Field(saddr,true), Constant(' port '), Field(sport,true), Constant(' '), Field(fld3,false)}"
-match("MESSAGE#168:sshd:05", "nwparser.payload", "Failed none for invalid user admin from %{saddr->} port %{sport->} %{fld3}", processor_chain([
+var part177 = match("MESSAGE#168:sshd:05", "nwparser.payload", "Failed none for invalid user admin from %{saddr->} port %{sport->} %{fld3}", processor_chain([
 	dup41,
 	setc("event_description","sshd:Failed none for invalid user admin."),
 	dup11,
@@ -2247,8 +2068,7 @@ match("MESSAGE#168:sshd:05", "nwparser.payload", "Failed none for invalid user a
 
 var msg169 = msg("sshd:05", part177);
 
-var part178 = // "Pattern{Constant('error: Could not get shadow information for NOUSER'), Field(,false)}"
-match("MESSAGE#169:sshd:06", "nwparser.payload", "error: Could not get shadow information for NOUSER%{}", processor_chain([
+var part178 = match("MESSAGE#169:sshd:06", "nwparser.payload", "error: Could not get shadow information for NOUSER%{}", processor_chain([
 	dup10,
 	setc("event_description","sshd:error:Could not get shadow information for NOUSER"),
 	dup11,
@@ -2257,8 +2077,7 @@ match("MESSAGE#169:sshd:06", "nwparser.payload", "error: Could not get shadow in
 
 var msg170 = msg("sshd:06", part178);
 
-var part179 = // "Pattern{Constant('Failed password for root from '), Field(saddr,true), Constant(' port '), Field(sport,true), Constant(' '), Field(fld3,false)}"
-match("MESSAGE#170:sshd:07", "nwparser.payload", "Failed password for root from %{saddr->} port %{sport->} %{fld3}", processor_chain([
+var part179 = match("MESSAGE#170:sshd:07", "nwparser.payload", "Failed password for root from %{saddr->} port %{sport->} %{fld3}", processor_chain([
 	dup41,
 	setc("event_description","sshd:Failed password for root."),
 	dup11,
@@ -2267,8 +2086,7 @@ match("MESSAGE#170:sshd:07", "nwparser.payload", "Failed password for root from 
 
 var msg171 = msg("sshd:07", part179);
 
-var part180 = // "Pattern{Constant('Accepted password for loginuser from '), Field(saddr,true), Constant(' port '), Field(sport,true), Constant(' '), Field(fld3,false)}"
-match("MESSAGE#171:sshd:08", "nwparser.payload", "Accepted password for loginuser from %{saddr->} port %{sport->} %{fld3}", processor_chain([
+var part180 = match("MESSAGE#171:sshd:08", "nwparser.payload", "Accepted password for loginuser from %{saddr->} port %{sport->} %{fld3}", processor_chain([
 	setc("eventcategory","1302000000"),
 	setc("event_description","sshd:Accepted password for loginuser."),
 	dup11,
@@ -2277,8 +2095,7 @@ match("MESSAGE#171:sshd:08", "nwparser.payload", "Accepted password for loginuse
 
 var msg172 = msg("sshd:08", part180);
 
-var part181 = // "Pattern{Constant('subsystem request for sftp failed, subsystem not found'), Field(,false)}"
-match("MESSAGE#172:sshd:09", "nwparser.payload", "subsystem request for sftp failed, subsystem not found%{}", processor_chain([
+var part181 = match("MESSAGE#172:sshd:09", "nwparser.payload", "subsystem request for sftp failed, subsystem not found%{}", processor_chain([
 	dup10,
 	setc("event_description","sshd:subsystem request for sftp failed,subsystem not found."),
 	dup11,
@@ -2319,8 +2136,7 @@ var part182 = tagval("MESSAGE#173:aua:01", "nwparser.payload", tvm, {
 
 var msg174 = msg("aua:01", part182);
 
-var part183 = // "Pattern{Constant('created new negotiatorchild'), Field(,false)}"
-match("MESSAGE#174:sockd:01", "nwparser.payload", "created new negotiatorchild%{}", processor_chain([
+var part183 = match("MESSAGE#174:sockd:01", "nwparser.payload", "created new negotiatorchild%{}", processor_chain([
 	dup12,
 	setc("event_description","sockd: created new negotiatorchild."),
 	dup11,
@@ -2329,8 +2145,7 @@ match("MESSAGE#174:sockd:01", "nwparser.payload", "created new negotiatorchild%{
 
 var msg175 = msg("sockd:01", part183);
 
-var part184 = // "Pattern{Constant('dante/server '), Field(version,true), Constant(' running')}"
-match("MESSAGE#175:sockd:02", "nwparser.payload", "dante/server %{version->} running", processor_chain([
+var part184 = match("MESSAGE#175:sockd:02", "nwparser.payload", "dante/server %{version->} running", processor_chain([
 	dup12,
 	setc("event_description","sockd:dante/server running."),
 	dup11,
@@ -2339,8 +2154,7 @@ match("MESSAGE#175:sockd:02", "nwparser.payload", "dante/server %{version->} run
 
 var msg176 = msg("sockd:02", part184);
 
-var part185 = // "Pattern{Constant('sockdexit(): terminating on signal '), Field(fld2,false)}"
-match("MESSAGE#176:sockd:03", "nwparser.payload", "sockdexit(): terminating on signal %{fld2}", processor_chain([
+var part185 = match("MESSAGE#176:sockd:03", "nwparser.payload", "sockdexit(): terminating on signal %{fld2}", processor_chain([
 	dup12,
 	setc("event_description","sockd:sockdexit():terminating on signal."),
 	dup11,
@@ -2355,8 +2169,7 @@ var select17 = linear_select([
 	msg177,
 ]);
 
-var part186 = // "Pattern{Constant('Master started'), Field(,false)}"
-match("MESSAGE#177:pop3proxy", "nwparser.payload", "Master started%{}", processor_chain([
+var part186 = match("MESSAGE#177:pop3proxy", "nwparser.payload", "Master started%{}", processor_chain([
 	dup12,
 	setc("event_description","pop3proxy:Master started."),
 	dup11,
@@ -2546,8 +2359,7 @@ var part188 = tagval("MESSAGE#179:httpd", "nwparser.payload", tvm, {
 
 var msg180 = msg("httpd", part188);
 
-var part189 = // "Pattern{Constant('['), Field(event_log,false), Constant(':'), Field(result,false), Constant('] [pid '), Field(fld3,false), Constant(':'), Field(fld4,false), Constant('] [client '), Field(gateway,false), Constant('] ModSecurity: Warning. '), Field(rulename,true), Constant(' [file "'), Field(filename,false), Constant('"] [line "'), Field(fld5,false), Constant('"] [id "'), Field(rule,false), Constant('"] [rev "'), Field(fld2,false), Constant('"] [msg "'), Field(event_description,false), Constant('"] [severity "'), Field(severity,false), Constant('"] [ver "'), Field(version,false), Constant('"] [maturity "'), Field(fld22,false), Constant('"] [accuracy "'), Field(fld23,false), Constant('"] [tag "'), Field(fld24,false), Constant('"] [hostname "'), Field(dhost,false), Constant('"] [uri "'), Field(web_root,false), Constant('"] [unique_id "'), Field(operation_id,false), Constant('"]'), Field(fld25,false)}"
-match("MESSAGE#180:httpd:01", "nwparser.payload", "[%{event_log}:%{result}] [pid %{fld3}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"] [rev \"%{fld2}\"] [msg \"%{event_description}\"] [severity \"%{severity}\"] [ver \"%{version}\"] [maturity \"%{fld22}\"] [accuracy \"%{fld23}\"] [tag \"%{fld24}\"] [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]%{fld25}", processor_chain([
+var part189 = match("MESSAGE#180:httpd:01", "nwparser.payload", "[%{event_log}:%{result}] [pid %{fld3}:%{fld4}] [client %{gateway}] ModSecurity: Warning. %{rulename->} [file \"%{filename}\"] [line \"%{fld5}\"] [id \"%{rule}\"] [rev \"%{fld2}\"] [msg \"%{event_description}\"] [severity \"%{severity}\"] [ver \"%{version}\"] [maturity \"%{fld22}\"] [accuracy \"%{fld23}\"] [tag \"%{fld24}\"] [hostname \"%{dhost}\"] [uri \"%{web_root}\"] [unique_id \"%{operation_id}\"]%{fld25}", processor_chain([
 	setc("eventcategory","1502000000"),
 	dup2,
 	dup3,
@@ -2663,5 +2475,4 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part191 = // "Pattern{Field(p0,false)}"
-match_copy("MESSAGE#44:reverseproxy:07/1_0", "nwparser.p0", "p0");
+var part191 = match_copy("MESSAGE#44:reverseproxy:07/1_0", "nwparser.p0", "p0");

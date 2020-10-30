@@ -189,6 +189,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.101",
             "192.0.2.10"
@@ -241,6 +244,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.3",
             "192.0.2.57"
@@ -700,6 +706,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "FJSG2NRFW01"
+        ],
         "related.ip": [
             "192.168.132.46",
             "172.24.177.29"
@@ -2154,6 +2163,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "process.name": "<IP>",
+        "related.hosts": [
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2207,6 +2219,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "process.name": "<IP>",
+        "related.hosts": [
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2776,6 +2791,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2821,6 +2839,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2866,6 +2887,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2911,6 +2935,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2956,6 +2983,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -3001,6 +3031,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -3046,6 +3079,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3091,6 +3127,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3142,6 +3181,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "192.0.2.95",
             "10.32.112.125"
@@ -3190,6 +3232,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "10.2.3.5"
         ],
@@ -3289,6 +3334,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "bad.example.com"
+        ],
         "related.ip": [
             "10.1.1.45",
             "192.88.99.129"

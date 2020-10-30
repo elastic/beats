@@ -872,8 +872,8 @@ type execveCall struct {
 	creds *commitCreds
 }
 
-func (e *execveCall) getProcess() process {
-	p := process{
+func (e *execveCall) getProcess() *process {
+	p := &process{
 		pid:     e.Meta.PID,
 		path:    readCString(e.Path[:]),
 		created: kernelTime(e.Meta.Timestamp),

@@ -83,6 +83,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -189,6 +192,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -293,6 +299,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -399,6 +408,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -504,6 +516,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -608,6 +623,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -715,6 +733,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -819,6 +840,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -924,6 +948,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1030,6 +1057,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1137,6 +1167,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "205.251.196.144"
@@ -1237,6 +1270,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1342,6 +1378,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1446,6 +1485,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1551,6 +1593,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1657,6 +1702,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1761,6 +1809,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1865,6 +1916,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1969,6 +2023,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -2071,6 +2128,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -2177,6 +2237,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"

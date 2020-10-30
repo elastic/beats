@@ -8,15 +8,39 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This is the Istio module. The Istio module collects metrics from the
+This is the Istio module.
+This module is compatible with versions before `1.5` of Istio where microservices architecture is used. If using
+versions prior to `1.5` then `mesh`, `mixer`, `pilot`, `galley`, `citadel` metricsets should be used where the Istio
+module collects metrics from the
 Istio https://istio.io/v1.4/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
+
+For versions after `1.5`, `istiod` and `proxy` metricsets can be used.
+
+`istiod` collects metrics directly from Istio Daemon while `proxy` collects from each of the proxy sidecars.
 
 The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
 
 [float]
 === Compatibility
 
-The Istio module is tested with Istio `1.4`.
+The Istio module is tested with Istio `1.4` for `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
+The Istio module is tested with Istio `1.7` for `istiod` and `proxy`.
+
+[float]
+=== Dashboard
+
+The Istio module includes predefined dashboards:
+
+1. overview information about Istio Daemon.
+
+2. Traffic information collected from istio-proxies.
+
+These dashboards are only compatible with versions of Istio after `1.5` which should be monitored with `istiod`
+and `proxy` metricsets.
+
+image::./images/metricbeat-istio-overview.png[]
+
+image::./images/metricbeat-istio-traffic.png[]
 
 
 [float]
@@ -62,6 +86,20 @@ metricbeat.modules:
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
+
+# Istio istiod to monitor the Istio Daemon for versions after 1.5 of Istio.
+- module: istio
+  metricsets: ['istiod']
+  period: 10s
+  # use istiod.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ['localhost:15014']
+
+# Istio proxy to monitor Envoy sidecars for versions after 1.5 of Istio.
+- module: istio
+  metricsets: ['proxy']
+  period: 10s
+  # it's recommended to deploy this metricset with autodiscovery, see metricset's docs for more info
+  hosts: ['localhost:15090']
 ----
 
 [float]
@@ -73,19 +111,27 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-istio-galley,galley>>
 
+* <<metricbeat-metricset-istio-istiod,istiod>>
+
 * <<metricbeat-metricset-istio-mesh,mesh>>
 
 * <<metricbeat-metricset-istio-mixer,mixer>>
 
 * <<metricbeat-metricset-istio-pilot,pilot>>
 
+* <<metricbeat-metricset-istio-proxy,proxy>>
+
 include::istio/citadel.asciidoc[]
 
 include::istio/galley.asciidoc[]
+
+include::istio/istiod.asciidoc[]
 
 include::istio/mesh.asciidoc[]
 
 include::istio/mixer.asciidoc[]
 
 include::istio/pilot.asciidoc[]
+
+include::istio/proxy.asciidoc[]
 

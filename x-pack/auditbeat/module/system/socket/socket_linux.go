@@ -158,7 +158,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	} else {
 		for _, p := range procs {
 			if i, err := p.Info(); err == nil {
-				process := process{
+				process := &process{
 					name:        i.Name,
 					pid:         uint32(i.PID),
 					args:        i.Args,

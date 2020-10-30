@@ -249,9 +249,13 @@ func NewLeaderElectionManager(
 	} else {
 		id = "beats-leader-" + uuid.String()
 	}
+	ns, err := kubernetes.InClusterNamespace()
+	if err != nil {
+		ns = "default"
+	}
 	lease := metav1.ObjectMeta{
 		Name:      cfg.LeaderLease,
-		Namespace: "default",
+		Namespace: ns,
 	}
 	metaUID := lease.GetObjectMeta().GetUID()
 	lem.leaderElection = leaderelection.LeaderElectionConfig{
@@ -262,7 +266,7 @@ func NewLeaderElectionManager(
 				Identity: id,
 			},
 		},
-		ReleaseOnCancel: true,
+		ReleaseOnCancel: false,
 		LeaseDuration:   15 * time.Second,
 		RenewDeadline:   10 * time.Second,
 		RetryPeriod:     2 * time.Second,

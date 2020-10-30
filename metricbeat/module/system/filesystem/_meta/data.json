@@ -1,33 +1,30 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.filesystem",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "filesystem"
+        "name": "filesystem",
+        "period": 10000
     },
     "service": {
         "type": "system"
     },
     "system": {
         "filesystem": {
-            "available": 53067177984,
-            "device_name": "/dev/dm-5",
-            "files": 0,
-            "free": 54342492160,
-            "free_files": 0,
-            "mount_point": "/var/lib/lxd/storage-pools/default",
-            "total": 86301999104,
-            "type": "btrfs",
+            "available": 148708327424,
+            "device_name": "/dev/mapper/fedora-root",
+            "files": 105089024,
+            "free": 148708327424,
+            "free_files": 103974920,
+            "mount_point": "/",
+            "total": 215211835392,
+            "type": "xfs",
             "used": {
-                "bytes": 31959506944,
-                "pct": 0.3759
+                "bytes": 66503507968,
+                "pct": 0.309
             }
         }
     }
