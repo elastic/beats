@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	inputName = "httpjson"
+	inputName = "httpjsonv2"
 )
 
 var (
