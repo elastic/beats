@@ -53,9 +53,18 @@ type paginationTransform interface {
 	run(transformContext, *pagination) (*pagination, error)
 }
 
+type maybeEvent struct {
+	err   error
+	event beat.Event
+}
+
+func (e maybeEvent) failed() bool { return e.err != nil }
+
+func (e maybeEvent) Error() string { return e.err.Error() }
+
 type splitTransform interface {
 	transform
-	run(transformContext, *response, []beat.Event) ([]beat.Event, error)
+	run(transformContext, *response, <-chan maybeEvent) error
 }
 
 type cursorTransform interface {

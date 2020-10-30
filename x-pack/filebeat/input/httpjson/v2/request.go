@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -126,16 +125,22 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transform
 }
 
 type requester struct {
-	log            *logp.Logger
-	client         *http.Client
-	requestFactory *requestFactory
+	log               *logp.Logger
+	client            *http.Client
+	requestFactory    *requestFactory
+	responseProcessor *responseProcessor
 }
 
-func newRequester(client *http.Client, requestFactory *requestFactory, log *logp.Logger) *requester {
+func newRequester(
+	client *http.Client,
+	requestFactory *requestFactory,
+	responseProcessor *responseProcessor,
+	log *logp.Logger) *requester {
 	return &requester{
-		log:            log,
-		client:         client,
-		requestFactory: requestFactory,
+		log:               log,
+		client:            client,
+		requestFactory:    requestFactory,
+		responseProcessor: responseProcessor,
 	}
 }
 
@@ -145,13 +150,26 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 		return fmt.Errorf("failed to create http request: %w", err)
 	}
 
-	resp, err := r.client.Do(req)
+	httpResp, err := r.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+	defer httpResp.Body.Close()
 
-	fmt.Println(string(body))
+	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx)
+	if err != nil {
+		return err
+	}
+
+	for maybeEvent := range eventsCh {
+		if maybeEvent.failed() {
+			r.log.Errorf("error processing response: %v", maybeEvent)
+			continue
+		}
+		if err := publisher.Publish(maybeEvent.event, trCtx.cursor.Clone()); err != nil {
+			r.log.Errorf("error publishing event: %v", err)
+		}
+	}
+
 	return nil
 }

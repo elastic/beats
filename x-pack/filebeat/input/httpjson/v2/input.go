@@ -132,7 +132,8 @@ func run(
 	}
 
 	requestFactory := newRequestFactory(config.Request, config.Auth, log)
-	requester := newRequester(httpClient, requestFactory, log)
+	responseProcessor := &responseProcessor{}
+	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	// loadContextFromCursor
 	trCtx := transformContext{}
