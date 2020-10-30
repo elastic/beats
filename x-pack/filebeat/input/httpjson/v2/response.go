@@ -69,7 +69,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				continue
 			}
 
-			event, err := makeEvent(page)
+			event, err := makeEvent(page.body)
 			if err != nil {
 				ch <- maybeEvent{err: err}
 				return

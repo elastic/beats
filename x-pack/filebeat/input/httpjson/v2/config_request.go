@@ -84,14 +84,18 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 type requestConfig struct {
-	URL        *urlConfig        `config:"url" validate:"required"`
-	Method     string            `config:"method" validate:"required"`
-	Body       *common.MapStr    `config:"body"`
-	Timeout    *time.Duration    `config:"timeout"`
-	SSL        *tlscommon.Config `config:"ssl"`
-	Retry      retryConfig       `config:"retry"`
-	RateLimit  *rateLimitConfig  `config:"rate_limit"`
-	Transforms transformsConfig  `config:"transforms"`
+	URL                     *urlConfig        `config:"url" validate:"required"`
+	Method                  string            `config:"method" validate:"required"`
+	Body                    *common.MapStr    `config:"body"`
+	Timeout                 *time.Duration    `config:"timeout"`
+	SSL                     *tlscommon.Config `config:"ssl"`
+	Retry                   retryConfig       `config:"retry"`
+	RedirectHeadersForward  bool              `config:"redirect.headers.forward"`
+	RedirectHeadersBanList  []string          `config:"redirect.headers.ban_list"`
+	RedirectLocationTrusted bool              `config:"redirect.location_trusted"`
+	RedirectMaxRedirects    int               `config:"redirect.max_redirects"`
+	RateLimit               *rateLimitConfig  `config:"rate_limit"`
+	Transforms              transformsConfig  `config:"transforms"`
 }
 
 func (c requestConfig) getTimeout() time.Duration {

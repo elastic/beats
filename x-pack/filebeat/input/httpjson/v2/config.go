@@ -29,8 +29,15 @@ func defaultConfig() config {
 		Interval: time.Minute,
 		Auth:     &authConfig{},
 		Request: &requestConfig{
-			Timeout: &timeout,
-			Method:  "GET",
+			Timeout:                 &timeout,
+			Method:                  "GET",
+			RedirectHeadersForward:  true,
+			RedirectLocationTrusted: false,
+			RedirectHeadersBanList: []string{
+				"WWW-Authenticate",
+				"Authorization",
+			},
+			RedirectMaxRedirects: 10,
 		},
 		Response: &responseConfig{},
 	}

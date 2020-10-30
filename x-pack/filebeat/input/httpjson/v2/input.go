@@ -173,7 +173,8 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 				TLSClientConfig:   tlsConfig.ToConfig(),
 				DisableKeepAlives: true,
 			},
-			Timeout: timeout,
+			Timeout:       timeout,
+			CheckRedirect: checkRedirect(config.Request),
 		},
 		Logger:       newRetryLogger(),
 		RetryWaitMin: config.Request.Retry.getWaitMin(),
@@ -188,6 +189,30 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 	}
 
 	return client.StandardClient(), nil
+}
+
+func checkRedirect(config *requestConfig) func(*http.Request, []*http.Request) error {
+	return func(req *http.Request, via []*http.Request) error {
+		if len(via) >= config.RedirectMaxRedirects {
+			return fmt.Errorf("stopped after %d redirects", config.RedirectMaxRedirects)
+		}
+
+		if !config.RedirectHeadersForward || len(via) == 0 {
+			return nil
+		}
+
+		prev := via[len(via)-1] // previous request to get headers from
+
+		req.Header = prev.Header.Clone()
+
+		if !config.RedirectLocationTrusted {
+			for _, k := range config.RedirectHeadersBanList {
+				req.Header.Del(k)
+			}
+		}
+
+		return nil
+	}
 }
 
 func makeEvent(body common.MapStr) (beat.Event, error) {

@@ -105,14 +105,14 @@ func (o *oAuth2Config) isEnabled() bool {
 func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
-	switch o.GetProvider() {
+	switch o.getProvider() {
 	case oAuth2ProviderAzure, oAuth2ProviderDefault:
 		creds := clientcredentials.Config{
 			ClientID:       o.ClientID,
 			ClientSecret:   o.ClientSecret,
-			TokenURL:       o.GetTokenURL(),
+			TokenURL:       o.getTokenURL(),
 			Scopes:         o.Scopes,
-			EndpointParams: o.GetEndpointParams(),
+			EndpointParams: o.getEndpointParams(),
 		}
 		return creds.Client(ctx), nil
 	case oAuth2ProviderGoogle:
@@ -135,9 +135,9 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 	}
 }
 
-// GetTokenURL returns the TokenURL.
-func (o *oAuth2Config) GetTokenURL() string {
-	switch o.GetProvider() {
+// getTokenURL returns the TokenURL.
+func (o *oAuth2Config) getTokenURL() string {
+	switch o.getProvider() {
 	case oAuth2ProviderAzure:
 		if o.TokenURL == "" {
 			return endpoints.AzureAD(o.AzureTenantID).TokenURL
@@ -147,14 +147,14 @@ func (o *oAuth2Config) GetTokenURL() string {
 	return o.TokenURL
 }
 
-// GetProvider returns provider in its canonical form.
-func (o oAuth2Config) GetProvider() oAuth2Provider {
+// getProvider returns provider in its canonical form.
+func (o oAuth2Config) getProvider() oAuth2Provider {
 	return o.Provider.canonical()
 }
 
-// GetEndpointParams returns endpoint params with any provider ones combined.
-func (o oAuth2Config) GetEndpointParams() map[string][]string {
-	switch o.GetProvider() {
+// getEndpointParams returns endpoint params with any provider ones combined.
+func (o oAuth2Config) getEndpointParams() map[string][]string {
+	switch o.getProvider() {
 	case oAuth2ProviderAzure:
 		if o.AzureResource != "" {
 			if o.EndpointParams == nil {
@@ -173,7 +173,7 @@ func (o *oAuth2Config) Validate() error {
 		return nil
 	}
 
-	switch o.GetProvider() {
+	switch o.getProvider() {
 	case oAuth2ProviderAzure:
 		return o.validateAzureProvider()
 	case oAuth2ProviderGoogle:
@@ -183,7 +183,7 @@ func (o *oAuth2Config) Validate() error {
 			return errors.New("both token_url and client credentials must be provided")
 		}
 	default:
-		return fmt.Errorf("unknown provider %q", o.GetProvider())
+		return fmt.Errorf("unknown provider %q", o.getProvider())
 	}
 
 	return nil
