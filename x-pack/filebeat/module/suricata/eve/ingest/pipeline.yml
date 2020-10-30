@@ -5,6 +5,203 @@ processors:
   - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
+
+  # Handle the different Suricata event types.
+  - lowercase:
+      field: suricata.eve.event_type
+      ignore_missing: true
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value:
+        - network
+  ## Alert
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "alert"
+      field: event.kind
+      value: alert
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "alert"
+      field: event.category
+      value:
+        - intrusion_detection
+  ## Anomaly and Alert
+  - lowercase:
+      field: suricata.eve.app_proto
+      ignore_missing: true
+  - set:
+      if: ctx?.suricata?.eve?.app_proto == "ftp-data"
+      field: network.protocol
+      value: ftp
+  - set:
+      if: >-
+        ctx?.suricata?.eve?.app_proto != "failed" &&
+        ctx?.suricata?.eve?.app_proto != "template" &&
+        ctx?.suricata?.eve?.app_proto != "template-rust"
+      field: network.protocol
+      value: '{{suricata.eve.app_proto}}'
+      ignore_empty_value: true
+  ## HTTP
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "http"
+      field: event.category
+      value:
+        - web
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "http"
+      field: event.type
+      value:
+        - access
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "http"
+      field: network.protocol
+      value: http
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "http" && ctx?.suricata?.eve?.http?.status < 400
+      field: event.outcome
+      value: success
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "http" && ctx?.suricata?.eve?.http?.status >= 400
+      field: event.outcome
+      value: failure
+  ## DNS
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "dns"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "dns"
+      field: network.protocol
+      value: dns
+  - pipeline:
+      if: >-
+        ctx?.network?.protocol == "dns"
+      name: '{< IngestPipeline "dns" >}'
+  ## FTP or FTP Data
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "ftp" || ctx?.suricata?.eve?.event_type == "ftp_data"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "ftp" || ctx?.suricata?.eve?.event_type == "ftp_data"
+      field: network.protocol
+      value: ftp
+  ## TLS
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "tls"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "tls"
+      field: network.protocol
+      value: tls
+  - pipeline:
+      if: ctx?.network?.protocol == "tls"
+      name: '{< IngestPipeline "tls" >}'
+  ## TFTP
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "tftp"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "tftp"
+      field: network.protocol
+      value: tftp
+  ## SMB
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "smb"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "smb"
+      field: network.protocol
+      value: smb
+  ## SSH
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "ssh"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "ssh"
+      field: network.protocol
+      value: ssh
+  ## Flow
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "flow"
+      field: event.type
+      value:
+        - connection
+  - append:
+      if: ctx?.suricata?.eve?.flow?.state == "new"
+      field: event.type
+      value:
+        - start
+  - append:
+      if: ctx?.suricata?.eve?.flow?.state == "closed"
+      field: event.type
+      value:
+        - end
+  ## RDP
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "rdp"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "rdp"
+      field: network.protocol
+      value: rdp
+  ## RFB (Remote Framebuffer Protocol)
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "rfb"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "rfb"
+      field: network.protocol
+      value: rfb
+  ## MQTT
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "mqtt"
+      field: event.type
+      value:
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "mqtt"
+      field: network.protocol
+      value: mqtt
+  ## HTTP2
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "http2"
+      field: event.category
+      value:
+        - web
+  - append:
+      if: ctx?.suricata?.eve?.event_type == "http2"
+      field: event.type
+      value:
+        - access
+        - protocol
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "http2"
+      field: network.protocol
+      value: http2
+  ## Stats
+  - set:
+      if: ctx?.suricata?.eve?.event_type == "stats"
+      field: event.kind
+      value: metric
+
   - set:
       value: "{{suricata.eve.http.http_method}}"
       field: http.request.method
@@ -17,11 +214,13 @@ processors:
       if: ctx.suricata?.eve?.http?.hostname != null
       value: '{{suricata.eve.http.hostname}}'
       field: destination.domain
+      allow_duplicates: false
   - remove:
       field: suricata.eve.http.hostname
       ignore_failure: true
   - script:
       lang: painless
+      tag: suricata_deduplicate_dest_domain
       source: >
         def domain = ctx.destination?.domain;
         if (domain instanceof Collection) {
@@ -219,124 +418,20 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
-  - uppercase:
-      field: tls.server.hash.sha1
-      ignore_missing: true
-  - split:
-      field: tls.server.hash.sha1
-      separator: ":"
-      ignore_missing: true
-  - join:
-      field: tls.server.hash.sha1
-      separator: ""
-      ignore_failure: true
-  - append:
-      field: related.hash
-      value: "{{tls.server.hash.sha1}}"
-      if: "ctx?.tls?.server?.hash?.sha1 != null"
-  - gsub:
-      field: suricata.eve.tls.issuerdn
-      pattern: \\,
-      replacement: ""
-      ignore_missing: true
-  - kv:
-      field: suricata.eve.tls.issuerdn
-      field_split: ', '
-      value_split: '='
-      target_field: suricata.eve.tls.kv_issuerdn
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.C
-      target_field: tls.server.x509.issuer.country
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.CN
-      target_field: tls.server.x509.issuer.common_name
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.L
-      target_field: tls.server.x509.issuer.locality
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.O
-      target_field: tls.server.x509.issuer.organization
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.OU
-      target_field: tls.server.x509.issuer.organizational_unit
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_issuerdn.ST
-      target_field: tls.server.x509.issuer.state_or_province
-      ignore_missing: true
-  - gsub:
-      field: suricata.eve.tls.subject
-      pattern: \\,
-      replacement: ""
-      ignore_missing: true
-  - kv:
-      field: suricata.eve.tls.subject
-      field_split: ', '
-      value_split: '='
-      target_field: suricata.eve.tls.kv_subject
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.C
-      target_field: tls.server.x509.subject.country
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.CN
-      target_field: tls.server.x509.subject.common_name
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.L
-      target_field: tls.server.x509.subject.locality
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.O
-      target_field: tls.server.x509.subject.organization
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.OU
-      target_field: tls.server.x509.subject.organizational_unit
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.tls.kv_subject.ST
-      target_field: tls.server.x509.subject.state_or_province
-      ignore_missing: true
-  - set:
-      field: tls.server.x509.serial_number
-      value: '{{suricata.eve.tls.serial}}'
-      ignore_empty_value: true
-  - gsub:
-      field: tls.server.x509.serial_number
-      pattern: ':'
-      replacement: ''
-      ignore_missing: true
-  - date:
-      field: suricata.eve.tls.notafter
-      target_field: tls.server.not_after
-      formats:
-        - ISO8601
-      if: ctx.suricata?.eve?.tls?.notafter != null
-  - date:
-      field: suricata.eve.tls.notbefore
-      target_field: tls.server.not_before
-      formats:
-        - ISO8601
-      if: ctx.suricata?.eve?.tls?.notbefore != null
-  - set:
-      field: tls.server.x509.not_after
-      value: '{{tls.server.not_after}}'
-      ignore_empty_value: true
-  - set:
-      field: tls.server.x509.not_before
-      value: '{{tls.server.not_before}}'
-      ignore_empty_value: true
   - append:
       field: related.hosts
       value: '{{url.domain}}'
       if: ctx.url?.domain != null && ctx.url?.domain != ''
+      allow_duplicates: false
+  - append:
+      if: ctx?.source?.ip != null
+      field: related.ip
+      value: '{{source.ip}}'
+      allow_duplicates: false
+  - append:
+      if: ctx?.destination?.ip != null
+      field: related.ip
+      value: '{{destination.ip}}'
       allow_duplicates: false
   - remove:
       field:
@@ -345,8 +440,6 @@ processors:
         - suricata.eve.flow.start
         - suricata.eve.http.http_method
         - suricata.eve.http.http_user_agent
-        - suricata.eve.tls.kv_issuerdn
-        - suricata.eve.tls.kv_subject
       ignore_missing: true
 on_failure:
   - set:
