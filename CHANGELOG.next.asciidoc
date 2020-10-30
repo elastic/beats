@@ -729,6 +729,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Add SSL option to checkpoint module {pull}19560[19560]
+- Copy tag names from MISP data into events. {pull}21664[21664]
 
 *Heartbeat*
 
