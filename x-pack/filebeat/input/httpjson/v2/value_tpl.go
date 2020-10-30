@@ -65,7 +65,11 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 		return defaultVal
 	}
 
-	return buf.String()
+	val = buf.String()
+	if val == "" {
+		val = defaultVal
+	}
+	return val
 }
 
 var (
