@@ -41,12 +41,14 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
-			addMonitorStatus,
-			addMonitorDuration,
-		), func() jobs.JobWrapper {
-			return addMonitorMeta(stdMonFields, len(js) > 1)
-		}, func() jobs.JobWrapper {
-			return makeAddSummary()
+			addMonitorMeta(stdMonFields, len(js) > 1),
+			addMonitorStatus(stdMonFields.Type),
+		),
+		func() jobs.JobWrapper {
+			return addMonitorDuration(stdMonFields.Type)
+		},
+		func() jobs.JobWrapper {
+			return makeAddSummary(stdMonFields.Type)
 		})
 }
 
@@ -107,24 +109,44 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func addMonitorStatus(origJob jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		cont, err := origJob(event)
-		fields := common.MapStr{
-			"monitor": common.MapStr{
-				"status": look.Status(err),
-			},
+
+func addMonitorStatus(monitorType string) jobs.JobWrapper {
+	return func(origJob jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := origJob(event)
+
+			// Non-summary browser events have no status associated
+			if monitorType == "browseroeeo" {
+				if t, _ := event.GetValue("synthetics.type"); t != "heartbeat/summary" {
+					return cont, nil
+				}
+			}
+
+			fields := common.MapStr{
+				"monitor": common.MapStr{
+					"status": look.Status(err),
+				},
+			}
+			if err != nil {
+				fields["error"] = look.Reason(err)
+			}
+			eventext.MergeEventFields(event, fields)
+			return cont, nil
 		}
-		if err != nil {
-			fields["error"] = look.Reason(err)
-		}
-		eventext.MergeEventFields(event, fields)
-		return cont, nil
 	}
 }
 
 // addMonitorDuration executes the given Job, checking the duration of its run.
-func addMonitorDuration(job jobs.Job) jobs.Job {
+func addMonitorDuration(monitorType string) jobs.JobWrapper {
+	if monitorType == "browser" {
+		return addBrowserMonitorDuration
+	}
+
+	return addSimpleMonitorDuration
+}
+
+// addSimpleMonitorDuration adds duration correctly for all non-browser jobs
+func addSimpleMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
 
@@ -143,8 +165,43 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
+// addBrowserMonitorDuration adds duration correctly for all browser jobs
+// measuring the duration from the first event to the last.
+// Also, we don't set event.Timestamp since browser based events set them themselves
+func addBrowserMonitorDuration(job jobs.Job) jobs.Job {
+	var start time.Time
+	var end time.Time
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		cont, err := job(event)
+
+		syntheticsType, _ := event.GetValue("synthetics.type")
+		name, _ := event.GetValue("monitor.name")
+		if event != nil  {
+			switch syntheticsType {
+			case "journey/start":
+				logp.Warn("JOURNEY START %s %v", name, event.Timestamp)
+				start = event.Timestamp
+			case "journey/end":
+				logp.Warn("JOURNEY END %s %v", name, event.Timestamp)
+				end = event.Timestamp
+			case "heartbeat/summary":
+				logp.Warn("JOURNEY DUR %s %v", name, end.Sub(start))
+				eventext.MergeEventFields(event, common.MapStr{
+					"monitor": common.MapStr{
+						"duration": look.RTT(end.Sub(start)),
+					},
+				})
+				start = time.Time{} // reset to zero for next job
+			}
+		}
+
+		return cont, err
+	}
+}
+
+
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary() jobs.JobWrapper {
+func makeAddSummary(monitorType string) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -173,15 +230,16 @@ func makeAddSummary() jobs.JobWrapper {
 
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := job(event)
+			cont, jobErr := job(event)
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
 
 			// If the event is cancelled we don't record it as being either up or down since
 			// we discard the event anyway.
+			var eventStatus interface{}
 			if !eventext.IsEventCancelled(event) {
 				// After each job
-				eventStatus, _ := event.GetValue("monitor.status")
+				eventStatus, _ = event.GetValue("monitor.status")
 				if eventStatus == "up" {
 					state.up++
 				} else {
@@ -199,16 +257,27 @@ func makeAddSummary() jobs.JobWrapper {
 
 			// After last job
 			if state.remaining == 0 {
+				up := state.up
+				down := state.down
+				if monitorType == "browser" {
+					if eventStatus == "down" {
+						up = 0
+						down = 1
+					} else {
+						up = 1
+						down = 0
+					}
+				}
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
-						"up":   state.up,
-						"down": state.down,
+						"up":   up,
+						"down": down,
 					},
 				})
 				resetState()
 			}
 
-			return cont, err
+			return cont, jobErr
 		}
 	}
 }
