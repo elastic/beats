@@ -432,6 +432,15 @@ The ID for the access key used to read from the SQS queue.
 
 The secret token used for authenticating to the SQS queue.
 
+*`var.visibility_timeout`*::
+
+The duration that the received messages are hidden from ReceiveMessage request.
+Default to be 300 seconds.
+
+*`var.api_timeout`*::
+
+Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
 :has-dashboards!:
 
 :fileset_ex!:
