@@ -151108,6 +151108,453 @@ type: keyword
 
 --
 
+[float]
+=== misp
+
+Fields for MISP Threat Intel
+
+
+
+*`threatintel.misp.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.threat_level_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.info`*::
++
+--
+ID
+
+
+type: text
+
+--
+
+*`threatintel.misp.published`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.uuid`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.date`*::
++
+--
+ID
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute_count`*::
++
+--
+ID
+
+
+type: long
+
+--
+
+*`threatintel.misp.analysis`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.timestamp`*::
++
+--
+ID
+
+
+type: date
+
+--
+
+*`threatintel.misp.distribution`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.proposal_email_lock`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.locked`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.publish_timestamp`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.sharing_group_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.disable_correlation`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.extends_uuid`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.name`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.uuid`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.local`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.orgc.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.name`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.uuid`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.local`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.type`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.category`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.to_ids`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.uuid`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.event_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.distribution`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.timestamp`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.comment`*::
++
+--
+ID
+
+
+type: text
+
+--
+
+*`threatintel.misp.attribute.sharing_group_id`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.deleted`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.disable_correlation`*::
++
+--
+ID
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.object_id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.object_relation`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.first_seen`*::
++
+--
+ID
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute.last_seen`*::
++
+--
+ID
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute.value`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.tags`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
 [[exported-fields-tomcat]]
 == Apache Tomcat fields
 

@@ -1,0 +1,61 @@
+description: Pipeline for parsing MISP Threat Intel
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: json.Event
+    target_field: threatintel.misp
+    ignore_missing: true
+- remove:
+    field:
+    - threatintel.misp.ShadowAttribute
+    - message
+    - threatintel.misp.RelatedEvent
+    - threatintel.misp.Galaxy
+    - threatintel.misp.Attribute.Galaxy
+    - threatintel.misp.Attribute.ShadowAttribute
+    - threatintel.misp.Object
+    - threatintel.misp.EventReport
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.Attribute
+    target_field: threatintel.misp.attribute
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.Orgc
+    target_field: threatintel.misp.orgc
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.Org
+    target_field: threatintel.misp.org
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.Attribute
+    target_field: threatintel.misp.attribute
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.Tag
+    target_field: threatintel.misp.tag
+    ignore_missing: true
+- foreach:
+    field: threatintel.misp.tag
+    processor:
+      gsub:
+        field: "_ingest._value.name"
+        pattern: '[\\\"]'
+        replacement: ""
+- foreach:
+    field: threatintel.misp.tag
+    processor:
+      append:
+        field: "threatintel.misp.tags"
+        value: "{{ _ingest._value.name }}"
+- remove:
+    field:
+    - threatintel.misp.tag
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

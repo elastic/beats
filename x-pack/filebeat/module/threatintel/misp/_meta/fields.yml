@@ -1,0 +1,181 @@
+- name: misp
+  type: group
+  description: >
+    Fields for MISP Threat Intel
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      ID
+  - name: orgc_id
+    type: keyword
+    description: >
+      ID
+  - name: org_id
+    type: keyword
+    description: >
+      ID
+  - name: threat_level_id
+    type: keyword
+    description: >
+      ID
+  - name: info
+    type: text
+    description: >
+      ID
+  - name: published
+    type: boolean
+    description: >
+      ID
+  - name: uuid
+    type: keyword
+    description: >
+      ID
+  - name: date
+    type: date
+    description: >
+      ID
+  - name: attribute_count
+    type: long
+    description: >
+      ID
+  - name: analysis
+    type: keyword
+    description: >
+      ID
+  - name: timestamp
+    type: date
+    description: >
+      ID
+  - name: distribution
+    type: keyword
+    description: >
+      ID
+  - name: proposal_email_lock
+    type: boolean
+    description: >
+      ID
+  - name: locked
+    type: boolean
+    description: >
+      ID
+  - name: publish_timestamp
+    type: keyword
+    description: >
+      ID
+  - name: sharing_group_id
+    type: keyword
+    description: >
+      ID
+  - name: disable_correlation
+    type: boolean
+    description: >
+      ID
+  - name: extends_uuid
+    type: keyword
+    description: >
+      ID
+  - name: org.id
+    type: keyword
+    description: >
+      ID
+  - name: org.name
+    type: keyword
+    description: >
+      ID
+  - name: org.uuid
+    type: keyword
+    description: >
+      ID
+  - name: org.local
+    type: boolean
+    description: >
+      ID
+  - name: orgc.id
+    type: keyword
+    description: >
+      ID
+  - name: orgc.name
+    type: keyword
+    description: >
+      ID
+  - name: orgc.uuid
+    type: keyword
+    description: >
+      ID
+  - name: orgc.local
+    type: boolean
+    description: >
+      ID
+  - name: attribute.id
+    type: keyword
+    description: >
+      ID
+  - name: attribute.type
+    type: keyword
+    description: >
+      ID
+  - name: attribute.category
+    type: keyword
+    description: >
+      ID
+  - name: attribute.to_ids
+    type: boolean
+    description: >
+      ID
+  - name: attribute.uuid
+    type: keyword
+    description: >
+      ID
+  - name: attribute.event_id
+    type: keyword
+    description: >
+      ID
+  - name: attribute.distribution
+    type: keyword
+    description: >
+      ID
+  - name: attribute.timestamp
+    type: keyword
+    description: >
+      ID
+  - name: attribute.comment
+    type: text
+    description: >
+      ID
+  - name: attribute.sharing_group_id
+    type: boolean
+    description: >
+      ID
+  - name: attribute.deleted
+    type: boolean
+    description: >
+      ID
+  - name: attribute.disable_correlation
+    type: boolean
+    description: >
+      ID
+  - name: attribute.object_id
+    type: keyword
+    description: >
+      ID
+  - name: attribute.object_relation
+    type: keyword
+    description: >
+      ID
+  - name: attribute.first_seen
+    type: date
+    description: >
+      ID
+  - name: attribute.last_seen
+    type: date
+    description: >
+      ID
+  - name: attribute.value
+    type: keyword
+    description: >
+      ID
+  - name: tags
+    type: keyword
+    description: >
+      ID
