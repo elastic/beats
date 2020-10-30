@@ -105,9 +105,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				"time":  counters.WriteTime,
 				"bytes": counters.WriteBytes,
 			},
-			"io": common.MapStr{
-				"time": counters.IoTime,
-			},
 		}
 
 		// accumulate values from all interfaces
@@ -121,6 +118,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				return errors.Wrap(err, "error calculating iostat")
 			}
 			event["iostat"] = iostat.AddLinuxIOStat(result)
+		}
+
+		if runtime.GOOS != "windows" {
+			event.Put("io.time", counters.IoTime)
 		}
 
 		if counters.SerialNumber != "" {
