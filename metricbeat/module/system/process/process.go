@@ -138,6 +138,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 
+		// use process.command_line ECS field name for system.process.cmdline
+		if v, ok := proc["cmdline"]; ok {
+			rootFields.Put("process.command_line", v)
+		}
+
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
 			rootFields.Put("process.working_directory", cwd)
 		}
