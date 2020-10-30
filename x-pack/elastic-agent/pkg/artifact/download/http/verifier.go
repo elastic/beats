@@ -26,6 +26,7 @@ import (
 const (
 	publicKeyURI = "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
 	ascSuffix    = ".asc"
+	sha512Length = 128
 )
 
 // Verifier verifies a downloaded package by comparing with public ASC
