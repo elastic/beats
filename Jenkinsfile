@@ -77,6 +77,7 @@ pipeline {
         withGithubNotify(context: "Lint") {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             cmd(label: "make check-python", script: "make check-python")
             cmd(label: "make check-go", script: "make check-go")
             cmd(label: "Check for changes", script: "make check-no-changes")
@@ -123,6 +124,12 @@ pipeline {
     }
   }
   post {
+    success {
+      writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
+COMMIT=${env.GIT_BASE_COMMIT}
+VERSION=${env.VERSION}-SNAPSHOT""")
+      archiveArtifacts artifacts: 'packaging.properties'
+    }
     always {
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
@@ -346,6 +353,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
       } catch(err) {
         // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
         upload = true
+        error("Error '${err.toString()}'")
       } finally {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
