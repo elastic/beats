@@ -6,6 +6,7 @@ package v2
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -189,17 +190,21 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 	return client.StandardClient(), nil
 }
 
-func makeEvent(body string) beat.Event {
+func makeEvent(body common.MapStr) (beat.Event, error) {
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return beat.Event{}, err
+	}
 	now := timeNow()
 	fields := common.MapStr{
 		"event": common.MapStr{
 			"created": now,
 		},
-		"message": body,
+		"message": string(bodyBytes),
 	}
 
 	return beat.Event{
 		Timestamp: now,
 		Fields:    fields,
-	}
+	}, nil
 }

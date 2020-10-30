@@ -72,11 +72,6 @@ type splitTransform interface {
 	run(transformContext, *transformable, <-chan maybeEvent) error
 }
 
-type cursorTransform interface {
-	transform
-	run(transformContext, common.MapStr) (common.MapStr, error)
-}
-
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
 func newTransformsFromConfig(config transformsConfig, namespace string) (transforms, error) {
 	var trans transforms

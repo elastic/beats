@@ -61,14 +61,20 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				}
 			}
 
-			if rp.splitTransform == nil {
+			if rp.splitTransform != nil {
+				if err := rp.splitTransform.run(trCtx, page, ch); err != nil {
+					ch <- maybeEvent{err: err}
+					return
+				}
 				continue
 			}
 
-			if err := rp.splitTransform.run(trCtx, page, ch); err != nil {
+			event, err := makeEvent(page)
+			if err != nil {
 				ch <- maybeEvent{err: err}
 				return
 			}
+			ch <- maybeEvent{event: event}
 		}
 	}()
 
