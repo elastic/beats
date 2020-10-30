@@ -19,7 +19,9 @@ package synthexec
 
 import (
 	"fmt"
+	"math"
 	"net/url"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,7 +34,7 @@ type SynthEvent struct {
 	Index                int                    `json:"index""`
 	Step                 *Step                  `json:"step"`
 	Journey              *Journey               `json:"journey"`
-	TimestampEpochMillis float64                `json:"@timestamp"`
+	TimestampEpochMicros float64                `json:"@timestamp"`
 	Payload              map[string]interface{} `json:"payload"`
 	Blob                 string                 `json:"blob"`
 	BlobMime             string                 `json:"blob_mime"`
@@ -95,6 +97,14 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 	}
 
 	return m
+}
+
+func (se SynthEvent) Timestamp() time.Time {
+	seconds := se.TimestampEpochMicros/1e6
+	wholeSeconds := math.Floor(seconds)
+	micros := (seconds - wholeSeconds) * 1e6
+	nanos := micros * 1000
+	return time.Unix(int64(wholeSeconds), int64(nanos))
 }
 
 type Step struct {

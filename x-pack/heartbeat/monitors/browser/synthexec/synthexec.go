@@ -140,7 +140,6 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		}
 		return []jobs.Job{readResultsJob(ctx, mpx, readResultsState{})}, nil
 	}
-
 }
 
 type readResultsState struct {
@@ -163,14 +162,15 @@ func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResults
 			if se == nil {
 				if state.journeyComplete {
 					event.PutValue("url", state.urlFields)
+					event.PutValue("synthetics.type", "heartbeat/summary")
 					return nil, state.lastError
 				}
 				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
 			}
 
 			// Set timestamp, which comes as a float of millis
-			if se.TimestampEpochMillis != 0 {
-				event.Timestamp = time.Unix(int64(se.TimestampEpochMillis/1000), (int64(se.TimestampEpochMillis) % 1000)*1000000)
+			if se.TimestampEpochMicros != 0 {
+				event.Timestamp = se.Timestamp()
 			}
 
 			switch se.Type {
@@ -330,7 +330,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
-			TimestampEpochMillis: float64(time.Now().UnixNano() / int64(time.Millisecond)),
+			TimestampEpochMicros: float64(time.Now().UnixNano() / int64(time.Millisecond)),
 			Payload: map[string]interface{}{
 				"message": text,
 			},

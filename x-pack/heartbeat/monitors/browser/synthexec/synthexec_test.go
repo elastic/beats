@@ -37,7 +37,7 @@ func TestLineToSynthEventFactory(t *testing.T) {
 	require.NotNil(t, res)
 	require.Equal(t, testType, res.Type)
 	require.Equal(t, testText, res.Payload["message"])
-	require.Greater(t, res.TimestampEpochMillis, float64(0))
+	require.Greater(t, res.TimestampEpochMicros, float64(0))
 }
 
 func TestJsonToSynthEvent(t *testing.T) {
@@ -67,7 +67,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 			name: "a valid line",
 			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
 			synthEvent: &SynthEvent{
-				TimestampEpochMillis: 7165676811882692608,
+				TimestampEpochMicros: 7165676811882692608,
 				Type:                 "step/end",
 				Journey: &Journey{
 					Name: "inline",
