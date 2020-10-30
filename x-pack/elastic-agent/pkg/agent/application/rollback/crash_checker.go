@@ -7,31 +7,70 @@ package rollback
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
+
+const (
+	checkPeriod      = 10 * time.Second
+	evaluatedPeriods = 6 // with 10s period this means we evaluate 60s of agent run
+	crashesAllowed   = 1 // means that within 60s one restart is allowed, additional one is considered crash
+)
+
+type serviceHandler interface {
+	PID(ctx context.Context) (int, error)
+	Close()
+}
 
 // CrashChecker checks agent for crash pattern in Elastic Agent lifecycle.
 type CrashChecker struct {
 	notifyChan chan error
+	q          *disctintQueue
+	log        *logger.Logger
+	sc         serviceHandler
 }
 
 // NewCrashChecker creates a new crash checker.
-func NewCrashChecker(ch chan error) *CrashChecker {
-	return &CrashChecker{
-		notifyChan: ch,
+func NewCrashChecker(ctx context.Context, ch chan error, log *logger.Logger) (*CrashChecker, error) {
+	q, err := newDistinctQueue(evaluatedPeriods)
+	if err != nil {
+		return nil, err
 	}
+
+	c := &CrashChecker{
+		notifyChan: ch,
+		q:          q,
+		log:        log,
+	}
+
+	if err := c.Init(ctx); err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }
 
 // Run runs the checking loop.
-func (ch CrashChecker) Run(ctx context.Context) {
-	// TODO: finish me
+func (ch *CrashChecker) Run(ctx context.Context) {
+	defer ch.sc.Close()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(checkPeriod):
+			pid, err := ch.sc.PID(ctx)
+			if err != nil {
+				ch.log.Error(err)
+			}
 
-}
-
-func getAgentServicePid() int {
-	// TODO: finish me
-	return 0
+			ch.q.Push(pid)
+			if restarts := ch.q.Distinct(); restarts > crashesAllowed {
+				ch.notifyChan <- errors.New("service restarted '%d' times within '%d' seconds", restarts, checkPeriod.Seconds())
+			}
+		}
+	}
 }
 
 type disctintQueue struct {
@@ -56,7 +95,7 @@ func (dq *disctintQueue) Push(id int) {
 	dq.q = append([]int{id}, dq.q[:dq.size-1]...)
 }
 
-func (dq *disctintQueue) Disctinct() int {
+func (dq *disctintQueue) Distinct() int {
 	dq.lock.Lock()
 	defer dq.lock.Unlock()
 

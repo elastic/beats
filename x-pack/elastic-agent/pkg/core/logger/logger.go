@@ -54,7 +54,7 @@ func new(name string, cfg *Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	internal, err := makeInternalFileOutput()
+	internal, err := makeInternalFileOutput(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -96,11 +96,11 @@ func DefaultLoggingConfig() *Config {
 // makeInternalFileOutput creates a zapcore.Core logger that cannot be changed with configuration.
 //
 // This is the logger that the spawned filebeat expects to read the log file from and ship to ES.
-func makeInternalFileOutput() (zapcore.Core, error) {
+func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", agentName))
+	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),

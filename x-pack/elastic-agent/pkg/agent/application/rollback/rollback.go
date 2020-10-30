@@ -56,6 +56,10 @@ func Cleanup(prevHash string) error {
 // InvokeWatcher invokes an agent instance using watcher argument for watching behavior of
 // agent during upgrade period.
 func InvokeWatcher() error {
+	if !upgrade.IsUpgradeable() {
+		return nil
+	}
+
 	topExePath := filepath.Join(paths.Top(), agentName)
 
 	cmd := exec.Command(topExePath, watcherSubcommand)

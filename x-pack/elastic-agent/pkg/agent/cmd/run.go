@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/rollback"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -86,6 +87,12 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
+	}
+
+	// initiate agent watcher
+	if err := rollback.InvokeWatcher(); err != nil {
+		// we should not fail because watcher is not working
+		logger.Error("failed to invoke rollback watcher")
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {

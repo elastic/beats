@@ -65,6 +65,13 @@ type stateReporter interface {
 	OnStateChange(id string, name string, s state.State)
 }
 
+// IsUpgradeable when agent is installed and running as a service or flag was provided.
+func IsUpgradeable() bool {
+	// only upgradeable if running from Agent installer and running under the
+	// control of the system supervisor (or built specifically with upgrading enabled)
+	return release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
+}
+
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
 func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker, r stateReporter) *Upgrader {
 	return &Upgrader{
@@ -75,7 +82,7 @@ func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logg
 		reexec:      reexec,
 		acker:       a,
 		reporter:    r,
-		upgradeable: getUpgradeable(),
+		upgradeable: IsUpgradeable(),
 	}
 }
 
@@ -223,12 +230,6 @@ func (u *Upgrader) reportUpdating(version string) {
 
 func rollbackInstall(hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
-}
-
-func getUpgradeable() bool {
-	// only upgradeable if running from Agent installer and running under the
-	// control of the system supervisor (or built specifically with upgrading enabled)
-	return release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor())
 }
 
 func copyActionStore(newHash string) error {
