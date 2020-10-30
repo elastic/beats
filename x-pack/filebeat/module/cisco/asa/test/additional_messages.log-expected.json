@@ -1918,8 +1918,8 @@
         "cisco.asa.destination_interface": "fw111",
         "cisco.asa.message_id": "106014",
         "cisco.asa.source_interface": "fw111",
-        "destination.address": "10.10.10.10(type",
-        "destination.domain": "10.10.10.10(type",
+        "destination.address": "10.10.10.10",
+        "destination.ip": "10.10.10.10",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -1951,6 +1951,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
