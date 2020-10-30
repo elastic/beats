@@ -88,8 +88,29 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             deleteDir()
-            gitCheckout(basedir: "${BASE_DIR}")
+            script {
+              if(isUpstreamTrigger()) {
+                try {
+                  copyArtifacts(filter: 'packaging.properties',
+                                flatten: true,
+                                projectName: "Beats/beats/${env.JOB_BASE_NAME}",
+                                selector: upstream(fallbackToLastSuccessful: true))
+                  def props = readProperties(file: 'packaging.properties')
+                  gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
+                } catch(err) {
+                  // Fallback to the head of the branch as used to be.
+                  gitCheckout(basedir: "${BASE_DIR}")
+                }
+              } else {
+                gitCheckout(basedir: "${BASE_DIR}")
+              }
+            }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+            withMageEnv(){
+              dir("${BASE_DIR}"){
+                setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              }
+            }
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
         }
@@ -229,6 +250,17 @@ def packageLinux(beat, platform){
           publishPackages("${env.BEATS_FOLDER}")
         }
       }
+      post {
+        success {
+          writeFile(file: 'beats-tester.properties',
+                    text: """\
+                    ## To be consumed by the beats-tester pipeline
+                    COMMIT=${env.GIT_BASE_COMMIT}
+                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}
+                    VERSION=${env.BEAT_VERSION}-SNAPSHOT""".stripIndent()) // stripIdent() requires '''/
+          archiveArtifacts artifacts: 'beats-tester.properties'
+        }
+      }
     }
   }
 }
@@ -254,7 +286,7 @@ def pushCIDockerImages(){
 }
 
 def tagAndPush(beatName){
-  def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
+  def libbetaVer = env.BEAT_VERSION
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
     aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
