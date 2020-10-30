@@ -426,9 +426,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
-- Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
 - Remove io.time from windows {pull}22237[22237]
-- Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 
 *Packetbeat*
 
