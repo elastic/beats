@@ -25,28 +25,15 @@ func registerRequestTransforms() {
 	registerTransform(requestNamespace, setName, newSetRequest)
 }
 
-type request struct {
-	body   common.MapStr
-	header http.Header
-	url    *url.URL
-}
-
-func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []requestTransform) (*request, error) {
-	req := &request{
-		body:   common.MapStr{},
-		header: http.Header{},
-	}
-
-	clonedURL, err := url.Parse(url.String())
-	if err != nil {
-		return nil, err
-	}
-	req.url = clonedURL
+func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []basicTransform) (*transformable, error) {
+	req := emptyTransformable()
+	req.url = url
 
 	if body != nil {
 		req.body.DeepUpdate(*body)
 	}
 
+	var err error
 	for _, t := range trs {
 		req, err = t.run(ctx, req)
 		if err != nil {
@@ -61,7 +48,7 @@ type requestFactory struct {
 	url        url.URL
 	method     string
 	body       *common.MapStr
-	transforms []requestTransform
+	transforms []basicTransform
 	user       string
 	password   string
 	log        *logp.Logger
@@ -69,7 +56,7 @@ type requestFactory struct {
 
 func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
-	ts, _ := newRequestTransformsFromConfig(config.Transforms)
+	ts, _ := newBasicTransformsFromConfig(config.Transforms, requestNamespace)
 	rf := &requestFactory{
 		url:        *config.URL.URL,
 		method:     config.Method,
@@ -156,7 +143,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 	}
 	defer httpResp.Body.Close()
 
-	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx)
+	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	if err != nil {
 		return err
 	}

@@ -14,12 +14,6 @@ import (
 
 const appendName = "append"
 
-var (
-	_ requestTransform    = &appendRequest{}
-	_ responseTransform   = &appendResponse{}
-	_ paginationTransform = &appendPagination{}
-)
-
 type appendConfig struct {
 	Target  string    `config:"target"`
 	Value   *valueTpl `config:"value"`
@@ -31,22 +25,10 @@ type appendt struct {
 	value        *valueTpl
 	defaultValue string
 
-	run func(ctx transformContext, transformable *transformable, key, val string) error
+	runFunc func(ctx transformContext, transformable *transformable, key, val string) error
 }
 
 func (appendt) transformName() string { return appendName }
-
-type appendRequest struct {
-	appendt
-}
-
-type appendResponse struct {
-	appendt
-}
-
-type appendPagination struct {
-	appendt
-}
 
 func newAppendRequest(cfg *common.Config) (transform, error) {
 	append, err := newAppend(cfg)
@@ -56,28 +38,16 @@ func newAppendRequest(cfg *common.Config) (transform, error) {
 
 	switch append.targetInfo.Type {
 	case targetBody:
-		append.run = appendBody
+		append.runFunc = appendBody
 	case targetHeader:
-		append.run = appendHeader
+		append.runFunc = appendHeader
 	case targetURLParams:
-		append.run = appendURLParams
+		append.runFunc = appendURLParams
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", append.targetInfo.Type)
 	}
 
-	return &appendRequest{appendt: append}, nil
-}
-
-func (appendReq *appendRequest) run(ctx transformContext, req *request) (*request, error) {
-	transformable := &transformable{
-		body:   req.body,
-		header: req.header,
-		url:    req.url,
-	}
-	if err := appendReq.appendt.runAppend(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return req, nil
+	return &append, nil
 }
 
 func newAppendResponse(cfg *common.Config) (transform, error) {
@@ -88,24 +58,12 @@ func newAppendResponse(cfg *common.Config) (transform, error) {
 
 	switch append.targetInfo.Type {
 	case targetBody:
-		append.run = appendBody
+		append.runFunc = appendBody
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", append.targetInfo.Type)
 	}
 
-	return &appendResponse{appendt: append}, nil
-}
-
-func (appendRes *appendResponse) run(ctx transformContext, res *response) (*response, error) {
-	transformable := &transformable{
-		body:   res.body,
-		header: res.header,
-		url:    res.url,
-	}
-	if err := appendRes.appendt.runAppend(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return res, nil
+	return &append, nil
 }
 
 func newAppendPagination(cfg *common.Config) (transform, error) {
@@ -116,28 +74,16 @@ func newAppendPagination(cfg *common.Config) (transform, error) {
 
 	switch append.targetInfo.Type {
 	case targetBody:
-		append.run = appendBody
+		append.runFunc = appendBody
 	case targetHeader:
-		append.run = appendHeader
+		append.runFunc = appendHeader
 	case targetURLParams:
-		append.run = appendURLParams
+		append.runFunc = appendURLParams
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", append.targetInfo.Type)
 	}
 
-	return &appendPagination{appendt: append}, nil
-}
-
-func (appendPag *appendPagination) run(ctx transformContext, pag *pagination) (*pagination, error) {
-	transformable := &transformable{
-		body:   pag.body,
-		header: pag.header,
-		url:    pag.url,
-	}
-	if err := appendPag.appendt.runAppend(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return pag, nil
+	return &append, nil
 }
 
 func newAppend(cfg *common.Config) (appendt, error) {
@@ -158,9 +104,12 @@ func newAppend(cfg *common.Config) (appendt, error) {
 	}, nil
 }
 
-func (append *appendt) runAppend(ctx transformContext, transformable *transformable) error {
+func (append *appendt) run(ctx transformContext, transformable *transformable) (*transformable, error) {
 	value := append.value.Execute(ctx, transformable, append.defaultValue)
-	return append.run(ctx, transformable, append.targetInfo.Name, value)
+	if err := append.runFunc(ctx, transformable, append.targetInfo.Name, value); err != nil {
+		return nil, err
+	}
+	return transformable, nil
 }
 
 func appendToCommonMap(m common.MapStr, key, val string) error {

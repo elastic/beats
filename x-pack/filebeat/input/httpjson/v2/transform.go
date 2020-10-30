@@ -25,32 +25,37 @@ type transforms []transform
 type transformContext struct {
 	cursor       common.MapStr
 	lastEvent    common.MapStr
-	lastResponse common.MapStr
+	lastResponse *transformable
+}
+
+func emptyTransformContext() transformContext {
+	return transformContext{
+		cursor:       make(common.MapStr),
+		lastEvent:    make(common.MapStr),
+		lastResponse: emptyTransformable(),
+	}
 }
 
 type transformable struct {
 	body   common.MapStr
 	header http.Header
-	url    *url.URL
+	url    url.URL
+}
+
+func emptyTransformable() *transformable {
+	return &transformable{
+		body:   make(common.MapStr),
+		header: make(http.Header),
+	}
 }
 
 type transform interface {
 	transformName() string
 }
 
-type requestTransform interface {
+type basicTransform interface {
 	transform
-	run(transformContext, *request) (*request, error)
-}
-
-type responseTransform interface {
-	transform
-	run(transformContext, *response) (*response, error)
-}
-
-type paginationTransform interface {
-	transform
-	run(transformContext, *pagination) (*pagination, error)
+	run(transformContext, *transformable) (*transformable, error)
 }
 
 type maybeEvent struct {
@@ -64,7 +69,7 @@ func (e maybeEvent) Error() string { return e.err.Error() }
 
 type splitTransform interface {
 	transform
-	run(transformContext, *response, <-chan maybeEvent) error
+	run(transformContext, *transformable, <-chan maybeEvent) error
 }
 
 type cursorTransform interface {
@@ -108,53 +113,17 @@ func newTransformsFromConfig(config transformsConfig, namespace string) (transfo
 	return trans, nil
 }
 
-func newRequestTransformsFromConfig(config transformsConfig) ([]requestTransform, error) {
-	ts, err := newTransformsFromConfig(config, requestNamespace)
+func newBasicTransformsFromConfig(config transformsConfig, namespace string) ([]basicTransform, error) {
+	ts, err := newTransformsFromConfig(config, namespace)
 	if err != nil {
 		return nil, err
 	}
 
-	var rts []requestTransform
+	var rts []basicTransform
 	for _, t := range ts {
-		rt, ok := t.(requestTransform)
+		rt, ok := t.(basicTransform)
 		if !ok {
-			return nil, fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), requestNamespace)
-		}
-		rts = append(rts, rt)
-	}
-
-	return rts, nil
-}
-
-func newResponseTransformsFromConfig(config transformsConfig) ([]responseTransform, error) {
-	ts, err := newTransformsFromConfig(config, responseNamespace)
-	if err != nil {
-		return nil, err
-	}
-
-	var rts []responseTransform
-	for _, t := range ts {
-		rt, ok := t.(responseTransform)
-		if !ok {
-			return nil, fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), responseNamespace)
-		}
-		rts = append(rts, rt)
-	}
-
-	return rts, nil
-}
-
-func newPaginationTransformsFromConfig(config transformsConfig) ([]paginationTransform, error) {
-	ts, err := newTransformsFromConfig(config, paginationNamespace)
-	if err != nil {
-		return nil, err
-	}
-
-	var rts []paginationTransform
-	for _, t := range ts {
-		rt, ok := t.(paginationTransform)
-		if !ok {
-			return nil, fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), paginationNamespace)
+			return nil, fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), namespace)
 		}
 		rts = append(rts, rt)
 	}

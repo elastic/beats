@@ -14,12 +14,6 @@ import (
 
 const deleteName = "delete"
 
-var (
-	_ requestTransform    = &deleteRequest{}
-	_ responseTransform   = &deleteResponse{}
-	_ paginationTransform = &deletePagination{}
-)
-
 type deleteConfig struct {
 	Target string `config:"target"`
 }
@@ -27,22 +21,10 @@ type deleteConfig struct {
 type delete struct {
 	targetInfo targetInfo
 
-	run func(ctx transformContext, transformable *transformable, key string) error
+	runFunc func(ctx transformContext, transformable *transformable, key string) error
 }
 
 func (delete) transformName() string { return deleteName }
-
-type deleteRequest struct {
-	delete
-}
-
-type deleteResponse struct {
-	delete
-}
-
-type deletePagination struct {
-	delete
-}
 
 func newDeleteRequest(cfg *common.Config) (transform, error) {
 	delete, err := newDelete(cfg)
@@ -52,28 +34,16 @@ func newDeleteRequest(cfg *common.Config) (transform, error) {
 
 	switch delete.targetInfo.Type {
 	case targetBody:
-		delete.run = deleteBody
+		delete.runFunc = deleteBody
 	case targetHeader:
-		delete.run = deleteHeader
+		delete.runFunc = deleteHeader
 	case targetURLParams:
-		delete.run = deleteURLParams
+		delete.runFunc = deleteURLParams
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", delete.targetInfo.Type)
 	}
 
-	return &deleteRequest{delete: delete}, nil
-}
-
-func (deleteReq *deleteRequest) run(ctx transformContext, req *request) (*request, error) {
-	transformable := &transformable{
-		body:   req.body,
-		header: req.header,
-		url:    req.url,
-	}
-	if err := deleteReq.delete.runDelete(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return req, nil
+	return &delete, nil
 }
 
 func newDeleteResponse(cfg *common.Config) (transform, error) {
@@ -84,24 +54,12 @@ func newDeleteResponse(cfg *common.Config) (transform, error) {
 
 	switch delete.targetInfo.Type {
 	case targetBody:
-		delete.run = deleteBody
+		delete.runFunc = deleteBody
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", delete.targetInfo.Type)
 	}
 
-	return &deleteResponse{delete: delete}, nil
-}
-
-func (deleteRes *deleteResponse) run(ctx transformContext, res *response) (*response, error) {
-	transformable := &transformable{
-		body:   res.body,
-		header: res.header,
-		url:    res.url,
-	}
-	if err := deleteRes.delete.runDelete(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return res, nil
+	return &delete, nil
 }
 
 func newDeletePagination(cfg *common.Config) (transform, error) {
@@ -112,28 +70,16 @@ func newDeletePagination(cfg *common.Config) (transform, error) {
 
 	switch delete.targetInfo.Type {
 	case targetBody:
-		delete.run = deleteBody
+		delete.runFunc = deleteBody
 	case targetHeader:
-		delete.run = deleteHeader
+		delete.runFunc = deleteHeader
 	case targetURLParams:
-		delete.run = deleteURLParams
+		delete.runFunc = deleteURLParams
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", delete.targetInfo.Type)
 	}
 
-	return &deletePagination{delete: delete}, nil
-}
-
-func (deletePag *deletePagination) run(ctx transformContext, pag *pagination) (*pagination, error) {
-	transformable := &transformable{
-		body:   pag.body,
-		header: pag.header,
-		url:    pag.url,
-	}
-	if err := deletePag.delete.runDelete(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return pag, nil
+	return &delete, nil
 }
 
 func newDelete(cfg *common.Config) (delete, error) {
@@ -152,8 +98,11 @@ func newDelete(cfg *common.Config) (delete, error) {
 	}, nil
 }
 
-func (delete *delete) runDelete(ctx transformContext, transformable *transformable) error {
-	return delete.run(ctx, transformable, delete.targetInfo.Name)
+func (delete *delete) run(ctx transformContext, transformable *transformable) (*transformable, error) {
+	if err := delete.runFunc(ctx, transformable, delete.targetInfo.Name); err != nil {
+		return nil, err
+	}
+	return transformable, nil
 }
 
 func deleteFromCommonMap(m common.MapStr, key string) error {

@@ -6,8 +6,11 @@ package v2
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type valueTpl struct {
@@ -36,21 +39,28 @@ func (t *valueTpl) Unpack(in string) error {
 func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string) (val string) {
 	defer func() {
 		if r := recover(); r != nil {
+			err, _ := r.(error)
+			fmt.Println(err)
+			_ = err
 			// TODO: find alternative to this ugliness
 			val = defaultVal
 		}
 	}()
 
 	buf := new(bytes.Buffer)
-	data := map[string]interface{}{
-		"header":        tr.header.Clone(),
-		"body":          tr.body.Clone(),
-		"url.value":     tr.url.String(),
-		"url.params":    tr.url.Query(),
-		"cursor":        trCtx.cursor.Clone(),
-		"last_event":    trCtx.lastEvent.Clone(),
-		"last_response": trCtx.lastResponse.Clone(),
-	}
+	data := common.MapStr{}
+
+	_, _ = data.Put("header", tr.header.Clone())
+	_, _ = data.Put("body", tr.body.Clone())
+	_, _ = data.Put("url.value", tr.url.String())
+	_, _ = data.Put("url.params", tr.url.Query())
+	_, _ = data.Put("cursor", trCtx.cursor.Clone())
+	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
+	_, _ = data.Put("last_response.body", trCtx.lastResponse.body.Clone())
+	_, _ = data.Put("last_response.header", trCtx.lastResponse.header.Clone())
+	_, _ = data.Put("last_response.url.value", trCtx.lastResponse.url.String())
+	_, _ = data.Put("last_response.url.params", trCtx.lastResponse.url.Query())
+
 	if err := t.Template.Execute(buf, data); err != nil {
 		return defaultVal
 	}

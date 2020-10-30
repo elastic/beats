@@ -10,12 +10,11 @@ type responseConfig struct {
 }
 
 func (c *responseConfig) Validate() error {
-	if _, err := newResponseTransformsFromConfig(c.Transforms); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace); err != nil {
 		return err
 	}
-	if _, err := newPaginationTransformsFromConfig(c.Transforms); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, paginationNamespace); err != nil {
 		return err
 	}
-
 	return nil
 }

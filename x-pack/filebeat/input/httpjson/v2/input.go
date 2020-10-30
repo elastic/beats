@@ -132,11 +132,14 @@ func run(
 	}
 
 	requestFactory := newRequestFactory(config.Request, config.Auth, log)
-	responseProcessor := &responseProcessor{}
+	pagination := newPagination(config, httpClient, log)
+	responseProcessor := newResponseProcessor(config.Response, pagination)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	// loadContextFromCursor
-	trCtx := transformContext{}
+	trCtx := emptyTransformContext()
+	//
+
 	err = timed.Periodic(stdCtx, config.Interval, func() error {
 		log.Info("Process another repeated request.")
 

@@ -117,7 +117,7 @@ func (c *requestConfig) Validate() error {
 		return errors.New("timeout must be greater than 0")
 	}
 
-	if _, err := newRequestTransformsFromConfig(c.Transforms); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace); err != nil {
 		return err
 	}
 

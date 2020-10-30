@@ -10,12 +10,6 @@ import (
 
 const setName = "set"
 
-var (
-	_ requestTransform    = &setRequest{}
-	_ responseTransform   = &setResponse{}
-	_ paginationTransform = &setPagination{}
-)
-
 type setConfig struct {
 	Target  string    `config:"target"`
 	Value   *valueTpl `config:"value"`
@@ -27,22 +21,10 @@ type set struct {
 	value        *valueTpl
 	defaultValue string
 
-	run func(ctx transformContext, transformable *transformable, key, val string) error
+	runFunc func(ctx transformContext, transformable *transformable, key, val string) error
 }
 
 func (set) transformName() string { return setName }
-
-type setRequest struct {
-	set
-}
-
-type setResponse struct {
-	set
-}
-
-type setPagination struct {
-	set
-}
 
 func newSetRequest(cfg *common.Config) (transform, error) {
 	set, err := newSet(cfg)
@@ -52,28 +34,16 @@ func newSetRequest(cfg *common.Config) (transform, error) {
 
 	switch set.targetInfo.Type {
 	case targetBody:
-		set.run = setBody
+		set.runFunc = setBody
 	case targetHeader:
-		set.run = setHeader
+		set.runFunc = setHeader
 	case targetURLParams:
-		set.run = setURLParams
+		set.runFunc = setURLParams
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
 	}
 
-	return &setRequest{set: set}, nil
-}
-
-func (setReq *setRequest) run(ctx transformContext, req *request) (*request, error) {
-	transformable := &transformable{
-		body:   req.body,
-		header: req.header,
-		url:    req.url,
-	}
-	if err := setReq.set.runSet(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return req, nil
+	return &set, nil
 }
 
 func newSetResponse(cfg *common.Config) (transform, error) {
@@ -84,24 +54,12 @@ func newSetResponse(cfg *common.Config) (transform, error) {
 
 	switch set.targetInfo.Type {
 	case targetBody:
-		set.run = setBody
+		set.runFunc = setBody
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
 	}
 
-	return &setResponse{set: set}, nil
-}
-
-func (setRes *setResponse) run(ctx transformContext, res *response) (*response, error) {
-	transformable := &transformable{
-		body:   res.body,
-		header: res.header,
-		url:    res.url,
-	}
-	if err := setRes.set.runSet(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return res, nil
+	return &set, nil
 }
 
 func newSetPagination(cfg *common.Config) (transform, error) {
@@ -112,30 +70,18 @@ func newSetPagination(cfg *common.Config) (transform, error) {
 
 	switch set.targetInfo.Type {
 	case targetBody:
-		set.run = setBody
+		set.runFunc = setBody
 	case targetHeader:
-		set.run = setHeader
+		set.runFunc = setHeader
 	case targetURLParams:
-		set.run = setURLParams
+		set.runFunc = setURLParams
 	case targetURLValue:
-		set.run = setURLValue
+		set.runFunc = setURLValue
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
 	}
 
-	return &setPagination{set: set}, nil
-}
-
-func (setPag *setPagination) run(ctx transformContext, pag *pagination) (*pagination, error) {
-	transformable := &transformable{
-		body:   pag.body,
-		header: pag.header,
-		url:    pag.url,
-	}
-	if err := setPag.set.runSet(ctx, transformable); err != nil {
-		return nil, err
-	}
-	return pag, nil
+	return &set, nil
 }
 
 func newSet(cfg *common.Config) (set, error) {
@@ -156,9 +102,12 @@ func newSet(cfg *common.Config) (set, error) {
 	}, nil
 }
 
-func (set *set) runSet(ctx transformContext, transformable *transformable) error {
+func (set *set) run(ctx transformContext, transformable *transformable) (*transformable, error) {
 	value := set.value.Execute(ctx, transformable, set.defaultValue)
-	return set.run(ctx, transformable, set.targetInfo.Name, value)
+	if err := set.runFunc(ctx, transformable, set.targetInfo.Name, value); err != nil {
+		return nil, err
+	}
+	return transformable, nil
 }
 
 func setToCommonMap(m common.MapStr, key, val string) error {
@@ -191,6 +140,6 @@ func setURLValue(ctx transformContext, transformable *transformable, _, value st
 		return err
 	}
 	url.RawQuery = query
-	transformable.url = url
+	transformable.url = *url
 	return nil
 }

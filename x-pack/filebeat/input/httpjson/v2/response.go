@@ -7,9 +7,6 @@ package v2
 import (
 	"context"
 	"net/http"
-	"net/url"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 const responseNamespace = "response"
@@ -20,16 +17,22 @@ func registerResponseTransforms() {
 	registerTransform(responseNamespace, setName, newSetResponse)
 }
 
-type response struct {
-	body   common.MapStr
-	header http.Header
-	url    *url.URL
-}
-
 type responseProcessor struct {
 	splitTransform splitTransform
-	transforms     []responseTransform
+	transforms     []basicTransform
 	pagination     *pagination
+}
+
+func newResponseProcessor(config *responseConfig, pagination *pagination) *responseProcessor {
+	rp := &responseProcessor{
+		pagination: pagination,
+	}
+	if config == nil {
+		return rp
+	}
+	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace)
+	rp.transforms = ts
+	return rp
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx transformContext, resp *http.Response) (<-chan maybeEvent, error) {
@@ -39,9 +42,16 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 		defer close(ch)
 
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
-		for iter.hasNext() {
-			var err error
-			page := iter.page()
+		for {
+			page, hasNext, err := iter.next()
+			if err != nil {
+				ch <- maybeEvent{err: err}
+				return
+			}
+
+			if !hasNext {
+				return
+			}
 
 			for _, t := range rp.transforms {
 				page, err = t.run(trCtx, page)

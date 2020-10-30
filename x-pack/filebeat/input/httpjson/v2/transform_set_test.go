@@ -41,34 +41,22 @@ func TestSetFunctions(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:     "setURLParams",
-			tfunc:    setURLParams,
-			paramCtx: transformContext{},
-			paramTr: &transformable{url: func() *url.URL {
-				u, _ := url.Parse("http://foo.example.com")
-				return u
-			}()},
-			paramKey: "a_key",
-			paramVal: "a_value",
-			expectedTr: &transformable{url: func() *url.URL {
-				u, _ := url.Parse("http://foo.example.com?a_key=a_value")
-				return u
-			}()},
+			name:        "setURLParams",
+			tfunc:       setURLParams,
+			paramCtx:    transformContext{},
+			paramTr:     &transformable{url: newURL("http://foo.example.com")},
+			paramKey:    "a_key",
+			paramVal:    "a_value",
+			expectedTr:  &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
 			expectedErr: nil,
 		},
 		{
-			name:     "setURLValue",
-			tfunc:    setURLValue,
-			paramCtx: transformContext{},
-			paramTr: &transformable{url: func() *url.URL {
-				u, _ := url.Parse("http://foo.example.com")
-				return u
-			}()},
-			paramVal: "http://different.example.com",
-			expectedTr: &transformable{url: func() *url.URL {
-				u, _ := url.Parse("http://different.example.com")
-				return u
-			}()},
+			name:        "setURLValue",
+			tfunc:       setURLValue,
+			paramCtx:    transformContext{},
+			paramTr:     &transformable{url: newURL("http://foo.example.com")},
+			paramVal:    "http://different.example.com",
+			expectedTr:  &transformable{url: newURL("http://different.example.com")},
 			expectedErr: nil,
 		},
 	}
@@ -85,4 +73,9 @@ func TestSetFunctions(t *testing.T) {
 			assert.EqualValues(t, tcase.expectedTr, tcase.paramTr)
 		})
 	}
+}
+
+func newURL(u string) url.URL {
+	url, _ := url.Parse(u)
+	return *url
 }
