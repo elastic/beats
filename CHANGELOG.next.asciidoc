@@ -386,6 +386,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Remove io.time from windows {pull}22237[22237]
+- Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 
 *Packetbeat*
 
@@ -770,6 +772,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
