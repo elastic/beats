@@ -166,6 +166,9 @@ func TestEventReader(t *testing.T) {
 	})
 
 	mustRun(t, "deleted", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("See https://github.com/elastic/beats/issues/21958")
+		}
 		if err = os.Remove(txt2); err != nil {
 			t.Fatal(err)
 		}
@@ -310,6 +313,9 @@ func readTimeout(t testing.TB, events <-chan Event) Event {
 	case <-time.After(time.Second):
 		t.Fatalf("%+v", errors.Errorf("timed-out waiting for event"))
 	case e, ok := <-events:
+		if runtime.GOOS == "windows" {
+			t.Skip("See https://github.com/elastic/beats/issues/21958")
+		}
 		if !ok {
 			t.Fatal("failed reading from event channel")
 		}
