@@ -243,6 +243,23 @@ var vtAnalysis = (function () {
         }
     };
 
+    var normalizePackers = function (evt) {
+        console.debug("vtAnalysis.normalizePackers()");
+
+        var packers = evt.Get("virustotal.packers");
+        var packer_list = Array();
+
+        if (packers != null) {
+            console.debug("virustotal.packers" + JSON.stringify(packers, undefined, 2));
+            Object.keys(packers).forEach(function (key) {
+                packer_list.push({ "tool_name": key, "name": packers[key] });
+            });
+            evt.Delete("virustotal.packers");
+            evt.Put("virustotal.packers", packer_list);
+            console.debug("virustotal.packers:\n" + JSON.stringify(packer_list, undefined, 2));
+        }
+    };
+
     var normalizeCommunityRules = function (evt) {
         console.debug("vtAnalysis.normalizeCommunityRules()");
 
@@ -328,6 +345,7 @@ var vtAnalysis = (function () {
         .Add(function (evt) {
             normalizeAnalysis(evt);
             normalizeCommunityRules(evt);
+            normalizePackers(evt);
             snakeCaseExifTool(evt);
             snakeCaseAndroguard(evt);
             addMimeType(evt);

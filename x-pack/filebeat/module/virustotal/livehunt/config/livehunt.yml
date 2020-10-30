@@ -111,6 +111,7 @@ processors:
 
         # Other attributes
         - {from: virustotal.attributes.tags,   to: virustotal.tags}
+        - {from: virustotal.attributes.packers, to: virustotal.packers}
         - {from: virustotal.attributes.magic, to: virustotal.magic}
         - {from: virustotal.attributes.capabilities_tags, to: virustotal.capabilities}
         - {from: virustotal.attributes.downloadable, to: virustotal.downloadable}
@@ -184,7 +185,6 @@ processors:
             - {from: virustotal.attributes.signature_info.comments, to: file.pe.comments}
             - {from: virustotal.attributes.signature_info.description, to: file.pe.description}
             - {from: "virustotal.attributes.signature_info.file version", to: file.pe.file_version}
-            - {from: virustotal.attributes.packers, to: virustotal.packers}
             - {from: virustotal.creation_date, to: file.pe.creation_date}
             - {from: virustotal.attributes.main_icon, to: file.pe.main_icon.hash}
             - {from: file.pe.main_icon.hash.raw_md5, to: file.pe.main_icon.hash.md5}

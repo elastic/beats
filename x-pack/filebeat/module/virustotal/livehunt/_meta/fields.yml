@@ -546,8 +546,9 @@
       description: >
         A guess of the file type, based on a popular parsing tool from unix
       type: keyword
+
     - name: packers
-      type: group
+      type: nested
       description: >
         List of packer detection tools and their result.
       fields:

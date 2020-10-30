@@ -21,9 +21,9 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 17,
               "i": "ec36b04f-b714-401a-a4c6-3212ca615592",
-              "w": 23,
+              "w": 24,
               "x": 0,
               "y": 0
             },
@@ -34,53 +34,92 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
-              "i": "37af54a7-99cb-41da-b00e-b5aebcd93e8b",
-              "w": 25,
-              "x": 23,
+              "h": 17,
+              "i": "6d8c609d-7843-40ca-982f-7c3fbef0a19a",
+              "w": 13,
+              "x": 24,
               "y": 0
             },
-            "panelIndex": "37af54a7-99cb-41da-b00e-b5aebcd93e8b",
+            "panelIndex": "6d8c609d-7843-40ca-982f-7c3fbef0a19a",
             "panelRefName": "panel_1",
             "version": "7.9.2"
           },
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 18,
-              "i": "e83917f5-d17a-4e09-a553-c996a57b4739",
-              "w": 17,
-              "x": 0,
-              "y": 15
+              "h": 17,
+              "i": "22c39a5c-5e89-49f5-aef5-070943e0aad9",
+              "w": 11,
+              "x": 37,
+              "y": 0
             },
-            "panelIndex": "e83917f5-d17a-4e09-a553-c996a57b4739",
+            "panelIndex": "22c39a5c-5e89-49f5-aef5-070943e0aad9",
             "panelRefName": "panel_2",
             "version": "7.9.2"
           },
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 18,
-              "i": "46e12b30-e4dd-462f-b59f-48c88300a89e",
-              "w": 12,
-              "x": 17,
-              "y": 15
+              "h": 14,
+              "i": "37af54a7-99cb-41da-b00e-b5aebcd93e8b",
+              "w": 24,
+              "x": 0,
+              "y": 17
             },
-            "panelIndex": "46e12b30-e4dd-462f-b59f-48c88300a89e",
+            "panelIndex": "37af54a7-99cb-41da-b00e-b5aebcd93e8b",
             "panelRefName": "panel_3",
             "version": "7.9.2"
           },
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 18,
+              "h": 14,
+              "i": "46e12b30-e4dd-462f-b59f-48c88300a89e",
+              "w": 13,
+              "x": 24,
+              "y": 17
+            },
+            "panelIndex": "46e12b30-e4dd-462f-b59f-48c88300a89e",
+            "panelRefName": "panel_4",
+            "version": "7.9.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 33,
+              "i": "4130c0b5-c2af-4ded-9406-0b7d477c202d",
+              "w": 11,
+              "x": 37,
+              "y": 17
+            },
+            "panelIndex": "4130c0b5-c2af-4ded-9406-0b7d477c202d",
+            "panelRefName": "panel_5",
+            "version": "7.9.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
+              "i": "e83917f5-d17a-4e09-a553-c996a57b4739",
+              "w": 20,
+              "x": 0,
+              "y": 31
+            },
+            "panelIndex": "e83917f5-d17a-4e09-a553-c996a57b4739",
+            "panelRefName": "panel_6",
+            "version": "7.9.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
               "i": "1096fbd8-383b-4d8d-9582-dac41270475f",
-              "w": 19,
-              "x": 29,
-              "y": 15
+              "w": 17,
+              "x": 20,
+              "y": 31
             },
             "panelIndex": "1096fbd8-383b-4d8d-9582-dac41270475f",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_7",
             "version": "7.9.2"
           },
           {
@@ -99,23 +138,10 @@
               "i": "c2fafd37-cbb9-48fd-ad21-76f2c57a4a0c",
               "w": 31,
               "x": 0,
-              "y": 33
+              "y": 50
             },
             "panelIndex": "c2fafd37-cbb9-48fd-ad21-76f2c57a4a0c",
-            "panelRefName": "panel_5",
-            "version": "7.9.2"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 17,
-              "i": "4130c0b5-c2af-4ded-9406-0b7d477c202d",
-              "w": 17,
-              "x": 31,
-              "y": 33
-            },
-            "panelIndex": "4130c0b5-c2af-4ded-9406-0b7d477c202d",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_8",
             "version": "7.9.2"
           },
           {
@@ -123,17 +149,17 @@
             "gridData": {
               "h": 15,
               "i": "70185726-7b35-4f2d-ab07-60c719705373",
-              "w": 48,
+              "w": 46,
               "x": 0,
-              "y": 50
+              "y": 67
             },
             "panelIndex": "70185726-7b35-4f2d-ab07-60c719705373",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_9",
             "version": "7.9.2"
           }
         ],
         "timeRestore": false,
-        "title": "[VirusTotal] Livehunt Overview",
+        "title": "[VirusTotal Filebeat] Livehunt Overview",
         "version": 1
       },
       "id": "bd059c90-0e56-11eb-9aef-8b55a4ae31c5",
@@ -150,44 +176,54 @@
           "type": "visualization"
         },
         {
-          "id": "502946c0-0fe2-11eb-9aef-8b55a4ae31c5",
+          "id": "2faeb100-14a1-11eb-9aef-8b55a4ae31c5",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "32ad8fe0-0e50-11eb-9aef-8b55a4ae31c5",
+          "id": "af3d9170-14a1-11eb-9aef-8b55a4ae31c5",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "a3cfa7a0-0fe3-11eb-9aef-8b55a4ae31c5",
+          "id": "502946c0-0fe2-11eb-9aef-8b55a4ae31c5",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "1fed6b80-0cd6-11eb-9aef-8b55a4ae31c5",
+          "id": "a3cfa7a0-0fe3-11eb-9aef-8b55a4ae31c5",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "506466e0-0d64-11eb-9aef-8b55a4ae31c5",
+          "id": "3429d920-0caf-11eb-9aef-8b55a4ae31c5",
           "name": "panel_5",
-          "type": "map"
+          "type": "visualization"
         },
         {
-          "id": "3429d920-0caf-11eb-9aef-8b55a4ae31c5",
+          "id": "32ad8fe0-0e50-11eb-9aef-8b55a4ae31c5",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "e906a5b0-0fe0-11eb-9aef-8b55a4ae31c5",
+          "id": "1fed6b80-0cd6-11eb-9aef-8b55a4ae31c5",
           "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "506466e0-0d64-11eb-9aef-8b55a4ae31c5",
+          "name": "panel_8",
+          "type": "map"
+        },
+        {
+          "id": "e906a5b0-0fe0-11eb-9aef-8b55a4ae31c5",
+          "name": "panel_9",
           "type": "search"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-10-19T18:41:36.890Z",
-      "version": "WzE3NjYxLDFd"
+      "updated_at": "2020-10-22T20:34:34.239Z",
+      "version": "WzE4NDA3LDFd"
     },
     {
       "attributes": {
@@ -202,7 +238,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Livehunt notifications by ruleset over time [Virustotal Filebeat]",
+        "title": "Livehunt notifications by YARA ruleset over time [Virustotal Filebeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -225,7 +261,7 @@
                 "min_doc_count": 1,
                 "scaleMetricValues": false,
                 "timeRange": {
-                  "from": "now-2w",
+                  "from": "now-1140m",
                   "to": "now"
                 },
                 "useNormalizedEsInterval": true
@@ -328,7 +364,7 @@
               }
             ]
           },
-          "title": "Livehunt notifications by ruleset over time [Virustotal Filebeat]",
+          "title": "Livehunt notifications by YARA ruleset over time [Virustotal Filebeat]",
           "type": "histogram"
         }
       },
@@ -347,8 +383,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-16T19:10:21.402Z",
-      "version": "WzE2OTg1LDFd"
+      "updated_at": "2020-10-22T20:37:55.506Z",
+      "version": "WzE4NDY3LDFd"
     },
     {
       "attributes": {
@@ -363,7 +399,163 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Livehunt notifications by type tag over time [Virustotal Filebeat]",
+        "title": "Counts by Rule Name [Virustotal Filebeat]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "rule.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": true,
+                "otherBucketLabel": "Other",
+                "size": 9
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Counts by Rule Name [Virustotal Filebeat]",
+          "type": "table"
+        }
+      },
+      "id": "2faeb100-14a1-11eb-9aef-8b55a4ae31c5",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "e906a5b0-0fe0-11eb-9aef-8b55a4ae31c5",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-10-22T20:37:35.822Z",
+      "version": "WzE4NDU5LDFd"
+    },
+    {
+      "attributes": {
+        "description": "Displays rule.tags by prevalence. In Virustotal, these tags come from YARA rule tags.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Rule Tags Cloud [Virustotal Filebeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "rule.tags",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": true,
+                "otherBucketLabel": "Other",
+                "size": 50
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear",
+            "showLabel": true
+          },
+          "title": "Rule Tags Cloud [Virustotal Filebeat]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "af3d9170-14a1-11eb-9aef-8b55a4ae31c5",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "e906a5b0-0fe0-11eb-9aef-8b55a4ae31c5",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-10-22T20:39:55.669Z",
+      "version": "WzE4NDk2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Virustotal Type Tags over Time [Virustotal Filebeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -386,7 +578,7 @@
                 "min_doc_count": 1,
                 "scaleMetricValues": false,
                 "timeRange": {
-                  "from": "now-2w",
+                  "from": "now-1140m",
                   "to": "now"
                 },
                 "useNormalizedEsInterval": true
@@ -489,7 +681,7 @@
               }
             ]
           },
-          "title": "Livehunt notifications by type tag over time [Virustotal Filebeat]",
+          "title": "Virustotal Type Tags over Time [Virustotal Filebeat]",
           "type": "histogram"
         }
       },
@@ -508,48 +700,12 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-16T19:09:35.807Z",
-      "version": "WzE2OTgwLDFd"
+      "updated_at": "2020-10-22T20:38:50.066Z",
+      "version": "WzE4NDkxLDFd"
     },
     {
       "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Analysis Results Wordcloud [Virustotal Filebeat] ",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "spec": "{\n  $schema: \"https://vega.github.io/schema/vega/v5.json\"\n  data: [\n    {\n      name: engines\n      url: {\n        %context%: true\n        %timefield%: @timestamp\n        index: \"filebeat-*\"\n        body: {\n          aggs: {\n            engines: {\n              nested: {\n                path: \"virustotal.analysis.results\"\n              },\n              aggs: {\n                values: {\n                  terms: {\n                    size: 100\n                    field: \"virustotal.analysis.results.result\" \n                  }\n                }\n              }\n            }\n          }\n          size: 0\n        }\n      }\n      format: { property: \"aggregations.engines.values.buckets\" }\n      transform: [\n        {\n          \"type\": \"formula\", \"as\": \"angle\",\n          \"expr\": \"0\"\n        },\n        {\n          \"type\": \"formula\", \"as\": \"weight\",\n          \"expr\": \"datum.doc_count\"\n        }\n      ]\n    }\n  ]\n  \n  \"signals\": [\n    {\n      \"name\": \"wordclick\",\n      \"value\": \"\",\n      \"on\": [\n        {\n          \"events\": \"text:click\",\n          \"update\": '''\n          kibanaAddFilter({\"nested\": {\"path\": \"virustotal.analysis.results\", \"query\": {\"bool\": {\"must\": [{ \"match\": { \"virustotal.analysis.results.result\":  event.item.text  } }]}}}})\n          '''\n        }\n      ]\n    }\n  ]\n\n  scales: [\n    {\n      name: \"color\"\n      type: \"ordinal\"\n      domain: { data: \"engines\", field: \"key\" }\n      range: {\"scheme\": \"elastic\"}\n    }\n  ]\n\n  marks: [\n    {\n      name: cloud\n      type: text\n      from: {data: \"engines\"}\n      encode: {\n        enter: {\n          text: {field: \"key\"}\n          align: {value: \"center\"}\n          baseline: {value: \"alphabetic\"}\n          fill: {scale: \"color\", field: \"key\"}\n        },\n        update: {\n          fillOpacity: {value: 1}\n        },\n        hover: {\n          fillOpacity: {value: 0.5}\n        }\n\n      }\n      transform: [\n        {\n          type: wordcloud\n          text: {field: \"datum.key\"}\n          size: [{signal: \"width\"}, {signal: \"height\"}],\n          rotate: {field: \"datum.angle\"}\n          font: \"Helvetica Neue, Arial\"\n          fontSize: {field: \"datum.doc_count\"}\n          fontWeight: {field: \"datum.weight\"}\n          fontSizeRange: [8, 72]\n          padding: 4\n        }\n      ]\n    }\n\n  ]\n}"
-          },
-          "title": "Analysis Results Wordcloud [Virustotal Filebeat] ",
-          "type": "vega"
-        }
-      },
-      "id": "32ad8fe0-0e50-11eb-9aef-8b55a4ae31c5",
-      "migrationVersion": {
-        "visualization": "7.8.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-10-16T21:39:56.735Z",
-      "version": "WzE3Mjk4LDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
+        "description": "Displays file.mime_type values in a stacked bar chart over time.",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
@@ -560,7 +716,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Livehunt notifications by mime-type [Virustotal FIlebeat]",
+        "title": "MIME-Types over Time [Virustotal FIlebeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -611,7 +767,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Livehunt notifications by mime-type [Virustotal FIlebeat]",
+          "title": "MIME-Types over Time [Virustotal FIlebeat]",
           "type": "table"
         }
       },
@@ -630,8 +786,80 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-10-16T19:13:14.522Z",
-      "version": "WzE2OTk2LDFd"
+      "updated_at": "2020-10-22T20:40:51.936Z",
+      "version": "WzE4NTAxLDFd"
+    },
+    {
+      "attributes": {
+        "description": "Displays engine names and result categories (e.g. malicious, undetected, etc) for all Virustotal File events.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Virustotal Detection Counts By Engine [VirusTotal Filebeat] ",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "spec": "{\n  $schema: https://vega.github.io/schema/vega-lite/v4.json\n  title: Event counts from all indexes\n  // Define the data source\n  data: {\n    url: {\n      // Apply dashboard context filters when set\n      %context%: true\n      // Filter the time picker (upper right corner) with this field\n      %timefield%: @timestamp\n\n      // Which index to search\n      index: filebeat-8.0.0\n      body: {\n        size: 0\n        aggs: {\n          \"results\": {\n            \"nested\": {\n              \"path\": \"virustotal.analysis.results\"\n            },\n            \"aggs\": {\n              \"table\": {\n                \"composite\": {\n                  \"size\": 1000,\n                  \"sources\": [\n                    {\"engine_name\": {\"terms\": {\"field\": \"virustotal.analysis.results.engine_name\"}}},\n                    {\"category\": {\"terms\": {\"field\": \"virustotal.analysis.results.category\"}}}\n                  ]\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n    name: kibana\n\n    // From the result, take just the data we are interested in\n    format: {\n      property: aggregations.results.table.buckets\n    }\n    // Convert key.stk1 -\u003e stk1 for simpler access below\n    transform: [\n      {\n        type: formula\n        expr: datum.key.engine_name\n        as: engine_name\n      }\n      {\n        type: formula\n        expr: datum.key.category\n        as: category\n      }\n      {\n        type: formula\n        expr: datum.doc_count\n        as: count\n      }\n    ]\n  }\n\n  // \"mark\" is the graphics element used to show our data.  Other mark values are: area, bar, circle, line, point, rect, rule, square, text, and tick.  See https://vega.github.io/vega-lite/docs/mark.html\n  mark: text\n\n  // \"encoding\" tells the \"mark\" what data to use and in what way.  See https://vega.github.io/vega-lite/docs/encoding.html\n  encoding: {\n    x: {\n      // The \"key\" value is the timestamp in milliseconds.  Use it for X axis.\n      field: key.category\n      type: ordinal\n      axis: {\n        title: Category\n      } // Customize X axis format\n    }\n    y: {\n      // The \"doc_count\" is the count per bucket.  Use it for Y axis.\n      field: key.engine_name\n      type: ordinal\n      axis: {\n        title: Engine Name\n      }\n    }\n  }\n  layer: [\n    {\n      \"mark\": \"rect\",\n      \"encoding\": {\n        \"color\": {\n          \"field\": \"doc_count\",\n          \"type\": \"quantitative\",\n          \"title\": \"Count of Records\",\n          \"legend\": {\"direction\": \"horizontal\", \"gradientLength\": 120}\n        }\n      }\n    },\n    {\n      mark: text\n      encoding: {\n        text: {\n          field: doc_count\n          type: quantitative\n        }\n        \"color\": {\n          \"condition\": {\"test\": \"datum['doc_count'] \u003c 40\", \"value\": \"black\"},\n          \"value\": \"white\"\n        }\n      }\n    }\n  ]\n  config: {\n    axis: {\n      grid: true\n      tickBand: extent\n    }\n  }\n}"
+          },
+          "title": "Virustotal Detection Counts By Engine [VirusTotal Filebeat] ",
+          "type": "vega"
+        }
+      },
+      "id": "3429d920-0caf-11eb-9aef-8b55a4ae31c5",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-10-22T20:42:12.097Z",
+      "version": "WzE4NTA2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Analysis Results Wordcloud [Virustotal Filebeat] ",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "spec": "{\n  $schema: \"https://vega.github.io/schema/vega/v5.json\"\n  data: [\n    {\n      name: engines\n      url: {\n        %context%: true\n        %timefield%: @timestamp\n        index: \"filebeat-*\"\n        body: {\n          aggs: {\n            engines: {\n              nested: {\n                path: \"virustotal.analysis.results\"\n              },\n              aggs: {\n                values: {\n                  terms: {\n                    size: 100\n                    field: \"virustotal.analysis.results.result\" \n                  }\n                }\n              }\n            }\n          }\n          size: 0\n        }\n      }\n      format: { property: \"aggregations.engines.values.buckets\" }\n      transform: [\n        {\n          \"type\": \"formula\", \"as\": \"angle\",\n          \"expr\": \"0\"\n        },\n        {\n          \"type\": \"formula\", \"as\": \"weight\",\n          \"expr\": \"datum.doc_count\"\n        }\n      ]\n    }\n  ]\n  \n  \"signals\": [\n    {\n      \"name\": \"wordclick\",\n      \"value\": \"\",\n      \"on\": [\n        {\n          \"events\": \"text:click\",\n          \"update\": '''\n          kibanaAddFilter({\"nested\": {\"path\": \"virustotal.analysis.results\", \"query\": {\"bool\": {\"must\": [{ \"match\": { \"virustotal.analysis.results.result\":  event.item.text  } }]}}}})\n          '''\n        }\n      ]\n    }\n  ]\n\n  scales: [\n    {\n      name: \"color\"\n      type: \"ordinal\"\n      domain: { data: \"engines\", field: \"key\" }\n      range: {\"scheme\": \"elastic\"}\n    }\n  ]\n\n  marks: [\n    {\n      name: cloud\n      type: text\n      from: {data: \"engines\"}\n      encode: {\n        enter: {\n          text: {field: \"key\"}\n          align: {value: \"center\"}\n          baseline: {value: \"alphabetic\"}\n          fill: {scale: \"color\", field: \"key\"}\n        },\n        update: {\n          fillOpacity: {value: 1}\n        },\n        hover: {\n          fillOpacity: {value: 0.5}\n        }\n\n      }\n      transform: [\n        {\n          type: wordcloud\n          text: {field: \"datum.key\"}\n          size: [{signal: \"width\"}, {signal: \"height\"}],\n          rotate: {field: \"datum.angle\"}\n          font: \"Helvetica Neue, Arial\"\n          fontSize: {field: \"datum.doc_count\"}\n          fontWeight: {field: \"datum.weight\"}\n          fontSizeRange: [8, 72]\n          padding: 4\n        }\n      ]\n    }\n\n  ]\n}"
+          },
+          "title": "Analysis Results Wordcloud [Virustotal Filebeat] ",
+          "type": "vega"
+        }
+      },
+      "id": "32ad8fe0-0e50-11eb-9aef-8b55a4ae31c5",
+      "migrationVersion": {
+        "visualization": "7.8.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-10-16T21:39:56.735Z",
+      "version": "WzE3Mjk4LDFd"
     },
     {
       "attributes": {
@@ -732,42 +960,6 @@
       "type": "map",
       "updated_at": "2020-10-14T19:16:25.908Z",
       "version": "WzE2NTEzLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Detection Counts By Engine [VirusTotal Filebeat] ",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "spec": "{\n  $schema: https://vega.github.io/schema/vega-lite/v4.json\n  title: Event counts from all indexes\n  // Define the data source\n  data: {\n    url: {\n      // Apply dashboard context filters when set\n      %context%: true\n      // Filter the time picker (upper right corner) with this field\n      %timefield%: @timestamp\n\n      // Which index to search\n      index: filebeat-8.0.0\n      body: {\n        size: 0\n        aggs: {\n          \"results\": {\n            \"nested\": {\n              \"path\": \"virustotal.analysis.results\"\n            },\n            \"aggs\": {\n              \"table\": {\n                \"composite\": {\n                  \"size\": 1000,\n                  \"sources\": [\n                    {\"engine_name\": {\"terms\": {\"field\": \"virustotal.analysis.results.engine_name\"}}},\n                    {\"category\": {\"terms\": {\"field\": \"virustotal.analysis.results.category\"}}}\n                  ]\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n    name: kibana\n\n    // From the result, take just the data we are interested in\n    format: {\n      property: aggregations.results.table.buckets\n    }\n    // Convert key.stk1 -\u003e stk1 for simpler access below\n    transform: [\n      {\n        type: formula\n        expr: datum.key.engine_name\n        as: engine_name\n      }\n      {\n        type: formula\n        expr: datum.key.category\n        as: category\n      }\n      {\n        type: formula\n        expr: datum.doc_count\n        as: count\n      }\n    ]\n  }\n\n  // \"mark\" is the graphics element used to show our data.  Other mark values are: area, bar, circle, line, point, rect, rule, square, text, and tick.  See https://vega.github.io/vega-lite/docs/mark.html\n  mark: text\n\n  // \"encoding\" tells the \"mark\" what data to use and in what way.  See https://vega.github.io/vega-lite/docs/encoding.html\n  encoding: {\n    x: {\n      // The \"key\" value is the timestamp in milliseconds.  Use it for X axis.\n      field: key.category\n      type: ordinal\n      axis: {\n        title: Category\n      } // Customize X axis format\n    }\n    y: {\n      // The \"doc_count\" is the count per bucket.  Use it for Y axis.\n      field: key.engine_name\n      type: ordinal\n      axis: {\n        title: Engine Name\n      }\n    }\n  }\n  layer: [\n    {\n      \"mark\": \"rect\",\n      \"encoding\": {\n        \"color\": {\n          \"field\": \"doc_count\",\n          \"type\": \"quantitative\",\n          \"title\": \"Count of Records\",\n          \"legend\": {\"direction\": \"horizontal\", \"gradientLength\": 120}\n        }\n      }\n    },\n    {\n      mark: text\n      encoding: {\n        text: {\n          field: doc_count\n          type: quantitative\n        }\n        \"color\": {\n          \"condition\": {\"test\": \"datum['doc_count'] \u003c 40\", \"value\": \"black\"},\n          \"value\": \"white\"\n        }\n      }\n    }\n  ]\n  config: {\n    axis: {\n      grid: true\n      tickBand: extent\n    }\n  }\n}"
-          },
-          "title": "Detection Counts By Engine [VirusTotal Filebeat] ",
-          "type": "vega"
-        }
-      },
-      "id": "3429d920-0caf-11eb-9aef-8b55a4ae31c5",
-      "migrationVersion": {
-        "visualization": "7.8.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-10-16T18:55:10.043Z",
-      "version": "WzE2ODk5LDFd"
     },
     {
       "attributes": {
