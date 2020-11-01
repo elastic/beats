@@ -36632,7 +36632,7 @@ type: keyword
 *`php_fpm.process.last_request_cpu`*::
 +
 --
-The max amount of memory the last request consumed (it is always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
+The CPU percentage the last request consumed. It's always 0 if the process is not in Idle state because CPU calculation is done when the request processing has terminated
 
 
 type: long
@@ -36642,7 +36642,7 @@ type: long
 *`php_fpm.process.last_request_memory`*::
 +
 --
-The content length of the request (only with POST) (of the current request)
+The max amount of memory the last request consumed. It's always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated
 
 
 type: integer
