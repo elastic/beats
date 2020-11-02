@@ -540,6 +540,10 @@ field. You can revert this change by configuring tags for the module and omittin
 - Cloud Foundry metadata is cached to disk. {pull}20775[20775]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
+- Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
+- Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
+- Add proxy metricset for istio module. {pull}21751[21751]
+- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 
 *Auditbeat*
 
