@@ -151546,6 +151546,73 @@ type: keyword
 
 --
 
+[float]
+=== otx
+
+Fields for MISP Threat Intel
+
+
+
+*`threatintel.otx.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.indicator`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.description`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.title`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.content`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.type`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
 [[exported-fields-tomcat]]
 == Apache Tomcat fields
 

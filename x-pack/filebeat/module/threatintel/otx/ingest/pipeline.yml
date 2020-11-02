@@ -1,0 +1,13 @@
+description: Pipeline for parsing MISP Threat Intel
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: json
+    target_field: threatintel.otx
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -22,3 +22,27 @@
 
     # The interval to poll the API for updates
     var.interval: 60m
+
+  misp:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls
+    var.url: https://SERVER/events/restSearch
+
+    # The interval to poll the API for updates
+    var.interval: 60m
+
+  otx:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls
+    var.url: https://otx.alienvault.com/api/v1/indicators/export?modified_since=2020-10-30T10:10:00+00:00&types=domain,IPv4,hostname,url,FileHash-SHA256&limit=10000
+
+    # The interval to poll the API for updates
+    var.interval: 60m

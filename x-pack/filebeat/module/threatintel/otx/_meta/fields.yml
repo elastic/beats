@@ -1,0 +1,29 @@
+- name: otx
+  type: group
+  description: >
+    Fields for MISP Threat Intel
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      ID
+  - name: indicator
+    type: keyword
+    description: >
+      ID
+  - name: description
+    type: keyword
+    description: >
+      ID
+  - name: title
+    type: keyword
+    description: >
+      ID
+  - name: content
+    type: keyword
+    description: >
+      ID
+  - name: type
+    type: keyword
+    description: >
+      ID
