@@ -97,7 +97,7 @@ This module also supports the
 <<module-standard-options-{modulename},standard configuration options>>
 described later.
 
-*`state.period`*:: The frequency at which the datasets send full state information.
+*`state.period`*:: The interval at which the datasets send full state information.
 This option can be overridden per dataset using `{dataset}.state.period`.
 
 *`user.detect_password_changes`*:: If the `user` dataset is configured and

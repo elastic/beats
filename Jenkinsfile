@@ -12,6 +12,7 @@ pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
+    AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
@@ -73,10 +74,13 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
@@ -120,16 +124,54 @@ pipeline {
     }
   }
   post {
+    success {
+      writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
+COMMIT=${env.GIT_BASE_COMMIT}
+VERSION=${env.VERSION}-SNAPSHOT""")
+      archiveArtifacts artifacts: 'packaging.properties'
+    }
     always {
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
-      notifyBuildResult(prComment: true, slackComment: true, slackNotify: (isBranch() || isTag()))
+      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
+      dir("${BASE_DIR}"){
+        notifyBuildResult(prComment: true,
+                          slackComment: true, slackNotify: (isBranch() || isTag()),
+                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+      }
     }
   }
 }
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getIdSuffix() {
+  if(isPR()) {
+    return getBranchIndice(env.CHANGE_TARGET)
+  }
+  if(isBranch()) {
+    return getBranchIndice(env.BRANCH_NAME)
+  }
+}
+
+/**
+* There are only two supported branches, master and 7.x
+*/
+def getBranchIndice(String compare) {
+  if (compare?.equals('master') || compare.equals('7.x')) {
+    return compare
+  } else {
+    if (compare.startsWith('7.')) {
+      return '7.x'
+    }
+  }
+  return 'master'
+}
+
 
 /**
 * This method is the one used for running the parallel stages, therefore
@@ -295,6 +337,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.name "beatsmachine"
           fi''')
       }
+      // Skip to upload the generated files by default.
+      def upload = false
       try {
         // Add more stability when dependencies are not accessible temporarily
         // See https://github.com/elastic/beats/issues/21609
@@ -304,9 +348,13 @@ def withBeatsEnv(Map args = [:], Closure body) {
           cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
         }
         body()
+      } catch(err) {
+        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+        upload = true
+        error("Error '${err.toString()}'")
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id)
+          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         // Tear down the setup for the permamnent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
@@ -384,16 +432,20 @@ def archiveTestOutput(Map args = [:]) {
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
-      tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
+      if (args.upload) {
+        tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
+      }
     }
-    catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
-      log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
-      if (folder.trim()) {
-        // TODO: nodeOS() should support ARM
-        def os_suffix = isArm() ? 'linux' : nodeOS()
-        def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-        tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+    if (args.upload) {
+      catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+        def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
+        log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
+        if (folder.trim()) {
+          // TODO: nodeOS() should support ARM
+          def os_suffix = isArm() ? 'linux' : nodeOS()
+          def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
+          tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+        }
       }
     }
   }
@@ -431,7 +483,7 @@ def withCloudTestEnv(Closure body) {
       error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
     }
     maskedVars.addAll([
-      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_REGION", password: "${env.AWS_REGION}"],
       [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
       [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
     ])
@@ -489,7 +541,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */
