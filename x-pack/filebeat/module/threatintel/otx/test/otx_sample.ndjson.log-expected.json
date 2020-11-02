@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-11-02T15:42:09.456Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -20,7 +19,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.456Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -40,7 +38,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -60,7 +57,6 @@
         "threatintel.otx.type": "hostname"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -80,7 +76,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -100,7 +95,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -120,7 +114,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -140,7 +133,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -160,7 +152,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -180,7 +171,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -200,7 +190,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -220,7 +209,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -240,7 +228,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -260,7 +247,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -280,7 +266,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -300,7 +285,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -320,7 +304,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -340,7 +323,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -360,7 +342,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -380,7 +361,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -400,7 +380,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -420,7 +399,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -440,7 +418,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -460,7 +437,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -480,7 +456,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -500,7 +475,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -520,7 +494,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -540,7 +513,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.457Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -560,7 +532,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -580,7 +551,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -600,7 +570,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -620,7 +589,6 @@
         "threatintel.otx.type": "FileHash-MD5"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -640,7 +608,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -660,7 +627,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -680,7 +646,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -700,7 +665,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -720,7 +684,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -740,7 +703,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -760,7 +722,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -780,7 +741,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -800,7 +760,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -820,7 +779,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -840,7 +798,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -860,7 +817,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -880,7 +836,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -900,7 +855,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -920,7 +874,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -940,7 +893,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -960,7 +912,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -980,7 +931,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1000,7 +950,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1020,7 +969,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1040,7 +988,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.458Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1060,7 +1007,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1080,7 +1026,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1100,7 +1045,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1120,7 +1064,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1140,7 +1083,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1160,7 +1102,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1180,7 +1121,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1200,7 +1140,6 @@
         "threatintel.otx.type": "FileHash-SHA256"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1220,7 +1159,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1240,7 +1178,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1260,7 +1197,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1280,7 +1216,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1300,7 +1235,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1320,7 +1254,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1340,7 +1273,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1360,7 +1292,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1380,7 +1311,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1400,7 +1330,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1420,7 +1349,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1440,7 +1368,6 @@
         "threatintel.otx.type": "domain"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1460,7 +1387,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1480,7 +1406,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1500,7 +1425,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1520,7 +1444,6 @@
         "threatintel.otx.type": "FileHash-SHA1"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1540,7 +1463,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1560,7 +1482,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
@@ -1580,7 +1501,6 @@
         "threatintel.otx.type": "IPv4"
     },
     {
-        "@timestamp": "2020-11-02T15:42:09.459Z",
         "event.dataset": "threatintel.otx",
         "event.module": "threatintel",
         "fileset.name": "otx",
