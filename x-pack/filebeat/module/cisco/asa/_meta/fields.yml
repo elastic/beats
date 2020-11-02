@@ -175,3 +175,9 @@
     type: keyword
     description: >
       The total count of burst rate hits since the object was created or cleared
+
+  - name: termination_user
+    default_field: false
+    type: keyword
+    description: >
+      AAA name of user requesting termination
