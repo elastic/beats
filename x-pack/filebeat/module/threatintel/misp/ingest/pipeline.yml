@@ -18,6 +18,10 @@ processors:
     - threatintel.misp.Object
     - threatintel.misp.EventReport
     ignore_missing: true
+- date:
+    field: threatintel.misp.timestamp
+    formats:
+      - UNIX
 - rename:
     field: threatintel.misp.Attribute
     target_field: threatintel.misp.attribute
