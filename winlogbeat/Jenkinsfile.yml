@@ -73,3 +73,5 @@ stages:
     #            - "/test winlogbeat for windows-7"
     #        labels:
     #            - "windows-7"
+    #        branches: true     ## for all the branches
+    #        tags: true         ## for all the tags	            tags: true         ## for all the tags
