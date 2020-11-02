@@ -87,67 +87,74 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEv
 		if !ok {
 			return fmt.Errorf("field %s needs to be an array to be able to split on it", s.targetInfo.Name)
 		}
+
 		for _, a := range arr {
-			m, ok := a.(map[string]interface{})
+			m, ok := toMapStr(a)
 			if !ok {
-				// TODO
+				return errors.New("split can only be applied on object lists")
 			}
 
-			if s.keepParent {
-				_, _ = respCpy.body.Put(s.targetInfo.Name, m)
-			} else {
-				respCpy.body = common.MapStr(m)
-			}
-
-			if s.split != nil {
-				return s.split.run(ctx, respCpy, ch)
-			}
-
-			event, err := makeEvent(respCpy.body)
-			if err != nil {
+			if err := s.sendEvent(ctx, respCpy, m, ch); err != nil {
 				return err
 			}
-
-			ch <- maybeEvent{event: event}
 		}
 
 		return nil
 	case splitTypeMap:
-		m, ok := v.(map[string]interface{})
+		ms, ok := toMapStr(v)
 		if !ok {
 			return fmt.Errorf("field %s needs to be a map to be able to split on it", s.targetInfo.Name)
 		}
-		for k, mm := range m {
-			v, ok := mm.(map[string]interface{})
+
+		for k, v := range ms {
+			m, ok := toMapStr(v)
 			if !ok {
-				// TODO
+				return errors.New("split can only be applied on object lists")
 			}
-
-			vv := common.MapStr(v)
 			if s.keyField != "" {
-				_, _ = vv.Put(s.keyField, k)
+				_, _ = m.Put(s.keyField, k)
 			}
-
-			if s.keepParent {
-				_, _ = respCpy.body.Put(s.targetInfo.Name, vv)
-			} else {
-				respCpy.body = vv
-			}
-
-			if s.split != nil {
-				return s.split.run(ctx, respCpy, ch)
-			}
-
-			event, err := makeEvent(respCpy.body)
-			if err != nil {
+			if err := s.sendEvent(ctx, respCpy, m, ch); err != nil {
 				return err
 			}
-
-			ch <- maybeEvent{event: event}
 		}
 
 		return nil
 	}
 
 	return errors.New("invalid split type")
+}
+
+func toMapStr(v interface{}) (common.MapStr, bool) {
+	var m common.MapStr
+	switch ts := v.(type) {
+	case common.MapStr:
+		m = ts
+	case map[string]interface{}:
+		m = common.MapStr(ts)
+	default:
+		return nil, false
+	}
+	return m, true
+}
+
+func (s *split) sendEvent(ctx transformContext, resp *transformable, m common.MapStr, ch chan<- maybeEvent) error {
+	if s.keepParent {
+		_, _ = resp.body.Put(s.targetInfo.Name, m)
+	} else {
+		resp.body = m
+	}
+
+	if s.split != nil {
+		return s.split.run(ctx, resp, ch)
+	}
+
+	event, err := makeEvent(resp.body)
+	if err != nil {
+		return err
+	}
+
+	ch <- maybeEvent{event: event}
+
+	return nil
 }
