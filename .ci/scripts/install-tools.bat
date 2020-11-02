@@ -1,6 +1,12 @@
 set GOPATH=%WORKSPACE%
 set MAGEFILE_CACHE=%WORKSPACE%\.magefile
-set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;%PATH%
+
+REM Configure GCC for either 32 or 64 bits
+set MINGW_ARCH=64
+IF NOT EXIST "%PROGRAMFILES(X86)%" (
+    set MINGW_ARCH=32
+)
+set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw%MINGW_ARCH%\bin;%PATH%
 
 where /q curl
 IF ERRORLEVEL 1 (
@@ -25,3 +31,13 @@ if not exist C:\Python38\python.exe (
 python --version
 where python
 
+where /q gcc
+IF ERRORLEVEL 1 (
+    REM Install mingw 5.3.0
+    choco install mingw -y -r --no-progress --version 5.3.0
+    IF NOT ERRORLEVEL 0 (
+        exit /b 1
+    )
+)
+gcc --version
+where gcc
