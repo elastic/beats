@@ -6,12 +6,14 @@ package rollback
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -63,6 +65,16 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 
 			if status.Status == client.Failed {
 				ch.notifyChan <- ErrAgentStatusFailed
+			}
+
+			for _, app := range status.Applications {
+				if app.Status == client.Failed {
+					err = multierror.Append(err, errors.New(fmt.Sprintf("application %s[%v] failed: %s", app.Name, app.ID, app.Message)))
+				}
+			}
+
+			if err != nil {
+				ch.notifyChan <- errors.New(err, "applications in a failed state", errors.TypeApplication)
 			}
 		}
 	}
