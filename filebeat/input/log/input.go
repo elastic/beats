@@ -566,6 +566,7 @@ func (p *Input) harvestExistingFile(newState file.State, oldState file.State) {
 			logp.Debug("input", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
 			oldState.Source = newState.Source
+			oldState.TTL = newState.TTL
 			err := p.updateState(oldState)
 			if err != nil {
 				logp.Err("File rotation state update error: %s", err)

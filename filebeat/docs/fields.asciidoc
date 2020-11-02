@@ -143953,15 +143953,6 @@ type: keyword
 
 --
 
-*`suricata.eve.timestamp`*::
-+
---
-type: alias
-
-alias to: @timestamp
-
---
-
 *`suricata.eve.in_iface`*::
 +
 --

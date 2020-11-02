@@ -7,7 +7,7 @@ integrations require root privileges to collect sensitive data.
 // end::enroll-tip[]
 [source,shell]
 ----
-elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
 include::enroll.asciidoc[tag=where-description]
@@ -19,7 +19,7 @@ include::enroll.asciidoc[tag=enroll-tip]
 
 [source,shell]
 ----
-elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
 include::enroll.asciidoc[tag=where-description]
@@ -31,7 +31,7 @@ include::enroll.asciidoc[tag=enroll-tip]
 
 [source,shell]
 ----
-./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
 include::enroll.asciidoc[tag=where-description]
@@ -43,7 +43,7 @@ include::enroll.asciidoc[tag=enroll-tip]
 
 [source,shell]
 ----
-./elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
 include::enroll.asciidoc[tag=where-description]
@@ -58,7 +58,7 @@ and run:
 
 [source,shell]
 ----
-.\elastic-agent.exe enroll KIBANA_URL ENROLLMENT_KEY
+.\elastic-agent.exe install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
 include::enroll.asciidoc[tag=where-description]

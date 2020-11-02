@@ -10,14 +10,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	tempSubdir = "tmp"
 )
 
 var (
 	topPath    string
 	configPath string
 	logsPath   string
+	tmpCreator sync.Once
 )
 
 func init() {
@@ -35,6 +41,16 @@ func init() {
 // home directories live under this top-level/data/elastic-agent-${hash}
 func Top() string {
 	return topPath
+}
+
+// TempDir returns agent temp dir located within data dir.
+func TempDir() string {
+	tmpDir := filepath.Join(Data(), tempSubdir)
+	tmpCreator.Do(func() {
+		// create tempdir as it probably don't exists
+		os.MkdirAll(tmpDir, 0750)
+	})
+	return tmpDir
 }
 
 // Home returns a directory where binary lives
