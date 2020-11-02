@@ -341,6 +341,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
       } catch(err) {
         // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
         upload = true
+        error("Error '${err.toString()}'")
       } finally {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
