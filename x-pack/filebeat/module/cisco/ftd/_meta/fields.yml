@@ -114,3 +114,9 @@
     default_field: false
     description: >
       The assigned DAP records
+
+  - name: termination_user
+    type: keyword
+    default_field: false
+    description: >
+      AAA name of user requesting termination
