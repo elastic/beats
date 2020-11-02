@@ -524,7 +524,8 @@ def startCloudTestEnv(Map args = [:]) {
           }
         } catch(err) {
           dirs?.each { folder ->
-            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}")
+            // If it failed then cleanup without failing the build
+            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
           }
         } finally {
           // Archive terraform states in case manual cleanup is needed.
