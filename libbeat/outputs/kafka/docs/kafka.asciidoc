@@ -277,3 +277,11 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 `-keyalg RSA` argument to ensure it uses a cipher supported by
 https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
 See <<configuration-ssl>> for more information.
+
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.
