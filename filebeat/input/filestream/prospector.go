@@ -19,7 +19,6 @@ package filestream
 
 import (
 	"os"
-	"strings"
 	"time"
 
 	"github.com/urso/sderr"
@@ -27,8 +26,6 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -71,17 +68,51 @@ func newFileProspector(
 	}, nil
 }
 
+func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+	if p.cleanRemoved {
+		cleaner.CleanIf(func(key string, u loginp.Unpackable) bool {
+			var st state
+			err := u.UnpackCursor(&st)
+			if err != nil {
+				// remove faulty entries
+				return true
+			}
+
+			_, err = os.Stat(st.Source)
+			if err != nil {
+				return false
+			}
+			return true
+		})
+	}
+
+	identifierName := p.identifier.Name()
+	cleaner.UpdateIdentifiers(func(key string, u loginp.Unpackable) (bool, string) {
+		var st state
+		err := u.UnpackCursor(&st)
+		if err != nil {
+			return false, ""
+		}
+		if st.IdentifierName != identifierName {
+			fi, err := os.Stat(st.Source)
+			if err != nil {
+				return false, ""
+			}
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: st.Source, Info: fi}).Name()
+			st.IdentifierName = identifierName
+			return true, newKey
+		}
+		return false, ""
+	})
+
+	return nil
+}
+
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.HarvesterGroup) {
+func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
-
-	if p.cleanRemoved {
-		p.cleanRemovedBetweenRuns(log, s)
-	}
-
-	p.updateIdentifiersBetweenRuns(log, s)
 
 	var tg unison.MultiErrGroup
 
@@ -115,7 +146,10 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.H
 					}
 				}
 
-				hg.Run(ctx, src)
+				err := hg.Start(ctx, src)
+				if err != nil {
+					log.Errorf("error while starting harvester %v", err)
+				}
 
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
@@ -129,9 +163,16 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.H
 					}
 				}
 
+				// TODO close_removed
+
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
 				// TODO update state information in the store
+				if p.identifier.Name() == "path" {
+					s.UpdateID(fe.OldPath, fe.NewPath)
+				}
+
+				// TODO close_renamed
 
 			default:
 				log.Error("Unkown return value %v", fe.Op)
@@ -144,64 +185,6 @@ func (p *fileProspector) Run(ctx input.Context, s *statestore.Store, hg loginp.H
 	if len(errs) > 0 {
 		log.Error("%s", sderr.WrapAll(errs, "running prospector failed"))
 	}
-}
-
-func (p *fileProspector) cleanRemovedBetweenRuns(log *logp.Logger, s *statestore.Store) {
-	keyPrefix := pluginName + "::"
-	s.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
-			return true, nil
-		}
-
-		var st state
-		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
-				key, err)
-			return true, nil
-		}
-
-		_, err := os.Stat(st.Source)
-		if err != nil {
-			s.Remove(key)
-		}
-
-		return true, nil
-	})
-}
-
-func (p *fileProspector) updateIdentifiersBetweenRuns(log *logp.Logger, s *statestore.Store) {
-	keyPrefix := pluginName + "::"
-	s.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
-			return true, nil
-		}
-
-		var st state
-		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v", key, err)
-			return true, nil
-		}
-
-		if st.IdentifierName == p.identifier.Name() {
-			return true, nil
-		}
-
-		fi, err := os.Stat(st.Source)
-		if err != nil {
-			return true, nil
-		}
-		newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: st.Source, Info: fi}).Name()
-		st.IdentifierName = p.identifier.Name()
-
-		err = s.Set(newKey, st)
-		if err != nil {
-			log.Errorf("Failed to add updated state for '%v', cursor state will be ignored. Error was: %+v", key, err)
-			return true, nil
-		}
-		s.Remove(key)
-
-		return true, nil
-	})
 }
 
 func (p *fileProspector) Test() error {

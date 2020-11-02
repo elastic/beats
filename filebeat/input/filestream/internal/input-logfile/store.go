@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -167,6 +168,58 @@ func (s *store) close() {
 // resource is not synced to disk yet.
 func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
+}
+
+// UpdateID updates the ID of a resource.
+func (s *store) UpdateID(oldKey, newKey string) {
+	resource := s.Get(oldKey)
+	err := s.persistentStore.Set(newKey, state{
+		TTL:     resource.internalState.TTL,
+		Updated: resource.internalState.Updated,
+		Cursor:  resource.cursor,
+	})
+	if err != nil {
+		s.log.Errorf("Failed to add updated state for '%v', cursor state will be ignored. Error was: %+v", oldKey, err)
+		resource.internalInSync = false
+	} else {
+		s.persistentStore.Remove(oldKey)
+	}
+}
+
+func (s *store) CleanIf(pred func(key string, u Unpackable) bool) {
+	s.ephemeralStore.mu.Lock()
+	defer s.ephemeralStore.mu.Unlock()
+
+	for id, state := range s.ephemeralStore.table {
+		remove := pred(id, state)
+		if remove {
+			delete(s.ephemeralStore.table, id)
+		}
+	}
+}
+
+func (s *store) UpdateIdentifiers(getNewID func(key string, u Unpackable) (bool, string)) {
+	s.ephemeralStore.mu.Lock()
+	defer s.ephemeralStore.mu.Unlock()
+
+	for id, state := range s.ephemeralStore.table {
+		update, newId := getNewID(id, state)
+		if update {
+			s.ephemeralStore.table[newId] = state
+			delete(s.ephemeralStore.table, id)
+		}
+	}
+}
+
+// Removes marks an entry for removal by setting its TTL to zero.
+func (s *store) Remove(key string) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+
+	s.UpdateTTL(resource, 0)
+	return nil
 }
 
 // UpdateTTL updates the time-to-live of a resource. Inactive resources with expired TTL are subject to removal.

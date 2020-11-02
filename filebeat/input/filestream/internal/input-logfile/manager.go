@@ -76,6 +76,12 @@ type Source interface {
 	Name() string
 }
 
+type resourceLocker interface {
+	Lock(input.Context, string) (*resource, error)
+	UpdateTTL(*resource, time.Duration)
+	Release()
+}
+
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
@@ -166,18 +172,40 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, errNoInputRunner
 	}
 
+	prospectorStore := cim.passStore()
+	defer prospectorStore.Release()
+	err = prospector.Init(prospectorStore)
+	if err != nil {
+		return nil, err
+	}
+
 	return &managedInput{
-		manager:      cim,
+		locker:       newResourceLocker(cim),
+		store:        cim.passStore(),
 		prospector:   prospector,
 		harvester:    harvester,
 		cleanTimeout: settings.CleanTimeout,
 	}, nil
 }
 
+func (cim *InputManager) passStore() *store {
+	store := cim.store
+	store.Retain()
+	return store
+}
+
+type resourceLock struct {
+	store *store
+}
+
+func newResourceLocker(cim *InputManager) resourceLocker {
+	return &resourceLock{store: cim.passStore()}
+}
+
 // Lock locks a key for exclusive access and returns an resource that can be used to modify
 // the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx input.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
+func (r *resourceLock) Lock(ctx input.Context, key string) (*resource, error) {
+	resource := r.store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()
@@ -196,4 +224,12 @@ func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler)
 		}
 	}
 	return nil
+}
+
+func (r *resourceLock) UpdateTTL(resource *resource, ttl time.Duration) {
+	r.store.UpdateTTL(resource, ttl)
+}
+
+func (r *resourceLock) Release() {
+	r.store.Release()
 }

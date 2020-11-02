@@ -19,17 +19,35 @@ package input_logfile
 
 import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 // Prospector is responsible for starting, stopping harvesters
 // based on the retrieved information about the configured paths.
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
+	// Init runs the cleanup processes before starting the prospector.
+	Init(ProspectorCleaner) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
-	Run(input.Context, *statestore.Store, HarvesterGroup)
+	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
 	// Test checks if the Prospector is able to run the configuration
 	// specified by the user.
 	Test() error
+}
+
+type StateMetadataUpdater interface {
+	// UpdateID updates the Identifier.
+	UpdateID(oldId, newId string)
+	// Remove deletes a state with a given ID.
+	Remove(string) error
+}
+
+type ProspectorCleaner interface {
+	// CleanIf removes an entry if the cursor is true
+	CleanIf(func(key string, u Unpackable) bool)
+	UpdateIdentifiers(func(key string, u Unpackable) (bool, string))
+}
+
+type Unpackable interface {
+	UnpackCursor(to interface{}) error
 }

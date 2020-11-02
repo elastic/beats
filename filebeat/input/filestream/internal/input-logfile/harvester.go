@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -41,15 +42,51 @@ type Harvester interface {
 	Run(input.Context, Source, Cursor, Publisher) error
 }
 
+type readerGroup struct {
+	mu    sync.Mutex
+	table map[string]context.CancelFunc
+}
+
+func newReaderGroup() *readerGroup {
+	return &readerGroup{
+		table: make(map[string]context.CancelFunc),
+	}
+}
+
+func (r *readerGroup) add(id string, cancel context.CancelFunc) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, ok := r.table[id]; ok {
+		return fmt.Errorf("harvester is already running for file")
+	}
+	r.table[id] = cancel
+	return nil
+}
+
+func (r *readerGroup) remove(id string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	cancel, ok := r.table[id]
+	if !ok {
+		return
+	}
+
+	cancel()
+	delete(r.table, id)
+}
+
 // HarvesterGroup is responsible for running the
 // Harvesters started by the Prospector.
 type HarvesterGroup interface {
-	Run(input.Context, Source) error
+	Start(input.Context, Source) error
+	Stop(Source)
 }
 
 type defaultHarvesterGroup struct {
-	manager      *InputManager
-	readers      map[string]context.CancelFunc
+	readers      *readerGroup
+	locker       resourceLocker
 	pipeline     beat.PipelineConnector
 	harvester    Harvester
 	cleanTimeout time.Duration
@@ -58,27 +95,18 @@ type defaultHarvesterGroup struct {
 }
 
 // Run starts the Harvester for a Source.
-func (hg *defaultHarvesterGroup) Run(ctx input.Context, s Source) error {
+func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 	log := ctx.Logger.With("source", s.Name())
 	log.Debug("Starting harvester for file")
 
 	harvesterCtx, cancelHarvester := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	ctx.Cancelation = harvesterCtx
 
-	resource, err := hg.manager.lock(ctx, s.Name())
+	err := hg.readers.add(s.Name(), cancelHarvester)
 	if err != nil {
 		cancelHarvester()
 		return err
 	}
-
-	if _, ok := hg.readers[s.Name()]; ok {
-		cancelHarvester()
-		log.Debug("A harvester is already running for file")
-		return nil
-	}
-	hg.readers[s.Name()] = cancelHarvester
-
-	hg.store.UpdateTTL(resource, hg.cleanTimeout)
 
 	client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
@@ -89,15 +117,10 @@ func (hg *defaultHarvesterGroup) Run(ctx input.Context, s Source) error {
 		return err
 	}
 
-	cursor := makeCursor(hg.store, resource)
-	publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
-
-	go func(cancel context.CancelFunc) {
-		defer client.Close()
+	go func() {
 		defer log.Debug("Stopped harvester for file")
-		defer cancel()
-		defer releaseResource(resource)
-		defer delete(hg.readers, s.Name())
+		defer client.Close()
+		defer hg.readers.remove(s.Name())
 
 		defer func() {
 			if v := recover(); v != nil {
@@ -106,21 +129,29 @@ func (hg *defaultHarvesterGroup) Run(ctx input.Context, s Source) error {
 			}
 		}()
 
-		err := hg.harvester.Run(ctx, s, cursor, publisher)
+		resource, err := hg.locker.Lock(ctx, s.Name())
+		if err != nil {
+			log.Errorf("Error while locking resource: %v", err)
+			return
+		}
+		defer releaseResource(resource)
+
+		hg.locker.UpdateTTL(resource, hg.cleanTimeout)
+		cursor := makeCursor(hg.store, resource)
+		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		err = hg.harvester.Run(ctx, s, cursor, publisher)
 		if err != nil {
 			log.Errorf("Harvester stopped: %v", err)
 		}
-	}(cancelHarvester)
+	}()
+
 	return nil
 }
 
 // Cancel stops the running Harvester for a given Source.
-func (hg *defaultHarvesterGroup) Cancel(s Source) error {
-	if cancel, ok := hg.readers[s.Name()]; ok {
-		cancel()
-		return nil
-	}
-	return fmt.Errorf("no such harvester %s", s.Name())
+func (hg *defaultHarvesterGroup) Stop(s Source) {
+	hg.readers.remove(s.Name())
 }
 
 func releaseResource(resource *resource) {
