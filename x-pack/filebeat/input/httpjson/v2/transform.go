@@ -42,6 +42,14 @@ type transformable struct {
 	url    url.URL
 }
 
+func (t *transformable) clone() *transformable {
+	return &transformable{
+		body:   t.body.Clone(),
+		header: t.header.Clone(),
+		url:    t.url,
+	}
+}
+
 func emptyTransformable() *transformable {
 	return &transformable{
 		body:   make(common.MapStr),
@@ -66,11 +74,6 @@ type maybeEvent struct {
 func (e maybeEvent) failed() bool { return e.err != nil }
 
 func (e maybeEvent) Error() string { return e.err.Error() }
-
-type splitTransform interface {
-	transform
-	run(transformContext, *transformable, <-chan maybeEvent) error
-}
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
 func newTransformsFromConfig(config transformsConfig, namespace string) (transforms, error) {

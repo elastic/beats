@@ -4,9 +4,29 @@
 
 package v2
 
+import (
+	"fmt"
+	"strings"
+)
+
+const (
+	splitTypeArr = "array"
+	splitTypeMap = "map"
+)
+
 type responseConfig struct {
 	Transforms transformsConfig `config:"transforms"`
 	Pagination transformsConfig `config:"pagination"`
+	Split      *splitConfig     `config:"split"`
+}
+
+type splitConfig struct {
+	Target     string           `config:"target" validation:"required"`
+	Type       string           `config:"type"`
+	Transforms transformsConfig `config:"transforms"`
+	Split      *splitConfig     `config:"split"`
+	KeepParent bool             `config:"keep_parent"`
+	KeyField   string           `config:"key_field"`
 }
 
 func (c *responseConfig) Validate() error {
@@ -16,5 +36,28 @@ func (c *responseConfig) Validate() error {
 	if _, err := newBasicTransformsFromConfig(c.Transforms, paginationNamespace); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (c *splitConfig) Validate() error {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace); err != nil {
+		return err
+	}
+
+	c.Type = strings.ToLower(c.Type)
+	switch c.Type {
+	case "", splitTypeArr:
+		if c.KeyField != "" {
+			return fmt.Errorf("key_field can only be used with a %s split type", splitTypeMap)
+		}
+	case splitTypeMap:
+	default:
+		return fmt.Errorf("invalid split type: %s", c.Type)
+	}
+
+	if _, err := newSplitResponse(c); err != nil {
+		return err
+	}
+
 	return nil
 }

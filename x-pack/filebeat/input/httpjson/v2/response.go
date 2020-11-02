@@ -18,9 +18,9 @@ func registerResponseTransforms() {
 }
 
 type responseProcessor struct {
-	splitTransform splitTransform
-	transforms     []basicTransform
-	pagination     *pagination
+	transforms []basicTransform
+	split      *split
+	pagination *pagination
 }
 
 func newResponseProcessor(config *responseConfig, pagination *pagination) *responseProcessor {
@@ -32,6 +32,11 @@ func newResponseProcessor(config *responseConfig, pagination *pagination) *respo
 	}
 	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace)
 	rp.transforms = ts
+
+	split, _ := newSplitResponse(config.Split)
+
+	rp.split = split
+
 	return rp
 }
 
@@ -61,8 +66,8 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				}
 			}
 
-			if rp.splitTransform != nil {
-				if err := rp.splitTransform.run(trCtx, page, ch); err != nil {
+			if rp.split != nil {
+				if err := rp.split.run(trCtx, page, ch); err != nil {
 					ch <- maybeEvent{err: err}
 					return
 				}
