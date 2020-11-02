@@ -76,7 +76,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	}
 
 	operator.config.DownloadConfig.OperatingSystem = "darwin"
-	operator.config.DownloadConfig.Architecture = "32"
+	operator.config.DownloadConfig.Architecture = "64"
 
 	// make the download path so the `operation_verify` can ensure the path exists
 	downloadConfig := operator.config.DownloadConfig
@@ -101,7 +101,7 @@ func getProgram(binary, version string) *app.Descriptor {
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
-		Architecture:    "32",
+		Architecture:    "64",
 	}
 	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }

@@ -300,8 +300,8 @@ func TestCAPinning(t *testing.T) {
 func genCA() (tls.Certificate, error) {
 	ca := &x509.Certificate{
 		SerialNumber: serial(),
+		DNSNames:     []string{"localhost"},
 		Subject: pkix.Name{
-			CommonName:    "localhost",
 			Organization:  []string{"TESTING"},
 			Country:       []string{"CANADA"},
 			Province:      []string{"QUEBEC"},
@@ -344,8 +344,8 @@ func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.C
 	// Create another Cert/key
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2000),
+		DNSNames:     []string{"localhost"},
 		Subject: pkix.Name{
-			CommonName:    "localhost",
 			Organization:  []string{"TESTING"},
 			Country:       []string{"CANADA"},
 			Province:      []string{"QUEBEC"},
