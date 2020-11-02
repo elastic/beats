@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-10-30T14:08:06.386Z",
+        "@timestamp": "2020-11-02T12:44:44.285Z",
         "event.dataset": "threatintel.misp",
         "event.module": "threatintel",
         "fileset.name": "misp",
@@ -60,7 +60,7 @@
         "threatintel.misp.uuid": "58dcfe62-ed84-4e5e-b293-4991950d210f"
     },
     {
-        "@timestamp": "2020-10-30T14:08:06.386Z",
+        "@timestamp": "2020-11-02T12:44:44.285Z",
         "event.dataset": "threatintel.misp",
         "event.module": "threatintel",
         "fileset.name": "misp",

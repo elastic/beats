@@ -151462,7 +151462,7 @@ type: text
 ID
 
 
-type: boolean
+type: keyword
 
 --
 
