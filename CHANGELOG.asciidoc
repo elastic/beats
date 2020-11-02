@@ -13,7 +13,7 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 
 - Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
 - Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
-- Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
+- Allow embedding of CAs, Certificate of private keys for anything that support TLS in outputs and inputs {pull}21179[21179]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 
 *Auditbeat*
@@ -130,13 +130,13 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 *Winlogbeat*
 
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
-- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
+- Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[20564]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 
 *Functionbeat*
 
-- Fix catchall bucket config errors by adding more validation. {issue}17572[16282] {pull}20887[16287]
+- Fix catchall bucket config errors by adding more validation. {issue}17572[17572] {pull}20887[20887]
 - Fix Google Cloud Function configuration issue. {issue}20864[20864] {pull}22156[22156]
 
 ==== Added
