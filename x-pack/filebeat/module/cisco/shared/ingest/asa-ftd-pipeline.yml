@@ -1250,11 +1250,11 @@ processors:
       ignore_failure: true
   - convert:
       field: "source.bytes"
-      type: integer
+      type: long
       ignore_failure: true
   - convert:
       field: "destination.bytes"
-      type: integer
+      type: long
       ignore_failure: true
   - convert:
       field: "source.packets"
