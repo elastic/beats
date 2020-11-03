@@ -77,7 +77,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if err = eventMapping(r, m, content); err != nil {
+	if err = eventMapping(r, content); err != nil {
 		return err
 	}
 

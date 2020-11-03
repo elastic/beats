@@ -143,7 +143,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMapping(r mb.ReporterV2, content []byte) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
