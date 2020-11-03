@@ -84,7 +84,6 @@ clean-vendor:
 check:
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	$(MAKE) check-python
-	# check if vendor folder does not exists
 	# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
