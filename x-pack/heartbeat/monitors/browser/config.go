@@ -6,6 +6,7 @@ package browser
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 

@@ -116,7 +116,7 @@ func addMonitorStatus(monitorType string) jobs.JobWrapper {
 			cont, err := origJob(event)
 
 			// Non-summary browser events have no status associated
-			if monitorType == "browseroeeo" {
+			if monitorType == "browser" {
 				if t, _ := event.GetValue("synthetics.type"); t != "heartbeat/summary" {
 					return cont, nil
 				}
@@ -175,17 +175,13 @@ func addBrowserMonitorDuration(job jobs.Job) jobs.Job {
 		cont, err := job(event)
 
 		syntheticsType, _ := event.GetValue("synthetics.type")
-		name, _ := event.GetValue("monitor.name")
-		if event != nil  {
+		if event != nil {
 			switch syntheticsType {
 			case "journey/start":
-				logp.Warn("JOURNEY START %s %v", name, event.Timestamp)
 				start = event.Timestamp
 			case "journey/end":
-				logp.Warn("JOURNEY END %s %v", name, event.Timestamp)
 				end = event.Timestamp
 			case "heartbeat/summary":
-				logp.Warn("JOURNEY DUR %s %v", name, end.Sub(start))
 				eventext.MergeEventFields(event, common.MapStr{
 					"monitor": common.MapStr{
 						"duration": look.RTT(end.Sub(start)),
@@ -198,7 +194,6 @@ func addBrowserMonitorDuration(job jobs.Job) jobs.Job {
 		return cont, err
 	}
 }
-
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
 func makeAddSummary(monitorType string) jobs.JobWrapper {

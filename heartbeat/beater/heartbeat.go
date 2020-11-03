@@ -21,9 +21,11 @@ import (
 	"context"
 	"fmt"
 	"time"
-	"github.com/elastic/beats/v7/heartbeat/hbregistry"
+
 	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -164,7 +166,8 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 }
 
 // Provide hook to define journey list discovery from x-pack
-type JourneyLister func (ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+type JourneyLister func(ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+
 var mainJourneyLister JourneyLister
 
 func RegisterJourneyLister(jl JourneyLister) {
@@ -188,7 +191,7 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 				"type":         "browser",
 				"path":         suite.Path,
 				"schedule":     suite.Schedule,
-				"params": suite.Params,
+				"params":       suite.Params,
 				"journey_name": name,
 				"name":         name,
 				"id":           name,
