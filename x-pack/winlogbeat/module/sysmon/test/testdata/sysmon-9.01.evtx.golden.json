@@ -129,6 +129,12 @@
         "name": "services.exe",
         "pid": 488
       },
+      "pe": {
+        "company": "Sysinternals - www.sysinternals.com",
+        "description": "System activity monitor",
+        "file_version": "9.01",
+        "product": "Sysinternals Sysmon"
+      },
       "pid": 4860,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -220,6 +226,12 @@
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
+      },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "Sink to receive asynchronous callbacks for WMI client application",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
       },
       "pid": 5028,
       "working_directory": "C:\\Windows\\system32\\"
@@ -412,6 +424,12 @@
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
+      },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "WMI Provider Host",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
       },
       "pid": 4508,
       "working_directory": "C:\\Windows\\system32\\"
