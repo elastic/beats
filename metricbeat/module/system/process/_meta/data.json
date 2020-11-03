@@ -19,32 +19,33 @@
         "command_line": "/private/var/folders/gj/50xyx1cj35z_348989k485th0000gn/T/___TestData_in_github_com_elastic_beats_v7_metricbeat_module_system_process -test.v -test.run ^\\QTestData\\E$",
         "executable": "/private/var/folders/gj/50xyx1cj35z_348989k485th0000gn/T/___TestData_in_github_com_elastic_beats_v7_metricbeat_module_system_process",
         "name": "___TestData_in_",
-        "pgid": 89312,
-        "pid": 89314,
-        "ppid": 89313
+        "pgid": 51996,
+        "pid": 51998,
+        "ppid": 51997
     },
     "service": {
         "type": "system"
     },
     "system": {
         "process": {
+            "cmdline": "/private/var/folders/gj/50xyx1cj35z_348989k485th0000gn/T/___TestData_in_github_com_elastic_beats_v7_metricbeat_module_system_process -test.v -test.run ^\\QTestData\\E$",
             "cpu": {
-                "start_time": "2020-10-30T17:50:57.446Z",
+                "start_time": "2020-11-03T18:04:24.712Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0153
+                        "pct": 0.0152
                     },
-                    "pct": 0.1834,
+                    "pct": 0.1825,
                     "value": 207
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 15990784,
+                    "bytes": 15581184,
                     "pct": 0.0005
                 },
                 "share": 0,
-                "size": 5139021824
+                "size": 5136650240
             },
             "state": "running"
         }

@@ -128,15 +128,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	for _, proc := range procs {
 		rootFields := common.MapStr{
 			"process": common.MapStr{
-				"name":         getAndRemove(proc, "name"),
-				"pid":          getAndRemove(proc, "pid"),
-				"ppid":         getAndRemove(proc, "ppid"),
-				"pgid":         getAndRemove(proc, "pgid"),
-				"command_line": getAndRemove(proc, "cmdline"),
+				"name": getAndRemove(proc, "name"),
+				"pid":  getAndRemove(proc, "pid"),
+				"ppid": getAndRemove(proc, "ppid"),
+				"pgid": getAndRemove(proc, "pgid"),
 			},
 			"user": common.MapStr{
 				"name": getAndRemove(proc, "username"),
 			},
+		}
+
+		// Duplicate system.process.cmdline with ECS name process.command_line
+		if v, ok := proc["cmdline"]; ok {
+			rootFields.Put("process.command_line", v)
 		}
 
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {

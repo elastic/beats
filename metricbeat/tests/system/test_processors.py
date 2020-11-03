@@ -116,7 +116,7 @@ class Test(metricbeat.BaseTest):
             }],
             processors=[{
                 "drop_event": {
-                    "when.not": "contains.system.process.state: running",
+                    "when.not": "contains.process.command_line: metricbeat.test",
                 },
             }]
         )

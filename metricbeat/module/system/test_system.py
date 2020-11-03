@@ -65,7 +65,8 @@ SYSTEM_NETWORK_HOST_FIELDS = ["in.bytes", "out.bytes", "in.packets", "out.packet
 
 SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 
-# fd is also part of the system process, but
+# cmdline is also part of the system process fields, but it may not be present
+# for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
 SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
@@ -441,8 +442,10 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
+        found_cmdline = False
         for evt in output:
             process = evt["system"]["process"]
+            found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             process.pop("env", None)
@@ -451,8 +454,11 @@ class Test(metricbeat.BaseTest):
             # Remove optional keys.
             process.pop("cgroup", None)
             process.pop("fd", None)
+            process.pop("cmdline", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
+
+            self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -506,6 +512,7 @@ class Test(metricbeat.BaseTest):
 
             # Remove optional keys.
             process.pop("cgroup", None)
+            process.pop("cmdline", None)
             process.pop("fd", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
@@ -536,6 +543,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
