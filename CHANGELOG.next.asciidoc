@@ -429,6 +429,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 - Remove io.time from windows {pull}22237[22237]
+- Change Session ID type from int to string {pull}22359[22359]
 
 *Packetbeat*
 
@@ -913,3 +914,5 @@ field. You can revert this change by configuring tags for the module and omittin
 ==== Known Issue
 
 *Journalbeat*
+
+
