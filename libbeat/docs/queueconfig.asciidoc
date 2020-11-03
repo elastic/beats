@@ -98,8 +98,7 @@ incoming event data.
 The disk queue is expected to replace the file spool in a future release.
 
 
-The disk queue can be enabled with default settings by specifying a maximum
-size:
+To enable the disk queue with default settings, specify a maximum size:
 
 [source,yaml]
 ------------------------------------------------------------------------------
