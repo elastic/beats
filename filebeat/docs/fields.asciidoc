@@ -3055,6 +3055,96 @@ type: keyword
 --
 
 [float]
+=== platformlogs
+
+Fields for Azure platform logs.
+
+
+
+[float]
+=== identity
+
+Identity
+
+
+*`azure.platformlogs.operation_name`*::
++
+--
+Operation name
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.result_type`*::
++
+--
+Result type
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.result_signature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.category`*::
++
+--
+Category
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.event_category`*::
++
+--
+Event Category
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+Properties
+
+
+
+*`azure.platformlogs.properties.service_request_id`*::
++
+--
+Service Request Id
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.properties.status_code`*::
++
+--
+Status code
+
+
+type: keyword
+
+--
+
+[float]
 === signinlogs
 
 Fields for Azure sign-in logs.
