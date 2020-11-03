@@ -131,7 +131,7 @@ The default value is `"${path.data}/diskqueue"`.
 ===== `max_size` (required)
 
 The maximum size the queue should use on disk. Events that exceed this
-this maximum will either pause their input or be discarded, depending on
+maximum will either pause their input or be discarded, depending on
 the input's configuration.
 
 A value of `0` means that no maximum size is enforced, and the queue can
