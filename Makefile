@@ -105,12 +105,12 @@ check:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
-## ccheck-go : Check there is no changes in Go modules.
+## check-go : Check there is no changes in Go modules.
 .PHONY: check-go
 check-go:
 	@go mod tidy
 
-## ccheck-no-changes : Check there is no local changes.
+## check-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
 check-no-changes:
 	@git diff | cat
