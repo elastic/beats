@@ -311,6 +311,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 
 *Heartbeat*
 
