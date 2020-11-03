@@ -1,0 +1,18 @@
+[[faq-development]]
+
+= Development FAQ
+
+== How to bypass signature validation of artifacts
+
+Elastic Agent verifies signature of packages on install. If there is a need to test unmerged features where signed binary does not exist custom Elastic Agent build is needed.
+
+When Elastic Agent is built with `DEV=true` environment variable, it will not check any signatures allowing user to replace archive in agents `downloads` directory (usally `data/elastic-agent-{commit}/downloads`).
+
+Using following command will result in an Elatic Agent archive with artifact security disabled.
+
+```
+cd x-pack/elastic-agent
+DEV=true mage package
+```
+
+Resulting packages will be located in `x-pack/elastic-agent/build/distributions` directory.
