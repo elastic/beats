@@ -32,6 +32,7 @@ import (
 
 type flowsProcessor struct {
 	spool    spool
+	watcher  procs.ProcessesWatcher
 	table    *flowMetaTable
 	counters *counterReg
 	timeout  time.Duration
@@ -44,6 +45,7 @@ var (
 
 func newFlowsWorker(
 	pub Reporter,
+	watcher procs.ProcessesWatcher,
 	table *flowMetaTable,
 	counters *counterReg,
 	timeout, period time.Duration,
@@ -84,6 +86,7 @@ func newFlowsWorker(
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
 		table:    table,
+		watcher:  watcher,
 		counters: counters,
 		timeout:  timeout,
 	}
@@ -194,13 +197,14 @@ func (fw *flowsProcessor) report(
 	isOver bool,
 	intNames, uintNames, floatNames []string,
 ) {
-	event := createEvent(ts, flow, isOver, intNames, uintNames, floatNames)
+	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames)
 
 	debugf("add event: %v", event)
 	fw.spool.publish(event)
 }
 
 func createEvent(
+	watcher procs.ProcessesWatcher,
 	ts time.Time, f *biFlow,
 	isOver bool,
 	intNames, uintNames, floatNames []string,
@@ -386,7 +390,7 @@ func createEvent(
 
 	// Set process information if it's available
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
-		if proc := procs.ProcWatcher.FindProcessesTuple(&tuple, proto); proc != nil {
+		if proc := watcher.FindProcessesTuple(&tuple, proto); proc != nil {
 			if proc.Src.PID > 0 {
 				p := common.MapStr{
 					"pid":               proc.Src.PID,
