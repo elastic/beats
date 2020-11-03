@@ -27,8 +27,8 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - script:
       lang: javascript
-      id: googlecloud_audit_script
-      file: ${path.home}/module/googlecloud/audit/config/pipeline.js
+      id: gcp_audit_script
+      file: ${path.home}/module/gcp/audit/config/pipeline.js
       params:
         keep_original_message: {{ .keep_original_message }}
   - add_fields:

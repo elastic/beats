@@ -13,35 +13,35 @@
         "destination.port": 53,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "4zuj4nfn4llkb",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.destination_range": [
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.destination_range": [
             "8.8.8.0/24"
         ],
-        "googlecloud.firewall.rule_details.direction": "EGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.firewall.rule_details.direction": "EGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "ALL"
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-central1",
-        "googlecloud.source.instance.zone": "us-central1-a",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-central1",
+        "gcp.source.instance.zone": "us-central1-a",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 0,
@@ -56,7 +56,7 @@
             "8.8.8.8"
         ],
         "rule.name": "network:default/firewall:adrian-test-1",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.128.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.128.0.16",
@@ -73,24 +73,24 @@
         "destination.port": 3389,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1f21ciqfpfssuo",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "windows-isolated",
-        "googlecloud.destination.vpc.vpc_name": "windows-isolated",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "windows-isolated",
+        "gcp.destination.vpc.vpc_name": "windows-isolated",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -98,11 +98,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow-rdp"
         ],
         "input.type": "log",
@@ -119,7 +119,7 @@
             "10.42.0.2"
         ],
         "rule.name": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.126",
         "source.geo.continent_name": "Asia",
         "source.geo.country_name": "omn",
@@ -137,24 +137,24 @@
         "destination.port": 8080,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "8vcfeailjd",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -163,11 +163,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -184,7 +184,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.219",
         "source.geo.city_name": "Krasnodar",
         "source.geo.continent_name": "Europe",
@@ -204,24 +204,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1bqgmw9feiabij",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -230,11 +230,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -251,7 +251,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.14",
         "source.geo.continent_name": "Europe",
         "source.geo.country_name": "deu",
@@ -269,24 +269,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1jrxaqbfe48bir",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -295,11 +295,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -316,7 +316,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.14",
         "source.geo.continent_name": "Europe",
         "source.geo.country_name": "deu",
@@ -334,24 +334,24 @@
         "destination.port": 8080,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1fw7drlfe2ty27",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -360,11 +360,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -381,7 +381,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.151",
         "source.geo.city_name": "Berdychiv",
         "source.geo.continent_name": "Europe",
@@ -401,24 +401,24 @@
         "destination.port": 8080,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1yre751fekaxzs",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -427,11 +427,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -448,7 +448,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.241",
         "source.geo.city_name": "Vicenza",
         "source.geo.continent_name": "Europe",
@@ -468,24 +468,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "5kanfzfiqepkh",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -494,11 +494,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -515,7 +515,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.114",
         "source.geo.city_name": "Tula",
         "source.geo.continent_name": "Europe",
@@ -535,24 +535,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "59z0t8fiow9vg",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -561,11 +561,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -582,7 +582,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.251",
         "source.geo.city_name": "Stavropol",
         "source.geo.continent_name": "Europe",
@@ -602,24 +602,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1y7e4yzff816cq",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -628,11 +628,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -649,7 +649,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.189",
         "source.geo.city_name": "Viol\u00e8s",
         "source.geo.continent_name": "Europe",
@@ -669,24 +669,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "lx5jlsfggpr0q",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -695,11 +695,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -716,7 +716,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.189",
         "source.geo.city_name": "Viol\u00e8s",
         "source.geo.continent_name": "Europe",
@@ -736,24 +736,24 @@
         "destination.port": 8080,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "18ynfbufer19m1",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -762,11 +762,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
         "input.type": "log",
@@ -783,7 +783,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.200",
         "source.geo.city_name": "\u0130zmir",
         "source.geo.continent_name": "Asia",
@@ -809,35 +809,35 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "tzddthfsr6fv5",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.destination_range": [
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.destination_range": [
             "8.8.8.0/24"
         ],
-        "googlecloud.firewall.rule_details.direction": "EGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.firewall.rule_details.direction": "EGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "ALL"
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-central1",
-        "googlecloud.source.instance.zone": "us-central1-a",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-central1",
+        "gcp.source.instance.zone": "us-central1-a",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 12444,
@@ -852,7 +852,7 @@
             "8.8.8.8"
         ],
         "rule.name": "network:default/firewall:adrian-test-1",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.28.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.28.0.16",
@@ -875,35 +875,35 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1k2b7kefsnhzq7",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.destination_range": [
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.destination_range": [
             "8.8.8.0/24"
         ],
-        "googlecloud.firewall.rule_details.direction": "EGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.firewall.rule_details.direction": "EGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "ALL"
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-central1",
-        "googlecloud.source.instance.zone": "us-central1-a",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-central1",
+        "gcp.source.instance.zone": "us-central1-a",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 13425,
@@ -918,7 +918,7 @@
             "8.8.8.8"
         ],
         "rule.name": "network:default/firewall:adrian-test-1",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.28.0.16",
         "source.domain": "adrian-test",
         "source.ip": "10.28.0.16",
@@ -935,24 +935,24 @@
         "destination.port": 9200,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1sdfuwxfk8hq1c",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -960,19 +960,19 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow9200"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-east1",
-        "googlecloud.source.instance.zone": "us-east1-b",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 14407,
@@ -987,7 +987,7 @@
             "10.42.0.10"
         ],
         "rule.name": "network:default/firewall:allow9200",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.114",
         "source.domain": "test-kibana",
         "source.geo.continent_name": "America",
@@ -1006,24 +1006,24 @@
         "destination.port": 9200,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1sdfuwxfk8hq1b",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -1031,19 +1031,19 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow9200"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-east1",
-        "googlecloud.source.instance.zone": "us-east1-b",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 15594,
@@ -1058,7 +1058,7 @@
             "10.42.0.10"
         ],
         "rule.name": "network:default/firewall:allow9200",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.114",
         "source.domain": "test-kibana",
         "source.geo.continent_name": "America",
@@ -1077,24 +1077,24 @@
         "destination.port": 3389,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "yot1ojetjdiw",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "windows-isolated",
-        "googlecloud.destination.vpc.vpc_name": "windows-isolated",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "windows-isolated",
+        "gcp.destination.vpc.vpc_name": "windows-isolated",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -1102,11 +1102,11 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow-rdp"
         ],
         "input.type": "log",
@@ -1123,7 +1123,7 @@
             "10.42.0.2"
         ],
         "rule.name": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.7",
         "source.geo.city_name": "Almelo",
         "source.geo.continent_name": "Europe",
@@ -1143,24 +1143,24 @@
         "destination.port": 9200,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "5a27u1g22jks9e",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -1168,19 +1168,19 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow9200"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-east1",
-        "googlecloud.source.instance.zone": "us-east1-b",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 17858,
@@ -1195,7 +1195,7 @@
             "10.42.0.10"
         ],
         "rule.name": "network:default/firewall:allow9200",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.114",
         "source.domain": "test-kibana",
         "source.geo.continent_name": "America",
@@ -1214,24 +1214,24 @@
         "destination.port": 9200,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "5a27u1g22jks8t",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "allowed"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-east1",
-        "googlecloud.destination.instance.zone": "us-east1-b",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "ALLOW",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-east1",
+        "gcp.destination.instance.zone": "us-east1-b",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "ALLOW",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -1239,19 +1239,19 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "allow9200"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-east1",
-        "googlecloud.source.instance.zone": "us-east1-b",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 19045,
@@ -1266,7 +1266,7 @@
             "10.42.0.10"
         ],
         "rule.name": "network:default/firewall:allow9200",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "192.0.2.114",
         "source.domain": "test-kibana",
         "source.geo.continent_name": "America",
@@ -1285,24 +1285,24 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1dobeotg13df9f5",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
         ],
         "fileset.name": "firewall",
-        "googlecloud.destination.instance.project_id": "test-beats",
-        "googlecloud.destination.instance.region": "us-central1",
-        "googlecloud.destination.instance.zone": "us-central1-a",
-        "googlecloud.destination.vpc.project_id": "test-beats",
-        "googlecloud.destination.vpc.subnetwork_name": "default",
-        "googlecloud.destination.vpc.vpc_name": "default",
-        "googlecloud.firewall.rule_details.action": "DENY",
-        "googlecloud.firewall.rule_details.direction": "INGRESS",
-        "googlecloud.firewall.rule_details.ip_port_info": [
+        "gcp.destination.instance.project_id": "test-beats",
+        "gcp.destination.instance.region": "us-central1",
+        "gcp.destination.instance.zone": "us-central1-a",
+        "gcp.destination.vpc.project_id": "test-beats",
+        "gcp.destination.vpc.subnetwork_name": "default",
+        "gcp.destination.vpc.vpc_name": "default",
+        "gcp.firewall.rule_details.action": "DENY",
+        "gcp.firewall.rule_details.direction": "INGRESS",
+        "gcp.firewall.rule_details.ip_port_info": [
             {
                 "ip_protocol": "TCP",
                 "port_range": [
@@ -1311,19 +1311,19 @@
                 ]
             }
         ],
-        "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.source_range": [
+        "gcp.firewall.rule_details.priority": 1000,
+        "gcp.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
-        "googlecloud.firewall.rule_details.target_tag": [
+        "gcp.firewall.rule_details.target_tag": [
             "adrian-test"
         ],
-        "googlecloud.source.instance.project_id": "test-beats",
-        "googlecloud.source.instance.region": "us-east1",
-        "googlecloud.source.instance.zone": "us-east1-b",
-        "googlecloud.source.vpc.project_id": "test-beats",
-        "googlecloud.source.vpc.subnetwork_name": "default",
-        "googlecloud.source.vpc.vpc_name": "default",
+        "gcp.source.instance.project_id": "test-beats",
+        "gcp.source.instance.region": "us-east1",
+        "gcp.source.instance.zone": "us-east1-b",
+        "gcp.source.vpc.project_id": "test-beats",
+        "gcp.source.vpc.subnetwork_name": "default",
+        "gcp.source.vpc.vpc_name": "default",
         "input.type": "log",
         "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
         "log.offset": 20231,
@@ -1338,7 +1338,7 @@
             "10.28.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.42.0.10",
         "source.domain": "test-es",
         "source.ip": "10.42.0.10",
