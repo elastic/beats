@@ -100,7 +100,6 @@ stages:
                 - "windows-8"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-<<<<<<< HEAD
     #windows-7-32:  See https://github.com/elastic/beats/issues/22316
     #    mage: "mage build unitTest"
     #    platforms:             ## override default labels in this specific stage.
@@ -112,7 +111,6 @@ stages:
     #            - "windows-7-32"
     #        branches: true     ## for all the branches
     #        tags: true         ## for all the tags
-=======
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -124,4 +122,3 @@ stages:
                 - "windows-7"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
->>>>>>> upstream/7.x
