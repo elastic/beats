@@ -41747,9 +41747,10 @@ alias to: process.pgid
 *`system.process.cmdline`*::
 +
 --
-type: alias
+The full command-line used to start the process, including the arguments separated by space.
 
-alias to: process.command_line
+
+type: keyword
 
 --
 
