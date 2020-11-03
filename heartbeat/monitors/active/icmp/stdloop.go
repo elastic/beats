@@ -180,7 +180,8 @@ func (l *stdICMPLoop) checkNetworkMode(mode string) error {
 func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	for {
 		bytes := make([]byte, 512)
-		conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+		// increase timeout to receive the data from Conn
+		conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 		_, addr, err := conn.ReadFrom(bytes)
 		if err != nil {
 			if neterr, ok := err.(*net.OpError); ok {
