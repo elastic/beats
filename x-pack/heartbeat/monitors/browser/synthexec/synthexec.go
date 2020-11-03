@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package synthexec
 
@@ -22,8 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/beater"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"io"
 	"os"
 	"os/exec"
@@ -33,9 +18,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	//"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -67,12 +52,7 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		return nil, err
 	}
 
-	cmd := exec.Command(
-		"npx",
-		"@elastic/synthetics",
-		suiteFile,
-		"--dry-run",
-	)
+	cmd := syntheticsCmd(suiteFile, "--dry-run")
 	cmd.Dir = dir
 
 	mpx, err := runCmd(ctx, cmd, nil, params)
@@ -93,7 +73,7 @@ Outer:
 	return journeyNames, nil
 }
 
-// SuiteJob will run a single journey by name from the given suite file.
+// SuiteJob will run a single journey by name from the given suite.
 func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) (jobs.Job, error) {
 	dir, err := getSuiteDir(suiteFile)
 	if err != nil {
@@ -101,13 +81,7 @@ func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params 
 	}
 
 	newCmd := func() *exec.Cmd {
-		cmd := exec.Command(
-			"npx",
-			"@elastic/synthetics",
-			suiteFile,
-			"--screenshots",
-			"--journey-name", journeyName,
-		)
+		cmd := syntheticsCmd(suiteFile, "--screenshots", "--journey-name", journeyName)
 		cmd.Dir = dir
 		return cmd
 	}
@@ -115,15 +89,10 @@ func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params 
 	return startCmdJob(ctx, newCmd, nil, params), nil
 }
 
-// JourneyJob returns a job that runs the given source as a single journey.
-func JourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
+// InlineJourneyJob returns a job that runs the given source as a single journey.
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command(
-			"npx",
-			"@elastic/synthetics",
-			"--inline",
-			"--screenshots",
-		)
+		return syntheticsCmd("--inline", "--screenshots")
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params)
@@ -138,63 +107,22 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		return []jobs.Job{readResultsJob(ctx, mpx, readResultsState{})}, nil
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), newJourneyEnricher())}, nil
 	}
 }
 
-type readResultsState struct {
-	journeyComplete bool
-	errorCount int
-	lastError error
-	stepCount int
-	// The first URL we visit is the URL for this journey, which is set on the summary event.
-	// We store the URL fields here for use on the summary event.
-	urlFields interface{}
-}
-
-// readResultsJob creates adapts the output of an ExecMultiplexer into a Job, that uses continuations
+// readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, mpx *ExecMultiplexer, state readResultsState) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, je *journeyEnricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
-		case se := <-mpx.SynthEvents():
-			// No more events? In this case this is the summary event
-			if se == nil {
-				if state.journeyComplete {
-					event.PutValue("url", state.urlFields)
-					event.PutValue("synthetics.type", "heartbeat/summary")
-					return nil, state.lastError
-				}
-				return nil, fmt.Errorf("journey did not finish executing, %d steps ran", state.stepCount)
+		case se := <-synthEvents:
+			err = je.enrich(event, se)
+			if se != nil {
+				return []jobs.Job{readResultsJob(ctx, synthEvents, je)}, err
+			} else {
+				return nil, err
 			}
-
-			// Set timestamp, which comes as a float of millis
-			if se.TimestampEpochMicros != 0 {
-				event.Timestamp = se.Timestamp()
-			}
-
-			switch se.Type {
-			case "journey/end":
-				state.journeyComplete = true
-			case "step/end":
-				state.stepCount++
-			}
-
-			eventext.MergeEventFields(event, se.ToMap())
-
-			if state.urlFields == nil {
-				if urlFields, err := event.GetValue("url"); err == nil && urlFields != nil {
-					state.urlFields = urlFields
-				}
-			}
-
-			var jobErr error
-			if se.Error != nil {
-				jobErr = fmt.Errorf("error executing step: %s", se.Error.String())
-				state.errorCount++
-				state.lastError = jobErr
-			}
-			return []jobs.Job{readResultsJob(ctx, mpx, state)}, jobErr
 		}
 	}
 }
@@ -383,4 +311,8 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	output, err := cmd.CombinedOutput()
 	logp.Info("Ran %s got %s", cmd, string(output))
 	return err
+}
+
+func syntheticsCmd(args ...string) *exec.Cmd {
+	return exec.Command("npx", append([]string{"@elastic/synthetics"}, args...)...)
 }

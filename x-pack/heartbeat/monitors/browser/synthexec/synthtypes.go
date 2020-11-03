@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package synthexec
 
@@ -29,36 +16,18 @@ import (
 )
 
 type SynthEvent struct {
-	Type                 string                 `json:"type"`
-	PackageVersion       string                 `json:"package_version"`
-	Index                int                    `json:"index""`
-	Step                 *Step                  `json:"step"`
-	Journey              *Journey               `json:"journey"`
-	TimestampEpochMicros float64                `json:"@timestamp"`
-	Payload              map[string]interface{} `json:"payload"`
-	Blob                 string                 `json:"blob"`
-	BlobMime             string                 `json:"blob_mime"`
-	Error                *SynthError            `json:"error"`
-	URL                  string                 `json:"url"`
-	Status               string                 `json:"status"`
-}
-
-type SynthError struct {
-	Name    string `json:"name"`
-	Message string `json:"message"`
-	Stack   string `json:"stack"`
-}
-
-func (se *SynthError) String() string {
-	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
-}
-
-func (se *SynthError) toMap() (common.MapStr) {
-	return common.MapStr{
-		"name": se.Name,
-		"message": se.Message,
-		"stack": se.Stack,
-	}
+	Type                 string        `json:"type"`
+	PackageVersion       string        `json:"package_version"`
+	Step                 *Step         `json:"step"`
+	Journey              *Journey      `json:"journey"`
+	TimestampEpochMicros float64       `json:"@timestamp"`
+	Payload              common.MapStr `json:"payload"`
+	Blob                 string        `json:"blob"`
+	BlobMime             string        `json:"blob_mime"`
+	Error                *SynthError   `json:"error"`
+	URL                  string        `json:"url"`
+	Status               string        `json:"status"`
+	index                int
 }
 
 func (se SynthEvent) ToMap() (m common.MapStr) {
@@ -67,7 +36,6 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 		"synthetics": common.MapStr{
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
-			"index":           se.Index,
 			"payload":         se.Payload,
 		},
 	}
@@ -100,11 +68,29 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 }
 
 func (se SynthEvent) Timestamp() time.Time {
-	seconds := se.TimestampEpochMicros/1e6
+	seconds := se.TimestampEpochMicros / 1e6
 	wholeSeconds := math.Floor(seconds)
 	micros := (seconds - wholeSeconds) * 1e6
 	nanos := micros * 1000
 	return time.Unix(int64(wholeSeconds), int64(nanos))
+}
+
+type SynthError struct {
+	Name    string `json:"name"`
+	Message string `json:"message"`
+	Stack   string `json:"stack"`
+}
+
+func (se *SynthError) String() string {
+	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
+}
+
+func (se *SynthError) toMap() common.MapStr {
+	return common.MapStr{
+		"name":    se.Name,
+		"message": se.Message,
+		"stack":   se.Stack,
+	}
 }
 
 type Step struct {

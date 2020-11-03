@@ -8,10 +8,11 @@ import (
 	"context"
 	"fmt"
 	"os/user"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func init() {
@@ -40,7 +41,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			return nil, 0, err
 		}
 	} else {
-		j = synthexec.JourneyJob(context.TODO(), config.Script, config.Params)
+		j = synthexec.InlineJourneyJob(context.TODO(), config.Script, config.Params)
 	}
 	return []jobs.Job{j}, 1, nil
 }
