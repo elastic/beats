@@ -89,7 +89,7 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	var expectedHash string
 	scanner := bufio.NewScanner(hashFileHandler)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.TrimSpace(scanner.Text())
 		if !strings.HasSuffix(line, filename) {
 			continue
 		}
