@@ -159,9 +159,13 @@ func TestGroupToSingleEvent(t *testing.T) {
 
 func TestMatchesParentProcess(t *testing.T) {
 	ok, val := matchesParentProcess("svchost")
-	assert.False(t, ok)
+	assert.True(t, ok)
 	assert.Equal(t, val, "svchost")
 	ok, val = matchesParentProcess("svchost#54")
 	assert.True(t, ok)
 	assert.Equal(t, val, "svchost")
+
+	ok, val = matchesParentProcess("svchost (test) another #54")
+	assert.True(t, ok)
+	assert.Equal(t, val, "svchost (test) another #54")
 }

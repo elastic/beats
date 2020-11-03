@@ -76,3 +76,36 @@ stages:
                 - "windows-10"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+    windows-2008:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2008-r2"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/functionbeat for windows-2008"
+            labels:
+                - "windows-2008"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    windows-8:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-8"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/functionbeat for windows-8"
+            labels:
+                - "windows-8"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    windows-7:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/functionbeat for windows-7"
+            labels:
+                - "windows-7"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags

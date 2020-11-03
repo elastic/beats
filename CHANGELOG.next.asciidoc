@@ -314,6 +314,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 
 *Heartbeat*
 
@@ -424,10 +425,13 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 - Report the correct windows events for system/filesystem {pull}21758[21758]
+- Fix regular expression in windows/permfon. {pull}22146[22146] {issue}21125[21125]
 - Fix azure storage event format. {pull}21845[21845]
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
+- Add interval information to `monitor` metricset in azure. {pull}22152[22152]
+- Remove io.time from windows {pull}22237[22237]
 
 *Packetbeat*
 
@@ -441,6 +445,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `event.outcome` in the security module for non-English languages. {issue}20079[20079] {pull}20564[2056
 - Fix duplicated field error when exporting index-pattern with migration.6_to_7.enabled. {issue}20521[20521] {pull}20540[20540]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
+- Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 
 *Functionbeat*
 
@@ -725,6 +730,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Adding support for FIPS in s3 input {pull}21446[21446]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Add SSL option to checkpoint module {pull}19560[19560]
+- Copy tag names from MISP data into events. {pull}21664[21664]
 
 *Heartbeat*
 
@@ -853,6 +860,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Release all kubernetes `state` metricsets as GA {pull}20901[20901]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]

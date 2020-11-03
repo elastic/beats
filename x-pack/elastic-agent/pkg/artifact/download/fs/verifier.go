@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	ascSuffix = ".asc"
+	ascSuffix    = ".asc"
+	sha512Length = 128
 )
 
 // Verifier verifies a downloaded package by comparing with public ASC
@@ -88,12 +89,14 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	var expectedHash string
 	scanner := bufio.NewScanner(hashFileHandler)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.TrimSpace(scanner.Text())
 		if !strings.HasSuffix(line, filename) {
 			continue
 		}
 
-		expectedHash = strings.TrimSpace(strings.TrimSuffix(line, filename))
+		if len(line) > sha512Length {
+			expectedHash = strings.TrimSpace(line[:sha512Length])
+		}
 	}
 
 	if expectedHash == "" {

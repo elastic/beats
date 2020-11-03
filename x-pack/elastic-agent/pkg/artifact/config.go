@@ -47,7 +47,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		SourceURI:       "https://artifacts.elastic.co/downloads/",
 		TargetDirectory: filepath.Join(homePath, "downloads"),
-		Timeout:         30 * time.Second,
+		Timeout:         120 * time.Second, // binaries are a getting bit larger it might take >30s to download them
 		InstallPath:     filepath.Join(homePath, "install"),
 	}
 }
