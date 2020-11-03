@@ -219,24 +219,25 @@ func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 		ctx := l.requests[id]
 		if ctx != nil {
 			delete(l.requests, id)
+			// Move assign ctx.result from channel before check it is nil or not
+			// since it may be override to nil then skip the loop
+			ctx.result <- requestResult{
+				packet: packet{
+					ts:   ts,
+					addr: addr,
+
+					Type:     m.Type,
+					Code:     m.Code,
+					Checksum: m.Checksum,
+					Echo:     *echo,
+				},
+			}
 		}
 		l.mutex.Unlock()
 
 		// no return context available for echo reply -> handle next message
 		if ctx == nil {
 			continue
-		}
-
-		ctx.result <- requestResult{
-			packet: packet{
-				ts:   ts,
-				addr: addr,
-
-				Type:     m.Type,
-				Code:     m.Code,
-				Checksum: m.Checksum,
-				Echo:     *echo,
-			},
 		}
 	}
 }
