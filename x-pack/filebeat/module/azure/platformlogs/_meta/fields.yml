@@ -1,0 +1,45 @@
+- name: platformlogs
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Fields for Azure platform logs.
+  fields:
+    - name: identity
+      type: group
+      description: >
+        Identity
+    - name: operation_name
+      type: keyword
+      description: >
+        Operation name
+    - name: result_type
+      type: keyword
+      description: >
+        Result type
+    - name: result_signature
+      type: keyword
+      description: >
+        Result signature
+    - name: category
+      type: keyword
+      description: >
+        Category
+    - name: event_category
+      type: keyword
+      description: >
+        Event Category
+    - name: properties
+      type: group
+      description: >
+        Properties
+      fields:
+        - name: service_request_id
+          type: keyword
+          description: >
+            Service Request Id
+        - name: status_code
+          type: keyword
+          description: >
+            Status code
+
