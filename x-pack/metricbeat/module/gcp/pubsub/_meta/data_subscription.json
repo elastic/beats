@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "gcp"
+    },
+    "event": {
+        "dataset": "gcp.pubsub",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {
+            "resource": {
+                "subscription_id": "test-ks"
+            }
+        },
+        "pubsub": {
+            "subscription": {
+                "backlog_bytes": {
+                    "value": 0
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "pubsub",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

@@ -1,0 +1,83 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "2843342272811583081",
+            "name": "instance-1"
+        },
+        "machine": {
+            "type": "n1-standard-8"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 608
+                },
+                "dropped_packets_count": {
+                    "value": 5
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 0.25
+                    },
+                    "usage_time": {
+                        "value": 7.160390726436162
+                    },
+                    "utilization": {
+                        "value": 0.47735938176241083
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 1035751424
+                        },
+                        "ram_used": {
+                            "value": 504037376
+                        },
+                        "swap_in_bytes_count": {
+                            "value": 0
+                        },
+                        "swap_out_bytes_count": {
+                            "value": 0
+                        }
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.47735938176241083
+        },
+        "id": "2843342272811583081",
+        "name": "instance-1"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}
