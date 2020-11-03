@@ -18806,9 +18806,6 @@ type: keyword
 *`elasticsearch.index.primaries.store.size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18816,9 +18813,6 @@ type: long
 *`elasticsearch.index.primaries.docs.count`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18826,9 +18820,6 @@ type: long
 *`elasticsearch.index.primaries.segments.count`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18836,9 +18827,6 @@ type: long
 *`elasticsearch.index.primaries.refresh.total_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18846,9 +18834,6 @@ type: long
 *`elasticsearch.index.primaries.merges.total_size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18857,9 +18842,6 @@ type: long
 *`elasticsearch.index.primaries.indexing.index_total`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18867,9 +18849,6 @@ type: long
 *`elasticsearch.index.primaries.indexing.index_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18877,9 +18856,6 @@ type: long
 *`elasticsearch.index.primaries.indexing.throttle_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18942,9 +18918,6 @@ format: bytes
 *`elasticsearch.index.total.store.size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18952,9 +18925,6 @@ type: long
 *`elasticsearch.index.total.store.size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18962,9 +18932,6 @@ type: long
 *`elasticsearch.index.total.query_cache.memory_size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18972,9 +18939,6 @@ type: long
 *`elasticsearch.index.total.fielddata.memory_size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18982,9 +18946,6 @@ type: long
 *`elasticsearch.index.total.request_cache.memory_size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -18992,9 +18953,6 @@ type: long
 *`elasticsearch.index.total.merges.total_size_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19002,9 +18960,6 @@ type: long
 *`elasticsearch.index.total.refresh.total_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19013,9 +18968,6 @@ type: long
 *`elasticsearch.index.total.segments.memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19023,9 +18975,6 @@ type: long
 *`elasticsearch.index.total.segments.terms_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19033,9 +18982,6 @@ type: long
 *`elasticsearch.index.total.segments.points_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19043,9 +18989,6 @@ type: long
 *`elasticsearch.index.total.segments.count`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19053,9 +18996,6 @@ type: long
 *`elasticsearch.index.total.segments.doc_values_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19063,9 +19003,6 @@ type: long
 *`elasticsearch.index.total.segments.norms_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19073,9 +19010,6 @@ type: long
 *`elasticsearch.index.total.segments.stored_fields_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19083,9 +19017,6 @@ type: long
 *`elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19093,9 +19024,6 @@ type: long
 *`elasticsearch.index.total.segments.term_vectors_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19103,9 +19031,6 @@ type: long
 *`elasticsearch.index.total.segments.version_map_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19113,9 +19038,6 @@ type: long
 *`elasticsearch.index.total.segments.index_writer_memory_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19124,9 +19046,6 @@ type: long
 *`elasticsearch.index.total.search.query_total`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19134,9 +19053,6 @@ type: long
 *`elasticsearch.index.total.search.query_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19145,9 +19061,6 @@ type: long
 *`elasticsearch.index.total.indexing.index_total`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19155,9 +19068,6 @@ type: long
 *`elasticsearch.index.total.indexing.index_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -19165,9 +19075,6 @@ type: long
 *`elasticsearch.index.total.indexing.throttle_time_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --

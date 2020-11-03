@@ -169,13 +169,13 @@ func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conte
 
 		// Convert struct to common.Mapstr by passing it to JSON first so we can store the data in the root of the
 		// metricset level
-		byt2, err := json.Marshal(idx)
+		indexBytes, err := json.Marshal(idx)
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "failure trying to convert metrics results to JSON"))
 			continue
 		}
 		var indexOutput common.MapStr
-		if err = json.Unmarshal(byt2, &indexOutput); err != nil {
+		if err = json.Unmarshal(indexBytes, &indexOutput); err != nil {
 			errs = append(errs, errors.Wrap(err, "failure trying to convert JSON metrics back to mapstr"))
 			continue
 		}
@@ -183,8 +183,6 @@ func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conte
 
 		event.MetricSetFields = indexOutput
 		event.MetricSetFields.Put("name", name)
-		event.MetricSetFields.Put("total.store.size.bytes", idx.Total.Store.SizeInBytes)
-		event.MetricSetFields.Put("total.segments.memory.bytes", idx.Total.Segments.MemoryInBytes)
 
 		r.Event(event)
 	}
