@@ -18884,12 +18884,9 @@ type: long
 *`elasticsearch.index.total.store.size.bytes`*::
 +
 --
-Total size of the index in bytes.
+type: alias
 
-
-type: long
-
-format: bytes
+alias to: elasticsearch.index.total.store.size_in_bytes
 
 --
 
@@ -18903,10 +18900,10 @@ type: long
 
 --
 
-*`elasticsearch.index.total.segments.memory.bytes`*::
+*`elasticsearch.index.total.store.size_in_bytes`*::
 +
 --
-Total number of memory used by the segments in bytes.
+Total size of the index in bytes.
 
 
 type: long
@@ -18915,17 +18912,12 @@ format: bytes
 
 --
 
-*`elasticsearch.index.total.store.size_in_bytes`*::
+*`elasticsearch.index.total.segments.memory.bytes`*::
 +
 --
-type: long
+type: alias
 
---
-
-*`elasticsearch.index.total.store.size_in_bytes`*::
-+
---
-type: long
+alias to: elasticsearch.index.total.segments.memory_in_bytes
 
 --
 
@@ -18968,7 +18960,12 @@ type: long
 *`elasticsearch.index.total.segments.memory_in_bytes`*::
 +
 --
+Total number of memory used by the segments in bytes.
+
+
 type: long
+
+format: bytes
 
 --
 
