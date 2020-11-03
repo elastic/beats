@@ -271,6 +271,15 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 
 	// Emit events for all initContainers
 	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+
+	// Emit events for all ephemeralContainers
+	// Ephemeral containers are alpha feature in k8s and this code may require some changes, if their
+	// api change in the future.
+	var mappedEphemeralsAsContainers []kubernetes.Container
+	for _, c := range pod.Spec.EphemeralContainers {
+		mappedEphemeralsAsContainers = append(mappedEphemeralsAsContainers, kubernetes.Container(c.EphemeralContainerCommon))
+	}
+	p.emitEvents(pod, flag, mappedEphemeralsAsContainers, pod.Status.EphemeralContainerStatuses)
 }
 
 func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
