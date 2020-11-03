@@ -188,6 +188,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21259[21258]
 - Orderly close processors when processing pipelines are not needed anymore to release their resources. {pull}16349[16349]
 - Fix memory leak and events duplication in docker autodiscover and add_docker_metadata. {pull}21851[21851]
+- Fixed documentation for commands in beats dev guide {pull}22194[22194]
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 
 *Auditbeat*
@@ -289,6 +290,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
+- Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 
 *Heartbeat*
 
@@ -378,11 +381,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
 - Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
 - Report the correct windows events for system/filesystem {pull}21758[21758]
+- Fix regular expression in windows/permfon. {pull}22146[22146] {issue}21125[21125]
 - Fix azure storage event format. {pull}21845[21845]
 - Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Remove io.time from windows {pull}22237[22237]
+- Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 
 *Packetbeat*
 
@@ -395,6 +401,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
+- Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 
 *Functionbeat*
 
@@ -477,6 +484,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
+- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 
 *Auditbeat*
 
@@ -642,6 +650,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Copy tag names from MISP data into events. {pull}21664[21664]
+- Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 
 *Heartbeat*
 
@@ -766,6 +776,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
@@ -798,6 +809,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
 - Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
+- Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
