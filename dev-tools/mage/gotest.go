@@ -193,8 +193,11 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	args := []string{"test"}
 	args = append(args, "-v")
 
-	if params.Race {
-		args = append(args, "-race")
+	// -race is only supported on */amd64
+	if os.Getenv("DEV_ARCH") == "amd64" {
+		if params.Race {
+			args = append(args, "-race")
+		}
 	}
 	if len(params.Tags) > 0 {
 		args = append(args, "-tags", strings.Join(params.Tags, " "))
