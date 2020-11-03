@@ -174,7 +174,7 @@ waiting for them to be written to disk. If you find the queue's memory
 use is too high because events are waiting too long to be written to
 disk, adjusting this setting downward may help, at the cost of reduced
 event throughput. On the other hand, if inputs are waiting or discarding
-events becausd they are being produced faster than the disk can handle,
+events because they are being produced faster than the disk can handle,
 adjusting this setting upward may help, at the cost of higher memory
 usage.
 
