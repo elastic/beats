@@ -35,5 +35,5 @@ var DefaultConfig = Config{
 	Mode: monitors.DefaultIPSettings,
 
 	Timeout: 16 * time.Second,
-	Wait:    1 * time.Second,
+	Wait:    2 * time.Second,
 }
