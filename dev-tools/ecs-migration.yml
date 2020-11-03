@@ -1826,11 +1826,6 @@
   alias: true
   beat: metricbeat
 
-- from: system.process.cmdline
-  to: process.command_line
-  alias: true
-  beat: metricbeat
-
 - from: system.process.username
   to: user.name
   alias: true
