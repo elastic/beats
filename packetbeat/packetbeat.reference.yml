@@ -603,20 +603,19 @@ packetbeat.ignore_outgoing: false
     #flush.timeout: 1s
   
   # The disk queue stores incoming events on disk until the output is
-  # ready for them, allowing a higher event limit than the memory-only
-  # queue and letting pending events persist through a restart.
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
     
-    # The maximum space the queue should occupy on disk. Events that
-    # would exceed this limit are delayed or discarded, depending on
-    # input settings.
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
 
     # The maximum size of a single queue data file. Data in the queue is
-    # stored in a collection of smaller segments that are deleted after
-    # all their events have been processed.
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
     #segment_size: 1GB
 
     # The number of events to read from disk to memory while waiting for
@@ -624,12 +623,12 @@ packetbeat.ignore_outgoing: false
     #read_ahead: 512
 
     # The number of events to accept from inputs while waiting for them
-    # to be written to disk. If event data is arriving faster than it
+    # to be written to disk. If event data arrives faster than it
     # can be written to disk, this setting prevents it from overflowing
     # main memory.
     #write_ahead: 2048
 
-    # How long to wait before retrying when the queue encounters a disk
+    # The duration to wait before retrying when the queue encounters a disk
     # write error.
     #retry_interval: 1s
 
