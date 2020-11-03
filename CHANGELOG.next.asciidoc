@@ -390,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix instance name in perfmon metricset. {issue}22218[22218] {pull}22261[22261]
 - Remove io.time from windows {pull}22237[22237]
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
+- Change Session ID type from int to string {pull}22359[22359]
 
 *Packetbeat*
 
@@ -841,6 +842,5 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
