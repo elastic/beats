@@ -184,7 +184,7 @@ The default value is `2048`.
 ===== `retry_interval`
 
 Some disk errors may block operation of the queue, for example a permission
-error writing to the data directory, or a disk-full error while writing an
+error writing to the data directory, or a disk full error while writing an
 event. In this case, the queue reports the error and retries after pausing
 for the time specified in `retry_interval`.
 
