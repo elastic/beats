@@ -13,5 +13,10 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        make: |
+          make -C journalbeat check;
+          make -C journalbeat update;
+          make check-no-changes;
     unitTest:
         mage: "mage build unitTest"

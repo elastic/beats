@@ -74,10 +74,12 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
@@ -489,7 +491,7 @@ def terraformApply(String directory) {
 }
 
 /**
-* Tear down the terraform environments, by looking for all terraform states in directory 
+* Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
 */
