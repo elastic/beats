@@ -212,7 +212,7 @@ beta[]
 NOTE: The disk queue offers similar functionality to the file spool with a
 streamlined configuration and lower overhead. It is expected to replace the
 file spool in a future release. While the file spool is still included for
-backward compatibility, new configurations should prefer the disk queue
+backward compatibility, new configurations should use the disk queue
 when possible.
 
 The file spool queue stores all events in an on disk ring buffer. The spool
