@@ -3,15 +3,21 @@
     "cloudfoundry": {
         "counter": {
             "delta": 0,
-            "name": "sinks.dropped",
-            "total": 89547093
+            "name": "dropped",
+            "total": 0
         },
         "envelope": {
             "deployment": "cf-6b7aee31c8d07637ad78",
-            "index": "9adedbd0-3af3-47af-9707-99016050b123",
-            "ip": "192.168.16.54",
-            "job": "doppler",
-            "origin": "loggregator.doppler"
+            "index": "995eb273-f871-4fea-a834-dbc0a4a72efc",
+            "ip": "192.168.16.37",
+            "job": "syslog_adapter",
+            "origin": "loggregator.metron"
+        },
+        "tags": {
+            "direction": "ingress",
+            "metric_version": "2.0",
+            "product": "Pivotal Application Service",
+            "source_id": "metron"
         },
         "type": "counter"
     },

@@ -45,6 +45,12 @@
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   cloudwatch:
     enabled: false
 
@@ -78,6 +84,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   ec2:
     enabled: false
@@ -113,6 +125,12 @@
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   elb:
     enabled: false
 
@@ -146,6 +164,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   s3access:
     enabled: false
@@ -181,6 +205,12 @@
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   vpcflow:
     enabled: false
 
@@ -214,3 +244,9 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5

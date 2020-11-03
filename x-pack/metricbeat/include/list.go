@@ -16,8 +16,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/ec2"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/rds"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/s3_daily_storage"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/s3_request"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/sqs"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/app_insights"
