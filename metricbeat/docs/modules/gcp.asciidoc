@@ -53,7 +53,7 @@ in `elastic-observability` project.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - compute
   zone: "us-central1-a"
@@ -68,7 +68,7 @@ under `us-central1` region in `elastic-observability` project.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - compute
     - pubsub
@@ -85,7 +85,7 @@ under `us-central1` region in `elastic-observability` project.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - compute
     - pubsub
@@ -138,7 +138,7 @@ If you also want to *extract service labels* (by setting `exclude_labels` to fal
 
 If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
 GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
-In googlecloud module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
+In `gcp` module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
 [float]
 [[gcp-api-requests]]
@@ -150,7 +150,7 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 [float]
 == Metricsets
 Currently, we have `billing`, `compute`, `loadbalancing`, `pubsub`, `metrics` and
-`storage` metricset in `googlecloud` module.
+`storage` metricset in `gcp` module.
 
 [float]
 === `billing`
@@ -161,7 +161,7 @@ periodically to export billing metrics for further analysis.
 
 The `billing` metricset comes with a predefined dashboard:
 
-image::./images/metricbeat-googlecloud-billing-overview.png[]
+image::./images/metricbeat-gcp-billing-overview.png[]
 
 [float]
 === `compute`
@@ -174,7 +174,7 @@ labels and metadata and metric specific Labels.
 
 The `compute` metricset comes with a predefined dashboard:
 
-image::./images/metricbeat-googlecloud-compute-overview.png[]
+image::./images/metricbeat-gcp-compute-overview.png[]
 
 [float]
 === `loadbalancing`
@@ -187,17 +187,17 @@ The `loadbalancing` metricset comes with two predefined dashboards:
 [float]
 ==== HTTPS
 For HTTPS load balancing:
-image::./images/metricbeat-googlecloud-load-balancing-https-overview.png[]
+image::./images/metricbeat-gcp-load-balancing-https-overview.png[]
 
 [float]
 ==== L3
 For L3 load balancing:
-image::./images/metricbeat-googlecloud-load-balancing-l3-overview.png[]
+image::./images/metricbeat-gcp-load-balancing-l3-overview.png[]
 
 [float]
 ==== TCP/SSL/Proxy
 For TCP/SSL/Proxy load balancing:
-image::./images/metricbeat-googlecloud-load-balancing-tcp-ssl-proxy-overview.png[]
+image::./images/metricbeat-gcp-load-balancing-tcp-ssl-proxy-overview.png[]
 
 [float]
 === `pubsub`
@@ -208,7 +208,7 @@ https://cloud.google.com/monitoring/api/metrics_gcp#gcp-pubsub[GCP PubSub Monito
 
 The `pubsub` metricset comes with a predefined dashboard:
 
-image::./images/metricbeat-googlecloud-pubsub-overview.png[]
+image::./images/metricbeat-gcp-pubsub-overview.png[]
 
 [float]
 === `metrics`
@@ -231,7 +231,7 @@ a 10-minute ingest delay.
 
 The `storage` metricset comes with a predefined dashboard:
 
-image::./images/metricbeat-googlecloud-storage-overview.png[]
+image::./images/metricbeat-gcp-storage-overview.png[]
 
 
 [float]
