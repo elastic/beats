@@ -1,10 +1,5 @@
-<<<<<<< HEAD:x-pack/metricbeat/modules.d/googlecloud.yml.disabled
-# Module: googlecloud
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-googlecloud.html
-=======
 # Module: gcp
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-gcp.html
->>>>>>> 7fb60fce8... [Metricbeat] Rename googlecloud module to gcp module in Metricbeat (#22246):x-pack/metricbeat/modules.d/gcp.yml.disabled
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-gcp.html
 
 - module: gcp
   metricsets:
