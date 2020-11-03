@@ -36,6 +36,9 @@
                 name: 'master'
                 case-sensitive: true
             - regex-name:
+                regex: '6\.[x89]'
+                case-sensitive: true
+            - regex-name:
                 regex: '7\.[x789]'
                 case-sensitive: true
             - regex-name:

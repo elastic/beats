@@ -11,10 +11,18 @@ processors:
     field: syslog5424_sd
     field_split: " (?=[a-z\\_\\-]+=)"
     value_split: "="
-    prefix: "fortinet.firewall."
+    prefix: "fortinet.tmp."
     ignore_missing: true
     ignore_failure: false
     trim_value: "\""
+- remove:
+    field: fortinet.tmp.assignip
+    if: "ctx.fortinet?.tmp?.assignip == 'N/A'"
+    ignore_missing: true
+- rename:
+    field: fortinet.tmp
+    target_field: fortinet.firewall
+    ignore_missing: true
 - set:
     field: observer.vendor
     value: Fortinet
@@ -65,41 +73,41 @@ processors:
     field: fortinet.firewall.eventtime
     pattern: "\\d{6}$"
     replacement: ""
-    if: "(ctx.fortinet?.firewall?.eventtime).length() > 18"
+    if: "ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 18"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX_MS
     timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    if: "ctx.fortinet?.firewall?.tz != null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
     timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+    if: "ctx.fortinet?.firewall?.tz != null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX_MS
-    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    if: "ctx.fortinet?.firewall?.tz == null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
-    if: "ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
-- rename:
-    field: fortinet.firewall.devname
-    target_field: observer.name
-    ignore_missing: true
+    if: "ctx.fortinet?.firewall?.tz == null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - script:
     lang: painless
     source: "ctx.event.duration = Long.parseLong(ctx.fortinet.firewall.duration) * 1000000000"
     if: "ctx.fortinet?.firewall?.duration != null"
+- rename:
+    field: fortinet.firewall.devname
+    target_field: observer.name
+    ignore_missing: true
 - rename:
     field: fortinet.firewall.devid
     target_field: observer.serial_number
@@ -126,9 +134,6 @@ processors:
     field: fortinet.firewall.level
     target_field: log.level
     ignore_missing: true
-- remove:
-    field: fortinet.firewall.assignip
-    if: "ctx.fortinet?.firewall?.assignip == 'N/A'"
 - remove:
     field: fortinet.firewall.dstip
     if: "ctx.fortinet?.firewall?.dstip == 'N/A'"
