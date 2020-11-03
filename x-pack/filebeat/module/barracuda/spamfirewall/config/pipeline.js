@@ -152,11 +152,9 @@ var map_getEventLegacyCategory = {
 	"default": constant("1901000000"),
 };
 
-var dup1 = // "Pattern{Field(fld3,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#0:000001/1_0", "nwparser.p0", "%{fld3->} %{resultcode->} %{info}");
+var dup1 = match("MESSAGE#0:000001/1_0", "nwparser.p0", "%{fld3->} %{resultcode->} %{info}");
 
-var dup2 = // "Pattern{Field(info,false)}"
-match_copy("MESSAGE#0:000001/1_1", "nwparser.p0", "info");
+var dup2 = match_copy("MESSAGE#0:000001/1_1", "nwparser.p0", "info");
 
 var dup3 = setc("eventcategory","1207010201");
 
@@ -194,8 +192,7 @@ var dup13 = setc("eventcategory","1207010000");
 
 var dup14 = setc("direction","outbound");
 
-var dup15 = // "Pattern{Constant('SZ:'), Field(fld9,true), Constant(' SUBJ:'), Field(subject,false)}"
-match("MESSAGE#13:000003/1_0", "nwparser.p0", "SZ:%{fld9->} SUBJ:%{subject}");
+var dup15 = match("MESSAGE#13:000003/1_0", "nwparser.p0", "SZ:%{fld9->} SUBJ:%{subject}");
 
 var dup16 = setc("eventcategory","1207040000");
 
@@ -259,8 +256,7 @@ var dup33 = linear_select([
 	dup2,
 ]);
 
-var hdr1 = // "Pattern{Field(messageid,false), Constant('['), Field(hfld14,false), Constant(']: '), Field(p0,false)}"
-match("HEADER#0:0001", "message", "%{messageid}[%{hfld14}]: %{p0}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{messageid}[%{hfld14}]: %{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -275,8 +271,7 @@ match("HEADER#0:0001", "message", "%{messageid}[%{hfld14}]: %{p0}", processor_ch
 	}),
 ]));
 
-var hdr2 = // "Pattern{Field(hfld1,false), Constant('/'), Field(messageid,false), Constant('['), Field(hfld14,false), Constant(']: '), Field(p0,false)}"
-match("HEADER#1:0002", "message", "%{hfld1}/%{messageid}[%{hfld14}]: %{p0}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hfld1}/%{messageid}[%{hfld14}]: %{p0}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
@@ -293,8 +288,7 @@ match("HEADER#1:0002", "message", "%{hfld1}/%{messageid}[%{hfld14}]: %{p0}", pro
 	}),
 ]));
 
-var hdr3 = // "Pattern{Field(messageid,false), Constant(': '), Field(p0,false)}"
-match("HEADER#2:0003", "message", "%{messageid}: %{p0}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "%{messageid}: %{p0}", processor_chain([
 	setc("header_id","0003"),
 	call({
 		dest: "nwparser.payload",
@@ -313,8 +307,7 @@ var select1 = linear_select([
 	hdr3,
 ]);
 
-var part1 = // "Pattern{Constant('inbound/pass1['), Field(fld14,false), Constant(']: '), Field(username,false), Constant('['), Field(saddr,false), Constant('] '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' RECV '), Field(from,true), Constant(' '), Field(to,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#0:000001/0", "nwparser.payload", "inbound/pass1[%{fld14}]: %{username}[%{saddr}] %{id->} %{fld1->} %{fld2->} RECV %{from->} %{to->} %{p0}");
+var part1 = match("MESSAGE#0:000001/0", "nwparser.payload", "inbound/pass1[%{fld14}]: %{username}[%{saddr}] %{id->} %{fld1->} %{fld2->} RECV %{from->} %{to->} %{p0}");
 
 var all1 = all_match({
 	processors: [
@@ -337,14 +330,11 @@ var all1 = all_match({
 
 var msg1 = msg("000001", all1);
 
-var part2 = // "Pattern{Constant('inbound/pass1: '), Field(web_domain,false), Constant('['), Field(saddr,false), Constant('] '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' SCAN '), Field(fld4,true), Constant(' '), Field(from,true), Constant(' '), Field(to,true), Constant(' '), Field(fld5,true), Constant(' '), Field(fld3,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#1:inbound/pass1/0", "nwparser.payload", "inbound/pass1: %{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} SCAN %{fld4->} %{from->} %{to->} %{fld5->} %{fld3->} %{resultcode->} %{p0}");
+var part2 = match("MESSAGE#1:inbound/pass1/0", "nwparser.payload", "inbound/pass1: %{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} SCAN %{fld4->} %{from->} %{to->} %{fld5->} %{fld3->} %{resultcode->} %{p0}");
 
-var part3 = // "Pattern{Field(fld6,true), Constant(' SZ:'), Field(fld8,true), Constant(' SUBJ:'), Field(subject,false)}"
-match("MESSAGE#1:inbound/pass1/1_0", "nwparser.p0", "%{fld6->} SZ:%{fld8->} SUBJ:%{subject}");
+var part3 = match("MESSAGE#1:inbound/pass1/1_0", "nwparser.p0", "%{fld6->} SZ:%{fld8->} SUBJ:%{subject}");
 
-var part4 = // "Pattern{Field(domain,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#1:inbound/pass1/1_1", "nwparser.p0", "%{domain->} %{info}");
+var part4 = match("MESSAGE#1:inbound/pass1/1_1", "nwparser.p0", "%{domain->} %{info}");
 
 var select2 = linear_select([
 	part3,
@@ -372,8 +362,7 @@ var all2 = all_match({
 
 var msg2 = msg("inbound/pass1", all2);
 
-var part5 = // "Pattern{Constant('inbound/pass1:'), Field(web_domain,false), Constant('['), Field(saddr,false), Constant('] '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' RECV '), Field(from,true), Constant(' '), Field(to,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#2:inbound/pass1:01/0", "nwparser.payload", "inbound/pass1:%{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} RECV %{from->} %{to->} %{p0}");
+var part5 = match("MESSAGE#2:inbound/pass1:01/0", "nwparser.payload", "inbound/pass1:%{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} RECV %{from->} %{to->} %{p0}");
 
 var all3 = all_match({
 	processors: [
@@ -402,11 +391,9 @@ var select3 = linear_select([
 	msg3,
 ]);
 
-var part6 = // "Pattern{Constant('outbound/smtp['), Field(fld14,false), Constant(']: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#3:000002/0", "nwparser.payload", "outbound/smtp[%{fld14}]: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{p0}");
+var part6 = match("MESSAGE#3:000002/0", "nwparser.payload", "outbound/smtp[%{fld14}]: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{p0}");
 
-var part7 = // "Pattern{Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#3:000002/1_0", "nwparser.p0", "%{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{info}");
+var part7 = match("MESSAGE#3:000002/1_0", "nwparser.p0", "%{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{info}");
 
 var select4 = linear_select([
 	part7,
@@ -430,37 +417,28 @@ var all4 = all_match({
 
 var msg4 = msg("000002", all4);
 
-var part8 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(fld5,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#4:outbound/smtp/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{fld5->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{p0}");
+var part8 = match("MESSAGE#4:outbound/smtp/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{fld5->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{p0}");
 
-var part9 = // "Pattern{Field(fld8,true), Constant(' <<'), Field(from,false), Constant('> '), Field(p0,false)}"
-match("MESSAGE#4:outbound/smtp/1_0", "nwparser.p0", "%{fld8->} \u003c\u003c%{from}> %{p0}");
+var part9 = match("MESSAGE#4:outbound/smtp/1_0", "nwparser.p0", "%{fld8->} \u003c\u003c%{from}> %{p0}");
 
-var part10 = // "Pattern{Constant('<<'), Field(from,false), Constant('>'), Field(p0,false)}"
-match("MESSAGE#4:outbound/smtp/1_1", "nwparser.p0", "\u003c\u003c%{from}>%{p0}");
+var part10 = match("MESSAGE#4:outbound/smtp/1_1", "nwparser.p0", "\u003c\u003c%{from}>%{p0}");
 
 var select5 = linear_select([
 	part9,
 	part10,
 ]);
 
-var part11 = // "Pattern{Field(,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#4:outbound/smtp/2", "nwparser.p0", "%{} %{p0}");
+var part11 = match("MESSAGE#4:outbound/smtp/2", "nwparser.p0", "%{} %{p0}");
 
-var part12 = // "Pattern{Constant('[InternalId='), Field(id,false), Constant(', Hostname='), Field(hostname,false), Constant('] '), Field(event_description,true), Constant(' #to#'), Field(ddomain,false)}"
-match("MESSAGE#4:outbound/smtp/3_0", "nwparser.p0", "[InternalId=%{id}, Hostname=%{hostname}] %{event_description->} #to#%{ddomain}");
+var part12 = match("MESSAGE#4:outbound/smtp/3_0", "nwparser.p0", "[InternalId=%{id}, Hostname=%{hostname}] %{event_description->} #to#%{ddomain}");
 
-var part13 = // "Pattern{Constant('[InternalId='), Field(id,false), Constant('] '), Field(event_description,true), Constant(' #to#'), Field(daddr,false)}"
-match("MESSAGE#4:outbound/smtp/3_1", "nwparser.p0", "[InternalId=%{id}] %{event_description->} #to#%{daddr}");
+var part13 = match("MESSAGE#4:outbound/smtp/3_1", "nwparser.p0", "[InternalId=%{id}] %{event_description->} #to#%{daddr}");
 
-var part14 = // "Pattern{Constant('[InternalId='), Field(id,false), Constant(', Hostname='), Field(hostname,false), Constant('] '), Field(info,false)}"
-match("MESSAGE#4:outbound/smtp/3_2", "nwparser.p0", "[InternalId=%{id}, Hostname=%{hostname}] %{info}");
+var part14 = match("MESSAGE#4:outbound/smtp/3_2", "nwparser.p0", "[InternalId=%{id}, Hostname=%{hostname}] %{info}");
 
-var part15 = // "Pattern{Field(event_description,true), Constant(' #to#'), Field(ddomain,false), Constant('['), Field(daddr,false), Constant(']:'), Field(dport,false)}"
-match("MESSAGE#4:outbound/smtp/3_3", "nwparser.p0", "%{event_description->} #to#%{ddomain}[%{daddr}]:%{dport}");
+var part15 = match("MESSAGE#4:outbound/smtp/3_3", "nwparser.p0", "%{event_description->} #to#%{ddomain}[%{daddr}]:%{dport}");
 
-var part16 = // "Pattern{Field(event_description,true), Constant(' #to#'), Field(ddomain,false)}"
-match("MESSAGE#4:outbound/smtp/3_4", "nwparser.p0", "%{event_description->} #to#%{ddomain}");
+var part16 = match("MESSAGE#4:outbound/smtp/3_4", "nwparser.p0", "%{event_description->} #to#%{ddomain}");
 
 var select6 = linear_select([
 	part12,
@@ -489,22 +467,18 @@ var all5 = all_match({
 
 var msg5 = msg("outbound/smtp", all5);
 
-var part17 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#5:000009/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{p0}");
+var part17 = match("MESSAGE#5:000009/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{p0}");
 
-var part18 = // "Pattern{Field(fld8,true), Constant(' ok'), Field(p0,false)}"
-match("MESSAGE#5:000009/1_0", "nwparser.p0", "%{fld8->} ok%{p0}");
+var part18 = match("MESSAGE#5:000009/1_0", "nwparser.p0", "%{fld8->} ok%{p0}");
 
-var part19 = // "Pattern{Constant('ok'), Field(p0,false)}"
-match("MESSAGE#5:000009/1_1", "nwparser.p0", "ok%{p0}");
+var part19 = match("MESSAGE#5:000009/1_1", "nwparser.p0", "ok%{p0}");
 
 var select7 = linear_select([
 	part18,
 	part19,
 ]);
 
-var part20 = // "Pattern{Field(fld9,true), Constant(' Message '), Field(fld10,true), Constant(' accepted #to#'), Field(ddomain,false), Constant('['), Field(daddr,false), Constant(']:'), Field(dport,false)}"
-match("MESSAGE#5:000009/2", "nwparser.p0", "%{fld9->} Message %{fld10->} accepted #to#%{ddomain}[%{daddr}]:%{dport}");
+var part20 = match("MESSAGE#5:000009/2", "nwparser.p0", "%{fld9->} Message %{fld10->} accepted #to#%{ddomain}[%{daddr}]:%{dport}");
 
 var all6 = all_match({
 	processors: [
@@ -524,8 +498,7 @@ var all6 = all_match({
 
 var msg6 = msg("000009", all6);
 
-var part21 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' Message accepted for delivery #to#'), Field(ddomain,false), Constant('['), Field(daddr,false), Constant(']:'), Field(dport,false)}"
-match("MESSAGE#6:outbound/smtp:01", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} Message accepted for delivery #to#%{ddomain}[%{daddr}]:%{dport}", processor_chain([
+var part21 = match("MESSAGE#6:outbound/smtp:01", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} Message accepted for delivery #to#%{ddomain}[%{daddr}]:%{dport}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -537,8 +510,7 @@ match("MESSAGE#6:outbound/smtp:01", "nwparser.payload", "outbound/smtp: %{saddr-
 
 var msg7 = msg("outbound/smtp:01", part21);
 
-var part22 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' conversation with '), Field(fld5,false), Constant('['), Field(fld6,false), Constant('] timed out while sending '), Field(fld7,true), Constant(' #to#'), Field(ddomain,false), Constant('['), Field(daddr,false), Constant(']:'), Field(dport,false)}"
-match("MESSAGE#7:outbound/smtp:02", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} conversation with %{fld5}[%{fld6}] timed out while sending %{fld7->} #to#%{ddomain}[%{daddr}]:%{dport}", processor_chain([
+var part22 = match("MESSAGE#7:outbound/smtp:02", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} conversation with %{fld5}[%{fld6}] timed out while sending %{fld7->} #to#%{ddomain}[%{daddr}]:%{dport}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -549,26 +521,19 @@ match("MESSAGE#7:outbound/smtp:02", "nwparser.payload", "outbound/smtp: %{saddr-
 
 var msg8 = msg("outbound/smtp:02", part22);
 
-var part23 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(fld7,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#8:000010/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{fld7->} %{p0}");
+var part23 = match("MESSAGE#8:000010/0", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{fld7->} %{p0}");
 
-var part24 = // "Pattern{Constant('Ok '), Field(fld9,true), Constant(' '), Field(fld10,true), Constant(' - gsmtp #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_0", "nwparser.p0", "Ok %{fld9->} %{fld10->} - gsmtp #to#%{p0}");
+var part24 = match("MESSAGE#8:000010/1_0", "nwparser.p0", "Ok %{fld9->} %{fld10->} - gsmtp #to#%{p0}");
 
-var part25 = // "Pattern{Constant('Ok: queued as '), Field(fld9,true), Constant(' #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_1", "nwparser.p0", "Ok: queued as %{fld9->} #to#%{p0}");
+var part25 = match("MESSAGE#8:000010/1_1", "nwparser.p0", "Ok: queued as %{fld9->} #to#%{p0}");
 
-var part26 = // "Pattern{Constant('ok '), Field(fld9,true), Constant(' #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_2", "nwparser.p0", "ok %{fld9->} #to#%{p0}");
+var part26 = match("MESSAGE#8:000010/1_2", "nwparser.p0", "ok %{fld9->} #to#%{p0}");
 
-var part27 = // "Pattern{Constant('Ok ('), Field(fld9,false), Constant(') #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_3", "nwparser.p0", "Ok (%{fld9}) #to#%{p0}");
+var part27 = match("MESSAGE#8:000010/1_3", "nwparser.p0", "Ok (%{fld9}) #to#%{p0}");
 
-var part28 = // "Pattern{Constant('OK '), Field(fld9,true), Constant(' #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_4", "nwparser.p0", "OK %{fld9->} #to#%{p0}");
+var part28 = match("MESSAGE#8:000010/1_4", "nwparser.p0", "OK %{fld9->} #to#%{p0}");
 
-var part29 = // "Pattern{Field(fld9,true), Constant(' #to#'), Field(p0,false)}"
-match("MESSAGE#8:000010/1_5", "nwparser.p0", "%{fld9->} #to#%{p0}");
+var part29 = match("MESSAGE#8:000010/1_5", "nwparser.p0", "%{fld9->} #to#%{p0}");
 
 var select8 = linear_select([
 	part24,
@@ -579,8 +544,7 @@ var select8 = linear_select([
 	part29,
 ]);
 
-var part30 = // "Pattern{Field(daddr,false)}"
-match_copy("MESSAGE#8:000010/2", "nwparser.p0", "daddr");
+var part30 = match_copy("MESSAGE#8:000010/2", "nwparser.p0", "daddr");
 
 var all7 = all_match({
 	processors: [
@@ -600,8 +564,7 @@ var all7 = all_match({
 
 var msg9 = msg("000010", all7);
 
-var part31 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' connect to '), Field(ddomain,false), Constant('['), Field(daddr,false), Constant(']: '), Field(event_description,false)}"
-match("MESSAGE#9:000011", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} connect to %{ddomain}[%{daddr}]: %{event_description}", processor_chain([
+var part31 = match("MESSAGE#9:000011", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} connect to %{ddomain}[%{daddr}]: %{event_description}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -612,8 +575,7 @@ match("MESSAGE#9:000011", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->}
 
 var msg10 = msg("000011", part31);
 
-var part32 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(fld7,true), Constant(' ['), Field(ddomain,false), Constant(']: '), Field(event_description,false)}"
-match("MESSAGE#10:000012", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{fld7->} [%{ddomain}]: %{event_description}", processor_chain([
+var part32 = match("MESSAGE#10:000012", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{fld7->} [%{ddomain}]: %{event_description}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -624,8 +586,7 @@ match("MESSAGE#10:000012", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->
 
 var msg11 = msg("000012", part32);
 
-var part33 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(fld7,true), Constant(' <<'), Field(from,false), Constant('>: '), Field(event_description,false)}"
-match("MESSAGE#11:000013", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{fld7->} \u003c\u003c%{from}>: %{event_description}", processor_chain([
+var part33 = match("MESSAGE#11:000013", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{fld7->} \u003c\u003c%{from}>: %{event_description}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -636,8 +597,7 @@ match("MESSAGE#11:000013", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->
 
 var msg12 = msg("000013", part33);
 
-var part34 = // "Pattern{Constant('outbound/smtp: '), Field(saddr,true), Constant(' '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(fld8,true), Constant(' '), Field(event_description,false)}"
-match("MESSAGE#12:000014", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{fld8->} %{event_description}", processor_chain([
+var part34 = match("MESSAGE#12:000014", "nwparser.payload", "outbound/smtp: %{saddr->} %{id->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{resultcode->} %{fld8->} %{event_description}", processor_chain([
 	dup13,
 	dup4,
 	dup14,
@@ -661,8 +621,7 @@ var select9 = linear_select([
 	msg13,
 ]);
 
-var part35 = // "Pattern{Constant('scan['), Field(fld14,false), Constant(']: '), Field(username,false), Constant('['), Field(saddr,false), Constant('] '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld8,true), Constant(' '), Field(from,true), Constant(' '), Field(to,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(fld7,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#13:000003/0", "nwparser.payload", "scan[%{fld14}]: %{username}[%{saddr}] %{id->} %{fld1->} %{fld2->} %{action->} %{fld8->} %{from->} %{to->} %{fld4->} %{fld3->} %{resultcode->} %{fld7->} %{p0}");
+var part35 = match("MESSAGE#13:000003/0", "nwparser.payload", "scan[%{fld14}]: %{username}[%{saddr}] %{id->} %{fld1->} %{fld2->} %{action->} %{fld8->} %{from->} %{to->} %{fld4->} %{fld3->} %{resultcode->} %{fld7->} %{p0}");
 
 var all8 = all_match({
 	processors: [
@@ -683,8 +642,7 @@ var all8 = all_match({
 
 var msg14 = msg("000003", all8);
 
-var part36 = // "Pattern{Constant('scan: '), Field(web_domain,false), Constant('['), Field(saddr,false), Constant('] '), Field(id,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld8,true), Constant(' '), Field(from,true), Constant(' '), Field(to,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(fld7,true), Constant(' '), Field(p0,false)}"
-match("MESSAGE#14:scan/0", "nwparser.payload", "scan: %{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} %{action->} %{fld8->} %{from->} %{to->} %{fld4->} %{fld3->} %{resultcode->} %{fld7->} %{p0}");
+var part36 = match("MESSAGE#14:scan/0", "nwparser.payload", "scan: %{web_domain}[%{saddr}] %{id->} %{fld1->} %{fld2->} %{action->} %{fld8->} %{from->} %{to->} %{fld4->} %{fld3->} %{resultcode->} %{fld7->} %{p0}");
 
 var all9 = all_match({
 	processors: [
@@ -710,16 +668,14 @@ var select10 = linear_select([
 	msg15,
 ]);
 
-var part37 = // "Pattern{Constant('web: Ret Policy Summary (Del:'), Field(fld1,true), Constant(' Kept:'), Field(fld2,false), Constant(')')}"
-match("MESSAGE#15:000004", "nwparser.payload", "web: Ret Policy Summary (Del:%{fld1->} Kept:%{fld2})", processor_chain([
+var part37 = match("MESSAGE#15:000004", "nwparser.payload", "web: Ret Policy Summary (Del:%{fld1->} Kept:%{fld2})", processor_chain([
 	dup17,
 	dup4,
 ]));
 
 var msg16 = msg("000004", part37);
 
-var part38 = // "Pattern{Constant('web: ['), Field(saddr,false), Constant('] FAILED_LOGIN ('), Field(username,false), Constant(')')}"
-match("MESSAGE#16:000005", "nwparser.payload", "web: [%{saddr}] FAILED_LOGIN (%{username})", processor_chain([
+var part38 = match("MESSAGE#16:000005", "nwparser.payload", "web: [%{saddr}] FAILED_LOGIN (%{username})", processor_chain([
 	setc("eventcategory","1401030000"),
 	dup18,
 	dup19,
@@ -731,16 +687,14 @@ match("MESSAGE#16:000005", "nwparser.payload", "web: [%{saddr}] FAILED_LOGIN (%{
 
 var msg17 = msg("000005", part38);
 
-var part39 = // "Pattern{Constant('web: Retention violating accounts: '), Field(fld1,true), Constant(' total')}"
-match("MESSAGE#17:000006", "nwparser.payload", "web: Retention violating accounts: %{fld1->} total", processor_chain([
+var part39 = match("MESSAGE#17:000006", "nwparser.payload", "web: Retention violating accounts: %{fld1->} total", processor_chain([
 	setc("eventcategory","1605000000"),
 	dup4,
 ]));
 
 var msg18 = msg("000006", part39);
 
-var part40 = // "Pattern{Constant('web: ['), Field(saddr,false), Constant('] global CHANGE '), Field(category,true), Constant(' ('), Field(info,false), Constant(')')}"
-match("MESSAGE#18:000007", "nwparser.payload", "web: [%{saddr}] global CHANGE %{category->} (%{info})", processor_chain([
+var part40 = match("MESSAGE#18:000007", "nwparser.payload", "web: [%{saddr}] global CHANGE %{category->} (%{info})", processor_chain([
 	dup17,
 	dup4,
 	setc("action","CHANGE"),
@@ -748,8 +702,7 @@ match("MESSAGE#18:000007", "nwparser.payload", "web: [%{saddr}] global CHANGE %{
 
 var msg19 = msg("000007", part40);
 
-var part41 = // "Pattern{Constant('web: ['), Field(saddr,false), Constant('] LOGOUT ('), Field(username,false), Constant(')')}"
-match("MESSAGE#19:000029", "nwparser.payload", "web: [%{saddr}] LOGOUT (%{username})", processor_chain([
+var part41 = match("MESSAGE#19:000029", "nwparser.payload", "web: [%{saddr}] LOGOUT (%{username})", processor_chain([
 	setc("eventcategory","1401070000"),
 	dup18,
 	setc("ec_activity","Logoff"),
@@ -760,8 +713,7 @@ match("MESSAGE#19:000029", "nwparser.payload", "web: [%{saddr}] LOGOUT (%{userna
 
 var msg20 = msg("000029", part41);
 
-var part42 = // "Pattern{Constant('web: ['), Field(saddr,false), Constant('] LOGIN ('), Field(username,false), Constant(')')}"
-match("MESSAGE#20:000030", "nwparser.payload", "web: [%{saddr}] LOGIN (%{username})", processor_chain([
+var part42 = match("MESSAGE#20:000030", "nwparser.payload", "web: [%{saddr}] LOGIN (%{username})", processor_chain([
 	setc("eventcategory","1401060000"),
 	dup18,
 	dup19,
@@ -781,8 +733,7 @@ var select11 = linear_select([
 	msg21,
 ]);
 
-var part43 = // "Pattern{Constant('notify/smtp['), Field(fld14,false), Constant(']: '), Field(saddr,true), Constant(' '), Field(fld1,true), Constant(' '), Field(fld2,true), Constant(' '), Field(action,true), Constant(' '), Field(fld4,true), Constant(' '), Field(fld3,true), Constant(' '), Field(sessionid,true), Constant(' '), Field(bytes,true), Constant(' '), Field(version,true), Constant(' '), Field(from,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#21:000008", "nwparser.payload", "notify/smtp[%{fld14}]: %{saddr->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{bytes->} %{version->} %{from->} %{info}", processor_chain([
+var part43 = match("MESSAGE#21:000008", "nwparser.payload", "notify/smtp[%{fld14}]: %{saddr->} %{fld1->} %{fld2->} %{action->} %{fld4->} %{fld3->} %{sessionid->} %{bytes->} %{version->} %{from->} %{info}", processor_chain([
 	dup13,
 	dup4,
 	dup32,
@@ -792,8 +743,7 @@ match("MESSAGE#21:000008", "nwparser.payload", "notify/smtp[%{fld14}]: %{saddr->
 
 var msg22 = msg("000008", part43);
 
-var part44 = // "Pattern{Constant('reports: REPORTS ('), Field(process,false), Constant(') queued as '), Field(fld1,false)}"
-match("MESSAGE#22:reports", "nwparser.payload", "reports: REPORTS (%{process}) queued as %{fld1}", processor_chain([
+var part44 = match("MESSAGE#22:reports", "nwparser.payload", "reports: REPORTS (%{process}) queued as %{fld1}", processor_chain([
 	dup16,
 	dup4,
 	setc("event_description","report queued"),
@@ -813,14 +763,11 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var part45 = // "Pattern{Field(fld3,true), Constant(' '), Field(resultcode,true), Constant(' '), Field(info,false)}"
-match("MESSAGE#0:000001/1_0", "nwparser.p0", "%{fld3->} %{resultcode->} %{info}");
+var part45 = match("MESSAGE#0:000001/1_0", "nwparser.p0", "%{fld3->} %{resultcode->} %{info}");
 
-var part46 = // "Pattern{Field(info,false)}"
-match_copy("MESSAGE#0:000001/1_1", "nwparser.p0", "info");
+var part46 = match_copy("MESSAGE#0:000001/1_1", "nwparser.p0", "info");
 
-var part47 = // "Pattern{Constant('SZ:'), Field(fld9,true), Constant(' SUBJ:'), Field(subject,false)}"
-match("MESSAGE#13:000003/1_0", "nwparser.p0", "SZ:%{fld9->} SUBJ:%{subject}");
+var part47 = match("MESSAGE#13:000003/1_0", "nwparser.p0", "SZ:%{fld9->} SUBJ:%{subject}");
 
 var select12 = linear_select([
 	dup1,

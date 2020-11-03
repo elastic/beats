@@ -105,12 +105,12 @@ func TestVerify(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			testVerifier, err := NewVerifier(config)
+			testVerifier, err := NewVerifier(config, true, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			isOk, err := testVerifier.Verify(beatName, version)
+			isOk, err := testVerifier.Verify(beatName, version, artifactName, false)
 			if err != nil {
 				t.Fatal(err)
 			}

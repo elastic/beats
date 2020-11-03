@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -48,6 +49,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	}
 
 	l := getLogger()
+	agentInfo, _ := info.NewAgentInfo()
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -67,7 +69,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -143,7 +145,7 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(p, v string) (bool, error) {
+func (*DummyVerifier) Verify(p, v, _ string, _ bool) (bool, error) {
 	return true, nil
 }
 

@@ -1,0 +1,78 @@
+[
+    {
+        "@timestamp": "2020-10-08T17:50:57.352Z",
+        "client.address": "10.0.0.1",
+        "destination.address": "192.168.50.1",
+        "destination.ip": "192.168.50.1",
+        "destination.port": 443,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.ssl",
+        "event.id": "CK17Dl2SB8bZOVonSl",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
+        "fileset.name": "ssl",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:qNHgoGHFvyhhK2jU7LlS3537ODc=",
+        "network.transport": "tcp",
+        "related.ip": [
+            "10.0.0.1",
+            "192.168.50.1"
+        ],
+        "server.address": "192.168.50.1",
+        "service.type": "zeek",
+        "source.address": "10.0.0.1",
+        "source.ip": "10.0.0.1",
+        "source.port": 49228,
+        "tags": [
+            "zeek.ssl"
+        ],
+        "tls.cipher": "TLS_RSA_WITH_AES_128_CBC_SHA256",
+        "tls.client.ja3": "74927e242d6c3febf8cb9cab10a7f889",
+        "tls.established": true,
+        "tls.resumed": false,
+        "tls.server.hash.sha1": "5dad8b55621b6b9c30679d9d61248dd132a83c94",
+        "tls.server.issuer": "CN=CA,OU=CA@example.com,O=Example Corp,L=foo,C=HI",
+        "tls.server.ja3s": "80b3a14bccc8598a1f3bbe83e71f735f",
+        "tls.server.not_after": "2019-12-30T23:23:44.000Z",
+        "tls.server.not_before": "2019-07-01T23:07:01.000Z",
+        "tls.server.subject": "CN=foo,OU=foo@bar,O=org,L=locality,C=LO",
+        "tls.server.x509.issuer.common_name": "CA",
+        "tls.server.x509.issuer.country": "HI",
+        "tls.server.x509.issuer.locality": "foo",
+        "tls.server.x509.issuer.organization": "Example Corp",
+        "tls.server.x509.issuer.organizational_unit": "CA@example.com",
+        "tls.server.x509.subject.common_name": "foo",
+        "tls.server.x509.subject.country": "LO",
+        "tls.server.x509.subject.locality": "locality",
+        "tls.server.x509.subject.organization": "org",
+        "tls.server.x509.subject.organizational_unit": "foo@bar",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
+        "zeek.session_id": "CK17Dl2SB8bZOVonSl",
+        "zeek.ssl.cipher": "TLS_RSA_WITH_AES_128_CBC_SHA256",
+        "zeek.ssl.established": true,
+        "zeek.ssl.resumed": false,
+        "zeek.ssl.server.cert_chain_fuids": [
+            "FOLwYQ6rs70bIMSf9"
+        ],
+        "zeek.ssl.server.issuer.common_name": "CA",
+        "zeek.ssl.server.issuer.country": "HI",
+        "zeek.ssl.server.issuer.locality": "foo",
+        "zeek.ssl.server.issuer.organization": "Example Corp",
+        "zeek.ssl.server.issuer.organizational_unit": "CA@example.com",
+        "zeek.ssl.server.subject.common_name": "foo",
+        "zeek.ssl.server.subject.country": "LO",
+        "zeek.ssl.server.subject.locality": "locality",
+        "zeek.ssl.server.subject.organization": "org",
+        "zeek.ssl.server.subject.organizational_unit": "foo@bar",
+        "zeek.ssl.validation.status": "self signed certificate",
+        "zeek.ssl.version": "TLSv12"
+    }
+]

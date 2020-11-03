@@ -107,7 +107,7 @@ Client Secret to authenticate with Cloud Foundry. Default: "".
 === `shard_id`
 
 Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
-from the RLP Gateway. Default: "(generated UUID)".
+from the RLP Gateway.
 
 [float]
 ==== `version`

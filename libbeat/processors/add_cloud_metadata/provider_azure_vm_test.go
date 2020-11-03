@@ -40,7 +40,8 @@ const azInstanceIdentityDocument = `{
 	"sku": "14.04.4-LTS",
 	"version": "14.04.201605091",
 	"vmId": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-	"vmSize": "Standard_D3_v2"
+	"vmSize": "Standard_D3_v2",
+	"subscriptionId": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e"
 }`
 
 func initAzureTestServer() *httptest.Server {
@@ -86,6 +87,9 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			},
 			"machine": common.MapStr{
 				"type": "Standard_D3_v2",
+			},
+			"account": common.MapStr{
+				"id": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e",
 			},
 			"region": "eastus2",
 		},
