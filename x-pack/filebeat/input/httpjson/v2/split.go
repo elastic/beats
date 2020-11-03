@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+var errEmtpyField = errors.New("the requested field is emtpy")
+
 type split struct {
 	targetInfo targetInfo
 	kind       string
@@ -82,10 +84,14 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEv
 	}
 
 	switch s.kind {
-	case splitTypeArr:
+	case "", splitTypeArr:
 		arr, ok := v.([]interface{})
 		if !ok {
-			return fmt.Errorf("field %s needs to be an array to be able to split on it", s.targetInfo.Name)
+			return fmt.Errorf("field %s needs to be an array to be able to split on it but it is %T", s.targetInfo.Name, v)
+		}
+
+		if len(arr) == 0 {
+			return errEmtpyField
 		}
 
 		for _, a := range arr {
@@ -101,9 +107,17 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEv
 
 		return nil
 	case splitTypeMap:
+		if v == nil {
+			return errEmtpyField
+		}
+
 		ms, ok := toMapStr(v)
 		if !ok {
-			return fmt.Errorf("field %s needs to be a map to be able to split on it", s.targetInfo.Name)
+			return fmt.Errorf("field %s needs to be a map to be able to split on it but it is %T", s.targetInfo.Name, v)
+		}
+
+		if len(ms) == 0 {
+			return errEmtpyField
 		}
 
 		for k, v := range ms {
@@ -155,6 +169,8 @@ func (s *split) sendEvent(ctx transformContext, resp *transformable, m common.Ma
 	}
 
 	ch <- maybeEvent{event: event}
+
+	*ctx.lastEvent = event
 
 	return nil
 }

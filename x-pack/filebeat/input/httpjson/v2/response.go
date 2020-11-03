@@ -6,6 +6,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -54,32 +55,38 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				return
 			}
 
-			if !hasNext {
+			if !hasNext || len(page.body) == 0 {
 				return
 			}
 
 			for _, t := range rp.transforms {
 				page, err = t.run(trCtx, page)
 				if err != nil {
+					fmt.Println("=== 2")
 					ch <- maybeEvent{err: err}
 					return
 				}
 			}
 
-			if rp.split != nil {
-				if err := rp.split.run(trCtx, page, ch); err != nil {
+			if rp.split == nil {
+				event, err := makeEvent(page.body)
+				if err != nil {
 					ch <- maybeEvent{err: err}
 					return
 				}
+				ch <- maybeEvent{event: event}
 				continue
 			}
 
-			event, err := makeEvent(page.body)
-			if err != nil {
+			if err := rp.split.run(trCtx, page, ch); err != nil {
+				if err == errEmtpyField {
+					// nothing else to send
+					return
+				}
+
 				ch <- maybeEvent{err: err}
 				return
 			}
-			ch <- maybeEvent{event: event}
 		}
 	}()
 

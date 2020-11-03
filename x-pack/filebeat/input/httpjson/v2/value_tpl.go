@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -55,7 +56,7 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	_, _ = data.Put("url.value", tr.url.String())
 	_, _ = data.Put("url.params", tr.url.Query())
 	_, _ = data.Put("cursor", trCtx.cursor.Clone())
-	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
+	_, _ = data.Put("last_event", cloneEvent(trCtx.lastEvent))
 	_, _ = data.Put("last_response.body", trCtx.lastResponse.body.Clone())
 	_, _ = data.Put("last_response.header", trCtx.lastResponse.header.Clone())
 	_, _ = data.Put("last_response.url.value", trCtx.lastResponse.url.String())
@@ -70,6 +71,15 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 		val = defaultVal
 	}
 	return val
+}
+
+func cloneEvent(event *beat.Event) beat.Event {
+	return beat.Event{
+		Timestamp:  event.Timestamp,
+		Meta:       event.Meta.Clone(),
+		Fields:     event.Fields.Clone(),
+		TimeSeries: event.TimeSeries,
+	}
 }
 
 var (

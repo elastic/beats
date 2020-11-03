@@ -7,6 +7,7 @@ package v2
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -33,11 +34,13 @@ func newPagination(config config, httpClient *http.Client, log *logp.Logger) *pa
 	if config.Response == nil {
 		return pagination
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace)
+
+	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace)
+	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace)
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
 		*config.Request.URL.URL,
-		ts,
+		append(rts, pts...),
 		config.Auth,
 		log,
 	)
@@ -98,12 +101,22 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
 	if err != nil {
+		if err == errNewURLValueNotSet {
+			// if this error happens here it means the transform used to pick the new url.value
+			// did not find any new value and we can stop paginating without error
+			return nil, false, nil
+		}
 		return nil, false, err
 	}
 
 	resp, err := iter.pagination.httpClient.Do(httpReq)
 	if err != nil {
 		return nil, false, err
+	}
+
+	if resp.StatusCode > 399 {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return nil, false, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
 
 	iter.resp = resp

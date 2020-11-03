@@ -24,15 +24,15 @@ type transforms []transform
 
 type transformContext struct {
 	cursor       common.MapStr
-	lastEvent    common.MapStr
+	lastEvent    *beat.Event
 	lastResponse *transformable
 }
 
 func emptyTransformContext() transformContext {
 	return transformContext{
 		cursor:       make(common.MapStr),
-		lastEvent:    make(common.MapStr),
 		lastResponse: emptyTransformable(),
+		lastEvent:    &beat.Event{},
 	}
 }
 

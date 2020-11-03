@@ -2,11 +2,13 @@ package v2
 
 import (
 	"fmt"
-	httpURL "net/url"
+	"net/url"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/pkg/errors"
 )
+
+var errNewURLValueNotSet = errors.New("the new url.value was not set")
 
 const setName = "set"
 
@@ -134,12 +136,15 @@ func setURLParams(ctx transformContext, transformable *transformable, key, value
 }
 
 func setURLValue(ctx transformContext, transformable *transformable, _, value string) error {
-	query := transformable.url.Query().Encode()
-	url, err := httpURL.Parse(value)
-	if err != nil {
-		return err
+	// if the template processing did not find any value
+	// we fail without parsing
+	if value == "<no value>" || value == "" {
+		return errNewURLValueNotSet
 	}
-	url.RawQuery = query
+	url, err := url.Parse(value)
+	if err != nil {
+		return errNewURLValueNotSet
+	}
 	transformable.url = *url
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -142,6 +143,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 		return fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
 	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode > 399 {
+		body, _ := ioutil.ReadAll(httpResp.Body)
+		return fmt.Errorf("server responded with status code %d: %s", httpResp.StatusCode, string(body))
+	}
 
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	if err != nil {
