@@ -146,7 +146,7 @@ The default value is `10GB`.
 [float]
 ===== `segment_size`
 
-Data added to the queue is stored in "segment files." Each segment contains
+Data added to the queue is stored in segment files. Each segment contains
 some number of events waiting to be sent to the outputs, and is deleted when
 all its events are sent. By default, segment size is limited to 1/10 of the
 maximum queue size. Using a smaller size means that the queue will use more
