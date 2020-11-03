@@ -7,6 +7,9 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
+IMPORTANT: To simplify upgrading to future versions of {agent}, we recommended
+that you use the tarball distribution instead of the DEB distribution.
+
 ["source","sh",subs="attributes"]
 ----
 curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-amd64.deb
@@ -24,6 +27,9 @@ Version {version} of {agent} has not yet been released.
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
+
+IMPORTANT: To simplify upgrading to future versions of {agent}, we recommended
+that you use the tarball distribution instead of the RPM distribution.
 
 ["source","sh",subs="attributes"]
 ----
@@ -65,10 +71,6 @@ ifeval::["{release-state}"!="unreleased"]
 curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-linux-x86_64.tar.gz
 tar xzvf elastic-agent-{version}-linux-x86_64.tar.gz
 ----
-
-NOTE: We recommend that you use the DEB or RPM distribution, instead of the
-tarball, to ensure that {agent} restarts automatically if the system is
-rebooted.
 
 endif::[]
 // end::linux[]

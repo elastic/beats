@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -40,10 +41,10 @@ func (b *operatorStream) Shutdown() {
 	b.configHandler.Shutdown()
 }
 
-func streamFactory(ctx context.Context, cfg *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
+func streamFactory(ctx context.Context, agentInfo *info.AgentInfo, cfg *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
-		operator, err := newOperator(ctx, log, id, cfg, srv, r, m)
+		operator, err := newOperator(ctx, log, agentInfo, id, cfg, srv, r, m)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +56,7 @@ func streamFactory(ctx context.Context, cfg *configuration.SettingsConfig, srv *
 	}
 }
 
-func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) (*operation.Operator, error) {
+func newOperator(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, id routingKey, config *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor) (*operation.Operator, error) {
 	fetcher := downloader.NewDownloader(log, config.DownloadConfig)
 	allowEmptyPgp, pgp := release.PGP()
 	verifier, err := downloader.NewVerifier(log, config.DownloadConfig, allowEmptyPgp, pgp)
@@ -81,6 +82,7 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 	return operation.NewOperator(
 		ctx,
 		log,
+		agentInfo,
 		id,
 		config,
 		fetcher,
