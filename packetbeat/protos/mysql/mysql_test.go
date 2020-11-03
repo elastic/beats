@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
@@ -60,7 +61,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	var mysql mysqlPlugin
 	config := defaultConfig
 	config.Ports = []int{serverPort}
-	mysql.init(callback, &config)
+	mysql.init(callback, procs.ProcessesWatcher{}, &config)
 	return &mysql
 }
 

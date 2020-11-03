@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -88,7 +89,7 @@ func httpModForTests(store *eventStore) *httpPlugin {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, common.NewConfig())
+	http, err := New(false, callback, procs.ProcessesWatcher{}, common.NewConfig())
 	if err != nil {
 		panic(err)
 	}

@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -45,7 +46,7 @@ func amqpModForTests() (*eventStore, *amqpPlugin) {
 	var amqp amqpPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	amqp.init(results.publish, &config)
+	amqp.init(results.publish, procs.ProcessesWatcher{}, &config)
 	return results, &amqp
 }
 

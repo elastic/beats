@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -56,7 +57,7 @@ func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 
 	var pgsql pgsqlPlugin
 	config := defaultConfig
-	pgsql.init(callback, &config)
+	pgsql.init(callback, procs.ProcessesWatcher{}, &config)
 	return &pgsql
 }
 

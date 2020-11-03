@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
@@ -45,6 +46,7 @@ type plugin struct {
 	keepOriginal       bool
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 var (
@@ -59,6 +61,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	cfgwarn.Beta("packetbeat SIP protocol is used")
@@ -71,19 +74,20 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
 // Init initializes the HTTP protocol analyser.
-func (p *plugin) init(results protos.Reporter, config *config) error {
+func (p *plugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *config) error {
 	p.setFromConfig(config)
 
 	isDebug = logp.IsDebug("sip")
 	isDetailed = logp.IsDebug("sipdetailed")
 	p.results = results
+	p.watcher = watcher
 	return nil
 }
 
@@ -111,7 +115,7 @@ func (p *plugin) doParse(pkt *protos.Packet) error {
 		detailedf("Payload received: [%s]", pkt.Payload)
 	}
 
-	parser := newParser()
+	parser := newParser(p.watcher)
 
 	pi := newParsingInfo(pkt)
 	m, err := parser.parse(pi)
