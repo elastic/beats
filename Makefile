@@ -89,13 +89,7 @@ check:
 	# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
-	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
-
-## ccheck-go : Check there is no changes in Go modules.
-.PHONY: check-go
-check-go:
-	@go mod tidy
 
 ## ccheck-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
