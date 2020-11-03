@@ -122,7 +122,7 @@ You can specify the following options in the `queue.disk` section of the
 [float]
 ===== `path`
 
-The path to the directory in which the disk queue should store its data files.
+The path to the directory where the disk queue should store its data files.
 The directory is created on startup if it doesn't exist.
 
 The default value is `"${path.data}/diskqueue"`.
