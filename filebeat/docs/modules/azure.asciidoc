@@ -108,11 +108,6 @@ include::../include/what-happens.asciidoc[]
 include::../include/gs-link.asciidoc[]
 
 [float]
-=== Compatibility
-
-TODO: document with what versions of the software is this tested
-
-[float]
 === Dashboards
 
 The azure module comes with several predefined dashboards for general cloud overview, user activity and alerts. For example:
