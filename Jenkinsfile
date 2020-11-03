@@ -75,10 +75,12 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "make check-go", script: "make check-go")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
@@ -286,15 +288,17 @@ def withBeatsEnv(Map args = [:], Closure body) {
     testResults = '**/build/TEST*.xml'
     artifacts = '**/build/TEST*.out'
   } else {
+    // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
+    def mingwArch = is32() ? '32' : '64'
+    def goArch = is32() ? '386' : 'amd64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
-    def mingw64Path = 'C:\\tools\\mingw64\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-    goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH};${mingw64Path}"
+    goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
+    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
-    gox_flags = '-arch amd64'
+    gox_flags = '-arch 386'
   }
 
   deleteDir()
@@ -507,10 +511,15 @@ def startCloudTestEnv(Map args = [:]) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         try {
-          for (folder in dirs) {
+          dirs?.each { folder ->
             retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(folder)
             }
+          }
+        } catch(err) {
+          dirs?.each { folder ->
+            // If it failed then cleanup without failing the build
+            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
           }
         } finally {
           // Archive terraform states in case manual cleanup is needed.

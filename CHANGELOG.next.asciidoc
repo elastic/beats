@@ -315,6 +315,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 
 *Heartbeat*
 
@@ -548,6 +549,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
+- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 
 *Auditbeat*
 
@@ -894,6 +896,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
+- Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]

@@ -1968,5 +1968,66 @@
         "tls.server.x509.subject.common_name": "*.dailymotion.com",
         "url.domain": "www.dailymotion.com",
         "url.path": "/"
+    },
+    {
+        "@timestamp": "2020-11-02T08:11:38.000Z",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "8.8.8.8",
+        "destination.port": 500,
+        "event.category": [
+            "network"
+        ],
+        "event.code": "0101037127",
+        "event.dataset": "fortinet.firewall",
+        "event.kind": "event",
+        "event.module": "fortinet",
+        "event.outcome": "success",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "firewall",
+        "fortinet.firewall.action": "negotiate",
+        "fortinet.firewall.cookies": "125cbf9ee8349965/0000000000000000",
+        "fortinet.firewall.init": "local",
+        "fortinet.firewall.mode": "aggressive",
+        "fortinet.firewall.outintf": "port1",
+        "fortinet.firewall.result": "OK",
+        "fortinet.firewall.role": "initiator",
+        "fortinet.firewall.stage": "1",
+        "fortinet.firewall.status": "success",
+        "fortinet.firewall.subtype": "vpn",
+        "fortinet.firewall.type": "event",
+        "fortinet.firewall.vd": "root",
+        "fortinet.firewall.vpntunnel": "P1_Test",
+        "fortinet.firewall.xauthgroup": "N/A",
+        "fortinet.firewall.xauthuser": "N/A",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 17123,
+        "message": "progress IPsec phase 1",
+        "network.direction": "outbound",
+        "observer.name": "testfirewall",
+        "observer.product": "Fortigate",
+        "observer.serial_number": "newrouterid",
+        "observer.type": "firewall",
+        "observer.vendor": "Fortinet",
+        "related.ip": [
+            "10.10.10.10",
+            "8.8.8.8"
+        ],
+        "rule.description": "Progress IPsec phase 1",
+        "service.type": "fortinet",
+        "source.ip": "10.10.10.10",
+        "source.port": 500,
+        "tags": [
+            "fortinet-firewall",
+            "forwarded"
+        ]
     }
 ]
