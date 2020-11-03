@@ -8,8 +8,8 @@
   fields:
     - name: kibana
       type: group
-      description: >
+      description: TODO
       fields:
         - name: stats.usage.name
           type: alias
-          path: kibana.stats.usage
+          path: kibana.stats.usage.index

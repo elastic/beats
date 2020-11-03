@@ -4,6 +4,12 @@
     Kibana stats and run-time metrics.
   release: ga
   fields:
+    - name: usage
+      type: group
+      fields:
+        - name: index
+          type: keyword
+          description: TODO
     - name: uuid
       type: alias
       path: service.id
