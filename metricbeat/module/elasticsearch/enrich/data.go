@@ -59,13 +59,12 @@ var (
 		},
 		"cancellable":    c.Bool("cancellable"),
 		"parent_task_id": c.Str("parent_task_id"),
-		// "headers": for reviewers -> ...What's the expected output of this? Maybe it's not necessary to add it
 	}
 )
 
 type response struct {
 	ExecutingPolicies []map[string]interface{} `json:"executing_policies"`
-	CoordinatorStats []map[string]interface{} `json:"coordinator_stats"`
+	CoordinatorStats  []map[string]interface{} `json:"coordinator_stats"`
 }
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
