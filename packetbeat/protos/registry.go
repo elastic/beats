@@ -22,11 +22,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
 type ProtocolPlugin func(
 	testMode bool,
 	results Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (Plugin, error)
 
