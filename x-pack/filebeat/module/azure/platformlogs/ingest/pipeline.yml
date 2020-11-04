@@ -98,14 +98,6 @@ processors:
     target_field: azure.correlation_id
     ignore_missing: true
 - rename:
-    field: azure.platformlogs.properties.serviceRequestId
-    target_field: azure.platformlogs.properties.service_request_id
-    ignore_missing: true
-- rename:
-    field: azure.platformlogs.properties.statusMessage
-    target_field: message
-    ignore_missing: true
-- rename:
     field: azure.platformlogs.properties.statusCode
     target_field: azure.platformlogs.properties.status_code
     ignore_missing: true
