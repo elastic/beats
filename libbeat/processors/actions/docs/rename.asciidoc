@@ -44,5 +44,5 @@ continues also if an error happened during renaming. Default is `true`.
 
 See <<conditions>> for a list of supported conditions.
 
-You can specify multiple `ignore_missing` processors under the `processors`
+You can specify multiple `rename` processors under the `processors`
 section.

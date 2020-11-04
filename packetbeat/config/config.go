@@ -18,6 +18,7 @@
 package config
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -33,6 +34,44 @@ type Config struct {
 	Procs           procs.ProcsConfig         `config:"procs"`
 	IgnoreOutgoing  bool                      `config:"ignore_outgoing"`
 	ShutdownTimeout time.Duration             `config:"shutdown_timeout"`
+}
+
+// FromStatic initializes a configuration given a common.Config
+func (c Config) FromStatic(cfg *common.Config) (Config, error) {
+	err := cfg.Unpack(&c)
+	if err != nil {
+		return c, err
+	}
+	return c, nil
+}
+
+// ICMP returns the ICMP configuration
+func (c Config) ICMP() (*common.Config, error) {
+	var icmp *common.Config
+	if c.Protocols["icmp"].Enabled() {
+		icmp = c.Protocols["icmp"]
+	}
+
+	for _, cfg := range c.ProtocolsList {
+		info := struct {
+			Type string `config:"type" validate:"required"`
+		}{}
+
+		if err := cfg.Unpack(&info); err != nil {
+			return nil, err
+		}
+
+		if info.Type != "icmp" {
+			continue
+		}
+
+		if icmp != nil {
+			return nil, errors.New("more than one icmp configuration found")
+		}
+
+		icmp = cfg
+	}
+	return icmp, nil
 }
 
 type InterfacesConfig struct {
@@ -57,6 +96,8 @@ type Flows struct {
 	EventMetadata common.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 	KeepNull      bool                    `config:"keep_null"`
+	// Index is used to overwrite the index where flows are published
+	Index string `config:"index"`
 }
 
 type ProtocolCommon struct {
