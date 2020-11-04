@@ -109,6 +109,9 @@ spec:
         - name: varlog
           mountPath: /var/log
           readOnly: true
+        - name: optdocker
+          mountPath: /opt/docker/containers
+          readOnly: true
       volumes:
       - name: config
         configMap:
@@ -120,6 +123,9 @@ spec:
       - name: varlog
         hostPath:
           path: /var/log
+      - name: optdocker
+        hostPath:
+          path: /opt/docker/containers
       # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
         hostPath:
