@@ -157,8 +157,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 
-		nodeMeta := kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
-		config.Host = nodeMeta.Name
+		nodeInfo := kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		config.Host = nodeInfo.Name
 
 		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
@@ -172,7 +172,34 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+		metaConfig := metadata.Config{}
+		metaConfig.InitDefaults()
+		metaCfg, _ := common.NewConfigFrom(&metaConfig)
+		metaConf := &metadata.AddResourceMetadataConfig{
+			Node:      metaCfg,
+			Namespace: metaCfg,
+		}
+
+		options := kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Node:        "",
+		}
+		if config.Namespace != "" {
+			options.Namespace = config.Namespace
+		}
+		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
+		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
+
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf, nodeInfo.Hostname)
+
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
@@ -195,8 +222,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			},
 		})
 
+		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
+		// be populated before trying to generate metadata for Pods.
+		if err := nodeWatcher.Start(); err != nil {
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+			return
+		}
+		if err := namespaceWatcher.Start(); err != nil {
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+			return
+		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
