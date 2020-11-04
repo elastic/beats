@@ -86,13 +86,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	}
 	metaConf := config.AddResourceMetadata
 	if metaConf == nil {
-		metaConfig := metadata.Config{}
-		metaConfig.InitDefaults()
-		metaCfg, _ := common.NewConfigFrom(&metaConfig)
-		metaConf = &metadata.AddResourceMetadataConfig{
-			Node:      metaCfg,
-			Namespace: metaCfg,
-		}
+		metaConf = metadata.GetDefaultResourceMetadataConfig()
 	}
 	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
 	if err != nil {

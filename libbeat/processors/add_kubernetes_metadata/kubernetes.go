@@ -172,13 +172,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		metaConfig := metadata.Config{}
-		metaConfig.InitDefaults()
-		metaCfg, _ := common.NewConfigFrom(&metaConfig)
-		metaConf := &metadata.AddResourceMetadataConfig{
-			Node:      metaCfg,
-			Namespace: metaCfg,
-		}
+		metaConf := metadata.GetDefaultResourceMetadataConfig()
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
