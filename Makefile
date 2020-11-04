@@ -81,17 +81,27 @@ clean-vendor:
 	@sh script/clean_vendor.sh
 
 .PHONY: check
-check: python-env
+check:
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@# Checks also python files which are not part of the beats
-	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@# Validate that all updates were committed
+	$(MAKE) check-python
+	# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
+	@$(MAKE) check-no-changes
+
+## ccheck-no-changes : Check there is no local changes.
+.PHONY: check-no-changes
+check-no-changes:
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
 
+## check-python : Python Linting.
+.PHONY: check-python
+check-python: python-env
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+
+## check-headers : Check the license headers.
 .PHONY: check-headers
 check-headers:
 	@go get github.com/elastic/go-licenser
