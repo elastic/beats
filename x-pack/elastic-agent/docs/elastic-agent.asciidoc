@@ -34,4 +34,4 @@ include::elastic-agent-command-line.asciidoc[leveloffset=+1]
 
 include::elastic-agent-configuration.asciidoc[leveloffset=+1]
 
-//include::elastic-agent-configuration-example.asciidoc[leveloffset=+1]
+include::elastic-agent-dynamic-inputs.asciidoc[leveloffset=+1]
