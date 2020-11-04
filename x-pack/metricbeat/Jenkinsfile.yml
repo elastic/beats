@@ -13,11 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-16" ## default label for all the stages
 stages:
-    Lint:
-        make: |
-          make -C x-pack/metricbeat check;
-          make -C x-pack/metricbeat update;
-          make check-no-changes;
     build:
         make: "RACE_DETECTOR=1 make -C x-pack/metricbeat check testsuite integration-tests-environment"
         when:
