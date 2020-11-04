@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
 - Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
+- Autodiscover kubernetes provider will find ephemeral containers. {pull}22389[22389]
 
 *Auditbeat*
 
