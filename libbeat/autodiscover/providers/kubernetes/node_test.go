@@ -163,6 +163,7 @@ func TestEmitEvent_Node(t *testing.T) {
 					"node": common.MapStr{
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
@@ -171,6 +172,7 @@ func TestEmitEvent_Node(t *testing.T) {
 						"node": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},
@@ -222,6 +224,7 @@ func TestEmitEvent_Node(t *testing.T) {
 					"node": common.MapStr{
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
@@ -230,6 +233,7 @@ func TestEmitEvent_Node(t *testing.T) {
 						"node": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},
