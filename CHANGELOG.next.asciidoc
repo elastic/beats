@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
+- Rename googlecloud module to gcp module. {pull}22246[22246]
 
 *Packetbeat*
 
@@ -387,8 +388,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Fix instance name in perfmon metricset. {issue}22218[22218] {pull}22261[22261]
 - Remove io.time from windows {pull}22237[22237]
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
+- Change Session ID type from int to string {pull}22359[22359]
 
 *Packetbeat*
 
@@ -784,6 +787,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
+- Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
 
 *Packetbeat*
 
@@ -793,6 +797,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 - Add 100-continue support {issue}15830[15830] {pull}19349[19349]
 - Add initial SIP protocol support {pull}21221[21221]
+- Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
 - Change build process for x-pack distribution {pull}21979[21979]
 
 
@@ -840,6 +845,5 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 

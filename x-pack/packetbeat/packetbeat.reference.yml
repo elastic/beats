@@ -63,6 +63,9 @@ packetbeat.flows:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
+  # Overrides where flow events are indexed.
+  #index: my-custom-flow-index
+
 # =========================== Transaction protocols ============================
 
 packetbeat.protocols:
@@ -72,6 +75,9 @@ packetbeat.protocols:
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-icmp-index
 
 - type: amqp
   # Enable AMQP monitoring. Default: true
@@ -113,6 +119,9 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-amqp-index
+
 - type: cassandra
   #Cassandra port for traffic monitoring.
   ports: [9042]
@@ -142,6 +151,9 @@ packetbeat.protocols:
 
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-cassandra-index
 
 - type: dhcpv4
   # Configure the DHCP for IPv4 ports.
@@ -182,6 +194,9 @@ packetbeat.protocols:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-dhcpv4-index
 
 - type: http
   # Enable HTTP monitoring. Default: true
@@ -257,6 +272,9 @@ packetbeat.protocols:
   # be trimmed to this size. Default is 10 MB.
   #max_message_size: 10485760
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-http-index
+
 - type: memcache
   # Enable memcache monitoring. Default: true
   #enabled: true
@@ -309,6 +327,9 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-memcache-index
+
 - type: mysql
   # Enable mysql monitoring. Default: true
   #enabled: true
@@ -332,6 +353,9 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-mysql-index
+
 - type: pgsql
   # Enable pgsql monitoring. Default: true
   #enabled: true
@@ -354,6 +378,9 @@ packetbeat.protocols:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-pgsql-index
 
 - type: redis
   # Enable redis monitoring. Default: true
@@ -386,6 +413,9 @@ packetbeat.protocols:
   # of requests or responses that can be buffered for correlation. Set a value
   # large enough to allow for pipelining.
   #queue_max_messages: 20000
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-redis-index
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -445,6 +475,9 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-thrift-index
+
 - type: mongodb
   # Enable mongodb monitoring. Default: true
   #enabled: true
@@ -478,6 +511,9 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-mongodb-index
+
 - type: nfs
   # Enable NFS monitoring. Default: true
   #enabled: true
@@ -500,6 +536,9 @@ packetbeat.protocols:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-nfs-index
 
 - type: tls
   # Enable TLS monitoring. Default: true
@@ -531,6 +570,9 @@ packetbeat.protocols:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-tls-index
+
 - type: sip
   # Configure the ports where to listen for SIP traffic. You can disable the SIP protocol by commenting out the list of ports.
   ports: [5060]
@@ -543,6 +585,9 @@ packetbeat.protocols:
 
   # Preserve original contents in event.original
   keep_original: true
+
+  # Overrides where this protocol's events are indexed.
+  #index: my-custom-sip-index
 
 # ============================ Monitored processes =============================
 
@@ -601,6 +646,41 @@ packetbeat.ignore_outgoing: false
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
+  
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+    
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
@@ -1616,6 +1696,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of packetbeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
