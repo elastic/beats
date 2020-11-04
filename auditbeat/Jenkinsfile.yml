@@ -52,6 +52,7 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
+            #- "windows-7-32-bit" https://github.com/elastic/beats/issues/19831
             #- "windows-2008-r2" https://github.com/elastic/beats/issues/19799
     windows-2016:
         mage: "mage build unitTest"
@@ -97,3 +98,14 @@ stages:
                 - "windows-8"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+    #windows-7:  See https://github.com/elastic/beats/issues/19831
+    #    mage: "mage build unitTest"
+    #    platforms:             ## override default labels in this specific stage.
+    #        - "windows-7"
+    #    when:                  ## Override the top-level when.
+    #        comments:
+    #            - "/test filebeat for windows-7"
+    #        labels:
+    #            - "windows-7"
+    #        branches: true     ## for all the branches
+    #        tags: true         ## for all the tags

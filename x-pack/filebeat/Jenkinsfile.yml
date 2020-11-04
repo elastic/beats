@@ -106,3 +106,25 @@ stages:
                 - "windows-8"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+    windows-7:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/filebeat for windows-7"
+            labels:
+                - "windows-7"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    #windows-7-32:  See https://github.com/elastic/beats/issues/22315
+    #    mage: "mage build unitTest"
+    #    platforms:             ## override default labels in this specific stage.
+    #        - "windows-7-32-bit"
+    #    when:                  ## Override the top-level when.
+    #        comments:
+    #            - "/test x-pack/filebeat for windows-7-32"
+    #        labels:
+    #            - "windows-7-32"
+    #        branches: true     ## for all the branches
+    #        tags: true         ## for all the tags

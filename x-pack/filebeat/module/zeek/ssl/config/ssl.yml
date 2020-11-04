@@ -55,6 +55,21 @@ processors:
         - from: "zeek.ssl.validation_code"
           to: "zeek.ssl.validation.code"
 
+        # These JA3 fields are available when using the zeek/salesforce/ja3 package.
+        - from: zeek.ssl.ja3
+          to: tls.client.ja3
+        - from: zeek.ssl.ja3s
+          to: tls.server.ja3s
+
+        - from: zeek.ssl.not_valid_before
+          to: tls.server.not_before
+        - from: zeek.ssl.not_valid_after
+          to: tls.server.not_after
+
+        - from: zeek.ssl.orig_certificate_sha1
+          to: tls.client.hash.sha1
+        - from: zeek.ssl.resp_certificate_sha1
+          to: tls.server.hash.sha1
       ignore_missing: true
       fail_on_error: false
   - convert:
