@@ -148,6 +148,11 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 		return err
 	}
 
+	if err := InvokeWatcher(u.log); err != nil {
+		rollbackInstall(newHash)
+		return errors.New("failed to invoke rollback watcher")
+	}
+
 	if reexecNow {
 		u.reexec.ReExec()
 	}

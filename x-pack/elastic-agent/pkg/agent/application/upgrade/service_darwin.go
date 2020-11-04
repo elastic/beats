@@ -4,7 +4,7 @@
 
 // +build darwin
 
-package rollback
+package upgrade
 
 import (
 	"bufio"

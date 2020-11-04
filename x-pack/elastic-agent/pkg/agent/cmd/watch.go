@@ -8,23 +8,24 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/rollback"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
 	// period during which we monitor for failures resulting in a rollback
-	gracePeriodDuration = 10 * time.Minute
+	gracePeriodDuration = 3 * time.Minute
 
 	watcherName = "elastic-agent-watcher"
 )
@@ -46,43 +47,62 @@ func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStre
 }
 
 func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	marker, err := upgrade.LoadMarker()
-	if err != nil {
-		return err
-	}
-	if marker == nil {
-		// no marker found we're not in upgrade process
-		return nil
-	}
-
-	isWithinGrace, tilGrace := gracePeriod(marker)
-	if !isWithinGrace {
-		// if it is started outside of upgrade loop exit nicely
-		return nil
-	}
-
-	locker := rollback.NewLocker(paths.Top())
-	if err := locker.TryLock(); err != nil {
-		if err == rollback.ErrAlreadyLocked {
-			return nil
-		}
-
-		return err
-	}
-	defer locker.Unlock()
-
 	log, err := configuredLogger(flags)
 	if err != nil {
 		return err
 	}
 
+	marker, err := upgrade.LoadMarker()
+	if err != nil {
+		log.Error("failed to load marker", err)
+		return err
+	}
+	if marker == nil {
+		// no marker found we're not in upgrade process
+		log.Debugf("update marker not present at '%s'", filepath.Join(paths.Data(), ".update-marker"))
+		return nil
+	}
+
+	locker := upgrade.NewLocker(paths.Top())
+	if err := locker.TryLock(); err != nil {
+		if err == upgrade.ErrAlreadyLocked {
+			log.Debugf("exiting, lock already exist")
+			return nil
+		}
+
+		log.Error("failed to acquire lock", err)
+		return err
+	}
+	defer locker.Unlock()
+
+	isWithinGrace, tilGrace := gracePeriod(marker)
+	if !isWithinGrace {
+		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn, time.Now().Sub(marker.UpdatedOn).String())
+		// if it is started outside of upgrade loop
+		// if we're not within grace and marker is still there it might mean
+		// that cleanup was not performed ok, cleanup everything except current version
+		// hash is the same as hash of agent which initiated watcher.
+		upgrade.Cleanup(release.ShortCommit())
+		// exit nicely
+		return nil
+	}
+
 	ctx := context.Background()
 
 	if err := watch(ctx, tilGrace, log); err != nil {
-		return rollback.Rollback(ctx, marker.PrevHash, marker.Hash)
+		log.Debugf("Error detected proceeding to rollback", err)
+		err = upgrade.Rollback(ctx, marker.PrevHash, marker.Hash)
+		if err != nil {
+			log.Error("rollback failed", err)
+		}
+		return err
 	}
 
-	return rollback.Cleanup(marker.PrevHash)
+	err = upgrade.Cleanup(marker.Hash)
+	if err != nil {
+		log.Error("rollback failed", err)
+	}
+	return err
 }
 
 func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) error {
@@ -98,12 +118,12 @@ func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) erro
 		close(crashChan)
 	}()
 
-	errorChecker, err := rollback.NewErrorChecker(errChan, log)
+	errorChecker, err := upgrade.NewErrorChecker(errChan, log)
 	if err != nil {
 		return err
 	}
 
-	crashChecker, err := rollback.NewCrashChecker(ctx, errChan, log)
+	crashChecker, err := upgrade.NewCrashChecker(ctx, errChan, log)
 	if err != nil {
 		return err
 	}

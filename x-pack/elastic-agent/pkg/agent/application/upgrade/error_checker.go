@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package rollback
+package upgrade
 
 import (
 	"context"
@@ -33,11 +33,6 @@ type ErrorChecker struct {
 // NewErrorChecker creates a new error checker.
 func NewErrorChecker(ch chan error, log *logger.Logger) (*ErrorChecker, error) {
 	c := client.New()
-	err := c.Connect(context.Background())
-	if err != nil {
-		return nil, errors.New(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
-	}
-
 	ec := &ErrorChecker{
 		notifyChan:  ch,
 		agentClient: c,
@@ -49,14 +44,20 @@ func NewErrorChecker(ch chan error, log *logger.Logger) (*ErrorChecker, error) {
 
 // Run runs the checking loop.
 func (ch ErrorChecker) Run(ctx context.Context) {
-	defer ch.agentClient.Disconnect()
-
+	ch.log.Debug("Error checker started")
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-time.After(statusCheckPeriod):
+			err := ch.agentClient.Connect(context.Background())
+			if err != nil {
+				ch.log.Error(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
+				continue
+			}
+
 			status, err := ch.agentClient.Status(ctx)
+			ch.agentClient.Disconnect()
 			if err != nil {
 				ch.log.Error("failed retrieving agent status", err)
 				// agent is probably not running and this will be detected by pid watcher
@@ -64,6 +65,7 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 			}
 
 			if status.Status == client.Failed {
+				ch.log.Error("error checker notifying failure of agent")
 				ch.notifyChan <- ErrAgentStatusFailed
 			}
 
@@ -74,6 +76,7 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 			}
 
 			if err != nil {
+				ch.log.Error("error checker notifying failure of applications")
 				ch.notifyChan <- errors.New(err, "applications in a failed state", errors.TypeApplication)
 			}
 		}

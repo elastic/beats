@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package rollback
+package upgrade
 
 import (
 	"context"
@@ -55,6 +55,8 @@ func NewCrashChecker(ctx context.Context, ch chan error, log *logger.Logger) (*C
 // Run runs the checking loop.
 func (ch *CrashChecker) Run(ctx context.Context) {
 	defer ch.sc.Close()
+
+	ch.log.Debug("Crash checker started")
 	for {
 		select {
 		case <-ctx.Done():

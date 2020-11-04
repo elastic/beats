@@ -96,13 +96,13 @@ func LoadMarker() (*UpdateMarker, error) {
 	markerFile := markerFilePath()
 	markerBytes, err := ioutil.ReadFile(markerFile)
 	if err != nil && os.IsNotExist(err) {
-		return nil, nil
+		return nil, err
 	} else if err != nil {
 		return nil, err
 	}
 
 	marker := &UpdateMarker{}
-	if err := yaml.Unmarshal(markerBytes, marker); err != nil {
+	if err := yaml.Unmarshal(markerBytes, &marker); err != nil {
 		return nil, err
 	}
 

@@ -5,7 +5,7 @@
 // +build !darwin
 // +build !windows
 
-package rollback
+package upgrade
 
 import (
 	"context"
