@@ -508,20 +508,8 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:2379"]
 
-#-------------------------------- Golang Module --------------------------------
-- module: golang
-  #metricsets:
-  #  - expvar
-  #  - heap
-  period: 10s
-  hosts: ["localhost:6060"]
-  heap.path: "/debug/vars"
-  expvar:
-    namespace: "example"
-    path: "/debug/vars"
-
 #------------------------ Google Cloud Platform Module ------------------------
-- module: googlecloud
+- module: gcp
   metricsets:
     - compute
   region: "us-"
@@ -530,7 +518,7 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
 
-- module: googlecloud
+- module: gcp
   metricsets:
     - pubsub
     - loadbalancing
@@ -541,7 +529,7 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
 
-- module: googlecloud
+- module: gcp
   metricsets:
     - storage
   project_id: "your project id"
@@ -549,7 +537,7 @@ metricbeat.modules:
   exclude_labels: false
   period: 5m
 
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   project_id: "your project id"
@@ -565,7 +553,7 @@ metricbeat.modules:
         - "instance/cpu/utilization"
         - "instance/uptime"
 
-- module: googlecloud
+- module: gcp
   metricsets:
     - billing
   period: 24h
@@ -574,6 +562,18 @@ metricbeat.modules:
   dataset_id: "dataset id"
   table_pattern: "table pattern"
   cost_type: "regular"
+
+#-------------------------------- Golang Module --------------------------------
+- module: golang
+  #metricsets:
+  #  - expvar
+  #  - heap
+  period: 10s
+  hosts: ["localhost:6060"]
+  heap.path: "/debug/vars"
+  expvar:
+    namespace: "example"
+    path: "/debug/vars"
 
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
