@@ -4,7 +4,6 @@ var:
   - name: input
     default: azure-eventhub
   - name: eventhub
-    default: "insights-operational-logs"
   - name: consumer_group
     default: "$Default"
   - name: connection_string

@@ -16,12 +16,12 @@
 
   platformlogs:
     enabled: false
-  #   var:
-  #     eventhub: "insights-logs-signinlogs"
-  #     consumer_group: "$Default"
-  #     connection_string: ""
-  #     storage_account: ""
-  #     storage_account_key: ""
+  #  var:
+  #    eventhub: "insights-logs-signinlogs"
+  #    consumer_group: "$Default"
+  #    connection_string: ""
+  #    storage_account: ""
+  #    storage_account_key: ""
 
 
   auditlogs:
