@@ -13670,7 +13670,7 @@ The amount of time spent remapping copy-on-write memory mapped views. Smaller va
 *`mongodb.status.journaling.times.commits.ms`*::
 +
 --
-type: long
+The CPU percentage the last request consumed. It's always 0 if the process is not in Idle state because CPU calculation is done when the request processing has terminated
 
 The amount of time spent for commits.
 
@@ -13680,7 +13680,7 @@ The amount of time spent for commits.
 *`mongodb.status.journaling.times.commits_in_write_lock.ms`*::
 +
 --
-type: long
+The max amount of memory the last request consumed. It's always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated
 
 The amount of time spent for commits that occurred while a write lock was held.
 
