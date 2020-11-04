@@ -517,10 +517,15 @@ def startCloudTestEnv(Map args = [:]) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         try {
-          for (folder in dirs) {
+          dirs?.each { folder ->
             retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(folder)
             }
+          }
+        } catch(err) {
+          dirs?.each { folder ->
+            // If it failed then cleanup without failing the build
+            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
           }
         } finally {
           // Archive terraform states in case manual cleanup is needed.

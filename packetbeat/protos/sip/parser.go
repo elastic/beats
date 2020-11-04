@@ -87,6 +87,7 @@ const (
 )
 
 type parser struct {
+	watcher procs.ProcessesWatcher
 }
 
 type parsingInfo struct {
@@ -117,15 +118,17 @@ var (
 	nameVia           = []byte("via")
 )
 
-func newParser() *parser {
-	return &parser{}
+func newParser(watcher procs.ProcessesWatcher) *parser {
+	return &parser{
+		watcher: watcher,
+	}
 }
 
 func (parser *parser) parse(pi *parsingInfo) (*message, error) {
 	m := &message{
 		ts:           pi.pkt.Ts,
 		ipPortTuple:  pi.pkt.Tuple,
-		cmdlineTuple: procs.ProcWatcher.FindProcessesTupleTCP(&pi.pkt.Tuple),
+		cmdlineTuple: parser.watcher.FindProcessesTupleTCP(&pi.pkt.Tuple),
 		rawData:      pi.data,
 	}
 	for pi.parseOffset < len(pi.data) {
