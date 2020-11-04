@@ -68,10 +68,11 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: 'Lint') {
-          withBeatsEnv(archive: false, id: 'lint') {
+        withGithubNotify(context: "Lint") {
+          withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            cmd(label: 'make check', script: 'make check')
+            cmd(label: "make check-python", script: "make check-python")
+            cmd(label: "Check for changes", script: "make check-no-changes")
           }
         }
       }
