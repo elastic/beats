@@ -53,7 +53,6 @@ var indexSummaryDict = s.Schema{
 		},
 	}),
 	"indexing": indexingDict,
-	// following field is not included in the Stack Monitoring UI mapping
 	"bulk":   bulkStatsDict,
 	"search": searchDict,
 }
