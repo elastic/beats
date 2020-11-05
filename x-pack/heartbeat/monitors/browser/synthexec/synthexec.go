@@ -52,10 +52,12 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		return nil, err
 	}
 
-	cmd := syntheticsCmd(suiteFile, "--dry-run")
-	cmd.Dir = dir
+	cmdFactory, err := suiteCommandFactory(dir, suiteFile, "--dry-run")
+	if err != nil {
+		return nil, err
+	}
 
-	mpx, err := runCmd(ctx, cmd, nil, params)
+	mpx, err := runCmd(ctx, cmdFactory(), nil, params)
 Outer:
 	for {
 		select {
@@ -75,24 +77,35 @@ Outer:
 
 // SuiteJob will run a single journey by name from the given suite.
 func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) (jobs.Job, error) {
-	dir, err := getSuiteDir(suiteFile)
+	newCmd, err := suiteCommandFactory(suiteFile, suiteFile, "--screenshots", "--journey-name", journeyName)
+	if err != nil {
+		return nil, err
+	}
+
+
+	return startCmdJob(ctx, newCmd, nil, params), nil
+}
+
+func suiteCommandFactory(suiteFile string, args ...string) (func() *exec.Cmd, error) {
+	npmRoot, err := getNpmRoot(suiteFile)
 	if err != nil {
 		return nil, err
 	}
 
 	newCmd := func() *exec.Cmd {
-		cmd := syntheticsCmd(suiteFile, "--screenshots", "--journey-name", journeyName)
-		cmd.Dir = dir
+		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
+		cmd := exec.Command(bin, args...)
+		cmd.Dir = npmRoot
 		return cmd
 	}
 
-	return startCmdJob(ctx, newCmd, nil, params), nil
+	return newCmd, nil
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return syntheticsCmd("--inline", "--screenshots")
+		return exec.Command("elastic-synthetics", "--inline", "--screenshots")
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params)
@@ -313,6 +326,16 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	return err
 }
 
-func syntheticsCmd(args ...string) *exec.Cmd {
-	return exec.Command("elastic-synthetics", args...)
+func getNpmRoot(path string) (string, error) {
+	candidate := filepath.Join(path, "package.json")
+	_, err := os.Lstat(candidate)
+	if err == nil {
+		return path, nil
+	}
+	// Try again one level up
+	parent := filepath.Dir(path)
+	if len(parent) < 2 {
+		return "", fmt.Errorf("no package.json found")
+	}
+	return getNpmRoot(parent)
 }
