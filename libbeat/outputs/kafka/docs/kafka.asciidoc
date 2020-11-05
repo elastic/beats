@@ -261,6 +261,12 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+[IMPORTANT]
+.Known issue with Azure Event Hub for Kafka
+====
+When targeting Azure Event Hub for Kafka, set `compression` to `none` as the provided codecs are not supported.
+====
+
 ===== `compression_level`
 
 Sets the compression level used by gzip. Setting this value to 0 disables compression.
@@ -288,3 +294,11 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 `-keyalg RSA` argument to ensure it uses a cipher supported by
 https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
 See <<configuration-ssl>> for more information.
+
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.

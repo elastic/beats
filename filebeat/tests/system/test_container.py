@@ -28,7 +28,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda:  self.output_has(lines=21))
+        self.wait_until(lambda: self.output_has(lines=21))
 
         filebeat.check_kill_and_wait()
 

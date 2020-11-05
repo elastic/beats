@@ -57,4 +57,4 @@ rules:
     - output
     - revision
 
-when: HasAny('fleet') && HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')
+when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')

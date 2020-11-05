@@ -1,0 +1,376 @@
+[
+    {
+        "event.action": "phone.caller_ringing",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "cadsd32wA"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQ33fdf34YxHMA",
+        "zoom.phone.call_id": "ddd5540",
+        "zoom.phone.callee.extension_number": 10800,
+        "zoom.phone.callee.phone_number": "10800",
+        "zoom.phone.caller.device_type": "Android_Phone(5.1.2)",
+        "zoom.phone.caller.extension_number": 10803,
+        "zoom.phone.caller.phone_number": "10803",
+        "zoom.phone.caller.timezone": "America/Los_Angeles",
+        "zoom.phone.caller.user_id": "cadsd32wA",
+        "zoom.phone.ringing_start_time": "2020-07-22T01:41:55Z"
+    },
+    {
+        "event.action": "phone.caller_connected",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "start"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 362,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "cajhdsf3wA"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQdfg34VYxHMA",
+        "zoom.phone.call_id": "684445540",
+        "zoom.phone.callee.extension_number": 10800,
+        "zoom.phone.callee.phone_number": "10800",
+        "zoom.phone.caller.device_type": "Android_Phone",
+        "zoom.phone.caller.extension_number": 10803,
+        "zoom.phone.caller.phone_number": "10803",
+        "zoom.phone.caller.timezone": "America/Los_Angeles",
+        "zoom.phone.caller.user_id": "cajhdsf3wA",
+        "zoom.phone.connected_start_time": "2020-07-22T01:42:04Z",
+        "zoom.phone.ringing_start_time": "2020-07-22T01:41:55Z"
+    },
+    {
+        "event.action": "phone.caller_ringing",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 767,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8yCxjgjsuyd58uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "cbvxnYyO30GVYxHMA",
+        "zoom.phone.call_id": "68sdsasdda7",
+        "zoom.phone.callee.phone_number": "16654444444444446",
+        "zoom.phone.caller.device_type": "MAC_Client(5.1.2856436)",
+        "zoom.phone.caller.extension_number": 10800,
+        "zoom.phone.caller.phone_number": "+1200000001",
+        "zoom.phone.caller.timezone": "America/Los_Angeles",
+        "zoom.phone.caller.user_id": "z8yCxjgjsuyd58uQ",
+        "zoom.phone.ringing_start_time": "2020-07-22T01:38:40Z"
+    },
+    {
+        "event.action": "phone.callee_answered",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "start"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1137,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8yCDSSQWSSWuQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPsjdhgffgHMA",
+        "zoom.phone.answer_start_time": "2020-07-22T01:42:04Z",
+        "zoom.phone.call_id": "685dfvhzsza5540",
+        "zoom.phone.callee.device_type": "MAC_Client",
+        "zoom.phone.callee.extension_number": 10800,
+        "zoom.phone.callee.phone_number": "10800",
+        "zoom.phone.callee.timezone": "America/Los_Angeles",
+        "zoom.phone.callee.user_id": "z8yCDSSQWSSWuQ",
+        "zoom.phone.caller.extension_number": 10803,
+        "zoom.phone.caller.phone_number": "10803",
+        "zoom.phone.ringing_start_time": "2020-07-22T01:41:56Z"
+    },
+    {
+        "event.action": "phone.callee_missed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1543,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z66jfgjdg2QgCfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQjuh6768MA",
+        "zoom.phone.call_end_time": "2020-07-22T21:09:24Z",
+        "zoom.phone.call_id": "6dfdg07-22T21:09:17Z",
+        "zoom.phone.callee.extension_number": "10800",
+        "zoom.phone.callee.timezone": "America/Los_Angeles",
+        "zoom.phone.callee.user_id": "z66jfgjdg2QgCfp8uQ",
+        "zoom.phone.caller.phone_number": "+1000000"
+    },
+    {
+        "event.action": "phone.callee_ended",
+        "event.dataset": "zoom.webhook",
+        "event.duration": 4000000000,
+        "event.end": "2020-07-22T21:09:24Z",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.start": "2020-07-22T21:09:20Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1838,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z66jfgjdg2QgCfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQjuh6768MA",
+        "zoom.phone.answer_start_time": "2020-07-22T21:09:20Z",
+        "zoom.phone.call_end_time": "2020-07-22T21:09:24Z",
+        "zoom.phone.call_id": "6dfdg07-22T21:09:17Z",
+        "zoom.phone.callee.extension_number": "10800",
+        "zoom.phone.callee.timezone": "America/Los_Angeles",
+        "zoom.phone.callee.user_id": "z66jfgjdg2QgCfp8uQ",
+        "zoom.phone.caller.phone_number": "+1000000"
+    },
+    {
+        "event.action": "phone.caller_ended",
+        "event.dataset": "zoom.webhook",
+        "event.duration": 4000000000,
+        "event.end": "2020-07-22T21:09:24Z",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.start": "2020-07-22T21:09:20Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2175,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z66jfgjdg2QgCfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQjuh6768MA",
+        "zoom.phone.answer_start_time": "2020-07-22T21:09:20Z",
+        "zoom.phone.call_end_time": "2020-07-22T21:09:24Z",
+        "zoom.phone.call_id": "6dfdg07-22T21:09:17Z",
+        "zoom.phone.callee.extension_number": "10800",
+        "zoom.phone.callee.timezone": "America/Los_Angeles",
+        "zoom.phone.callee.user_id": "z66jfgjdg2QgCfp8uQ",
+        "zoom.phone.caller.phone_number": "+1000000"
+    },
+    {
+        "event.action": "phone.callee_rejected",
+        "event.dataset": "zoom.webhook",
+        "event.duration": 6000000000,
+        "event.end": "2020-07-22T21:06:39Z",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.start": "2020-07-22T21:06:33Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2512,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "sfcg43FOCYw"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "MKDRWo34535wow",
+        "zoom.phone.call_end_time": "2020-07-22T21:06:39Z",
+        "zoom.phone.call_id": "6dfhggtrh93",
+        "zoom.phone.callee.extension_number": "9001",
+        "zoom.phone.callee.timezone": "America/Los_Angeles",
+        "zoom.phone.callee.user_id": "sfcg43FOCYw",
+        "zoom.phone.caller.phone_number": "+12044444444",
+        "zoom.phone.ringing_start_time": "2020-07-22T21:06:33Z"
+    },
+    {
+        "event.action": "phone.voicemail_received",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2841,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "543234"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "url.full": "https://testurl.com/file.mp4",
+        "zoom.account_id": "test",
+        "zoom.phone.callee.extension_type": "2",
+        "zoom.phone.callee.id": "1234",
+        "zoom.phone.callee.name": "Testaccount2",
+        "zoom.phone.callee.number_type": "2",
+        "zoom.phone.callee.phone_number": "+12044444444",
+        "zoom.phone.callee.user_id": "543234",
+        "zoom.phone.caller.name": "Testaccount",
+        "zoom.phone.caller.number_type": "3",
+        "zoom.phone.caller.phone_number": "+12044444444",
+        "zoom.phone.duration": "1235",
+        "zoom.phone.id": "235435"
+    },
+    {
+        "event.action": "phone.caller_call_log_completed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3276,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPebnxvbdn342MA",
+        "zoom.phone.user_id": "caddsfsdfv_VaHE53wA"
+    },
+    {
+        "event.action": "phone.callee_call_log_completed",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3677,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQt3543hvxzc",
+        "zoom.phone.user_id": "z8sdfsdfds3uQ"
+    }
+]

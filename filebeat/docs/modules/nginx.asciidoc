@@ -28,7 +28,7 @@ The Nginx module was tested with logs from version 1.10.
 On Windows, the module was tested with Nginx installed from the Chocolatey
 repository.
 
-`ingress_controller` fileset was tested with version 0.28.0 of `nginx-ingress-controller`.
+`ingress_controller` fileset was tested with version v0.28.0 and v0.34.1 of `nginx-ingress-controller`.
 
 include::../include/configuring-intro.asciidoc[]
 

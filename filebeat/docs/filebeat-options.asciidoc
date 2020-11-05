@@ -94,6 +94,8 @@ include::inputs/input-container.asciidoc[]
 
 include::inputs/input-docker.asciidoc[]
 
+include::inputs/input-filestream.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]

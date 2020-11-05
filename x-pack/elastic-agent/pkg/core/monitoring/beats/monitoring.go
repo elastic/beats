@@ -32,8 +32,8 @@ func getMonitoringEndpoint(program, operatingSystem, pipelineID string) string {
 
 func getLoggingFile(program, operatingSystem, installPath, pipelineID string) string {
 	if operatingSystem == "windows" {
-		return fmt.Sprintf(logFileFormatWin, paths.Data(), pipelineID, program)
+		return fmt.Sprintf(logFileFormatWin, paths.Home(), pipelineID, program)
 	}
 
-	return fmt.Sprintf(logFileFormat, paths.Data(), pipelineID, program)
+	return fmt.Sprintf(logFileFormat, paths.Home(), pipelineID, program)
 }
