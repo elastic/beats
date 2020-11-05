@@ -12,7 +12,6 @@ import (
 	"os"
 
 	"github.com/docker/docker/api/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
@@ -59,11 +58,7 @@ type BlkioRaw struct {
 	totals uint64
 }
 
-// Stats is a struct represents information regarding a container
-type Stats struct {
-	Time      common.Time
-	Container *container
-
+type cpuStats struct {
 	PerCPUUsage                           common.MapStr
 	TotalUsage                            float64
 	TotalUsageNormalized                  float64
@@ -76,7 +71,9 @@ type Stats struct {
 	SystemUsage                           uint64
 	SystemUsagePercentage                 float64
 	SystemUsagePercentageNormalized       float64
+}
 
+type memoryStats struct {
 	Failcnt   uint64
 	Limit     uint64
 	MaxUsage  uint64
@@ -90,18 +87,14 @@ type Stats struct {
 	Commit            uint64
 	CommitPeak        uint64
 	PrivateWorkingSet uint64
+}
 
+type networkStats struct {
 	NameInterface string
-	RxBytes       float64
-	RxDropped     float64
-	RxErrors      float64
-	RxPackets     float64
-	TxBytes       float64
-	TxDropped     float64
-	TxErrors      float64
-	TxPackets     float64
-	Total         *types.NetworkStats
+	Total         types.NetworkStats
+}
 
+type diskStats struct {
 	reads  float64
 	writes float64
 	totals float64
@@ -111,6 +104,16 @@ type Stats struct {
 	servicedTime  BlkioRaw
 	waitTime      BlkioRaw
 	queued        BlkioRaw
+}
+
+// Stats is a struct represents information regarding a container
+type Stats struct {
+	Time         common.Time
+	Container    *container
+	cpuStats     cpuStats
+	memoryStats  memoryStats
+	networkStats []networkStats
+	diskStats    diskStats
 }
 
 // TaskMetadata is an struct represents response body from ${ECS_CONTAINER_METADATA_URI_V4}/task
@@ -137,7 +140,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logger := logp.NewLogger(metricsetName)
 	metricSet, err := awsfargate.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating aws metricset")
+		return nil, fmt.Errorf("error creating %s metricset: %w", metricsetName, err)
 	}
 
 	return &MetricSet{
@@ -161,7 +164,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	taskEndpoint := fmt.Sprintf("%s/task", ecsURI)
 	formattedStats, err := queryTaskMetadataEndpoints(taskStatsEndpoint, taskEndpoint)
 	if err != nil {
-		err := fmt.Errorf("queryTaskMetadataEndpoints failed")
+		err := fmt.Errorf("queryTaskMetadataEndpoints failed: %w", err)
 		m.logger.Error(err)
 		return err
 	}
@@ -191,17 +194,17 @@ func queryTaskMetadataEndpoints(taskStatsEndpoint string, taskEndpoint string) (
 		return nil, fmt.Errorf("getTask failed: %w", err)
 	}
 
-	formattedStats := getCPUStatsList(taskStatsOutput, taskOutput)
+	formattedStats := getStatsList(taskStatsOutput, taskOutput)
 	return formattedStats, nil
 }
 
-func getTaskStats(taskStatsResp *http.Response) (map[string]types.Stats, error) {
+func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, error) {
 	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
 
-	var taskStatsOutput map[string]types.Stats
+	var taskStatsOutput map[string]types.StatsJSON
 	err = json.Unmarshal(taskStatsBody, &taskStatsOutput)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed: %w", err)
@@ -223,7 +226,7 @@ func getTask(taskResp *http.Response) (TaskMetadata, error) {
 	return taskOutput, nil
 }
 
-func getCPUStatsList(taskStatsOutput map[string]types.Stats, taskOutput TaskMetadata) []Stats {
+func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMetadata) []Stats {
 	containersInfo := map[string]ContainerMetadata{}
 	for _, c := range taskOutput.Containers {
 		// Skip ~internal~ecs~pause container
@@ -243,35 +246,50 @@ func getCPUStatsList(taskStatsOutput map[string]types.Stats, taskOutput TaskMeta
 
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
-		var dockerStat docker.Stat
-		dockerStat.Stats = types.StatsJSON{
-			Stats: taskStats,
-			ID:    id,
-		}
+		//var dockerStat docker.Stat
+		//dockerStat.Stats = taskStats
 
 		if cInfo, ok := containersInfo[id]; ok {
-			formattedStats = append(formattedStats, getCPUStats(&dockerStat, cInfo.Container))
+			formattedStats = append(formattedStats, getStats(taskStats, cInfo.Container))
 		}
 	}
 	return formattedStats
 }
 
-func getCPUStats(myRawStat *docker.Stat, c *container) Stats {
-	usage := cpu.CPUUsage{Stat: myRawStat}
-
-	stats := Stats{
-		Time:                                  common.Time(myRawStat.Stats.Read),
+func getStats(taskStats types.StatsJSON, c *container) Stats {
+	usage := cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}
+	cpuStats := cpuStats{
 		TotalUsage:                            usage.Total(),
 		TotalUsageNormalized:                  usage.TotalNormalized(),
-		UsageInKernelmode:                     myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInKernelmode:                     taskStats.Stats.CPUStats.CPUUsage.UsageInKernelmode,
 		UsageInKernelmodePercentage:           usage.InKernelMode(),
 		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
-		UsageInUsermode:                       myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermode:                       taskStats.Stats.CPUStats.CPUUsage.UsageInUsermode,
 		UsageInUsermodePercentage:             usage.InUserMode(),
 		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
-		SystemUsage:                           myRawStat.Stats.CPUStats.SystemUsage,
+		SystemUsage:                           taskStats.Stats.CPUStats.SystemUsage,
 		SystemUsagePercentage:                 usage.System(),
 		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
+	}
+
+	totalRSS := taskStats.Stats.MemoryStats.Stats["total_rss"]
+	memoryStats := memoryStats{
+		TotalRss:  totalRSS,
+		MaxUsage:  taskStats.Stats.MemoryStats.MaxUsage,
+		TotalRssP: float64(totalRSS) / float64(taskStats.Stats.MemoryStats.Limit),
+		Usage:     taskStats.Stats.MemoryStats.Usage,
+		UsageP:    float64(taskStats.Stats.MemoryStats.Usage) / float64(taskStats.Stats.MemoryStats.Limit),
+		Stats:     taskStats.Stats.MemoryStats.Stats,
+		//Windows memory statistics
+		Commit:            taskStats.Stats.MemoryStats.Commit,
+		CommitPeak:        taskStats.Stats.MemoryStats.CommitPeak,
+		PrivateWorkingSet: taskStats.Stats.MemoryStats.PrivateWorkingSet,
+	}
+
+	stats := Stats{
+		Time:        common.Time(taskStats.Stats.Read),
+		cpuStats:    cpuStats,
+		memoryStats: memoryStats,
 	}
 
 	stats.Container = &container{
@@ -280,6 +298,16 @@ func getCPUStats(myRawStat *docker.Stat, c *container) Stats {
 		Name:     helpers.ExtractContainerName([]string{c.Name}),
 		Labels:   deDotLabels(c.Labels),
 	}
+
+	var networks []networkStats
+	for nameInterface, rawNetStats := range taskStats.Networks {
+		networks = append(networks, networkStats{
+			NameInterface: nameInterface,
+			Total:         rawNetStats,
+		})
+	}
+
+	stats.networkStats = networks
 	return stats
 }
 
