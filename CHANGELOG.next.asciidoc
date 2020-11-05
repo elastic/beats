@@ -657,6 +657,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Copy tag names from MISP data into events. {pull}21664[21664]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
+- Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
 
 *Heartbeat*
 
