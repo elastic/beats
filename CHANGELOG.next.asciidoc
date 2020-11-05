@@ -932,4 +932,3 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Journalbeat*
 
-
