@@ -6,7 +6,6 @@ package v2
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 	"time"
 
@@ -22,10 +21,14 @@ func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
-			"now":            now,
-			"formatDate":     formatDate,
-			"parseDate":      parseDate,
-			"getRFC5988Link": getRFC5988Link,
+			"now":                 now,
+			"hour":                hour,
+			"parseDate":           parseDate,
+			"formatDate":          formatDate,
+			"parseTimestamp":      parseTimestamp,
+			"parseTimestampMilli": parseTimestampMilli,
+			"parseTimestampNano":  parseTimestampNano,
+			"getRFC5988Link":      getRFC5988Link,
 		}).
 		Parse(in)
 	if err != nil {
@@ -40,10 +43,6 @@ func (t *valueTpl) Unpack(in string) error {
 func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string) (val string) {
 	defer func() {
 		if r := recover(); r != nil {
-			err, _ := r.(error)
-			fmt.Println(err)
-			_ = err
-			// TODO: find alternative to this ugliness
 			val = defaultVal
 		}
 	}()
@@ -74,6 +73,9 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 }
 
 func cloneEvent(event *beat.Event) beat.Event {
+	if event == nil {
+		return beat.Event{}
+	}
 	return beat.Event{
 		Timestamp:  event.Timestamp,
 		Meta:       event.Meta.Clone(),
@@ -98,34 +100,30 @@ var (
 	}
 )
 
-func formatDate(date time.Time, layout string, tz ...string) string {
-	if found := predefinedLayouts[layout]; found != "" {
-		layout = found
-	} else {
-		layout = time.RFC3339
+func now(add ...time.Duration) time.Time {
+	now := timeNow()
+	if len(add) == 0 {
+		return now
 	}
-
-	if len(tz) > 0 {
-		if loc, err := time.LoadLocation(tz[0]); err == nil {
-			date = date.In(loc)
-		} else {
-			date = date.UTC()
-		}
-	} else {
-		date = date.UTC()
-	}
-
-	return date.Format(layout)
+	return now.Add(add[0])
 }
 
-func parseDate(date, layout string) time.Time {
-	if found := predefinedLayouts[layout]; found != "" {
-		layout = found
+func hour(n int) time.Duration {
+	return time.Duration(n) * time.Hour
+}
+
+func parseDate(date string, layout ...string) time.Time {
+	var ly string
+	if len(layout) == 0 {
+		ly = "RFC3339"
 	} else {
-		layout = time.RFC3339
+		ly = layout[0]
+	}
+	if found := predefinedLayouts[ly]; found != "" {
+		ly = found
 	}
 
-	t, err := time.Parse(layout, date)
+	t, err := time.Parse(ly, date)
 	if err != nil {
 		return time.Time{}
 	}
@@ -133,12 +131,40 @@ func parseDate(date, layout string) time.Time {
 	return t
 }
 
-func now(add ...time.Duration) time.Time {
-	now := time.Now()
-	if len(add) == 0 {
-		return now
+func formatDate(date time.Time, layouttz ...string) string {
+	var layout, tz string
+	switch {
+	case len(layouttz) == 0:
+		layout = "RFC3339"
+	case len(layouttz) == 1:
+		layout = layouttz[0]
+	case len(layouttz) > 1:
+		layout, tz = layouttz[0], layouttz[1]
 	}
-	return now.Add(add[0])
+
+	if found := predefinedLayouts[layout]; found != "" {
+		layout = found
+	}
+
+	if loc, err := time.LoadLocation(tz); err == nil {
+		date = date.In(loc)
+	} else {
+		date = date.UTC()
+	}
+
+	return date.Format(layout)
+}
+
+func parseTimestamp(s int64) time.Time {
+	return time.Unix(s, 0)
+}
+
+func parseTimestampMilli(ms int64) time.Time {
+	return time.Unix(0, ms*1e6)
+}
+
+func parseTimestampNano(ns int64) time.Time {
+	return time.Unix(0, ns)
 }
 
 func getRFC5988Link(links, rel string) string {
