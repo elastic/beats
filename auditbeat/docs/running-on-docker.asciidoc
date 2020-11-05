@@ -10,5 +10,5 @@ It is also essential to run {beatname_uc} in the host PID namespace.
 
 ["source","sh",subs="attributes"]
 ----
-docker run --cap-add=AUDIT_CONTROL,AUDIT_READ --pid=host {dockerimage}
+docker run --cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --user=root --pid=host {dockerimage}
 ----

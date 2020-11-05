@@ -1,7 +1,7 @@
 - name: node.stats
   type: group
   description: >
-    node_stats
+    Statistics about each node in a Elasticsearch cluster
   release: ga
   fields:
     - name: indices
@@ -122,22 +122,22 @@
             - name: max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Max bytes.
             - name: peak.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak bytes.
             - name: peak_max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak max bytes.
             - name: used.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Used bytes.
         - name: young
           type: group
@@ -147,22 +147,22 @@
             - name: max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Max bytes.
             - name: peak.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak bytes.
             - name: peak_max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak max bytes.
             - name: used.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Used bytes.
         - name: survivor
           type: group
@@ -172,22 +172,22 @@
             - name: max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Max bytes.
             - name: peak.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak bytes.
             - name: peak_max.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Peak max bytes.
             - name: used.bytes
               type: long
               format: bytes
-              description:
+              description: >
                 Used bytes.
     - name: jvm.gc.collectors
       type: group
@@ -201,10 +201,8 @@
           fields:
             - name: count
               type: long
-              description: >
             - name: ms
               type: long
-              description: >
         - name: young.collection
           type: group
           description: >
@@ -212,10 +210,8 @@
           fields:
             - name: count
               type: long
-              description: >
             - name: ms
               type: long
-              description: >
 
     - name: fs
       type: group
@@ -228,15 +224,12 @@
             - name: total.bytes
               type: long
               format: bytes
-              description: >
             - name: free.bytes
               type: long
               format: bytes
-              description: >
             - name: available.bytes
               type: long
               format: bytes
-              description: >
         - name: io_stats
           type: group
           fields:

@@ -28,7 +28,8 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 [float]
 === Module configuration
 
-```
+[source,yaml]
+----
 - module: azure
   activitylogs:
     enabled: true
@@ -53,20 +54,20 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
    signinlogs:
      enabled: false
      var:
-       eventhub: ["insights-logs-signinlogs"]
+       eventhub: "insights-logs-signinlogs"
        consumer_group: "$Default"
        connection_string: ""
        storage_account: ""
        storage_account_key: ""
        resource_manager_endpoint: ""
 
-```
+----
 
 
 `eventhub` ::
-  _[]string_
-Is a fully managed, real-time data ingestion service.
-Default value `insights-operational-logs`
+  _string_
+Is the fully managed, real-time data ingestion service.
+Default value `insights-operational-logs`.
 
 `consumer_group` ::
 _string_
@@ -101,11 +102,6 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
-
-[float]
-=== Compatibility
-
-TODO: document with what versions of the software is this tested
 
 [float]
 === Dashboards

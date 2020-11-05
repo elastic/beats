@@ -105,7 +105,6 @@ func (n *node) OnUpdate(obj interface{}) {
 		time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(node, "stop") })
 	} else {
 		n.logger.Debugf("Watcher Node update: %+v", obj)
-		// TODO: figure out how to avoid stop starting when node status is periodically being updated by kubelet
 		n.emit(node, "stop")
 		n.emit(node, "start")
 	}

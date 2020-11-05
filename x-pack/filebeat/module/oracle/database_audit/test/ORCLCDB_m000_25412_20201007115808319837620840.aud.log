@@ -1,0 +1,367 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_m000_25412_20201007115808319837620840.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 51
+Unix process pid: 25412, image: oracle@testlab.local (M000)
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] '192.168.2.2'
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '5q7ay9d08jgtf' and inst_id = 1 and child_address = hextoraw('00000000645509D0')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] 'test.local'
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '5q7ay9d08jgtf' and inst_id = 1 and child_address = hextoraw('00000000645509D0')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '5q7ay9d08jgtf' and inst_id = 1 and child_address = hextoraw('00000000645509D0')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 11:58:08 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '5q7ay9d08jgtf' and inst_id = 1 and child_address = hextoraw('00000000645509D0')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '3cmwr02yfw7ud' and inst_id = 1 and child_address = hextoraw('0000000064E538F8')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '3cmwr02yfw7ud' and inst_id = 1 and child_address = hextoraw('0000000064E538F8')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '3cmwr02yfw7ud' and inst_id = 1 and child_address = hextoraw('0000000064E538F8')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '392'
+ACTION :[151] 'select /*+ opt_param('parallel_execution_enabled',
+                                   'false') EXEC_FROM_DBMS_XPLAN */ * from gv$all_sql_plan where 1=0'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 12:03:14 2020 -04:00
+LENGTH : '366'
+ACTION :[125] 'SELECT * FROM gv$all_sql_plan where sql_id = '3cmwr02yfw7ud' and inst_id = 1 and child_address = hextoraw('0000000064E538F8')'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+

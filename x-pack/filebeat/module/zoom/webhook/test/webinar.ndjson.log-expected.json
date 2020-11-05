@@ -1,0 +1,568 @@
+[
+    {
+        "event.action": "webinar.created",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ",
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.operator_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": 111111111,
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    },
+    {
+        "event.action": "webinar.updated",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 357,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "BBBBBBBBBB"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "AAAAAAAAAAA",
+        "zoom.old_values.id": 155184668,
+        "zoom.old_values.join_url": "https://zoom.us/j/00000000",
+        "zoom.old_values.settings.join_before_host": true,
+        "zoom.old_values.settings.participant_video": true,
+        "zoom.old_values.settings.use_pmi": false,
+        "zoom.old_values.time_stamp": 1562791953209,
+        "zoom.old_values.type": 9,
+        "zoom.operator": "someemail@email.com",
+        "zoom.operator_id": "BBBBBBBBBB",
+        "zoom.settings.host_video": "false",
+        "zoom.webinar.duration": 120,
+        "zoom.webinar.id": 155184668,
+        "zoom.webinar.join_url": "https://zoom.us/j/00000000",
+        "zoom.webinar.start_time": "2019-07-11T20:00:00Z",
+        "zoom.webinar.type": 5
+    },
+    {
+        "event.action": "webinar.deleted",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "deletion"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1588,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ",
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.operator_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": 111111111,
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    },
+    {
+        "event.action": "webinar.started",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "start"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 1945,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.webinar.duration": 0,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": 111111111,
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    },
+    {
+        "event.action": "webinar.ended",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "end"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2262,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.webinar.duration": 0,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": 111111111,
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    },
+    {
+        "event.action": "webinar.alert",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2577,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8yCxTTTTSiw02QgCAp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "z8yCxTTTTSiw02QgCAp8uQ",
+        "zoom.webinar.id": "6962400003",
+        "zoom.webinar.issues": "Unstable audio quality",
+        "zoom.webinar.start_time": "2019-07-16T17:14:39Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Webinar",
+        "zoom.webinar.type": 2,
+        "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
+    },
+    {
+        "event.action": "webinar.sharing_started",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "start"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 2894,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8yCxTTTTSiw02QgCAp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQtiABC000VYxHMA",
+        "zoom.participant.id": "s0AAAASoSE1V8KIFOCYw",
+        "zoom.participant.sharing_details.content": "application",
+        "zoom.participant.sharing_details.date_time": "2019-07-16T17:19:11Z",
+        "zoom.participant.sharing_details.file_link": "",
+        "zoom.participant.sharing_details.link_source": "in_meeting",
+        "zoom.participant.sharing_details.source": "dropbox",
+        "zoom.participant.user_id": "16778000",
+        "zoom.participant.user_name": "Arya Arya",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "z8yCxTTTTSiw02QgCAp8uQ",
+        "zoom.webinar.id": "6962400003",
+        "zoom.webinar.start_time": "2019-07-16T17:14:39Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
+    },
+    {
+        "event.action": "webinar.sharing_started",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "start"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3416,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8yCxTTTTSiw02QgCAp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPeQtiABC000VYxHMA",
+        "zoom.participant.id": "s0AAAASoSE1V8KIFOCYw",
+        "zoom.participant.sharing_details.content": "application",
+        "zoom.participant.sharing_details.date_time": "2019-07-16T17:19:11Z",
+        "zoom.participant.sharing_details.file_link": "",
+        "zoom.participant.sharing_details.link_source": "in_meeting",
+        "zoom.participant.sharing_details.source": "dropbox",
+        "zoom.participant.user_id": "16778000",
+        "zoom.participant.user_name": "Arya Arya",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "z8yCxTTTTSiw02QgCAp8uQ",
+        "zoom.webinar.id": "6962400003",
+        "zoom.webinar.start_time": "2019-07-16T17:14:39Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "4118UHIiRCAAAtBlDkcVyw=="
+    },
+    {
+        "event.action": "webinar.registration_created",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 3938,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.registrant.address": "",
+        "zoom.registrant.city": "",
+        "zoom.registrant.comments": "",
+        "zoom.registrant.country": "",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.industry": "",
+        "zoom.registrant.job_title": "",
+        "zoom.registrant.join_url": "https://zoom.us/w/someendpointhere",
+        "zoom.registrant.last_name": "Person",
+        "zoom.registrant.no_of_employees": "",
+        "zoom.registrant.org": "",
+        "zoom.registrant.phone": "",
+        "zoom.registrant.purchasing_time_frame": "",
+        "zoom.registrant.role_in_purchase_process": "",
+        "zoom.registrant.state": "",
+        "zoom.registrant.status": "approved",
+        "zoom.registrant.zip": "",
+        "zoom.webinar.duration": 120,
+        "zoom.webinar.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.webinar.id": 150000008,
+        "zoom.webinar.start_time": "2019-07-11T20:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "A test meeting",
+        "zoom.webinar.type": 2,
+        "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "webinar.registration_approved",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "allowed",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 4630,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "Lobbbbbbbbbb_qQsQ",
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.operator": "somemail@email.com",
+        "zoom.operator_id": "Lobbbbbbbbbb_qQsQ",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person",
+        "zoom.webinar.duration": 120,
+        "zoom.webinar.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.webinar.id": 150000008,
+        "zoom.webinar.start_time": "2019-07-11T20:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "A test meeting",
+        "zoom.webinar.type": 2,
+        "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "webinar.registration_denied",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 5102,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.operator": "coolemail@email.com",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person",
+        "zoom.webinar.duration": 120,
+        "zoom.webinar.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.webinar.id": 150000008,
+        "zoom.webinar.start_time": "2019-07-11T20:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "A test meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "webinar.registration_cancelled",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 5539,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLobbbbbbbbbb_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "lAAAAAAAAAAAAA",
+        "zoom.operator": "coolemail@email.com",
+        "zoom.registrant.email": "coolemail@email.com",
+        "zoom.registrant.first_name": "Cool",
+        "zoom.registrant.id": "U0BBBBBBBBBBfrUz1Q",
+        "zoom.registrant.last_name": "Person",
+        "zoom.webinar.duration": 120,
+        "zoom.webinar.host_id": "uLobbbbbbbbbb_qQsQ",
+        "zoom.webinar.id": 150000008,
+        "zoom.webinar.start_time": "2019-07-11T20:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "A test meeting",
+        "zoom.webinar.type": 5,
+        "zoom.webinar.uuid": "dj12vck6sdTn6yy7qdy3dQg=="
+    },
+    {
+        "event.action": "webinar.participant_joined",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 5979,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.participant.id": "iFxeBPYun6SAiWUzBcEkX",
+        "zoom.participant.join_time": "2019-07-16T17:13:13Z",
+        "zoom.participant.user_id": "16782040",
+        "zoom.participant.user_name": "shree",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": "111111111",
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 2,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    },
+    {
+        "event.action": "webinar.participant_left",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 6431,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "uLoRgfbbTayCX6r2Q_qQsQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
+        "zoom.operator": "someemail@email.com",
+        "zoom.participant.id": "iFxeBPYun6SAiWUzBcEkX",
+        "zoom.participant.leave_time": "2019-07-16T17:13:13Z",
+        "zoom.participant.user_id": "16782040",
+        "zoom.participant.user_name": "shree",
+        "zoom.webinar.duration": 60,
+        "zoom.webinar.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "zoom.webinar.id": "111111111",
+        "zoom.webinar.start_time": "2019-07-09T17:00:00Z",
+        "zoom.webinar.timezone": "America/Los_Angeles",
+        "zoom.webinar.topic": "My Meeting",
+        "zoom.webinar.type": 2,
+        "zoom.webinar.uuid": "czLF6FFFoQOKgAB99DlDb9g=="
+    }
+]

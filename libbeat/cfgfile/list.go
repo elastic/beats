@@ -92,7 +92,12 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			r.logger.Errorf("Error creating runner from config: %s", err)
+			if _, ok := err.(*common.ErrInputNotFinished); ok {
+				// error is related to state, we should not log at error level
+				r.logger.Debugf("Error creating runner from config: %s", err)
+			} else {
+				r.logger.Errorf("Error creating runner from config: %s", err)
+			}
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
 			continue
 		}
@@ -152,7 +157,9 @@ func (r *RunnerList) Has(hash uint64) bool {
 // HashConfig hashes a given common.Config
 func HashConfig(c *common.Config) (uint64, error) {
 	var config map[string]interface{}
-	c.Unpack(&config)
+	if err := c.Unpack(&config); err != nil {
+		return 0, err
+	}
 	return hashstructure.Hash(config, nil)
 }
 
