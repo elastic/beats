@@ -10,23 +10,96 @@ processors:
   - lowercase:
       field: suricata.eve.event_type
       ignore_missing: true
-  - set:
-      field: event.kind
-      value: event
-  - append:
-      field: event.category
-      value:
-        - network
-  ## Alert
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "alert"
-      field: event.kind
-      value: alert
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "alert"
-      field: event.category
-      value:
-        - intrusion_detection
+  - script:
+      lang: painless
+      ignore_failure: true
+      params:
+        alert:
+          kind: alert
+          category:
+            - network
+            - intrusion_detection
+        dns:
+          type:
+            - protocol
+          network_protocol: dns
+        flow:
+          type:
+            - connection
+        ftp:
+          type:
+            - protocol
+          network_protocol: ftp
+        ftp_data:
+          type:
+            - protocol
+          network_protocol: ftp
+        http:
+          category:
+            - network
+            - web
+          type:
+            - access
+            - protocol
+          network_protocol: http
+        http2:
+          category:
+            - network
+            - web
+          type:
+            - access
+            - protocol
+          network_protocol: http
+        mqtt:
+          type:
+            - protocol
+          network_protocol: mqtt
+        smb:
+          type:
+            - protocol
+          network_protocol: smb
+        ssh:
+          type:
+            - protocol
+          network_protocol: ssh
+        stats:
+          kind: metric
+        tftp:
+          type:
+            - protocol
+          network_protocol: tftp
+        tls:
+          type:
+            - protocol
+          network_protocol: tls
+        rdp:
+          type:
+            - protocol
+          network_protocol: rdp
+        rfb: # RFB (Remote Framebuffer Protocol)
+          type:
+            - protocol
+          network_protocol: rdp
+
+      source: |
+        ctx.event.kind = 'event';
+        ctx.event.category = ['network'];
+        def type_params = params.get(ctx?.suricata?.eve?.event_type);
+        if (type_params == null) {
+            return;
+        }
+        type_params.forEach((k, v) -> {
+            if ('network_protocol' == k) {
+                if (ctx.network == null) {
+                    ctx.network = ['protocol': v];
+                } else {
+                    ctx.network.protocol = v;
+                }
+            } else {
+                ctx.event[k] = v;
+            }
+        });
+
   ## Anomaly and Alert
   - lowercase:
       field: suricata.eve.app_proto
@@ -44,21 +117,6 @@ processors:
       value: '{{suricata.eve.app_proto}}'
       ignore_empty_value: true
   ## HTTP
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "http"
-      field: event.category
-      value:
-        - web
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "http"
-      field: event.type
-      value:
-        - access
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "http"
-      field: network.protocol
-      value: http
   - set:
       if: ctx?.suricata?.eve?.event_type == "http" && ctx?.suricata?.eve?.http?.status < 400
       field: event.outcome
@@ -68,78 +126,15 @@ processors:
       field: event.outcome
       value: failure
   ## DNS
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "dns"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "dns"
-      field: network.protocol
-      value: dns
   - pipeline:
       if: >-
         ctx?.network?.protocol == "dns"
       name: '{< IngestPipeline "dns" >}'
-  ## FTP or FTP Data
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "ftp" || ctx?.suricata?.eve?.event_type == "ftp_data"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "ftp" || ctx?.suricata?.eve?.event_type == "ftp_data"
-      field: network.protocol
-      value: ftp
   ## TLS
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "tls"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "tls"
-      field: network.protocol
-      value: tls
   - pipeline:
       if: ctx?.network?.protocol == "tls"
       name: '{< IngestPipeline "tls" >}'
-  ## TFTP
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "tftp"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "tftp"
-      field: network.protocol
-      value: tftp
-  ## SMB
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "smb"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "smb"
-      field: network.protocol
-      value: smb
-  ## SSH
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "ssh"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "ssh"
-      field: network.protocol
-      value: ssh
   ## Flow
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "flow"
-      field: event.type
-      value:
-        - connection
   - append:
       if: ctx?.suricata?.eve?.flow?.state == "new"
       field: event.type
@@ -150,57 +145,7 @@ processors:
       field: event.type
       value:
         - end
-  ## RDP
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "rdp"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "rdp"
-      field: network.protocol
-      value: rdp
-  ## RFB (Remote Framebuffer Protocol)
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "rfb"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "rfb"
-      field: network.protocol
-      value: rfb
-  ## MQTT
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "mqtt"
-      field: event.type
-      value:
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "mqtt"
-      field: network.protocol
-      value: mqtt
-  ## HTTP2
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "http2"
-      field: event.category
-      value:
-        - web
-  - append:
-      if: ctx?.suricata?.eve?.event_type == "http2"
-      field: event.type
-      value:
-        - access
-        - protocol
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "http2"
-      field: network.protocol
-      value: http2
-  ## Stats
-  - set:
-      if: ctx?.suricata?.eve?.event_type == "stats"
-      field: event.kind
-      value: metric
+
 
   - set:
       value: "{{suricata.eve.http.http_method}}"
