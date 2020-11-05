@@ -1,23 +1,20 @@
 [[dynamic-input-configuration]]
 [role="xpack"]
-= Dynamic input configuration
+= Variables and conditions in input configurations
 
 //TODO: Break into multiple source files to make this info easier to change over
 //time. Maybe move to a separate directory.
 
-//PH: I'm not sure what the best heading for this topic is. What are users
-//likely to search on?
-
-The inputs defined in {agent} support variable replacement and conditions. When
-used together, these capabilities offer a lot of flexibility for you to define
-configurations based on information available from the running environment and
-decide when to run a defined input.
-
-//PH: Do we want to say something about container monitoring here, or is
-//it too early? 
+When running {agent} in some environments, you might not know all the input
+configuration details up front. To solve this problem, the input configuration
+accepts variables and conditions that get evaluated at runtime using
+information from the running environment. Similar to autodiscovery, these
+capabilities allow you to apply configurations dynamically.
 
 Let's consider a unique agent policy that is deployed on two machines: a Linux
-machine named "linux-app" and a Windows machine named "winapp":
+machine named "linux-app" and a Windows machine named "winapp". Notice that
+the configuration has some variable references: `${host.name}` and
+`${host.platform}`:
 
 [source,yaml]
 ----
@@ -30,7 +27,8 @@ inputs:
       condition: ${host.platform} == "windows"
 ----
 
-The agent policy in the example generates two different concrete input
+At runtime, {agent} resolves variables and evaluates the conditions based
+on values provided by the environment, generating two possible input
 configurations.
 
 On the Windows machine:
@@ -53,22 +51,25 @@ inputs:
     - paths: /var/log/linux-app/another.log
 ----
 
-Using variable replacement along with conditions allows you to create concise,
+Using variable substitution along with conditions allows you to create concise,
 but flexible input configurations that adapt to their deployed environment.
 
+[[variable-substitution]]
 == Variable substitution
 
-//PH: I don't think we should mention Beats here, so I need to work on this:
+The syntax for variable substitution is `${var}`, where `var` is the name of a
+variable defined by a provider. A _provider_ defines key/value pairs that are
+used for variable substitution and conditions. 
 
-The syntax for variable replacement is `${var}`, where `var` is the name of a
-variable defined by a _provider_. {agent} supports a variety of provider types,
-such as `host` and `local`, that supply variables that you can use in your
-configuration. For example, earlier you saw `${host.name}` used to resolve the
-path to the host's log file based on the `{host.platform}` value. Both of these
-values were provided by the `host` provider. 
+{agent} supports a variety of providers, such as `host` and `local`, that
+supply variables to {agent}. For example, earlier you saw `${host.name}` used to
+resolve the path to the host's log file based on the `{host.platform}` value. Both of these values
+were provided by the `host` provider. 
 
 All providers are enabled by default when {agent} starts. If a provider cannot
-be configured, its variables are ignored. See <<providers>> for more detail.
+be configured, its variables are ignored.
+
+See <<providers>> for more detail.
 
 The following agent policy uses a custom key named `foo` to resolve a value
 defined by a local provider:
@@ -154,7 +155,7 @@ Providers supply the key/values pairs that are used for variable substitution
 and conditionals. Each provider's keys are automatically prefixed with the name
 of the provider in the context of the {agent}.
 
-For example, if a provider named **foo** provides
+For example, if a provider named `foo` provides
 `{"key1": "value1", "key2": "value2"}`, the key/value pairs are placed in
 `{"foo" : {"key1": "value1", "key2": "value2"}}`. To reference the keys, you
 would use `{{foo.key1}}` and `{{foo.key2}}`.
@@ -165,7 +166,7 @@ The provider configuration is specified under the top-level `providers`
 key in the `elastic-agent.yml` configuration. By default, all registered
 providers are enabled. If a provider cannot connect, it produces no mappings.
 
-The following examples shows two providers, `local` and `local_dynamic`, that
+The following example shows two providers, `local` and `local_dynamic`, that
 supply custom keys:
 
 [source,yaml]
@@ -229,36 +230,77 @@ providers:
 
 Provides information about the {agent}. The available keys are:
 
-//PH: I think it might be easier for users if we show the keys they can use
-//in their config. Is this correct? 
+|===
+|Key |Type |Description
 
-`agent.id`:: Current agent ID
-`agent.version`:: Current agent version information object
-`agent.version.version`:: Current agent version
-`agent.version.commit`:: Version commit
-`agent.version.build_time`:: Version build time
-`agent.version.snapshot`:: Version is snapshot build
+|`agent.id`
+|`string`
+|Current agent ID
 
-//PH: Is snapshot a boolean? Should we document the types here? 
+|`agent.version`
+|`object`
+|Current agent version information object
+
+|`agent.version.version`
+|`string`
+|Current agent version
+
+|`agent.version.commit`
+|`string`
+|Version commit
+
+|`agent.version.build_time`
+|`date`
+|Version build time
+
+|`agent.version.snapshot`
+|`boolean`
+|Version is snapshot build
+|===
+
 
 [[host-provider]]
 ==== Host provider
 
 Provides information about the current host. The available keys are:
 
-`host.name`:: Host name
-`host.platform`:: Host platform
-`host.architecture`:: Host architecture
-`host.ip[]`:: Host IP addresses
-`host.mac[]`:: Host MAC addresses
+|===
+|Key |Type |Description
+
+|`host.name`
+|`string`
+|Host name
+
+|`host.platform`
+|`string`
+|Host platform
+
+|`host.architecture`
+|`string`
+|Host architecture
+
+|`host.ip[]`
+|`[]string`
+|Host IP addresses
+
+|`host.mac[]`
+|`[]string`
+|Host MAC addresses
+|===
 
 [[env-provider]]
 ==== Env Provider
 
 Provides access to the environment variables as key/values.
 
-//PH: Maybe we should provide some concrete examples here? To access env var
-//would you need to use something like `${env.SHELL}`??
+For example, if you set the variable foo:
+
+[source,shell]
+----
+foo=bar elastic-agent run
+----
+
+You can reference the environment variable as `${env.foo}`.
 
 [[dynamic-providers]]
 === Dynamic Providers
@@ -267,8 +309,6 @@ Dynamic providers provide an array of multiple key/value mappings. Each
 key/value mapping is combined with the previous context provider's key/value
 mapping to provide a new unique key/value mapping that is used to generate a
 configuration.
-
-//PH: Did a light edit, but these details are a little hard to follow ^^
 
 [[local-dynamic-provider]]
 ==== Local dynamic provider
@@ -291,7 +331,7 @@ providers:
       - item: key3
 ----
 
-The policy generated by this configuration looks like:
+The configuration generated by this policy looks like:
 
 [source,yaml]
 ----
@@ -309,14 +349,43 @@ inputs:
 
 Provides inventory information from Docker. The available keys are:
 
-`docker.id`:: ID of the container
-`docker.cmd`:: Arg path of container
-`docker.name`:: Name of the container
-`docker.image`:: Image of the container
-`docker.labels`:: Labels of the container
-`docker.ports`:: Ports of the container
-`docker.paths`:: Object of paths for the container
-`docker.paths.log`:: Log path of the container
+//PH: Please confirm the types here. You missed this provider in your feedback.
+
+|===
+|Key |Type |Description
+
+|`docker.id`
+|`string`
+|ID of the container
+
+|`docker.cmd`
+|`string`
+|Arg path of container
+
+|`docker.name`
+|`string`
+|Name of the container
+
+|`docker.image`
+|`string`
+|Image of the container
+
+|`docker.labels`
+|`string`
+|Labels of the container
+
+|`docker.ports`
+|`string`
+|Ports of the container
+
+|`docker.paths`
+|`object`
+|Object of paths for the container
+
+|`docker.paths.log`
+|`string`
+|Log path of the container
+|===
 
 Imagine that the Docker provider provides the following inventory:
 
@@ -374,8 +443,6 @@ inputs:
           container.name: other-container
 ----
 
-//PH: Do the processors just get added automatically because they are sent by
-//the provider?
 
 [[conditions]]
 == Conditions
@@ -408,7 +475,7 @@ inputs:
         condition: ${host.platform} != 'windows'
 ----
 
-In this example, the processor is applied if the host platform is not Windows.
+In this example, the processor is applied if the host platform is not Windows:
 
 [source,yaml]
 ----
@@ -428,27 +495,32 @@ inputs:
 [[condition-syntax]]
 === Condition syntax
 
-The conditions supported by {agent} are based on EQL's boolean syntax, but add
-support for variables from providers and functions to manipulate the values. 
+The conditions supported by {agent} are based on {ref}/eql-syntax.html[EQL]'s
+boolean syntax, but add support for variables from providers and functions to
+manipulate the values. 
 
-Supported operators:
+**Supported operators:**
 
 * Full PEMDAS math support for `+ - * / %`.
 * Relational operators `< <= >= > == !=`
 * Logical operators `and` and `or`
 
 
-Functions:
+**Functions:**
 
-* Array functions `arrayContains`
-* Dict functions `hasKey` (not in EQL)
-* Length functions `length`
-* Math functions `add`, `subtract`, `multiply`, `divide`, `modulo`
-* String functions `concat`, `endsWith`, `indexOf`, `match`, `number`, `startsWith`, `string`, `stringContains`.
+* Array functions <<arrayContains-function,`arrayContains`>>
+* Dict functions <<hasKey-function,`hasKey`>> (not in EQL)
+* Length functions <<length-function,`length`>>
+* Math functions <<add-function,`add`>>, <<subtract-function,`subtract`>>,
+<<multiply-function,`multiply`>>, <<divide-function,`divide`>>, <<modulo-function,`modulo`>>
+* String functions <<concat-function,`concat`>>, <<endsWith-function,`endsWith`>>,
+<<indexOf-function,`indexOf`>>, <<match-function,`match`>>, <<number-function,`number`>>,
+<<startsWith-function,`startsWith`>>, <<string-function,`string`>>,
+<<stringContains-function,`stringContains`>>
 
-Types:
+**Types:**
 
-* Booleans `true` `false`
+* Booleans `true` and `false`
 
 [[condition-examples]]
 === Condition examples
@@ -477,47 +549,8 @@ arrayContains(${docker.labels}, 'monitor') or arrayContains(${docker.label}, 'pr
 [[condition-function-reference]]
 == Function reference
 
-//TODO: Alphabetize and/or group by use.
 
 The condition syntax supports the following functions.
-
-[[array-contains-function]]
-=== `arrayContains`
-
-`arrayContains(Array, String) Boolean`
-
-Usage:
-
-[source,eql]
-----
-arrayContains(${docker.labels}, 'monitor')
-----
-
-[[has-key-function]]
-=== `hasKey`
-
-`hasKey(Dictionary, String) Boolean`
-
-Usage:
-
-[source,eql]
-----
-hasKey(${host}, "platform")
-----
-
-[[length-function]]
-=== `length`
-
-`length(Array|Dictionary|string)`
-
-Usage:
-
-[source,eql]
-----
-length("foobar") > 2
-length(${docker.labels}) > 0
-length(${host}) > 2
-----
 
 [[add-function]]
 === `add`
@@ -531,56 +564,16 @@ add(1, 2) == 3
 add(5, ${foo}) >= 5
 ----
 
-[[subtract-function]]
-=== `subtract`
+[[arrayContains-function]]
+=== `arrayContains`
 
-`subtract(Number, Number) Number`
-
-Usage:
-
-[source,eql]
-----
-substract(5, 1) == 4
-subtract(${foo}, 2) != 2
-----
-
-[[multiply-function]]
-=== `multiply`
-
-`multiply(Number, Number) Number`
+`arrayContains(Array, String) Boolean`
 
 Usage:
 
 [source,eql]
 ----
-multiply(5, 5) == 25
-multiple(${var1}, ${var2}) > x
-----
-
-[[divide-function]]
-=== `divide`
-
-`divide(Number, Number) Number`
-
-Usage:
-
-[source,eql]
-----
-divide(25, 5) > 0
-divide(${var1}, ${var2}) > 7
-----
-
-[[modulo-function]]
-=== `modulo`
-
-`modulo(number, number) Number`
-
-Usage:
-
-[source,eql]
-----
-modulo(25, 5) > 0
-modulo(${var1}, ${var2}) == 0
+arrayContains(${docker.labels}, 'monitor')
 ----
 
 [[concat-function]]
@@ -598,6 +591,19 @@ concat("foo", "bar") == "foobar"
 concat(${var1}, ${var2}) != "foobar"
 ----
 
+[[divide-function]]
+=== `divide`
+
+`divide(Number, Number) Number`
+
+Usage:
+
+[source,eql]
+----
+divide(25, 5) > 0
+divide(${var1}, ${var2}) > 7
+----
+
 [[endsWith-function]]
 === `endsWith`
 
@@ -610,6 +616,18 @@ Usage:
 ----
 endsWith("hello world", "hello") == true
 endsWith(${var1}, "hello") != true
+----
+
+[[hasKey-function]]
+=== `hasKey`
+
+`hasKey(Dictionary, String) Boolean`
+
+Usage:
+
+[source,eql]
+----
+hasKey(${host}, "platform")
 ----
 
 [[indexOf-function]]
@@ -627,6 +645,20 @@ indexOf("hello", "llo") == 2
 indexOf(${var1}, "hello") >= 0
 ----
 
+[[length-function]]
+=== `length`
+
+`length(Array|Dictionary|string)`
+
+Usage:
+
+[source,eql]
+----
+length("foobar") > 2
+length(${docker.labels}) > 0
+length(${host}) > 2
+----
+
 [[match-function]]
 === `match`
 
@@ -642,6 +674,32 @@ Usage:
 ----
 match("hello world", "^hello") == true
 match(${var1}, "world$") == true
+----
+
+[[modulo-function]]
+=== `modulo`
+
+`modulo(number, number) Number`
+
+Usage:
+
+[source,eql]
+----
+modulo(25, 5) > 0
+modulo(${var1}, ${var2}) == 0
+----
+
+[[multiply-function]]
+=== `multiply`
+
+`multiply(Number, Number) Number`
+
+Usage:
+
+[source,eql]
+----
+multiply(5, 5) == 25
+multiple(${var1}, ${var2}) > x
 ----
 
 [[number-function]]
@@ -696,12 +754,25 @@ stringContains("hello world", "hello") == true
 stringContains(${var1}, "hello") != true
 ----
 
+[[subtract-function]]
+=== `subtract`
+
+`subtract(Number, Number) Number`
+
+Usage:
+
+[source,eql]
+----
+substract(5, 1) == 4
+subtract(${foo}, 2) != 2
+----
+
 [[debug-configs]]
 == Debugging 
 
-To debug configurations that include variable replacements and conditions, use 
-the `inspect` command to see the configuration that's generated after variables
-are replaced and conditions are applied.
+To debug configurations that include variable substitution and conditions, use 
+the `inspect` command. This command shows the configuration that's generated
+after variables are replaced and conditions are applied.
 
 First run the {agent}. For this example, we'll use the following agent policy:
 
