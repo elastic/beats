@@ -349,7 +349,6 @@ inputs:
 
 Provides inventory information from Docker. The available keys are:
 
-//PH: Please confirm the types here. You missed this provider in your feedback.
 
 |===
 |Key |Type |Description
