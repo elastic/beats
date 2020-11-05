@@ -148,6 +148,9 @@ packetbeat.protocols:
 {% if mongodb_max_docs is not none %}  max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}  max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
+- type: sip
+  ports: [{{ sip_ports|default([5060])|join(", ") }}]
+
 
 {% if procs_enabled %}
 #=========================== Monitored processes ==============================

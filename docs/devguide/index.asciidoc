@@ -27,6 +27,8 @@ include::./fields-yml.asciidoc[]
 
 include::./event-conventions.asciidoc[]
 
+include::./python.asciidoc[]
+
 include::./newdashboards.asciidoc[]
 
 include::./new_protocol.asciidoc[]

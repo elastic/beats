@@ -47,10 +47,6 @@ const (
 	winEventLogAPIName = "wineventlog"
 )
 
-var winEventLogConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"batch_read_size", "ignore_older", "include_xml", "event_id", "forwarded",
-	"level", "provider", "no_more_events")...)
-
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
 	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
@@ -366,7 +362,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 // using the Windows Event Log.
 func newWinEventLog(options *common.Config) (EventLog, error) {
 	c := defaultWinEventLogConfig
-	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 

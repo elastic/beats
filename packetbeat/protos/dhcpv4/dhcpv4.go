@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/ecs/code/go/ecs"
 )
@@ -45,12 +46,13 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	return newPlugin(testMode, results, cfg)
+	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, cfg *common.Config) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -62,14 +64,16 @@ func newPlugin(testMode bool, results protos.Reporter, cfg *common.Config) (*dhc
 	return &dhcpv4Plugin{
 		dhcpv4Config: config,
 		report:       results,
+		watcher:      watcher,
 		log:          logp.NewLogger("dhcpv4"),
 	}, nil
 }
 
 type dhcpv4Plugin struct {
 	dhcpv4Config
-	report protos.Reporter
-	log    *logp.Logger
+	report  protos.Reporter
+	watcher procs.ProcessesWatcher
+	log     *logp.Logger
 }
 
 func (p *dhcpv4Plugin) GetPorts() []int {

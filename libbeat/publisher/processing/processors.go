@@ -22,6 +22,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -75,6 +77,20 @@ func (p *group) add(processor processors.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}
+}
+
+func (p *group) Close() error {
+	if p == nil {
+		return nil
+	}
+	var errs multierror.Errors
+	for _, processor := range p.list {
+		err := processors.Close(processor)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs.Err()
 }
 
 func (p *group) String() string {

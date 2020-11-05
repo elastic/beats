@@ -30,7 +30,6 @@ import (
 	// Import processors and supporting modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 const (
@@ -38,7 +37,7 @@ const (
 	Name = "winlogbeat"
 
 	// ecsVersion specifies the version of ECS that Winlogbeat is implementing.
-	ecsVersion = "1.5.0"
+	ecsVersion = "1.6.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
