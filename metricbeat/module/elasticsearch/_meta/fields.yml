@@ -276,6 +276,42 @@
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
                   type: alias
+    - name: indices_stats
+      type: group
+      fields:
+        - name: _all
+          type: group
+          fields:
+            - name: primaries
+              type: group
+              fields:
+                - name: indexing
+                  type: group
+                  fields:
+                    - name: index_total
+                      type: alias
+                      path: elasticsearch.index.summary.primaries.indexing.index.count
+                    - name: index_time_in_millis
+                      type: alias
+                      path: elasticsearch.index.summary.primaries.indexing.index.time.ms
+            - name: total
+              type: group
+              fields:
+                - name: search
+                  type: group
+                  fields:
+                    - name: query_total
+                      type: alias
+                      path: elasticsearch.index.summary.total.search.query.count
+                    - name: query_time_in_millis
+                      type: alias
+                      path: elasticsearch.index.summary.total.search.query.time.ms
+                - name: indexing
+                  type: group
+                  fields:
+                    - name: index_total
+                      type: alias
+                      path: elasticsearch.index.summary.total.indexing.index.count
     - name: elasticsearch
       type: group
       description: >

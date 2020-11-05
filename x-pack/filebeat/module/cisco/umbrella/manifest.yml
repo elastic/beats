@@ -1,0 +1,12 @@
+module_version: "1.0"
+
+var:
+  - name: tags
+    default: [cisco-umbrella, forwarded]
+  - name: visibility_timeout
+    default: 300
+  - name: api_timeout
+    default: 120
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml

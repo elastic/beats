@@ -131,7 +131,7 @@ func TestXPackEnabled(t *testing.T) {
 		"cluster_stats":  []string{"cluster_stats"},
 		"enrich":         []string{"enrich_coordinator_stats"},
 		"index_recovery": []string{"index_recovery"},
-		"index_summary":  []string{"indices_stats"},
+		"index_summary":  []string{}, // no longer indexed into .monitoring-es-*
 		"ml_job":         []string{"job_stats"},
 		"node_stats":     []string{}, // no longer indexed into .monitoring-es-*
 	}

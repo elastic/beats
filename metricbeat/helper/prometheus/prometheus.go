@@ -18,6 +18,7 @@
 package prometheus
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -63,19 +64,33 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	}
 
 	http.SetHeaderDefault("Accept", acceptHeader)
+	http.SetHeaderDefault("Accept-Encoding", "gzip")
 	return &prometheus{http, base.Logger()}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
 func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
+	var reader io.Reader
+
 	resp, err := p.FetchResponse()
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		greader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer greader.Close()
+		reader = greader
+	} else {
+		reader = resp.Body
+	}
+
 	if resp.StatusCode > 399 {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		bodyBytes, err := ioutil.ReadAll(reader)
 		if err == nil {
 			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
 		}
@@ -87,7 +102,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		return nil, fmt.Errorf("Invalid format for response of response")
 	}
 
-	decoder := expfmt.NewDecoder(resp.Body, format)
+	decoder := expfmt.NewDecoder(reader, format)
 	if decoder == nil {
 		return nil, fmt.Errorf("Unable to create decoder to decode response")
 	}

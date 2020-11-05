@@ -142,6 +142,11 @@ processors:
     field: related.ip
     value: "{{source.ip}}"
     if: "ctx?.source?.ip != null"
+- append:
+    field: related.hosts
+    value: "{{host.hostname}}"
+    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+    allow_duplicates: false
 on_failure:
 - set:
     field: error.message
