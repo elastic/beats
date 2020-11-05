@@ -876,6 +876,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
+- Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
 
 *Packetbeat*
 
