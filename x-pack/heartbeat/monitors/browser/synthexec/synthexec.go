@@ -314,5 +314,5 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 }
 
 func syntheticsCmd(args ...string) *exec.Cmd {
-	return exec.Command("npx", append([]string{"@elastic/synthetics"}, args...)...)
+	return exec.Command("elastic-synthetics", args...)
 }
