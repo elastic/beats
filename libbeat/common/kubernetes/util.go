@@ -24,8 +24,6 @@ import (
 	"os"
 	"strings"
 
-	v1 "k8s.io/api/core/v1"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -36,11 +34,6 @@ import (
 )
 
 const defaultNode = "localhost"
-
-type KubernetesNodeInfo struct {
-	Name     string
-	Hostname string
-}
 
 func getKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
@@ -101,81 +94,53 @@ func IsInCluster(kubeconfig string) bool {
 // If host is provided in the config use it directly.
 // If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
 // If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) KubernetesNodeInfo {
-	ctx := context.TODO()
+func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (node string) {
 	if host != "" {
 		log.Infof("kubernetes: Using node %s provided in the config", host)
-		node, err := client.CoreV1().Nodes().Get(ctx, host, metav1.GetOptions{})
-		if err != nil {
-			log.Errorf("kubernetes: Querying for node failed with error: %+v", err)
-			return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
-		}
-		hostname := getHostName(node)
-		log.Infof("kubernetes: Using hostname %s", hostname)
-		return KubernetesNodeInfo{Name: host, Hostname: hostname}
+		return host
 	}
+	ctx := context.TODO()
 	if inCluster {
 		ns, err := InClusterNamespace()
 		if err != nil {
 			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
-			return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
+			return defaultNode
 		}
 		podName, err := os.Hostname()
 		if err != nil {
 			log.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
-			return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
+			return defaultNode
 		}
 		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
 		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
 		if err != nil {
 			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
-			return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
+			return defaultNode
 		}
-		nodename := pod.Spec.NodeName
-		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", nodename)
-
-		node, err := client.CoreV1().Nodes().Get(ctx, nodename, metav1.GetOptions{})
-		if err != nil {
-			log.Errorf("kubernetes: Querying for node failed with error: %+v", err)
-			return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
-		}
-		hostname := getHostName(node)
-		log.Infof("kubernetes: Using hostname %s", hostname)
-		return KubernetesNodeInfo{Name: nodename, Hostname: hostname}
+		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
+		return pod.Spec.NodeName
 	}
 
 	mid := machineID()
 	if mid == "" {
 		log.Error("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
-		return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
+		return defaultNode
 	}
 
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
-		return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
+		return defaultNode
 	}
 	for _, n := range nodes.Items {
 		if n.Status.NodeInfo.MachineID == mid {
 			name := n.GetObjectMeta().GetName()
 			log.Infof("kubernetes: Using node %s discovered by machine-id matching", name)
-			hostname := getHostName(&n)
-			log.Infof("kubernetes: Using hostname %s", hostname)
-			return KubernetesNodeInfo{Name: name, Hostname: hostname}
+			return name
 		}
 	}
 
 	log.Warn("kubernetes: Couldn't discover node, using localhost as default")
-	return KubernetesNodeInfo{Name: defaultNode, Hostname: defaultNode}
-}
-
-// getHostName returns the HostName address of the node
-func getHostName(node *v1.Node) string {
-	for _, adr := range node.Status.Addresses {
-		if adr.Type == v1.NodeHostName {
-			return adr.Address
-		}
-	}
 	return defaultNode
 }
 

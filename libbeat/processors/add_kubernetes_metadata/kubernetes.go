@@ -157,8 +157,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 
-		nodeInfo := kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
-		config.Host = nodeInfo.Name
+		config.Host = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
 		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
@@ -192,7 +191,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
 
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf, nodeInfo.Hostname)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher

@@ -314,6 +314,9 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
 			namespace: &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -367,7 +370,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.node)
-		nodeMeta := NewNodeMetadataGenerator(config, nodes, "node1")
+		nodeMeta := NewNodeMetadataGenerator(config, nodes)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)

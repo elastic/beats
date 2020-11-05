@@ -55,8 +55,7 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if p.config.Scope == "node" {
-		nodeMeta := kubernetes.DiscoverKubernetesNode(p.logger, p.config.Node, kubernetes.IsInCluster(p.config.KubeConfig), client)
-		p.config.Node = nodeMeta.Name
+		p.config.Node = kubernetes.DiscoverKubernetesNode(p.logger, p.config.Node, kubernetes.IsInCluster(p.config.KubeConfig), client)
 	} else {
 		p.config.Node = ""
 	}

@@ -58,10 +58,9 @@ func GetPodMetaGen(
 	podWatcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
-	metaConf *AddResourceMetadataConfig,
-	hostname string) MetaGen {
+	metaConf *AddResourceMetadataConfig) MetaGen {
 
-	nodeMetaGen := NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store(), hostname)
+	nodeMetaGen := NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
 	namespaceMetaGen := NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
 	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), nodeMetaGen, namespaceMetaGen)
 

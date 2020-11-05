@@ -56,10 +56,8 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
-	nodeInfo := kubernetes.KubernetesNodeInfo{}
 	if config.Scope == "node" {
-		nodeInfo := kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
-		config.Node = nodeInfo.Name
+		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 	} else {
 		config.Node = ""
 	}
@@ -80,7 +78,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		config:  config,
 		uuid:    uuid,
 		publish: publish,
-		metagen: metadata.NewNodeMetadataGenerator(cfg, watcher.Store(), nodeInfo.Hostname),
+		metagen: metadata.NewNodeMetadataGenerator(cfg, watcher.Store()),
 		logger:  logger,
 		watcher: watcher,
 	}

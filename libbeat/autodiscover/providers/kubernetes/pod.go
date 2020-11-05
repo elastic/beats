@@ -58,10 +58,8 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
-	nodeInfo := kubernetes.KubernetesNodeInfo{}
 	if config.Scope == "node" {
-		nodeInfo = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
-		config.Node = nodeInfo.Name
+		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 	} else {
 		config.Node = ""
 	}
@@ -98,7 +96,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf, nodeInfo.Hostname)
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 	p := &pod{
 		config:           config,

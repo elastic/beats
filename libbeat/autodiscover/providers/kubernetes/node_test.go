@@ -151,6 +151,9 @@ func TestEmitEvent_Node(t *testing.T) {
 							Type:    v1.NodeInternalIP,
 							Address: "1.2.3.4",
 						},
+						{Type: v1.NodeHostName,
+							Address: "node1",
+						},
 					},
 				},
 			},
@@ -206,7 +209,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				},
 				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
-					Addresses: []v1.NodeAddress{},
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
 					Conditions: []v1.NodeCondition{
 						{
 							Type:   v1.NodeReady,
@@ -249,7 +252,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil, "node1")
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
 			config := defaultConfig()
 			p := &Provider{
 				config:    config,
