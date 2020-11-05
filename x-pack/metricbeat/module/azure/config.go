@@ -7,20 +7,38 @@ package azure
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/pkg/errors"
+)
+
+const (
+	// DefaultBaseURI is the default URI used for the service Insights
+	DefaultBaseURI = "https://management.azure.com/"
+)
+
+var (
+	AzureEnvs = common.MapStr{
+		"https://management.azure.com/":         "https://login.microsoftonline.com/",
+		"https://management.usgovcloudapi.net/": "https://login.microsoftonline.us/",
+		"https://management.chinacloudapi.cn/":  "https://login.chinacloudapi.cn/",
+		"https://management.microsoftazure.de/": "https://login.microsoftonline.de/",
+	}
 )
 
 // Config options
 type Config struct {
-	ClientId            string           `config:"client_id"`
-	ClientSecret        string           `config:"client_secret"`
-	TenantId            string           `config:"tenant_id"`
-	SubscriptionId      string           `config:"subscription_id"`
-	Period              time.Duration    `config:"period" validate:"nonzero,required"`
-	Resources           []ResourceConfig `config:"resources"`
-	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
-	DefaultResourceType string           `config:"default_resource_type"`
-	AddCloudMetadata    bool             `config:"add_cloud_metadata"`
+	ClientId                string           `config:"client_id"  validate:"required"`
+	ClientSecret            string           `config:"client_secret"  validate:"required"`
+	TenantId                string           `config:"tenant_id"  validate:"required"`
+	SubscriptionId          string           `config:"subscription_id"  validate:"required"`
+	Period                  time.Duration    `config:"period" validate:"nonzero,required"`
+	Resources               []ResourceConfig `config:"resources"`
+	RefreshListInterval     time.Duration    `config:"refresh_list_interval"`
+	DefaultResourceType     string           `config:"default_resource_type"`
+	AddCloudMetadata        bool             `config:"add_cloud_metadata"`
+	ResourceManagerEndpoint string           `config:"resource_manager_endpoint"`
+	ActiveDirectoryEndpoint string           `config:"active_directory_endpoint"`
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -52,17 +70,24 @@ type DimensionConfig struct {
 }
 
 func (conf *Config) Validate() error {
-	if conf.SubscriptionId == "" {
-		return errors.New("no subscription ID has been configured")
+	if conf.ResourceManagerEndpoint == "" {
+		conf.ResourceManagerEndpoint = DefaultBaseURI
 	}
-	if conf.ClientSecret == "" {
-		return errors.New("no client secret has been configured")
-	}
-	if conf.ClientId == "" {
-		return errors.New("no client ID has been configured")
-	}
-	if conf.TenantId == "" {
-		return errors.New("no tenant ID has been configured")
+	if conf.ActiveDirectoryEndpoint == "" {
+		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
+		if err != nil {
+			return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+		}
+		if ok {
+			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
+			if err != nil {
+				return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+			}
+			conf.ActiveDirectoryEndpoint = add.(string)
+		}
+		if conf.ActiveDirectoryEndpoint == "" {
+			return errors.New("no active directory endpoint has been configured")
+		}
 	}
 	return nil
 }

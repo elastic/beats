@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
+- Autodiscover kubernetes provider will find ephemeral containers. {pull}22389[22389]
 
 *Auditbeat*
 
@@ -100,6 +101,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
+- Rename googlecloud module to gcp module. {pull}22246[22246]
 
 *Packetbeat*
 
@@ -290,6 +292,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
+- Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
+- Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 
 *Heartbeat*
 
@@ -385,6 +390,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Fix instance name in perfmon metricset. {issue}22218[22218] {pull}22261[22261]
+- Remove io.time from windows {pull}22237[22237]
+- Add interval information to `monitor` metricset in azure. {pull}22152[22152]
+- Change Session ID type from int to string {pull}22359[22359]
 
 *Packetbeat*
 
@@ -397,6 +406,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
+- Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 
 *Functionbeat*
 
@@ -479,6 +489,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
+- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 
 *Auditbeat*
 
@@ -644,6 +655,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Copy tag names from MISP data into events. {pull}21664[21664]
+- Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 
 *Heartbeat*
 
@@ -768,6 +781,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
 - Move `compute_vm_scaleset` to light metricset. {pull}21038[21038] {issue}20985[20985]
 - Sanitize `event.host`. {pull}21022[21022]
+- Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
 - Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
@@ -775,6 +789,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
+- Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
 
 *Packetbeat*
 
@@ -784,6 +799,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 - Add 100-continue support {issue}15830[15830] {pull}19349[19349]
 - Add initial SIP protocol support {pull}21221[21221]
+- Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
 - Change build process for x-pack distribution {pull}21979[21979]
 
 
@@ -800,6 +816,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add new winlogbeat security dashboard {pull}18775[18775]
 - Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
+- Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
@@ -830,6 +847,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
-
 

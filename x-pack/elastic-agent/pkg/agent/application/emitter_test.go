@@ -654,6 +654,76 @@ func TestRenderInputs(t *testing.T) {
 					}),
 			},
 		},
+		"same var result with different processors": {
+			input: transpiler.NewKey("inputs", transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/${var1.name}.log"),
+							})),
+						}),
+					})),
+				}),
+			})),
+			expected: transpiler.NewList([]transpiler.Node{
+				transpiler.NewDict([]transpiler.Node{
+					transpiler.NewKey("type", transpiler.NewStrVal("logfile")),
+					transpiler.NewKey("streams", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("paths", transpiler.NewList([]transpiler.Node{
+								transpiler.NewStrVal("/var/log/value1.log"),
+							})),
+						}),
+					})),
+					transpiler.NewKey("processors", transpiler.NewList([]transpiler.Node{
+						transpiler.NewDict([]transpiler.Node{
+							transpiler.NewKey("add_fields", transpiler.NewDict([]transpiler.Node{
+								transpiler.NewKey("fields", transpiler.NewDict([]transpiler.Node{
+									transpiler.NewKey("custom", transpiler.NewStrVal("value1")),
+								})),
+								transpiler.NewKey("to", transpiler.NewStrVal("dynamic")),
+							})),
+						}),
+					})),
+				}),
+			}),
+			varsArray: []*transpiler.Vars{
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+					},
+				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value1",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
+				mustMakeVarsP(map[string]interface{}{
+					"var1": map[string]interface{}{
+						"name": "value1",
+					},
+				},
+					"var1",
+					[]map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"fields": map[string]interface{}{
+									"custom": "value2",
+								},
+								"to": "dynamic",
+							},
+						},
+					}),
+			},
+		},
 	}
 
 	for name, test := range testcases {
