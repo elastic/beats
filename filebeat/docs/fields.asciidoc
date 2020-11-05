@@ -3124,16 +3124,6 @@ Properties
 
 
 
-*`azure.platformlogs.properties.service_request_id`*::
-+
---
-Service Request Id
-
-
-type: keyword
-
---
-
 *`azure.platformlogs.properties.status_code`*::
 +
 --

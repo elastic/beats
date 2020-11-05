@@ -21,6 +21,13 @@ processors:
     ignore_failure: true
     formats:
     - ISO8601
+- date:
+    field: azure.platformlogs.EventTimeString
+    target_field: '@timestamp'
+    ignore_failure: true
+    formats:
+      - ISO8601
+      - "M/d/yyyy h:mm:ss a XXX"
 - remove:
     field:
     - message
@@ -29,6 +36,27 @@ processors:
 - rename:
     field: azure.platformlogs.resourceId
     target_field: azure.resource_id
+    ignore_missing: true
+- rename:
+    field: azure.platformlogs.Region
+    target_field: cloud.region
+    ignore_missing: true
+- json:
+    field: azure.platformlogs.EventProperties
+    target_field: azure.platformlogs.properties
+    ignore_failure: true
+- remove:
+    if: ctx.azure.platformlogs.properties != null
+    field:
+      - azure.platformlogs.EventProperties
+    ignore_missing: true
+- rename:
+    field: azure.platformlogs.EventName
+    target_field: event.action
+    ignore_missing: true
+- rename:
+    field: azure.platformlogs.properties.log
+    target_field: message
     ignore_missing: true
 - rename:
     field: azure.platformlogs.callerIpAddress
@@ -80,6 +108,11 @@ processors:
     target_field: event.outcome
     type: string
     if: "ctx?.event?.outcome == null && ctx?.azure?.platformlogs?.properties?.result != null && ctx?.azure?.platformlogs?.properties?.result instanceof String && ['success', 'failure', 'unknown'].contains(ctx.azure?.platformlogs?.properties?.result)"
+- convert:
+    field: azure.platformlogs.Status
+    target_field: event.outcome
+    type: string
+    if: "ctx?.event?.outcome == null && ctx?.azure?.platformlogs?.Status != null && ctx?.azure?.platformlogs?.Status instanceof String && ['success', 'failure', 'unknown', 'Succeeded', 'Failed'].contains(ctx.azure?.platformlogs?.Status)"
 - rename:
     field: azure.platformlogs.operationName
     target_field: azure.platformlogs.operation_name

@@ -368,7 +368,7 @@ filebeat.modules:
   platformlogs:
     enabled: false
   #  var:
-  #    eventhub: "insights-logs-signinlogs"
+  #    eventhub: ""
   #    consumer_group: "$Default"
   #    connection_string: ""
   #    storage_account: ""
