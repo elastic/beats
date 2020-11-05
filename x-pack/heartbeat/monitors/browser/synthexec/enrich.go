@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/look"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -23,6 +25,8 @@ type journeyEnricher struct {
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
 	urlFields common.MapStr
+	start     time.Time
+	end       time.Time
 }
 
 func newJourneyEnricher() *journeyEnricher {
@@ -32,6 +36,13 @@ func newJourneyEnricher() *journeyEnricher {
 func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	if se != nil && !se.Timestamp().IsZero() {
 		event.Timestamp = se.Timestamp()
+		// Record start and end so we can calculate journey duration accurately later
+		switch se.Type {
+		case "journey/start":
+			je.start = event.Timestamp
+		case "journey/end":
+			je.end = event.Timestamp
+		}
 	} else {
 		event.Timestamp = time.Now()
 	}
@@ -78,6 +89,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 			"url": je.urlFields,
 			"synthetics": common.MapStr{
 				"type": "heartbeat/summary",
+			},
+			"monitor": common.MapStr{
+				"duration": look.RTT(je.end.Sub(je.start)),
 			},
 		})
 		return je.lastError
