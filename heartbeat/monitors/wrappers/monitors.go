@@ -38,15 +38,20 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	jobWrappers := []jobs.JobWrapper{
+		addMonitorMeta(stdMonFields, len(js) > 1),
+		addMonitorStatus(stdMonFields.Type),
+	}
+
+	if stdMonFields.Type != "browser" {
+		jobWrappers = append(jobWrappers, addMonitorDuration)
+	}
+
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
-			addMonitorMeta(stdMonFields, len(js) > 1),
-			addMonitorStatus(stdMonFields.Type),
+			jobWrappers...
 		),
-		func() jobs.JobWrapper {
-			return addMonitorDuration(stdMonFields.Type)
-		},
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields.Type)
 		})
@@ -136,17 +141,8 @@ func addMonitorStatus(monitorType string) jobs.JobWrapper {
 	}
 }
 
-// addMonitorDuration executes the given Job, checking the duration of its run.
-func addMonitorDuration(monitorType string) jobs.JobWrapper {
-	if monitorType == "browser" {
-		return addBrowserMonitorDuration
-	}
-
-	return addSimpleMonitorDuration
-}
-
-// addSimpleMonitorDuration adds duration correctly for all non-browser jobs
-func addSimpleMonitorDuration(job jobs.Job) jobs.Job {
+// addMonitorDuration adds duration correctly for all non-browser jobs
+func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
 
@@ -159,36 +155,6 @@ func addSimpleMonitorDuration(job jobs.Job) jobs.Job {
 				},
 			})
 			event.Timestamp = start
-		}
-
-		return cont, err
-	}
-}
-
-// addBrowserMonitorDuration adds duration correctly for all browser jobs
-// measuring the duration from the first event to the last.
-// Also, we don't set event.Timestamp since browser based events set them themselves
-func addBrowserMonitorDuration(job jobs.Job) jobs.Job {
-	var start time.Time
-	var end time.Time
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		cont, err := job(event)
-
-		syntheticsType, _ := event.GetValue("synthetics.type")
-		if event != nil {
-			switch syntheticsType {
-			case "journey/start":
-				start = event.Timestamp
-			case "journey/end":
-				end = event.Timestamp
-			case "heartbeat/summary":
-				eventext.MergeEventFields(event, common.MapStr{
-					"monitor": common.MapStr{
-						"duration": look.RTT(end.Sub(start)),
-					},
-				})
-				start = time.Time{} // reset to zero for next job
-			}
 		}
 
 		return cont, err

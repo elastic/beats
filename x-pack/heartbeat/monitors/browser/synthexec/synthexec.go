@@ -82,7 +82,6 @@ func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params 
 		return nil, err
 	}
 
-
 	return startCmdJob(ctx, newCmd, nil, params), nil
 }
 
