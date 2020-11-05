@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap/zapcore"
@@ -101,6 +102,11 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+
+	// TODO: remove me
+	if strings.Contains(cfg.Beat, "watcher") {
+		filename = filepath.Join("/Users/michalpristas/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+	}
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),

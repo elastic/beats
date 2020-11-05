@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
@@ -102,22 +103,69 @@ func InvokeWatcher(log *logger.Logger) error {
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),
 	)
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
+
+	var cred = &syscall.Credential{
+		Uid:         uint32(os.Getuid()),
+		Gid:         uint32(os.Getgid()),
+		Groups:      nil,
+		NoSetGroups: true,
+	}
+	var sysproc = &syscall.SysProcAttr{
+		Credential: cred,
+		Setsid:     true,
+	}
+	cmd.SysProcAttr = sysproc
+	defer func() {
+		if cmd.Process != nil {
+			log.Debugf("releasing watcher %v", cmd.Process.Pid)
+			cmd.Process.Release()
+		}
+	}()
 
 	log.Debugf("Starting watcher %v", cmd)
 	return cmd.Start()
-	// go func() {
-	// 	<-time.After(15 * time.Second)
-	// 	if cmd.Process != nil {
-	// 		cmd.Process.Kill()
-	// 	}
-	// }()
-	// o, err := cmd.CombinedOutput()
-	// log.Error(">>> ", string(o))
-	// log.Error(">>> ", err)
 
-	// return cmd.Start()
+	// TODO: remove me
+	// var cred = &syscall.Credential{
+	// 	Uid:         uint32(os.Getuid()),
+	// 	Gid:         uint32(os.Getgid()),
+	// 	Groups:      nil,
+	// 	NoSetGroups: true,
+	// }
+
+	// var sysproc = &syscall.SysProcAttr{
+	// 	Credential: cred,
+	// 	Setsid:     true,
+	// 	// Setpgid:    true,
+	// }
+	// var attr = os.ProcAttr{
+	// 	Dir: paths.Top(),
+	// 	Env: os.Environ(),
+	// 	Files: []*os.File{
+	// 		os.Stdin,
+	// 		os.Stdout,
+	// 		os.Stderr,
+	// 	},
+	// 	Sys: sysproc,
+	// }
+
+	// args := []string{watcherSubcommand,
+	// 	"--path.config", paths.Config(),
+	// 	"--path.home", paths.Top(),
+	// }
+	// log.Error("starting watcher")
+	// _, err := os.StartProcess(homeExePath, args, &attr)
+	// if err != nil {
+	// 	log.Error("failed to invoke watcher", err)
+	// 	return err
+	// }
+
+	// // if err := process.Release(); err != nil {
+	// // 	log.Error("failed to release watcher", err)
+	// // 	return err
+	// // }
+
+	// return nil
 }
 
 func restartAgent(ctx context.Context) error {

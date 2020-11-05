@@ -6,6 +6,7 @@ package upgrade
 
 import (
 	"context"
+	"os"
 	"sync"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 const (
 	checkPeriod      = 10 * time.Second
 	evaluatedPeriods = 6 // with 10s period this means we evaluate 60s of agent run
-	crashesAllowed   = 1 // means that within 60s one restart is allowed, additional one is considered crash
+	crashesAllowed   = 2 // means that within 60s one restart is allowed, additional one is considered crash
 )
 
 type serviceHandler interface {
@@ -58,6 +59,8 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 
 	ch.log.Debug("Crash checker started")
 	for {
+		// TODO: remove me
+		ch.log.Debugf("watcher having PID: %d", os.Getpid())
 		select {
 		case <-ctx.Done():
 			return
@@ -66,9 +69,14 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 			if err != nil {
 				ch.log.Error(err)
 			}
+			// TODO: remove me
+			ch.log.Debugf("retrieved service PID: %d", pid)
 
 			ch.q.Push(pid)
-			if restarts := ch.q.Distinct(); restarts > crashesAllowed {
+			restarts := ch.q.Distinct()
+			// TODO: remove me
+			ch.log.Debugf("crashed within %d: %d", evaluatedPeriods, restarts)
+			if restarts > crashesAllowed {
 				ch.notifyChan <- errors.New("service restarted '%d' times within '%d' seconds", restarts, checkPeriod.Seconds())
 			}
 		}
@@ -94,7 +102,12 @@ func newDistinctQueue(size int) (*disctintQueue, error) {
 func (dq *disctintQueue) Push(id int) {
 	dq.lock.Lock()
 	defer dq.lock.Unlock()
-	dq.q = append([]int{id}, dq.q[:dq.size-1]...)
+
+	cutIdx := len(dq.q)
+	if dq.size-1 < len(dq.q) {
+		cutIdx = dq.size - 1
+	}
+	dq.q = append([]int{id}, dq.q[:cutIdx]...)
 }
 
 func (dq *disctintQueue) Distinct() int {

@@ -25,7 +25,7 @@ import (
 
 const (
 	// period during which we monitor for failures resulting in a rollback
-	gracePeriodDuration = 3 * time.Minute
+	gracePeriodDuration = 10 * time.Minute
 
 	watcherName = "elastic-agent-watcher"
 )
@@ -52,6 +52,11 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return err
 	}
 
+	// TODO: remove me
+	log.Debug("home", paths.Home())
+	log.Debug("top", paths.Top())
+	log.Debug("config", paths.Config())
+
 	marker, err := upgrade.LoadMarker()
 	if err != nil {
 		log.Error("failed to load marker", err)
@@ -77,7 +82,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 
 	isWithinGrace, tilGrace := gracePeriod(marker)
 	if !isWithinGrace {
-		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn, time.Now().Sub(marker.UpdatedOn).String())
+		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn.String(), time.Now().Sub(marker.UpdatedOn).String())
 		// if it is started outside of upgrade loop
 		// if we're not within grace and marker is still there it might mean
 		// that cleanup was not performed ok, cleanup everything except current version
@@ -86,6 +91,8 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		// exit nicely
 		return nil
 	}
+	// TODO: remove me
+	log.Debugf("within grace [updatedOn %v] now: %v until end of grace: %v", marker.UpdatedOn, time.Now(), tilGrace.String())
 
 	ctx := context.Background()
 
@@ -160,7 +167,7 @@ func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 	sinceUpdate := time.Now().Sub(marker.UpdatedOn)
 
 	if 0 < sinceUpdate && sinceUpdate < gracePeriodDuration {
-		return true, sinceUpdate
+		return true, gracePeriodDuration - sinceUpdate
 	}
 
 	return false, gracePeriodDuration
