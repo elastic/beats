@@ -4,17 +4,55 @@
     `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
   release: experimental
   fields:
-    - name: cpu_stats
-      type: group
+    - name: kernel.pct
+      type: scaled_float
+      format: percent
       description: >
-        Runtime CPU metrics.
-      fields:
-        - name: cpu_usage
-          type: group
-          description: >
-            CPU usage stats.
-          fields:
-            - name: total_usage
-              type: long
-              description: >
-                Total CPU time used per container.
+        Percentage of time in kernel space.
+    - name: kernel.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in kernel space normalized by the number of CPU cores.
+    - name: kernel.ticks
+      type: long
+      description: >
+        CPU ticks in kernel space.
+    - name: system.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of total CPU time in the system.
+    - name: system.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of total CPU time in the system normalized by the number of CPU cores.
+    - name: system.ticks
+      type: long
+      description: >
+        CPU system ticks.
+    - name: user.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in user space.
+    - name: user.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in user space normalized by the number of CPU cores.
+    - name: user.ticks
+      type: long
+      description: >
+        CPU ticks in user space.
+    - name: total.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total CPU usage.
+    - name: total.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total CPU usage normalized by the number of CPU cores.

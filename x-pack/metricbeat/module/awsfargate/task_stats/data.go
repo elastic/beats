@@ -5,90 +5,159 @@
 package task_stats
 
 import (
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-var (
-	schemaCPUUsage = s.Schema{
-		"total_usage":         c.Int("total_usage"),
-		"usage_in_kernelmode": c.Int("usage_in_kernelmode"),
-		"usage_in_usermode":   c.Int("usage_in_usermode"),
+func eventsMapping(r mb.ReporterV2, statsList []Stats) {
+	for _, stats := range statsList {
+		eventMapping(r, &stats)
+	}
+}
+
+func eventMapping(r mb.ReporterV2, stats *Stats) {
+	containerFields := common.MapStr{
+		"container": common.MapStr{
+			"id": stats.Container.DockerId,
+			"image": common.MapStr{
+				"name": stats.Container.Image,
+			},
+			"name":   stats.Container.Name,
+			"labels": stats.Container.Labels,
+		},
 	}
 
-	schemaThrottlingData = s.Schema{
-		"periods":           c.Int("periods"),
-		"throttled_periods": c.Int("throttled_periods"),
-		"throttled_time":    c.Int("throttled_time"),
+	cpuFields := common.MapStr{
+		"core": stats.PerCPUUsage,
+		"total": common.MapStr{
+			"pct": stats.TotalUsage,
+			"norm": common.MapStr{
+				"pct": stats.TotalUsageNormalized,
+			},
+		},
+		"kernel": common.MapStr{
+			"ticks": stats.UsageInKernelmode,
+			"pct":   stats.UsageInKernelmodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInKernelmodePercentageNormalized,
+			},
+		},
+		"user": common.MapStr{
+			"ticks": stats.UsageInUsermode,
+			"pct":   stats.UsageInUsermodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInUsermodePercentageNormalized,
+			},
+		},
+		"system": common.MapStr{
+			"ticks": stats.SystemUsage,
+			"pct":   stats.SystemUsagePercentage,
+			"norm": common.MapStr{
+				"pct": stats.SystemUsagePercentageNormalized,
+			},
+		},
 	}
 
-	schemaMemoryStatsStats = s.Schema{
-		"active_anon":               c.Int("active_anon"),
-		"active_file":               c.Int("active_file"),
-		"cache":                     c.Int("cache"),
-		"dirty":                     c.Int("dirty"),
-		"hierarchical_memory_limit": c.Int("hierarchical_memory_limit"),
-		"hierarchical_memsw_limit":  c.Int("hierarchical_memsw_limit"),
-		"inactive_anon":             c.Int("inactive_anon"),
-		"inactive_file":             c.Int("inactive_file"),
-		"mapped_file":               c.Int("mapped_file"),
-		"pgfault":                   c.Int("pgfault"),
-		"pgmajfault":                c.Int("pgmajfault"),
-		"pgpgin":                    c.Int("pgpgin"),
-		"pgpgout":                   c.Int("pgpgout"),
-		"rss":                       c.Int("rss"),
-		"rss_huge":                  c.Int("rss_huge"),
-		"total_active_anon":         c.Int("total_active_anon"),
-		"total_active_file":         c.Int("total_active_file"),
-		"total_cache":               c.Int("total_cache"),
-		"total_dirty":               c.Int("total_dirty"),
-		"total_inactive_anon":       c.Int("total_inactive_anon"),
-		"total_inactive_file":       c.Int("total_inactive_file"),
-		"total_mapped_file":         c.Int("total_mapped_file"),
-		"total_pgfault":             c.Int("total_pgfault"),
-		"total_pgmajfault":          c.Int("total_pgmajfault"),
-		"total_pgpgin":              c.Int("total_pgpgin"),
-		"total_pgpgout":             c.Int("total_pgpgout"),
-		"total_rss":                 c.Int("total_rss"),
-		"total_rss_huge":            c.Int("total_rss_huge"),
-		"total_unevictable":         c.Int("total_unevictable"),
-		"total_writeback":           c.Int("total_writeback"),
-		"unevictable":               c.Int("unevictable"),
-		"writeback":                 c.Int("writeback"),
+	var memoryFields common.MapStr
+	if stats.Commit+stats.CommitPeak+stats.PrivateWorkingSet > 0 {
+		memoryFields = common.MapStr{
+			"commit": common.MapStr{
+				"total": stats.Commit,
+				"peak":  stats.CommitPeak,
+			},
+			"private_working_set": common.MapStr{
+				"total": stats.PrivateWorkingSet,
+			},
+		}
+	} else {
+		memoryFields = common.MapStr{
+			"stats": stats.Stats,
+			"fail": common.MapStr{
+				"count": stats.Failcnt,
+			},
+			"limit": stats.Limit,
+			"rss": common.MapStr{
+				"total": stats.TotalRss,
+				"pct":   stats.TotalRssP,
+			},
+			"usage": common.MapStr{
+				"total": stats.Usage,
+				"pct":   stats.UsageP,
+				"max":   stats.MaxUsage,
+			},
+		}
 	}
 
-	schemaNetwork = s.Schema{
-		"rx_bytes":   c.Int("rx_bytes"),
-		"rx_packets": c.Int("rx_packets"),
-		"rx_errors":  c.Int("rx_errors"),
-		"rx_dropped": c.Int("rx_dropped"),
-		"tx_bytes":   c.Int("tx_bytes"),
-		"tx_packets": c.Int("tx_packets"),
-		"tx_errors":  c.Int("tx_errors"),
-		"tx_dropped": c.Int("tx_dropped"),
+	networkFields := common.MapStr{
+		"interface": stats.NameInterface,
+		// Deprecated
+		"in": common.MapStr{
+			"bytes":   stats.RxBytes,
+			"dropped": stats.RxDropped,
+			"errors":  stats.RxErrors,
+			"packets": stats.RxPackets,
+		},
+		// Deprecated
+		"out": common.MapStr{
+			"bytes":   stats.TxBytes,
+			"dropped": stats.TxDropped,
+			"errors":  stats.TxErrors,
+			"packets": stats.TxPackets,
+		},
+		"inbound": common.MapStr{
+			"bytes":   stats.Total.RxBytes,
+			"dropped": stats.Total.RxDropped,
+			"errors":  stats.Total.RxErrors,
+			"packets": stats.Total.RxPackets,
+		},
+		"outbound": common.MapStr{
+			"bytes":   stats.Total.TxBytes,
+			"dropped": stats.Total.TxDropped,
+			"errors":  stats.Total.TxErrors,
+			"packets": stats.Total.TxPackets,
+		},
 	}
 
-	schemaCPUStats = s.Schema{
-		"cpu_usage":        c.Dict("cpu_usage", schemaCPUUsage),
-		"throttling_data":  c.Dict("throttling_data", schemaThrottlingData),
-		"system_cpu_usage": c.Int("system_cpu_usage"),
+	diskFields := common.MapStr{
+		"reads":  stats.reads,
+		"writes": stats.writes,
+		"total":  stats.totals,
+		"read": common.MapStr{
+			"ops":          stats.serviced.reads,
+			"bytes":        stats.servicedBytes.reads,
+			"rate":         stats.reads,
+			"service_time": stats.servicedTime.reads,
+			"wait_time":    stats.waitTime.reads,
+			"queued":       stats.queued.reads,
+		},
+		"write": common.MapStr{
+			"ops":          stats.serviced.writes,
+			"bytes":        stats.servicedBytes.writes,
+			"rate":         stats.writes,
+			"service_time": stats.servicedTime.writes,
+			"wait_time":    stats.waitTime.writes,
+			"queued":       stats.queued.writes,
+		},
+		"summary": common.MapStr{
+			"ops":          stats.serviced.totals,
+			"bytes":        stats.servicedBytes.totals,
+			"rate":         stats.totals,
+			"service_time": stats.servicedTime.totals,
+			"wait_time":    stats.waitTime.totals,
+			"queued":       stats.queued.totals,
+		},
 	}
 
-	schemaMemoryStats = s.Schema{
-		"usage":     c.Int("total_usage"),
-		"max_usage": c.Int("max_usage"),
-		"limit":     c.Int("limit"),
-		"stats":     c.Dict("stats", schemaMemoryStatsStats),
-	}
-
-	schemaContainer = s.Schema{
-		"docker_id":      c.Str("DockerId"),
-		"name":           c.Str("Name"),
-		"docker_name":    c.Str("DockerName"),
-		"image":          c.Str("Image"),
-		"image_iD":       c.Str("ImageID"),
-		"desired_status": c.Str("DesiredStatus"),
-		"known_status":   c.Str("KnownStatus"),
-		"type":           c.Str("Type"),
-	}
-)
+	r.Event(mb.Event{
+		Timestamp:  time.Time(stats.Time),
+		RootFields: containerFields,
+		MetricSetFields: common.MapStr{
+			"cpu":     cpuFields,
+			"memory":  memoryFields,
+			"network": networkFields,
+			"diskio":  diskFields,
+		},
+	})
+}

@@ -4604,27 +4604,129 @@ type: double
 
 
 
-[float]
-=== cpu_stats
-
-Runtime CPU metrics.
-
-
-
-[float]
-=== cpu_usage
-
-CPU usage stats.
-
-
-
-*`task_stats.cpu_stats.cpu_usage.total_usage`*::
+*`task_stats.kernel.pct`*::
 +
 --
-Total CPU time used per container.
+Percentage of time in kernel space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.kernel.ticks`*::
++
+--
+CPU ticks in kernel space.
 
 
 type: long
+
+--
+
+*`task_stats.system.pct`*::
++
+--
+Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.system.ticks`*::
++
+--
+CPU system ticks.
+
+
+type: long
+
+--
+
+*`task_stats.user.pct`*::
++
+--
+Percentage of time in user space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.user.ticks`*::
++
+--
+CPU ticks in user space.
+
+
+type: long
+
+--
+
+*`task_stats.total.pct`*::
++
+--
+Total CPU usage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
 
 --
 

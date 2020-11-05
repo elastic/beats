@@ -5,111 +5,92 @@
 package task_stats
 
 import (
+	"bytes"
+	"io/ioutil"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
 )
 
-func TestMappingEvent(t *testing.T) {
-	cpuStatsExpected := map[string]interface{}{
-		"cpu_usage": map[string]interface{}{
-			"total_usage":         484750075,
-			"usage_in_kernelmode": 60000000,
-			"usage_in_usermode":   330000000,
-		},
-		"throttling_data": map[string]interface{}{
-			"periods":           0,
-			"throttled_periods": 0,
-			"throttled_time":    0,
-		},
+var (
+	taskStatsJson = `{"query-metadata-1": {"read": "2020-04-06T16:12:01.090148907Z",
+"preread": "2020-04-06T16:12:01.090148907Z",
+"cpu_stats": {"cpu_usage": {"total_usage": 410557100,
+"percpu_usage": [410557100,0,0,0,0,0,0,0,0], "usage_in_kernelmode": 10000000,
+"usage_in_usermode": 250000000}, "throttling_data": {"periods": 0,
+"throttled_periods": 0, "throttled_time": 0}},
+"precpu_stats": {"cpu_usage": {"total_usage": 0, "usage_in_kernelmode": 0,
+"usage_in_usermode": 0}, "throttling_data": {"periods": 0,
+"throttled_periods": 0, "throttled_time": 0}}
+}}`
+
+	taskRespJson = `{
+		"Cluster": "arn:aws:ecs:us-west-2:123:cluster/default",
+		"TaskARN": "arn:aws:ecs:us-west-2:123:task/default/febee207c04a",
+		"Family": "query-metadata-1",
+		"Revision": "7",
+		"Containers": [{
+			"DockerId": "query-metadata-1",
+			"Name": "query-metadata",
+			"Image": "mreferre/eksutils",
+			"Labels": {
+				"com.amazonaws.ecs.cluster": "arn:aws:ecs:us-west-2:111122223333:cluster/default",
+				"com.amazonaws.ecs.container-name": "query-metadata",
+				"com.amazonaws.ecs.task-arn": "arn:aws:ecs:us-west-2:111122223333:task/default/febee046097849aba589d4435207c04a",
+				"com.amazonaws.ecs.task-definition-family": "query-metadata",
+				"com.amazonaws.ecs.task-definition-version": "7"}
+			}]
+}`
+)
+
+func TestGetTaskStats(t *testing.T) {
+	taskStatsResp := &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
 	}
 
-	memoryStatsExpected := map[string]interface{}{
-		"usage":     20606976,
-		"max_usage": 20729856,
-		"stats": map[string]interface{}{
-			"pgpgout":                   5518,
-			"total_unevictable":         0,
-			"total_pgfault":             13920,
-			"inactive_anon":             0,
-			"pgmajfault":                0,
-			"total_cache":               53248,
-			"total_inactive_file":       49152,
-			"total_rss":                 18931712,
-			"active_anon":               18911232,
-			"rss":                       18931712,
-			"total_dirty":               4096,
-			"total_writeback":           0,
-			"cache":                     53248,
-			"writeback":                 0,
-			"hierarchical_memory_limit": 2147483648,
-			"total_pgpgout":             5518,
-			"pgfault":                   13920,
-			"pgpgin":                    10153,
-			"total_pgpgin":              10153,
-			"dirty":                     4096,
-			"active_file":               24576,
-			"total_active_anon":         18911232,
-			"inactive_file":             49152,
-			"total_pgmajfault":          0,
-			"total_inactive_anon":       0,
-			"total_rss_huge":            0,
-			"hierarchical_memsw_limit":  9223372036854772000,
-			"mapped_file":               0,
-			"rss_huge":                  0,
-			"unevictable":               0,
-			"total_mapped_file":         0,
-			"total_active_file":         24576,
-		},
-		"limit": 3937787904,
-	}
-
-	networkEth0Expected := map[string]interface{}{
-		"tx_dropped": 0,
-		"rx_bytes":   220597168,
-		"rx_packets": 151398,
-		"rx_errors":  0,
-		"rx_dropped": 0,
-		"tx_bytes":   1473393,
-		"tx_packets": 25392,
-		"tx_errors":  0,
-	}
-
-	taskMetadata := map[string]interface{}{
-		"/ecs-test-metricbeat": map[string]interface{}{
-			"name":         "query-metadata",
-			"id":           "/ecs-test-metricbeat",
-			"read":         "2020-04-06T16:12:01.090148907Z",
-			"cpu_stats":    cpuStatsExpected,
-			"memory_stats": memoryStatsExpected,
-			"networks": map[string]interface{}{
-				"eth0": networkEth0Expected,
-			},
-		},
-	}
-
-	m := MetricSet{
-		&awsfargate.MetricSet{},
-		logp.NewLogger("test"),
-	}
-
-	event := m.createEvent(taskMetadata["/ecs-test-metricbeat"])
-	name, err := event.MetricSetFields.GetValue("name")
+	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)
-	assert.Equal(t, "query-metadata", name)
 
-	cpuStatsOutput, err := event.MetricSetFields.GetValue("cpu_stats")
-	assert.NoError(t, err)
-	assert.NotEmpty(t, cpuStatsOutput)
+	output := taskStatsOutput["query-metadata-1"]
+	assert.Equal(t, uint64(410557100), output.CPUStats.CPUUsage.TotalUsage)
+}
 
-	memStatsOutput, err := event.MetricSetFields.GetValue("memory_stats")
-	assert.NoError(t, err)
-	assert.NotEmpty(t, memStatsOutput)
+func TestGetTask(t *testing.T) {
+	taskResp := &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+	}
 
-	networksOutput, err := event.MetricSetFields.GetValue("networks")
-	assert.NotEmpty(t, networksOutput)
+	taskOutput, err := getTask(taskResp)
 	assert.NoError(t, err)
+
+	assert.Equal(t, "arn:aws:ecs:us-west-2:123:cluster/default", taskOutput.Cluster)
+	assert.Equal(t, "arn:aws:ecs:us-west-2:123:task/default/febee207c04a", taskOutput.TaskARN)
+	assert.Equal(t, "query-metadata-1", taskOutput.Family)
+	assert.Equal(t, "7", taskOutput.Revision)
+
+	assert.Equal(t, 1, len(taskOutput.Containers))
+	assert.Equal(t, "query-metadata-1", taskOutput.Containers[0].DockerId)
+	assert.Equal(t, "query-metadata", taskOutput.Containers[0].Name)
+	assert.Equal(t, "mreferre/eksutils", taskOutput.Containers[0].Image)
+	assert.Equal(t, 5, len(taskOutput.Containers[0].Labels))
+}
+
+func TestGetCPUStatsList(t *testing.T) {
+	taskStatsResp := &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+	}
+
+	taskStatsOutput, err := getTaskStats(taskStatsResp)
+	assert.NoError(t, err)
+
+	taskResp := &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+	}
+
+	taskOutput, err := getTask(taskResp)
+	assert.NoError(t, err)
+
+	formattedStats := getCPUStatsList(taskStatsOutput, taskOutput)
+	assert.Equal(t, 1, len(formattedStats))
 }

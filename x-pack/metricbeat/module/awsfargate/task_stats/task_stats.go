@@ -10,14 +10,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 
+	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
 )
 
@@ -40,6 +42,93 @@ func init() {
 type MetricSet struct {
 	*awsfargate.MetricSet
 	logger *logp.Logger
+}
+
+// container is a struct representation of a container
+type container struct {
+	DockerId string
+	Name     string
+	Image    string
+	Labels   map[string]string
+}
+
+// BlkioRaw sums raw Blkio stats
+type BlkioRaw struct {
+	reads  uint64
+	writes uint64
+	totals uint64
+}
+
+// Stats is a struct represents information regarding a container
+type Stats struct {
+	Time      common.Time
+	Container *container
+
+	PerCPUUsage                           common.MapStr
+	TotalUsage                            float64
+	TotalUsageNormalized                  float64
+	UsageInKernelmode                     uint64
+	UsageInKernelmodePercentage           float64
+	UsageInKernelmodePercentageNormalized float64
+	UsageInUsermode                       uint64
+	UsageInUsermodePercentage             float64
+	UsageInUsermodePercentageNormalized   float64
+	SystemUsage                           uint64
+	SystemUsagePercentage                 float64
+	SystemUsagePercentageNormalized       float64
+
+	Failcnt   uint64
+	Limit     uint64
+	MaxUsage  uint64
+	TotalRss  uint64
+	TotalRssP float64
+	Usage     uint64
+	UsageP    float64
+	//Raw stats from the cgroup subsystem
+	Stats map[string]uint64
+	//Windows-only memory stats
+	Commit            uint64
+	CommitPeak        uint64
+	PrivateWorkingSet uint64
+
+	NameInterface string
+	RxBytes       float64
+	RxDropped     float64
+	RxErrors      float64
+	RxPackets     float64
+	TxBytes       float64
+	TxDropped     float64
+	TxErrors      float64
+	TxPackets     float64
+	Total         *types.NetworkStats
+
+	reads  float64
+	writes float64
+	totals float64
+
+	serviced      BlkioRaw
+	servicedBytes BlkioRaw
+	servicedTime  BlkioRaw
+	waitTime      BlkioRaw
+	queued        BlkioRaw
+}
+
+// TaskMetadata is an struct represents response body from ${ECS_CONTAINER_METADATA_URI_V4}/task
+type TaskMetadata struct {
+	Cluster    string       `json:"Cluster"`
+	TaskARN    string       `json:"TaskARN"`
+	Family     string       `json:"Family"`
+	Revision   string       `json:"Revision"`
+	Containers []*container `json:"Containers"`
+}
+
+// ContainerMetadata is an struct represents container metadata
+type ContainerMetadata struct {
+	Cluster   string
+	TaskARN   string
+	Family    string
+	Revision  string
+	Container *container
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -68,156 +157,143 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
 	taskStatsEndpoint := fmt.Sprintf("%s/task/stats", ecsURI)
-	taskStatsOutput, err := queryTaskMetadataEndpoint(taskStatsEndpoint)
-	if err != nil {
-		err = fmt.Errorf("queryTaskMetadataEndpoint %s failed: %w", taskStatsEndpoint, err)
-		m.logger.Error(err)
-		return err
-	}
-
-	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
 	taskEndpoint := fmt.Sprintf("%s/task", ecsURI)
-	taskOutput, err := queryTaskMetadataEndpoint(taskEndpoint)
+	formattedStats, err := queryTaskMetadataEndpoints(taskStatsEndpoint, taskEndpoint)
 	if err != nil {
-		err = fmt.Errorf("queryTaskMetadataEndpoint %s failed: %w", taskEndpoint, err)
+		err := fmt.Errorf("queryTaskMetadataEndpoints failed")
 		m.logger.Error(err)
 		return err
 	}
 
-	containersMetadata := collectContainerMetadata(taskOutput)
-
-	// Create events for all containers in the same task
-	for id, taskStats := range taskStatsOutput {
-		metadata := containersMetadata[id]
-		event := m.createEvent(taskStats, metadata)
-
-		// report events
-		if reported := report.Event(event); !reported {
-			m.logger.Debug("Fetch interrupted, failed to emit event")
-			return nil
-		}
-	}
+	eventsMapping(report, formattedStats)
 	return nil
 }
 
-func queryTaskMetadataEndpoint(taskMetadataEndpoint string) (map[string]interface{}, error) {
-	resp, err := http.Get(taskMetadataEndpoint)
+func queryTaskMetadataEndpoints(taskStatsEndpoint string, taskEndpoint string) ([]Stats, error) {
+	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
+	taskStatsResp, err := http.Get(taskStatsEndpoint)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	taskStatsOutput, err := getTaskStats(taskStatsResp)
+	if err != nil {
+		return nil, fmt.Errorf("getTaskStats failed: %w", err)
+	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
+	taskResp, err := http.Get(taskEndpoint)
+	if err != nil {
+		return nil, fmt.Errorf("http.Get failed: %w", err)
+	}
+	taskOutput, err := getTask(taskResp)
+	if err != nil {
+		return nil, fmt.Errorf("getTask failed: %w", err)
+	}
+
+	formattedStats := getCPUStatsList(taskStatsOutput, taskOutput)
+	return formattedStats, nil
+}
+
+func getTaskStats(taskStatsResp *http.Response) (map[string]types.Stats, error) {
+	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
 
-	var output map[string]interface{}
-	err = json.Unmarshal(body, &output)
+	var taskStatsOutput map[string]types.Stats
+	err = json.Unmarshal(taskStatsBody, &taskStatsOutput)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed: %w", err)
 	}
-	return output, nil
+	return taskStatsOutput, nil
 }
 
-func collectContainerMetadata(taskOutput map[string]interface{}) map[string]common.MapStr {
-	containersMetadata := make(map[string]common.MapStr)
-	for _, container := range taskOutput["Containers"].([]interface{}) {
-		// basic metadata
-		containerMap := container.(map[string]interface{})
-		resultContainer, err := schemaContainer.Apply(containerMap, s.FailOnRequired)
-		if err != nil {
-			continue
-		}
-
-		// labels
-		labels := containerMap["Labels"].(map[string]interface{})
-		labelsMap := map[string]interface{}{}
-		for k, v := range labels {
-			labelsMap[common.DeDot(k)] = v
-		}
-		resultContainer.Put("labels", labelsMap)
-
-		// limits
-		resultContainer.Put("limits", containerMap["Limits"].(map[string]interface{}))
-
-		dockerID, err := resultContainer.GetValue("docker_id")
-		if err != nil {
-			continue
-		}
-		containersMetadata[dockerID.(string)] = resultContainer
-	}
-	return containersMetadata
-}
-
-func (m *MetricSet) createEvent(taskStats interface{}, metadata common.MapStr) mb.Event {
-	event := mb.Event{
-		MetricSetFields: common.MapStr{},
-	}
-
-	taskMeta := taskStats.(map[string]interface{})
-	readTimestamp := taskMeta["read"].(string)
-	timestamp, err := time.Parse(time.RFC3339, readTimestamp)
+func getTask(taskResp *http.Response) (TaskMetadata, error) {
+	taskBody, err := ioutil.ReadAll(taskResp.Body)
 	if err != nil {
-		m.logger.Warn(fmt.Errorf("parsing timestamp %s failed, use current timestamp in event instead", readTimestamp))
-	} else {
-		event.Timestamp = timestamp
+		return TaskMetadata{}, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
 
-	// name and id
-	event.MetricSetFields.Put("name", taskMeta["name"])
-	event.MetricSetFields.Put("id", taskMeta["id"])
+	var taskOutput TaskMetadata
+	err = json.Unmarshal(taskBody, &taskOutput)
+	if err != nil {
+		return TaskMetadata{}, fmt.Errorf("json.Unmarshal failed: %w", err)
+	}
+	return taskOutput, nil
+}
 
-	// cpu stats
-	cpuStats := taskMeta["cpu_stats"].(map[string]interface{})
-	resultCPUStats, err := schemaCPUStats.Apply(cpuStats, s.FailOnRequired)
-	event.MetricSetFields.Put("cpu_stats", resultCPUStats)
-
-	// precpu stats
-	preCpuStats := taskMeta["precpu_stats"].(map[string]interface{})
-	resultPreCPUStats, err := schemaCPUStats.Apply(preCpuStats, s.FailOnRequired)
-	event.MetricSetFields.Put("precpu_stats", resultPreCPUStats)
-
-	// memory stats
-	resultMemoryStats, err := schemaMemoryStats.Apply(taskMeta["memory_stats"].(map[string]interface{}), s.FailOnRequired)
-	event.MetricSetFields.Put("memory_stats", resultMemoryStats)
-
-	// networks
-	networks := taskMeta["networks"]
-	resultNetworkStats := common.MapStr{}
-	for name, network := range networks.(map[string]interface{}) {
-		resultNetwork, err := schemaNetwork.Apply(network.(map[string]interface{}), s.FailOnRequired)
-		if err != nil {
+func getCPUStatsList(taskStatsOutput map[string]types.Stats, taskOutput TaskMetadata) []Stats {
+	containersInfo := map[string]ContainerMetadata{}
+	for _, c := range taskOutput.Containers {
+		// Skip ~internal~ecs~pause container
+		if c.Name == "~internal~ecs~pause" {
 			continue
 		}
 
-		resultNetworkStats.Put(name, resultNetwork)
+		containerMetadata := ContainerMetadata{
+			Container: c,
+			Family:    taskOutput.Family,
+			TaskARN:   taskOutput.TaskARN,
+			Cluster:   taskOutput.Cluster,
+			Revision:  taskOutput.Revision,
+		}
+		containersInfo[c.DockerId] = containerMetadata
 	}
-	event.MetricSetFields.Put("networks", resultNetworkStats)
 
-	// add container metadata
-	event.MetricSetFields.Put("metadata", metadata)
+	var formattedStats []Stats
+	for id, taskStats := range taskStatsOutput {
+		var dockerStat docker.Stat
+		dockerStat.Stats = types.StatsJSON{
+			Stats: taskStats,
+			ID:    id,
+		}
 
-	// calculate cpu.total.norm.pct
-	event = calculateCPU(cpuStats, preCpuStats, resultCPUStats, resultPreCPUStats, event)
-	return event
-}
-
-func calculateCPU(cpuStats map[string]interface{}, preCpuStats map[string]interface{}, resultCPUStats common.MapStr, resultPreCPUStats common.MapStr, event mb.Event) mb.Event {
-	cpuUsage := cpuStats["cpu_usage"].(map[string]interface{})
-	if cpuUsage != nil && cpuUsage["percpu_usage"] != nil {
-		numCores := float64(len(cpuUsage["percpu_usage"].([]interface{})))
-		event.MetricSetFields.Put("cpu.cores", numCores)
-
-		cpuUsage := resultCPUStats["cpu_usage"].(common.MapStr)
-		preCpuUsage := resultPreCPUStats["cpu_usage"].(common.MapStr)
-
-		if cpuUsage["total_usage"] != nil && preCpuUsage["total_usage"] != nil && cpuStats["system_cpu_usage"] != nil && preCpuStats["system_cpu_usage"] != nil {
-			deltaTotalUsage := cpuUsage["total_usage"].(int64) - preCpuUsage["total_usage"].(int64)
-			deltaSystemUsage := cpuStats["system_cpu_usage"].(float64) - preCpuStats["system_cpu_usage"].(float64)
-			event.MetricSetFields.Put("cpu.total.norm.pct", float64(deltaTotalUsage)/deltaSystemUsage*numCores)
+		if cInfo, ok := containersInfo[id]; ok {
+			formattedStats = append(formattedStats, getCPUStats(&dockerStat, cInfo.Container))
 		}
 	}
-	return event
+	return formattedStats
+}
+
+func getCPUStats(myRawStat *docker.Stat, c *container) Stats {
+	usage := cpu.CPUUsage{Stat: myRawStat}
+
+	stats := Stats{
+		Time:                                  common.Time(myRawStat.Stats.Read),
+		TotalUsage:                            usage.Total(),
+		TotalUsageNormalized:                  usage.TotalNormalized(),
+		UsageInKernelmode:                     myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInKernelmodePercentage:           usage.InKernelMode(),
+		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
+		UsageInUsermode:                       myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermodePercentage:             usage.InUserMode(),
+		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
+		SystemUsage:                           myRawStat.Stats.CPUStats.SystemUsage,
+		SystemUsagePercentage:                 usage.System(),
+		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
+	}
+
+	stats.Container = &container{
+		DockerId: c.DockerId,
+		Image:    c.Image,
+		Name:     helpers.ExtractContainerName([]string{c.Name}),
+		Labels:   deDotLabels(c.Labels),
+	}
+	return stats
+}
+
+// deDotLabels returns a new map[string]string containing a copy of the labels
+// where the dots have been converted into nested structure, avoiding possible
+// mapping errors
+func deDotLabels(labels map[string]string) map[string]string {
+	outputLabels := map[string]string{}
+	for k, v := range labels {
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
+		label := common.DeDot(k)
+		outputLabels[label] = v
+	}
+
+	return outputLabels
 }
