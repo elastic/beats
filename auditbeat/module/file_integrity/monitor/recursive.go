@@ -85,8 +85,16 @@ func (watcher *recursiveWatcher) ErrorChannel() <-chan error {
 }
 
 func (watcher *recursiveWatcher) addRecursive(path string) error {
+	if watcher.isExcludedPath(path) {
+		return nil
+	}
+
 	var errs multierror.Errors
 	err := filepath.Walk(path, func(path string, info os.FileInfo, fnErr error) error {
+		if watcher.isExcludedPath(path) {
+			return nil
+		}
+
 		if fnErr != nil {
 			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
 			// If FileInfo is not nil, the directory entry can be processed
@@ -122,10 +130,6 @@ func (watcher *recursiveWatcher) close() error {
 }
 
 func (watcher *recursiveWatcher) deliver(ev fsnotify.Event) {
-	// skip deliver events for excluded path
-	if watcher.isExcludedPath(ev.Name) {
-		return
-	}
 	for {
 		select {
 		case <-watcher.done:
@@ -161,7 +165,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			switch event.Op {
 			case fsnotify.Create:
 				err := watcher.addRecursive(event.Name)
-				if err != nil && !watcher.isExcludedPath(event.Name) {
+				if err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to add created path '%s'", event.Name)
 				}
 				err = watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
@@ -171,7 +175,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					})
 					return nil
 				})
-				if err != nil && !watcher.isExcludedPath(event.Name) {
+				if err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit created path '%s'", event.Name)
 				}
 
@@ -183,12 +187,12 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					})
 					return nil
 				})
-				if err != nil && !watcher.isExcludedPath(event.Name) {
+				if err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
 				}
 
 				err = watcher.tree.Remove(event.Name)
-				if err != nil && !watcher.isExcludedPath(event.Name) {
+				if err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
 				}
 
@@ -198,7 +202,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			// - Moving a dir away sends only one notification for this dir
 			case fsnotify.Rename:
 				err := watcher.tree.Remove(event.Name)
-				if err != nil && !watcher.isExcludedPath(event.Name) {
+				if err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", event.Name)
 				}
 				fallthrough
