@@ -739,6 +739,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Copy tag names from MISP data into events. {pull}21664[21664]
+- Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 
 *Heartbeat*
