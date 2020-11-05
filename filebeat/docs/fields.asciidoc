@@ -3061,12 +3061,6 @@ Fields for Azure platform logs.
 
 
 
-[float]
-=== identity
-
-Identity
-
-
 *`azure.platformlogs.operation_name`*::
 +
 --

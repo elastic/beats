@@ -5,10 +5,6 @@
   description: >
     Fields for Azure platform logs.
   fields:
-    - name: identity
-      type: group
-      description: >
-        Identity
     - name: operation_name
       type: keyword
       description: >
