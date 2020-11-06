@@ -60,14 +60,6 @@ type rateLimitConfig struct {
 	Remaining *valueTpl `config:"remaining"`
 }
 
-func (c rateLimitConfig) Validate() error {
-	if c.Limit == nil || c.Reset == nil || c.Remaining == nil {
-		return errors.New("all rate_limit fields must have a value")
-	}
-
-	return nil
-}
-
 type urlConfig struct {
 	*url.URL
 }

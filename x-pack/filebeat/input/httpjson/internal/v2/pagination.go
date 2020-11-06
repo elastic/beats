@@ -7,7 +7,6 @@ package v2
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -26,11 +25,11 @@ func registerPaginationTransforms() {
 
 type pagination struct {
 	log            *logp.Logger
-	httpClient     *http.Client
+	httpClient     *httpClient
 	requestFactory *requestFactory
 }
 
-func newPagination(config config, httpClient *http.Client, log *logp.Logger) *pagination {
+func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
 	pagination := &pagination{httpClient: httpClient, log: log}
 	if config.Response == nil || len(config.Response.Pagination) == 0 {
 		return pagination
@@ -118,14 +117,9 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.Do(httpReq)
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
 	if err != nil {
 		return nil, false, err
-	}
-
-	if resp.StatusCode > 399 {
-		body, _ := ioutil.ReadAll(resp.Body)
-		return nil, false, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
 
 	iter.resp = resp

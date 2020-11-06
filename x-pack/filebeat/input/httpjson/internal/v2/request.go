@@ -26,6 +26,26 @@ func registerRequestTransforms() {
 	registerTransform(requestNamespace, setName, newSetRequest)
 }
 
+type httpClient struct {
+	client  *http.Client
+	limiter *rateLimiter
+}
+
+func (c *httpClient) do(stdCtx context.Context, trCtx transformContext, req *http.Request) (*http.Response, error) {
+	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
+		return c.client.Do(req)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
+	}
+	if resp.StatusCode > 399 {
+		body, _ := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
+	}
+	return resp, nil
+}
+
 func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []basicTransform) (*transformable, error) {
 	req := emptyTransformable()
 	req.url = url
@@ -114,13 +134,13 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transform
 
 type requester struct {
 	log               *logp.Logger
-	client            *http.Client
+	client            *httpClient
 	requestFactory    *requestFactory
 	responseProcessor *responseProcessor
 }
 
 func newRequester(
-	client *http.Client,
+	client *httpClient,
 	requestFactory *requestFactory,
 	responseProcessor *responseProcessor,
 	log *logp.Logger) *requester {
@@ -138,16 +158,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 		return fmt.Errorf("failed to create http request: %w", err)
 	}
 
-	httpResp, err := r.client.Do(req)
+	httpResp, err := r.client.do(stdCtx, trCtx, req)
 	if err != nil {
 		return fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
 	defer httpResp.Body.Close()
-
-	if httpResp.StatusCode > 399 {
-		body, _ := ioutil.ReadAll(httpResp.Body)
-		return fmt.Errorf("server responded with status code %d: %s", httpResp.StatusCode, string(body))
-	}
 
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	if err != nil {

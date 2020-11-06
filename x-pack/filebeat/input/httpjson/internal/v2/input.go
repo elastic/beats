@@ -108,7 +108,7 @@ func run(
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	httpClient, err := newHTTPClient(stdCtx, config, tlsConfig)
+	httpClient, err := newHTTPClient(stdCtx, config, tlsConfig, log)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func run(
 	return nil
 }
 
-func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig) (*http.Client, error) {
+func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig, log *logp.Logger) (*httpClient, error) {
 	timeout := config.Request.getTimeout()
 
 	// Make retryable HTTP client
@@ -165,11 +165,17 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 		Backoff:      retryablehttp.DefaultBackoff,
 	}
 
+	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
+
 	if config.Auth.OAuth2.isEnabled() {
-		return config.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := config.Auth.OAuth2.client(ctx, client.StandardClient())
+		if err != nil {
+			return nil, err
+		}
+		return &httpClient{client: authClient, limiter: limiter}, nil
 	}
 
-	return client.StandardClient(), nil
+	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
 }
 
 func checkRedirect(config *requestConfig) func(*http.Request, []*http.Request) error {
