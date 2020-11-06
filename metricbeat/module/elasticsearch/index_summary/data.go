@@ -53,8 +53,8 @@ var indexSummaryDict = s.Schema{
 		},
 	}),
 	"indexing": indexingDict,
-	"bulk":   bulkStatsDict,
-	"search": searchDict,
+	"bulk":     bulkStatsDict,
+	"search":   searchDict,
 }
 
 var indexingDict = c.Dict("indexing", s.Schema{
