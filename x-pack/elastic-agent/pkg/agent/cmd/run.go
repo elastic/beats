@@ -92,7 +92,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	// initiate agent watcher
 	if err := upgrade.InvokeWatcher(logger); err != nil {
 		// we should not fail because watcher is not working
-		logger.Error("failed to invoke rollback watcher")
+		logger.Error("failed to invoke rollback watcher", err)
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {

@@ -139,18 +139,18 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 	}
 
 	if err := ChangeSymlink(ctx, newHash); err != nil {
-		rollbackInstall(newHash)
+		rollbackInstall(ctx, newHash)
 		return err
 	}
 
 	if err := u.markUpgrade(ctx, newHash, a); err != nil {
-		rollbackInstall(newHash)
+		rollbackInstall(ctx, newHash)
 		return err
 	}
 
 	if err := InvokeWatcher(u.log); err != nil {
-		rollbackInstall(newHash)
-		return errors.New("failed to invoke rollback watcher")
+		rollbackInstall(ctx, newHash)
+		return errors.New("failed to invoke rollback watcher", err)
 	}
 
 	if reexecNow {
@@ -233,8 +233,9 @@ func (u *Upgrader) reportUpdating(version string) {
 	)
 }
 
-func rollbackInstall(hash string) {
+func rollbackInstall(ctx context.Context, hash string) {
 	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+	ChangeSymlink(ctx, release.ShortCommit())
 }
 
 func copyActionStore(newHash string) error {
