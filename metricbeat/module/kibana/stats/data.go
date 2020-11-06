@@ -124,7 +124,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
-	event := mb.Event{ModuleFields: common.MapStr{}}
+	event := mb.Event{ModuleFields: common.MapStr{}, RootFields:common.MapStr{}}
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
