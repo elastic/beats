@@ -135,7 +135,6 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	return errs.Err()
 }
 
-
 func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
 	nodeInfo, ok := stateData.Nodes[nodeID]
 	if !ok {
