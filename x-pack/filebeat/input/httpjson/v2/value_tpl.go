@@ -6,6 +6,7 @@ package v2
 
 import (
 	"bytes"
+	"regexp"
 	"text/template"
 	"time"
 
@@ -167,6 +168,25 @@ func parseTimestampNano(ns int64) time.Time {
 	return time.Unix(0, ns)
 }
 
-func getRFC5988Link(links, rel string) string {
+var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)
+
+func getRFC5988Link(rel string, links []string) string {
+	for _, link := range links {
+		if !regexpLinkRel.MatchString(link) {
+			continue
+		}
+
+		matches := regexpLinkRel.FindStringSubmatch(link)
+		if len(matches) != 3 {
+			continue
+		}
+
+		if matches[2] != rel {
+			continue
+		}
+
+		return matches[1]
+	}
+
 	return ""
 }

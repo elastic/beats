@@ -149,6 +149,46 @@ func TestValueTpl(t *testing.T) {
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
+			name:  "func getRFC5988Link",
+			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
+			paramCtx: transformContext{
+				lastResponse: newTestTransformable(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>; title="Page 1"; rel="previous"`,
+					}},
+					"",
+				),
+			},
+			paramTr:  emptyTransformable(),
+			expected: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
+			name:  "func getRFC5988Link does not match",
+			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
+			paramCtx: transformContext{
+				lastResponse: newTestTransformable(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>`,
+					}},
+					"",
+				),
+			},
+			paramTr:     emptyTransformable(),
+			paramDefVal: "https://example.com/default",
+			expected:    "https://example.com/default",
+		},
+		{
+			name:        "func getRFC5988Link empty header",
+			value:       `{{ getRFC5988Link "previous" .last_response.header.Empty }}`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     emptyTransformable(),
+			paramDefVal: "https://example.com/default",
+			expected:    "https://example.com/default",
+		},
+		{
 			name:     "can execute functions pipeline",
 			setup:    func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown: func() { timeNow = time.Now },
