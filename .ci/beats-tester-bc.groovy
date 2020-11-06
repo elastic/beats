@@ -11,7 +11,7 @@ pipeline {
     BASE_URL = "https://staging.elastic.co/${params.version}/downloads"
     APM_BASE_URL = "${env.BASE_URL}/apm-server"
     BEATS_BASE_URL = "${env.BASE_URL}/beats"
-    VERSION = "${params.version}"
+    VERSION = "${params.version?.split('-')[0]}"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
