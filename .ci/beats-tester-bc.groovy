@@ -35,7 +35,7 @@ pipeline {
         }
       }
       steps {
-        build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
+        build(job: env.BEATS_TESTER_JOB, propagate: true, wait: true,
           parameters: [
             string(name: 'APM_URL_BASE', value: "${APM_BASE_URL}"),
             string(name: 'BEATS_URL_BASE', value: "${BEATS_BASE_URL}"),
