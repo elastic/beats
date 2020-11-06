@@ -178,8 +178,6 @@ func (m *MetricSet) fetchSettings(r mb.ReporterV2) error {
 		return err
 	}
 
-
-
 	return nil
 }
 
