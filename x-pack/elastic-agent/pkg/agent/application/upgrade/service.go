@@ -17,9 +17,10 @@ import (
 
 // Init initializes os dependent properties.
 func (ch *CrashChecker) Init(ctx context.Context) error {
-	dbusConn, err := dbus.NewSystemConnectionContext(ctx)
+	// TODO: use with context once dbus upgraded
+	dbusConn, err := dbus.New()
 	if err != nil {
-		return err
+		return errors.New("failed to create dbus connection", err)
 	}
 
 	ch.sc = &pidProvider{
