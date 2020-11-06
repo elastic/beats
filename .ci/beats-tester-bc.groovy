@@ -24,6 +24,7 @@ pipeline {
   }
   parameters {
     stringParam(name: 'version', defaultValue: '', description: 'Id of the Build Candidate (7.10.0-b55684ff).')
+    stringParam(name: 'BRANCH_REFERENCE', defaultValue: 'master', description: 'Branch to grab the Groovy script(for test changes).')
   }
   stages {
     stage('Run Beat Tester') {
@@ -34,7 +35,7 @@ pipeline {
         }
       }
       steps {
-        build(job: env.BEATS_TESTER_JOB, propagate: true, wait: true,
+        build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
           parameters: [
             string(name: 'APM_URL_BASE', value: "${APM_BASE_URL}"),
             string(name: 'BEATS_URL_BASE', value: "${BEATS_BASE_URL}"),

@@ -6,14 +6,13 @@
     view: Beats
     disabled: false
     project-type: pipeline
-    script-path: .ci/beats-tester-bc.groovy
     parameters:
       - string:
           name: BRANCH_REFERENCE
           default: master
           description: the Git branch specifier
     pipeline-scm:
-      script-path: .ci/build-docker-images.groovy
+      script-path: .ci/beats-tester-bc.groovy
       scm:
         - git:
             url: git@github.com:elastic/beats.git
