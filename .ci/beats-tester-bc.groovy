@@ -24,6 +24,7 @@ pipeline {
   }
   parameters {
     stringParam(name: 'version', defaultValue: '', description: 'Id of the Build Candidate (7.10.0-b55684ff).')
+    stringParam(name: 'BRANCH_REFERENCE', defaultValue: 'master', description: 'Branch to grab the Groovy script(for test changes).')
   }
   stages {
     stage('Run Beat Tester') {
