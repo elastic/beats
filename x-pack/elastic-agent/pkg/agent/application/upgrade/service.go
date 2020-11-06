@@ -74,7 +74,8 @@ func getInvokeCmd() *exec.Cmd {
 	var sysproc = &syscall.SysProcAttr{
 		Credential: cred,
 		Setsid:     true,
-		Pdeathsig:  syscall.SIGINT,
+		// propagate sigint instead of sigkill so we can ignore it
+		Pdeathsig: syscall.SIGINT,
 	}
 	cmd.SysProcAttr = sysproc
 	return cmd
