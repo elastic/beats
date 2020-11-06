@@ -8,10 +8,8 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
@@ -97,24 +95,7 @@ func InvokeWatcher(log *logger.Logger) error {
 		return nil
 	}
 
-	homeExePath := filepath.Join(paths.Home(), agentName)
-
-	cmd := exec.Command(homeExePath, watcherSubcommand,
-		"--path.config", paths.Config(),
-		"--path.home", paths.Top(),
-	)
-
-	var cred = &syscall.Credential{
-		Uid:         uint32(os.Getuid()),
-		Gid:         uint32(os.Getgid()),
-		Groups:      nil,
-		NoSetGroups: true,
-	}
-	var sysproc = &syscall.SysProcAttr{
-		Credential: cred,
-		Setsid:     true,
-	}
-	cmd.SysProcAttr = sysproc
+	cmd := invokeCmd()
 	defer func() {
 		if cmd.Process != nil {
 			log.Debugf("releasing watcher %v", cmd.Process.Pid)

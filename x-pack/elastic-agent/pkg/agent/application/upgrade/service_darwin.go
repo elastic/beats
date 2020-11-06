@@ -100,7 +100,7 @@ func (p *pidProvider) piderFromCmd(ctx context.Context, name string, args ...str
 	}
 }
 
-func getInvokeCmd() *exec.Cmd {
+func invokeCmd() *exec.Cmd {
 	homeExePath := filepath.Join(paths.Home(), agentName)
 
 	cmd := exec.Command(homeExePath, watcherSubcommand,
