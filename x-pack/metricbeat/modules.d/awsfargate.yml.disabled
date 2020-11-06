@@ -2,6 +2,6 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-awsfargate.html
 
 - module: awsfargate
-  period: 5m
+  period: 10s
   metricsets:
     - task_stats

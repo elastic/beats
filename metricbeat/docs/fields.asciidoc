@@ -4604,7 +4604,13 @@ type: double
 
 
 
-*`task_stats.kernel.pct`*::
+[float]
+=== cpu
+
+Runtime CPU metrics.
+
+
+*`task_stats.cpu.kernel.pct`*::
 +
 --
 Percentage of time in kernel space.
@@ -4616,7 +4622,7 @@ format: percent
 
 --
 
-*`task_stats.kernel.norm.pct`*::
+*`task_stats.cpu.kernel.norm.pct`*::
 +
 --
 Percentage of time in kernel space normalized by the number of CPU cores.
@@ -4628,7 +4634,7 @@ format: percent
 
 --
 
-*`task_stats.kernel.ticks`*::
+*`task_stats.cpu.kernel.ticks`*::
 +
 --
 CPU ticks in kernel space.
@@ -4638,7 +4644,7 @@ type: long
 
 --
 
-*`task_stats.system.pct`*::
+*`task_stats.cpu.system.pct`*::
 +
 --
 Percentage of total CPU time in the system.
@@ -4650,7 +4656,7 @@ format: percent
 
 --
 
-*`task_stats.system.norm.pct`*::
+*`task_stats.cpu.system.norm.pct`*::
 +
 --
 Percentage of total CPU time in the system normalized by the number of CPU cores.
@@ -4662,7 +4668,7 @@ format: percent
 
 --
 
-*`task_stats.system.ticks`*::
+*`task_stats.cpu.system.ticks`*::
 +
 --
 CPU system ticks.
@@ -4672,7 +4678,7 @@ type: long
 
 --
 
-*`task_stats.user.pct`*::
+*`task_stats.cpu.user.pct`*::
 +
 --
 Percentage of time in user space.
@@ -4684,7 +4690,7 @@ format: percent
 
 --
 
-*`task_stats.user.norm.pct`*::
+*`task_stats.cpu.user.norm.pct`*::
 +
 --
 Percentage of time in user space normalized by the number of CPU cores.
@@ -4696,7 +4702,7 @@ format: percent
 
 --
 
-*`task_stats.user.ticks`*::
+*`task_stats.cpu.user.ticks`*::
 +
 --
 CPU ticks in user space.
@@ -4706,7 +4712,7 @@ type: long
 
 --
 
-*`task_stats.total.pct`*::
+*`task_stats.cpu.total.pct`*::
 +
 --
 Total CPU usage.
@@ -4718,7 +4724,7 @@ format: percent
 
 --
 
-*`task_stats.total.norm.pct`*::
+*`task_stats.cpu.total.norm.pct`*::
 +
 --
 Total CPU usage normalized by the number of CPU cores.
@@ -4727,6 +4733,388 @@ Total CPU usage normalized by the number of CPU cores.
 type: scaled_float
 
 format: percent
+
+--
+
+[float]
+=== diskio
+
+Disk I/O metrics.
+
+
+[float]
+=== read
+
+Accumulated reads during the life of the container
+
+
+
+*`task_stats.diskio.read.ops`*::
++
+--
+Number of reads during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.bytes`*::
++
+--
+Bytes read during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.rate`*::
++
+--
+Number of current reads per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.reads`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current reads per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== write
+
+Accumulated writes during the life of the container
+
+
+
+*`task_stats.diskio.read.write.ops`*::
++
+--
+Number of writes during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.bytes`*::
++
+--
+Bytes written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.write.rate`*::
++
+--
+Number of current writes per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.writes`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== summary
+
+Accumulated reads and writes during the life of the container
+
+
+
+*`task_stats.diskio.read.summary.ops`*::
++
+--
+Number of I/O operations during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.bytes`*::
++
+--
+Bytes read and written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.summary.rate`*::
++
+--
+Number of current operations per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.total`*::
++
+--
+
+deprecated:[6.4]
+
+Number of reads and writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== memory
+
+Memory metrics.
+
+
+*`task_stats.memory.stats.*`*::
++
+--
+Raw memory stats from the cgroups memory.stat interface
+
+
+type: object
+
+--
+
+[float]
+=== network
+
+Network metrics.
+
+
+*`task_stats.network.interface`*::
++
+--
+Network interface name.
+
+
+type: keyword
+
+--
+
+[float]
+=== inbound
+
+Incoming network stats since the container started.
+
+
+
+*`task_stats.network.inbound.bytes`*::
++
+--
+Total number of incoming bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.network.inbound.dropped`*::
++
+--
+Total number of dropped incoming packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.inbound.errors`*::
++
+--
+Total errors on incoming packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.inbound.packets`*::
++
+--
+Total number of incoming packets.
+
+
+type: long
+
+--
+
+[float]
+=== outbound
+
+Outgoing network stats since the container started.
+
+
+
+*`task_stats.network.outbound.bytes`*::
++
+--
+Total number of outgoing bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.network.outbound.dropped`*::
++
+--
+Total number of dropped outgoing packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.outbound.errors`*::
++
+--
+Total errors on outgoing packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.outbound.packets`*::
++
+--
+Total number of outgoing packets.
+
+
+type: long
 
 --
 

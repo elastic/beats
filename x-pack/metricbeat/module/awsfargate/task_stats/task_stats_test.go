@@ -18,6 +18,27 @@ var (
 		"query-metadata-1": {
 			"read": "2020-04-06T16:12:01.090148907Z",
 			"preread": "2020-04-06T16:12:01.090148907Z",
+			"blkio_stats": {
+				"io_service_bytes_recursive": [
+					{"major": 202, "minor": 26368, "op": "Read", "value": 3452928},
+					{"major": 202, "minor": 26368, "op": "Write", "value": 0},
+					{"major": 202, "minor": 26368, "op": "Sync", "value": 3452928},
+					{"major": 202, "minor": 26368, "op": "Async", "value": 0},
+      				{"major": 202, "minor": 26368, "op": "Total", "value": 3452928}
+				],
+				"io_serviced_recursive": [
+					{"major": 202, "minor": 26368, "op": "Read", "value": 118},
+      				{"major": 202, "minor": 26368, "op": "Write", "value": 0},
+      				{"major": 202, "minor": 26368, "op": "Sync", "value": 118},
+      				{"major": 202, "minor": 26368, "op": "Async", "value": 0},
+      				{"major": 202, "minor": 26368, "op": "Total", "value": 118}
+				],
+				"io_queue_recursive": [],
+            	"io_service_time_recursive": [],
+            	"io_wait_time_recursive": [],
+            	"io_merged_recursive": [],
+            	"io_time_recursive": [],
+            	"sectors_recursive": []},
 			"cpu_stats": {
 				"cpu_usage": {"total_usage": 410557100, "percpu_usage": [410557100,0,0,0,0,0,0,0,0],
 				"usage_in_kernelmode": 10000000, "usage_in_usermode": 250000000},
@@ -28,7 +49,7 @@ var (
 			"name": "query-metadata-1",
 			"id": "query-metadata-1",
 			"networks": {"eth0": {"rx_bytes": 1802, "rx_packets": 19, "rx_errors": 0, "rx_dropped": 0,
-            "tx_bytes": 567, "tx_packets": 7, "tx_errors": 0, "tx_dropped": 0}}
+            	"tx_bytes": 567, "tx_packets": 7, "tx_errors": 0, "tx_dropped": 0}}
 		}}`
 
 	taskRespJson = `{

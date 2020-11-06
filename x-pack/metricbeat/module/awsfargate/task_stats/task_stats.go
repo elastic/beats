@@ -51,13 +51,6 @@ type container struct {
 	Labels   map[string]string
 }
 
-// BlkioRaw sums raw Blkio stats
-type BlkioRaw struct {
-	reads  uint64
-	writes uint64
-	totals uint64
-}
-
 type cpuStats struct {
 	PerCPUUsage                           common.MapStr
 	TotalUsage                            float64
@@ -94,7 +87,14 @@ type networkStats struct {
 	Total         types.NetworkStats
 }
 
-type diskStats struct {
+// BlkioRaw sums raw Blkio stats
+type BlkioRaw struct {
+	reads  uint64
+	writes uint64
+	totals uint64
+}
+
+type blkioStats struct {
 	reads  float64
 	writes float64
 	totals float64
@@ -113,7 +113,7 @@ type Stats struct {
 	cpuStats     cpuStats
 	memoryStats  memoryStats
 	networkStats []networkStats
-	diskStats    diskStats
+	blkioStats   blkioStats
 }
 
 // TaskMetadata is an struct represents response body from ${ECS_CONTAINER_METADATA_URI_V4}/task
@@ -246,9 +246,6 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
-		//var dockerStat docker.Stat
-		//dockerStat.Stats = taskStats
-
 		if cInfo, ok := containersInfo[id]; ok {
 			formattedStats = append(formattedStats, getStats(taskStats, cInfo.Container))
 		}
@@ -306,8 +303,10 @@ func getStats(taskStats types.StatsJSON, c *container) Stats {
 			Total:         rawNetStats,
 		})
 	}
-
 	stats.networkStats = networks
+
+	blkioStats := getBlkioStats(taskStats.BlkioStats)
+	stats.blkioStats = blkioStats
 	return stats
 }
 
@@ -324,4 +323,36 @@ func deDotLabels(labels map[string]string) map[string]string {
 	}
 
 	return outputLabels
+}
+
+// getBlkioStats collects diskio metrics from BlkioStats structures, that
+// are not populated in Windows
+func getBlkioStats(raw types.BlkioStats) blkioStats {
+	return blkioStats{
+		serviced:      getNewStats(raw.IoServicedRecursive),
+		servicedBytes: getNewStats(raw.IoServiceBytesRecursive),
+		servicedTime:  getNewStats(raw.IoServiceTimeRecursive),
+		waitTime:      getNewStats(raw.IoWaitTimeRecursive),
+		queued:        getNewStats(raw.IoQueuedRecursive),
+	}
+}
+
+func getNewStats(blkioEntry []types.BlkioStatEntry) BlkioRaw {
+	stats := BlkioRaw{
+		reads:  0,
+		writes: 0,
+		totals: 0,
+	}
+
+	for _, myEntry := range blkioEntry {
+		switch myEntry.Op {
+		case "Write":
+			stats.writes += myEntry.Value
+		case "Read":
+			stats.reads += myEntry.Value
+		case "Total":
+			stats.totals += myEntry.Value
+		}
+	}
+	return stats
 }

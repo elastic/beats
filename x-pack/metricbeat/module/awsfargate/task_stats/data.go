@@ -25,6 +25,7 @@ func createEvent(stats *Stats) mb.Event {
 			"cpu":     createCPUFields(stats),
 			"memory":  createMemoryFields(stats),
 			"network": createNetworkFields(stats),
+			"diskio":  createDiskIOFields(stats),
 		},
 	}
 }
@@ -108,6 +109,7 @@ func createMemoryFields(stats *Stats) common.MapStr {
 
 	return memoryFields
 }
+
 func createNetworkFields(stats *Stats) common.MapStr {
 	networkFields := common.MapStr{}
 	for _, n := range stats.networkStats {
@@ -126,4 +128,37 @@ func createNetworkFields(stats *Stats) common.MapStr {
 				}})
 	}
 	return networkFields
+}
+
+func createDiskIOFields(stats *Stats) common.MapStr {
+	return common.MapStr{
+		"reads":  stats.blkioStats.reads,
+		"writes": stats.blkioStats.writes,
+		"total":  stats.blkioStats.totals,
+		"read": common.MapStr{
+			"ops":          stats.blkioStats.serviced.reads,
+			"bytes":        stats.blkioStats.servicedBytes.reads,
+			"rate":         stats.blkioStats.reads,
+			"service_time": stats.blkioStats.servicedTime.reads,
+			"wait_time":    stats.blkioStats.waitTime.reads,
+			"queued":       stats.blkioStats.queued.reads,
+		},
+		"write": common.MapStr{
+			"ops":          stats.blkioStats.serviced.writes,
+			"bytes":        stats.blkioStats.servicedBytes.writes,
+			"rate":         stats.blkioStats.writes,
+			"service_time": stats.blkioStats.servicedTime.writes,
+			"wait_time":    stats.blkioStats.waitTime.writes,
+			"queued":       stats.blkioStats.queued.writes,
+		},
+		"summary": common.MapStr{
+			"ops":          stats.blkioStats.serviced.totals,
+			"bytes":        stats.blkioStats.servicedBytes.totals,
+			"rate":         stats.blkioStats.totals,
+			"service_time": stats.blkioStats.servicedTime.totals,
+			"wait_time":    stats.blkioStats.waitTime.totals,
+			"queued":       stats.blkioStats.queued.totals,
+		},
+	}
+
 }
