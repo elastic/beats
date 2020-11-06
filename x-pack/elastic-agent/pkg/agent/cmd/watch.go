@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -95,6 +96,10 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 	log.Debugf("within grace [updatedOn %v] now: %v until end of grace: %v", marker.UpdatedOn, time.Now(), tilGrace.String())
 
 	ctx := context.Background()
+
+	if _, err := syscall.Setsid(); err != nil {
+		log.Debugf("failed to demonise", err)
+	}
 
 	if err := watch(ctx, tilGrace, log); err != nil {
 		log.Debugf("Error detected proceeding to rollback", err)
