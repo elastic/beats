@@ -11,6 +11,7 @@ import (
 	"context"
 
 	"github.com/coreos/go-systemd/v22/dbus"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 )
 
@@ -22,23 +23,21 @@ func (ch *CrashChecker) Init(ctx context.Context) error {
 	}
 
 	ch.sc = &pidProvider{
-		dbusConn = dbusConn,
+		dbusConn: dbusConn,
 	}
 
 	return nil
 }
 
-
-
 type pidProvider struct {
 	dbusConn *dbus.Conn
 }
 
-func (p *pidProvider)Close(){
-	 p.dbusConn.Close()
+func (p *pidProvider) Close() {
+	p.dbusConn.Close()
 }
 
-func (p *pidProvider) PID(ctx context.Context) (int,error) {
+func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	p, err := p.dbusConn.GetServiceProperty(install.ServiceName, "MainPID")
 	if err != nil {
 		return 0, errors.New("filed to read service", err)
@@ -46,8 +45,8 @@ func (p *pidProvider) PID(ctx context.Context) (int,error) {
 
 	pid, ok := prop.Value.Value().(uint32)
 	if !ok {
-		return 0,errors.New("filed to get process id", value)
+		return 0, errors.New("filed to get process id", value)
 	}
 
-	return int(pid),nil
+	return int(pid), nil
 }
