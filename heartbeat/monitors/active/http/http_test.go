@@ -303,6 +303,7 @@ func TestDownStatuses(t *testing.T) {
 }
 
 func TestLargeResponse(t *testing.T) {
+	//t.Skipf("This seems to fail now on CI only, for reasons that are unclear")
 	server := httptest.NewServer(hbtest.SizedResponseHandler(1024 * 1024))
 	defer server.Close()
 
