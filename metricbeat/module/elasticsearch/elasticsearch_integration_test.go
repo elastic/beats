@@ -261,10 +261,11 @@ func getConfig(metricset string, host string) map[string]interface{} {
 
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        elasticsearch.ModuleName,
-		"metricsets":    xpackMetricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":                     elasticsearch.ModuleName,
+		"metricsets":                 xpackMetricSets,
+		"hosts":                      []string{host},
+		"xpack.enabled":              true,
+		"index_recovery.active_only": false,
 	}
 }
 
