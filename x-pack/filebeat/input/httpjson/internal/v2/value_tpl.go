@@ -10,8 +10,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type valueTpl struct {
@@ -41,9 +41,11 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string) (val string) {
+func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string, log *logp.Logger) (val string) {
 	defer func() {
 		if r := recover(); r != nil {
+			err := r.(error)
+			log.Infof("template execution: %v", err)
 			val = defaultVal
 		}
 	}()
@@ -55,14 +57,15 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	_, _ = data.Put("body", tr.body.Clone())
 	_, _ = data.Put("url.value", tr.url.String())
 	_, _ = data.Put("url.params", tr.url.Query())
-	_, _ = data.Put("cursor", trCtx.cursor.Clone())
-	_, _ = data.Put("last_event", cloneEvent(trCtx.lastEvent))
+	_, _ = data.Put("cursor", trCtx.cursor.clone())
+	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
 	_, _ = data.Put("last_response.body", trCtx.lastResponse.body.Clone())
 	_, _ = data.Put("last_response.header", trCtx.lastResponse.header.Clone())
 	_, _ = data.Put("last_response.url.value", trCtx.lastResponse.url.String())
 	_, _ = data.Put("last_response.url.params", trCtx.lastResponse.url.Query())
 
 	if err := t.Template.Execute(buf, data); err != nil {
+		log.Infof("template execution: %v", err)
 		return defaultVal
 	}
 
@@ -71,18 +74,6 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 		val = defaultVal
 	}
 	return val
-}
-
-func cloneEvent(event *beat.Event) beat.Event {
-	if event == nil {
-		return beat.Event{}
-	}
-	return beat.Event{
-		Timestamp:  event.Timestamp,
-		Meta:       event.Meta.Clone(),
-		Fields:     event.Fields.Clone(),
-		TimeSeries: event.TimeSeries,
-	}
 }
 
 var (

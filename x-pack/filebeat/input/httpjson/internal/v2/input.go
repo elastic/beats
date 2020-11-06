@@ -17,7 +17,7 @@ import (
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -101,8 +101,8 @@ func run(
 	ctx v2.Context,
 	config config,
 	tlsConfig *tlscommon.TLSConfig,
-	publisher cursor.Publisher,
-	cursor *cursor.Cursor,
+	publisher inputcursor.Publisher,
+	cursor *inputcursor.Cursor,
 ) error {
 	log := ctx.Logger.With("url", config.Request.URL)
 
@@ -115,12 +115,12 @@ func run(
 
 	requestFactory := newRequestFactory(config.Request, config.Auth, log)
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config.Response, pagination)
+	responseProcessor := newResponseProcessor(config.Response, pagination, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
-	// loadContextFromCursor
 	trCtx := emptyTransformContext()
-	//
+	trCtx.cursor = newCursor(config.Cursor, log)
+	trCtx.cursor.load(cursor)
 
 	err = timed.Periodic(stdCtx, config.Interval, func() error {
 		log.Info("Process another repeated request.")

@@ -6,8 +6,9 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const responseNamespace = "response"
@@ -19,30 +20,32 @@ func registerResponseTransforms() {
 }
 
 type responseProcessor struct {
+	log        *logp.Logger
 	transforms []basicTransform
 	split      *split
 	pagination *pagination
 }
 
-func newResponseProcessor(config *responseConfig, pagination *pagination) *responseProcessor {
+func newResponseProcessor(config *responseConfig, pagination *pagination, log *logp.Logger) *responseProcessor {
 	rp := &responseProcessor{
 		pagination: pagination,
+		log:        log,
 	}
 	if config == nil {
 		return rp
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace)
+	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace, log)
 	rp.transforms = ts
 
-	split, _ := newSplitResponse(config.Split)
+	split, _ := newSplitResponse(config.Split, log)
 
 	rp.split = split
 
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx transformContext, resp *http.Response) (<-chan maybeEvent, error) {
-	ch := make(chan maybeEvent)
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx transformContext, resp *http.Response) (<-chan maybeMsg, error) {
+	ch := make(chan maybeMsg)
 
 	go func() {
 		defer close(ch)
@@ -51,7 +54,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 		for {
 			page, hasNext, err := iter.next()
 			if err != nil {
-				ch <- maybeEvent{err: err}
+				ch <- maybeMsg{err: err}
 				return
 			}
 
@@ -59,22 +62,20 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				return
 			}
 
+			*trCtx.lastResponse = *page.clone()
+
+			rp.log.Debugf("last received page: %v", trCtx.lastResponse)
+
 			for _, t := range rp.transforms {
 				page, err = t.run(trCtx, page)
 				if err != nil {
-					fmt.Println("=== 2")
-					ch <- maybeEvent{err: err}
+					ch <- maybeMsg{err: err}
 					return
 				}
 			}
 
 			if rp.split == nil {
-				event, err := makeEvent(page.body)
-				if err != nil {
-					ch <- maybeEvent{err: err}
-					return
-				}
-				ch <- maybeEvent{event: event}
+				ch <- maybeMsg{msg: page.body}
 				continue
 			}
 
@@ -84,7 +85,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 					return
 				}
 
-				ch <- maybeEvent{err: err}
+				ch <- maybeMsg{err: err}
 				return
 			}
 		}

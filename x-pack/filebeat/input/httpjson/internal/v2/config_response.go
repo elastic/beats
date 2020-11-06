@@ -30,17 +30,17 @@ type splitConfig struct {
 }
 
 func (c *responseConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, nil); err != nil {
 		return err
 	}
-	if _, err := newBasicTransformsFromConfig(c.Transforms, paginationNamespace); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, paginationNamespace, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c *splitConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace); err != nil {
+	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, nil); err != nil {
 		return err
 	}
 
@@ -55,7 +55,7 @@ func (c *splitConfig) Validate() error {
 		return fmt.Errorf("invalid split type: %s", c.Type)
 	}
 
-	if _, err := newSplitResponse(c); err != nil {
+	if _, err := newSplitResponse(c, nil); err != nil {
 		return err
 	}
 

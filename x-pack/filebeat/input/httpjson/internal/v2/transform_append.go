@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const appendName = "append"
@@ -21,6 +22,7 @@ type appendConfig struct {
 }
 
 type appendt struct {
+	log          *logp.Logger
 	targetInfo   targetInfo
 	value        *valueTpl
 	defaultValue string
@@ -30,8 +32,8 @@ type appendt struct {
 
 func (appendt) transformName() string { return appendName }
 
-func newAppendRequest(cfg *common.Config) (transform, error) {
-	append, err := newAppend(cfg)
+func newAppendRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +52,8 @@ func newAppendRequest(cfg *common.Config) (transform, error) {
 	return &append, nil
 }
 
-func newAppendResponse(cfg *common.Config) (transform, error) {
-	append, err := newAppend(cfg)
+func newAppendResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +68,8 @@ func newAppendResponse(cfg *common.Config) (transform, error) {
 	return &append, nil
 }
 
-func newAppendPagination(cfg *common.Config) (transform, error) {
-	append, err := newAppend(cfg)
+func newAppendPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +88,7 @@ func newAppendPagination(cfg *common.Config) (transform, error) {
 	return &append, nil
 }
 
-func newAppend(cfg *common.Config) (appendt, error) {
+func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 	c := &appendConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return appendt{}, errors.Wrap(err, "fail to unpack the append configuration")
@@ -98,6 +100,7 @@ func newAppend(cfg *common.Config) (appendt, error) {
 	}
 
 	return appendt{
+		log:          log,
 		targetInfo:   ti,
 		value:        c.Value,
 		defaultValue: c.Default,
@@ -105,7 +108,7 @@ func newAppend(cfg *common.Config) (appendt, error) {
 }
 
 func (append *appendt) run(ctx transformContext, transformable *transformable) (*transformable, error) {
-	value := append.value.Execute(ctx, transformable, append.defaultValue)
+	value := append.value.Execute(ctx, transformable, append.defaultValue, append.log)
 	if err := append.runFunc(ctx, transformable, append.targetInfo.Name, value); err != nil {
 		return nil, err
 	}

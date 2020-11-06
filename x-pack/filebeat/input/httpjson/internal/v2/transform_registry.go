@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type constructor func(config *common.Config) (transform, error)
+type constructor func(config *common.Config, log *logp.Logger) (transform, error)
 
 var registeredTransforms = newRegistry()
 

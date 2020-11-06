@@ -8,8 +8,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // inputManager wraps one stateless input manager
@@ -17,14 +19,21 @@ import (
 // based on the config that is passed.
 type InputManager struct {
 	stateless *stateless.InputManager
+	cursor    *inputcursor.InputManager
 }
 
 var _ v2.InputManager = InputManager{}
 
-func NewInputManager() InputManager {
+func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
 	sim := stateless.NewInputManager(statelessConfigure)
 	return InputManager{
 		stateless: &sim,
+		cursor: &inputcursor.InputManager{
+			Logger:     log,
+			StateStore: store,
+			Type:       inputName,
+			Configure:  cursorConfigure,
+		},
 	}
 }
 
@@ -43,5 +52,8 @@ func (m InputManager) Create(cfg *common.Config) (v2.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
-	return m.stateless.Create(cfg)
+	if len(config.Cursor) == 0 {
+		return m.stateless.Create(cfg)
+	}
+	return m.cursor.Create(cfg)
 }

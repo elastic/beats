@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package v2
 
 import (
@@ -5,8 +9,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestSetFunctions(t *testing.T) {

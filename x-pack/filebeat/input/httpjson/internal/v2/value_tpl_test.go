@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package v2
 
 import (
@@ -5,8 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -24,6 +30,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render values from ctx",
 			value: "{{.last_response.body.param}}",
 			paramCtx: transformContext{
+				lastEvent:    &common.MapStr{},
 				lastResponse: newTestTransformable(common.MapStr{"param": 25}, nil, ""),
 			},
 			paramTr:     emptyTransformable(),
@@ -152,6 +159,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "func getRFC5988Link",
 			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
 			paramCtx: transformContext{
+				lastEvent: &common.MapStr{},
 				lastResponse: newTestTransformable(
 					nil,
 					http.Header{"Link": []string{
@@ -210,7 +218,7 @@ func TestValueTpl(t *testing.T) {
 			}
 			tpl := &valueTpl{}
 			assert.NoError(t, tpl.Unpack(tc.value))
-			got := tpl.Execute(tc.paramCtx, tc.paramTr, tc.paramDefVal)
+			got := tpl.Execute(tc.paramCtx, tc.paramTr, tc.paramDefVal, logp.NewLogger(""))
 			assert.Equal(t, tc.expected, got)
 		})
 	}

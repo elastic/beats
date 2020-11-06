@@ -1,11 +1,17 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package v2
 
 import (
 	"fmt"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var errNewURLValueNotSet = errors.New("the new url.value was not set")
@@ -19,6 +25,7 @@ type setConfig struct {
 }
 
 type set struct {
+	log          *logp.Logger
 	targetInfo   targetInfo
 	value        *valueTpl
 	defaultValue string
@@ -28,8 +35,8 @@ type set struct {
 
 func (set) transformName() string { return setName }
 
-func newSetRequest(cfg *common.Config) (transform, error) {
-	set, err := newSet(cfg)
+func newSetRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +55,8 @@ func newSetRequest(cfg *common.Config) (transform, error) {
 	return &set, nil
 }
 
-func newSetResponse(cfg *common.Config) (transform, error) {
-	set, err := newSet(cfg)
+func newSetResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +71,8 @@ func newSetResponse(cfg *common.Config) (transform, error) {
 	return &set, nil
 }
 
-func newSetPagination(cfg *common.Config) (transform, error) {
-	set, err := newSet(cfg)
+func newSetPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +93,7 @@ func newSetPagination(cfg *common.Config) (transform, error) {
 	return &set, nil
 }
 
-func newSet(cfg *common.Config) (set, error) {
+func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 	c := &setConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return set{}, errors.Wrap(err, "fail to unpack the set configuration")
@@ -98,6 +105,7 @@ func newSet(cfg *common.Config) (set, error) {
 	}
 
 	return set{
+		log:          log,
 		targetInfo:   ti,
 		value:        c.Value,
 		defaultValue: c.Default,
@@ -105,7 +113,7 @@ func newSet(cfg *common.Config) (set, error) {
 }
 
 func (set *set) run(ctx transformContext, transformable *transformable) (*transformable, error) {
-	value := set.value.Execute(ctx, transformable, set.defaultValue)
+	value := set.value.Execute(ctx, transformable, set.defaultValue, set.log)
 	if err := set.runFunc(ctx, transformable, set.targetInfo.Name, value); err != nil {
 		return nil, err
 	}

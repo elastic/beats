@@ -12,8 +12,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const logName = "httpjson.transforms"
@@ -23,16 +23,16 @@ type transformsConfig []*common.Config
 type transforms []transform
 
 type transformContext struct {
-	cursor       common.MapStr
-	lastEvent    *beat.Event
+	cursor       *cursor
+	lastEvent    *common.MapStr
 	lastResponse *transformable
 }
 
 func emptyTransformContext() transformContext {
 	return transformContext{
-		cursor:       make(common.MapStr),
+		cursor:       &cursor{},
+		lastEvent:    &common.MapStr{},
 		lastResponse: emptyTransformable(),
-		lastEvent:    &beat.Event{},
 	}
 }
 
@@ -43,10 +43,23 @@ type transformable struct {
 }
 
 func (t *transformable) clone() *transformable {
+	if t == nil {
+		return emptyTransformable()
+	}
 	return &transformable{
-		body:   t.body.Clone(),
-		header: t.header.Clone(),
-		url:    t.url,
+		body: func() common.MapStr {
+			if t.body == nil {
+				return common.MapStr{}
+			}
+			return t.body.Clone()
+		}(),
+		header: func() http.Header {
+			if t.header == nil {
+				return http.Header{}
+			}
+			return t.header.Clone()
+		}(),
+		url: t.url,
 	}
 }
 
@@ -66,17 +79,17 @@ type basicTransform interface {
 	run(transformContext, *transformable) (*transformable, error)
 }
 
-type maybeEvent struct {
-	err   error
-	event beat.Event
+type maybeMsg struct {
+	err error
+	msg common.MapStr
 }
 
-func (e maybeEvent) failed() bool { return e.err != nil }
+func (e maybeMsg) failed() bool { return e.err != nil }
 
-func (e maybeEvent) Error() string { return e.err.Error() }
+func (e maybeMsg) Error() string { return e.err.Error() }
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
-func newTransformsFromConfig(config transformsConfig, namespace string) (transforms, error) {
+func newTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
 	var trans transforms
 
 	for _, tfConfig := range config {
@@ -100,7 +113,7 @@ func newTransformsFromConfig(config transformsConfig, namespace string) (transfo
 		}
 
 		cfg.PrintDebugf("Configure transform '%v' with:", actionName)
-		transform, err := constructor(cfg)
+		transform, err := constructor(cfg, log)
 		if err != nil {
 			return nil, err
 		}
@@ -111,8 +124,8 @@ func newTransformsFromConfig(config transformsConfig, namespace string) (transfo
 	return trans, nil
 }
 
-func newBasicTransformsFromConfig(config transformsConfig, namespace string) ([]basicTransform, error) {
-	ts, err := newTransformsFromConfig(config, namespace)
+func newBasicTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
+	ts, err := newTransformsFromConfig(config, namespace, log)
 	if err != nil {
 		return nil, err
 	}

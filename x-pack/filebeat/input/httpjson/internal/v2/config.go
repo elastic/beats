@@ -14,6 +14,12 @@ type config struct {
 	Auth     *authConfig     `config:"auth"`
 	Request  *requestConfig  `config:"request" validate:"required"`
 	Response *responseConfig `config:"response"`
+	Cursor   cursorConfig    `config:"cursor"`
+}
+
+type cursorConfig map[string]struct {
+	Value   *valueTpl `config:"value"`
+	Default string    `config:"default"`
 }
 
 func (c config) Validate() error {

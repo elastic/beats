@@ -1,10 +1,16 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package v2
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestSplit(t *testing.T) {
@@ -13,7 +19,7 @@ func TestSplit(t *testing.T) {
 		config           *splitConfig
 		ctx              transformContext
 		resp             *transformable
-		expectedMessages []string
+		expectedMessages []common.MapStr
 		expectedErr      error
 	}{
 		{
@@ -58,43 +64,27 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []string{
-				`{
-					"this": "is kept",
-					"alerts": {
-						"this_is": "also kept",
-						"entities": {
-							"something": "something"
-						}
-					}
-				}`,
-				`{
-					"this": "is kept",
-					"alerts": {
-						"this_is": "also kept",
-						"entities": {
-							"else": "else"
-						}
-					}
-				}`,
-				`{
-					"this": "is kept",
-					"alerts": {
-						"this_is": "also kept 2",
-						"entities": {
-							"something": "something 2"
-						}
-					}
-				}`,
-				`{
-					"this": "is kept",
-					"alerts": {
-						"this_is": "also kept 2",
-						"entities": {
-							"else": "else 2"
-						}
-					}
-				}`,
+			expectedMessages: []common.MapStr{
+				{
+					"this":                      "is kept",
+					"alerts.this_is":            "also kept",
+					"alerts.entities.something": "something",
+				},
+				{
+					"this":                 "is kept",
+					"alerts.this_is":       "also kept",
+					"alerts.entities.else": "else",
+				},
+				{
+					"this":                      "is kept",
+					"alerts.this_is":            "also kept 2",
+					"alerts.entities.something": "something 2",
+				},
+				{
+					"this":                 "is kept",
+					"alerts.this_is":       "also kept 2",
+					"alerts.entities.else": "else 2",
+				},
 			},
 			expectedErr: nil,
 		},
@@ -135,21 +125,17 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedMessages: []string{
-				`{
-					"this_is": "kept",
-					"entities": {
-						"id": "id1",
-						"something": "else"
-					}
-				}`,
-				`{
-					"this_is": "also kept",
-					"entities": {
-						"id": "id2",
-						"something": "else 2"
-					}
-				}`,
+			expectedMessages: []common.MapStr{
+				{
+					"this_is":            "kept",
+					"entities.id":        "id1",
+					"entities.something": "else",
+				},
+				{
+					"this_is":            "also kept",
+					"entities.id":        "id2",
+					"entities.something": "else 2",
+				},
 			},
 			expectedErr: nil,
 		},
@@ -158,8 +144,8 @@ func TestSplit(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			ch := make(chan maybeEvent, len(tc.expectedMessages))
-			split, err := newSplitResponse(tc.config)
+			ch := make(chan maybeMsg, len(tc.expectedMessages))
+			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
 			err = split.run(tc.ctx, tc.resp, ch)
 			if tc.expectedErr == nil {
@@ -172,8 +158,7 @@ func TestSplit(t *testing.T) {
 			for _, msg := range tc.expectedMessages {
 				e := <-ch
 				assert.NoError(t, e.err)
-				got := e.event.Fields["message"].(string)
-				assert.JSONEq(t, msg, got)
+				assert.Equal(t, msg.Flatten(), e.msg.Flatten())
 			}
 		})
 	}

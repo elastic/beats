@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var errEmtpyField = errors.New("the requested field is emtpy")
@@ -22,12 +23,12 @@ type split struct {
 	keyField   string
 }
 
-func newSplitResponse(cfg *splitConfig) (*split, error) {
+func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
 	if cfg == nil {
 		return nil, nil
 	}
 
-	split, err := newSplit(cfg)
+	split, err := newSplit(cfg, log)
 	if err != nil {
 		return nil, err
 	}
@@ -39,20 +40,20 @@ func newSplitResponse(cfg *splitConfig) (*split, error) {
 	return split, nil
 }
 
-func newSplit(c *splitConfig) (*split, error) {
+func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	ti, err := getTargetInfo(c.Target)
 	if err != nil {
 		return nil, err
 	}
 
-	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace)
+	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, log)
 	if err != nil {
 		return nil, err
 	}
 
 	var s *split
 	if c.Split != nil {
-		s, err = newSplitResponse(c.Split)
+		s, err = newSplitResponse(c.Split, log)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +69,7 @@ func newSplit(c *splitConfig) (*split, error) {
 	}, nil
 }
 
-func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEvent) error {
+func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMsg) error {
 	respCpy := resp.clone()
 	var err error
 	for _, t := range s.transforms {
@@ -95,12 +96,7 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEv
 		}
 
 		for _, a := range arr {
-			m, ok := toMapStr(a)
-			if !ok {
-				return errors.New("split can only be applied on object lists")
-			}
-
-			if err := s.sendEvent(ctx, respCpy, m, ch); err != nil {
+			if err := s.sendEvent(ctx, respCpy, "", a, ch); err != nil {
 				return err
 			}
 		}
@@ -121,14 +117,7 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeEv
 		}
 
 		for k, v := range ms {
-			m, ok := toMapStr(v)
-			if !ok {
-				return errors.New("split can only be applied on object lists")
-			}
-			if s.keyField != "" {
-				_, _ = m.Put(s.keyField, k)
-			}
-			if err := s.sendEvent(ctx, respCpy, m, ch); err != nil {
+			if err := s.sendEvent(ctx, respCpy, k, v, ch); err != nil {
 				return err
 			}
 		}
@@ -152,7 +141,16 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 	return m, true
 }
 
-func (s *split) sendEvent(ctx transformContext, resp *transformable, m common.MapStr, ch chan<- maybeEvent) error {
+func (s *split) sendEvent(ctx transformContext, resp *transformable, key string, val interface{}, ch chan<- maybeMsg) error {
+	m, ok := toMapStr(val)
+	if !ok {
+		return errors.New("split can only be applied on object lists")
+	}
+
+	if s.keyField != "" && key != "" {
+		_, _ = m.Put(s.keyField, key)
+	}
+
 	if s.keepParent {
 		_, _ = resp.body.Put(s.targetInfo.Name, m)
 	} else {
@@ -163,14 +161,7 @@ func (s *split) sendEvent(ctx transformContext, resp *transformable, m common.Ma
 		return s.split.run(ctx, resp, ch)
 	}
 
-	event, err := makeEvent(resp.body)
-	if err != nil {
-		return err
-	}
-
-	ch <- maybeEvent{event: event}
-
-	*ctx.lastEvent = event
+	ch <- maybeMsg{msg: resp.body.Clone()}
 
 	return nil
 }

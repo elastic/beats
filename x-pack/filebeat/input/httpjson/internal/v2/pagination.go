@@ -25,18 +25,19 @@ func registerPaginationTransforms() {
 }
 
 type pagination struct {
+	log            *logp.Logger
 	httpClient     *http.Client
 	requestFactory *requestFactory
 }
 
 func newPagination(config config, httpClient *http.Client, log *logp.Logger) *pagination {
-	pagination := &pagination{httpClient: httpClient}
-	if config.Response == nil {
+	pagination := &pagination{httpClient: httpClient, log: log}
+	if config.Response == nil || len(config.Response.Pagination) == 0 {
 		return pagination
 	}
 
-	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace)
-	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace)
+	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
+	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
 		*config.Request.URL.URL,
@@ -73,6 +74,7 @@ type pageIterator struct {
 	resp *http.Response
 
 	isFirst bool
+	done    bool
 }
 
 func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformContext, resp *http.Response) *pageIterator {
@@ -86,15 +88,20 @@ func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformCont
 }
 
 func (iter *pageIterator) next() (*transformable, bool, error) {
-	if iter == nil || iter.resp == nil {
+	if iter == nil || iter.resp == nil || iter.done {
 		return nil, false, nil
 	}
 
 	if iter.isFirst {
+		iter.pagination.log.Debug("first page requested")
 		iter.isFirst = false
 		tr, err := iter.getPage()
 		if err != nil {
 			return nil, false, err
+		}
+		if iter.pagination.requestFactory == nil {
+			iter.pagination.log.Debug("last page")
+			iter.done = true
 		}
 		return tr, true, nil
 	}
@@ -104,6 +111,8 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 		if err == errNewURLValueNotSet {
 			// if this error happens here it means the transform used to pick the new url.value
 			// did not find any new value and we can stop paginating without error
+			iter.pagination.log.Debug("last page")
+			iter.done = true
 			return nil, false, nil
 		}
 		return nil, false, err
@@ -127,6 +136,8 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 	}
 
 	if len(tr.body) == 0 {
+		iter.pagination.log.Debug("finished pagination because there is no body")
+		iter.done = true
 		return nil, false, nil
 	}
 
@@ -148,12 +159,6 @@ func (iter *pageIterator) getPage() (*transformable, error) {
 		if err := json.Unmarshal(bodyBytes, &tr.body); err != nil {
 			return nil, err
 		}
-	}
-
-	iter.trCtx.lastResponse = &transformable{
-		body:   tr.body.Clone(),
-		header: tr.header.Clone(),
-		url:    tr.url,
 	}
 
 	return tr, nil

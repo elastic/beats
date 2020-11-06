@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const deleteName = "delete"
@@ -26,7 +27,7 @@ type delete struct {
 
 func (delete) transformName() string { return deleteName }
 
-func newDeleteRequest(cfg *common.Config) (transform, error) {
+func newDeleteRequest(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -46,7 +47,7 @@ func newDeleteRequest(cfg *common.Config) (transform, error) {
 	return &delete, nil
 }
 
-func newDeleteResponse(cfg *common.Config) (transform, error) {
+func newDeleteResponse(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func newDeleteResponse(cfg *common.Config) (transform, error) {
 	return &delete, nil
 }
 
-func newDeletePagination(cfg *common.Config) (transform, error) {
+func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err

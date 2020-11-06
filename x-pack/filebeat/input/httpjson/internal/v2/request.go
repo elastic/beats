@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"net/url"
 
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -57,7 +57,7 @@ type requestFactory struct {
 
 func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
-	ts, _ := newBasicTransformsFromConfig(config.Transforms, requestNamespace)
+	ts, _ := newBasicTransformsFromConfig(config.Transforms, requestNamespace, log)
 	rf := &requestFactory{
 		url:        *config.URL.URL,
 		method:     config.Method,
@@ -132,7 +132,7 @@ func newRequester(
 	}
 }
 
-func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, publisher cursor.Publisher) error {
+func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, publisher inputcursor.Publisher) error {
 	req, err := r.requestFactory.newHTTPRequest(stdCtx, trCtx)
 	if err != nil {
 		return fmt.Errorf("failed to create http request: %w", err)
@@ -154,15 +154,29 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 		return err
 	}
 
-	for maybeEvent := range eventsCh {
-		if maybeEvent.failed() {
-			r.log.Errorf("error processing response: %v", maybeEvent)
+	var n int
+	for maybeMsg := range eventsCh {
+		if maybeMsg.failed() {
+			r.log.Errorf("error processing response: %v", maybeMsg)
 			continue
 		}
-		if err := publisher.Publish(maybeEvent.event, trCtx.cursor.Clone()); err != nil {
-			r.log.Errorf("error publishing event: %v", err)
+
+		event, err := makeEvent(maybeMsg.msg)
+		if err != nil {
+			r.log.Errorf("error creating event: %v", maybeMsg)
+			continue
 		}
+
+		if err := publisher.Publish(event, trCtx.cursor.clone()); err != nil {
+			r.log.Errorf("error publishing event: %v", err)
+			continue
+		}
+
+		*trCtx.lastEvent = maybeMsg.msg
+		trCtx.cursor.update(trCtx)
+		n += 1
 	}
 
+	r.log.Infof("request finished: %d events published", n)
 	return nil
 }

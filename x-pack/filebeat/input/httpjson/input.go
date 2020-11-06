@@ -73,7 +73,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
 		Stability:  feature.Beta,
 		Deprecated: false,
 		Manager: inputManager{
-			v2inputManager: v2.NewInputManager(),
+			v2inputManager: v2.NewInputManager(log, store),
 			stateless:      &sim,
 			cursor: &cursor.InputManager{
 				Logger:     log,
