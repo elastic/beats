@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"syscall"
 	"time"
@@ -97,9 +98,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 
 	ctx := context.Background()
 
-	if _, err := syscall.Setsid(); err != nil {
-		log.Debugf("failed to demonise", err)
-	}
+	// TODO: end
 
 	if err := watch(ctx, tilGrace, log); err != nil {
 		log.Debugf("Error detected proceeding to rollback", err)
@@ -143,9 +142,15 @@ func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) erro
 	go errorChecker.Run(ctx)
 	go crashChecker.Run(ctx)
 
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
 WATCHLOOP:
 	for {
 		select {
+		case <-signals:
+			// ignore
+			continue
 		case <-ctx.Done():
 			break WATCHLOOP
 		// grace period passed, agent is considered stable

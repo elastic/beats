@@ -11,12 +11,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/hashicorp/go-multierror"
@@ -95,4 +98,26 @@ func (p *pidProvider) piderFromCmd(ctx context.Context, name string, args ...str
 
 		return pid, nil
 	}
+}
+
+func getInvokeCmd() *exec.Cmd {
+	homeExePath := filepath.Join(paths.Home(), agentName)
+
+	cmd := exec.Command(homeExePath, watcherSubcommand,
+		"--path.config", paths.Config(),
+		"--path.home", paths.Top(),
+	)
+
+	var cred = &syscall.Credential{
+		Uid:         uint32(os.Getuid()),
+		Gid:         uint32(os.Getgid()),
+		Groups:      nil,
+		NoSetGroups: true,
+	}
+	var sysproc = &syscall.SysProcAttr{
+		Credential: cred,
+		Setsid:     true,
+	}
+	cmd.SysProcAttr = sysproc
+	return cmd
 }

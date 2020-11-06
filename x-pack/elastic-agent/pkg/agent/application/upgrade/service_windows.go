@@ -8,7 +8,12 @@ package upgrade
 
 import (
 	"context"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -46,4 +51,26 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	}
 
 	return int(status.ProcessId), nil
+}
+
+func getInvokeCmd() *exec.Cmd {
+	homeExePath := filepath.Join(paths.Home(), agentName)
+
+	cmd := exec.Command(homeExePath, watcherSubcommand,
+		"--path.config", paths.Config(),
+		"--path.home", paths.Top(),
+	)
+
+	var cred = &syscall.Credential{
+		Uid:         uint32(os.Getuid()),
+		Gid:         uint32(os.Getgid()),
+		Groups:      nil,
+		NoSetGroups: true,
+	}
+	var sysproc = &syscall.SysProcAttr{
+		Credential: cred,
+		Setsid:     true,
+	}
+	cmd.SysProcAttr = sysproc
+	return cmd
 }
