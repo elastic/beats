@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"go.elastic.co/ecszap"
@@ -105,7 +106,13 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 
 	// TODO: remove me
 	if strings.Contains(cfg.Beat, "watcher") {
-		filename = filepath.Join("/Users/michalpristas/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+		if runtime.GOOS == "darwin" {
+			filename = filepath.Join("/Users/michalpristas/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+		} else if runtime.GOOS == "windows" {
+
+		} else {
+			filename = filepath.Join("/home/vagrant/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+		}
 	}
 
 	rotator, err := file.NewFileRotator(filename,
