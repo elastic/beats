@@ -1,140 +1,122 @@
 {
-    "@timestamp": "2020-10-02T16:14:24.034Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "agent": {
-        "type": "metricbeat",
-        "version": "8.0.0",
-        "ephemeral_id": "38dd3436-2a1a-449f-8f43-b8d78c358b22",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro"
-    },
-    "process": {
-        "pid": 6
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "event": {
         "dataset": "kibana.stats",
-        "module": "kibana",
-        "duration": 336003392
-    },
-    "metricset": {
-        "period": 10000,
-        "name": "stats"
+        "duration": 115000,
+        "module": "kibana"
     },
     "kibana": {
         "elasticsearch": {
             "cluster": {
-                "id": "AcU_Ce_aS5W4NvGYNinnxg"
+                "id": "jE0cx6-RSISFW1XxvS8hJA"
             }
         },
         "stats": {
-            "os": {
-                "distro": "Centos",
-                "distroRelease": "Centos-7.8.2003",
-                "platform": "linux",
-                "platformRelease": "linux-5.6.10-arch1-1",
-                "load": {
-                    "1m": 1.919921875,
-                    "5m": 2.08984375,
-                    "15m": 1.8681640625
-                },
-                "memory": {
-                    "total_in_bytes": 33300463616,
-                    "free_in_bytes": 4162576384,
-                    "used_in_bytes": 29137887232
-                },
-                "uptime_in_millis": 31276000
-            },
-            "usage": {
-                "visualization": {
-                    "total": 0
-                },
-                "search": {
-                    "total": 0
-                },
-                "index_pattern": {
-                    "total": 0
-                },
-                "graph_workspace": {
-                    "total": 0
-                },
-                "timelion_sheet": {
-                    "total": 0
-                },
-                "index": ".kibana",
-                "dashboard": {
-                    "total": 0
-                }
-            },
-            "snapshot": true,
+            "concurrent_connections": 1,
             "host": {
                 "name": "0"
             },
-            "concurrent_connections": 0,
-            "response_time": {
-                "max": {
-                    "ms": 5
-                },
-                "avg": {
-                    "ms": 3
-                }
-            },
             "index": "kibana",
+            "kibana": {
+                "host": "0",
+                "index": ".kibana",
+                "name": "kibana",
+                "snapshot": true,
+                "status": "green",
+                "transport_address": "0:5601",
+                "uuid": "14ba2833-10a3-4ab6-92c9-04dace6d168d",
+                "version": "8.0.0"
+            },
             "name": "kibana",
-            "process": {
-                "uptime": {
-                    "ms": 26020764
-                },
-                "event_loop_delay": {
-                    "ms": 0.09594599902629852
+            "os": {
+                "distro": "Centos",
+                "distroRelease": "Centos-7.8.2003",
+                "load": {
+                    "15m": 2.95068359375,
+                    "1m": 1.78125,
+                    "5m": 2.33056640625
                 },
                 "memory": {
-                    "resident_set_size": {
-                        "bytes": 621748224
-                    },
+                    "free_in_bytes": 6904168448,
+                    "total_in_bytes": 33300463616,
+                    "used_in_bytes": 26396295168
+                },
+                "platform": "linux",
+                "platformRelease": "linux-5.6.10-arch1-1",
+                "uptime_in_millis": 28027000
+            },
+            "process": {
+                "event_loop_delay": {
+                    "ms": 0.1285110004246235
+                },
+                "memory": {
                     "heap": {
-                        "used": {
-                            "bytes": 354069632
-                        },
                         "size_limit": {
                             "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 504594432
+                            "bytes": 519217152
+                        },
+                        "used": {
+                            "bytes": 344540432
                         }
+                    },
+                    "resident_set_size": {
+                        "bytes": 632963072
                     }
+                },
+                "uptime": {
+                    "ms": 20205347
                 }
             },
             "request": {
                 "disconnects": 0,
                 "total": 4
             },
+            "response_time": {
+                "avg": {
+                    "ms": 4
+                },
+                "max": {
+                    "ms": 4
+                }
+            },
+            "snapshot": true,
             "status": "green",
-            "kibana": {
-                "transport_address": "0:5601",
-                "version": "8.0.0",
-                "snapshot": true,
-                "status": "green",
-                "uuid": "0b55ab2a-5fdc-4097-9a46-a3d35e2c1dbf",
-                "name": "kibana",
+            "usage": {
+                "dashboard": {
+                    "total": 0
+                },
+                "graph_workspace": {
+                    "total": 0
+                },
                 "index": ".kibana",
-                "host": "0"
+                "index_pattern": {
+                    "total": 0
+                },
+                "search": {
+                    "total": 0
+                },
+                "timelion_sheet": {
+                    "total": 0
+                },
+                "visualization": {
+                    "total": 0
+                }
             }
         }
     },
+    "metricset": {
+        "name": "stats",
+        "period": 10000
+    },
+    "process": {
+        "pid": 6
+    },
     "service": {
-        "id": "0b55ab2a-5fdc-4097-9a46-a3d35e2c1dbf",
-        "version": "8.0.0",
         "address": "localhost:5601",
-        "type": "kibana"
-    },
-    "ecs": {
-        "version": "1.5.0"
-    },
-    "host": {
-        "name": "mcastro"
+        "id": "14ba2833-10a3-4ab6-92c9-04dace6d168d",
+        "type": "kibana",
+        "version": "8.0.0"
     }
 }
