@@ -13,6 +13,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	v2 "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/internal/v2"
 )
 
@@ -45,6 +46,7 @@ func (m inputManager) Create(cfg *common.Config) (inputv2.Input, error) {
 	if b, _ := cfg.Bool("is_v2", -1); b {
 		return m.v2inputManager.Create(cfg)
 	}
+	cfgwarn.Deprecate("7.12", "you are using a deprecated version of httpjson config")
 	config := newDefaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
