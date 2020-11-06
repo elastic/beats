@@ -94,34 +94,12 @@ type defaultHarvesterGroup struct {
 	tg           unison.TaskGroup
 }
 
-// Run starts the Harvester for a Source.
+// Start starts the Harvester for a Source. It does not block.
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 	log := ctx.Logger.With("source", s.Name())
 	log.Debug("Starting harvester for file")
 
-	harvesterCtx, cancelHarvester := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
-	ctx.Cancelation = harvesterCtx
-
-	err := hg.readers.add(s.Name(), cancelHarvester)
-	if err != nil {
-		cancelHarvester()
-		return err
-	}
-
-	client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   ctx.Cancelation,
-		ACKHandler: newInputACKHandler(ctx.Logger),
-	})
-	if err != nil {
-		cancelHarvester()
-		return err
-	}
-
 	go func() {
-		defer log.Debug("Stopped harvester for file")
-		defer client.Close()
-		defer hg.readers.remove(s.Name())
-
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -129,12 +107,35 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 			}
 		}()
 
+		defer log.Debug("Stopped harvester for file")
+
+		harvesterCtx, cancelHarvester := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
+		ctx.Cancelation = harvesterCtx
+		defer cancelHarvester()
+
+		err := hg.readers.add(s.Name(), cancelHarvester)
+		if err != nil {
+			log.Errorf("error while adding new reader to the bookkeeper %v", err)
+			return
+		}
+		defer hg.readers.remove(s.Name())
+
 		resource, err := hg.locker.Lock(ctx, s.Name())
 		if err != nil {
 			log.Errorf("Error while locking resource: %v", err)
 			return
 		}
 		defer releaseResource(resource)
+
+		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
+			CloseRef:   ctx.Cancelation,
+			ACKHandler: newInputACKHandler(ctx.Logger),
+		})
+		if err != nil {
+			log.Errorf("error while connecting to output with pipeline: %v", err)
+			return
+		}
+		defer client.Close()
 
 		hg.locker.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(hg.store, resource)
@@ -149,7 +150,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 	return nil
 }
 
-// Cancel stops the running Harvester for a given Source.
+// Stop stops the running Harvester for a given Source.
 func (hg *defaultHarvesterGroup) Stop(s Source) {
 	hg.readers.remove(s.Name())
 }
