@@ -27,8 +27,6 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -99,7 +97,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := getTestHarvesterGroup()
 
-			p.Run(ctx, testStateStore(), hg)
+			p.Run(ctx, newMockMetadataUpdater(), hg)
 
 			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
 		})
@@ -136,15 +134,12 @@ func TestProspectorDeletedFile(t *testing.T) {
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
-			testStore := testStateStore()
-			testStore.Set("filestream::path::/path/to/file", nil)
+			testStore := newMockMetadataUpdater()
+			testStore.set("filestream::path::/path/to/file")
 
 			p.Run(ctx, testStore, getTestHarvesterGroup())
 
-			has, err := testStore.Has("filestream::path::/path/to/file")
-			if err != nil {
-				t.Fatal(err)
-			}
+			has := testStore.has("filestream::path::/path/to/file")
 
 			if test.cleanRemoved {
 				assert.False(t, has)
@@ -162,9 +157,13 @@ type testHarvesterGroup struct {
 
 func getTestHarvesterGroup() *testHarvesterGroup { return &testHarvesterGroup{make([]string, 0)} }
 
-func (t *testHarvesterGroup) Run(_ input.Context, s loginp.Source) error {
+func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) error {
 	t.encounteredNames = append(t.encounteredNames, s.Name())
 	return nil
+}
+
+func (t *testHarvesterGroup) Stop(_ loginp.Source) {
+	return
 }
 
 type mockFileWatcher struct {
@@ -180,11 +179,34 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	m.nextIdx++
 	return evt
 }
+
 func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
 
-func testStateStore() *statestore.Store {
-	s, _ := statestore.NewRegistry(storetest.NewMemoryStoreBackend()).Get(pluginName)
-	return s
+type mockMetadataUpdater struct {
+	table map[string]interface{}
+}
+
+func newMockMetadataUpdater() *mockMetadataUpdater {
+	return &mockMetadataUpdater{
+		table: make(map[string]interface{}),
+	}
+}
+
+func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
+
+func (mu *mockMetadataUpdater) has(id string) bool {
+	_, ok := mu.table[id]
+	return ok
+}
+
+func (mu *mockMetadataUpdater) UpdateID(oldID, newID string) {
+	mu.table[newID] = mu.table[oldID]
+	delete(mu.table, oldID)
+}
+
+func (mu *mockMetadataUpdater) Remove(id string) error {
+	delete(mu.table, id)
+	return nil
 }
 
 func mustPathIdentifier() fileIdentifier {
