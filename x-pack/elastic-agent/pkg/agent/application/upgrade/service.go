@@ -38,14 +38,14 @@ func (p *pidProvider) Close() {
 }
 
 func (p *pidProvider) PID(ctx context.Context) (int, error) {
-	p, err := p.dbusConn.GetServiceProperty(install.ServiceName, "MainPID")
+	prop, err := p.dbusConn.GetServiceProperty(install.ServiceName, "MainPID")
 	if err != nil {
 		return 0, errors.New("filed to read service", err)
 	}
 
 	pid, ok := prop.Value.Value().(uint32)
 	if !ok {
-		return 0, errors.New("filed to get process id", value)
+		return 0, errors.New("filed to get process id", prop.Value.Value())
 	}
 
 	return int(pid), nil
