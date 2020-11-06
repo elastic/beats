@@ -80,9 +80,9 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 
 			_, err = os.Stat(st.Source)
 			if err != nil {
-				return false
+				return true
 			}
-			return true
+			return false
 		})
 	}
 
