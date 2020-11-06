@@ -9,10 +9,11 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/common"
+	v2 "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/internal/v2"
 )
 
 // inputManager wraps one stateless input manager
@@ -21,21 +22,29 @@ import (
 type inputManager struct {
 	stateless *stateless.InputManager
 	cursor    *cursor.InputManager
+
+	v2inputManager v2.InputManager
 }
 
-var _ v2.InputManager = inputManager{}
+var _ inputv2.InputManager = inputManager{}
 
 // Init initializes both wrapped input managers.
-func (m inputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (m inputManager) Init(grp unison.Group, mode inputv2.Mode) error {
 	return multierr.Append(
-		m.stateless.Init(grp, mode),
-		m.cursor.Init(grp, mode),
+		multierr.Append(
+			m.stateless.Init(grp, mode),
+			m.cursor.Init(grp, mode),
+		),
+		m.v2inputManager.Init(grp, mode),
 	)
 }
 
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
-func (m inputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (m inputManager) Create(cfg *common.Config) (inputv2.Input, error) {
+	if b, _ := cfg.Bool("is_v2", -1); b {
+		return m.v2inputManager.Create(cfg)
+	}
 	config := newDefaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

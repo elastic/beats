@@ -15,20 +15,30 @@ import (
 // inputManager wraps one stateless input manager
 // and one cursor input manager. It will create one or the other
 // based on the config that is passed.
-type inputManager struct {
+type InputManager struct {
 	stateless *stateless.InputManager
 }
 
-var _ v2.InputManager = inputManager{}
+var _ v2.InputManager = InputManager{}
+
+func NewInputManager() InputManager {
+	sim := stateless.NewInputManager(statelessConfigure)
+	return InputManager{
+		stateless: &sim,
+	}
+}
 
 // Init initializes both wrapped input managers.
-func (m inputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
+	registerRequestTransforms()
+	registerResponseTransforms()
+	registerPaginationTransforms()
 	return m.stateless.Init(grp, mode) // multierr.Append()
 }
 
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
-func (m inputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (m InputManager) Create(cfg *common.Config) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

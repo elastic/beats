@@ -18,12 +18,10 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
@@ -64,23 +62,6 @@ func (log *retryLogger) Debug(format string, args ...interface{}) {
 
 func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
-}
-
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
-	sim := stateless.NewInputManager(statelessConfigure)
-
-	registerRequestTransforms()
-	registerResponseTransforms()
-	registerPaginationTransforms()
-
-	return v2.Plugin{
-		Name:       inputName,
-		Stability:  feature.Beta,
-		Deprecated: false,
-		Manager: inputManager{
-			stateless: &sim,
-		},
-	}
 }
 
 func newTLSConfig(config config) (*tlscommon.TLSConfig, error) {
