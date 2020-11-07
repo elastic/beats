@@ -21080,6 +21080,16 @@ type: keyword
 
 --
 
+*`cisco.asa.termination_user`*::
++
+--
+AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -21292,6 +21302,16 @@ type: keyword
 +
 --
 The assigned DAP records
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.termination_user`*::
++
+--
+AAA name of user requesting termination
 
 
 type: keyword
