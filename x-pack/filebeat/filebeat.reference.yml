@@ -813,7 +813,7 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#--------------------------------- GCP Module ---------------------------------
+#--------------------- Google Cloud Platform (GCP) Module ---------------------
 - module: gcp
   vpcflow:
     enabled: true
@@ -870,7 +870,8 @@ filebeat.modules:
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
 #----------------------------- Googlecloud Module -----------------------------
-- module: googlecloud
+# googlecloud module is deprecated, please use gcp instead
+- module: gcp
   vpcflow:
     enabled: true
 
@@ -879,11 +880,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
     # configured to use this topic as a sink for VPC flow logs.
-    var.topic: googlecloud-vpc-flowlogs
+    var.topic: gcp-vpc-flowlogs
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -897,11 +898,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-firewall
+    var.topic: gcp-vpc-firewall
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-firewall-sub
+    var.subscription_name: filebeat-gcp-firewall-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -915,11 +916,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-audit
+    var.topic: gcp-vpc-audit
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-audit
+    var.subscription_name: filebeat-gcp-audit
 
     # Credentials file for the service account with authorization to read from
     # the subscription.

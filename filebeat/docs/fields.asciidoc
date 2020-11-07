@@ -68452,11 +68452,126 @@ type: integer
 --
 
 [[exported-fields-gcp]]
-== GCP fields
+== Google Cloud Platform (GCP) fields
 
 Module for handling logs from Google Cloud.
 
 
+
+[float]
+=== googlecloud
+
+Aliases for backward compatibility with old googlecloud fields
+
+
+
+*`googlecloud.destination.instance.project_id`*::
++
+--
+type: alias
+
+alias to: gcp.destination.instance.project_id
+
+--
+
+*`googlecloud.destination.instance.region`*::
++
+--
+type: alias
+
+alias to: gcp.destination.instance.region
+
+--
+
+*`googlecloud.destination.instance.zone`*::
++
+--
+type: alias
+
+alias to: gcp.destination.instance.zone
+
+--
+
+*`googlecloud.destination.vpc.project_id`*::
++
+--
+type: alias
+
+alias to: gcp.destination.vpc.project_id
+
+--
+
+*`googlecloud.destination.vpc.vpc_name`*::
++
+--
+type: alias
+
+alias to: gcp.destination.vpc.vpc_name
+
+--
+
+*`googlecloud.destination.vpc.subnetwork_name`*::
++
+--
+type: alias
+
+alias to: gcp.destination.vpc.subnetwork_name
+
+--
+
+*`googlecloud.source.instance.project_id`*::
++
+--
+type: alias
+
+alias to: gcp.source.instance.project_id
+
+--
+
+*`googlecloud.source.instance.region`*::
++
+--
+type: alias
+
+alias to: gcp.source.instance.region
+
+--
+
+*`googlecloud.source.instance.zone`*::
++
+--
+type: alias
+
+alias to: gcp.source.instance.zone
+
+--
+
+*`googlecloud.source.vpc.project_id`*::
++
+--
+type: alias
+
+alias to: gcp.source.vpc.project_id
+
+--
+
+*`googlecloud.source.vpc.vpc_name`*::
++
+--
+type: alias
+
+alias to: gcp.source.vpc.vpc_name
+
+--
+
+*`googlecloud.source.vpc.subnetwork_name`*::
++
+--
+type: alias
+
+alias to: gcp.source.vpc.subnetwork_name
+
+--
 
 [float]
 === gcp
@@ -68509,7 +68624,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`gcp.destination.vpc.project_id`*::
+*`gcp.destination.instance.destination.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68519,7 +68634,7 @@ type: keyword
 
 --
 
-*`gcp.destination.vpc.vpc_name`*::
+*`gcp.destination.instance.destination.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -68529,7 +68644,7 @@ type: keyword
 
 --
 
-*`gcp.destination.vpc.subnetwork_name`*::
+*`gcp.destination.instance.destination.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -68546,7 +68661,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`gcp.source.instance.project_id`*::
+*`gcp.destination.instance.source.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68556,7 +68671,7 @@ type: keyword
 
 --
 
-*`gcp.source.instance.region`*::
+*`gcp.destination.instance.source.instance.region`*::
 +
 --
 Region of the VM.
@@ -68566,7 +68681,7 @@ type: keyword
 
 --
 
-*`gcp.source.instance.zone`*::
+*`gcp.destination.instance.source.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -68583,7 +68698,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`gcp.source.vpc.project_id`*::
+*`gcp.destination.instance.source.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68593,7 +68708,7 @@ type: keyword
 
 --
 
-*`gcp.source.vpc.vpc_name`*::
+*`gcp.destination.instance.source.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -68603,7 +68718,7 @@ type: keyword
 
 --
 
-*`gcp.source.vpc.subnetwork_name`*::
+*`gcp.destination.instance.source.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.

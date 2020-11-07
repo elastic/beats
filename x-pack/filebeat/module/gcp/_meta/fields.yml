@@ -1,8 +1,61 @@
 - key: gcp
-  title: GCP
+  title: Google Cloud Platform (GCP)
   description: >
     Module for handling logs from Google Cloud.
   fields:
+    - name: googlecloud
+      type: group
+      description: >
+        Aliases for backward compatibility with old googlecloud fields
+      fields:
+        - name: destination.instance.project_id
+          type: alias
+          path: gcp.destination.instance.project_id
+          migration: true
+        - name: destination.instance.region
+          type: alias
+          path: gcp.destination.instance.region
+          migration: true
+        - name: destination.instance.zone
+          type: alias
+          path: gcp.destination.instance.zone
+          migration: true
+        - name: destination.vpc.project_id
+          type: alias
+          path: gcp.destination.vpc.project_id
+          migration: true
+        - name: destination.vpc.vpc_name
+          type: alias
+          path: gcp.destination.vpc.vpc_name
+          migration: true
+        - name: destination.vpc.subnetwork_name
+          type: alias
+          path: gcp.destination.vpc.subnetwork_name
+          migration: true
+        - name: source.instance.project_id
+          type: alias
+          path: gcp.source.instance.project_id
+          migration: true
+        - name: source.instance.region
+          type: alias
+          path: gcp.source.instance.region
+          migration: true
+        - name: source.instance.zone
+          type: alias
+          path: gcp.source.instance.zone
+          migration: true
+        - name: source.vpc.project_id
+          type: alias
+          path: gcp.source.vpc.project_id
+          migration: true
+        - name: source.vpc.vpc_name
+          type: alias
+          path: gcp.source.vpc.vpc_name
+          migration: true
+        - name: source.vpc.subnetwork_name
+          type: alias
+          path: gcp.source.vpc.subnetwork_name
+          migration: true
     - name: gcp
       type: group
       description: >
@@ -31,69 +84,69 @@
               description: >
                 Zone of the VM.
 
-        - name: destination.vpc
-          type: group
-          description: >
-            If the destination of the connection was a VM located on the same VPC,
-            this field is populated with VPC network details. In a Shared VPC
-            configuration, project_id corresponds to that of the host project.
-          fields:
-            - name: project_id
-              type: keyword
+            - name: destination.vpc
+              type: group
               description: >
-                ID of the project containing the VM.
+                If the destination of the connection was a VM located on the same VPC,
+                this field is populated with VPC network details. In a Shared VPC
+                configuration, project_id corresponds to that of the host project.
+              fields:
+                - name: project_id
+                  type: keyword
+                  description: >
+                    ID of the project containing the VM.
 
-            - name: vpc_name
-              type: keyword
-              description: >
-                VPC on which the VM is operating.
+                - name: vpc_name
+                  type: keyword
+                  description: >
+                    VPC on which the VM is operating.
 
-            - name: subnetwork_name
-              type: keyword
-              description: >
-                Subnetwork on which the VM is operating.
+                - name: subnetwork_name
+                  type: keyword
+                  description: >
+                    Subnetwork on which the VM is operating.
 
-        - name: source.instance
-          type: group
-          description: >
-            If the source of the connection was a VM located on the same VPC, this
-            field is populated with VM instance details. In a Shared VPC
-            configuration, project_id corresponds to the project that owns the
-            instance, usually the service project.
-          fields:
-            - name: project_id
-              type: keyword
+            - name: source.instance
+              type: group
               description: >
-                ID of the project containing the VM.
+                If the source of the connection was a VM located on the same VPC, this
+                field is populated with VM instance details. In a Shared VPC
+                configuration, project_id corresponds to the project that owns the
+                instance, usually the service project.
+              fields:
+                - name: project_id
+                  type: keyword
+                  description: >
+                    ID of the project containing the VM.
 
-            - name: region
-              type: keyword
-              description: >
-                Region of the VM.
+                - name: region
+                  type: keyword
+                  description: >
+                    Region of the VM.
 
-            - name: zone
-              type: keyword
-              description: >
-                Zone of the VM.
+                - name: zone
+                  type: keyword
+                  description: >
+                    Zone of the VM.
 
-        - name: source.vpc
-          type: group
-          description: >
-            If the source of the connection was a VM located on the same VPC, this
-            field is populated with VPC network details. In a Shared VPC
-            configuration, project_id corresponds to that of the host project.
-          fields:
-            - name: project_id
-              type: keyword
+            - name: source.vpc
+              type: group
               description: >
-                ID of the project containing the VM.
+                If the source of the connection was a VM located on the same VPC, this
+                field is populated with VPC network details. In a Shared VPC
+                configuration, project_id corresponds to that of the host project.
+              fields:
+                - name: project_id
+                  type: keyword
+                  description: >
+                    ID of the project containing the VM.
 
-            - name: vpc_name
-              type: keyword
-              description: >
-                VPC on which the VM is operating.
+                - name: vpc_name
+                  type: keyword
+                  description: >
+                    VPC on which the VM is operating.
 
-            - name: subnetwork_name
-              type: keyword
-              description: >
-                Subnetwork on which the VM is operating.
+                - name: subnetwork_name
+                  type: keyword
+                  description: >
+                    Subnetwork on which the VM is operating.
