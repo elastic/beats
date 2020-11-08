@@ -68624,7 +68624,7 @@ If the destination of the connection was a VM located on the same VPC, this fiel
 
 
 
-*`gcp.destination.instance.destination.vpc.project_id`*::
+*`gcp.destination.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68634,7 +68634,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.destination.vpc.vpc_name`*::
+*`gcp.destination.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -68644,7 +68644,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.destination.vpc.subnetwork_name`*::
+*`gcp.destination.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
@@ -68661,7 +68661,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`gcp.destination.instance.source.instance.project_id`*::
+*`gcp.source.instance.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68671,7 +68671,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.source.instance.region`*::
+*`gcp.source.instance.region`*::
 +
 --
 Region of the VM.
@@ -68681,7 +68681,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.source.instance.zone`*::
+*`gcp.source.instance.zone`*::
 +
 --
 Zone of the VM.
@@ -68698,7 +68698,7 @@ If the source of the connection was a VM located on the same VPC, this field is 
 
 
 
-*`gcp.destination.instance.source.vpc.project_id`*::
+*`gcp.source.vpc.project_id`*::
 +
 --
 ID of the project containing the VM.
@@ -68708,7 +68708,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.source.vpc.vpc_name`*::
+*`gcp.source.vpc.vpc_name`*::
 +
 --
 VPC on which the VM is operating.
@@ -68718,7 +68718,7 @@ type: keyword
 
 --
 
-*`gcp.destination.instance.source.vpc.subnetwork_name`*::
+*`gcp.source.vpc.subnetwork_name`*::
 +
 --
 Subnetwork on which the VM is operating.
