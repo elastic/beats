@@ -8,10 +8,8 @@ package upgrade
 
 import (
 	"context"
-	"os"
 	"os/exec"
 	"path/filepath"
-	"syscall"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -61,16 +59,5 @@ func invokeCmd() *exec.Cmd {
 		"--path.home", paths.Top(),
 	)
 
-	var cred = &syscall.Credential{
-		Uid:         uint32(os.Getuid()),
-		Gid:         uint32(os.Getgid()),
-		Groups:      nil,
-		NoSetGroups: true,
-	}
-	var sysproc = &syscall.SysProcAttr{
-		Credential: cred,
-		Setsid:     true,
-	}
-	cmd.SysProcAttr = sysproc
 	return cmd
 }
