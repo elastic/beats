@@ -109,7 +109,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		if runtime.GOOS == "darwin" {
 			filename = filepath.Join("/Users/michalpristas/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 		} else if runtime.GOOS == "windows" {
-
+			filename = filepath.Join(`C:\Users\vagrant`, "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 		} else {
 			filename = filepath.Join("/home/vagrant/", "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 		}
