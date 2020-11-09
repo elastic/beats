@@ -92,6 +92,8 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 - Fix checkpoint module when logs contain time field. {pull}20567[20567]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
+- Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 
 *Heartbeat*
 
@@ -119,6 +121,7 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 - Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 - Remove `io.time` from windows {pull}22237[22237]
+- Fix instance name in perfmon metricset. {issue}22218[22218] {pull}22261[22261]
 
 *Packetbeat*
 
@@ -162,6 +165,7 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 - Cloud Foundry metadata is cached to disk. {pull}20775[20775]
 - Add option to select the type of index template to load: `legacy`, `component`, `index`. {pull}21212[21212]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
+- Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 
 *Auditbeat*
 
