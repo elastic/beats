@@ -24,8 +24,6 @@ agents, instead of using {fleet}, see <<run-elastic-agent-standalone>>.
 //TODO: Remove this when docs are building.
 [[elastic-agent-install-service-macos]]
 
-//REVIEWERS: Should we cover deb/rpm here?
-
 To install {agent} and enroll it in {fleet}:
 
 . On your host, download and extract the installation package.
@@ -38,8 +36,8 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/download-widget.
 // end::install-elastic-agent[]
 --
 
-. Run the `install` command to install {agent} as a managed service. This
-command also starts the service.
+. Install {agent} as a managed service, enroll it in {fleet}, and start the
+service:
 +
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.asciidoc[]

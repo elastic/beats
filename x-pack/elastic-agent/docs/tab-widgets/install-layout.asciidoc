@@ -49,12 +49,34 @@ Log files for {agent}
 
 // tag::deb[]
 
-REVIEWERS: Not sure what to say here.
+`/opt/Elastic/Agent/*`::
+{agent} program files
+`/opt/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/opt/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/opt/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/opt/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
 
 // end::deb[]
 
 // tag::rpm[]
 
-REVIEWERS: Not sure what to say here.
+`/opt/Elastic/Agent/*`::
+{agent} program files
+`/opt/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/opt/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/opt/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/opt/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
 
 // end::rpm[]

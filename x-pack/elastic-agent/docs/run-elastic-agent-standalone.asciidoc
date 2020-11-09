@@ -4,6 +4,10 @@
 
 beta[]
 
+//TODO: Test standalone on RPM and DEB.
+
+//TODO: Merge this with content in other PR.
+
 Instead of using {fleet} to manage your {agent}s, you can run agents standalone.
 With standalone mode, you manually configure and manage the agents locally on
 the systems where they are installed. 
@@ -62,8 +66,7 @@ outputs:
 [...]
 ----
 
-. Run the `install` command to install {agent} as a managed service and start
-the service:
+. Install {agent} as a managed service and start the service:
 +
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-standalone-widget.asciidoc[]
@@ -72,7 +75,7 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/run-standalone-w
 
 For additional configuration options, see <<elastic-agent-configuration>>.
 
-//REVIEWERS: Does agent still need to be installed under the SYSTEM account for
+//TODO: Find out: does agent still need to be installed under the SYSTEM account for
 //Endpoint security to work, or does the install program take care of that
 //somehow? 
 

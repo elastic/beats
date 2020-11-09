@@ -4,6 +4,8 @@
 
 beta[]
 
+//TODO: Add instructions for upgrading from Fleet.
+
 NOTE: This process is not supported for upgrading DEB/RPM packages or Docker
 images.
 
