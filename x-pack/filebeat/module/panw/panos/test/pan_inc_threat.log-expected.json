@@ -69,6 +69,9 @@
         "panw.panos.threat.resource": "lorexx.cn/loader.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lorexx.cn"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -92,7 +95,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lorexx.cn/loader.exe"
+        "url.domain": "lorexx.cn",
+        "url.extension": "exe",
+        "url.original": "lorexx.cn/loader.exe",
+        "url.path": "/loader.exe"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -164,6 +170,9 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=2",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lsiu.info"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -187,7 +196,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lsiu.info/evo/count.php?o=2"
+        "url.domain": "lsiu.info",
+        "url.extension": "php",
+        "url.original": "lsiu.info/evo/count.php?o=2",
+        "url.path": "/evo/count.php",
+        "url.query": "o=2"
     },
     {
         "@timestamp": "2012-04-10T04:39:56.000-02:00",
@@ -259,6 +272,9 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=5",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lsiu.info"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -282,7 +298,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lsiu.info/evo/count.php?o=5"
+        "url.domain": "lsiu.info",
+        "url.extension": "php",
+        "url.original": "lsiu.info/evo/count.php?o=5",
+        "url.path": "/evo/count.php",
+        "url.query": "o=5"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -354,6 +374,9 @@
         "panw.panos.threat.resource": "lsiu.info/evo/count.php?o=7",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lsiu.info"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -377,7 +400,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lsiu.info/evo/count.php?o=7"
+        "url.domain": "lsiu.info",
+        "url.extension": "php",
+        "url.original": "lsiu.info/evo/count.php?o=7",
+        "url.path": "/evo/count.php",
+        "url.query": "o=7"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -449,6 +476,9 @@
         "panw.panos.threat.resource": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lsiu.info"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -472,7 +502,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122"
+        "url.domain": "lsiu.info",
+        "url.extension": "php",
+        "url.original": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122",
+        "url.path": "/evo/exploits/x18.php",
+        "url.query": "o=2&t=1241403746&i=1365814122"
     },
     {
         "@timestamp": "2012-04-10T04:39:57.000-02:00",
@@ -544,6 +578,9 @@
         "panw.panos.threat.resource": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lsiu.info"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -567,7 +604,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122"
+        "url.domain": "lsiu.info",
+        "url.extension": "php",
+        "url.original": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122",
+        "url.path": "/evo/exploits/x19.php",
+        "url.query": "o=2&t=1241403746&i=1365814122"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -639,6 +680,9 @@
         "panw.panos.threat.resource": "liteautobestguide.cn/load.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "liteautobestguide.cn"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -662,7 +706,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "liteautobestguide.cn/load.php"
+        "url.domain": "liteautobestguide.cn",
+        "url.extension": "php",
+        "url.original": "liteautobestguide.cn/load.php",
+        "url.path": "/load.php"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -734,6 +781,9 @@
         "panw.panos.threat.resource": "liteautobestguide.cn/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "liteautobestguide.cn"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -757,7 +807,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "liteautobestguide.cn/index.php"
+        "url.domain": "liteautobestguide.cn",
+        "url.extension": "php",
+        "url.original": "liteautobestguide.cn/index.php",
+        "url.path": "/index.php"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -829,6 +882,9 @@
         "panw.panos.threat.resource": "litetopdetect.cn/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "litetopdetect.cn"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -852,7 +908,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "litetopdetect.cn/index.php"
+        "url.domain": "litetopdetect.cn",
+        "url.extension": "php",
+        "url.original": "litetopdetect.cn/index.php",
+        "url.path": "/index.php"
     },
     {
         "@timestamp": "2012-04-10T04:39:55.000-02:00",
@@ -924,6 +983,9 @@
         "panw.panos.threat.resource": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "lkmpmlm.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -947,7 +1009,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513"
+        "url.domain": "lkmpmlm.com",
+        "url.extension": "php",
+        "url.original": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513",
+        "url.path": "/fff9999.php",
+        "url.query": "aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1019,6 +1085,9 @@
         "panw.panos.threat.resource": "girlteenxxxfreemov.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "girlteenxxxfreemov.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1042,7 +1111,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "girlteenxxxfreemov.com/"
+        "url.domain": "girlteenxxxfreemov.com",
+        "url.original": "girlteenxxxfreemov.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1114,6 +1185,9 @@
         "panw.panos.threat.resource": "imagesrepository.com/resolution.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "imagesrepository.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1137,7 +1211,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "imagesrepository.com/resolution.php"
+        "url.domain": "imagesrepository.com",
+        "url.extension": "php",
+        "url.original": "imagesrepository.com/resolution.php",
+        "url.path": "/resolution.php"
     },
     {
         "@timestamp": "2012-04-10T04:39:53.000-02:00",
@@ -1209,6 +1286,9 @@
         "panw.panos.threat.resource": "hottestfiles.com/search/search.php?q=xxx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "search-engines",
+        "related.hosts": [
+            "hottestfiles.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1232,7 +1312,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "hottestfiles.com/search/search.php?q=xxx"
+        "url.domain": "hottestfiles.com",
+        "url.extension": "php",
+        "url.original": "hottestfiles.com/search/search.php?q=xxx",
+        "url.path": "/search/search.php",
+        "url.query": "q=xxx"
     },
     {
         "@timestamp": "2012-04-10T04:39:54.000-02:00",
@@ -1303,6 +1387,9 @@
         "panw.panos.threat.resource": "infodist1.com/in.cgi?11&parameter=404",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "infodist1.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1326,7 +1413,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "infodist1.com/in.cgi?11&parameter=404"
+        "url.domain": "infodist1.com",
+        "url.extension": "cgi",
+        "url.original": "infodist1.com/in.cgi?11&parameter=404",
+        "url.path": "/in.cgi",
+        "url.query": "11&parameter=404"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1398,6 +1489,9 @@
         "panw.panos.threat.resource": "cls-softwares.com/suc.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "cls-softwares.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1421,7 +1515,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "cls-softwares.com/suc.php"
+        "url.domain": "cls-softwares.com",
+        "url.extension": "php",
+        "url.original": "cls-softwares.com/suc.php",
+        "url.path": "/suc.php"
     },
     {
         "@timestamp": "2012-04-10T04:39:51.000-02:00",
@@ -1493,6 +1590,9 @@
         "panw.panos.threat.resource": "cls-softwares.com/softwarefortubeview.40013.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "cls-softwares.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1516,7 +1616,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "cls-softwares.com/softwarefortubeview.40013.exe"
+        "url.domain": "cls-softwares.com",
+        "url.extension": "40013.exe",
+        "url.original": "cls-softwares.com/softwarefortubeview.40013.exe",
+        "url.path": "/softwarefortubeview.40013.exe"
     },
     {
         "@timestamp": "2012-04-10T04:39:52.000-02:00",
@@ -1584,6 +1687,9 @@
         "panw.panos.threat.resource": "findmorepill.com/klik/search.php?q=xxx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "online-gambling",
+        "related.hosts": [
+            "findmorepill.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "78.159.99.224",
@@ -1607,7 +1713,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "findmorepill.com/klik/search.php?q=xxx"
+        "url.domain": "findmorepill.com",
+        "url.extension": "php",
+        "url.original": "findmorepill.com/klik/search.php?q=xxx",
+        "url.path": "/klik/search.php",
+        "url.query": "q=xxx"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -1679,6 +1789,9 @@
         "panw.panos.threat.resource": "allowedwebsurfing.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "allowedwebsurfing.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1702,7 +1815,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "allowedwebsurfing.com/"
+        "url.domain": "allowedwebsurfing.com",
+        "url.original": "allowedwebsurfing.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1774,6 +1889,9 @@
         "panw.panos.threat.resource": "antivirus-remote.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "antivirus-remote.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1797,7 +1915,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "antivirus-remote.com/"
+        "url.domain": "antivirus-remote.com",
+        "url.original": "antivirus-remote.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:49.000-02:00",
@@ -1869,6 +1989,9 @@
         "panw.panos.threat.resource": "bklinkov.ru/hi/start.cfg",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "bklinkov.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1892,7 +2015,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "bklinkov.ru/hi/start.cfg"
+        "url.domain": "bklinkov.ru",
+        "url.extension": "cfg",
+        "url.original": "bklinkov.ru/hi/start.cfg",
+        "url.path": "/hi/start.cfg"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -1964,6 +2090,9 @@
         "panw.panos.threat.resource": "blogsexnakedgirlxxx.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "blogsexnakedgirlxxx.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -1987,7 +2116,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "blogsexnakedgirlxxx.com/"
+        "url.domain": "blogsexnakedgirlxxx.com",
+        "url.original": "blogsexnakedgirlxxx.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:50.000-02:00",
@@ -2059,6 +2190,9 @@
         "panw.panos.threat.resource": "bklinkov.ru/hi/start.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "not-resolved",
+        "related.hosts": [
+            "bklinkov.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2082,7 +2216,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "bklinkov.ru/hi/start.exe"
+        "url.domain": "bklinkov.ru",
+        "url.extension": "exe",
+        "url.original": "bklinkov.ru/hi/start.exe",
+        "url.path": "/hi/start.exe"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2154,6 +2291,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2177,7 +2317,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2249,6 +2391,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2272,7 +2417,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2344,6 +2491,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2367,7 +2517,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2439,6 +2591,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2462,7 +2617,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2534,6 +2691,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2557,7 +2717,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2629,6 +2791,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2652,7 +2817,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2724,6 +2891,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2747,7 +2917,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2819,6 +2991,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2842,7 +3017,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -2914,6 +3091,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2937,7 +3117,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3009,6 +3191,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3032,7 +3217,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3104,6 +3291,9 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
+        "related.hosts": [
+            "-"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3127,7 +3317,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "-/"
+        "url.domain": "-",
+        "url.original": "-/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:39:43.000-02:00",
@@ -3195,6 +3387,9 @@
         "panw.panos.threat.resource": "wantfinest.com/tds/in.cgi?default",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "related.hosts": [
+            "wantfinest.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "69.43.161.167",
@@ -3218,7 +3413,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "wantfinest.com/tds/in.cgi?default"
+        "url.domain": "wantfinest.com",
+        "url.extension": "cgi",
+        "url.original": "wantfinest.com/tds/in.cgi?default",
+        "url.path": "/tds/in.cgi",
+        "url.query": "default"
     },
     {
         "@timestamp": "2012-04-10T04:39:38.000-02:00",
@@ -3286,6 +3485,9 @@
         "panw.panos.threat.resource": "sameshitasiteverwas.com/traf/tds/in.cgi?2",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "sameshitasiteverwas.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "202.31.187.154",
@@ -3309,7 +3511,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "sameshitasiteverwas.com/traf/tds/in.cgi?2"
+        "url.domain": "sameshitasiteverwas.com",
+        "url.extension": "cgi",
+        "url.original": "sameshitasiteverwas.com/traf/tds/in.cgi?2",
+        "url.path": "/traf/tds/in.cgi",
+        "url.query": "2"
     },
     {
         "@timestamp": "2012-04-10T04:39:39.000-02:00",
@@ -3377,6 +3583,9 @@
         "panw.panos.threat.resource": "svarkon.ru/update.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "svarkon.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "89.111.176.67",
@@ -3400,7 +3609,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "svarkon.ru/update.exe"
+        "url.domain": "svarkon.ru",
+        "url.extension": "exe",
+        "url.original": "svarkon.ru/update.exe",
+        "url.path": "/update.exe"
     },
     {
         "@timestamp": "2012-04-10T04:39:36.000-02:00",
@@ -3471,6 +3683,9 @@
         "panw.panos.threat.resource": "onlinescanxpp.com/land/eurl/1.php?code=",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "onlinescanxpp.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3494,7 +3709,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "onlinescanxpp.com/land/eurl/1.php?code="
+        "url.domain": "onlinescanxpp.com",
+        "url.extension": "php",
+        "url.original": "onlinescanxpp.com/land/eurl/1.php?code=",
+        "url.path": "/land/eurl/1.php",
+        "url.query": "code="
     },
     {
         "@timestamp": "2012-04-10T04:39:34.000-02:00",
@@ -3562,6 +3781,9 @@
         "panw.panos.threat.resource": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "nolagtime.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
@@ -3585,7 +3807,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6"
+        "url.domain": "nolagtime.com",
+        "url.original": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6",
+        "url.path": "/conn/",
+        "url.query": "JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6"
     },
     {
         "@timestamp": "2012-04-10T04:39:35.000-02:00",
@@ -3653,6 +3878,9 @@
         "panw.panos.threat.resource": "nolagtime.com/gwc.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "nolagtime.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
@@ -3676,7 +3904,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "nolagtime.com/gwc.txt"
+        "url.domain": "nolagtime.com",
+        "url.extension": "txt",
+        "url.original": "nolagtime.com/gwc.txt",
+        "url.path": "/gwc.txt"
     },
     {
         "@timestamp": "2012-04-10T04:38:19.000-02:00",
@@ -3747,6 +3978,9 @@
         "panw.panos.threat.resource": "karavan.us/bon/index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "related.hosts": [
+            "karavan.us"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3770,7 +4004,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "karavan.us/bon/index.php"
+        "url.domain": "karavan.us",
+        "url.extension": "php",
+        "url.original": "karavan.us/bon/index.php",
+        "url.path": "/bon/index.php"
     },
     {
         "@timestamp": "2012-04-10T04:38:14.000-02:00",
@@ -3838,6 +4075,9 @@
         "panw.panos.threat.resource": "findnolimits.com/go.php?sid=1",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "dead-sites",
+        "related.hosts": [
+            "findnolimits.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
@@ -3861,7 +4101,11 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "findnolimits.com/go.php?sid=1"
+        "url.domain": "findnolimits.com",
+        "url.extension": "php",
+        "url.original": "findnolimits.com/go.php?sid=1",
+        "url.path": "/go.php",
+        "url.query": "sid=1"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -3929,6 +4173,9 @@
         "panw.panos.threat.resource": "bizoplata.ru/moun.html",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "parked-domains",
+        "related.hosts": [
+            "bizoplata.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "89.108.64.156",
@@ -3952,7 +4199,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "bizoplata.ru/moun.html"
+        "url.domain": "bizoplata.ru",
+        "url.extension": "html",
+        "url.original": "bizoplata.ru/moun.html",
+        "url.path": "/moun.html"
     },
     {
         "@timestamp": "2012-04-10T04:38:12.000-02:00",
@@ -4020,6 +4270,9 @@
         "panw.panos.threat.resource": "bizoplata.ru/palast.html",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "parked-domains",
+        "related.hosts": [
+            "bizoplata.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "89.108.64.156",
@@ -4043,7 +4296,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "bizoplata.ru/palast.html"
+        "url.domain": "bizoplata.ru",
+        "url.extension": "html",
+        "url.original": "bizoplata.ru/palast.html",
+        "url.path": "/palast.html"
     },
     {
         "@timestamp": "2012-04-10T04:37:28.000-02:00",
@@ -4101,6 +4357,9 @@
         "panw.panos.threat.resource": "controller.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "controller.php"
+        ],
         "related.ip": [
             "204.232.231.46",
             "192.168.0.2",
@@ -4134,7 +4393,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "controller.php"
+        "url.domain": "controller.php",
+        "url.original": "controller.php",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:37:32.000-02:00",
@@ -4205,6 +4466,9 @@
         "panw.panos.threat.resource": "www.15min.it/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "www.15min.it"
+        ],
         "related.ip": [
             "192.168.0.2",
             "216.8.179.25",
@@ -4228,7 +4492,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "www.15min.it/"
+        "url.domain": "www.15min.it",
+        "url.original": "www.15min.it/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:37:27.000-02:00",
@@ -4296,6 +4562,9 @@
         "panw.panos.threat.resource": "tubemov.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "adult-and-pornography",
+        "related.hosts": [
+            "tubemov.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "69.43.161.154",
@@ -4319,7 +4588,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "tubemov.com/"
+        "url.domain": "tubemov.com",
+        "url.original": "tubemov.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:37:25.000-02:00",
@@ -4387,6 +4658,9 @@
         "panw.panos.threat.resource": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "pagesinxt.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.91.196.252",
@@ -4410,7 +4684,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js"
+        "url.domain": "pagesinxt.com",
+        "url.original": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js",
+        "url.path": "/",
+        "url.query": "dn=teenstube.us&flrdr=yes&nxte=js"
     },
     {
         "@timestamp": "2012-04-10T04:37:05.000-02:00",
@@ -4478,6 +4755,9 @@
         "panw.panos.threat.resource": "movfree.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "spyware-and-adware",
+        "related.hosts": [
+            "movfree.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.73.210.29",
@@ -4501,7 +4781,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "movfree.com/"
+        "url.domain": "movfree.com",
+        "url.original": "movfree.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:36:51.000-02:00",
@@ -4572,6 +4854,9 @@
         "panw.panos.threat.resource": "gometascan.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "gometascan.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4595,7 +4880,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "gometascan.com/"
+        "url.domain": "gometascan.com",
+        "url.original": "gometascan.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2012-04-10T04:36:39.000-02:00",
@@ -4666,6 +4953,9 @@
         "panw.panos.threat.resource": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "antivirus-powerful-scannerv2.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4689,7 +4979,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe"
+        "url.domain": "antivirus-powerful-scannerv2.com",
+        "url.extension": "exe",
+        "url.original": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe",
+        "url.path": "/download/Install_11-1.exe"
     },
     {
         "@timestamp": "2012-04-10T04:36:38.000-02:00",
@@ -4760,6 +5053,9 @@
         "panw.panos.threat.resource": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "antivirus-powerful-scannerv2.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4783,7 +5079,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N"
+        "url.domain": "antivirus-powerful-scannerv2.com",
+        "url.original": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N",
+        "url.path": "/1/",
+        "url.query": "id=11-1&back==TQzyDTyMUQNMI=N"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -4854,6 +5153,9 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "basdzsdas.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4877,7 +5179,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "basdzsdas.com/poker/config.bin"
+        "url.domain": "basdzsdas.com",
+        "url.extension": "bin",
+        "url.original": "basdzsdas.com/poker/config.bin",
+        "url.path": "/poker/config.bin"
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -4948,6 +5253,9 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "basdzsdas.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -4971,7 +5279,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "basdzsdas.com/poker/config.bin"
+        "url.domain": "basdzsdas.com",
+        "url.extension": "bin",
+        "url.original": "basdzsdas.com/poker/config.bin",
+        "url.path": "/poker/config.bin"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -5032,6 +5343,9 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "uLLGRaXP.exe"
+        ],
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
@@ -5065,7 +5379,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "uLLGRaXP.exe"
+        "url.domain": "uLLGRaXP.exe",
+        "url.original": "uLLGRaXP.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -5136,6 +5452,9 @@
         "panw.panos.threat.resource": "basdzsdas.com/poker/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "basdzsdas.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -5159,7 +5478,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "basdzsdas.com/poker/config.bin"
+        "url.domain": "basdzsdas.com",
+        "url.extension": "bin",
+        "url.original": "basdzsdas.com/poker/config.bin",
+        "url.path": "/poker/config.bin"
     },
     {
         "@timestamp": "2012-04-10T04:51:29.000-02:00",
@@ -5220,6 +5542,9 @@
         "panw.panos.threat.resource": "FunkyEmoticons_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "FunkyEmoticons_setup.exe"
+        ],
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
@@ -5253,7 +5578,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "FunkyEmoticons_setup.exe"
+        "url.domain": "FunkyEmoticons_setup.exe",
+        "url.original": "FunkyEmoticons_setup.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:54:33.000-02:00",
@@ -5314,6 +5641,9 @@
         "panw.panos.threat.resource": "52hxw.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "52hxw.exe"
+        ],
         "related.ip": [
             "122.226.169.183",
             "192.168.0.2",
@@ -5346,7 +5676,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "52hxw.exe"
+        "url.domain": "52hxw.exe",
+        "url.original": "52hxw.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T05:01:00.000-02:00",
@@ -5417,6 +5749,9 @@
         "panw.panos.threat.resource": "softsellfast.com/test/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "softsellfast.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -5440,7 +5775,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "softsellfast.com/test/config.bin"
+        "url.domain": "softsellfast.com",
+        "url.extension": "bin",
+        "url.original": "softsellfast.com/test/config.bin",
+        "url.path": "/test/config.bin"
     },
     {
         "@timestamp": "2012-04-10T04:45:17.000-02:00",
@@ -5501,6 +5839,9 @@
         "panw.panos.threat.resource": "setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "setup.exe"
+        ],
         "related.ip": [
             "109.201.131.15",
             "192.168.0.2",
@@ -5531,7 +5872,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "setup.exe"
+        "url.domain": "setup.exe",
+        "url.original": "setup.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:46:16.000-02:00",
@@ -5592,6 +5935,9 @@
         "panw.panos.threat.resource": "Live-Player_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "Live-Player_setup.exe"
+        ],
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
@@ -5625,7 +5971,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "Live-Player_setup.exe"
+        "url.domain": "Live-Player_setup.exe",
+        "url.original": "Live-Player_setup.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:42:39.000-02:00",
@@ -5693,6 +6041,9 @@
         "panw.panos.threat.resource": "boialex.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "boialex.narod.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
@@ -5716,7 +6067,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "boialex.narod.ru/config.txt"
+        "url.domain": "boialex.narod.ru",
+        "url.extension": "txt",
+        "url.original": "boialex.narod.ru/config.txt",
+        "url.path": "/config.txt"
     },
     {
         "@timestamp": "2012-04-10T04:42:42.000-02:00",
@@ -5784,6 +6138,9 @@
         "panw.panos.threat.resource": "edw-melon.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "edw-melon.narod.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
@@ -5807,7 +6164,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "edw-melon.narod.ru/config.txt"
+        "url.domain": "edw-melon.narod.ru",
+        "url.extension": "txt",
+        "url.original": "edw-melon.narod.ru/config.txt",
+        "url.path": "/config.txt"
     },
     {
         "@timestamp": "2012-04-10T04:42:51.000-02:00",
@@ -5875,6 +6235,9 @@
         "panw.panos.threat.resource": "maximtushin.narod.ru/config.txt",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "malware-sites",
+        "related.hosts": [
+            "maximtushin.narod.ru"
+        ],
         "related.ip": [
             "192.168.0.2",
             "213.180.199.61",
@@ -5898,7 +6261,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "maximtushin.narod.ru/config.txt"
+        "url.domain": "maximtushin.narod.ru",
+        "url.extension": "txt",
+        "url.original": "maximtushin.narod.ru/config.txt",
+        "url.path": "/config.txt"
     },
     {
         "@timestamp": "2012-04-10T04:19:59.000-02:00",
@@ -5959,6 +6325,9 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "uLLGRaXP.exe"
+        ],
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
@@ -5992,7 +6361,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "uLLGRaXP.exe"
+        "url.domain": "uLLGRaXP.exe",
+        "url.original": "uLLGRaXP.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-10T04:09:01.000-02:00",
@@ -6063,6 +6434,9 @@
         "panw.panos.threat.resource": "marketingsoluchion.biz/fkn/config.bin",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "unknown",
+        "related.hosts": [
+            "marketingsoluchion.biz"
+        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -6086,7 +6460,10 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "marketingsoluchion.biz/fkn/config.bin"
+        "url.domain": "marketingsoluchion.biz",
+        "url.extension": "bin",
+        "url.original": "marketingsoluchion.biz/fkn/config.bin",
+        "url.path": "/fkn/config.bin"
     },
     {
         "@timestamp": "2012-04-09T08:18:27.000-02:00",
@@ -6157,6 +6534,9 @@
         "panw.panos.threat.resource": "default.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "default.aspx"
+        ],
         "related.ip": [
             "192.168.0.6",
             "207.46.140.46",
@@ -6180,7 +6560,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "default.aspx"
+        "url.domain": "default.aspx",
+        "url.original": "default.aspx",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:18:29.000-02:00",
@@ -6241,6 +6623,9 @@
         "panw.panos.threat.resource": "sck.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "sck.aspx"
+        ],
         "related.ip": [
             "65.54.161.34",
             "192.168.0.6",
@@ -6274,7 +6659,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "sck.aspx"
+        "url.domain": "sck.aspx",
+        "url.original": "sck.aspx",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:18:32.000-02:00",
@@ -6335,6 +6722,9 @@
         "panw.panos.threat.resource": "ADSAdClient31.dll",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "ADSAdClient31.dll"
+        ],
         "related.ip": [
             "65.55.5.231",
             "192.168.0.6",
@@ -6368,7 +6758,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "ADSAdClient31.dll"
+        "url.domain": "ADSAdClient31.dll",
+        "url.original": "ADSAdClient31.dll",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:18:33.000-02:00",
@@ -6439,6 +6831,9 @@
         "panw.panos.threat.resource": "c.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "c.gif"
+        ],
         "related.ip": [
             "192.168.0.6",
             "65.54.71.11",
@@ -6462,7 +6857,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "c.gif"
+        "url.domain": "c.gif",
+        "url.original": "c.gif",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:18:37.000-02:00",
@@ -6523,6 +6920,9 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "csi"
+        ],
         "related.ip": [
             "74.125.239.17",
             "192.168.0.6",
@@ -6553,7 +6953,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "csi"
+        "url.domain": "csi",
+        "url.original": "csi",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:50:12.000-02:00",
@@ -6621,6 +7023,9 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "internal-tuner.pandora.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
@@ -6644,7 +7049,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "internal-tuner.pandora.com"
+        "url.domain": "internal-tuner.pandora.com",
+        "url.original": "internal-tuner.pandora.com",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:58:18.000-02:00",
@@ -6705,6 +7112,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
@@ -6735,7 +7145,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:22:27.000-02:00",
@@ -6796,6 +7208,9 @@
         "panw.panos.threat.resource": "about.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "about.exe"
+        ],
         "related.ip": [
             "188.190.124.75",
             "192.168.0.6",
@@ -6829,7 +7244,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "about.exe"
+        "url.domain": "about.exe",
+        "url.original": "about.exe",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:11:43.000-02:00",
@@ -6890,6 +7307,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -6920,7 +7340,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:14:02.000-02:00",
@@ -6981,6 +7403,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
@@ -7011,7 +7436,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:14:39.000-02:00",
@@ -7072,6 +7499,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
@@ -7102,7 +7532,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:16:03.000-02:00",
@@ -7163,6 +7595,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -7193,7 +7628,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:18:14.000-02:00",
@@ -7261,6 +7698,9 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "__utm.gif"
+        ],
         "related.ip": [
             "192.168.0.2",
             "74.125.239.6",
@@ -7284,7 +7724,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "__utm.gif"
+        "url.domain": "__utm.gif",
+        "url.original": "__utm.gif",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:25:04.000-02:00",
@@ -7345,6 +7787,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.193",
             "192.168.0.2",
@@ -7375,7 +7820,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T07:36:04.000-02:00",
@@ -7436,6 +7883,9 @@
         "panw.panos.threat.resource": "nav_logo107.png",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "nav_logo107.png"
+        ],
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
@@ -7466,7 +7916,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "nav_logo107.png"
+        "url.domain": "nav_logo107.png",
+        "url.original": "nav_logo107.png",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:08:08.000-02:00",
@@ -7527,6 +7979,9 @@
         "panw.panos.threat.resource": "Eadweard_Muybridge",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "Eadweard_Muybridge"
+        ],
         "related.ip": [
             "208.80.154.225",
             "192.168.0.2",
@@ -7557,7 +8012,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "Eadweard_Muybridge"
+        "url.domain": "Eadweard_Muybridge",
+        "url.original": "Eadweard_Muybridge",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:08:44.000-02:00",
@@ -7618,6 +8075,9 @@
         "panw.panos.threat.resource": "load.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "load.php"
+        ],
         "related.ip": [
             "208.80.154.234",
             "192.168.0.2",
@@ -7648,7 +8108,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "load.php"
+        "url.domain": "load.php",
+        "url.original": "load.php",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T08:16:57.000-02:00",
@@ -7709,6 +8171,9 @@
         "panw.panos.threat.resource": "8fe44cb728c0f40750c64ee906eb72.css",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "8fe44cb728c0f40750c64ee906eb72.css"
+        ],
         "related.ip": [
             "65.54.75.25",
             "192.168.0.6",
@@ -7742,7 +8207,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "8fe44cb728c0f40750c64ee906eb72.css"
+        "url.domain": "8fe44cb728c0f40750c64ee906eb72.css",
+        "url.original": "8fe44cb728c0f40750c64ee906eb72.css",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T04:06:41.000-02:00",
@@ -7803,6 +8270,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.206",
             "192.168.0.2",
@@ -7833,7 +8303,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T04:12:52.000-02:00",
@@ -7894,6 +8366,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
@@ -7924,7 +8399,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:07:49.000-02:00",
@@ -7985,6 +8462,9 @@
         "panw.panos.threat.resource": "appcast.xml",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "appcast.xml"
+        ],
         "related.ip": [
             "207.178.96.34",
             "192.168.0.2",
@@ -8018,7 +8498,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "appcast.xml"
+        "url.domain": "appcast.xml",
+        "url.original": "appcast.xml",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:48:44.000-02:00",
@@ -8079,6 +8561,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
@@ -8109,7 +8594,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:48:59.000-02:00",
@@ -8170,6 +8657,9 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "csi"
+        ],
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
@@ -8200,7 +8690,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "csi"
+        "url.domain": "csi",
+        "url.original": "csi",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:50:14.000-02:00",
@@ -8261,6 +8753,9 @@
         "panw.panos.threat.resource": "index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "index.php"
+        ],
         "related.ip": [
             "66.152.109.24",
             "192.168.0.2",
@@ -8294,7 +8789,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "index.php"
+        "url.domain": "index.php",
+        "url.original": "index.php",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:51:34.000-02:00",
@@ -8355,6 +8852,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -8385,7 +8885,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:53:41.000-02:00",
@@ -8453,6 +8955,9 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "__utm.gif"
+        ],
         "related.ip": [
             "192.168.0.2",
             "74.125.224.201",
@@ -8476,7 +8981,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "__utm.gif"
+        "url.domain": "__utm.gif",
+        "url.original": "__utm.gif",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:54:35.000-02:00",
@@ -8537,6 +9044,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -8567,7 +9077,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T06:54:55.000-02:00",
@@ -8628,6 +9140,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -8658,7 +9173,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:44:49.000-02:00",
@@ -8726,6 +9243,9 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "internal-tuner.pandora.com"
+        ],
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
@@ -8749,7 +9269,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "internal-tuner.pandora.com"
+        "url.domain": "internal-tuner.pandora.com",
+        "url.original": "internal-tuner.pandora.com",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:45:45.000-02:00",
@@ -8810,6 +9332,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
@@ -8840,7 +9365,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:49:17.000-02:00",
@@ -8901,6 +9428,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
@@ -8931,7 +9461,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:53:41.000-02:00",
@@ -8992,6 +9524,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9022,7 +9557,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:55:23.000-02:00",
@@ -9083,6 +9620,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9113,7 +9653,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T03:55:52.000-02:00",
@@ -9174,6 +9716,9 @@
         "panw.panos.threat.resource": "ga.js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "ga.js"
+        ],
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
@@ -9204,7 +9749,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "ga.js"
+        "url.domain": "ga.js",
+        "url.original": "ga.js",
+        "url.path": ""
     },
     {
         "@timestamp": "2012-04-09T04:03:55.000-02:00",
@@ -9265,6 +9812,9 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "js"
+        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9295,6 +9845,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "js"
+        "url.domain": "js",
+        "url.original": "js",
+        "url.path": ""
     }
 ]
