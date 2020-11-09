@@ -24,12 +24,9 @@ const (
 )
 
 func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
-	if spec.MetricEndpoints != nil {
-		if endpoint, ok := (*spec.MetricEndpoints)[operatingSystem]; ok {
-			return endpoint
-		}
+	if endpoint, ok := spec.MetricEndpoints[operatingSystem]; ok {
+		return endpoint
 	}
-
 	if operatingSystem == "windows" {
 		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, spec.Cmd)
 	}
@@ -37,12 +34,9 @@ func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string
 }
 
 func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID string) string {
-	if spec.LogPaths != nil {
-		if path, ok := (*spec.LogPaths)[operatingSystem]; ok {
-			return path
-		}
+	if path, ok := spec.LogPaths[operatingSystem]; ok {
+		return path
 	}
-
 	if operatingSystem == "windows" {
 		return fmt.Sprintf(logFileFormatWin, paths.Home(), pipelineID, spec.Cmd)
 	}
