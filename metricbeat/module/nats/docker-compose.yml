@@ -19,5 +19,3 @@ services:
         NATS_VERSION: ${NATS_VERSION:-2.0.4}
     environment:
       - ROUTES=1
-    ports:
-      - 8222
