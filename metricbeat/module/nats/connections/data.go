@@ -66,8 +66,7 @@ type Connections struct {
 	Connections   []map[string]interface{} `json:"connections,omitempty"`
 }
 
-// eventMapping maps a subscription to a Metricbeat event using subscriptionsSchema
-// to parse through each subscription under a presumed channel
+// eventMapping maps a connection to a Metricbeat event using connectionsSchema
 func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Event, error) {
 	fields, err := fieldsSchema.Apply(content)
 	if err != nil {
@@ -96,7 +95,7 @@ func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Eve
 	return event, nil
 }
 
-// eventsMapping maps the top-level channel metrics AND also per-channel metrics AND subscriptions
+// eventsMapping maps the top-level connections metrics AND also per-connection metrics
 func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var err error
 	connections := Connections{}
