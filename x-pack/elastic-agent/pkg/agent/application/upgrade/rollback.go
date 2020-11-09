@@ -45,14 +45,14 @@ func Rollback(ctx context.Context, prevHash, currentHash string) error {
 		return err
 	}
 
-	<-time.After(afterRestartDelay)
-
 	// cleanup everything except version we're rolling back into
 	return Cleanup(prevHash)
 }
 
 // Cleanup removes all artifacts and files related to a specified version.
 func Cleanup(currentHash string) error {
+	<-time.After(afterRestartDelay)
+
 	// remove upgrade marker
 	if err := CleanMarker(); err != nil {
 		return err

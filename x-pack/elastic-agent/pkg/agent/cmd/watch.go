@@ -109,11 +109,13 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return err
 	}
 
-	err = upgrade.Cleanup(marker.Hash)
-	if err != nil {
-		log.Error("rollback failed", err)
-	}
-	return err
+	// invoke so active agent cleans inactive ones
+	upgrade.InvokeWatcher(log)
+	// err = upgrade.Cleanup(marker.Hash)
+	// if err != nil {
+	// 	log.Error("rollback failed", err)
+	// }
+	// return err
 }
 
 func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) error {
