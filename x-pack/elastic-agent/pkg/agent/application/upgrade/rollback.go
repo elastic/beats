@@ -45,6 +45,8 @@ func Rollback(ctx context.Context, prevHash, currentHash string) error {
 		return err
 	}
 
+	<-time.After(afterRestartDelay)
+
 	// cleanup everything except version we're rolling back into
 	return Cleanup(prevHash)
 }

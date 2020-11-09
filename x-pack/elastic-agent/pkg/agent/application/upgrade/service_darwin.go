@@ -18,11 +18,18 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/hashicorp/go-multierror"
+)
+
+const (
+	// delay after agent restart is performed to allow agent to tear down all the processes
+	// important mainly for windows, as it prevents removing files which are in use
+	afterRestartDelay = 2 * time.Second
 )
 
 // Init initializes os dependent properties.
