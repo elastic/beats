@@ -13,6 +13,11 @@ when:
     tags: true                 ## for all the tags
 platform: "linux && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        make: |
+          make -C heartbeat check;
+          make -C heartbeat update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -89,3 +94,36 @@ stages:
                 - "windows-2008"
             branches: true     ## for all the branches
             tags: true         ## for all the tag
+    windows-8:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-8"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test heartbeat for windows-8"
+            labels:
+                - "windows-8"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tag
+    windows-7:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test heartbeat for windows-7"
+            labels:
+                - "windows-7"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tag
+    windows-7-32:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7-32-bit"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test heartbeat for windows-7-32"
+            labels:
+                - "windows-7-32"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags

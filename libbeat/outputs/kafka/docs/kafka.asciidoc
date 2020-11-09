@@ -244,6 +244,12 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+[IMPORTANT]
+.Known issue with Azure Event Hub for Kafka
+====
+When targeting Azure Event Hub for Kafka, set `compression` to `none` as the provided codecs are not supported.
+====
+
 ===== `compression_level`
 
 Sets the compression level used by gzip. Setting this value to 0 disables compression.

@@ -515,6 +515,14 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
+	fi, err := os.Stat(h.state.Source)
+	if err != nil {
+		return fmt.Errorf("failed to stat source file %s: %v", h.state.Source, err)
+	}
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return fmt.Errorf("failed to open file %s, named pipes are not supported", h.state.Source)
+	}
+
 	f, err := file_helper.ReadOpen(h.state.Source)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
