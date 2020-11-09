@@ -2388,7 +2388,7 @@ filebeat.inputs:
 
 #---------------------------- Google Cloud Pub/Sub Input -----------------------
 # Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: google-pubsub
+- type: gcp-pubsub
   enabled: false
 
   # Google Cloud project ID. Required.
