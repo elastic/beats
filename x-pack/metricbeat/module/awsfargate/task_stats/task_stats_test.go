@@ -18,33 +18,22 @@ var (
 		"query-metadata-1": {
 			"read": "2020-04-06T16:12:01.090148907Z",
 			"preread": "2020-04-06T16:12:01.090148907Z",
-			"blkio_stats": {
-				"io_service_bytes_recursive": [
-					{"major": 202, "minor": 26368, "op": "Read", "value": 3452928},
-					{"major": 202, "minor": 26368, "op": "Write", "value": 0},
-					{"major": 202, "minor": 26368, "op": "Sync", "value": 3452928},
-					{"major": 202, "minor": 26368, "op": "Async", "value": 0},
-      				{"major": 202, "minor": 26368, "op": "Total", "value": 3452928}
-				],
-				"io_serviced_recursive": [
-					{"major": 202, "minor": 26368, "op": "Read", "value": 118},
-      				{"major": 202, "minor": 26368, "op": "Write", "value": 0},
-      				{"major": 202, "minor": 26368, "op": "Sync", "value": 118},
-      				{"major": 202, "minor": 26368, "op": "Async", "value": 0},
-      				{"major": 202, "minor": 26368, "op": "Total", "value": 118}
-				],
-				"io_queue_recursive": [],
-            	"io_service_time_recursive": [],
-            	"io_wait_time_recursive": [],
-            	"io_merged_recursive": [],
-            	"io_time_recursive": [],
-            	"sectors_recursive": []},
 			"cpu_stats": {
-				"cpu_usage": {"total_usage": 410557100, "percpu_usage": [410557100,0,0,0,0,0,0,0,0],
-				"usage_in_kernelmode": 10000000, "usage_in_usermode": 250000000},
+				"cpu_usage": {
+					"percpu_usage": [1800000000, 500000000, 0, 0, 0, 0, 0, 0],
+					"total_usage": 2300000000, "usage_in_kernelmode": 1520000000, "usage_in_usermode": 490000000
+				},
+				"online_cpus": 2,
+				"system_cpu_usage": 1420180000000,
 				"throttling_data": {"periods": 0, "throttled_periods": 0, "throttled_time": 0}},
-			"precpu_stats": {"cpu_usage": {"total_usage": 1455776944, "percpu_usage": [1012800588, 0,0,0,0,0,0,0,0],
-				"usage_in_kernelmode": 0, "usage_in_usermode": 0}},
+			"precpu_stats": {
+				"cpu_usage": {
+					"percpu_usage": [1600000000, 300000000, 0, 0, 0, 0, 0, 0],
+					"total_usage": 1900000000, "usage_in_kernelmode": 1520000000, "usage_in_usermode": 490000000
+				},
+				"online_cpus": 2,
+				"system_cpu_usage": 1418180000000,
+				"throttling_data": {"periods": 0, "throttled_periods": 0, "throttled_time": 0}},
 			"memory_stats": {"limit": 8362348544, "usage": 4390912, "max_usage": 6488064, "stats": {"total_rss": 278528}},
 			"name": "query-metadata-1",
 			"id": "query-metadata-1",
@@ -78,7 +67,7 @@ func TestGetTaskStats(t *testing.T) {
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(410557100), taskStatsOutput["query-metadata-1"].CPUStats.CPUUsage.TotalUsage)
+	assert.Equal(t, uint64(2300000000), taskStatsOutput["query-metadata-1"].CPUStats.CPUUsage.TotalUsage)
 }
 
 func TestGetTask(t *testing.T) {
@@ -118,4 +107,18 @@ func TestGetStatsList(t *testing.T) {
 
 	formattedStats := getStatsList(taskStatsOutput, taskOutput)
 	assert.Equal(t, 1, len(formattedStats))
+}
+
+func TestGetCPUStats(t *testing.T) {
+	taskStatsResp := &http.Response{
+		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+	}
+
+	taskStatsOutput, err := getTaskStats(taskStatsResp)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(taskStatsOutput))
+
+	cpuStats := getCPUStats(taskStatsOutput["query-metadata-1"])
+	assert.Equal(t, 0.4, cpuStats.TotalUsage)
+	assert.Equal(t, 0.2, cpuStats.TotalUsageNormalized)
 }

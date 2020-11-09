@@ -247,15 +247,25 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
 		if cInfo, ok := containersInfo[id]; ok {
-			formattedStats = append(formattedStats, getStats(taskStats, cInfo.Container))
+			statsPerContainer := Stats{
+				Time:         common.Time(taskStats.Stats.Read),
+				Container:    getContainerStats(cInfo.Container),
+				cpuStats:     getCPUStats(taskStats),
+				memoryStats:  getMemoryStats(taskStats),
+				networkStats: getNetworkStats(taskStats),
+				blkioStats:   getBlkioStats(taskStats.BlkioStats),
+			}
+
+			formattedStats = append(formattedStats, statsPerContainer)
 		}
 	}
 	return formattedStats
 }
 
-func getStats(taskStats types.StatsJSON, c *container) Stats {
+func getCPUStats(taskStats types.StatsJSON) cpuStats {
 	usage := cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}
-	cpuStats := cpuStats{
+
+	return cpuStats{
 		TotalUsage:                            usage.Total(),
 		TotalUsageNormalized:                  usage.TotalNormalized(),
 		UsageInKernelmode:                     taskStats.Stats.CPUStats.CPUUsage.UsageInKernelmode,
@@ -268,9 +278,12 @@ func getStats(taskStats types.StatsJSON, c *container) Stats {
 		SystemUsagePercentage:                 usage.System(),
 		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
 	}
+}
 
+func getMemoryStats(taskStats types.StatsJSON) memoryStats {
 	totalRSS := taskStats.Stats.MemoryStats.Stats["total_rss"]
-	memoryStats := memoryStats{
+
+	return memoryStats{
 		TotalRss:  totalRSS,
 		MaxUsage:  taskStats.Stats.MemoryStats.MaxUsage,
 		TotalRssP: float64(totalRSS) / float64(taskStats.Stats.MemoryStats.Limit),
@@ -282,20 +295,18 @@ func getStats(taskStats types.StatsJSON, c *container) Stats {
 		CommitPeak:        taskStats.Stats.MemoryStats.CommitPeak,
 		PrivateWorkingSet: taskStats.Stats.MemoryStats.PrivateWorkingSet,
 	}
+}
 
-	stats := Stats{
-		Time:        common.Time(taskStats.Stats.Read),
-		cpuStats:    cpuStats,
-		memoryStats: memoryStats,
-	}
-
-	stats.Container = &container{
+func getContainerStats(c *container) *container {
+	return &container{
 		DockerId: c.DockerId,
 		Image:    c.Image,
 		Name:     helpers.ExtractContainerName([]string{c.Name}),
 		Labels:   deDotLabels(c.Labels),
 	}
+}
 
+func getNetworkStats(taskStats types.StatsJSON) []networkStats {
 	var networks []networkStats
 	for nameInterface, rawNetStats := range taskStats.Networks {
 		networks = append(networks, networkStats{
@@ -303,26 +314,7 @@ func getStats(taskStats types.StatsJSON, c *container) Stats {
 			Total:         rawNetStats,
 		})
 	}
-	stats.networkStats = networks
-
-	blkioStats := getBlkioStats(taskStats.BlkioStats)
-	stats.blkioStats = blkioStats
-	return stats
-}
-
-// deDotLabels returns a new map[string]string containing a copy of the labels
-// where the dots have been converted into nested structure, avoiding possible
-// mapping errors
-func deDotLabels(labels map[string]string) map[string]string {
-	outputLabels := map[string]string{}
-	for k, v := range labels {
-		// This is necessary so that ES does not interpret '.' fields as new
-		// nested JSON objects, and also makes this compatible with ES 2.x.
-		label := common.DeDot(k)
-		outputLabels[label] = v
-	}
-
-	return outputLabels
+	return networks
 }
 
 // getBlkioStats collects diskio metrics from BlkioStats structures, that
@@ -355,4 +347,19 @@ func getNewStats(blkioEntry []types.BlkioStatEntry) BlkioRaw {
 		}
 	}
 	return stats
+}
+
+// deDotLabels returns a new map[string]string containing a copy of the labels
+// where the dots have been converted into nested structure, avoiding possible
+// mapping errors
+func deDotLabels(labels map[string]string) map[string]string {
+	outputLabels := map[string]string{}
+	for k, v := range labels {
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
+		label := common.DeDot(k)
+		outputLabels[label] = v
+	}
+
+	return outputLabels
 }
