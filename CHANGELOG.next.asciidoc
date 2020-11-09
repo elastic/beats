@@ -32,7 +32,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
 - Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
-- Autodiscover kubernetes provider will find ephemeral containers. {pull}22389[22389]
 
 *Auditbeat*
 
@@ -555,6 +554,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
+- Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 
 *Auditbeat*
 
