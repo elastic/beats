@@ -206,6 +206,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Orderly close processors when processing pipelines are not needed anymore to release their resources. {pull}16349[16349]
 - Fix memory leak and events duplication in docker autodiscover and add_docker_metadata. {pull}21851[21851]
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
+- Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 
 *Auditbeat*
 
