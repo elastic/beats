@@ -1,0 +1,78 @@
+[2020-01-09T15:27:55.073562Z] [BUILD] Copying additional config files from distro [/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/users_roles, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/role_mapping.yml, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/users, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/elasticsearch.yml, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/roles.yml, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/log4j2.properties, /Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/config/jvm.options]
+[2020-01-09T15:27:55.075866Z] [BUILD] Adding 1 keystore settings and 0 keystore files
+[2020-01-09T15:27:56.769955Z] [BUILD] Setting up 1 users
+[2020-01-09T15:27:57.833530Z] [BUILD] Starting Elasticsearch process
+[2020-01-09T16:27:59,684][INFO ][o.e.e.NodeEnvironment    ] [runTask-0] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [125gb], net total_space [465.6gb], types [apfs]
+[2020-01-09T16:27:59,687][INFO ][o.e.e.NodeEnvironment    ] [runTask-0] heap size [494.9mb], compressed ordinary object pointers [true]
+[2020-01-09T16:27:59,727][INFO ][o.e.n.Node               ] [runTask-0] node name [runTask-0], node ID [XU-iOxugRLS6ktCXSDkARw], cluster name [runTask]
+[2020-01-09T16:27:59,736][INFO ][o.e.n.Node               ] [runTask-0] version[8.0.0-SNAPSHOT], pid[24057], build[default/tar/a0f56437047cb804296b60852c47af1bfe2750a0/2020-01-09T15:25:15.400120Z], OS[Mac OS X/10.14.6/x86_64], JVM[AdoptOpenJDK/OpenJDK 64-Bit Server VM/13.0.1/13.0.1+9]
+[2020-01-09T16:27:59,736][INFO ][o.e.n.Node               ] [runTask-0] JVM home [/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT/jdk.app/Contents/Home]
+[2020-01-09T16:27:59,737][INFO ][o.e.n.Node               ] [runTask-0] JVM arguments [-Des.networkaddress.cache.ttl=60, -Des.networkaddress.cache.negative.ttl=10, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dio.netty.allocator.numDirectArenas=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.locale.providers=SPI,COMPAT, -Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -Djava.io.tmpdir=/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/tmp, -XX:+HeapDumpOnOutOfMemoryError, -XX:HeapDumpPath=data, -XX:ErrorFile=logs/hs_err_pid%p.log, -Xlog:gc*,gc+age=trace,safepoint:file=logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m, -Xms512m, -Xmx512m, -ea, -esa, -XX:MaxDirectMemorySize=268435456, -Des.path.home=/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/distro/8.0.0-DEFAULT, -Des.path.conf=/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/config, -Des.distribution.flavor=default, -Des.distribution.type=tar, -Des.bundled_jdk=true]
+[2020-01-09T16:27:59,737][WARN ][o.e.n.Node               ] [runTask-0] version [8.0.0-SNAPSHOT] is a pre-release version of Elasticsearch and is not suitable for production
+[2020-01-09T16:28:01,204][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [aggs-matrix-stats]
+[2020-01-09T16:28:01,204][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [analysis-common]
+[2020-01-09T16:28:01,204][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [flattened]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [frozen-indices]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [ingest-common]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [ingest-geoip]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [ingest-user-agent]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [lang-expression]
+[2020-01-09T16:28:01,205][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [lang-mustache]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [lang-painless]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [mapper-extras]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [parent-join]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [percolator]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [rank-eval]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [reindex]
+[2020-01-09T16:28:01,206][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [repository-url]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [search-business-rules]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [spatial]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [transform]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [transport-netty4]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [vectors]
+[2020-01-09T16:28:01,207][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-analytics]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-ccr]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-core]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-deprecation]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-enrich]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-graph]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-ilm]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-logstash]
+[2020-01-09T16:28:01,208][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-ml]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-monitoring]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-rollup]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-security]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-sql]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-voting-only-node]
+[2020-01-09T16:28:01,209][INFO ][o.e.p.PluginsService     ] [runTask-0] loaded module [x-pack-watcher]
+[2020-01-09T16:28:01,210][INFO ][o.e.p.PluginsService     ] [runTask-0] no plugins loaded
+[2020-01-09T16:28:04,522][INFO ][o.e.x.s.a.s.FileRolesStore] [runTask-0] parsed [0] roles from file [/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/config/roles.yml]
+[2020-01-09T16:28:04,910][INFO ][o.e.x.m.p.l.CppLogMessageHandler] [runTask-0] [controller/24076] [Main.cc@110] controller (64 bit): Version 8.0.0-SNAPSHOT (Build 493cdf8a083b10) Copyright (c) 2020 Elasticsearch BV
+[2020-01-09T16:28:05,385][DEBUG][o.e.a.ActionModule       ] [runTask-0] Using REST wrapper from plugin org.elasticsearch.xpack.security.Security
+[2020-01-09T16:28:05,481][INFO ][o.e.d.DiscoveryModule    ] [runTask-0] using discovery type [zen] and seed hosts providers [settings, file]
+[2020-01-09T16:28:06,104][INFO ][o.e.n.Node               ] [runTask-0] initialized
+[2020-01-09T16:28:06,105][INFO ][o.e.n.Node               ] [runTask-0] starting ...
+[2020-01-09T16:28:06,247][INFO ][o.e.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2020-01-09T16:28:06,372][WARN ][o.e.d.FileBasedSeedHostsProvider] [runTask-0] expected, but did not find, a dynamic hosts list at [/Users/przemek/workspace/pgomulka/elasticsearch/distribution/build/testclusters/runTask-0/config/unicast_hosts.txt]
+[2020-01-09T16:28:06,373][INFO ][o.e.c.c.Coordinator      ] [runTask-0] setting initial configuration to VotingConfiguration{XU-iOxugRLS6ktCXSDkARw}
+[2020-01-09T16:28:06,415][INFO ][o.e.h.AbstractHttpServerTransport] [runTask-0] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2020-01-09T16:28:06,417][INFO ][o.e.n.Node               ] [runTask-0] started
+[2020-01-09T16:28:06,490][INFO ][o.e.c.s.MasterService    ] [runTask-0] elected-as-master ([1] nodes joined)[{runTask-0}{XU-iOxugRLS6ktCXSDkARw}{pRaExanUQ3-jGKlK0Q3v1Q}{127.0.0.1}{127.0.0.1:9300}{dilm}{ml.machine_memory=34359738368, xpack.installed=true, testattr=test, ml.max_open_jobs=20} elect leader, _BECOME_MASTER_TASK_, _FINISH_ELECTION_], term: 1, version: 1, delta: master node changed {previous [], current [{runTask-0}{XU-iOxugRLS6ktCXSDkARw}{pRaExanUQ3-jGKlK0Q3v1Q}{127.0.0.1}{127.0.0.1:9300}{dilm}{ml.machine_memory=34359738368, xpack.installed=true, testattr=test, ml.max_open_jobs=20}]}
+[2020-01-09T16:28:06,530][INFO ][o.e.c.c.CoordinationState] [runTask-0] cluster UUID set to [EMCTMwc9TPSsa_RxpFSb9w]
+[2020-01-09T16:28:06,562][INFO ][o.e.c.s.ClusterApplierService] [runTask-0] master node changed {previous [], current [{runTask-0}{XU-iOxugRLS6ktCXSDkARw}{pRaExanUQ3-jGKlK0Q3v1Q}{127.0.0.1}{127.0.0.1:9300}{dilm}{ml.machine_memory=34359738368, xpack.installed=true, testattr=test, ml.max_open_jobs=20}]}, term: 1, version: 1, reason: Publication{term=1, version=1}
+[2020-01-09T16:28:06,641][INFO ][o.e.g.GatewayService     ] [runTask-0] recovered [0] indices into cluster_state
+[2020-01-09T16:28:06,738][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.watches] for index patterns [.watches*]
+[2020-01-09T16:28:06,797][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.watch-history-10] for index patterns [.watcher-history-10*]
+[2020-01-09T16:28:06,840][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.slm-history] for index patterns [.slm-history-1*]
+[2020-01-09T16:28:06,882][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.triggered_watches] for index patterns [.triggered_watches*]
+[2020-01-09T16:28:06,933][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [ilm-history] for index patterns [ilm-history-1*]
+[2020-01-09T16:28:06,990][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.monitoring-logstash] for index patterns [.monitoring-logstash-7-*]
+[2020-01-09T16:28:07,047][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.monitoring-es] for index patterns [.monitoring-es-7-*]
+[2020-01-09T16:28:07,095][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.monitoring-beats] for index patterns [.monitoring-beats-7-*]
+[2020-01-09T16:28:07,133][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.monitoring-alerts-7] for index patterns [.monitoring-alerts-7]
+[2020-01-09T16:28:07,173][INFO ][o.e.c.m.MetaDataIndexTemplateService] [runTask-0] adding template [.monitoring-kibana] for index patterns [.monitoring-kibana-7-*]
+[2020-01-09T16:28:07,266][INFO ][o.e.l.LicenseService     ] [runTask-0] license [95f414d4-7f50-48b6-9f73-d08eb0becdb7] mode [basic] - valid
+[2020-01-09T16:28:07,266][INFO ][o.e.x.s.s.SecurityStatusChangeListener] [runTask-0] Active license is now [BASIC]; Security is enabled
+[2020-01-09T16:28:07,269][INFO ][o.e.x.i.a.TransportPutLifecycleAction] [runTask-0] adding index lifecycle policy [ilm-history-ilm-policy]
+[2020-01-09T16:28:07,312][INFO ][o.e.x.i.a.TransportPutLifecycleAction] [runTask-0] adding index lifecycle policy [slm-history-ilm-policy]
+[2020-01-09T16:28:07,348][INFO ][o.e.x.i.a.TransportPutLifecycleAction] [runTask-0] adding index lifecycle policy [watch-history-ilm-policy]
