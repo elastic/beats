@@ -110,7 +110,12 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 	}
 
 	// invoke so active agent cleans inactive ones
-	upgrade.InvokeWatcher(log)
+	err = upgrade.InvokeWatcher(log)
+	if err != nil {
+		log.Error("rollback failed", err)
+	}
+	return err
+
 	// err = upgrade.Cleanup(marker.Hash)
 	// if err != nil {
 	// 	log.Error("rollback failed", err)
