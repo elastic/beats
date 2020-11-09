@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
-- Autodiscover kubernetes provider will find ephemeral containers. {pull}22389[22389]
 
 *Auditbeat*
 
@@ -492,6 +491,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
+- Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 
 *Auditbeat*
 
