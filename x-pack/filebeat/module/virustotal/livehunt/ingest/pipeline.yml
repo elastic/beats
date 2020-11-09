@@ -75,9 +75,4 @@ on_failure:
       field: error.message
       value: '{{ _ingest.on_failure_message }}'
 
-# - date:
-#     field: virustotal.analysis_date
-#     target_field: virustotal.analysis_date
-#     formats:
-#     - UNIX_MS
-#     if: ctx.virustotal.analysis_date != null
+

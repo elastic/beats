@@ -685,7 +685,7 @@
       description: >
         Section information of the ELF file.
       release: beta
-      type: group
+      type: nested
       fields:
         - name: flags
           description: >
@@ -717,7 +717,7 @@
       description: >
         List of exported element names and types
       release: beta
-      type: group
+      type: nested
       fields:
         - name: name
           description: >
@@ -733,7 +733,7 @@
       description: >
         List of imported element names and types
       release: beta
-      type: group
+      type: nested
       fields:
         - name: name
           description: >
@@ -749,7 +749,7 @@
       description: >
         List of shared libraries used by this ELF object
       type: keyword
-    - name: telfhash
+    - name: hash.telfhash
       description: >
         telfhash hash for ELF files.
       type: keyword
@@ -770,6 +770,7 @@
     - name: flattened
       release: beta
       type: group
+      overwrite: true
       fields:
         - name: debug
           default_field: false
@@ -803,14 +804,6 @@
           description: >
             Digest of resource types. Key is resource type (as string) and value
             is how many resources there are of that specific type (as integer)
-        - name: packers
-          default_field: false
-          type: flattened
-          description: >
-            Identifies packers used on Windows PE files by several tools and AVs.
-            Keys are tool names and values are identified packers, both strings.
-            see `file.pe.packers` for merged list of packers from all tools.
-      overwrite: true
     - name: exports
       type: keyword
       description: >
@@ -822,7 +815,7 @@
         extracted when possible from the file's metadata. Indicates when it was
         built or compiled. It can also be faked by malware creators.
       type: date
-    - name: authentihash
+    - name: hash.authentihash
       description: >
         Authentihash of the PE file.
       type: keyword
@@ -830,12 +823,6 @@
       description: >
         Compile timestamp of the PE file.
       type: date
-
-    - name: packers
-      type: keyword
-      description: >
-        Merged list of all detected packers by all tools used. See `file.pe.flattened.packers`.
-
     - name: main_icon.hash
       type: group
       description: >
@@ -855,10 +842,10 @@
       type: keyword
       description: >
         Version of the compiler product.
-    - name: rich_pe_header_hash
+    - name: rich_pe_header.hash
       type: keyword
       description: >
-        Hash of the PE header.
+        RichPE header hash of the PE.
     - name: entry_point
       description: >
         Entry point of the PE file.
@@ -872,7 +859,7 @@
       description: >
         Overlay information of the PE file.
       release: beta
-      type: group
+      type: nested
       fields:
         - name: chi2
           description: >

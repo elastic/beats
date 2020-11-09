@@ -1,4 +1,12 @@
 // spellchecker: disable
+
+var elf_symbol_type_lookup = {
+    "NOTYPE": "no type",
+    "FUNC": "function",
+    "TLS": "thread local symbol",
+    "OBJECT": "object"
+};
+
 var vtELF = (function () {
     var processor = require("processor");
     var console = require("console");
@@ -37,10 +45,76 @@ var vtELF = (function () {
         }
     };
 
+    var normalizeImports = function (evt) {
+        console.debug("vtELF.normalizeImports");
+
+        var imports = evt.Get("file.elf.imports");
+        var normal_imports = Array();
+
+        if (import != null) {
+            console.debug("imports[" + imports.length + "]: \n" + JSON.stringify(imports, undefined, 2));
+
+            /* The goal is to normalize import list to the following
+             * structure:
+             * {
+             *  "name": "MY_SYMBOL", (keyword)
+             *  "type": "function", (keyword, lowercased; normalized to function, object, notype, thread local symbol
+             *  "library_name": "kernel32.dll"
+             * }
+             *
+             * NOTE: VT doesn't return resolved library_name for ELF files, so this will be omitted
+             */
+            for (var i = 0; i < imports.length; i++) {
+                var sym_type = imports[i].type;
+                if (sym_type in elf_symbol_type_lookup) {
+                    imports[i].type = elf_symbol_type_lookup[sym_type];
+                }
+            }
+
+            evt.Delete("file.elf.imports");
+            evt.Put("file.elf.imports", imports);
+        }
+
+    };
+
+    var normalizeExports = function (evt) {
+        console.debug("vtELF.normalizeExports");
+
+        var exports = evt.Get("file.elf.exports");
+        var normal_exports = Array();
+
+        if (import != null) {
+            console.debug("exports[" + exports.length + "]: \n" + JSON.stringify(exports, undefined, 2));
+
+            /* The goal is to normalize import list to the following
+             * structure:
+             * {
+             *  "name": "MY_SYMBOL", (keyword)
+             *  "type": "function", (keyword, lowercased; normalized to function, object, notype, thread local symbol
+             *  "library_name": "kernel32.dll"
+             * }
+             *
+             * NOTE: VT doesn't return resolved library_name for ELF files, so this will be omitted
+             */
+            for (var i = 0; i < exports.length; i++) {
+                var sym_type = exports[i].type;
+                if (sym_type in elf_symbol_type_lookup) {
+                    exports[i].type = elf_symbol_type_lookup[sym_type];
+                }
+            }
+
+            evt.Delete("file.elf.exports");
+            evt.Put("file.elf.exports", exports);
+        }
+
+    };
+
     var processMessage = new processor.Chain()
         .Add(function (evt) {
             correctSpelling(evt);
             enumeratePackers(evt);
+            normalizeImports(evt);
+            normalizeExports(evt);
         })
         .Build();
 
