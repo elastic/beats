@@ -1,45 +1,45 @@
 ++++
 <div class="tabs" data-tab-group="os">
-  <div role="tablist" aria-label="Install">
+  <div role="tablist" aria-label="Enroll">
     <button role="tab"
             aria-selected="true"
-            aria-controls="mac-tab-install"
-            id="mac-install">
+            aria-controls="mac-tab-enroll"
+            id="mac-enroll">
       MacOS
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="linux-tab-install"
-            id="linux-install"
+            aria-controls="linux-tab-enroll"
+            id="linux-enroll"
             tabindex="-1">
       Linux
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="win-tab-install"
-            id="win-install"
+            aria-controls="win-tab-enroll"
+            id="win-enroll"
             tabindex="-1">
       Windows
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="deb-tab-install"
-            id="deb-install"
+            aria-controls="deb-tab-enroll"
+            id="deb-enroll"
             tabindex="-1">
       DEB
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="rpm-tab-install"
-            id="rpm-install"
+            aria-controls="rpm-tab-enroll"
+            id="rpm-enroll"
             tabindex="-1">
       RPM
     </button>
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="mac-tab-install"
-       aria-labelledby="mac-install">
+       id="mac-tab-enroll"
+       aria-labelledby="mac-enroll">
 ++++
 
 include::install.asciidoc[tag=mac]
@@ -48,8 +48,8 @@ include::install.asciidoc[tag=mac]
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="linux-tab-install"
-       aria-labelledby="linux-install"
+       id="linux-tab-enroll"
+       aria-labelledby="linux-enroll"
        hidden="">
 ++++
 
@@ -59,8 +59,8 @@ include::install.asciidoc[tag=linux]
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="win-tab-install"
-       aria-labelledby="win-install"
+       id="win-tab-enroll"
+       aria-labelledby="win-enroll"
        hidden="">
 ++++
 
@@ -70,10 +70,9 @@ include::install.asciidoc[tag=win]
   </div>
   <div tabindex="0"
        role="tabpanel"
-       id="deb-tab-install"
-       aria-labelledby="deb-install"
+       id="deb-tab-enroll"
+       aria-labelledby="deb-enroll"
        hidden="">
-
 ++++
 
 include::install.asciidoc[tag=deb]
@@ -82,8 +81,8 @@ include::install.asciidoc[tag=deb]
   </div> 
   <div tabindex="0"
        role="tabpanel"
-       id="rpm-tab-install"
-       aria-labelledby="rpm-install"
+       id="rpm-tab-enroll"
+       aria-labelledby="rpm-enroll"
        hidden="">
 ++++
 
