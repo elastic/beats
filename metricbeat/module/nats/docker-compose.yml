@@ -10,8 +10,6 @@ services:
         NATS_VERSION: ${NATS_VERSION:-2.0.4}
     ports:
       - 8222
-      - 4222
-      - 6222
   nats-1:
     image: docker.elastic.co/integrations-ci/beats-nats:${NATS_VERSION:-2.0.4}-1
     build:
@@ -23,5 +21,3 @@ services:
       - ROUTES=1
     ports:
       - 8222
-      - 4222
-      - 6222
