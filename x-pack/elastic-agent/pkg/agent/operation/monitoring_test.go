@@ -6,9 +6,10 @@ package operation
 
 import (
 	"context"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
@@ -169,7 +170,9 @@ type testMonitor struct {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *testMonitor) EnrichArgs(_ program.Spec, _ string, args []string, _ bool) []string { return args }
+func (b *testMonitor) EnrichArgs(_ program.Spec, _ string, args []string, _ bool) []string {
+	return args
+}
 
 // Cleanup cleans up all drops.
 func (b *testMonitor) Cleanup(program.Spec, string) error { return nil }
