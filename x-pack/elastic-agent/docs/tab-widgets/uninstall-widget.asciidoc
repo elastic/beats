@@ -21,6 +21,7 @@
             tabindex="-1">
       Windows
     </button>
+  </div>
   <div tabindex="0"
        role="tabpanel"
        id="mac-tab-uninstall"
