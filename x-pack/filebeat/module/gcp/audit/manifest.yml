@@ -8,7 +8,7 @@ var:
   - name: topic
     default: stackdriver-audit
   - name: subscription_name
-    default: filebeat-googlecloud-audit
+    default: filebeat-gcp-audit
   - name: credentials_file
   - name: credentials_json
   - name: keep_original_message

@@ -8,7 +8,7 @@ var:
   - name: topic
     default: stackdriver-vpcflow
   - name: subscription_name
-    default: filebeat-googlecloud-vpcflow
+    default: filebeat-gcp-vpcflow
   - name: credentials_file
   - name: credentials_json
   - name: keep_original_message
