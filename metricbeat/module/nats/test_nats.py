@@ -8,7 +8,7 @@ NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
 @metricbeat.parameterized_with_supported_versions
 class TestNats(metricbeat.BaseTest):
-    COMPOSE_SERVICES = ['nats']
+    COMPOSE_SERVICES = ['nats', 'nats-1']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
@@ -109,3 +109,6 @@ class TestNats(metricbeat.BaseTest):
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
+
+    def get_hosts(self):
+        return [self.compose_host("nats")]
