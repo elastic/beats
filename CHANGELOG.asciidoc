@@ -97,9 +97,6 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 
 - Add support for new `service_name` option to all monitors. {pull}19932[19932].
 
-*Heartbeat*
-
-
 *Journalbeat*
 
 
@@ -206,8 +203,6 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 
 - Add index and pipeline settings to monitor configurations. {pull}20610[20610]
 
-*Heartbeat*
-
 *Journalbeat*
 
 
@@ -256,29 +251,8 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 
 ==== Deprecated
 
-*Affecting all Beats*
 
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
-
+- N/A
 
 [[release-notes-7.9.3]]
 === Beats version 7.9.3
