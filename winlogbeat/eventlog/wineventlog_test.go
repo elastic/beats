@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
@@ -52,10 +53,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// Publish large test messages.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		err := writer.Report(eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(31800)})
-		if err != nil {
-			t.Fatal(err)
-		}
+		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(31800)})
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
@@ -165,6 +163,20 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	}
 
 	return log, tearDown
+}
+
+func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+	deadline := time.Now().Add(time.Second * 10)
+	for {
+		err := log.Report(etype, eid, msgs)
+		if err == nil {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("Failed to write event to event log", err)
+			return
+		}
+	}
 }
 
 // setLogSize set the maximum number of bytes that an event log can hold.
