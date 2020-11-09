@@ -21,4 +21,4 @@ rules:
     - inputs
     - output
 
-when: HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch')
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
