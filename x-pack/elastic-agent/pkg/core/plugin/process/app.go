@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -37,7 +39,7 @@ type Application struct {
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         app.Specifier
+	desc         *app.Descriptor
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
@@ -66,14 +68,14 @@ type ArgsDecorator func([]string) []string
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
-	spec app.Specifier,
+	desc *app.Descriptor,
 	srv *server.Server,
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
 
-	s := spec.Spec()
+	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
@@ -86,7 +88,7 @@ func NewApplication(
 		name:          appName,
 		pipelineID:    pipelineID,
 		logLevel:      logLevel,
-		spec:          spec,
+		desc:          desc,
 		srv:           srv,
 		processConfig: cfg.ProcessConfig,
 		logger:        logger,
@@ -101,6 +103,11 @@ func NewApplication(
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// Spec returns the program spec of this app.
+func (a *Application) Spec() program.Spec {
+	return a.desc.Spec()
 }
 
 // State returns the application state.
@@ -252,5 +259,5 @@ func (a *Application) setState(status state.Status, msg string, payload map[stri
 }
 
 func (a *Application) cleanUp() {
-	a.monitor.Cleanup(a.name, a.pipelineID)
+	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
 }

@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -26,10 +28,17 @@ import (
 )
 
 const (
-	agentName         = "elastic-agent"
-	hashLen           = 6
-	agentCommitFile   = ".elastic-agent.active.commit"
-	agentArtifactName = "beats/" + agentName
+	agentName       = "elastic-agent"
+	hashLen         = 6
+	agentCommitFile = ".elastic-agent.active.commit"
+)
+
+var (
+	agentSpec = program.Spec{
+		Name:     "Elastic Agent",
+		Cmd:      agentName,
+		Artifact: "beats/" + agentName,
+	}
 )
 
 // Upgrader performs an upgrade
