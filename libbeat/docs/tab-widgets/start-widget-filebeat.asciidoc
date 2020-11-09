@@ -52,7 +52,7 @@
        aria-labelledby="deb-start-filebeat">
 ++++
 
-include::start.asciidoc[tag=deb]
+include::start-filebeat.asciidoc[tag=deb]
 
 ++++
   </div>
@@ -63,7 +63,7 @@ include::start.asciidoc[tag=deb]
        hidden="">
 ++++
 
-include::start.asciidoc[tag=rpm]
+include::start-filebeat.asciidoc[tag=rpm]
 
 ++++
   </div>
@@ -74,7 +74,7 @@ include::start.asciidoc[tag=rpm]
        hidden="">
 ++++
 
-include::start.asciidoc[tag=mac]
+include::start-filebeat.asciidoc[tag=mac]
 
 ++++
   </div>
@@ -85,7 +85,7 @@ include::start.asciidoc[tag=mac]
        hidden="">
 ++++
 
-include::start.asciidoc[tag=brew]
+include::start-filebeat.asciidoc[tag=brew]
 
 ++++
   </div>
@@ -96,7 +96,7 @@ include::start.asciidoc[tag=brew]
        hidden="">
 ++++
 
-include::start.asciidoc[tag=linux]
+include::start-filebeat.asciidoc[tag=linux]
 
 ++++
   </div>
@@ -107,7 +107,7 @@ include::start.asciidoc[tag=linux]
        hidden="">
 ++++
 
-include::start.asciidoc[tag=win]
+include::start-filebeat.asciidoc[tag=win]
 
 ++++
   </div>

@@ -191,6 +191,11 @@ python-env:
 test-apm:
 	sh ./script/test_apm.sh
 
+## get-version : Get the libbeat version
+.PHONY: get-version
+get-version:
+	@mage dumpVariables | grep 'beat_version' | cut -d"=" -f 2 | tr -d " "
+
 ### Packaging targets ####
 
 ## snapshot : Builds a snapshot release.
