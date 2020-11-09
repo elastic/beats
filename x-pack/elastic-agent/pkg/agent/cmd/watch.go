@@ -89,7 +89,9 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		// if we're not within grace and marker is still there it might mean
 		// that cleanup was not performed ok, cleanup everything except current version
 		// hash is the same as hash of agent which initiated watcher.
-		upgrade.Cleanup(release.ShortCommit())
+		if err := upgrade.Cleanup(release.ShortCommit()); err != nil {
+			log.Error("rollback failed", err)
+		}
 		// exit nicely
 		return nil
 	}
