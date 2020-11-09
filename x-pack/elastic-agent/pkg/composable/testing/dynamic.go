@@ -11,6 +11,7 @@ import (
 
 // DynamicState is the state of the dynamic mapping.
 type DynamicState struct {
+	Priority   int
 	Mapping    map[string]interface{}
 	Processors []map[string]interface{}
 }
@@ -34,7 +35,7 @@ func NewDynamicComm(ctx context.Context) *DynamicComm {
 }
 
 // AddOrUpdate adds or updates a current mapping.
-func (t *DynamicComm) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error {
+func (t *DynamicComm) AddOrUpdate(id string, priority int, mapping map[string]interface{}, processors []map[string]interface{}) error {
 	var err error
 	mapping, err = CloneMap(mapping)
 	if err != nil {
@@ -53,6 +54,7 @@ func (t *DynamicComm) AddOrUpdate(id string, mapping map[string]interface{}, pro
 		t.previous[id] = prev
 	}
 	t.current[id] = DynamicState{
+		Priority:   priority,
 		Mapping:    mapping,
 		Processors: processors,
 	}
