@@ -833,6 +833,7 @@ same journal. {pull}18467[18467]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
+- Add awsfargate module task_stats metricset to monitor AWS ECS Fargate. {pull}22034[22034]
 
 *Packetbeat*
 
