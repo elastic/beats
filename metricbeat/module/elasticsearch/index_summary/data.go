@@ -31,52 +31,73 @@ import (
 
 var (
 	schema = s.Schema{
-		"primaries": c.Dict("primaries", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count":   c.Int("count"),
-				"deleted": c.Int("deleted"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size": s.Object{
-					"bytes": c.Int("size_in_bytes"),
-				},
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"count": c.Int("count"),
-				"memory": s.Object{
-					"bytes": c.Int("memory_in_bytes"),
-				},
-			}),
-		}),
-		"total": c.Dict("total", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count":   c.Int("count"),
-				"deleted": c.Int("deleted"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size": s.Object{
-					"bytes": c.Int("size_in_bytes"),
-				},
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"count": c.Int("count"),
-				"memory": s.Object{
-					"bytes": c.Int("memory_in_bytes"),
-				},
-			}),
-		}),
+		"primaries": c.Dict("primaries", indexSummaryDict),
+		"total":     c.Dict("total", indexSummaryDict),
 	}
 )
 
+var indexSummaryDict = s.Schema{
+	"docs": c.Dict("docs", s.Schema{
+		"count":   c.Int("count"),
+		"deleted": c.Int("deleted"),
+	}),
+	"store": c.Dict("store", s.Schema{
+		"size": s.Object{
+			"bytes": c.Int("size_in_bytes"),
+		},
+	}),
+	"segments": c.Dict("segments", s.Schema{
+		"count": c.Int("count"),
+		"memory": s.Object{
+			"bytes": c.Int("memory_in_bytes"),
+		},
+	}),
+	"indexing": indexingDict,
+	"bulk":     bulkStatsDict,
+	"search":   searchDict,
+}
+
+var indexingDict = c.Dict("indexing", s.Schema{
+	"index": s.Object{
+		"count": c.Int("index_total"),
+		"time": s.Object{
+			"ms": c.Int("index_time_in_millis"),
+		},
+	},
+	"is_throttled": c.Bool("is_throttled"),
+	"throttle_time": s.Object{
+		"ms": c.Int("throttle_time_in_millis"),
+	},
+})
+
+var searchDict = c.Dict("search", s.Schema{
+	"query": s.Object{
+		"count": c.Int("query_total"),
+		"time": s.Object{
+			"ms": c.Int("query_time_in_millis"),
+		},
+	},
+})
+
+var bulkStatsDict = c.Dict("bulk", s.Schema{
+	"operations": s.Object{
+		"count": c.Int("total_operations"),
+	},
+	"time": s.Object{
+		"count": s.Object{
+			"ms": c.Int("total_time_in_millis"),
+		},
+		"avg": s.Object{
+			"ms":    c.Int("avg_time_in_millis"),
+			"bytes": c.Int("avg_size_in_bytes"),
+		},
+	},
+	"size": s.Object{
+		"bytes": c.Int("total_size_in_bytes"),
+	},
+}, c.DictOptional)
+
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var event mb.Event
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
-	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cluster.name", info.ClusterName)
-	event.ModuleFields.Put("cluster.id", info.ClusterID)
-
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -90,6 +111,14 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 	if err != nil {
 		return errors.Wrap(err, "failure applying stats schema")
 	}
+
+	var event mb.Event
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+	event.ModuleFields = common.MapStr{}
+	event.ModuleFields.Put("cluster.name", info.ClusterName)
+	event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 	event.MetricSetFields = fields
 

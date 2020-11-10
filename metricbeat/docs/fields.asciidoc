@@ -18134,6 +18134,58 @@ alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
 
 --
 
+
+
+
+
+*`indices_stats._all.primaries.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.primaries.indexing.index.count
+
+--
+
+*`indices_stats._all.primaries.indexing.index_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.primaries.indexing.index.time.ms
+
+--
+
+
+
+*`indices_stats._all.total.search.query_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.search.query.count
+
+--
+
+*`indices_stats._all.total.search.query_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.search.query.time.ms
+
+--
+
+
+*`indices_stats._all.total.indexing.index_total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.summary.total.indexing.index.count
+
+--
+
 [float]
 === elasticsearch
 
@@ -18688,6 +18740,110 @@ format: bytes
 --
 
 
+*`elasticsearch.index.summary.primaries.indexing.index.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.indexing.index.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.indexing.is_throttled`*::
++
+--
+TODO
+
+type: boolean
+
+--
+
+*`elasticsearch.index.summary.primaries.indexing.throttle_time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+
+*`elasticsearch.index.summary.primaries.search.query.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.search.query.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.primaries.bulk.operations.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.size.bytes`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.primaries.bulk.time.count.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.time.avg.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.primaries.bulk.time.avg.bytes`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
 *`elasticsearch.index.summary.total.docs.count`*::
 +
 --
@@ -18739,6 +18895,110 @@ Total number of memory used by the segments in bytes.
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.index.summary.total.indexing.index.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.is_throttled`*::
++
+--
+TODO
+
+type: boolean
+
+--
+
+*`elasticsearch.index.summary.total.indexing.throttle_time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+
+*`elasticsearch.index.summary.total.search.query.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.search.query.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.operations.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.size.bytes`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.time.count.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.time.avg.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
++
+--
+TODO
+
+type: long
 
 --
 
