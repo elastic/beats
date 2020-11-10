@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/version"
 
 	// register central management
 	"github.com/elastic/beats/v7/x-pack/libbeat/licenser"
@@ -20,6 +21,10 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/ec2"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws/elb"
 )
+
+func init() {
+	version.OSS = false
+}
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {

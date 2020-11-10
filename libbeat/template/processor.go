@@ -30,6 +30,7 @@ import (
 type Processor struct {
 	EsVersion common.Version
 	Migration bool
+	OSS       bool
 }
 
 var (
@@ -73,6 +74,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.integer(&field)
 		case "text":
 			indexMapping = p.text(&field)
+		case "wildcard":
+			noWildcards := p.EsVersion.LessThan(common.MustNewVersion("7.9.0"))
+			if p.OSS || noWildcards {
+				indexMapping = p.keyword(&field)
+			} else {
+				indexMapping = p.wildcard(&field)
+			}
 		case "", "keyword":
 			indexMapping = p.keyword(&field)
 		case "object":
@@ -218,6 +226,28 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
 		property["index"] = "not_analyzed"
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, nil, fields)
+		property["fields"] = fields
+	}
+
+	return property
+}
+
+func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
+	property := getDefaultProperties(f)
+
+	property["type"] = "wildcard"
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
+		property["ignore_above"] = defaultIgnoreAbove
+	case -1: // Use ES default
+	default: // Use user value
+		property["ignore_above"] = f.IgnoreAbove
 	}
 
 	if len(f.MultiFields) > 0 {

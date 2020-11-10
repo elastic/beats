@@ -32,6 +32,9 @@ var (
 	buildTime = "unknown"
 	commit    = "unknown"
 	qualifier = ""
+
+	// OSS provides if this is the OSS distro
+	OSS = true
 )
 
 // BuildTime exposes the compile-time build time information.
