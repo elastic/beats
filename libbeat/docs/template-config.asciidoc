@@ -27,7 +27,7 @@ existing one.
 you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
-before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `composite`
+before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `component`
 and `index`. Selecting `component` loads a component template which can be included in new index templates.
 The option `index` loads the new index template.
 
