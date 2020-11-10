@@ -18922,6 +18922,13 @@ type: long
 
 --
 
+*`elasticsearch.index.total.query_cache.evictions`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.total.fielddata.memory_size_in_bytes`*::
 +
 --

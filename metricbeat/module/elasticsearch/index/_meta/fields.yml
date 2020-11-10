@@ -58,6 +58,8 @@
           path: elasticsearch.index.total.segments.memory_in_bytes
         - name: query_cache.memory_size_in_bytes
           type: long
+        - name: query_cache.evictions
+          type: long
         - name: fielddata.memory_size_in_bytes
           type: long
         - name: request_cache.memory_size_in_bytes
