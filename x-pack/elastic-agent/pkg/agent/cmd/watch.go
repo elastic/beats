@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -89,7 +90,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		// if we're not within grace and marker is still there it might mean
 		// that cleanup was not performed ok, cleanup everything except current version
 		// hash is the same as hash of agent which initiated watcher.
-		if err := upgrade.Cleanup(release.ShortCommit()); err != nil {
+		if err := upgrade.Cleanup(release.ShortCommit(), true); err != nil {
 			log.Error("rollback failed", err)
 		}
 		// exit nicely
@@ -111,18 +112,15 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return err
 	}
 
-	// invoke so active agent cleans inactive ones
-	err = upgrade.InvokeWatcher(log)
+	// cleanup older versions,
+	// in windows it might leave self untouched, this will get cleaned up
+	// later at the start, because for windows we leave marker untouched.
+	removeMarker := runtime.GOOS != "windows"
+	err = upgrade.Cleanup(marker.Hash, removeMarker)
 	if err != nil {
 		log.Error("rollback failed", err)
 	}
 	return err
-
-	// err = upgrade.Cleanup(marker.Hash)
-	// if err != nil {
-	// 	log.Error("rollback failed", err)
-	// }
-	// return err
 }
 
 func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) error {

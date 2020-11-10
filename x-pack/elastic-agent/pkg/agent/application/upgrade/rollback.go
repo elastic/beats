@@ -40,22 +40,26 @@ func Rollback(ctx context.Context, prevHash, currentHash string) error {
 		return err
 	}
 
+	// TODO: resurrect action store?
+
 	// Restart
 	if err := restartAgent(ctx); err != nil {
 		return err
 	}
 
 	// cleanup everything except version we're rolling back into
-	return Cleanup(prevHash)
+	return Cleanup(prevHash, true)
 }
 
 // Cleanup removes all artifacts and files related to a specified version.
-func Cleanup(currentHash string) error {
+func Cleanup(currentHash string, removeMarker bool) error {
 	<-time.After(afterRestartDelay)
 
 	// remove upgrade marker
-	if err := CleanMarker(); err != nil {
-		return err
+	if removeMarker {
+		if err := CleanMarker(); err != nil {
+			return err
+		}
 	}
 
 	// remove data/elastic-agent-{hash}
