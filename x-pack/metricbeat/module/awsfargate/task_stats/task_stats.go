@@ -14,11 +14,8 @@ import (
 	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
-	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
 )
 
@@ -43,69 +40,6 @@ type MetricSet struct {
 	logger *logp.Logger
 }
 
-// container is a struct representation of a container
-type container struct {
-	DockerId string
-	Name     string
-	Image    string
-	Labels   map[string]string
-}
-
-type cpuStats struct {
-	PerCPUUsage                           common.MapStr
-	TotalUsage                            float64
-	TotalUsageNormalized                  float64
-	UsageInKernelmode                     uint64
-	UsageInKernelmodePercentage           float64
-	UsageInKernelmodePercentageNormalized float64
-	UsageInUsermode                       uint64
-	UsageInUsermodePercentage             float64
-	UsageInUsermodePercentageNormalized   float64
-	SystemUsage                           uint64
-	SystemUsagePercentage                 float64
-	SystemUsagePercentageNormalized       float64
-}
-
-type memoryStats struct {
-	Failcnt   uint64
-	Limit     uint64
-	MaxUsage  uint64
-	TotalRss  uint64
-	TotalRssP float64
-	Usage     uint64
-	UsageP    float64
-	//Raw stats from the cgroup subsystem
-	Stats map[string]uint64
-	//Windows-only memory stats
-	Commit            uint64
-	CommitPeak        uint64
-	PrivateWorkingSet uint64
-}
-
-type networkStats struct {
-	NameInterface string
-	Total         types.NetworkStats
-}
-
-// BlkioRaw sums raw Blkio stats
-type BlkioRaw struct {
-	reads  uint64
-	writes uint64
-	totals uint64
-}
-
-type blkioStats struct {
-	reads  float64
-	writes float64
-	totals float64
-
-	serviced      BlkioRaw
-	servicedBytes BlkioRaw
-	servicedTime  BlkioRaw
-	waitTime      BlkioRaw
-	queued        BlkioRaw
-}
-
 // Stats is a struct represents information regarding a container
 type Stats struct {
 	Time         common.Time
@@ -123,15 +57,6 @@ type TaskMetadata struct {
 	Family     string       `json:"Family"`
 	Revision   string       `json:"Revision"`
 	Containers []*container `json:"Containers"`
-}
-
-// ContainerMetadata is an struct represents container metadata
-type ContainerMetadata struct {
-	Cluster   string
-	TaskARN   string
-	Family    string
-	Revision  string
-	Container *container
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -260,93 +185,6 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 		}
 	}
 	return formattedStats
-}
-
-func getCPUStats(taskStats types.StatsJSON) cpuStats {
-	usage := cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}
-
-	return cpuStats{
-		TotalUsage:                            usage.Total(),
-		TotalUsageNormalized:                  usage.TotalNormalized(),
-		UsageInKernelmode:                     taskStats.Stats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInKernelmodePercentage:           usage.InKernelMode(),
-		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
-		UsageInUsermode:                       taskStats.Stats.CPUStats.CPUUsage.UsageInUsermode,
-		UsageInUsermodePercentage:             usage.InUserMode(),
-		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
-		SystemUsage:                           taskStats.Stats.CPUStats.SystemUsage,
-		SystemUsagePercentage:                 usage.System(),
-		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
-	}
-}
-
-func getMemoryStats(taskStats types.StatsJSON) memoryStats {
-	totalRSS := taskStats.Stats.MemoryStats.Stats["total_rss"]
-
-	return memoryStats{
-		TotalRss:  totalRSS,
-		MaxUsage:  taskStats.Stats.MemoryStats.MaxUsage,
-		TotalRssP: float64(totalRSS) / float64(taskStats.Stats.MemoryStats.Limit),
-		Usage:     taskStats.Stats.MemoryStats.Usage,
-		UsageP:    float64(taskStats.Stats.MemoryStats.Usage) / float64(taskStats.Stats.MemoryStats.Limit),
-		Stats:     taskStats.Stats.MemoryStats.Stats,
-		//Windows memory statistics
-		Commit:            taskStats.Stats.MemoryStats.Commit,
-		CommitPeak:        taskStats.Stats.MemoryStats.CommitPeak,
-		PrivateWorkingSet: taskStats.Stats.MemoryStats.PrivateWorkingSet,
-	}
-}
-
-func getContainerStats(c *container) *container {
-	return &container{
-		DockerId: c.DockerId,
-		Image:    c.Image,
-		Name:     helpers.ExtractContainerName([]string{c.Name}),
-		Labels:   deDotLabels(c.Labels),
-	}
-}
-
-func getNetworkStats(taskStats types.StatsJSON) []networkStats {
-	var networks []networkStats
-	for nameInterface, rawNetStats := range taskStats.Networks {
-		networks = append(networks, networkStats{
-			NameInterface: nameInterface,
-			Total:         rawNetStats,
-		})
-	}
-	return networks
-}
-
-// getBlkioStats collects diskio metrics from BlkioStats structures, that
-// are not populated in Windows
-func getBlkioStats(raw types.BlkioStats) blkioStats {
-	return blkioStats{
-		serviced:      getNewStats(raw.IoServicedRecursive),
-		servicedBytes: getNewStats(raw.IoServiceBytesRecursive),
-		servicedTime:  getNewStats(raw.IoServiceTimeRecursive),
-		waitTime:      getNewStats(raw.IoWaitTimeRecursive),
-		queued:        getNewStats(raw.IoQueuedRecursive),
-	}
-}
-
-func getNewStats(blkioEntry []types.BlkioStatEntry) BlkioRaw {
-	stats := BlkioRaw{
-		reads:  0,
-		writes: 0,
-		totals: 0,
-	}
-
-	for _, myEntry := range blkioEntry {
-		switch myEntry.Op {
-		case "Write":
-			stats.writes += myEntry.Value
-		case "Read":
-			stats.reads += myEntry.Value
-		case "Total":
-			stats.totals += myEntry.Value
-		}
-	}
-	return stats
 }
 
 // deDotLabels returns a new map[string]string containing a copy of the labels

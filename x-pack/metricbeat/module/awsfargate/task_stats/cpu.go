@@ -1,33 +1,33 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
-package cpu
+package task_stats
 
 import (
 	"strconv"
 
+	"github.com/docker/docker/api/types"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
-type CPUStats struct {
-	Time                                  common.Time
-	Container                             *docker.Container
+// Stat contains container and statistics information
+type Stat struct {
+	Container *types.Container
+	Stats     types.StatsJSON
+}
+
+// cpuUsage is a struct representation of container CPU usage stats
+type cpuUsage struct {
+	*Stat
+
+	cpus        uint32
+	systemDelta uint64
+}
+
+type cpuStats struct {
 	PerCPUUsage                           common.MapStr
 	TotalUsage                            float64
 	TotalUsageNormalized                  float64
@@ -42,58 +42,22 @@ type CPUStats struct {
 	SystemUsagePercentageNormalized       float64
 }
 
-// CPUService is a helper to collect docker CPU metrics
-type CPUService struct {
-	Cores bool
-}
+func getCPUStats(taskStats types.StatsJSON) cpuStats {
+	usage := cpuUsage{Stat: &Stat{Stats: taskStats}}
 
-func NewCpuService() *CPUService {
-	return &CPUService{}
-}
-
-func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
-	formattedStats := []CPUStats{}
-
-	for _, stats := range rawStats {
-		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
-	}
-
-	return formattedStats
-}
-
-func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
-	usage := cpuUsage{Stat: myRawStat}
-
-	stats := CPUStats{
-		Time:                                  common.Time(myRawStat.Stats.Read),
-		Container:                             docker.NewContainer(myRawStat.Container, dedot),
+	return cpuStats{
 		TotalUsage:                            usage.Total(),
 		TotalUsageNormalized:                  usage.TotalNormalized(),
-		UsageInKernelmode:                     myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInKernelmode:                     taskStats.Stats.CPUStats.CPUUsage.UsageInKernelmode,
 		UsageInKernelmodePercentage:           usage.InKernelMode(),
 		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
-		UsageInUsermode:                       myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermode:                       taskStats.Stats.CPUStats.CPUUsage.UsageInUsermode,
 		UsageInUsermodePercentage:             usage.InUserMode(),
 		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
-		SystemUsage:                           myRawStat.Stats.CPUStats.SystemUsage,
+		SystemUsage:                           taskStats.Stats.CPUStats.SystemUsage,
 		SystemUsagePercentage:                 usage.System(),
 		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
 	}
-
-	if c.Cores {
-		stats.PerCPUUsage = usage.PerCPU()
-	}
-
-	return stats
-}
-
-// TODO: These helper should be merged with the cpu helper in system/cpu
-
-type cpuUsage struct {
-	*docker.Stat
-
-	cpus        uint32
-	systemDelta uint64
 }
 
 // CPUS returns the number of cpus. If number of cpus is equal to zero, the field will
