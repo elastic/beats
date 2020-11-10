@@ -1,0 +1,253 @@
+[
+    {
+        "@timestamp": "2020-11-09T04:50:06.331Z",
+        "email.message_id": "\\u003c95689d8d5e7f429390a4e3646eef75e8-JFBVALKQOJXWILKBK4YVA7CPGM3DKTLFONZWCZ3FINSW45DFOJ6EAQ2ENFTWK43UL4YTCMBYGIYHYU3NORYA====@microsoft.com\\u003e",
+        "email.recipients.addresses": "john@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 64329,
+        "email.subject": "Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 0,
+        "o365.mailtrace.index": 25,
+        "o365.mailtrace.message_trace_id": "ff1a64a3-cafb-41b7-1efb-08d8848aedc3",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "source.ip": "8.8.8.8",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T04:50:07.397Z",
+        "email.message_id": "\\u003ccc83c8245c794a168842398bc0ec6740-JFBVALKQOJXWNLKNK4YVA7CPGM3DKTLFONZWCZ3FINSW45DFOJ6E2Q2ENFTWK43UL4YTCMBYGIYHYU3NORYA====@microsoft.com\\u003e",
+        "email.recipients.addresses": "test@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 64363,
+        "email.subject": "Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 612,
+        "o365.mailtrace.index": 24,
+        "o365.mailtrace.message_trace_id": "27f5766c-aa22-408f-cabc-08d8846aee65",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Failed",
+        "service.type": "o365",
+        "source.ip": "4.4.4.4",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T04:50:08.210Z",
+        "email.message_id": "\\u003c3360adb12ef74e458506ff2da03d3e99-JFBVALKQOJXWILKNK4YVA7CPGM3DKTLFONZWCZ3FINSW45DFOJ6E2Q2ENFTWK43UL4YTCMBYGIYHYU3NORYA====@microsoft.com\\u003e",
+        "email.recipients.addresses": "testuser2@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 64398,
+        "email.subject": "Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 1221,
+        "o365.mailtrace.index": 23,
+        "o365.mailtrace.message_trace_id": "aaaa397e-de4f-jf2b-de0a-08d8846aeee1",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "source.ip": "8.8.8.5",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T04:50:08.518Z",
+        "email.message_id": "\\u003c1d80b476-b23c-415b-a6b2-449beca5176c@DB8P191MB1047.EURP191.PROD.OUTLOOK.COM\\u003e",
+        "email.recipients.addresses": "o365mc@microsoft.com",
+        "email.sender.address": "postmaster@testdomain.onmicrosoft.com",
+        "email.size": 105955,
+        "email.subject": "Undeliverable: Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 1838,
+        "o365.mailtrace.index": 22,
+        "o365.mailtrace.message_trace_id": "a7200aan-69c6-4bf2-e3b4-08a8846aef10",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Failed",
+        "service.type": "o365",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T04:50:09.350Z",
+        "email.message_id": "\\u003c85b7084d46e0499aa94687cb5287aa01-JFBVALKQOJXWILKNK4YVA7CPGM3DKTLFONZWCZ3FINSW45DFOJ6E2Q2ENFTWK43UL4YTCMBYGIYHYU3NORYA====@microsoft.com\\u003e",
+        "email.recipients.addresses": "testuser3@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 64250,
+        "email.subject": "Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 2404,
+        "o365.mailtrace.index": 21,
+        "o365.mailtrace.message_trace_id": "7c5eddd3-3891-4cbd-d661-08d9846aef8f",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "source.ip": "2.2.2.2",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T04:50:09.652Z",
+        "email.message_id": "\\u003cc0f1816384ab4809bdb2a68087a80dv4-JFBVALKQOJXWILKNK4YVA7CPGM3DKTLFONZWCZ3FINSW45DFOJ6E2Q2ENFTWK43UL4YTCMBYGIYHYU3NORYA====@microsoft.com\\u003e",
+        "email.recipients.addresses": "testuser@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 64177,
+        "email.subject": "Weekly digest: Microsoft service updates",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 3021,
+        "o365.mailtrace.index": 20,
+        "o365.mailtrace.message_trace_id": "41bc91ab-1362-44f2-f7f5-09d8246aefbd",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "source.ip": "8.8.8.8",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-09T16:54:31.650Z",
+        "email.message_id": "\\u003cc30ff864-f92a-4755-7ab63-ab70c2554b9c@AM5EUR02BG405.eop-EUR02.prod.protection.outlook.com\\u003e",
+        "email.recipients.addresses": "testuser@testdomain.onmicrosoft.com",
+        "email.sender.address": "Office365Alerts@microsoft.com",
+        "email.size": 8962,
+        "email.subject": "Low-severity alert: Elevation of Exchange admin privilege",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 3637,
+        "o365.mailtrace.index": 19,
+        "o365.mailtrace.message_trace_id": "2fd27ef9-3c55-40b1-74a5-08d884d0211c",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "source.ip": "2a11:211:f400:7a1e::109",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-10T00:28:56.040Z",
+        "email.message_id": "\\u003c4163cf7dd39b41df82bb52a5a772cc10-JFvVAAKQOJXWILKNK4YVA7CPGA3DKTLFONZWCZ3FINSW45DFOJ6E2ZLTONQWOZKDMVXHIZLSL5GUGMRSGYYDKM34KNWXI4A=@microsoft.com\\u003e",
+        "email.recipients.addresses": "test@testdomain.onmicrosoft.com",
+        "email.sender.address": "o365mc@microsoft.com",
+        "email.size": 25657,
+        "email.subject": "Message Center Major Change Update Notification",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 4248,
+        "o365.mailtrace.index": 10,
+        "o365.mailtrace.message_trace_id": "82c9dd89-aa1b-3367-52bb-08d8850f9bf4",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Failed",
+        "service.type": "o365",
+        "source.ip": "6.6.6.6",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-10T00:28:56.330Z",
+        "destination.ip": "8.8.8.8",
+        "email.message_id": "\\u003c72872e16-f4c2-4eef-a393-e5621748a0ff@AS8P19vMB1605.EURP191.PROD.OUTLOOK.COM\\u003e",
+        "email.recipients.addresses": "o365mc@microsoft.com",
+        "email.sender.address": "postmaster@testdomain.onmicrosoft.com",
+        "email.size": 96627,
+        "email.subject": "Undeliverable: Message Center Major Change Update Notification",
+        "event.category": [
+            "email"
+        ],
+        "event.dataset": "o365.mailtrace",
+        "event.end": "2020-11-10T22:12:34.8196921Z",
+        "event.module": "o365",
+        "event.start": "2020-11-08T22:12:34.8196921Z",
+        "fileset.name": "mailtrace",
+        "input.type": "log",
+        "log.offset": 4872,
+        "o365.mailtrace.index": 8,
+        "o365.mailtrace.message_trace_id": "a4bd8c4c-3a4f-427f-8952-08d8850f9c20",
+        "o365.mailtrace.organization": "testdomain.onmicrosoft.com",
+        "o365.mailtrace.status": "Delivered",
+        "service.type": "o365",
+        "tags": [
+            "o365-mailtrace",
+            "forwarded"
+        ]
+    }
+]

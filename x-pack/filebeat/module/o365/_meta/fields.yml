@@ -1,3 +1,38 @@
+- key: email
+  title: Office 365
+  description: >
+    Module for handling logs from Office 365.
+  fields:
+  - name: email
+    type: group
+    description: >
+      Fields from Office 365 Mailtrace logs
+    fields:
+    - name: size
+      type: long
+      description: >
+        Size of the email body.
+    - name: message_id
+      type: keyword
+      description: >
+        Unique ID for the email message
+    - name: message_id
+      type: keyword
+      description: >
+        Unique ID for the email message
+    - name: recipients.addresses
+      type: keyword
+      description: >
+        An array of recipient email addresses
+    - name: sender.address
+      type: keyword
+      description: >
+        The senders email address
+    - name: subject
+      type: keyword
+      description: >
+        The email subject text
+
 - key: o365
   title: Office 365
   description: >

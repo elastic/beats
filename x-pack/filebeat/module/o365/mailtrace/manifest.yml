@@ -1,0 +1,10 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: tags
+    default: [o365-mailtrace, forwarded]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml

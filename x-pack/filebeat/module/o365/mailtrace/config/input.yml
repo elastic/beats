@@ -1,0 +1,33 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+http_method: GET
+http_headers: {"Content-Type": "application/json"}
+interval: {{ .interval }}
+json_objects_array: value
+url: {{ .url }}
+
+http_headers: {{ .http_headers | tojson }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{ .tags | tojson }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: o365.mailtrace
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.6.0
