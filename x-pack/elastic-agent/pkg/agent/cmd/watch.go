@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"runtime"
 	"syscall"
 	"time"
@@ -55,11 +54,6 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return err
 	}
 
-	// TODO: remove me
-	log.Debug("home", paths.Home())
-	log.Debug("top", paths.Top())
-	log.Debug("config", paths.Config())
-
 	marker, err := upgrade.LoadMarker()
 	if err != nil {
 		log.Error("failed to load marker", err)
@@ -67,14 +61,14 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 	}
 	if marker == nil {
 		// no marker found we're not in upgrade process
-		log.Debugf("update marker not present at '%s'", filepath.Join(paths.Data(), ".update-marker"))
+		log.Debugf("update marker not present at '%s'", paths.Data())
 		return nil
 	}
 
 	locker := upgrade.NewLocker(paths.Top())
 	if err := locker.TryLock(); err != nil {
 		if err == upgrade.ErrAlreadyLocked {
-			log.Debugf("exiting, lock already exist")
+			log.Debugf("exiting, lock already exists")
 			return nil
 		}
 
@@ -96,13 +90,8 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		// exit nicely
 		return nil
 	}
-	// TODO: remove me
-	log.Debugf("within grace [updatedOn %v] now: %v until end of grace: %v", marker.UpdatedOn, time.Now(), tilGrace.String())
 
 	ctx := context.Background()
-
-	// TODO: end
-
 	if err := watch(ctx, tilGrace, log); err != nil {
 		log.Debugf("Error detected proceeding to rollback", err)
 		err = upgrade.Rollback(ctx, marker.PrevHash, marker.Hash)

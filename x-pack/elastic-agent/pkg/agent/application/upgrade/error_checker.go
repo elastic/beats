@@ -9,11 +9,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -50,7 +51,7 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-time.After(statusCheckPeriod):
-			err := ch.agentClient.Connect(context.Background())
+			err := ch.agentClient.Connect(ctx)
 			if err != nil {
 				ch.log.Error(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
 				continue

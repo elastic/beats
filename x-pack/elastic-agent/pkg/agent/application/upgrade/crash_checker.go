@@ -6,6 +6,7 @@ package upgrade
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -77,7 +78,7 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 			// TODO: remove me
 			ch.log.Debugf("crashed within %d: %d", evaluatedPeriods, restarts)
 			if restarts > crashesAllowed {
-				ch.notifyChan <- errors.New("service restarted '%d' times within '%d' seconds", restarts, checkPeriod.Seconds())
+				ch.notifyChan <- errors.New(fmt.Sprintf("service restarted '%d' times within '%v' seconds", restarts, checkPeriod.Seconds()))
 			}
 		}
 	}

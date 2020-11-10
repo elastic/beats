@@ -20,10 +20,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
-	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -73,7 +74,7 @@ func (p *pidProvider) piderFromCmd(ctx context.Context, name string, args ...str
 		}
 		out, err := listCmd.Output()
 		if err != nil {
-			return 0, errors.New("filed to read process id", err)
+			return 0, errors.New("failed to read process id", err)
 		}
 
 		// find line
@@ -100,7 +101,7 @@ func (p *pidProvider) piderFromCmd(ctx context.Context, name string, args ...str
 
 		pid, err := strconv.Atoi(matches[1])
 		if err != nil {
-			return 0, errors.New(fmt.Sprintf("filed to get process id[%v]", matches[1]), err)
+			return 0, errors.New(fmt.Sprintf("failed to get process id[%v]", matches[1]), err)
 		}
 
 		return pid, nil

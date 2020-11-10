@@ -185,6 +185,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
 			},
 			"index": "logs-elastic_agent-default",
 			"processors": []map[string]interface{}{

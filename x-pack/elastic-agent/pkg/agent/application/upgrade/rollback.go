@@ -13,13 +13,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/hashicorp/go-multierror"
 )
 
 const (
@@ -40,8 +41,6 @@ func Rollback(ctx context.Context, prevHash, currentHash string) error {
 	if err := UpdateActiveCommit(prevHash); err != nil {
 		return err
 	}
-
-	// TODO: resurrect action store?
 
 	// Restart
 	if err := restartAgent(ctx); err != nil {
@@ -119,50 +118,7 @@ func InvokeWatcher(log *logger.Logger) error {
 		}
 	}()
 
-	log.Debugf("Starting watcher %v", cmd)
 	return cmd.Start()
-
-	// TODO: remove me
-	// var cred = &syscall.Credential{
-	// 	Uid:         uint32(os.Getuid()),
-	// 	Gid:         uint32(os.Getgid()),
-	// 	Groups:      nil,
-	// 	NoSetGroups: true,
-	// }
-
-	// var sysproc = &syscall.SysProcAttr{
-	// 	Credential: cred,
-	// 	Setsid:     true,
-	// 	// Setpgid:    true,
-	// }
-	// var attr = os.ProcAttr{
-	// 	Dir: paths.Top(),
-	// 	Env: os.Environ(),
-	// 	Files: []*os.File{
-	// 		os.Stdin,
-	// 		os.Stdout,
-	// 		os.Stderr,
-	// 	},
-	// 	Sys: sysproc,
-	// }
-
-	// args := []string{watcherSubcommand,
-	// 	"--path.config", paths.Config(),
-	// 	"--path.home", paths.Top(),
-	// }
-	// log.Error("starting watcher")
-	// _, err := os.StartProcess(homeExePath, args, &attr)
-	// if err != nil {
-	// 	log.Error("failed to invoke watcher", err)
-	// 	return err
-	// }
-
-	// // if err := process.Release(); err != nil {
-	// // 	log.Error("failed to release watcher", err)
-	// // 	return err
-	// // }
-
-	// return nil
 }
 
 func restartAgent(ctx context.Context) error {
@@ -170,13 +126,13 @@ func restartAgent(ctx context.Context) error {
 		c := client.New()
 		err := c.Connect(ctx)
 		if err != nil {
-			return errors.New(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
+			return errors.New(err, "failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
 		}
 		defer c.Disconnect()
 
 		err = c.Restart(ctx)
 		if err != nil {
-			return errors.New(err, "Failed trigger restart of daemon")
+			return errors.New(err, "failed trigger restart of daemon")
 		}
 
 		return nil

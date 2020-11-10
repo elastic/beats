@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
@@ -29,7 +30,6 @@ const (
 
 // Init initializes os dependent properties.
 func (ch *CrashChecker) Init(ctx context.Context) error {
-	// TODO: use with context once dbus upgraded
 	dbusConn, err := dbus.New()
 	if err != nil {
 		return errors.New("failed to create dbus connection", err)
@@ -53,12 +53,12 @@ func (p *pidProvider) Close() {
 func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	prop, err := p.dbusConn.GetServiceProperty(install.ServiceName, "MainPID")
 	if err != nil {
-		return 0, errors.New("filed to read service", err)
+		return 0, errors.New("failed to read service", err)
 	}
 
 	pid, ok := prop.Value.Value().(uint32)
 	if !ok {
-		return 0, errors.New("filed to get process id", prop.Value.Value())
+		return 0, errors.New("failed to get process id", prop.Value.Value())
 	}
 
 	return int(pid), nil
