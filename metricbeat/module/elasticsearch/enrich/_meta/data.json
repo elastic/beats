@@ -46,10 +46,10 @@
           },
           "remote_requests": {
             "current": 0,
-            "count": 0
+            "total": 0
           },
           "executed_searches": {
-            "count": 0
+            "total": 0
           }
         }
       }

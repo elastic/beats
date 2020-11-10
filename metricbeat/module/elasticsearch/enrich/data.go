@@ -38,10 +38,10 @@ var (
 		},
 		"remote_requests": s.Object{
 			"current": c.Int("remote_requests_current"),
-			"count":   c.Int("remote_requests_total"),
+			"total":   c.Int("remote_requests_total"),
 		},
 		"executed_searches": s.Object{
-			"count": c.Int("executed_searches_total"),
+			"total": c.Int("executed_searches_total"),
 		},
 	}
 

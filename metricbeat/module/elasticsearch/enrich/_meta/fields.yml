@@ -15,11 +15,11 @@
           type: long
           description: >
             Current number of outstanding remote requests.
-        - name: count
+        - name: total
           type: long
           description: >
             Number of outstanding remote requests executed since node startup.
-    - name: executed_searches.count
+    - name: executed_searches.total
       type: long
       description: >
         Number of search requests that enrich processors have executed since node startup.

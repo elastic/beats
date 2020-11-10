@@ -18478,7 +18478,7 @@ type: long
 
 --
 
-*`elasticsearch.enrich.remote_requests.count`*::
+*`elasticsearch.enrich.remote_requests.total`*::
 +
 --
 Number of outstanding remote requests executed since node startup.
@@ -18488,7 +18488,7 @@ type: long
 
 --
 
-*`elasticsearch.enrich.executed_searches.count`*::
+*`elasticsearch.enrich.executed_searches.total`*::
 +
 --
 Number of search requests that enrich processors have executed since node startup.
