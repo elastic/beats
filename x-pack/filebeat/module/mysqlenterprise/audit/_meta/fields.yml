@@ -63,7 +63,7 @@
     - name: login.user
       type: keyword
       description: >
-        A string representing the text of an SQL statement. The value can be empty. Long values may be truncated. The string, like the audit log file itself, is written using UTF-8 (up to 4 bytes per character), so the value may be the result of conversion.
+        A string representing the information indicating how a client connected to the server.
 
     - name: login.proxy
       type: keyword

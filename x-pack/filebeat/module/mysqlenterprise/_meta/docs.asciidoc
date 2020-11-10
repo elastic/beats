@@ -45,7 +45,7 @@ include::../include/var-paths.asciidoc[]
 
 A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
-events. Defaults to `[mysql-audit]`.
+events. Defaults to `[mysqlenterprise-audit]`.
 
 [float]
 ==== MySQL Enterprise ECS Fields

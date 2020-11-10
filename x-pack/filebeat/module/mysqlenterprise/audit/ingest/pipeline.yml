@@ -89,10 +89,23 @@ processors:
     target_field: process.args
     ignore_missing: true
 # Attributes starting with _ is only supported by MySQL 8.0.19 and above.
-- rename:
+- convert:
     field: mysqlenterprise.audit.connection_data.connection_attributes._pid
     target_field: process.pid
+    type: long
     ignore_missing: true
+- append:
+    field: related.user
+    value: '{{server.user.name}}'
+    if: ctx?.server?.user?.name != null
+- append:
+    field: related.user
+    value: '{{client.user.name}}'
+    if: ctx?.client?.user?.name != null
+- append:
+    field: related.ip
+    value: '{{client.ip}}'
+    if: ctx?.client?.ip != null
 - date:
     field: mysqlenterprise.audit.timestamp
     formats:
@@ -103,6 +116,7 @@ processors:
     - message
     - mysqlenterprise.audit.event
     - mysqlenterprise.audit.timestamp
+    - mysqlenterprise.audit.connection_data.connection_attributes._pid
     ignore_missing: true
 on_failure:
 - set:

@@ -97689,14 +97689,14 @@ alias to: source.ip
 [[exported-fields-mysqlenterprise]]
 == Mysql Enterprise fields
 
-Some mysql module
+Mysql Enterprise Audit module
 
 
 
 [float]
 === mysqlenterprise
 
-Fields from MySQL Logs
+Fields from MySQL Enterprise Logs
 
 
 
@@ -97820,7 +97820,7 @@ type: long
 *`mysqlenterprise.audit.login.user`*::
 +
 --
-A string representing the text of an SQL statement. The value can be empty. Long values may be truncated. The string, like the audit log file itself, is written using UTF-8 (up to 4 bytes per character), so the value may be the result of conversion.
+A string representing the information indicating how a client connected to the server.
 
 
 type: keyword

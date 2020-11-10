@@ -21,6 +21,9 @@
         "process.args": [
             "/usr/sbin/mysqld"
         ],
+        "related.user": [
+            "skip-grants user"
+        ],
         "server.user.name": "skip-grants user",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -56,7 +59,10 @@
         "mysqlenterprise.audit.connection_id": 13,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
-        "process.pid": "33038",
+        "process.pid": 33038,
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -88,6 +94,9 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -117,6 +126,9 @@
         "mysqlenterprise.audit.connection_id": 13,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -152,7 +164,10 @@
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
-        "process.pid": "33197",
+        "process.pid": 33197,
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -184,6 +199,9 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -215,6 +233,9 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -246,6 +267,9 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -277,6 +301,9 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -308,6 +335,9 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -339,6 +369,9 @@
         "mysqlenterprise.audit.general_data.status": 1396,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -370,6 +403,9 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -401,6 +437,9 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -432,6 +471,9 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -463,6 +505,9 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -494,6 +539,9 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -529,7 +577,13 @@
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
-        "process.pid": "394499",
+        "process.pid": 394499,
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -562,6 +616,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -594,6 +654,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -626,6 +692,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -657,6 +729,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -689,6 +767,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 2,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -721,6 +805,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 3,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -753,6 +843,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -785,6 +881,12 @@
         "mysqlenterprise.audit.table_access_data.query": "INSERT INTO audit_test_table values ('John', 'Smith')",
         "mysqlenterprise.audit.table_access_data.sql_command": "insert",
         "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -817,6 +919,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -849,6 +957,12 @@
         "mysqlenterprise.audit.table_access_data.query": "select * from audit_test_table",
         "mysqlenterprise.audit.table_access_data.sql_command": "select",
         "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -881,6 +995,12 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -911,6 +1031,12 @@
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
         "server.user.name": "audit_test_user2",
         "service.type": "mysqlenterprise",
         "tags": [
@@ -940,6 +1066,9 @@
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "related.user": [
+            "root"
+        ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
         "tags": [
