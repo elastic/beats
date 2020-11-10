@@ -320,8 +320,6 @@
                       path: elasticsearch.index.summary.total.indexing.index.count
     - name: elasticsearch
       type: group
-      description: >
-                TODO
       fields:
         - name: cluster.name
           type: keyword

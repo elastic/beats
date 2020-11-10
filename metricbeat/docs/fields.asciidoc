@@ -18196,12 +18196,6 @@ alias to: elasticsearch.index.summary.total.indexing.index.count
 
 --
 
-[float]
-=== elasticsearch
-
-TODO
-
-
 
 *`elasticsearch.cluster.name`*::
 +
