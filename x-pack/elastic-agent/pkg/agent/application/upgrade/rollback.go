@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -85,12 +86,21 @@ func Cleanup(currentHash string, removeMarker bool) error {
 		}
 
 		hashedDir := filepath.Join(paths.Data(), dir)
-		if cleanupErr := os.RemoveAll(hashedDir); cleanupErr != nil {
+		if cleanupErr := os.RemoveAll(hashedDir); cleanupErr != nil && !isErrorExpected(cleanupErr) {
 			err = multierror.Append(err, cleanupErr)
 		}
 	}
 
 	return err
+}
+
+func isErrorExpected(err error) bool {
+	// cannot remove self, this is expected
+	// fails with  remove {path}}\elastic-agent.exe: Access is denied
+	if runtime.GOOS == "windows" && strings.Contains(err.Error(), "elastic-agent.exe") && strings.Contains(err.Error(), "Access is denied") {
+		return true
+	}
+	return false
 }
 
 // InvokeWatcher invokes an agent instance using watcher argument for watching behavior of
