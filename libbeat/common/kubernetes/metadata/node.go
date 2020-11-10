@@ -25,8 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
-const defaultNode = "localhost"
-
 type node struct {
 	store    cache.Store
 	resource *Resource

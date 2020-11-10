@@ -171,8 +171,6 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		metaConf := metadata.GetDefaultResourceMetadataConfig()
-
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Node:        "",
@@ -180,6 +178,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		if config.Namespace != "" {
 			options.Namespace = config.Namespace
 		}
+
 		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
@@ -190,8 +189,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
-
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher

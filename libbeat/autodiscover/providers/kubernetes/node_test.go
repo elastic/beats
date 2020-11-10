@@ -151,7 +151,8 @@ func TestEmitEvent_Node(t *testing.T) {
 							Type:    v1.NodeInternalIP,
 							Address: "1.2.3.4",
 						},
-						{Type: v1.NodeHostName,
+						{
+							Type:    v1.NodeHostName,
 							Address: "node1",
 						},
 					},

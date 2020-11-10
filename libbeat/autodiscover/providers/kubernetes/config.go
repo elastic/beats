@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -53,8 +51,6 @@ type Config struct {
 	Builders  []*common.Config        `config:"builders"`
 	Appenders []*common.Config        `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
-
-	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
 func defaultConfig() *Config {
