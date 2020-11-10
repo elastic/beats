@@ -236,6 +236,9 @@
             }
         ],
         "dns.id": "12308",
+        "dns.resolved_ip": [
+            "172.217.13.110"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -255,6 +258,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "172.217.13.110",
             "192.168.86.1",
             "192.168.86.85"
         ],
@@ -278,6 +282,9 @@
     },
     {
         "@timestamp": "2018-07-05T19:51:23.009Z",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "metric",
         "event.module": "suricata",
@@ -430,18 +437,6 @@
         "event.type": [
             "protocol"
         ],
-        "file.x509.issuer.common_name": "Apple IST CA 2 - G1",
-        "file.x509.issuer.country": "US",
-        "file.x509.issuer.organization": "Apple Inc.",
-        "file.x509.issuer.organizational_unit": "Certification Authority",
-        "file.x509.not_after": "2019-03-29T17:54:31.000Z",
-        "file.x509.not_before": "2017-02-27T17:54:31.000Z",
-        "file.x509.serial_number": "5C9CE1097887F807",
-        "file.x509.subject.common_name": "*.icloud.com",
-        "file.x509.subject.country": "US",
-        "file.x509.subject.organization": "Apple Inc.",
-        "file.x509.subject.organizational_unit": "management:idms.group.506364",
-        "file.x509.subject.state_or_province": "California",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4683,
@@ -479,6 +474,18 @@
         "tls.server.not_after": "2019-03-29T17:54:31.000Z",
         "tls.server.not_before": "2017-02-27T17:54:31.000Z",
         "tls.server.subject": "CN=*.icloud.com, OU=management:idms.group.506364, O=Apple Inc., ST=California, C=US",
+        "tls.server.x509.issuer.common_name": "Apple IST CA 2 - G1",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.organization": "Apple Inc.",
+        "tls.server.x509.issuer.organizational_unit": "Certification Authority",
+        "tls.server.x509.not_after": "2019-03-29T17:54:31.000Z",
+        "tls.server.x509.not_before": "2017-02-27T17:54:31.000Z",
+        "tls.server.x509.serial_number": "5C9CE1097887F807",
+        "tls.server.x509.subject.common_name": "*.icloud.com",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.organization": "Apple Inc.",
+        "tls.server.x509.subject.organizational_unit": "management:idms.group.506364",
+        "tls.server.x509.subject.state_or_province": "California",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     },

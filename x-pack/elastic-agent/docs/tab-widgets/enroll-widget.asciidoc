@@ -3,18 +3,6 @@
   <div role="tablist" aria-label="Enroll">
     <button role="tab"
             aria-selected="true"
-            aria-controls="deb-tab-enroll"
-            id="deb-enroll">
-      DEB
-    </button>
-    <button role="tab"
-            aria-selected="false"
-            aria-controls="rpm-tab-enroll"
-            id="rpm-enroll">
-      RPM
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="mac-tab-enroll"
             id="mac-enroll">
       MacOS
@@ -33,36 +21,28 @@
             tabindex="-1">
       Windows
     </button>
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="deb-tab-enroll"
-       aria-labelledby="deb-enroll">
-++++
-
-include::enroll.asciidoc[tag=deb]
-
-++++
-  </div> 
-  <div tabindex="0"
-       role="tabpanel"
-       id="rpm-tab-enroll"
-       aria-labelledby="rpm-enroll"
-       hidden="">
-++++
-
-include::enroll.asciidoc[tag=rpm]
-
-++++
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="deb-tab-enroll"
+            id="deb-enroll"
+            tabindex="-1">
+      DEB
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="rpm-tab-enroll"
+            id="rpm-enroll"
+            tabindex="-1">
+      RPM
+    </button>
   </div>
   <div tabindex="0"
        role="tabpanel"
        id="mac-tab-enroll"
-       aria-labelledby="mac-enroll"
-       hidden="">
+       aria-labelledby="mac-enroll">
 ++++
 
-include::enroll.asciidoc[tag=mac]
+include::install.asciidoc[tag=mac]
 
 ++++
   </div>
@@ -73,7 +53,7 @@ include::enroll.asciidoc[tag=mac]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=linux]
+include::install.asciidoc[tag=linux]
 
 ++++
   </div>
@@ -84,7 +64,29 @@ include::enroll.asciidoc[tag=linux]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=win]
+include::install.asciidoc[tag=win]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="deb-tab-enroll"
+       aria-labelledby="deb-enroll"
+       hidden="">
+++++
+
+include::install.asciidoc[tag=deb]
+
+++++
+  </div> 
+  <div tabindex="0"
+       role="tabpanel"
+       id="rpm-tab-enroll"
+       aria-labelledby="rpm-enroll"
+       hidden="">
+++++
+
+include::install.asciidoc[tag=rpm]
 
 ++++
   </div>

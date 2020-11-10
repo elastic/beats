@@ -10,13 +10,15 @@
     <button role="tab"
             aria-selected="false"
             aria-controls="rpm-tab-stop"
-            id="rpm-stop">
+            id="rpm-stop"
+            tabindex="-1">
       RPM
     </button>
     <button role="tab"
             aria-selected="false"
             aria-controls="mac-tab-stop"
-            id="mac-stop">
+            id="mac-stop"
+            tabindex="-1">
       MacOS
     </button>
     <button role="tab"
