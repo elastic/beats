@@ -127,7 +127,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c.Query = QueryParams{"default": "foo"}
 	raw, err := common.NewConfigFrom(c)
 	require.NoError(t, err)
-	baseModule, err := newBaseModuleFromConfig(raw)
+	baseModule, err := NewBaseModuleFromConfig(raw)
 	require.NoError(t, err)
 
 	bm := BaseMetricSet{

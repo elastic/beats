@@ -38,10 +38,9 @@ import (
 // Name of this beat
 var Name = "metricbeat"
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
-func init() {
+// RootCmd creates the to handle beats cli
+func RootCmd(opts ...beater.Option) *cmd.BeatsRootCmd {
+	var RootCmd *cmd.BeatsRootCmd
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	settings := instance.Settings{
@@ -49,7 +48,8 @@ func init() {
 		Name:          Name,
 		HasDashboards: true,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(opts...), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	return RootCmd
 }
