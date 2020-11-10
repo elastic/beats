@@ -46,3 +46,5 @@
       type: keyword
       description: >
         Source node name.
+    - name: translog.total_time.ms
+      type: long

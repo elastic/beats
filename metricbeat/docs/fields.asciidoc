@@ -18677,6 +18677,13 @@ type: keyword
 
 --
 
+*`elasticsearch.index.recovery.translog.total_time.ms`*::
++
+--
+type: long
+
+--
+
 [float]
 === index.summary
 
