@@ -61,12 +61,7 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...Fie
 		labelMap.Delete(label)
 	}
 
-	annotationsMap := common.MapStr{}
-	if len(r.config.IncludeAnnotations) == 0 {
-		annotationsMap = generateMap(accessor.GetAnnotations(), r.config.LabelsDedot)
-	} else {
-		annotationsMap = generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.LabelsDedot)
-	}
+	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.LabelsDedot)
 
 	meta := common.MapStr{
 		strings.ToLower(kind): common.MapStr{
