@@ -1258,8 +1258,8 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#-------------------------------- Mysql Module --------------------------------
-- module: mysql
+#--------------------------- Mysql Enterprise Module ---------------------------
+- module: mysqlenterprise
   audit:
     enabled: true
 

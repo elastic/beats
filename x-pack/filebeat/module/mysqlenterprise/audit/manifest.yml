@@ -2,7 +2,7 @@ module_version: 1.0
 
 var:
   - name: tags
-    default: [mysql-audit]
+    default: [mysqlenterprise-audit]
   - name: input
     default: file
 

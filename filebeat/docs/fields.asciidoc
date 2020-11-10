@@ -59,7 +59,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-mysql>>
-* <<exported-fields-mysql>>
+* <<exported-fields-mysqlenterprise>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
 * <<exported-fields-netscout>>
@@ -97686,15 +97686,15 @@ alias to: source.ip
 
 --
 
-[[exported-fields-mysql]]
-== mysql fields
+[[exported-fields-mysqlenterprise]]
+== Mysql Enterprise fields
 
 Some mysql module
 
 
 
 [float]
-=== mysql
+=== mysqlenterprise
 
 Fields from MySQL Logs
 
@@ -97707,7 +97707,7 @@ Module for parsing MySQL Enterprise Audit Logs
 
 
 
-*`mysql.audit.class`*::
+*`mysqlenterprise.audit.class`*::
 +
 --
 A string representing the event class. The class defines the type of event, when taken together with the event item that specifies the event subclass.
@@ -97717,7 +97717,7 @@ type: keyword
 
 --
 
-*`mysql.audit.connection_id`*::
+*`mysqlenterprise.audit.connection_id`*::
 +
 --
 An integer representing the client connection identifier. This is the same as the value returned by the CONNECTION_ID() function within the session.
@@ -97727,7 +97727,7 @@ type: keyword
 
 --
 
-*`mysql.audit.id`*::
+*`mysqlenterprise.audit.id`*::
 +
 --
 An unsigned integer representing an event ID.
@@ -97737,7 +97737,7 @@ type: keyword
 
 --
 
-*`mysql.audit.connection_data.connection_type`*::
+*`mysqlenterprise.audit.connection_data.connection_type`*::
 +
 --
 The security state of the connection to the server. Permitted values are tcp/ip (TCP/IP connection established without encryption), ssl (TCP/IP connection established with encryption), socket (Unix socket file connection), named_pipe (Windows named pipe connection), and shared_memory (Windows shared memory connection).
@@ -97747,7 +97747,7 @@ type: keyword
 
 --
 
-*`mysql.audit.connection_data.status`*::
+*`mysqlenterprise.audit.connection_data.status`*::
 +
 --
 An integer representing the command status: 0 for success, nonzero if an error occurred.
@@ -97757,7 +97757,7 @@ type: long
 
 --
 
-*`mysql.audit.connection_data.db`*::
+*`mysqlenterprise.audit.connection_data.db`*::
 +
 --
 A string representing a database name. For connection_data, it is the default database. For table_access_data, it is the table database.
@@ -97767,7 +97767,7 @@ type: keyword
 
 --
 
-*`mysql.audit.connection_data.connection_attributes`*::
+*`mysqlenterprise.audit.connection_data.connection_attributes`*::
 +
 --
 Connection attributes that might be passed by different MySQL Clients.
@@ -97777,7 +97777,7 @@ type: flattened
 
 --
 
-*`mysql.audit.general_data.command`*::
+*`mysqlenterprise.audit.general_data.command`*::
 +
 --
 A string representing the type of instruction that generated the audit event, such as a command that the server received from a client.
@@ -97787,7 +97787,7 @@ type: keyword
 
 --
 
-*`mysql.audit.general_data.sql_command`*::
+*`mysqlenterprise.audit.general_data.sql_command`*::
 +
 --
 A string that indicates the SQL statement type.
@@ -97797,7 +97797,7 @@ type: keyword
 
 --
 
-*`mysql.audit.general_data.query`*::
+*`mysqlenterprise.audit.general_data.query`*::
 +
 --
 A string representing the text of an SQL statement. The value can be empty. Long values may be truncated. The string, like the audit log file itself, is written using UTF-8 (up to 4 bytes per character), so the value may be the result of conversion.
@@ -97807,7 +97807,7 @@ type: keyword
 
 --
 
-*`mysql.audit.general_data.status`*::
+*`mysqlenterprise.audit.general_data.status`*::
 +
 --
 An integer representing the command status: 0 for success, nonzero if an error occurred. This is the same as the value of the mysql_errno() C API function.
@@ -97817,7 +97817,7 @@ type: long
 
 --
 
-*`mysql.audit.login.user`*::
+*`mysqlenterprise.audit.login.user`*::
 +
 --
 A string representing the text of an SQL statement. The value can be empty. Long values may be truncated. The string, like the audit log file itself, is written using UTF-8 (up to 4 bytes per character), so the value may be the result of conversion.
@@ -97827,7 +97827,7 @@ type: keyword
 
 --
 
-*`mysql.audit.login.proxy`*::
+*`mysqlenterprise.audit.login.proxy`*::
 +
 --
 A string representing the proxy user. The value is empty if user proxying is not in effect.
@@ -97837,7 +97837,7 @@ type: keyword
 
 --
 
-*`mysql.audit.shutdown_data.server_id`*::
+*`mysqlenterprise.audit.shutdown_data.server_id`*::
 +
 --
 An integer representing the server ID. This is the same as the value of the server_id system variable.
@@ -97847,7 +97847,7 @@ type: keyword
 
 --
 
-*`mysql.audit.startup_data.server_id`*::
+*`mysqlenterprise.audit.startup_data.server_id`*::
 +
 --
 An integer representing the server ID. This is the same as the value of the server_id system variable.
@@ -97857,7 +97857,7 @@ type: keyword
 
 --
 
-*`mysql.audit.startup_data.mysql_version`*::
+*`mysqlenterprise.audit.startup_data.mysql_version`*::
 +
 --
 An integer representing the server ID. This is the same as the value of the server_id system variable.
@@ -97867,7 +97867,7 @@ type: keyword
 
 --
 
-*`mysql.audit.table_access_data.db`*::
+*`mysqlenterprise.audit.table_access_data.db`*::
 +
 --
 A string representing a database name. For connection_data, it is the default database. For table_access_data, it is the table database.
@@ -97877,7 +97877,7 @@ type: keyword
 
 --
 
-*`mysql.audit.table_access_data.table`*::
+*`mysqlenterprise.audit.table_access_data.table`*::
 +
 --
 A string representing a table name.
@@ -97887,7 +97887,7 @@ type: keyword
 
 --
 
-*`mysql.audit.table_access_data.query`*::
+*`mysqlenterprise.audit.table_access_data.query`*::
 +
 --
 A string representing the text of an SQL statement. The value can be empty. Long values may be truncated. The string, like the audit log file itself, is written using UTF-8 (up to 4 bytes per character), so the value may be the result of conversion.
@@ -97897,7 +97897,7 @@ type: keyword
 
 --
 
-*`mysql.audit.table_access_data.sql_command`*::
+*`mysqlenterprise.audit.table_access_data.sql_command`*::
 +
 --
 A string that indicates the SQL statement type.
@@ -97907,7 +97907,7 @@ type: keyword
 
 --
 
-*`mysql.audit.account.user`*::
+*`mysqlenterprise.audit.account.user`*::
 +
 --
 A string representing the user that the server authenticated the client as. This is the user name that the server uses for privilege checking.
@@ -97917,7 +97917,7 @@ type: keyword
 
 --
 
-*`mysql.audit.account.host`*::
+*`mysqlenterprise.audit.account.host`*::
 +
 --
 A string representing the client host name.
@@ -97927,7 +97927,7 @@ type: keyword
 
 --
 
-*`mysql.audit.login.os`*::
+*`mysqlenterprise.audit.login.os`*::
 +
 --
 A string representing the external user name used during the authentication process, as set by the plugin used to authenticate the client.

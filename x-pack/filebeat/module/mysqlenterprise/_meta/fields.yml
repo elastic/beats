@@ -1,9 +1,9 @@
-- key: mysql
-  title: mysql
+- key: mysqlenterprise
+  title: Mysql Enterprise
   description: >
     Some mysql module
   fields:
-    - name: mysql
+    - name: mysqlenterprise
       type: group
       description: >
         Fields from MySQL Logs

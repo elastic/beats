@@ -1,10 +1,15 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-mysqlenterprise]]
 [role="xpack"]
 
-:modulename: mysql
+:modulename: mysqlenterprise
 :has-dashboards: false
 
 
-== MySQL module
+== MySQL Enterprise module
 beta[]
 
 This is a module for different types of MySQL logs. Currently focusing on data from the MySQL Enterprise Audit Plugin in JSON format.
@@ -33,7 +38,7 @@ Example config:
 
 [source,yaml]
 ----
-- module: mysql
+- module: mysqlenterprise
   audit:
     var.input: file
     var.paths: /home/user/mysqlauditlogs/audit.*.log
@@ -48,7 +53,7 @@ events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[mysql-audit]`.
 
 [float]
-==== MySQL ECS Fields
+==== MySQL Enterprise ECS Fields
 
 MySQL Enterprise Audit fields are mapped to ECS in the following way:
 [options="header"]
@@ -65,3 +70,11 @@ MySQL Enterprise Audit fields are mapped to ECS in the following way:
 |==============================================================
 
 :modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mysqlenterprise,exported fields>> section.
+
