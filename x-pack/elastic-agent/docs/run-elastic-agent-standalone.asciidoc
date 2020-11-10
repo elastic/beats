@@ -6,8 +6,6 @@ beta[]
 
 //TODO: Test standalone on RPM and DEB.
 
-//TODO: Merge this with content in other PR.
-
 Instead of using {fleet} to manage your {agent}s, you can run agents standalone.
 With standalone mode, you manually configure and manage the agents locally on
 the systems where they are installed. 
