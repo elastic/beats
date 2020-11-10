@@ -6,14 +6,14 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: test-cloudformation-fargate
+      ClusterName: metricbeat-cloudformation-fargate
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: test-cloudformation-fargate-log-group
+      LogGroupName: metricbeat-fargate-log-group
   ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -35,8 +35,8 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource:
-                  - arn:aws:secretsmanager:us-east-2:428152502467:secret:ELASTIC_CLOUD_ID-CcbUG2
-                  - arn:aws:secretsmanager:us-east-2:428152502467:secret:ELASTIC_CLOUD_AUTH-vMz67n
+                  - <ELASTIC_CLOUD_ID_ARN>
+                  - <ELASTIC_CLOUD_AUTH_ARN>
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -50,9 +50,9 @@ Resources:
           Image: kaiyansheng/metricbeat-awsfargate:v1
           Secrets:
             - Name: ELASTIC_CLOUD_ID
-              ValueFrom: "arn:aws:secretsmanager:us-east-2:428152502467:secret:ELASTIC_CLOUD_ID-CcbUG2"
+              ValueFrom: <ELASTIC_CLOUD_ID_ARN>
             - Name: ELASTIC_CLOUD_AUTH
-              ValueFrom: "arn:aws:secretsmanager:us-east-2:428152502467:secret:ELASTIC_CLOUD_AUTH-vMz67n"
+              ValueFrom: <ELASTIC_CLOUD_AUTH_ARN>
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -63,7 +63,7 @@ Resources:
             - sh
             - -c
           Command:
-            - ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+            - ./metricbeat setup && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
       RequiresCompatibilities:
         - EC2
         - FARGATE
