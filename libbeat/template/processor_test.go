@@ -698,7 +698,7 @@ func TestProcessWildcardOSS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := Processor{EsVersion: *version, OSS: true}
+	p := Processor{EsVersion: *version}
 	err = p.Process(fields, nil, output)
 	if err != nil {
 		t.Fatal(err)
@@ -740,7 +740,7 @@ func TestProcessWildcardElastic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := Processor{EsVersion: *version, OSS: false}
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
 	err = p.Process(fields, nil, output)
 	if err != nil {
 		t.Fatal(err)
@@ -782,7 +782,7 @@ func TestProcessWildcardPreSupport(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := Processor{EsVersion: *version, OSS: false}
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
 	err = p.Process(fields, nil, output)
 	if err != nil {
 		t.Fatal(err)

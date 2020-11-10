@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	version.OSS = false
+	version.ElasticLicensed = true
 }
 
 // AddXPack extends the given root folder with XPack features

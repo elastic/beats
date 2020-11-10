@@ -158,7 +158,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	processor := Processor{EsVersion: t.esVersion, OSS: version.OSS, Migration: t.migration}
+	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: version.ElasticLicensed, Migration: t.migration}
 	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
