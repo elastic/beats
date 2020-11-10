@@ -265,6 +265,8 @@ func getXPackConfig(host string) map[string]interface{} {
 		"metricsets":                 xpackMetricSets,
 		"hosts":                      []string{host},
 		"xpack.enabled":              true,
+		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
+		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
 		"index_recovery.active_only": false,
 	}
 }
