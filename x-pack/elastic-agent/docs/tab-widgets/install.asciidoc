@@ -61,8 +61,9 @@ include::install.asciidoc[tag=install-tip]
 
 [source,shell]
 ----
-./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
+./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY <1>
 ----
+<1> This command requires a system and service manager like systemd.
 
 include::install.asciidoc[tag=where-description]
 
