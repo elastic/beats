@@ -488,8 +488,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
 - Add kubernetes.node.hostname metadata of Kubernetes node. {pull}22189[22189]
-- Include node metadata and namespace metadata in pod's metadata by default for autodiscovery. {pull}22189[22189]
-- Include node metadata and namespace metadata in pod's metadata by default for add_kuberentes_metadata. {pull}22189[22189]
 - Enable always add_resource_metadata for Pods and Services of kubernetes autodiscovery. {pull}22189[22189]
 - Add add_resource_metadata option setting (always enabled) for add_kubernetes_metadata setting. {pull}22189[22189]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
@@ -850,5 +848,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
