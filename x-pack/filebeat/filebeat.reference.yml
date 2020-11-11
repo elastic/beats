@@ -2016,6 +2016,9 @@ filebeat.inputs:
   # Default is 0 which means unlimited
   #harvester_limit: 0
 
+  # Enable detailed harvester metrics.
+  #detailed_metrics: true
+
   ### Harvester closing options
 
   # Close inactive closes the file handler after the predefined period.
