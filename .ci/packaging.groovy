@@ -55,6 +55,7 @@ pipeline {
         stage('Checkout') {
           options { skipDefaultCheckout() }
           steps {
+	    deleteDir()
             script {
               if(isUpstreamTrigger()) {
                 try {
