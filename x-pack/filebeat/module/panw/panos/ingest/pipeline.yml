@@ -460,7 +460,7 @@ processors:
        PATH: '[^\?#]*'
        QUERY: '[^#]*'
        ANY: '.*'
-     if: 'ctx?.url?.original != null'
+     if: 'ctx?.url?.original != null && ctx?.url?.original != "-/"'
  - grok:
      field: url.path
      patterns:

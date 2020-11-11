@@ -2291,9 +2291,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2317,9 +2314,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2391,9 +2386,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2417,9 +2409,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:47.000-02:00",
@@ -2491,9 +2481,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2517,9 +2504,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2591,9 +2576,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2617,9 +2599,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:48.000-02:00",
@@ -2691,9 +2671,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2717,9 +2694,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2791,9 +2766,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2817,9 +2789,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2891,9 +2861,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -2917,9 +2884,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:45.000-02:00",
@@ -2991,9 +2956,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3017,9 +2979,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3091,9 +3051,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3117,9 +3074,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3191,9 +3146,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3217,9 +3169,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:46.000-02:00",
@@ -3291,9 +3241,6 @@
         "panw.panos.threat.resource": "-/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "private-ip-addresses",
-        "related.hosts": [
-            "-"
-        ],
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
@@ -3317,9 +3264,7 @@
             "pan-os",
             "forwarded"
         ],
-        "url.domain": "-",
-        "url.original": "-/",
-        "url.path": "/"
+        "url.original": "-/"
     },
     {
         "@timestamp": "2012-04-10T04:39:43.000-02:00",
