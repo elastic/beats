@@ -24,6 +24,7 @@ type Info struct {
 	Beat        string    // The actual beat's name
 	IndexPrefix string    // The beat's index prefix in Elasticsearch.
 	Version     string    // The beat version. Defaults to the libbeat version when an implementation does not set a version
+	XPack       bool      // Whether the beat is licensed under xpack
 	Name        string    // configured beat name
 	Hostname    string    // hostname
 	ID          uuid.UUID // ID assigned to beat machine

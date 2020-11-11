@@ -32,9 +32,6 @@ var (
 	buildTime = "unknown"
 	commit    = "unknown"
 	qualifier = ""
-
-	// ElasticLicensed provides if this is an Elastic Licensed distro or OSS
-	ElasticLicensed = false
 )
 
 // BuildTime exposes the compile-time build time information.

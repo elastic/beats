@@ -26,6 +26,7 @@ func init() {
 		Name:            Name,
 		HasDashboards:   false,
 		ConfigOverrides: config.Overrides,
+		XPack:           true,
 	})
 
 	RootCmd.RemoveCommand(RootCmd.RunCmd)

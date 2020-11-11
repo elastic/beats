@@ -37,6 +37,7 @@ func init() {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		XPack:         true,
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))

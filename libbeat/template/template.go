@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 var (
@@ -49,6 +48,7 @@ type Template struct {
 	sync.Mutex
 	name         string
 	pattern      string
+	xpack        bool
 	beatVersion  common.Version
 	beatName     string
 	esVersion    common.Version
@@ -63,6 +63,7 @@ type Template struct {
 func New(
 	beatVersion string,
 	beatName string,
+	xpack bool,
 	esVersion common.Version,
 	config TemplateConfig,
 	migration bool,
@@ -128,6 +129,7 @@ func New(
 	return &Template{
 		pattern:      pattern,
 		name:         name,
+		xpack:        xpack,
 		beatVersion:  *bV,
 		esVersion:    esVersion,
 		beatName:     beatName,
@@ -158,7 +160,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: version.ElasticLicensed, Migration: t.migration}
+	processor := Processor{EsVersion: t.esVersion, XPack: t.xpack, Migration: t.migration}
 	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
