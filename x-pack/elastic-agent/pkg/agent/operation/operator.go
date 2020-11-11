@@ -258,7 +258,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	desc, ok := p.(*app.Descriptor)
 	if !ok {
-		return nil, fmt.Errorf("descriptor is not an app.Specifier")
+		return nil, fmt.Errorf("descriptor is not an app.Descriptor")
 	}
 
 	// TODO: (michal) join args into more compact options version
