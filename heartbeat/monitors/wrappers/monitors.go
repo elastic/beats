@@ -50,7 +50,7 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
-			jobWrappers...
+			jobWrappers...,
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields.Type)
