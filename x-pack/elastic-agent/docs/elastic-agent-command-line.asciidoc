@@ -185,7 +185,8 @@ elastic-agent inspect output --output default --program filebeat
 
 Install {agent} permanently on the system and manage it by using the system's
 service manager. The agent will start automatically after installation is
-complete.
+complete. On Linux, this command requires a system and service manager like
+systemd.
 
 You must run this command as the root user (or Administrator on Windows)
 to write files to the correct locations. This command overwrites the
