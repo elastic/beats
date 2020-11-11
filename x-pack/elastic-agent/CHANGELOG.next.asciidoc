@@ -49,3 +49,4 @@
 - Update `fleet.kibana.path` from a POLICY_CHANGE {pull}21804[21804]
 - Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]
 - Add `priority` to `AddOrUpdate` on dynamic composable input providers communication channel {pull}22352[22352]
+- Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]
