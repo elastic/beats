@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/look"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -91,7 +89,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 				"type": "heartbeat/summary",
 			},
 			"monitor": common.MapStr{
-				"duration": look.RTT(je.end.Sub(je.start)),
+				"duration": common.MapStr{
+					"us": int64(je.end.Sub(je.start) / time.Microsecond),
+				},
 			},
 		})
 		return je.lastError
