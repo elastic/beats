@@ -10,8 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 var (
