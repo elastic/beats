@@ -1,0 +1,74 @@
+// tag::deb[]
+
+// tag::install-tip[]
+TIP: We recommend that you run this command as the root user because some
+integrations require root privileges to collect sensitive data.
+
+// end::install-tip[]
+
+[source,shell]
+----
+systemctl enable elastic-agent <1>
+systemctl start elastic-agent
+----
+<1> The DEB package includes a service unit for Linux systems with systemd. On
+these systems, you can manage {agent} by using the usual systemd commands. If
+you don't have systemd, run `sudo service elastic-agent start`.
+
+// tag::config-flag[]
+Use the `-c` flag to specify the policy file. If no policy file is
+specified, {agent} uses the default policy, `elastic-agent.yml`, which is
+located in the same directory as {agent}.
+// end::config-flag[]
+
+// end::deb[]
+
+// tag::rpm[]
+
+[source,shell]
+----
+systemctl enable elastic-agent <1>
+systemctl start elastic-agent
+----
+<1> The RPM package includes a service unit for Linux systems with systemd. On
+these systems, you can manage {agent} by using the usual systemd commands. If
+you don't have systemd, run `sudo service elastic-agent start`.
+
+
+include::run-standalone.asciidoc[tag=config-flag]
+// end::rpm[]
+
+// tag::mac[]
+
+[source,shell]
+----
+./elastic-agent install
+----
+
+include::run-standalone.asciidoc[tag=config-flag]
+// end::mac[]
+
+// tag::linux[]
+
+[source,shell]
+----
+./elastic-agent install
+----
+
+include::run-standalone.asciidoc[tag=config-flag]
+// end::linux[]
+
+// tag::win[]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
+
+From the PowerShell prompt, change to the directory where you installed {agent},
+and run:
+
+[source,shell]
+----
+.\elastic-agent.exe install
+----
+
+include::run-standalone.asciidoc[tag=config-flag]
+// end::win[]
