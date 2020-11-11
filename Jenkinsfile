@@ -61,6 +61,7 @@ pipeline {
         dir("${BASE_DIR}"){
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
+          setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
@@ -119,6 +120,21 @@ pipeline {
               parallel(mapParallelTasks)
             }
           }
+        }
+      }
+    }
+    stage('Packaging') {
+      agent none
+      options { skipDefaultCheckout() }
+      when {
+        allOf {
+          expression { return env.GO_MOD_CHANGES == "true" }
+          changeRequest()
+        }
+      }
+      steps {
+        withGithubNotify(context: 'Packaging') {
+          build(job: "Beats/packaging/${env.BRANCH_NAME}", propagate: true,  wait: true)
         }
       }
     }
@@ -517,10 +533,15 @@ def startCloudTestEnv(Map args = [:]) {
     withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         try {
-          for (folder in dirs) {
+          dirs?.each { folder ->
             retryWithSleep(retries: 2, seconds: 5, backoff: true){
               terraformApply(folder)
             }
+          }
+        } catch(err) {
+          dirs?.each { folder ->
+            // If it failed then cleanup without failing the build
+            sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
           }
         } finally {
           // Archive terraform states in case manual cleanup is needed.

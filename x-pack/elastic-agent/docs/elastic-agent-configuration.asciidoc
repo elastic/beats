@@ -1,28 +1,17 @@
 [[elastic-agent-configuration]]
 [role="xpack"]
-= Configuration settings
+= Policy settings
 
 beta[]
 
-// TODO: This topic assumes users know what standalone and fleet are. When we
-// add the settings reference, we should clean this up: describe the available
-// options, then show how to configure them manually for standalone. We should
-// assume Fleet is the common use case, even if it's not the default, and make
-// sure this reference is useful for both use cases.
+The policy settings for {fleet}-managed agents are specified through the UI.
+You do not set them explicitly in a configuration file.
 
-By default {agent} runs in standalone mode to ingest system data and send it to
-a local {es} instance running on port 9200. It uses the demo credentials of the
-`elastic` user. It's also configured to monitor all programs managed by {agent}
-and send the logs and metrics to the same {es} instance.
+For standalone agents, you need to configure settings in the `elastic-agent.yml`
+file. 
 
-To alter this behavior, configure the output and other configuration settings.
-When running the agent standalone, specify configuration settings in the
-`elastic-agent.yml` file. When using {fleet}, do not modify settings in
-the `elastic-agent.yml` file. Instead, use {fleet} in {kib} to change
-settings.
-
-//TIP: To get started quickly, you can use {fleet} to generate a standalone
-//configuration. For more information, see <<agent-standalone-mode>>.
+TIP: To get started quickly, you can use {fleet} to generate a standalone
+configuration. For more information, see <<run-elastic-agent-standalone>>.
 
 [discrete]
 [[elastic-agent-output-configuration]]
@@ -117,5 +106,14 @@ inputs:
 
 If `use_output` is not specified, the `default` output is used.
 
-//For more examples, see
-//<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>.
+== Reference yaml
+
+The {agent} installation includes an `elastic-agent.reference.yml` file that
+describes all the settings available in a standalone configuration.
+
+The contents of the file are included here for your convenience.
+
+[source,yaml]
+----
+include::elastic-agent-reference-yaml.yml[]
+----

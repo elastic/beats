@@ -458,7 +458,7 @@ class Test(metricbeat.BaseTest):
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
-        self.assertTrue(found_cmdline, "cmdline not found in any process events")
+            self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -544,6 +544,7 @@ class Test(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["user.name"])

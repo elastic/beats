@@ -158,6 +158,7 @@ type mysqlPlugin struct {
 	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -171,6 +172,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
@@ -181,13 +183,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (mysql *mysqlPlugin) init(results protos.Reporter, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(
@@ -203,6 +205,7 @@ func (mysql *mysqlPlugin) init(results protos.Reporter, config *mysqlConfig) err
 
 	mysql.handleMysql = handleMysql
 	mysql.results = results
+	mysql.watcher = watcher
 
 	return nil
 }
@@ -651,7 +654,7 @@ func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = mysql.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	m.raw = rawMsg
 
 	if m.isRequest {

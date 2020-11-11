@@ -11702,15 +11702,6 @@ SIP-specific event fields.
 Information about SIP traffic.
 
 
-*`sip.timestamp`*::
-+
---
-Timestamp with nano second precision.
-
-type: date_nanos
-
---
-
 *`sip.code`*::
 +
 --
