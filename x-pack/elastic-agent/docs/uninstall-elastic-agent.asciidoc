@@ -4,7 +4,9 @@
 
 beta[]
 
-To uninstall {agent}, run:
+To uninstall {agent}, run the `uninstall` command from the directory where
+{agent} is running. Not sure where the agent is running? See
+<<installation-layout>>.
 
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/uninstall-widget.asciidoc[]
