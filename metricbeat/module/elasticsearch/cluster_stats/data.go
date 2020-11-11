@@ -401,10 +401,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 		return errors.Wrap(err, "failure applying cluster stats schema")
 	}
 
-	stackData, err := stackSchema.Apply(stackStats)
-	if err != nil {
-		return errors.Wrap(err, "failure applying stack schema")
-	}
+	stackData, _ := stackSchema.Apply(stackStats)
 
 	metricSetFields.Put("stack", stackData)
 	metricSetFields.Put("license", l)
