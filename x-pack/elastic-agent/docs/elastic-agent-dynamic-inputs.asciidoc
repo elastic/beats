@@ -1,0 +1,62 @@
+[[dynamic-input-configuration]]
+[role="xpack"]
+= Variables and conditions in input configurations
+
+When running {agent} in some environments, you might not know all the input
+configuration details up front. To solve this problem, the input configuration
+accepts variables and conditions that get evaluated at runtime using
+information from the running environment. Similar to autodiscovery, these
+capabilities allow you to apply configurations dynamically.
+
+Let's consider a unique agent policy that is deployed on two machines: a Linux
+machine named "linux-app" and a Windows machine named "winapp". Notice that
+the configuration has some variable references: `${host.name}` and
+`${host.platform}`:
+
+[source,yaml]
+----
+inputs:
+ - type: logfile
+   streams:
+    - paths: /var/log/${host.name}/another.log
+      condition: ${host.platform} == "linux"
+    - path: c:/service/app.log
+      condition: ${host.platform} == "windows"
+----
+
+At runtime, {agent} resolves variables and evaluates the conditions based
+on values provided by the environment, generating two possible input
+configurations.
+
+On the Windows machine:
+
+[source,yaml]
+----
+inputs:
+ - type: logfile
+   streams:
+    - path: c:/service/app.log
+----
+
+On the Linux machine:
+
+[source,yaml]
+----
+inputs:
+ - type: logfile
+   streams:
+    - paths: /var/log/linux-app/another.log
+----
+
+Using variable substitution along with conditions allows you to create concise,
+but flexible input configurations that adapt to their deployed environment.
+
+include::elastic-agent-variable-substitution.asciidoc[]
+
+include::elastic-agent-providers.asciidoc[]
+
+include::elastic-agent-conditions.asciidoc[]
+
+include::elastic-agent-functions.asciidoc[]
+
+include::elastic-agent-debug-input-configs.asciidoc[]

@@ -1,0 +1,82 @@
+// tag::mac[]
+
+`/Library/Elastic/Agent/*`::
+{agent} program files
+`/Library/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/Library/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/Library/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/Library/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
+
+// end::mac[]
+
+// tag::linux[]
+
+`/opt/Elastic/Agent/*`::
+{agent} program files
+`/opt/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/opt/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/opt/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/opt/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
+
+// end::linux[]
+
+// tag::win[]
+
+`C:\Program/ Files\Elastic\Agent*`::
+{agent} program files
+`C:\Program/ Files\Elastic\Agent\elastic-agent.yml`::
+Main {agent} configuration
+`C:\Program/ Files\Elastic\Agent\fleet.yml`::
+Main {agent} {fleet} configuration
+`C:\Program/ Files\Elastic\Agent\elastic-agent.sock`::
+Running {agent} communication socket
+`C:\Program/ Files\Elastic\Agent\elastic-agent.log`::
+Log files for {agent}
+
+// end::win[]
+
+// tag::deb[]
+
+`/opt/Elastic/Agent/*`::
+{agent} program files
+`/opt/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/opt/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/opt/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/opt/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
+
+// end::deb[]
+
+// tag::rpm[]
+
+`/opt/Elastic/Agent/*`::
+{agent} program files
+`/opt/Elastic/Agent/elastic-agent.yml`::
+Main {agent} configuration
+`/opt/Elastic/Agent/fleet.yml`::
+Main {agent} {fleet} configuration
+`/opt/Elastic/Agent/elastic-agent.sock`::
+Running {agent} communication socket
+`/opt/Elastic/Agent/elastic-agent.log`::
+Log files for {agent}
+`/usr/bin/elastic-agent`::
+Shell wrapper installed into PATH
+
+// end::rpm[]

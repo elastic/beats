@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
@@ -47,6 +48,7 @@ type amqpPlugin struct {
 	transactions              *common.Cache
 	transactionTimeout        time.Duration
 	results                   protos.Reporter
+	watcher                   procs.ProcessesWatcher
 
 	//map containing functions associated with different method numbers
 	methodMap map[codeClass]map[codeMethod]amqpMethod
@@ -64,6 +66,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &amqpPlugin{}
@@ -74,13 +77,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (amqp *amqpPlugin) init(results protos.Reporter, config *amqpConfig) error {
+func (amqp *amqpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *amqpConfig) error {
 	amqp.initMethodMap()
 	amqp.setFromConfig(config)
 
@@ -92,6 +95,7 @@ func (amqp *amqpPlugin) init(results protos.Reporter, config *amqpConfig) error 
 		protos.DefaultTransactionHashSize)
 	amqp.transactions.StartJanitor(amqp.transactionTimeout)
 	amqp.results = results
+	amqp.watcher = watcher
 	return nil
 }
 
