@@ -45,7 +45,6 @@
           "primary": true,
           "translog": {
             "count": 0,
-            "pct": "100.0%",
             "total_on_start": 0,
             "total_time": {
               "ms": 68
@@ -66,7 +65,6 @@
               "recovered": {
                 "bytes": 0
               },
-              "pct": "0.0%",
               "total": {
                 "bytes": 0
               },
@@ -75,7 +73,6 @@
               }
             },
             "files": {
-              "pct": "0.0%",
               "count": 0,
               "reused": 0,
               "recovered": 0
@@ -110,4 +107,4 @@
         "name": ".kibana_1"
       }
     }
-}  
+}

@@ -68,13 +68,11 @@ var (
 				"total":     s.Object{"bytes": c.Int("total_in_bytes")},
 				"reused":    s.Object{"bytes": c.Int("reused_in_bytes")},
 				"recovered": s.Object{"bytes": c.Int("recovered_in_bytes")},
-				"pct":       c.Str("percent"),
 			}),
 			"files": c.Dict("files", s.Schema{
 				"count":     c.Int("total"),
 				"reused":    c.Int("reused"),
 				"recovered": c.Int("recovered"),
-				"pct":       c.Str("percent"),
 			}),
 			"total_time": s.Object{
 				"ms": c.Int("total_time_in_millis"),
@@ -92,7 +90,6 @@ var (
 		"translog": c.Dict("translog", s.Schema{
 			"recovered":      c.Int("recovered"),
 			"count":          c.Int("total"),
-			"pct":            c.Str("percent"),
 			"total_on_start": c.Int("total_on_start"),
 			"total_time": s.Object{
 				"ms": c.Int("total_time_in_millis"),
