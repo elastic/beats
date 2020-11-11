@@ -34,7 +34,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu-18 && immutable' }
+      agent { label 'ubuntu && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -55,7 +55,7 @@ pipeline {
         stage('Checkout') {
           options { skipDefaultCheckout() }
           steps {
-	    deleteDir()
+            deleteDir()
             script {
               if(isUpstreamTrigger()) {
                 try {
@@ -110,7 +110,7 @@ pipeline {
             }
             stages {
               stage('Package Linux'){
-                agent { label 'ubuntu-18 && immutable' }
+                agent { label 'ubuntu && immutable' }
                 options { skipDefaultCheckout() }
                 when {
                   beforeAgent true
