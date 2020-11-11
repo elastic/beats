@@ -21,10 +21,10 @@ TIP: We recommend using {fleet} management because it makes the management and
 upgrade of your agents considerably easier. If you want to run standalone
 agents, instead of using {fleet}, see <<run-elastic-agent-standalone>>.
 
-//TODO: Remove this when docs are building.
-[[elastic-agent-install-service-macos]]
-
 To install {agent} and enroll it in {fleet}:
+
+. If you're running {agent} 7.9 or earlier, stop the agent and manually remove
+it from your host.
 
 . On your host, download and extract the installation package.
 +
