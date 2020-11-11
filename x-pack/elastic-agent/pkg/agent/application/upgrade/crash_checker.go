@@ -72,7 +72,7 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 
 			ch.q.Push(pid)
 			restarts := ch.q.Distinct()
-			ch.log.Debugf("retrieved service PID changed %d times within %d", pid, restarts, evaluatedPeriods)
+			ch.log.Debugf("retrieved service PID [%d] changed %d times within %d", pid, restarts, evaluatedPeriods)
 			if restarts > crashesAllowed {
 				ch.notifyChan <- errors.New(fmt.Sprintf("service restarted '%d' times within '%v' seconds", restarts, checkPeriod.Seconds()))
 			}
