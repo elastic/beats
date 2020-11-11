@@ -23,6 +23,9 @@ agents, instead of using {fleet}, see <<run-elastic-agent-standalone>>.
 
 To install {agent} and enroll it in {fleet}:
 
+. If you're running {agent} 7.9 or earlier, stop the agent and manually remove
+it from your host.
+
 . On your host, download and extract the installation package.
 +
 --
