@@ -589,6 +589,7 @@ same journal. {pull}18467[18467]
 `host` metadata fields when processing network data from network tap or mirror
 port. {pull}19209[19209]
 - Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
+- Change build process for x-pack distribution {pull}21979[21979]
 
 
 *Functionbeat*

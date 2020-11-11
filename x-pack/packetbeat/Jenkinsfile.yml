@@ -45,7 +45,7 @@ stages:
             parameters:
                 - "macosTest"
             branches: true     ## for all the branches
-            tags: true
+            tags: true         ## for all the tags
     windows:
         mage: "mage build unitTest"
         withModule: true
@@ -68,7 +68,7 @@ stages:
             - "windows-2012-r2"
         when:                  ## Override the top-level when.
             comments:
-                - "/test x-pack/winlogbeat for windows-2012"
+                - "/test x-pack/packetbeat for windows-2012"
             labels:
                 - "windows-2012"
             branches: true     ## for all the branches

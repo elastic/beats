@@ -55,6 +55,7 @@ pipeline {
         stage('Checkout') {
           options { skipDefaultCheckout() }
           steps {
+            deleteDir()
             script {
               if(isUpstreamTrigger()) {
                 try {
@@ -102,7 +103,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
-                  // 'x-pack/packetbeat',
+                  'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
               }
