@@ -53228,16 +53228,6 @@ type: keyword
 
 --
 
-*`email.message_id`*::
-+
---
-Unique ID for the email message
-
-
-type: keyword
-
---
-
 *`email.recipients.addresses`*::
 +
 --

@@ -16,10 +16,6 @@
       type: keyword
       description: >
         Unique ID for the email message
-    - name: message_id
-      type: keyword
-      description: >
-        Unique ID for the email message
     - name: recipients.addresses
       type: keyword
       description: >
