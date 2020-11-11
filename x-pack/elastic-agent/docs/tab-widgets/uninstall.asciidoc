@@ -1,0 +1,40 @@
+// tag::uninstall-tip[]
+TIP: You must run this command as the root user. 
+
+// end::uninstall-tip[]
+
+// tag::mac[]
+
+include::uninstall.asciidoc[tag=uninstall-tip]
+
+[source,shell]
+----
+elastic-agent uninstall
+----
+
+// end::mac[]
+
+// tag::linux[]
+
+include::uninstall.asciidoc[tag=uninstall-tip]
+
+[source,shell]
+----
+elastic-agent uninstall
+----
+
+// end::linux[]
+
+// tag::win[]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
+
+From the PowerShell prompt, change to the directory where {agent} is installed,
+and run:
+
+[source,shell]
+----
+C:\Program Files\Elastic\Agent\elastic-agent.exe uninstall
+----
+
+// end::win[]

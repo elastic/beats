@@ -60,6 +60,7 @@ pipeline {
         dir("${BASE_DIR}"){
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
+          setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
@@ -76,6 +77,7 @@ pipeline {
         withGithubNotify(context: "Lint") {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             cmd(label: "make check-python", script: "make check-python")
             cmd(label: "make check-go", script: "make check-go")
             cmd(label: "Check for changes", script: "make check-no-changes")
@@ -120,8 +122,29 @@ pipeline {
         }
       }
     }
+    stage('Packaging') {
+      agent none
+      options { skipDefaultCheckout() }
+      when {
+        allOf {
+          expression { return env.GO_MOD_CHANGES == "true" }
+          changeRequest()
+        }
+      }
+      steps {
+        withGithubNotify(context: 'Packaging') {
+          build(job: "Beats/packaging/${env.BRANCH_NAME}", propagate: true,  wait: true)
+        }
+      }
+    }
   }
   post {
+    success {
+      writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
+COMMIT=${env.GIT_BASE_COMMIT}
+VERSION=${env.VERSION}-SNAPSHOT""")
+      archiveArtifacts artifacts: 'packaging.properties'
+    }
     always {
       deleteDir()
       unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
