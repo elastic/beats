@@ -18,6 +18,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/azure"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/barracuda"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/bluecoat"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/carbonblack"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cef"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/checkpoint"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cisco"

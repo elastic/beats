@@ -10,6 +10,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-azure>>
   * <<filebeat-module-barracuda>>
   * <<filebeat-module-bluecoat>>
+  * <<filebeat-module-carbonblack>>
   * <<filebeat-module-cef>>
   * <<filebeat-module-checkpoint>>
   * <<filebeat-module-cisco>>
@@ -78,6 +79,7 @@ include::modules/aws.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/barracuda.asciidoc[]
 include::modules/bluecoat.asciidoc[]
+include::modules/carbonblack.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]

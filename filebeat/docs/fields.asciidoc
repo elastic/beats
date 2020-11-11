@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-bluecoat>>
+* <<exported-fields-carbonblack>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
 * <<exported-fields-checkpoint>>
@@ -14372,6 +14373,131 @@ type: keyword
 This key captures values or decorators used within a registry entry
 
 type: keyword
+
+--
+
+[[exported-fields-carbonblack]]
+== Carbon Black fields
+
+Carbon Black Module
+
+
+
+[float]
+=== carbonblack
+
+Module for parsing Carbon Black logs.
+
+
+
+[float]
+=== auditlog
+
+Fileset for parsing Carbon Black Auditlogs
+
+
+
+*`carbonblack.auditlog.org_name`*::
++
+--
+The Organization name or account related to the endpoint.
+
+
+type: keyword
+
+--
+
+*`carbonblack.auditlog.flagged`*::
++
+--
+If the endpoint has been flagged by this event.
+
+
+type: boolean
+
+--
+
+*`carbonblack.auditlog.verbose`*::
++
+--
+The status of the verbosity setting, can be either true or false.
+
+
+type: boolean
+
+--
+
+[float]
+=== edr
+
+Fileset for parsing Carbon Black EDR logs
+
+
+
+*`carbonblack.edr.org_name`*::
++
+--
+The Organization name or account related to the endpoint.
+
+
+type: keyword
+
+--
+
+*`carbonblack.edr.flagged`*::
++
+--
+If the endpoint has been flagged by this event.
+
+
+type: boolean
+
+--
+
+*`carbonblack.edr.verbose`*::
++
+--
+The status of the verbosity setting, can be either true or false.
+
+
+type: boolean
+
+--
+
+[float]
+=== notification
+
+Fileset for parsing Carbon Black Notifications
+
+
+
+*`carbonblack.notification.org_name`*::
++
+--
+The Organization name or account related to the endpoint.
+
+
+type: keyword
+
+--
+
+*`carbonblack.notification.flagged`*::
++
+--
+If the endpoint has been flagged by this event.
+
+
+type: boolean
+
+--
+
+*`carbonblack.notification.verbose`*::
++
+--
+The status of the verbosity setting, can be either true or false.
+
+
+type: boolean
 
 --
 

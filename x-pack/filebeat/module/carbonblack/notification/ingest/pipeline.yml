@@ -1,0 +1,24 @@
+description: Pipeline for parsing checkpoint firewall logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: json.type
+    target_field: event.action
+    ignore_missing: true
+- append:
+    field: event.category
+    value: malware
+    if: ctx?.event?.action == 'POLICY_ACTION'
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.kind
+    value: alert
+    if: ctx?.event?.action == 'POLICY_ACTION'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

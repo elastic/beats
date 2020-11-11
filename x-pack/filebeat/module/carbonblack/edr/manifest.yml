@@ -1,0 +1,9 @@
+module_version: 1.0
+
+var:
+  - name: tags
+    default: [carbonblack-edr, forwarded]
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

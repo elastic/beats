@@ -1,0 +1,64 @@
+description: Pipeline for parsing checkpoint firewall logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- append:
+    field: event.category
+    value: authentication
+    if: ctx?.json?.description == 'Logged in successfully'
+- append:
+    field: event.category
+    value: configuration
+    if: ctx?.json?.description != 'Logged in successfully'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.json?.description != 'Logged in successfully'
+- append:
+    field: event.type
+    value: access
+    if: ctx?.json?.description == 'Logged in successfully'
+- set:
+    field: event.outcome
+    value: success
+- remove:
+    field:
+    - message
+    ignore_missing: true
+- rename:
+    field: json.description
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: json.eventId
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: json.clientIp
+    target_field: host.ip
+    ignore_missing: true
+- rename:
+    field: json.orgName
+    target_field: json.org_name
+    ignore_missing: true
+- rename:
+    field: json.requestUrl
+    target_field: json.request_url
+    ignore_missing: true
+- date:
+    field: json.eventTime
+    formats:
+    - UNIX_MS
+- rename:
+    field: json
+    target_field: carbonblack.auditlog
+    ignore_missing: true
+- remove:
+    field:
+    - carbonblack.auditlog.eventTime
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

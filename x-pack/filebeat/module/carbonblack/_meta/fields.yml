@@ -1,0 +1,11 @@
+- key: carbonblack
+  title: Carbon Black
+  release: beta
+  description: >
+    Carbon Black Module
+  fields:
+    - name: carbonblack
+      type: group
+      description: >
+        Module for parsing Carbon Black logs.
+      fields:

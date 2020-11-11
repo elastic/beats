@@ -443,6 +443,21 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+#----------------------------- Carbon Black Module -----------------------------
+- module: carbonblack
+  auditlog:
+    enabled: true
+
+    # Set which input to use, currently supports httpjson
+    #var.input: httpjson
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.url: https://api-url.conferdeploy.net/integrationServices/v3/auditlogs
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.token: Username/Password
+
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
   log:
