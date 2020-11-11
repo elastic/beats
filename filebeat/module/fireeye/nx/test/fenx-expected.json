@@ -1,116 +1,1204 @@
-{
-  "_index": "filebeat-8.0.0-fireeye-2020.09.29",
-  "_type": "_doc",
-  "_id": "o5eH2HQBpCtV8m7qC5wZ",
-  "_score": 1,
-  "_source": {
-    "agent": {
-      "name": "logstash",
-      "id": "cd98c34e-a103-4116-becf-57a599f40b5e",
-      "type": "filebeat",
-      "ephemeral_id": "24280cbd-bdb9-4252-ab7d-77079668ae3e",
-      "version": "8.0.0"
-    },
-    "fireeyenx": {
-      "device_ip": "192.168.1.99",
-      "device_oml": 480,
-      "ip_tos": 0,
-      "session_id": 1643674613400745,
-      "flow": {
-        "reason": "timeout",
-        "endtime": "2020-09-29T06:17:40.659265+0000",
-        "state": "established",
-        "starttime": "2020-09-29T06:17:25.541865+0000",
-        "age": 15,
-        "altered": false
-      }
-    },
-    "meta_cbname": "fireeye-7e0de1",
-    "log": {
-      "source": {
-        "address": "192.168.1.99:54956"
-      }
-    },
-    "destination": {
-      "geo": {
-        "continent_name": "North America",
-        "country_iso_code": "US",
-        "location": {
-          "lon": -97.822,
-          "lat": 37.751
+
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "CivCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 520,
+            "session_id" : 721570461162990,
+            "flow" : {
+              "reason" : "timeout",
+              "endtime" : "2020-09-22T08:34:12.761348+0000",
+              "state" : "new",
+              "ip_tc" : 0,
+              "starttime" : "2020-09-22T08:34:12.761326+0000",
+              "age" : 0,
+              "altered" : false
+            }
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 0
+          },
+          "destination" : {
+            "address" : "ff02:0000:0000:0000:0000:0000:0000:0001",
+            "port" : 10001,
+            "bytes" : 0,
+            "packets" : 0
+          },
+          "source" : {
+            "address" : "fe80:0000:0000:0000:feec:daff:fe31:b706",
+            "port" : 45944,
+            "bytes" : 1680,
+            "packets" : 8
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.991339+0000\",\"flow_id\":721570461162990,\"event_type\":\"flow\",\"src_ip\":\"fe80:0000:0000:0000:feec:daff:fe31:b706\",\"src_port\":45944,\"dest_ip\":\"ff02:0000:0000:0000:0000:0000:0000:0001\",\"dest_port\":10001,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tc\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":8,\"pkts_toclient\":0,\"bytes_toserver\":1680,\"bytes_toclient\":0,\"start\":\"2020-09-22T08:34:12.761326+0000\",\"end\":\"2020-09-22T08:34:12.761348+0000\",\"age\":0,\"state\":\"new\",\"reason\":\"timeout\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":520,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "fileset" : {
+            "name" : "nx"
+          },
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.991Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
         }
       },
-      "as": {
-        "number": 15169,
-        "organization": {
-          "name": "Google LLC"
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "CyvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "meta_cbname" : "fireeye-7e0de1",
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 475,
+            "ip_tos" : 0,
+            "session_id" : 175370876476591,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:33:15.193693+0000",
+              "starttime" : "2020-09-22T08:33:15.122031+0000",
+              "state" : "established",
+              "age" : 0,
+              "altered" : false
+            }
+          },
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 698
+          },
+          "destination" : {
+            "geo" : {
+              "continent_name" : "Asia",
+              "region_iso_code" : "ID-YO",
+              "city_name" : "Yogyakarta",
+              "country_iso_code" : "ID",
+              "region_name" : "Yogyakarta",
+              "location" : {
+                "lon" : 110.3646,
+                "lat" : -7.8035
+              }
+            },
+            "as" : {
+              "number" : 23951,
+              "organization" : {
+                "name" : "PT JEMBATAN CITRA NUSANTARA"
+              }
+            },
+            "address" : "202.65.114.202",
+            "port" : 123,
+            "bytes" : 90,
+            "packets" : 1
+          },
+          "source" : {
+            "address" : "192.168.1.15",
+            "port" : 39808,
+            "bytes" : 90,
+            "packets" : 1
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993228+0000\",\"flow_id\":175370876476591,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.15\",\"src_port\":39808,\"dest_ip\":\"202.65.114.202\",\"dest_port\":123,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tos\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":1,\"pkts_toclient\":1,\"bytes_toserver\":90,\"bytes_toclient\":90,\"start\":\"2020-09-22T08:33:15.122031+0000\",\"end\":\"2020-09-22T08:33:15.193693+0000\",\"age\":0,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":475,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "fileset" : {
+            "name" : "nx"
+          },
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
         }
       },
-      "address": "74.125.130.95",
-      "port": 443,
-      "bytes": 2507,
-      "packets": 5
-    },
-    "source": {
-      "address": "192.168.1.164",
-      "port": 51334,
-      "bytes": 3298,
-      "packets": 6
-    },
-    "message": "{\"rawmsg\":\"{\\\"timestamp\\\":\\\"2020-09-29T06:22:42.000095+0000\\\",\\\"flow_id\\\":1643674613400745,\\\"event_type\\\":\\\"flow\\\",\\\"src_ip\\\":\\\"192.168.1.164\\\",\\\"src_port\\\":51334,\\\"dest_ip\\\":\\\"74.125.130.95\\\",\\\"dest_port\\\":443,\\\"proto\\\":\\\"UDP\\\",\\\"proto_number\\\":17,\\\"ip_tos\\\":0,\\\"app_proto\\\":\\\"failed\\\",\\\"flow\\\":{\\\"pkts_toserver\\\":6,\\\"pkts_toclient\\\":5,\\\"bytes_toserver\\\":3298,\\\"bytes_toclient\\\":2507,\\\"start\\\":\\\"2020-09-29T06:17:25.541865+0000\\\",\\\"end\\\":\\\"2020-09-29T06:17:40.659265+0000\\\",\\\"age\\\":15,\\\"state\\\":\\\"established\\\",\\\"reason\\\":\\\"timeout\\\",\\\"alerted\\\":false}}\\n\",\"meta_sip4\":\"192.168.1.99\",\"meta_oml\":480,\"deviceid\":\"860665216674\",\"meta_cbname\":\"fireeye-7e0de1\"}",
-    "fileset": {
-      "name": "nx"
-    },
-    "deviceid": "860665216674",
-    "rawmsg": {
-      "flow": {}
-    },
-    "network": {
-      "protocol": "failed",
-      "transport": "UDP",
-      "iana_number": 17
-    },
-    "input": {
-      "type": "tcp"
-    },
-    "@timestamp": "2020-09-29T06:22:42.000Z",
-    "ecs": {
-      "version": "1.6.0"
-    },
-    "service": {
-      "type": "fireeye"
-    },
-    "host": {
-      "hostname": "logstash",
-      "os": {
-        "kernel": "3.10.0-1062.18.1.el7.x86_64",
-        "codename": "Core",
-        "name": "CentOS Linux",
-        "family": "redhat",
-        "version": "7 (Core)",
-        "platform": "centos"
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "DCvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "type" : "filebeat",
+            "version" : "8.0.0"
+          },
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 522,
+            "session_id" : 1285126005631046,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:34:22.764073+0000",
+              "ip_tc" : 0,
+              "starttime" : "2020-09-22T08:34:22.763974+0000",
+              "state" : "new",
+              "age" : 0,
+              "altered" : false
+            }
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 1351
+          },
+          "destination" : {
+            "address" : "ff02:0000:0000:0000:0000:0000:0000:0001",
+            "port" : 10001,
+            "bytes" : 0,
+            "packets" : 0
+          },
+          "source" : {
+            "address" : "fe80:0000:0000:0000:feec:daff:fe31:b706",
+            "port" : 44535,
+            "bytes" : 1680,
+            "packets" : 8
+          },
+          "fileset" : {
+            "name" : "nx"
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993227+0000\",\"flow_id\":1285126005631046,\"event_type\":\"flow\",\"src_ip\":\"fe80:0000:0000:0000:feec:daff:fe31:b706\",\"src_port\":44535,\"dest_ip\":\"ff02:0000:0000:0000:0000:0000:0000:0001\",\"dest_port\":10001,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tc\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":8,\"pkts_toclient\":0,\"bytes_toserver\":1680,\"bytes_toclient\":0,\"start\":\"2020-09-22T08:34:22.763974+0000\",\"end\":\"2020-09-22T08:34:22.764073+0000\",\"age\":0,\"state\":\"new\",\"reason\":\"shutdown\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":522,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
       },
-      "containerized": false,
-      "ip": [
-        "192.168.1.12",
-        "fe80::d6ba:ce58:5df8:45d1"
-      ],
-      "name": "logstash",
-      "id": "e652e9f80f5c4b0386b6a622b7365553",
-      "mac": [
-        "00:0c:29:df:d1:36"
-      ],
-      "architecture": "x86_64"
-    },
-    "event": {
-      "module": "fireeye",
-      "type": "flow",
-      "dataset": "fireeye.nx"
-    }
-  },
-  "fields": {
-    "@timestamp": [
-      "2020-09-29T06:22:42.000Z"
-    ]
-  }
-}
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "DSvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "tcp" : {
+              "tcp_flags_ts" : "1a",
+              "tcp_flags_tc" : "1a",
+              "psh" : true,
+              "tcp_flags" : "1a",
+              "ack" : true,
+              "syn" : true,
+              "state" : "established"
+            },
+            "device_oml" : 611,
+            "ip_tos" : 0,
+            "session_id" : 222460015300681,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:34:36.067255+0000",
+              "state" : "established",
+              "starttime" : "2020-09-22T04:48:48.282697+0000",
+              "age" : 13548,
+              "altered" : false
+            }
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 2051
+          },
+          "destination" : {
+            "geo" : {
+              "continent_name" : "Europe",
+              "region_iso_code" : "DE-HE",
+              "city_name" : "Frankfurt am Main",
+              "country_iso_code" : "DE",
+              "region_name" : "Hesse",
+              "location" : {
+                "lon" : 8.6843,
+                "lat" : 50.1188
+              }
+            },
+            "as" : {
+              "number" : 42473,
+              "organization" : {
+                "name" : "ANEXIA Internetdienstleistungs GmbH"
+              }
+            },
+            "address" : "213.227.168.146",
+            "port" : 5938,
+            "bytes" : 59808,
+            "packets" : 544
+          },
+          "source" : {
+            "address" : "192.168.1.150",
+            "port" : 51082,
+            "bytes" : 69825,
+            "packets" : 799
+          },
+          "fileset" : {
+            "name" : "nx"
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993286+0000\",\"flow_id\":222460015300681,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.150\",\"src_port\":51082,\"dest_ip\":\"213.227.168.146\",\"dest_port\":5938,\"proto\":\"TCP\",\"proto_number\":6,\"ip_tos\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":799,\"pkts_toclient\":544,\"bytes_toserver\":69825,\"bytes_toclient\":59808,\"start\":\"2020-09-22T04:48:48.282697+0000\",\"end\":\"2020-09-22T08:34:36.067255+0000\",\"age\":13548,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":false},\"tcp\":{\"tcp_flags\":\"1a\",\"tcp_flags_ts\":\"1a\",\"tcp_flags_tc\":\"1a\",\"syn\":true,\"psh\":true,\"ack\":true,\"state\":\"established\"}}\n","meta_sip4":"192.168.1.99","meta_oml":611,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "TCP",
+            "iana_number" : 6
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "DivCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 476,
+            "ip_tos" : 0,
+            "session_id" : 1463569002949603,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:32:06.439495+0000",
+              "starttime" : "2020-09-22T08:32:06.355299+0000",
+              "state" : "established",
+              "age" : 0,
+              "altered" : false
+            }
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 2864
+          },
+          "destination" : {
+            "geo" : {
+              "continent_name" : "Asia",
+              "region_iso_code" : "TH-40",
+              "city_name" : "Ban Kho",
+              "country_iso_code" : "TH",
+              "region_name" : "Khon Kaen",
+              "location" : {
+                "lon" : 102.6842,
+                "lat" : 16.4007
+              }
+            },
+            "as" : {
+              "number" : 9546,
+              "organization" : {
+                "name" : "Ministry of University Affairs"
+              }
+            },
+            "address" : "202.28.116.236",
+            "port" : 123,
+            "bytes" : 90,
+            "packets" : 1
+          },
+          "source" : {
+            "address" : "192.168.1.15",
+            "port" : 52147,
+            "bytes" : 90,
+            "packets" : 1
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993501+0000\",\"flow_id\":1463569002949603,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.15\",\"src_port\":52147,\"dest_ip\":\"202.28.116.236\",\"dest_port\":123,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tos\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":1,\"pkts_toclient\":1,\"bytes_toserver\":90,\"bytes_toclient\":90,\"start\":\"2020-09-22T08:32:06.355299+0000\",\"end\":\"2020-09-22T08:32:06.439495+0000\",\"age\":0,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":476,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "fileset" : {
+            "name" : "nx"
+          },
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "DyvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "meta_cbname" : "fireeye-7e0de1",
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "type" : "filebeat",
+            "version" : "8.0.0"
+          },
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 467,
+            "ip_tos" : 0,
+            "session_id" : 402046369967059,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:34:29.197664+0000",
+              "starttime" : "2020-09-22T08:34:24.175059+0000",
+              "state" : "new",
+              "age" : 5,
+              "altered" : false
+            }
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 3518
+          },
+          "destination" : {
+            "address" : "192.168.1.12",
+            "port" : 5051,
+            "bytes" : 0,
+            "packets" : 0
+          },
+          "source" : {
+            "address" : "192.168.1.55",
+            "port" : 38046,
+            "bytes" : 1428,
+            "packets" : 4
+          },
+          "fileset" : {
+            "name" : "nx"
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993575+0000\",\"flow_id\":402046369967059,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.55\",\"src_port\":38046,\"dest_ip\":\"192.168.1.12\",\"dest_port\":5051,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tos\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":4,\"pkts_toclient\":0,\"bytes_toserver\":1428,\"bytes_toclient\":0,\"start\":\"2020-09-22T08:34:24.175059+0000\",\"end\":\"2020-09-22T08:34:29.197664+0000\",\"age\":5,\"state\":\"new\",\"reason\":\"shutdown\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":467,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "ECvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "fireeyenx" : {
+            "tcp" : {
+              "tcp_flags_ts" : "1a",
+              "tcp_flags_tc" : "1a",
+              "psh" : true,
+              "tcp_flags" : "1a",
+              "ack" : true,
+              "syn" : true,
+              "state" : "established"
+            },
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 595,
+            "ip_tos" : 0,
+            "session_id" : 1528143842847399,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:33:47.937482+0000",
+              "state" : "established",
+              "starttime" : "2020-09-22T08:33:47.797351+0000",
+              "age" : 0,
+              "altered" : true
+            }
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 4163
+          },
+          "destination" : {
+            "as" : {
+              "number" : 13335,
+              "organization" : {
+                "name" : "Cloudflare, Inc."
+              }
+            },
+            "address" : "162.159.246.125",
+            "port" : 443,
+            "bytes" : 3552,
+            "packets" : 5
+          },
+          "source" : {
+            "address" : "192.168.1.99",
+            "port" : 52824,
+            "bytes" : 874,
+            "packets" : 7
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993600+0000\",\"flow_id\":1528143842847399,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.99\",\"src_port\":52824,\"dest_ip\":\"162.159.246.125\",\"dest_port\":443,\"proto\":\"TCP\",\"proto_number\":6,\"ip_tos\":0,\"app_proto\":\"tls\",\"flow\":{\"pkts_toserver\":7,\"pkts_toclient\":5,\"bytes_toserver\":874,\"bytes_toclient\":3552,\"start\":\"2020-09-22T08:33:47.797351+0000\",\"end\":\"2020-09-22T08:33:47.937482+0000\",\"age\":0,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":true},\"tcp\":{\"tcp_flags\":\"1a\",\"tcp_flags_ts\":\"1a\",\"tcp_flags_tc\":\"1a\",\"syn\":true,\"psh\":true,\"ack\":true,\"state\":\"established\"}}\n","meta_sip4":"192.168.1.99","meta_oml":595,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "fileset" : {
+            "name" : "nx"
+          },
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "tls",
+            "transport" : "TCP",
+            "iana_number" : 6
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "ESvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "tcp" : {
+              "tcp_flags_ts" : "1a",
+              "tcp_flags_tc" : "1a",
+              "psh" : true,
+              "tcp_flags" : "1a",
+              "ack" : true,
+              "syn" : true,
+              "state" : "established"
+            },
+            "device_oml" : 593,
+            "ip_tos" : 0,
+            "session_id" : 478995001628181,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:33:47.921250+0000",
+              "starttime" : "2020-09-22T08:33:47.644629+0000",
+              "state" : "established",
+              "age" : 0,
+              "altered" : true
+            }
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 4960
+          },
+          "destination" : {
+            "geo" : {
+              "continent_name" : "North America",
+              "country_iso_code" : "US",
+              "location" : {
+                "lon" : -97.822,
+                "lat" : 37.751
+              }
+            },
+            "as" : {
+              "number" : 714,
+              "organization" : {
+                "name" : "Apple Inc."
+              }
+            },
+            "address" : "17.57.145.71",
+            "port" : 5223,
+            "bytes" : 3761,
+            "packets" : 5
+          },
+          "source" : {
+            "address" : "192.168.1.176",
+            "port" : 59365,
+            "bytes" : 771,
+            "packets" : 7
+          },
+          "fileset" : {
+            "name" : "nx"
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.993796+0000\",\"flow_id\":478995001628181,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.176\",\"src_port\":59365,\"dest_ip\":\"17.57.145.71\",\"dest_port\":5223,\"proto\":\"TCP\",\"proto_number\":6,\"ip_tos\":0,\"app_proto\":\"tls\",\"flow\":{\"pkts_toserver\":7,\"pkts_toclient\":5,\"bytes_toserver\":771,\"bytes_toclient\":3761,\"start\":\"2020-09-22T08:33:47.644629+0000\",\"end\":\"2020-09-22T08:33:47.921250+0000\",\"age\":0,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":true},\"tcp\":{\"tcp_flags\":\"1a\",\"tcp_flags_ts\":\"1a\",\"tcp_flags_tc\":\"1a\",\"syn\":true,\"psh\":true,\"ack\":true,\"state\":\"established\"}}\n","meta_sip4":"192.168.1.99","meta_oml":593,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "tls",
+            "transport" : "TCP",
+            "iana_number" : 6
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.993Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "EivCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "fireeyenx" : {
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 473,
+            "ip_tos" : 0,
+            "session_id" : 1656662151570480,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:34:22.763027+0000",
+              "starttime" : "2020-09-22T08:34:22.762928+0000",
+              "state" : "new",
+              "age" : 0,
+              "altered" : false
+            }
+          },
+          "meta_cbname" : "fireeye-7e0de1",
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 5755
+          },
+          "destination" : {
+            "address" : "255.255.255.255",
+            "port" : 10001,
+            "bytes" : 0,
+            "packets" : 0
+          },
+          "source" : {
+            "address" : "192.168.1.119",
+            "port" : 33828,
+            "bytes" : 1520,
+            "packets" : 8
+          },
+          "fileset" : {
+            "name" : "nx"
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.994013+0000\",\"flow_id\":1656662151570480,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.119\",\"src_port\":33828,\"dest_ip\":\"255.255.255.255\",\"dest_port\":10001,\"proto\":\"UDP\",\"proto_number\":17,\"ip_tos\":0,\"app_proto\":\"failed\",\"flow\":{\"pkts_toserver\":8,\"pkts_toclient\":0,\"bytes_toserver\":1520,\"bytes_toclient\":0,\"start\":\"2020-09-22T08:34:22.762928+0000\",\"end\":\"2020-09-22T08:34:22.763027+0000\",\"age\":0,\"state\":\"new\",\"reason\":\"shutdown\",\"alerted\":false}}\n","meta_sip4":"192.168.1.99","meta_oml":473,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "failed",
+            "transport" : "UDP",
+            "iana_number" : 17
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.994Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      },
+      {
+        "_index" : "filebeat-8.0.0-hx-2020.11.11",
+        "_type" : "_doc",
+        "_id" : "EyvCtXUBnHrl0pTS3Lxy",
+        "_score" : 1.0,
+        "_source" : {
+          "meta_cbname" : "fireeye-7e0de1",
+          "fireeyenx" : {
+            "tcp" : {
+              "tcp_flags_ts" : "1a",
+              "tcp_flags_tc" : "1a",
+              "psh" : true,
+              "tcp_flags" : "1a",
+              "ack" : true,
+              "syn" : true,
+              "state" : "established"
+            },
+            "device_ip" : "192.168.1.99",
+            "device_oml" : 595,
+            "ip_tos" : 0,
+            "session_id" : 1657950624816048,
+            "flow" : {
+              "reason" : "shutdown",
+              "endtime" : "2020-09-22T08:30:04.103892+0000",
+              "starttime" : "2020-09-22T08:30:04.007088+0000",
+              "state" : "established",
+              "age" : 0,
+              "altered" : true
+            }
+          },
+          "agent" : {
+            "name" : "swn",
+            "id" : "3d330d36-5d5c-42d2-80a7-e70e2b76510e",
+            "type" : "filebeat",
+            "ephemeral_id" : "a844bef4-74d5-4703-9473-c30eeb17b9e8",
+            "version" : "8.0.0"
+          },
+          "log" : {
+            "file" : {
+              "path" : "/home/swn/fenx.log"
+            },
+            "offset" : 6406
+          },
+          "destination" : {
+            "as" : {
+              "number" : 13335,
+              "organization" : {
+                "name" : "Cloudflare, Inc."
+              }
+            },
+            "address" : "162.159.246.125",
+            "port" : 443,
+            "bytes" : 3799,
+            "packets" : 5
+          },
+          "source" : {
+            "address" : "192.168.1.99",
+            "port" : 49778,
+            "bytes" : 678,
+            "packets" : 7
+          },
+          "message" : """{"rawmsg":"{\"timestamp\":\"2020-09-22T08:34:44.994037+0000\",\"flow_id\":1657950624816048,\"event_type\":\"flow\",\"src_ip\":\"192.168.1.99\",\"src_port\":49778,\"dest_ip\":\"162.159.246.125\",\"dest_port\":443,\"proto\":\"TCP\",\"proto_number\":6,\"ip_tos\":0,\"app_proto\":\"tls\",\"flow\":{\"pkts_toserver\":7,\"pkts_toclient\":5,\"bytes_toserver\":678,\"bytes_toclient\":3799,\"start\":\"2020-09-22T08:30:04.007088+0000\",\"end\":\"2020-09-22T08:30:04.103892+0000\",\"age\":0,\"state\":\"established\",\"reason\":\"shutdown\",\"alerted\":true},\"tcp\":{\"tcp_flags\":\"1a\",\"tcp_flags_ts\":\"1a\",\"tcp_flags_tc\":\"1a\",\"syn\":true,\"psh\":true,\"ack\":true,\"state\":\"established\"}}\n","meta_sip4":"192.168.1.99","meta_oml":595,"deviceid":"860665216674","meta_cbname":"fireeye-7e0de1"}""",
+          "fileset" : {
+            "name" : "nx"
+          },
+          "deviceid" : "860665216674",
+          "rawmsg" : {
+            "flow" : { }
+          },
+          "network" : {
+            "protocol" : "tls",
+            "transport" : "TCP",
+            "iana_number" : 6
+          },
+          "input" : {
+            "type" : "log"
+          },
+          "@timestamp" : "2020-09-22T08:34:44.994Z",
+          "ecs" : {
+            "version" : "1.6.0"
+          },
+          "service" : {
+            "type" : "fireeye"
+          },
+          "host" : {
+            "hostname" : "swn",
+            "os" : {
+              "kernel" : "4.4.0-18362-Microsoft",
+              "codename" : "focal",
+              "name" : "Ubuntu",
+              "family" : "debian",
+              "version" : "20.04.1 LTS (Focal Fossa)",
+              "platform" : "ubuntu"
+            },
+            "containerized" : false,
+            "ip" : [
+              "169.254.154.238",
+              "fe80::5a5:466e:7c68:9aee",
+              "172.17.130.145",
+              "fe80::25f9:c12e:e520:6aba",
+              "192.168.101.4",
+              "fe80::cdbe:613b:1b2a:48d3",
+              "169.254.107.194",
+              "fe80::c1f6:d93a:7e5b:6bc2",
+              "169.254.93.86",
+              "fe80::50d0:5e3e:b765:5d56"
+            ],
+            "name" : "swn",
+            "mac" : [
+              "dc:fb:48:37:2e:21",
+              "00:15:5d:e9:06:c6",
+              "dc:fb:48:37:2e:1d",
+              "dc:fb:48:37:2e:1e",
+              "de:fb:48:37:2e:1d"
+            ],
+            "architecture" : "x86_64"
+          },
+          "event" : {
+            "module" : "fireeye",
+            "type" : "flow",
+            "dataset" : "fireeye.nx"
+          }
+        }
+      }
