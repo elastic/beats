@@ -19,7 +19,7 @@ beta[]
 * <<elastic-agent-restart-command,restart>>
 * <<elastic-agent-run-command,run>>
 * <<elastic-agent-uninstall-command,uninstall>>
-//* <<elastic-agent-upgrade-command,upgrade>>
+* <<elastic-agent-upgrade-command,upgrade>>
 * <<elastic-agent-version-command,version>>
 
 NOTE: You might need to log in as a root user to run these commands.
@@ -379,48 +379,46 @@ elastic-agent uninstall
 <hr>
 ++++
 
+[discrete]
+[[elastic-agent-upgrade-command]]
+== elastic-agent upgrade
 
-//Commenting out because not currently supported
-//[discrete]
-//[[elastic-agent-upgrade-command]]
-//== elastic-agent upgrade
-//
-//Upgrade the currently running {agent} to the specified version.
-//
-//[discrete]
-//=== Synopsis
-//
-//[source,shell]
-//----
-//elastic-agent upgrade <version> [--source-uri <string>] [--help] [flags]
-//----
-//
-//[discrete]
-//=== Options
+Upgrade the currently running {agent} to the specified version.
 
-//`version`::
-//The version of {agent} to upgrade to.
-//
-//`--source-uri <string>`::
-//The source URI to download the new version from. By default, {agent} uses the
-//Elastic Artifacts URL.
-//
-//`--help`::
-//Show help for the `upgrade` command.
-//
-//{global-flags-link}
-//
-//[discrete]
-//=== Examples
-//
-//[source,shell]
-//----
-//elastic-agent upgrade 7.10.1
-//----
-//
-//++++
-//<hr>
-//++++
+[discrete]
+=== Synopsis
+
+[source,shell]
+----
+elastic-agent upgrade <version> [--source-uri <string>] [--help] [flags]
+----
+
+[discrete]
+=== Options
+
+`version`::
+The version of {agent} to upgrade to.
+
+`--source-uri <string>`::
+The source URI to download the new version from. By default, {agent} uses the
+Elastic Artifacts URL.
+
+`--help`::
+Show help for the `upgrade` command.
+
+{global-flags-link}
+
+[discrete]
+=== Examples
+
+[source,shell]
+----
+elastic-agent upgrade 7.10.1
+----
+
+++++
+<hr>
+++++
 
 [discrete]
 [[elastic-agent-version-command]]
