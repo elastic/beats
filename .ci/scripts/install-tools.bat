@@ -26,13 +26,20 @@ IF ERRORLEVEL 1 (
     ) ELSE (
         curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
     )
+    IF ERRORLEVEL 1 (
+        exit /b 1
+    )
+    dir "%WORKSPACE%\bin" /b
 )
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
 go env
 go get github.com/magefile/mage
-mage -version
 where mage
+mage -version
+IF ERRORLEVEL 1 (
+    exit /b 1
+)
 
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8

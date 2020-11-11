@@ -2,7 +2,7 @@
 
 :libbeat-xpack-dir: ../../../../x-pack/libbeat
 
-:type: awscloudwatch
+:type: aws-cloudwatch
 
 [id="{beatname_lc}-input-{type}"]
 === AWS CloudWatch input
@@ -13,7 +13,7 @@
 
 beta[]
 
-`awscloudwatch` input can be used to retrieve all logs from all log streams in a
+`aws-cloudwatch` input can be used to retrieve all logs from all log streams in a
 specific log group. `filterLogEvents` AWS API is used to list log events from
 the specified log group. Amazon CloudWatch Logs can be used to store log files
 from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
@@ -29,14 +29,14 @@ separate source of logs in CloudWatch Logs makes up a separate log stream.
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
-- type: awscloudwatch
+- type: aws-cloudwatch
   log_group_arn: arn:aws:logs:us-east-1:428152502467:log-group:test:*
   scan_frequency: 1m
   credential_profile_name: elastic-beats
   start_position: beginning
 ----
 
-The `awscloudwatch` input supports the following configuration options plus the
+The `aws-cloudwatch` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
@@ -100,12 +100,12 @@ collecting logs from the same region and AWS account.
 
 [float]
 ==== `aws credentials`
-In order to make AWS API calls, `awscloudwatch` input requires AWS credentials.
+In order to make AWS API calls, `aws-cloudwatch` input requires AWS credentials.
 Please see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
 === AWS Permissions
-Specific AWS permissions are required for IAM user to access awscloudwatch:
+Specific AWS permissions are required for IAM user to access aws-cloudwatch:
 ----
 logs:FilterLogEvents
 ----
