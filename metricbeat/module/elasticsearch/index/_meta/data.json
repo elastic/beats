@@ -102,7 +102,6 @@
                 }
             },
             "uuid": "uej1VlIuQiydn_ZeKgNmpw",
-            "index": ".monitoring-es-7-2020.09.23",
             "hidden": false,
             "shards": {
                 "initializing": 0,
