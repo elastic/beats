@@ -171,7 +171,31 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+		metaConf := config.AddResourceMetadata
+		if metaConf == nil {
+			metaConf = metadata.GetDefaultResourceMetadataConfig()
+		}
+
+		options := kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Node:        "",
+		}
+		if config.Namespace != "" {
+			options.Namespace = config.Namespace
+		}
+		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
+		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
+		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
@@ -194,8 +218,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			},
 		})
 
+		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
+		// be populated before trying to generate metadata for Pods.
+		if err := nodeWatcher.Start(); err != nil {
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+			return
+		}
+		if err := namespaceWatcher.Start(); err != nil {
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+			return
+		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
 			return
 		}
 	})

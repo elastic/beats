@@ -42,7 +42,7 @@
        aria-labelledby="mac-enroll">
 ++++
 
-include::enroll.asciidoc[tag=mac]
+include::install.asciidoc[tag=mac]
 
 ++++
   </div>
@@ -53,7 +53,7 @@ include::enroll.asciidoc[tag=mac]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=linux]
+include::install.asciidoc[tag=linux]
 
 ++++
   </div>
@@ -64,7 +64,7 @@ include::enroll.asciidoc[tag=linux]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=win]
+include::install.asciidoc[tag=win]
 
 ++++
   </div>
@@ -75,7 +75,7 @@ include::enroll.asciidoc[tag=win]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=deb]
+include::install.asciidoc[tag=deb]
 
 ++++
   </div> 
@@ -86,7 +86,7 @@ include::enroll.asciidoc[tag=deb]
        hidden="">
 ++++
 
-include::enroll.asciidoc[tag=rpm]
+include::install.asciidoc[tag=rpm]
 
 ++++
   </div>

@@ -236,6 +236,9 @@
             }
         ],
         "dns.id": "12308",
+        "dns.resolved_ip": [
+            "172.217.13.110"
+        ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
         "event.category": [
@@ -255,6 +258,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
+            "172.217.13.110",
             "192.168.86.1",
             "192.168.86.85"
         ],
@@ -278,6 +282,9 @@
     },
     {
         "@timestamp": "2018-07-05T19:51:23.009Z",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "metric",
         "event.module": "suricata",
