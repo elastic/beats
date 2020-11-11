@@ -198,7 +198,6 @@ var (
 	}
 )
 
-
 func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
 	if !license.IsOneOf("trial") {
