@@ -180,7 +180,6 @@ func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conte
 			continue
 		}
 
-
 		event.MetricSetFields = indexOutput
 		event.MetricSetFields.Put("name", name)
 
