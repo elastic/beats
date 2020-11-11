@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	checkPeriod      = 10 * time.Second
-	evaluatedPeriods = 6 // with 10s period this means we evaluate 60s of agent run
-	crashesAllowed   = 2 // means that within 60s one restart is allowed, additional one is considered crash
+	defaultCheckPeriod = 10 * time.Second
+	evaluatedPeriods   = 6 // with 10s period this means we evaluate 60s of agent run
+	crashesAllowed     = 2 // means that within 60s one restart is allowed, additional one is considered crash
 )
 
 type serviceHandler interface {
@@ -28,10 +28,11 @@ type serviceHandler interface {
 
 // CrashChecker checks agent for crash pattern in Elastic Agent lifecycle.
 type CrashChecker struct {
-	notifyChan chan error
-	q          *disctintQueue
-	log        *logger.Logger
-	sc         serviceHandler
+	notifyChan  chan error
+	q           *disctintQueue
+	log         *logger.Logger
+	sc          serviceHandler
+	checkPeriod time.Duration
 }
 
 // NewCrashChecker creates a new crash checker.
@@ -42,9 +43,10 @@ func NewCrashChecker(ctx context.Context, ch chan error, log *logger.Logger) (*C
 	}
 
 	c := &CrashChecker{
-		notifyChan: ch,
-		q:          q,
-		log:        log,
+		notifyChan:  ch,
+		q:           q,
+		log:         log,
+		checkPeriod: defaultCheckPeriod,
 	}
 
 	if err := c.Init(ctx); err != nil {
@@ -64,7 +66,7 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.After(checkPeriod):
+		case <-time.After(ch.checkPeriod):
 			pid, err := ch.sc.PID(ctx)
 			if err != nil {
 				ch.log.Error(err)
@@ -74,7 +76,7 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 			restarts := ch.q.Distinct()
 			ch.log.Debugf("retrieved service PID [%d] changed %d times within %d", pid, restarts, evaluatedPeriods)
 			if restarts > crashesAllowed {
-				ch.notifyChan <- errors.New(fmt.Sprintf("service restarted '%d' times within '%v' seconds", restarts, checkPeriod.Seconds()))
+				ch.notifyChan <- errors.New(fmt.Sprintf("service restarted '%d' times within '%v' seconds", restarts, ch.checkPeriod.Seconds()))
 			}
 		}
 	}
