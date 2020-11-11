@@ -18457,7 +18457,67 @@ Enrich stats
 
 
 
-*`elasticsearch.enrich.queue.size`*::
+
+*`elasticsearch.enrich.executing_policy.name`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.id`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.task`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.action`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.cancellable`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.parent_task_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.time.start.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.time.running.nano`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.enrich.coordinator_stats.queue.size`*::
 +
 --
 Number of search requests in the queue.
@@ -18467,8 +18527,18 @@ type: long
 
 --
 
+*`elasticsearch.enrich.coordinator_stats.executed_searches.count`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
 
-*`elasticsearch.enrich.remote_requests.current`*::
+
+type: long
+
+--
+
+
+*`elasticsearch.enrich.coordinator_stats.remote_requests.current`*::
 +
 --
 Current number of outstanding remote requests.
@@ -18478,7 +18548,7 @@ type: long
 
 --
 
-*`elasticsearch.enrich.remote_requests.total`*::
+*`elasticsearch.enrich.coordinator_stats.remote_requests.count`*::
 +
 --
 Number of outstanding remote requests executed since node startup.
@@ -18488,13 +18558,40 @@ type: long
 
 --
 
+*`elasticsearch.enrich.queue.size`*::
++
+--
+type: alias
+
+alias to: elasticsearch.enrich.coordinator_stats.queue.size
+
+--
+
+
+*`elasticsearch.enrich.remote_requests.current`*::
++
+--
+type: alias
+
+alias to: elasticsearch.coordinator_stats.remote_requests.current
+
+--
+
+*`elasticsearch.enrich.remote_requests.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.coordinator_stats.remote_requests.count
+
+--
+
 *`elasticsearch.enrich.executed_searches.total`*::
 +
 --
-Number of search requests that enrich processors have executed since node startup.
+type: alias
 
-
-type: long
+alias to: elasticsearch.coordinator_stats.executed_searches.count
 
 --
 
