@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,7 @@ var (
 )
 
 func init() {
-	new := func(_ bool, _ protos.Reporter, _ *common.Config) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ procs.ProcessesWatcher, _ *common.Config) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 

@@ -431,6 +431,11 @@ processors in your config.
 If this option is set to true, fields with `null` values will be published in
 the output document. By default, `keep_null` is set to `false`.
 
+[float]
+==== `index`
+
+Overrides the index that flow events are published to.
+
 [[configuration-protocols]]
 == Configure which transaction protocols to monitor
 
@@ -553,6 +558,12 @@ grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
 If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
+
+[float]
+[[packetbeat-configuration-index]]
+==== `index`
+
+Overrides the index that events for the given protocol are published to.
 
 [source,yaml]
 --------------------------------------------------------------------------------
