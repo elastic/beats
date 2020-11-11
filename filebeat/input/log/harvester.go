@@ -195,13 +195,15 @@ func (h *Harvester) Setup() error {
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
-	h.metrics = newHarvesterProgressMetrics(h.id.String())
-	h.metrics.filename.Set(h.source.Name())
-	h.metrics.started.Set(common.Time(time.Now()).String())
-	h.metrics.readOffset.Set(h.state.Offset)
-	err = h.updateCurrentSize()
-	if err != nil {
-		return err
+	if h.config.DetailedMetrics {
+		h.metrics = newHarvesterProgressMetrics(h.id.String())
+		h.metrics.filename.Set(h.source.Name())
+		h.metrics.started.Set(common.Time(time.Now()).String())
+		h.metrics.readOffset.Set(h.state.Offset)
+		err = h.updateCurrentSize()
+		if err != nil {
+			return err
+		}
 	}
 
 	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
@@ -223,12 +225,14 @@ func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
 }
 
 func (h *Harvester) updateCurrentSize() error {
-	fInfo, err := h.source.Stat()
-	if err != nil {
-		return err
-	}
+	if h.config.DetailedMetrics {
+		fInfo, err := h.source.Stat()
+		if err != nil {
+			return err
+		}
 
-	h.metrics.currentSize.Set(fInfo.Size())
+		h.metrics.currentSize.Set(fInfo.Size())
+	}
 	return nil
 }
 
@@ -356,10 +360,12 @@ func (h *Harvester) Run() error {
 		// Update state of harvester as successfully sent
 		h.state = state
 
-		// Update metics of harvester as event was sent
-		h.metrics.readOffset.Set(state.Offset)
-		h.metrics.lastPublished.Set(time.Now())
-		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
+		if h.config.DetailedMetrics {
+			// Update metics of harvester as event was sent
+			h.metrics.readOffset.Set(state.Offset)
+			h.metrics.lastPublished.Set(time.Now())
+			h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
+		}
 	}
 }
 
@@ -386,7 +392,9 @@ func (h *Harvester) stop() {
 		close(h.done)
 		// Wait for goroutines monitoring h.done to terminate before closing source.
 		h.doneWg.Wait()
-		filesMetrics.Remove(h.id.String())
+		if h.config.DetailedMetrics {
+			filesMetrics.Remove(h.id.String())
+		}
 	})
 }
 

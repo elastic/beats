@@ -45,17 +45,18 @@ type config struct {
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
 	// Input
-	Enabled        bool                    `config:"enabled"`
-	ExcludeFiles   []match.Matcher         `config:"exclude_files"`
-	IgnoreOlder    time.Duration           `config:"ignore_older"`
-	Paths          []string                `config:"paths"`
-	ScanFrequency  time.Duration           `config:"scan_frequency" validate:"min=0,nonzero"`
-	CleanRemoved   bool                    `config:"clean_removed"`
-	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
-	Symlinks       bool                    `config:"symlinks"`
-	TailFiles      bool                    `config:"tail_files"`
-	RecursiveGlob  bool                    `config:"recursive_glob.enabled"`
-	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
+	Enabled         bool                    `config:"enabled"`
+	ExcludeFiles    []match.Matcher         `config:"exclude_files"`
+	IgnoreOlder     time.Duration           `config:"ignore_older"`
+	Paths           []string                `config:"paths"`
+	ScanFrequency   time.Duration           `config:"scan_frequency" validate:"min=0,nonzero"`
+	CleanRemoved    bool                    `config:"clean_removed"`
+	HarvesterLimit  uint32                  `config:"harvester_limit" validate:"min=0"`
+	Symlinks        bool                    `config:"symlinks"`
+	DetailedMetrics bool                    `config:"detailed_metrics"`
+	TailFiles       bool                    `config:"tail_files"`
+	RecursiveGlob   bool                    `config:"recursive_glob.enabled"`
+	FileIdentity    *common.ConfigNamespace `config:"file_identity"`
 
 	// Harvester
 	BufferSize int    `config:"harvester_buffer_size"`
