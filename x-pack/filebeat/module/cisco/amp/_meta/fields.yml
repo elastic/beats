@@ -1,0 +1,20 @@
+- name: cisco.amp
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing Cisco AMP logs.
+  fields:
+    - name: confidence_level
+      type: integer
+      overwrite: true
+      description: >
+        Confidence level determined by ThreatCloud.
+
+    - name: calc_desc
+      type: keyword
+      overwrite: true
+      description: >
+        Log description.
+
+    

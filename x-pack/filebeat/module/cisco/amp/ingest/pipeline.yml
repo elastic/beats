@@ -1,0 +1,36 @@
+description: Pipeline for parsing checkpoint firewall logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- remove:
+    field:
+    - message
+    ignore_missing: true
+- rename:
+    field: json.id
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: json.event_type
+    target_field: event.action
+    ignore_missing: true
+- date:
+    field: json.timestamp
+    formats:
+      - UNIX
+    ignore_missing: true
+- rename:
+    field: json.id
+    target_field: event.id
+    ignore_missing: true
+- remove:
+    field:
+    - cisco.amp.timestamp
+    - checkpoint.client_outbound_packets
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+
