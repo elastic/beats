@@ -1,0 +1,108 @@
+- name: http.request.mime_type
+  type: keyword
+- name: dns.resolved_data
+  type: keyword
+- name: fireeyenx
+  type: group
+  default_field: false
+  description: >
+    Fields export by Fireeye Network Security
+  fields:
+    - name: device_ip
+      type: keyword
+      description: >
+        Fireeye NX device_ip
+    - name: session_id
+      type: keyword
+      description: >
+        Fireeye NX Session ID
+    - name: device_oml
+      type: long 
+      description: >
+        Fireeye NX OML
+    - name: deviceid
+      type: long
+      description: >
+        Fireeye NX Appliance ID
+    - name: hostname
+      type: keyword
+      description: >
+        Fireeye NX Appliance Hostname
+    - name: ip_tos
+      tpye: keyword
+      description: >
+        Network Flow Type Of Service
+    - name: tx_id
+      type: long
+    - name: flow
+      type: group
+      description: > 
+        Fireeye NX Flow Logs
+      fields:
+        - name: starttime
+          type: keyword
+        - name: endtime
+          type: keyword
+        - name: age
+          type: keyword
+        - name: state
+          type: keyword
+        - name: reason
+          type: keyword
+        - name: altered
+          type: keyword
+        - name: icmp_code
+          type: long
+        - name: icmp_type
+          tpye: long
+        - name: response_icmp_code
+          type: long
+        - name: response_icmp_type
+          type: long
+        - name: ip_tc
+          type: keyword
+    - name: tcp
+      type: group
+      description: >
+        Fireeye NX TCP Logs
+      fields:
+        - name: ack
+          type: keyword
+        - name: fin
+          type: keyword
+        - name: psh
+          type: keyword
+        - name: state
+          type: keyword
+        - name: syn
+          type: keyword
+        - name: tcp_flags
+          type: keyword
+        - name: tcp_flags_tc
+          type: keyword
+        - name: tcp_flags_ts
+          type: keyword
+    - name: fileinfo
+      type: group
+      description: >
+        Fireeye NX File Logs
+      fields:
+        - name: filename
+          type: keyword
+        - name: magic
+          tpye: keyword
+        - name: md5
+          type: keyword
+        - name: size
+          type: keyword
+        - name: state
+          type: keyword
+        - name: stored
+          type: keyword
+    - name: tls
+      type: group
+      description: >
+        Fireeye NX TLS Logs
+      fields:
+        - name: fetal_alert
+          type: keyword

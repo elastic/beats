@@ -33,17 +33,12 @@ This is an example of how to use the module.
     var.syslog_host: 0.0.0.0
     var.syslog_port: 12345
 ----
-`Fireeye Network Security` Evidence Collector settings
 
-include::../images/fenxec.png[]
 
 :fileset_ex: {fileset}
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
 
 [float]
 ==== `{fileset}` log fileset settings
@@ -55,8 +50,8 @@ include::../include/var-paths.asciidoc[]
 
 This module comes with a sample dashboard. For example:
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+[role="screenshot"]
+image::./images/Filebeat-Fireeyenx-flow.png[]
 
 :has-dashboards!:
 

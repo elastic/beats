@@ -1,5 +1,8 @@
 description: Pipeline for parsing fireeye nx logs
 processors:
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
  - date:
      field: temp_ts
      formats:
@@ -45,8 +48,11 @@ processors:
      target_field: destination.as.organization.name
      ignore_missing: true
  - user_agent:
-     field: http.request.user_agent
+     field: user_agent.original 
      ignore_missing: true
+ - remove:
+     field: message
+
 on_failure:
   - set:
         field: error.message

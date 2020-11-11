@@ -61,6 +61,12 @@ processors:
             - from: "meta_oml"
               to: "fireeyenx.device_oml"
 
+            - from: "deviceid"
+              to: "fireeyenx.deviceid"
+
+            - from: "meta_cbname"
+              to: "fireeyenx.hostname"
+
         ignore_missing: true
         fail_on_error: false
 
@@ -132,7 +138,7 @@ processors:
             - from: "rawmsg.http.http_refer"
               to: "http.request.referrer"
             - from: "rawmsg.http.http_user_agent"
-              to: "http.request.user_agent"
+              to: "user_agent.original"
             - from: "rawmsg.http.length"
               to: "http.response.bytes"
             - from: "rawmsg.http.protocol"
@@ -140,7 +146,7 @@ processors:
             - from: "rawmsg.http.status"
               to: "http.response.status_code"
             - from: "rawmsg.http.url"
-              to: "http.url.path"
+              to: "url.path"
             - from: "rawmsg.iface"
               to: "interface.name"
             - from: "rawmsg.fileinfo.tx_id"
@@ -161,7 +167,7 @@ processors:
             - from: "rawmsg.http.http_refer"
               to: "http.request.referrer"
             - from: "rawmsg.http.http_user_agent"
-              to: "http.request.user_agent"
+              to: "user_agent.original"
             - from: "rawmsg.http.length"
               to: "http.response.bytes"
             - from: "rawmsg.http.protocol"
@@ -169,7 +175,7 @@ processors:
             - from: "rawmsg.http.status"
               to: "http.response.status_code"
             - from: "rawmsg.http.url"
-              to: "http.url.path"
+              to: "url.path"
             - from: "rawmsg.iface"
               to: "interface.name"
             - from: "rawmsg.tx_id"

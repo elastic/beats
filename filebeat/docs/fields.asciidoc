@@ -58517,10 +58517,297 @@ fireeye Module
 
 
 
+*`http.request.mime_type`*::
++
+--
+type: keyword
+
+--
+
+*`dns.resolved_data`*::
++
+--
+type: keyword
+
+--
+
 [float]
-=== fireeye
+=== fireeyenx
+
+Fields export by Fireeye Network Security
 
 
+
+*`fireeyenx.device_ip`*::
++
+--
+Fireeye NX device_ip
+
+
+type: keyword
+
+--
+
+*`fireeyenx.session_id`*::
++
+--
+Fireeye NX Session ID
+
+
+type: keyword
+
+--
+
+*`fireeyenx.device_oml`*::
++
+--
+Fireeye NX OML
+
+
+type: long
+
+--
+
+*`fireeyenx.deviceid`*::
++
+--
+Fireeye NX Appliance ID
+
+
+type: long
+
+--
+
+*`fireeyenx.hostname`*::
++
+--
+Fireeye NX Appliance Hostname
+
+
+type: keyword
+
+--
+
+*`fireeyenx.ip_tos`*::
++
+--
+Network Flow Type Of Service
+
+
+--
+
+*`fireeyenx.tx_id`*::
++
+--
+type: long
+
+--
+
+[float]
+=== flow
+
+Fireeye NX Flow Logs
+
+
+
+*`fireeyenx.flow.starttime`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.endtime`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.age`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.state`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.reason`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.altered`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.flow.icmp_code`*::
++
+--
+type: long
+
+--
+
+*`fireeyenx.flow.icmp_type`*::
++
+--
+--
+
+*`fireeyenx.flow.response_icmp_code`*::
++
+--
+type: long
+
+--
+
+*`fireeyenx.flow.response_icmp_type`*::
++
+--
+type: long
+
+--
+
+*`fireeyenx.flow.ip_tc`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== tcp
+
+Fireeye NX TCP Logs
+
+
+
+*`fireeyenx.tcp.ack`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.fin`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.psh`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.state`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.syn`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.tcp_flags`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.tcp_flags_tc`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.tcp.tcp_flags_ts`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== fileinfo
+
+Fireeye NX File Logs
+
+
+
+*`fireeyenx.fileinfo.filename`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.fileinfo.magic`*::
++
+--
+--
+
+*`fireeyenx.fileinfo.md5`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.fileinfo.size`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.fileinfo.state`*::
++
+--
+type: keyword
+
+--
+
+*`fireeyenx.fileinfo.stored`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== tls
+
+Fireeye NX TLS Logs
+
+
+
+*`fireeyenx.tls.fetal_alert`*::
++
+--
+type: keyword
+
+--
 
 [[exported-fields-fortinet]]
 == Fortinet fields
