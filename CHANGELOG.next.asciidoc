@@ -433,6 +433,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove io.time from windows {pull}22237[22237]
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 - Change Session ID type from int to string {pull}22359[22359]
+- Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
 
 *Packetbeat*
 
@@ -523,6 +524,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for OpenStack SSL metadata APIs in `add_cloud_metadata`. {pull}21590[21590]
 - Add cloud.account.id for GCP into add_cloud_metadata processor. {pull}21776[21776]
 - Add proxy metricset for istio module. {pull}21751[21751]
+- Add kubernetes.node.hostname metadata of Kubernetes node. {pull}22189[22189]
+- Enable always add_resource_metadata for Pods and Services of kubernetes autodiscovery. {pull}22189[22189]
+- Add add_resource_metadata option setting (always enabled) for add_kubernetes_metadata setting. {pull}22189[22189]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 
@@ -705,6 +709,7 @@ from being added to events by default. {pull}18159[18159]
 - New juniper.srx dataset for Juniper SRX logs. {pull}20017[20017]
 - Adding support for Microsoft 365 Defender (Microsoft Threat Protection) {pull}21446[21446]
 - Adding support for FIPS in s3 input {pull}21446[21446]
+- Adding support for Oracle Database Audit Logs {pull}21991[21991]
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
