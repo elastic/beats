@@ -246,6 +246,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
+- Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 
 *Filebeat*
 
@@ -708,6 +709,7 @@ from being added to events by default. {pull}18159[18159]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Rename googlecloud module to gcp module. {pull}22214[22214]
+- Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
 - Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
 - Copy tag names from MISP data into events. {pull}21664[21664]
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
