@@ -103,7 +103,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
-                  // 'x-pack/packetbeat',
+                  'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
               }
