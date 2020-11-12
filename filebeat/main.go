@@ -33,7 +33,7 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
-	if err := cmd.Filebeat(inputs.Init).Execute(); err != nil {
+	if err := cmd.Filebeat(inputs.Init, cmd.FilebeatSettings()).Execute(); err != nil {
 		os.Exit(1)
 	}
 }

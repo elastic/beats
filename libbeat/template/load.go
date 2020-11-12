@@ -171,7 +171,7 @@ func template(config TemplateConfig, info beat.Info, esVersion common.Version, m
 		logp.Info("template config not enabled")
 		return nil, nil
 	}
-	tmpl, err := New(info.Version, info.IndexPrefix, esVersion, config, migration)
+	tmpl, err := New(info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template instance: %v", err)
 	}
