@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -160,7 +159,6 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error)
 	fields["status"] = status
 
 	var sipFields ProtocolFields
-	sipFields.Timestamp = time.Now().UnixNano()
 	if m.isRequest {
 		populateRequestFields(m, pbf, &sipFields)
 	} else {

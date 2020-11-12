@@ -344,7 +344,7 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
+		logPath := a.Monitor().LogPath(a.Spec(), o.pipelineID)
 		if logPath != "" {
 			paths[a.Name()] = append(paths[a.Name()], logPath)
 		}
@@ -360,7 +360,7 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
+		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Spec(), o.pipelineID)
 		if metricEndpoint != "" {
 			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
 		}

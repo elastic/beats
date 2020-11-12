@@ -182,7 +182,7 @@ func NewContainerIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, er
 // GetMetadata returns the composed metadata list from all registered indexers
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var m []MetadataIndex
-	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+	for _, status := range getContainerStatusesInPod(pod) {
 		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
 		if cID == "" {
 			continue
@@ -205,7 +205,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 // GetIndexes returns the indexes for the given Pod
 func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var containers []string
-	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+	for _, status := range getContainerStatusesInPod(pod) {
 		cID := kubernetes.ContainerID(status)
 		if cID == "" {
 			continue
@@ -241,7 +241,7 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 	cIDs := make(map[string]string)
 	runtimes := make(map[string]string)
-	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+	for _, status := range getContainerStatusesInPod(pod) {
 		cID, runtime := kubernetes.ContainerIDWithRuntime(status)
 		if cID == "" {
 			continue
@@ -293,4 +293,15 @@ func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	}
 
 	return hostPorts
+}
+
+func getContainerStatusesInPod(pod *kubernetes.Pod) []kubernetes.PodContainerStatus {
+	if pod == nil {
+		return nil
+	}
+	var statuses []kubernetes.PodContainerStatus
+	statuses = append(statuses, pod.Status.ContainerStatuses...)
+	statuses = append(statuses, pod.Status.InitContainerStatuses...)
+	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+	return statuses
 }
