@@ -19,7 +19,7 @@ const Name = fbcmd.Name
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
 	settings := fbcmd.FilebeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	command := fbcmd.Filebeat(inputs.Init, settings)
 	xpackcmd.AddXPack(command, Name)
 	return command

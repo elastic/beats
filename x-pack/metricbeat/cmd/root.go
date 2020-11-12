@@ -34,10 +34,10 @@ func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	settings := instance.Settings{
-		RunFlags:      runFlags,
-		Name:          Name,
-		HasDashboards: true,
-		XPack:         true,
+		RunFlags:        runFlags,
+		Name:            Name,
+		HasDashboards:   true,
+		ElasticLicensed: true,
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))

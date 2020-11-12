@@ -33,7 +33,7 @@ type Settings struct {
 	IndexPrefix     string
 	Version         string
 	HasDashboards   bool
-	XPack           bool
+	ElasticLicensed bool
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
 	ConfigOverrides []cfgfile.ConditionalOverride

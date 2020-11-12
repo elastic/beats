@@ -21,7 +21,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := auditbeatcmd.AuditbeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	RootCmd = auditbeatcmd.Initialize(settings)
 	xpackcmd.AddXPack(RootCmd, auditbeatcmd.Name)
 }

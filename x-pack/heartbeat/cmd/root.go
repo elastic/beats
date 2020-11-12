@@ -15,7 +15,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := heartbeatCmd.HeartbeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	RootCmd = heartbeatCmd.Initialize(settings)
 	xpackcmd.AddXPack(RootCmd, heartbeatCmd.Name)
 }

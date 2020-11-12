@@ -156,7 +156,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
-	xpack := settings.XPack
+	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
 		defer func() {
@@ -165,7 +165,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version, xpack)
+		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
 		if err != nil {
 			return err
 		}
@@ -192,7 +192,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.XPack)
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, indexPrefix, v string, xpack bool) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
@@ -228,14 +228,14 @@ func NewBeat(name, indexPrefix, v string, xpack bool) (*Beat, error) {
 
 	b := beat.Beat{
 		Info: beat.Info{
-			Beat:        name,
-			XPack:       xpack,
-			IndexPrefix: indexPrefix,
-			Version:     v,
-			Name:        hostname,
-			Hostname:    hostname,
-			ID:          id,
-			EphemeralID: ephemeralID,
+			Beat:            name,
+			ElasticLicensed: elasticLicensed,
+			IndexPrefix:     indexPrefix,
+			Version:         v,
+			Name:            hostname,
+			Hostname:        hostname,
+			ID:              id,
+			EphemeralID:     ephemeralID,
 		},
 		Fields: fields,
 	}

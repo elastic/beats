@@ -21,7 +21,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := winlogbeatCmd.WinlogbeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	RootCmd = winlogbeatCmd.Initialize(settings)
 	xpackcmd.AddXPack(RootCmd, winlogbeatCmd.Name)
 }

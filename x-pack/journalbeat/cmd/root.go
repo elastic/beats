@@ -15,7 +15,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := journalbeatCmd.JournalbeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	RootCmd = journalbeatCmd.Initialize(settings)
 	xpackcmd.AddXPack(RootCmd, journalbeatCmd.Name)
 }

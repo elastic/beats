@@ -18,7 +18,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	settings := packetbeatCmd.PacketbeatSettings()
-	settings.XPack = true
+	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
 	xpackcmd.AddXPack(RootCmd, packetbeatCmd.Name)
 }

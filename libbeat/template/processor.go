@@ -28,9 +28,9 @@ import (
 
 // Processor struct to process fields to template
 type Processor struct {
-	EsVersion common.Version
-	Migration bool
-	XPack     bool
+	EsVersion       common.Version
+	Migration       bool
+	ElasticLicensed bool
 }
 
 var (
@@ -76,7 +76,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.text(&field)
 		case "wildcard":
 			noWildcards := p.EsVersion.LessThan(common.MustNewVersion("7.9.0"))
-			if !p.XPack || noWildcards {
+			if !p.ElasticLicensed || noWildcards {
 				indexMapping = p.keyword(&field)
 			} else {
 				indexMapping = p.wildcard(&field)
