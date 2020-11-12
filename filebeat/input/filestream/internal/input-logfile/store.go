@@ -206,8 +206,7 @@ func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (bool, stri
 	for key, res := range s.ephemeralStore.table {
 		update, newKey, updatedMeta := getNewID(key, res)
 		if update && res.internalState.TTL > 0 {
-			r := res.clone()
-			r.key = newKey
+			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			s.ephemeralStore.table[newKey] = r
 			s.UpdateTTL(res, 0)
@@ -337,9 +336,9 @@ func (r *resource) inSyncStateSnapshot() state {
 	}
 }
 
-func (r *resource) clone() *resource {
+func (r *resource) copyWithNewKey(key string) *resource {
 	return &resource{
-		key:                    r.key,
+		key:                    key,
 		stored:                 r.stored,
 		internalInSync:         r.internalInSync,
 		activeCursorOperations: r.activeCursorOperations,
