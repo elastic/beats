@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package connections
+package connection
 
 import (
 	"github.com/pkg/errors"
@@ -35,7 +35,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		PathConfigKey: "connections.metrics_path",
+		PathConfigKey: "connection.metrics_path",
 	}.Build()
 )
 
@@ -44,9 +44,8 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("nats", "connections", New,
+	mb.Registry.MustAddMetricSet("nats", "connection", New,
 		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
 	)
 }
 
@@ -87,7 +86,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")
 	}
-	err = eventMapping(r, content)
+	err = eventsMapping(r, content)
 	if err != nil {
 		return errors.Wrap(err, "error in mapping")
 	}

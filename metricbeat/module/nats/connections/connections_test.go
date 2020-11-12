@@ -33,7 +33,7 @@ func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("./_meta/test/connectionsmetrics.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventMapping(reporter, content)
 	assert.NoError(t, err)
 	event := reporter.GetEvents()[0]
 	d, _ := event.MetricSetFields.GetValue("total")

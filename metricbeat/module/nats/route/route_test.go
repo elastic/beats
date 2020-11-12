@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package routes
+package route
 
 import (
 	"io/ioutil"
@@ -33,11 +33,8 @@ func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("./_meta/test/routesmetrics.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventMapping(reporter, content)
+	err = eventsMapping(reporter, content)
 	assert.NoError(t, err)
-	event := reporter.GetEvents()[0]
-	d, _ := event.MetricSetFields.GetValue("total")
-	assert.Equal(t, d, int64(2))
 }
 
 func TestFetchEventContent(t *testing.T) {
@@ -53,7 +50,7 @@ func TestFetchEventContent(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "nats",
-		"metricsets": []string{"routes"},
+		"metricsets": []string{"route"},
 		"hosts":      []string{server.URL},
 	}
 	reporter := &mbtest.CapturingReporterV2{}

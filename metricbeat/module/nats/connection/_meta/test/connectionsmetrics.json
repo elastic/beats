@@ -1,0 +1,29 @@
+{
+    "server_id": "NCA52DU3MRRJGSDZXWBKSAGCKICQBYFLTQDHHXWAWYYCXBZ33LF55P7H",
+    "now": "2020-11-05T10:55:51.553046034Z",
+    "num_connections": 1,
+    "total": 1,
+    "offset": 0,
+    "limit": 1024,
+    "connections": [
+        {
+            "cid": 3,
+            "ip": "172.22.0.1",
+            "port": 33794,
+            "start": "2020-11-05T10:55:21.968199135Z",
+            "last_activity": "2020-11-05T10:55:51.552942651Z",
+            "rtt": "31ms",
+            "uptime": "29s",
+            "idle": "0s",
+            "pending_bytes": 0,
+            "in_msgs": 42429204,
+            "out_msgs": 0,
+            "in_bytes": 678867264,
+            "out_bytes": 0,
+            "subscriptions": 0,
+            "name": "NATS Benchmark",
+            "lang": "go",
+            "version": "1.11.0"
+        }
+    ]
+}

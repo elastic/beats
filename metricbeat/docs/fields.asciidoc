@@ -35475,23 +35475,13 @@ type: date
 --
 
 [float]
-=== connections
+=== connection
 
 Contains nats connection related metrics
 
 
 
-*`nats.connections.total`*::
-+
---
-The number of currently active clients
-
-
-type: integer
-
---
-
-*`nats.connections.name`*::
+*`nats.connection.name`*::
 +
 --
 The name of the connection
@@ -35501,7 +35491,7 @@ type: keyword
 
 --
 
-*`nats.connections.subscriptions`*::
+*`nats.connection.subscriptions`*::
 +
 --
 The number of subscriptions in this connection
@@ -35511,7 +35501,7 @@ type: integer
 
 --
 
-*`nats.connections.pending_bytes`*::
+*`nats.connection.pending_bytes`*::
 +
 --
 The number of pending bytes of this connection
@@ -35523,7 +35513,7 @@ format: bytes
 
 --
 
-*`nats.connections.uptime`*::
+*`nats.connection.uptime`*::
 +
 --
 The period the connection is up (sec)
@@ -35535,7 +35525,7 @@ format: duration
 
 --
 
-*`nats.connections.idle_time`*::
+*`nats.connection.idle_time`*::
 +
 --
 The period the connection is idle (sec)
@@ -35554,7 +35544,7 @@ The amount of incoming data
 
 
 
-*`nats.connections.in.messages`*::
+*`nats.connection.in.messages`*::
 +
 --
 The amount of incoming messages
@@ -35564,7 +35554,7 @@ type: long
 
 --
 
-*`nats.connections.in.bytes`*::
+*`nats.connection.in.bytes`*::
 +
 --
 The amount of incoming bytes
@@ -35583,7 +35573,7 @@ The amount of outgoing data
 
 
 
-*`nats.connections.out.messages`*::
+*`nats.connection.out.messages`*::
 +
 --
 The amount of outgoing messages
@@ -35593,7 +35583,139 @@ type: long
 
 --
 
-*`nats.connections.out.bytes`*::
+*`nats.connection.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== connections
+
+Contains nats connection related metrics
+
+
+
+*`nats.connections.total`*::
++
+--
+The number of currently active clients
+
+
+type: integer
+
+--
+
+[float]
+=== route
+
+Contains nats route related metrics
+
+
+
+*`nats.route.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.route.remote_id`*::
++
+--
+The remote id on which the route is connected to
+
+
+type: keyword
+
+--
+
+*`nats.route.pending_size`*::
++
+--
+The number of pending routes
+
+
+type: long
+
+--
+
+*`nats.route.port`*::
++
+--
+The port of the route
+
+
+type: integer
+
+--
+
+*`nats.route.ip`*::
++
+--
+The ip of the route
+
+
+type: ip
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.route.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.route.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.route.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.route.out.bytes`*::
 +
 --
 The amount of outgoing bytes
@@ -35619,114 +35741,6 @@ The number of registered routes
 
 
 type: integer
-
---
-
-*`nats.routes.subscriptions`*::
-+
---
-The number of subscriptions in this connection
-
-
-type: integer
-
---
-
-*`nats.routes.remote_id`*::
-+
---
-The remote id on which the route is connected to
-
-
-type: keyword
-
---
-
-*`nats.routes.pending_size`*::
-+
---
-The number of pending routes
-
-
-type: long
-
---
-
-*`nats.routes.port`*::
-+
---
-The port of the route
-
-
-type: integer
-
---
-
-*`nats.routes.ip`*::
-+
---
-The ip of the route
-
-
-type: ip
-
---
-
-[float]
-=== in
-
-The amount of incoming data
-
-
-
-*`nats.routes.in.messages`*::
-+
---
-The amount of incoming messages
-
-
-type: long
-
---
-
-*`nats.routes.in.bytes`*::
-+
---
-The amount of incoming bytes
-
-
-type: long
-
-format: bytes
-
---
-
-[float]
-=== out
-
-The amount of outgoing data
-
-
-
-*`nats.routes.out.messages`*::
-+
---
-The amount of outgoing messages
-
-
-type: long
-
---
-
-*`nats.routes.out.bytes`*::
-+
---
-The amount of outgoing bytes
-
-
-type: long
-
-format: bytes
 
 --
 
