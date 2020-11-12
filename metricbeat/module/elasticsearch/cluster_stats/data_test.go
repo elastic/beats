@@ -29,9 +29,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
-type mockMetricset struct {
-	*elasticsearch.MetricSet
-}
 
 func TestMapper(t *testing.T) {
 	httpHelper, err := helper.NewHTTPFromConfig(helper.Config{
@@ -42,38 +39,6 @@ func TestMapper(t *testing.T) {
 		SanitizedURI: "http://localhost:9200",
 		Host:         "http://localhost:9200",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	f := func(r mb.ReporterV2, content []byte) error {
-		return eventMapping(r, httpHelper, elasticsearch.Info{
-			ClusterName: "test_cluster",
-			ClusterID:   "12345",
-			Version: struct {
-				Number *common.Version `json:"number"`
-			}{
-				Number: &common.Version{
-					Major:  7,
-					Minor:  10,
-					Bugfix: 0,
-				},
-			},
-		}, content)
-	}
-
-	elasticsearch.TestMapper(t, "./_meta/test/cluster_stats.*.json", f)
-}
-
-
-func TestMapper2(t *testing.T) {
-	m := mockMetricset{MetricSet: &elasticsearch.MetricSet{
-		BaseMetricSet: mb.BaseMetricSet{},
-		HTTP:          nil,
-		XPack:         false,
-		Scope:         0,
-	}}
-	httpHelper, err := helper.NewHTTP(m.BaseMetricSet)
 	if err != nil {
 		t.Fatal(err)
 	}
