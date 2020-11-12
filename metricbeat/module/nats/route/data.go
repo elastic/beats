@@ -19,14 +19,13 @@ package route
 
 import (
 	"encoding/json"
-	"time"
-
-	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/nats/util"
 )
 
 var (
@@ -72,12 +71,15 @@ func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Eve
 		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
-	timestamp, _ := moduleFields.GetValue("now")
-	moduleFields.Delete("now")
+	timestamp, err := util.GetNatsTimestamp(moduleFields)
+	moduleFields.Delete("server.time")
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "failure parsing server timestamp")
+	}
 	event := mb.Event{
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,
-		Timestamp: timestamp.(time.Time),
+		Timestamp:       timestamp,
 	}
 	return event, nil
 }

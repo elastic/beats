@@ -19,7 +19,6 @@ package stats
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -125,12 +124,15 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "failure applying module schema")
 	}
-	timestamp, _ := moduleMetrics.GetValue("now")
-	moduleMetrics.Delete("now")
+	timestamp, err := util.GetNatsTimestamp(moduleMetrics)
+	moduleMetrics.Delete("server.time")
+	if err != nil {
+		return errors.Wrap(err, "failure parsing server timestamp")
+	}
 	evt := mb.Event{
 		MetricSetFields: metricsetMetrics,
 		ModuleFields:    moduleMetrics,
-		Timestamp: timestamp.(time.Time),
+		Timestamp:       timestamp,
 	}
 	r.Event(evt)
 	return nil

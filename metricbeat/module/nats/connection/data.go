@@ -19,7 +19,6 @@ package connection
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -82,12 +81,15 @@ func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Eve
 		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
-	timestamp, _ := moduleFields.GetValue("now")
-	moduleFields.Delete("now")
+	timestamp, err := util.GetNatsTimestamp(moduleFields)
+	moduleFields.Delete("server.time")
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "failure parsing server timestamp")
+	}
 	event := mb.Event{
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,
-		Timestamp: timestamp.(time.Time),
+		Timestamp:       timestamp,
 	}
 	return event, nil
 }

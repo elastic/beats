@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -105,4 +106,16 @@ func UpdateDuration(event common.MapStr, key string) error {
 		return errors.Wrap(err, fmt.Sprintf("failure updating %v key", key))
 	}
 	return nil
+}
+
+// GetNatsTimestamp gets the timestamp of base level metrics NATS server returns
+func GetNatsTimestamp(event common.MapStr) (time.Time, error) {
+	var timeStamp time.Time
+	timestamp, _ := event.GetValue("server.time")
+	timestampString := timestamp.(string)
+	timeStamp, err := time.Parse(time.RFC3339, timestampString)
+	if err != nil {
+		return timeStamp, err
+	}
+	return timeStamp, nil
 }
