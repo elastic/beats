@@ -19148,6 +19148,12 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+[float]
+=== indices
+
+Node indices stats
+
+
 
 *`elasticsearch.node.stats.indices.docs.count`*::
 +
@@ -19379,6 +19385,18 @@ format: percent
 
 --
 
+[float]
+=== jvm.mem.pools
+
+JVM memory pool stats
+
+
+
+[float]
+=== old
+
+Old memory pool stats.
+
 
 
 *`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`*::
@@ -19429,6 +19447,12 @@ format: bytes
 
 --
 
+[float]
+=== young
+
+Young memory pool stats.
+
+
 
 *`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`*::
 +
@@ -19477,6 +19501,12 @@ type: long
 format: bytes
 
 --
+
+[float]
+=== survivor
+
+Survivor memory pool stats.
+
 
 
 *`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`*::
@@ -19527,6 +19557,18 @@ format: bytes
 
 --
 
+[float]
+=== jvm.gc.collectors
+
+GC collector stats.
+
+
+
+[float]
+=== old.collection
+
+Old collection gc.
+
 
 
 *`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`*::
@@ -19542,6 +19584,12 @@ type: long
 type: long
 
 --
+
+[float]
+=== young.collection
+
+Young collection gc.
+
 
 
 *`elasticsearch.node.stats.jvm.gc.collectors.young.collection.count`*::
@@ -19569,8 +19617,6 @@ File system summary
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -19580,8 +19626,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.free.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -19591,8 +19635,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.available.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -26663,6 +26705,16 @@ type: keyword
 +
 --
 Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
 
 
 type: keyword
