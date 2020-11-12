@@ -16,13 +16,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
 const (
-	beatName     = "filebeat"
-	artifactName = "beats/filebeat"
-	version      = "7.5.1"
+	version = "7.5.1"
+)
+
+var (
+	beatSpec = program.Spec{Name: "Filebeat", Cmd: "filebeat", Artifact: "beat/filebeat"}
 )
 
 type testCase struct {
@@ -36,8 +39,7 @@ func TestFetchVerify(t *testing.T) {
 	installPath := filepath.Join("testdata", "install")
 	targetPath := filepath.Join("testdata", "download")
 	ctx := context.Background()
-	programName := "beat"
-	artifactName := "beats/beat"
+	s := program.Spec{Name: "Beat", Cmd: "beat", Artifact: "beats/filebeat"}
 	version := "8.0.0"
 
 	targetFilePath := filepath.Join(targetPath, "beat-8.0.0-darwin-x86_64.tar.gz")
@@ -65,7 +67,7 @@ func TestFetchVerify(t *testing.T) {
 	// first download verify should fail:
 	// download skipped, as invalid package is prepared upfront
 	// verify fails and cleans download
-	matches, err := verifier.Verify(programName, version, artifactName, true)
+	matches, err := verifier.Verify(s, version, true)
 	assert.NoError(t, err)
 	assert.Equal(t, false, matches)
 
@@ -78,7 +80,7 @@ func TestFetchVerify(t *testing.T) {
 	// second one should pass
 	// download not skipped: package missing
 	// verify passes because hash is not correct
-	_, err = downloader.Download(ctx, programName, artifactName, version)
+	_, err = downloader.Download(ctx, s, version)
 	assert.NoError(t, err)
 
 	// file downloaded ok
@@ -88,7 +90,7 @@ func TestFetchVerify(t *testing.T) {
 	_, err = os.Stat(hashTargetFilePath)
 	assert.NoError(t, err)
 
-	matches, err = verifier.Verify(programName, version, artifactName, true)
+	matches, err = verifier.Verify(s, version, true)
 	assert.NoError(t, err)
 	assert.Equal(t, true, matches)
 }
@@ -142,12 +144,12 @@ func TestVerify(t *testing.T) {
 		Architecture:    "32",
 	}
 
-	if err := prepareTestCase(beatName, version, config); err != nil {
+	if err := prepareTestCase(beatSpec, version, config); err != nil {
 		t.Fatal(err)
 	}
 
 	testClient := NewDownloader(config)
-	artifact, err := testClient.Download(context.Background(), beatName, artifactName, version)
+	artifact, err := testClient.Download(context.Background(), beatSpec, version)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,7 +164,7 @@ func TestVerify(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	isOk, err := testVerifier.Verify(beatName, version, artifactName, true)
+	isOk, err := testVerifier.Verify(beatSpec, version, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,8 +178,8 @@ func TestVerify(t *testing.T) {
 	os.RemoveAll(config.DropPath)
 }
 
-func prepareTestCase(beatName, version string, cfg *artifact.Config) error {
-	filename, err := artifact.GetArtifactName(beatName, version, cfg.OperatingSystem, cfg.Architecture)
+func prepareTestCase(beatSpec program.Spec, version string, cfg *artifact.Config) error {
+	filename, err := artifact.GetArtifactName(beatSpec, version, cfg.OperatingSystem, cfg.Architecture)
 	if err != nil {
 		return err
 	}

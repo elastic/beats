@@ -43,7 +43,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -65,8 +65,29 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             deleteDir()
-            gitCheckout(basedir: "${BASE_DIR}")
+            script {
+              if(isUpstreamTrigger()) {
+                try {
+                  copyArtifacts(filter: 'packaging.properties',
+                                flatten: true,
+                                projectName: "Beats/beats/${env.JOB_BASE_NAME}",
+                                selector: upstream(fallbackToLastSuccessful: true))
+                  def props = readProperties(file: 'packaging.properties')
+                  gitCheckout(basedir: "${BASE_DIR}", branch: props.COMMIT)
+                } catch(err) {
+                  // Fallback to the head of the branch as used to be.
+                  gitCheckout(basedir: "${BASE_DIR}")
+                }
+              } else {
+                gitCheckout(basedir: "${BASE_DIR}")
+              }
+            }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+            withMageEnv(){
+              dir("${BASE_DIR}"){
+                setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              }
+            }
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
         }
@@ -91,14 +112,14 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
-                  // 'x-pack/packetbeat',
+                  'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
               }
             }
             stages {
               stage('Package Linux'){
-                agent { label 'ubuntu && immutable' }
+                agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
                 when {
                   beforeAgent true
@@ -160,11 +181,22 @@ pipeline {
           }
         }
         stage('Run E2E Tests for Packages'){
-          agent { label 'ubuntu && immutable' }
+          agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           steps {
             runE2ETests()
           }
+        }
+      }
+      post {
+        success {
+          writeFile(file: 'beats-tester.properties',
+                    text: """\
+                    ## To be consumed by the beats-tester pipeline
+                    COMMIT=${env.GIT_BASE_COMMIT}
+                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}
+                    VERSION=${env.BEAT_VERSION}-SNAPSHOT""".stripIndent()) // stripIdent() requires '''/
+          archiveArtifacts artifacts: 'beats-tester.properties'
         }
       }
     }
@@ -191,10 +223,14 @@ def pushCIDockerImages(){
   }
 }
 
-def tagAndPush(name){
-  def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
+def tagAndPush(beatName){
+  def libbetaVer = env.BEAT_VERSION
+  def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
+    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+
     libbetaVer += "-SNAPSHOT"
+    aliasVersion += "-SNAPSHOT"
   }
 
   def tagName = "${libbetaVer}"
@@ -207,25 +243,37 @@ def tagAndPush(name){
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    def oldName = "${DOCKER_REGISTRY}/beats/${name}${variant}:${libbetaVer}"
-    def newName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${tagName}"
-    def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}${variant}:${env.GIT_BASE_COMMIT}"
+    doTagAndPush(beatName, variant, libbetaVer, tagName)
+    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
 
-    def iterations = 0
-    retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-      iterations++
-      def status = sh(label:'Change tag and push', script: """
-        docker tag ${oldName} ${newName}
-        docker push ${newName}
-        docker tag ${oldName} ${commitName}
-        docker push ${commitName}
-      """, returnStatus: true)
+    if (!isPR() && aliasVersion != "") {
+      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    }
+  }
+}
 
-      if ( status > 0 && iterations < 3) {
-        error('tag and push failed, retry')
-      } else if ( status > 0 ) {
-        log(level: 'WARN', text: "${name} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-      }
+/**
+* @param beatName name of the Beat
+* @param variant name of the variant used to build the docker image name
+* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
+* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
+*/
+def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+
+  def iterations = 0
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    iterations++
+    def status = sh(label: "Change tag and push ${targetName}", script: """
+      docker tag ${sourceName} ${targetName}
+      docker push ${targetName}
+    """, returnStatus: true)
+
+    if ( status > 0 && iterations < 3) {
+      error("tag and push failed for ${beatName}, retry")
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
     }
   }
 }
@@ -330,7 +378,7 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 
   // Copy those files to another location with the sha commit to test them
-  // aftewords.
+  // afterward.
   bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }

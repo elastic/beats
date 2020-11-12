@@ -55,6 +55,11 @@ type diskQueue struct {
 	// otherwise.
 	writing bool
 
+	// If writing is true, then writeRequestSize equals the number of bytes it
+	// contained. Used to calculate how much free capacity the queue has left
+	// after all scheduled writes have been completed (see canAcceptFrameOfSize).
+	writeRequestSize uint64
+
 	// reading is true if the reader loop is processing a request, false
 	// otherwise.
 	reading bool
