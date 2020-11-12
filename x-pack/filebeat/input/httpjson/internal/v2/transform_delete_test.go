@@ -6,7 +6,6 @@ package v2
 
 import (
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestNewSet(t *testing.T) {
+func TestNewDelete(t *testing.T) {
 	cases := []struct {
 		name           string
 		constructor    constructor
@@ -23,88 +22,88 @@ func TestNewSet(t *testing.T) {
 		expectedErr    string
 	}{
 		{
-			name:        "newSetResponse targets body",
-			constructor: newSetResponse,
+			name:        "newDeleteResponse targets body",
+			constructor: newDeleteResponse,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetResponse targets something else",
-			constructor: newSetResponse,
+			name:        "newDeleteResponse targets something else",
+			constructor: newDeleteResponse,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
 		},
 		{
-			name:        "newSetRequest targets body",
-			constructor: newSetRequest,
+			name:        "newDeleteRequest targets body",
+			constructor: newDeleteRequest,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetRequest targets header",
-			constructor: newSetRequest,
+			name:        "newDeleteRequest targets header",
+			constructor: newDeleteRequest,
 			config: map[string]interface{}{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
 		},
 		{
-			name:        "newSetRequest targets url param",
-			constructor: newSetRequest,
+			name:        "newDeleteRequest targets url param",
+			constructor: newDeleteRequest,
 			config: map[string]interface{}{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
 		},
 		{
-			name:        "newSetRequest targets something else",
-			constructor: newSetRequest,
+			name:        "newDeleteRequest targets something else",
+			constructor: newDeleteRequest,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
 		},
 		{
-			name:        "newSetPagination targets body",
-			constructor: newSetPagination,
+			name:        "newDeletePagination targets body",
+			constructor: newDeletePagination,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetPagination targets header",
-			constructor: newSetPagination,
+			name:        "newDeletePagination targets header",
+			constructor: newDeletePagination,
 			config: map[string]interface{}{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
 		},
 		{
-			name:        "newSetPagination targets url param",
-			constructor: newSetPagination,
+			name:        "newDeletePagination targets url param",
+			constructor: newDeletePagination,
 			config: map[string]interface{}{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
 		},
 		{
-			name:        "newSetPagination targets url value",
-			constructor: newSetPagination,
+			name:        "newDeletePagination targets url value",
+			constructor: newDeletePagination,
 			config: map[string]interface{}{
 				"target": "url.value",
 			},
-			expectedTarget: targetInfo{Type: "url.value"},
+			expectedErr: "invalid target type: url.value",
 		},
 		{
-			name:        "newSetPagination targets something else",
-			constructor: newSetPagination,
+			name:        "newDeletePagination targets something else",
+			constructor: newDeletePagination,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
@@ -116,10 +115,10 @@ func TestNewSet(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := common.MustNewConfigFrom(tc.config)
-			gotSet, gotErr := tc.constructor(cfg, nil)
+			gotDelete, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.expectedTarget, (gotSet.(*set)).targetInfo)
+				assert.Equal(t, tc.expectedTarget, (gotDelete.(*delete)).targetInfo)
 			} else {
 				assert.EqualError(t, gotErr, tc.expectedErr)
 			}
@@ -127,54 +126,43 @@ func TestNewSet(t *testing.T) {
 	}
 }
 
-func TestSetFunctions(t *testing.T) {
+func TestDeleteFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx transformContext, transformable *transformable, key, val string) error
+		tfunc       func(ctx transformContext, transformable *transformable, key string) error
 		paramCtx    transformContext
 		paramTr     *transformable
 		paramKey    string
-		paramVal    string
 		expectedTr  *transformable
 		expectedErr error
 	}{
 		{
-			name:        "setBody",
-			tfunc:       setBody,
+			name:        "deleteBody",
+			tfunc:       deleteBody,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{body: common.MapStr{}},
+			paramTr:     &transformable{body: common.MapStr{"a_key": "a_value"}},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{body: common.MapStr{"a_key": "a_value"}},
+			expectedTr:  &transformable{body: common.MapStr{}},
 			expectedErr: nil,
 		},
 		{
-			name:        "setHeader",
-			tfunc:       setHeader,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{header: http.Header{}},
+			name:     "deleteHeader",
+			tfunc:    deleteHeader,
+			paramCtx: transformContext{},
+			paramTr: &transformable{header: http.Header{
+				"A_key": []string{"a_value"},
+			}},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{header: http.Header{"A_key": []string{"a_value"}}},
+			expectedTr:  &transformable{header: http.Header{}},
 			expectedErr: nil,
 		},
 		{
-			name:        "setURLParams",
-			tfunc:       setURLParams,
+			name:        "deleteURLParams",
+			tfunc:       deleteURLParams,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com")},
+			paramTr:     &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
-			expectedErr: nil,
-		},
-		{
-			name:        "setURLValue",
-			tfunc:       setURLValue,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com")},
-			paramVal:    "http://different.example.com",
-			expectedTr:  &transformable{url: newURL("http://different.example.com")},
+			expectedTr:  &transformable{url: newURL("http://foo.example.com")},
 			expectedErr: nil,
 		},
 	}
@@ -182,7 +170,7 @@ func TestSetFunctions(t *testing.T) {
 	for _, tcase := range cases {
 		tcase := tcase
 		t.Run(tcase.name, func(t *testing.T) {
-			gotErr := tcase.tfunc(tcase.paramCtx, tcase.paramTr, tcase.paramKey, tcase.paramVal)
+			gotErr := tcase.tfunc(tcase.paramCtx, tcase.paramTr, tcase.paramKey)
 			if tcase.expectedErr == nil {
 				assert.NoError(t, gotErr)
 			} else {
@@ -191,9 +179,4 @@ func TestSetFunctions(t *testing.T) {
 			assert.EqualValues(t, tcase.expectedTr, tcase.paramTr)
 		})
 	}
-}
-
-func newURL(u string) url.URL {
-	url, _ := url.Parse(u)
-	return *url
 }

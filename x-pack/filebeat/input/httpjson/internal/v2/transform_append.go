@@ -145,6 +145,8 @@ func appendHeader(ctx transformContext, transformable *transformable, key, value
 }
 
 func appendURLParams(ctx transformContext, transformable *transformable, key, value string) error {
-	transformable.url.Query().Add(key, value)
+	q := transformable.url.Query()
+	q.Add(key, value)
+	transformable.url.RawQuery = q.Encode()
 	return nil
 }

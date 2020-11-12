@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -65,8 +64,8 @@ func (t *transformable) clone() *transformable {
 
 func emptyTransformable() *transformable {
 	return &transformable{
-		body:   make(common.MapStr),
-		header: make(http.Header),
+		body:   common.MapStr{},
+		header: http.Header{},
 	}
 }
 
@@ -95,9 +94,8 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
 			return nil, errors.Errorf(
-				"each transform must have exactly one action, but found %d actions (%v)",
+				"each transform must have exactly one action, but found %d actions",
 				len(tfConfig.GetFields()),
-				strings.Join(tfConfig.GetFields(), ","),
 			)
 		}
 
@@ -140,12 +138,4 @@ func newBasicTransformsFromConfig(config transformsConfig, namespace string, log
 	}
 
 	return rts, nil
-}
-
-func (trans transforms) String() string {
-	var s []string
-	for _, p := range trans {
-		s = append(s, p.transformName())
-	}
-	return strings.Join(s, ", ")
 }

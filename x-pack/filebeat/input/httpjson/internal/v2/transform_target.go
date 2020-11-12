@@ -13,7 +13,6 @@ type targetType string
 
 const (
 	targetBody      targetType = "body"
-	targetCursor    targetType = "cursor"
 	targetHeader    targetType = "header"
 	targetURLValue  targetType = "url.value"
 	targetURLParams targetType = "url.params"
@@ -44,6 +43,10 @@ func getTargetInfo(t string) (targetInfo, error) {
 		}
 
 		paramParts := strings.SplitN(parts[1], ".", 2)
+		if len(paramParts) < 2 || paramParts[0] != "params" {
+			return targetInfo{}, errInvalidTarget{t}
+		}
+
 		return targetInfo{
 			Type: targetURLParams,
 			Name: paramParts[1],
@@ -56,11 +59,6 @@ func getTargetInfo(t string) (targetInfo, error) {
 	case "body":
 		return targetInfo{
 			Type: targetBody,
-			Name: parts[1],
-		}, nil
-	case "cursor":
-		return targetInfo{
-			Type: targetCursor,
 			Name: parts[1],
 		}, nil
 	}

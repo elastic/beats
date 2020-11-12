@@ -123,6 +123,8 @@ func deleteHeader(ctx transformContext, transformable *transformable, key string
 }
 
 func deleteURLParams(ctx transformContext, transformable *transformable, key string) error {
-	transformable.url.Query().Del(key)
+	q := transformable.url.Query()
+	q.Del(key)
+	transformable.url.RawQuery = q.Encode()
 	return nil
 }

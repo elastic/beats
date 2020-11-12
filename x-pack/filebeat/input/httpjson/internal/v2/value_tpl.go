@@ -7,6 +7,7 @@ package v2
 import (
 	"bytes"
 	"regexp"
+	"strings"
 	"text/template"
 	"time"
 
@@ -70,7 +71,7 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	}
 
 	val = buf.String()
-	if val == "" {
+	if val == "" || strings.Contains(val, "<no value>") {
 		val = defaultVal
 	}
 	return val

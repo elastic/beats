@@ -138,7 +138,7 @@ func setHeader(ctx transformContext, transformable *transformable, key, value st
 
 func setURLParams(ctx transformContext, transformable *transformable, key, value string) error {
 	q := transformable.url.Query()
-	q.Add(key, value)
+	q.Set(key, value)
 	transformable.url.RawQuery = q.Encode()
 	return nil
 }

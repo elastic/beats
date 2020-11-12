@@ -6,7 +6,6 @@ package v2
 
 import (
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestNewSet(t *testing.T) {
+func TestNewAppend(t *testing.T) {
 	cases := []struct {
 		name           string
 		constructor    constructor
@@ -23,88 +22,88 @@ func TestNewSet(t *testing.T) {
 		expectedErr    string
 	}{
 		{
-			name:        "newSetResponse targets body",
-			constructor: newSetResponse,
+			name:        "newAppendResponse targets body",
+			constructor: newAppendResponse,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetResponse targets something else",
-			constructor: newSetResponse,
+			name:        "newAppendResponse targets something else",
+			constructor: newAppendResponse,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
 		},
 		{
-			name:        "newSetRequest targets body",
-			constructor: newSetRequest,
+			name:        "newAppendRequest targets body",
+			constructor: newAppendRequest,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetRequest targets header",
-			constructor: newSetRequest,
+			name:        "newAppendRequest targets header",
+			constructor: newAppendRequest,
 			config: map[string]interface{}{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
 		},
 		{
-			name:        "newSetRequest targets url param",
-			constructor: newSetRequest,
+			name:        "newAppendRequest targets url param",
+			constructor: newAppendRequest,
 			config: map[string]interface{}{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
 		},
 		{
-			name:        "newSetRequest targets something else",
-			constructor: newSetRequest,
+			name:        "newAppendRequest targets something else",
+			constructor: newAppendRequest,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
 		},
 		{
-			name:        "newSetPagination targets body",
-			constructor: newSetPagination,
+			name:        "newAppendPagination targets body",
+			constructor: newAppendPagination,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetPagination targets header",
-			constructor: newSetPagination,
+			name:        "newAppendPagination targets header",
+			constructor: newAppendPagination,
 			config: map[string]interface{}{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
 		},
 		{
-			name:        "newSetPagination targets url param",
-			constructor: newSetPagination,
+			name:        "newAppendPagination targets url param",
+			constructor: newAppendPagination,
 			config: map[string]interface{}{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
 		},
 		{
-			name:        "newSetPagination targets url value",
-			constructor: newSetPagination,
+			name:        "newAppendPagination targets url value",
+			constructor: newAppendPagination,
 			config: map[string]interface{}{
 				"target": "url.value",
 			},
-			expectedTarget: targetInfo{Type: "url.value"},
+			expectedErr: "invalid target type: url.value",
 		},
 		{
-			name:        "newSetPagination targets something else",
-			constructor: newSetPagination,
+			name:        "newAppendPagination targets something else",
+			constructor: newAppendPagination,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},
@@ -116,10 +115,10 @@ func TestNewSet(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := common.MustNewConfigFrom(tc.config)
-			gotSet, gotErr := tc.constructor(cfg, nil)
+			gotAppend, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.expectedTarget, (gotSet.(*set)).targetInfo)
+				assert.Equal(t, tc.expectedTarget, (gotAppend.(*appendt)).targetInfo)
 			} else {
 				assert.EqualError(t, gotErr, tc.expectedErr)
 			}
@@ -127,7 +126,7 @@ func TestNewSet(t *testing.T) {
 	}
 }
 
-func TestSetFunctions(t *testing.T) {
+func TestAppendFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
 		tfunc       func(ctx transformContext, transformable *transformable, key, val string) error
@@ -139,42 +138,35 @@ func TestSetFunctions(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name:        "setBody",
-			tfunc:       setBody,
+			name:        "appendBody",
+			tfunc:       appendBody,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{body: common.MapStr{}},
+			paramTr:     &transformable{body: common.MapStr{"a_key": "a_value"}},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{body: common.MapStr{"a_key": "a_value"}},
+			paramVal:    "another_value",
+			expectedTr:  &transformable{body: common.MapStr{"a_key": []interface{}{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
-			name:        "setHeader",
-			tfunc:       setHeader,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{header: http.Header{}},
+			name:     "appendHeader",
+			tfunc:    appendHeader,
+			paramCtx: transformContext{},
+			paramTr: &transformable{header: http.Header{
+				"A_key": []string{"a_value"},
+			}},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{header: http.Header{"A_key": []string{"a_value"}}},
+			paramVal:    "another_value",
+			expectedTr:  &transformable{header: http.Header{"A_key": []string{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
-			name:        "setURLParams",
-			tfunc:       setURLParams,
+			name:        "appendURLParams",
+			tfunc:       appendURLParams,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com")},
+			paramTr:     &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
 			paramKey:    "a_key",
-			paramVal:    "a_value",
-			expectedTr:  &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
-			expectedErr: nil,
-		},
-		{
-			name:        "setURLValue",
-			tfunc:       setURLValue,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com")},
-			paramVal:    "http://different.example.com",
-			expectedTr:  &transformable{url: newURL("http://different.example.com")},
+			paramVal:    "another_value",
+			expectedTr:  &transformable{url: newURL("http://foo.example.com?a_key=a_value&a_key=another_value")},
 			expectedErr: nil,
 		},
 	}
@@ -191,9 +183,4 @@ func TestSetFunctions(t *testing.T) {
 			assert.EqualValues(t, tcase.expectedTr, tcase.paramTr)
 		})
 	}
-}
-
-func newURL(u string) url.URL {
-	url, _ := url.Parse(u)
-	return *url
 }
