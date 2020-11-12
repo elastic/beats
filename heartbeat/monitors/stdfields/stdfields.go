@@ -18,6 +18,7 @@
 package stdfields
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -35,20 +36,30 @@ type ServiceFields struct {
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID       string             `config:"id"`
-	Name     string             `config:"name"`
-	Type     string             `config:"type" validate:"required"`
-	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
-	Timeout  time.Duration      `config:"timeout"`
-	Service  ServiceFields      `config:"service"`
-	Enabled  bool               `config:"enabled"`
+	ID                string             `config:"id"`
+	Name              string             `config:"name"`
+	Type              string             `config:"type" validate:"required"`
+	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
+	Timeout           time.Duration      `config:"timeout"`
+	Service           ServiceFields      `config:"service"`
+	LegacyServiceName string             `config:"service_name""`
+	Enabled           bool               `config:"enabled"`
 }
 
 func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 	mpi := StdMonitorFields{Enabled: true}
 
 	if err := config.Unpack(&mpi); err != nil {
+		fmt.Printf("HIER %s", err)
 		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
+	}
+
+	// Use `service_name` if `service.name` is unspecified
+	// `service_name` was only document in the 7.10.0 release.
+	if mpi.LegacyServiceName != "" {
+		if mpi.Service.Name == "" {
+			mpi.Service.Name = mpi.LegacyServiceName
+		}
 	}
 
 	if !mpi.Enabled {
