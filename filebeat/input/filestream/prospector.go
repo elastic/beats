@@ -70,15 +70,15 @@ func newFileProspector(
 
 func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	if p.cleanRemoved {
-		cleaner.CleanIf(func(key string, u loginp.Unpackable) bool {
-			var st state
-			err := u.UnpackCursor(&st)
+		cleaner.CleanIf(func(key string, v loginp.Value) bool {
+			var fm fileMeta
+			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
 				// remove faulty entries
 				return true
 			}
 
-			_, err = os.Stat(st.Source)
+			_, err = os.Stat(fm.Source)
 			if err != nil {
 				return true
 			}
@@ -87,22 +87,22 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	}
 
 	identifierName := p.identifier.Name()
-	cleaner.UpdateIdentifiers(func(key string, u loginp.Unpackable) (bool, string) {
-		var st state
-		err := u.UnpackCursor(&st)
+	cleaner.UpdateIdentifiers(func(key string, v loginp.Value) (bool, string, interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
-			return false, ""
+			return false, "", nil
 		}
-		if st.IdentifierName != identifierName {
-			fi, err := os.Stat(st.Source)
+		if fm.IdentifierName != identifierName {
+			fi, err := os.Stat(fm.Source)
 			if err != nil {
-				return false, ""
+				return false, "", fm
 			}
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: st.Source, Info: fi}).Name()
-			st.IdentifierName = identifierName
-			return true, newKey
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
+			fm.IdentifierName = identifierName
+			return true, newKey, fm
 		}
-		return false, ""
+		return false, "", nil
 	})
 
 	return nil
@@ -146,10 +146,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					}
 				}
 
-				err := hg.Start(ctx, src)
-				if err != nil {
-					log.Errorf("error while starting harvester %v", err)
-				}
+				hg.Start(ctx, src)
 
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
@@ -167,12 +164,32 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
-				// TODO update state information in the store
-				if p.identifier.Name() == "path" {
-					s.UpdateID(fe.OldPath, fe.NewPath)
-				}
 
-				// TODO close_renamed
+				// if file_identity is based on path, the current reader has to be cancelled
+				// and a new one has to start.
+				if p.identifier.Name() == "path" {
+					prevSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
+					hg.Stop(prevSrc)
+
+					log.Debugf("Remove state for file as file renamed and path file_identity is configured: %s", fe.OldPath)
+					err := s.Remove(prevSrc.Name())
+					if err != nil {
+						log.Errorf("Error while removing old state of renamed file (%s): %v", fe.OldPath, err)
+					}
+
+					hg.Start(ctx, src)
+				} else {
+					// update file metadata as the path has changed
+					id := src.Name()
+					var meta fileMeta
+					err := s.FindCursorMeta(id, meta)
+					if err != nil {
+						log.Errorf("Error while getting cursor meta data of entry %s: %v", id, err)
+					}
+					s.UpdateMetadata(id, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
+
+					// TODO close_renamed
+				}
 
 			default:
 				log.Error("Unkown return value %v", fe.Op)

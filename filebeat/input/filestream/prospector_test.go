@@ -157,9 +157,8 @@ type testHarvesterGroup struct {
 
 func getTestHarvesterGroup() *testHarvesterGroup { return &testHarvesterGroup{make([]string, 0)} }
 
-func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) error {
+func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 	t.encounteredNames = append(t.encounteredNames, s.Name())
-	return nil
 }
 
 func (t *testHarvesterGroup) Stop(_ loginp.Source) {
@@ -199,9 +198,13 @@ func (mu *mockMetadataUpdater) has(id string) bool {
 	return ok
 }
 
-func (mu *mockMetadataUpdater) UpdateID(oldID, newID string) {
-	mu.table[newID] = mu.table[oldID]
-	delete(mu.table, oldID)
+func (mu *mockMetadataUpdater) FindCursorMeta(key string, v interface{}) error {
+	return nil
+}
+
+func (mu *mockMetadataUpdater) UpdateMetadata(key string, v interface{}) error {
+	mu.table[key] = v
+	return nil
 }
 
 func (mu *mockMetadataUpdater) Remove(id string) error {

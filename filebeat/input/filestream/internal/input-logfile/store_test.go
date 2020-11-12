@@ -227,6 +227,126 @@ func TestStore_UpdateTTL(t *testing.T) {
 	})
 }
 
+type testMeta struct {
+	IdentifierName string
+}
+
+func TestStore_UpdateIdentifiers(t *testing.T) {
+	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL:  60 * time.Second,
+				Meta: testMeta{IdentifierName: "method"},
+			},
+			"test::key2": state{
+				TTL:  0 * time.Second,
+				Meta: testMeta{IdentifierName: "method"},
+			},
+		})
+		store := testOpenStore(t, "test", backend)
+		defer store.Release()
+
+		store.UpdateIdentifiers(func(key string, v Value) (bool, string, interface{}) {
+			var m testMeta
+			err := v.UnpackCursorMeta(&m)
+			if err != nil {
+				t.Fatalf("cannot unpack meta: %v", err)
+			}
+			if m.IdentifierName == "method" {
+				return true, key + "::updated", testMeta{IdentifierName: "something"}
+
+			}
+			return false, "", nil
+
+		})
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: store.Get("test::key1").internalState.Updated,
+				TTL:     0 * time.Second,
+				Meta:    map[string]interface{}{"identifiername": "method"},
+			},
+			"test::key2": state{
+				Updated: store.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+				Meta:    map[string]interface{}{"identifiername": "method"},
+			},
+			"test::key1::updated": state{
+				Updated: store.Get("test::key1::updated").internalState.Updated,
+				TTL:     60 * time.Second,
+				Meta:    testMeta{IdentifierName: "something"},
+			},
+		}
+
+		checkEqualStoreState(t, want, storeMemorySnapshot(store))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(store))
+	})
+}
+
+func TestStore_CleanIf(t *testing.T) {
+	t.Run("entries are cleaned when funtion returns true", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL: 60 * time.Second,
+			},
+			"test::key2": state{
+				TTL: 0 * time.Second,
+			},
+		})
+		store := testOpenStore(t, "test", backend)
+		defer store.Release()
+
+		store.CleanIf(func(key string, v Value) bool {
+			return true
+		})
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: store.Get("test::key1").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+			"test::key2": state{
+				Updated: store.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+		}
+
+		checkEqualStoreState(t, want, storeMemorySnapshot(store))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(store))
+	})
+
+	t.Run("entries are left alone when funtion returns false", func(t *testing.T) {
+		backend := createSampleStore(t, map[string]state{
+			"test::key1": state{
+				TTL: 60 * time.Second,
+			},
+			"test::key2": state{
+				TTL: 0 * time.Second,
+			},
+		})
+		store := testOpenStore(t, "test", backend)
+		defer store.Release()
+
+		store.CleanIf(func(key string, v Value) bool {
+			return false
+		})
+
+		want := map[string]state{
+			"test::key1": state{
+				Updated: store.Get("test::key1").internalState.Updated,
+				TTL:     60 * time.Second,
+			},
+			"test::key2": state{
+				Updated: store.Get("test::key2").internalState.Updated,
+				TTL:     0 * time.Second,
+			},
+		}
+
+		checkEqualStoreState(t, want, storeMemorySnapshot(store))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(store))
+	})
+}
+
 func closeStoreWith(fn func(s *store)) func() {
 	old := closeStore
 	closeStore = fn

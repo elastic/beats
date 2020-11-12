@@ -36,18 +36,24 @@ type Prospector interface {
 }
 
 type StateMetadataUpdater interface {
-	// UpdateID updates the Identifier.
-	UpdateID(oldId, newId string)
-	// Remove deletes a state with a given ID.
+	// FindCursorMeta retrieves and unpacks a cursor metadata of an entry.
+	FindCursorMeta(key string, v interface{}) error
+	// UpdateMetadata updates the source metadata of a registry entry for a given ID.
+	UpdateMetadata(key string, v interface{}) error
+	// Remove marks a state for deletion with a given ID.
 	Remove(string) error
 }
 
+// ProspectorCleaner cleans the state store before it starts running.
 type ProspectorCleaner interface {
-	// CleanIf removes an entry if the cursor is true
-	CleanIf(func(key string, u Unpackable) bool)
-	UpdateIdentifiers(func(key string, u Unpackable) (bool, string))
+	// CleanIf removes an entry if the function returns true
+	CleanIf(func(key string, v Value) bool)
+	// UpdateIdentifiers updates ID in the registry.
+	UpdateIdentifiers(func(key string, v Value) (bool, string, interface{}))
 }
 
-type Unpackable interface {
-	UnpackCursor(to interface{}) error
+// Value contains the cursor metadata.
+type Value interface {
+	// UnpackCursorMeta returns the cursor metadata required by the prospector.
+	UnpackCursorMeta(to interface{}) error
 }

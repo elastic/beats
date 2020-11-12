@@ -100,6 +100,7 @@ type resource struct {
 	// we always write the complete state of the key/value pair.
 	cursor        interface{}
 	pendingCursor interface{}
+	cursorMeta    interface{}
 }
 
 type (
@@ -117,6 +118,7 @@ type (
 		TTL     time.Duration
 		Updated time.Time
 		Cursor  interface{}
+		Meta    interface{}
 	}
 
 	stateInternal struct {
@@ -170,45 +172,57 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-// UpdateID updates the ID of a resource.
-func (s *store) UpdateID(oldKey, newKey string) {
-	resource := s.Get(oldKey)
-	err := s.persistentStore.Set(newKey, state{
-		TTL:     resource.internalState.TTL,
-		Updated: resource.internalState.Updated,
-		Cursor:  resource.cursor,
-	})
-	if err != nil {
-		s.log.Errorf("Failed to add updated state for '%v', cursor state will be ignored. Error was: %+v", oldKey, err)
-		resource.internalInSync = false
-	} else {
-		s.persistentStore.Remove(oldKey)
-	}
-}
-
-func (s *store) CleanIf(pred func(key string, u Unpackable) bool) {
+// CleanIf sets the TTL of a resource if the predicate return true.
+func (s *store) CleanIf(pred func(key string, v Value) bool) {
 	s.ephemeralStore.mu.Lock()
 	defer s.ephemeralStore.mu.Unlock()
 
-	for id, state := range s.ephemeralStore.table {
-		remove := pred(id, state)
+	for key, res := range s.ephemeralStore.table {
+		remove := pred(key, res)
 		if remove {
-			delete(s.ephemeralStore.table, id)
+			s.UpdateTTL(res, 0)
 		}
 	}
 }
 
-func (s *store) UpdateIdentifiers(getNewID func(key string, u Unpackable) (bool, string)) {
+func (s *store) FindCursorMeta(key string, to interface{}) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+	return typeconv.Convert(to, resource.cursorMeta)
+}
+
+func (r *resource) UnpackCursorMeta(to interface{}) error {
+	return typeconv.Convert(to, r.cursorMeta)
+}
+
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (bool, string, interface{})) {
 	s.ephemeralStore.mu.Lock()
 	defer s.ephemeralStore.mu.Unlock()
 
-	for id, state := range s.ephemeralStore.table {
-		update, newId := getNewID(id, state)
-		if update {
-			s.ephemeralStore.table[newId] = state
-			delete(s.ephemeralStore.table, id)
+	for key, res := range s.ephemeralStore.table {
+		update, newKey, updatedMeta := getNewID(key, res)
+		if update && res.internalState.TTL > 0 {
+			r := res.clone()
+			r.key = newKey
+			r.cursorMeta = updatedMeta
+			s.ephemeralStore.table[newKey] = r
+			s.UpdateTTL(res, 0)
 		}
 	}
+}
+
+func (s *store) UpdateMetadata(key string, meta interface{}) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+
+	resource.cursorMeta = meta
+	return nil
 }
 
 // Removes marks an entry for removal by setting its TTL to zero.
@@ -242,6 +256,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		TTL:     resource.internalState.TTL,
 		Updated: resource.internalState.Updated,
 		Cursor:  resource.cursor,
+		Meta:    resource.cursorMeta,
 	})
 	if err != nil {
 		s.log.Errorf("Failed to update resource management fields for '%v'", resource.key)
@@ -318,6 +333,20 @@ func (r *resource) inSyncStateSnapshot() state {
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
 		Cursor:  r.cursor,
+		Meta:    r.cursorMeta,
+	}
+}
+
+func (r *resource) clone() *resource {
+	return &resource{
+		key:                    r.key,
+		stored:                 r.stored,
+		internalInSync:         r.internalInSync,
+		activeCursorOperations: r.activeCursorOperations,
+		internalState:          r.internalState,
+		cursor:                 r.cursor,
+		pendingCursor:          r.pendingCursor,
+		cursorMeta:             r.cursorMeta,
 	}
 }
 
@@ -333,6 +362,7 @@ func (r *resource) stateSnapshot() state {
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
 		Cursor:  cursor,
+		Meta:    r.cursorMeta,
 	}
 }
 
@@ -363,7 +393,8 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 				TTL:     st.TTL,
 				Updated: st.Updated,
 			},
-			cursor: st.Cursor,
+			cursor:     st.Cursor,
+			cursorMeta: st.Meta,
 		}
 		states.table[resource.key] = resource
 

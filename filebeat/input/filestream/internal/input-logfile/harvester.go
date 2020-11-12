@@ -25,6 +25,7 @@ import (
 	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
@@ -53,15 +54,20 @@ func newReaderGroup() *readerGroup {
 	}
 }
 
-func (r *readerGroup) add(id string, cancel context.CancelFunc) error {
+// newContext createas a new context, cancel function and adds it to the readers list.
+// the returned context does not have to be cancelled if the function returns an error.
+func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Context, context.CancelFunc, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if _, ok := r.table[id]; ok {
-		return fmt.Errorf("harvester is already running for file")
+		return nil, nil, fmt.Errorf("harvester is already running for file")
 	}
+
+	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))
+
 	r.table[id] = cancel
-	return nil
+	return ctx, cancel, nil
 }
 
 func (r *readerGroup) remove(id string) {
@@ -80,7 +86,7 @@ func (r *readerGroup) remove(id string) {
 // HarvesterGroup is responsible for running the
 // Harvesters started by the Prospector.
 type HarvesterGroup interface {
-	Start(input.Context, Source) error
+	Start(input.Context, Source)
 	Stop(Source)
 }
 
@@ -95,7 +101,7 @@ type defaultHarvesterGroup struct {
 }
 
 // Start starts the Harvester for a Source. It does not block.
-func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
+func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 	log := ctx.Logger.With("source", s.Name())
 	log.Debug("Starting harvester for file")
 
@@ -106,18 +112,15 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 			}
 		}()
-
 		defer log.Debug("Stopped harvester for file")
 
-		harvesterCtx, cancelHarvester := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
-		ctx.Cancelation = harvesterCtx
-		defer cancelHarvester()
-
-		err := hg.readers.add(s.Name(), cancelHarvester)
+		harvesterCtx, cancelHarvester, err := hg.readers.newContext(s.Name(), ctx.Cancelation)
 		if err != nil {
 			log.Errorf("error while adding new reader to the bookkeeper %v", err)
 			return
 		}
+		ctx.Cancelation = harvesterCtx
+		defer cancelHarvester()
 		defer hg.readers.remove(s.Name())
 
 		resource, err := hg.locker.Lock(ctx, s.Name())
@@ -146,8 +149,6 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) error {
 			log.Errorf("Harvester stopped: %v", err)
 		}
 	}()
-
-	return nil
 }
 
 // Stop stops the running Harvester for a given Source.
