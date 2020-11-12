@@ -1,95 +1,99 @@
 // tag::deb[]
-ifeval::["{release-state}"=="unreleased"]
 
-Version {version} of {agent} has not yet been released.
+// tag::install-tip[]
+TIP: We recommend that you run this command as the root user because some
+integrations require root privileges to collect sensitive data.
 
-endif::[]
+// end::install-tip[]
 
-ifeval::["{release-state}"!="unreleased"]
-
-IMPORTANT: To simplify upgrading to future versions of {agent}, we recommended
-that you use the tarball distribution instead of the DEB distribution.
-
-["source","sh",subs="attributes"]
+[source,shell]
 ----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-amd64.deb
-sudo dpkg -i elastic-agent-{version}-amd64.deb
+elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+systemctl enable elastic-agent <1>
+systemctl start elastic-agent
 ----
+<1> The DEB package includes a service unit for Linux systems with systemd. On
+these systems, you can manage {agent} by using the usual systemd commands. If
+you don't have systemd, run `sudo service elastic-agent start`.
 
-endif::[]
+include::install.asciidoc[tag=where-description]
+
+TIP: {agent} will restart automatically if the system is rebooted.
+
 // end::deb[]
 
 // tag::rpm[]
-ifeval::["{release-state}"=="unreleased"]
 
-Version {version} of {agent} has not yet been released.
+include::install.asciidoc[tag=install-tip]
 
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-IMPORTANT: To simplify upgrading to future versions of {agent}, we recommended
-that you use the tarball distribution instead of the RPM distribution.
-
-["source","sh",subs="attributes"]
+[source,shell]
 ----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-x86_64.rpm
-sudo rpm -vi elastic-agent-{version}-x86_64.rpm
+elastic-agent enroll KIBANA_URL ENROLLMENT_KEY
+systemctl enable elastic-agent <1>
+systemctl start elastic-agent
 ----
-endif::[]
+<1> The RPM package includes a service unit for Linux systems with systemd. On
+these systems, you can manage {agent} by using the usual systemd commands. If
+you don't have systemd, run `sudo service elastic-agent start`.
+
+TIP: {agent} will restart automatically if the system is rebooted.
+
 // end::rpm[]
 
 // tag::mac[]
-ifeval::["{release-state}"=="unreleased"]
 
-Version {version} of {agent} has not yet been released.
+include::install.asciidoc[tag=install-tip]
 
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
+[source,shell]
 ----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-darwin-x86_64.tar.gz
-tar xzvf elastic-agent-{version}-darwin-x86_64.tar.gz
+./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
 ----
 
-endif::[]
+include::install.asciidoc[tag=where-description]
+
+Omit `-f` to run an interactive installation.
+
 // end::mac[]
 
 // tag::linux[]
-ifeval::["{release-state}"=="unreleased"]
 
-Version {version} of {agent} has not yet been released.
+include::install.asciidoc[tag=install-tip]
 
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
+[source,shell]
 ----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-linux-x86_64.tar.gz
-tar xzvf elastic-agent-{version}-linux-x86_64.tar.gz
+./elastic-agent install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY <1>
 ----
+<1> This command requires a system and service manager like systemd.
 
-endif::[]
+include::install.asciidoc[tag=where-description]
+
+Omit `-f` to run an interactive installation.
+
 // end::linux[]
 
 // tag::win[]
-ifeval::["{release-state}"=="unreleased"]
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select **Run As Administrator**).
 
-Version {version} of {agent} has not yet been released.
+From the PowerShell prompt, change to the directory where you installed {agent},
+and run:
 
-endif::[]
+[source,shell]
+----
+.\elastic-agent.exe install -f --kibana-url=KIBANA_URL --enrollment-token=ENROLLMENT_KEY
+----
 
-ifeval::["{release-state}"!="unreleased"]
+include::install.asciidoc[tag=where-description]
 
-. Download the {agent} Windows zip file from the
-https://www.elastic.co/downloads/beats/elastic-agent[downloads page].
+Omit `-f` to run an interactive installation.
 
-. Extract the contents of the zip file into `C:\Program Files`.
-
-. Rename the `elastic-agent-<version>-windows` directory to `Elastic-Agent`.
-
-endif::[]
 // end::win[]
+
+// tag::where-description[]
+`KIBANA_URL` is the {kib} URL where {fleet} is running, and
+`ENROLLMENT_KEY` is the enrollment token acquired from {fleet}. Don't have a
+{fleet} enrollment key? Read the
+{ingest-guide}/ingest-management-getting-started.html[Quick start guide] to
+learn how to generate one.
+
+// end::where-description[]

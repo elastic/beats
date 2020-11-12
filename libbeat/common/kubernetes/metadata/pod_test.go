@@ -314,6 +314,9 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
 			namespace: &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -345,6 +348,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					"labels": common.MapStr{
 						"nodekey": "nodevalue",
 					},
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
