@@ -35464,16 +35464,6 @@ type: keyword
 
 --
 
-*`nats.server.time`*::
-+
---
-Server time of metric creation
-
-
-type: date
-
---
-
 [float]
 === connection
 

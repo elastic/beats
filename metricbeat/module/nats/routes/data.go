@@ -19,6 +19,7 @@ package routes
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
@@ -41,21 +42,27 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var event mb.Event
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Nats routes API response")
 	}
-	event.MetricSetFields, err = routesSchema.Apply(inInterface)
+	metricSetFields, err := routesSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying routes schema")
 	}
 
-	event.ModuleFields, err = moduleSchema.Apply(inInterface)
+	moduleFields, err := moduleSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying module schema")
+	}
+	timestamp, _ := moduleFields.GetValue("now")
+	moduleFields.Delete("now")
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		ModuleFields:    moduleFields,
+		Timestamp: timestamp.(time.Time),
 	}
 	r.Event(event)
 	return nil

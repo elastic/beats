@@ -19,6 +19,7 @@ package stats
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -66,24 +67,24 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var event common.MapStr
+	var metricsetMetrics common.MapStr
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Nats stats API response")
 	}
-	event, err = statsSchema.Apply(inInterface)
+	metricsetMetrics, err = statsSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying stats schema")
 	}
 
-	err = util.UpdateDuration(event, "uptime")
+	err = util.UpdateDuration(metricsetMetrics, "uptime")
 	if err != nil {
 		return errors.Wrap(err, "failure updating uptime key")
 	}
 
-	d, err := event.GetValue("http_req_stats")
+	d, err := metricsetMetrics.GetValue("http_req_stats")
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving http_req_stats key")
 	}
@@ -92,12 +93,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure casting http_req_stats to common.Mapstr")
 
 	}
-	err = event.Delete("http_req_stats")
+	err = metricsetMetrics.Delete("http_req_stats")
 	if err != nil {
 		return errors.Wrap(err, "failure deleting http_req_stats key")
 
 	}
-	event["http"] = common.MapStr{
+	metricsetMetrics["http"] = common.MapStr{
 		"req_stats": common.MapStr{
 			"uri": common.MapStr{
 				"root":   httpStats["root_uri"],
@@ -108,7 +109,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 			},
 		},
 	}
-	cpu, err := event.GetValue("cpu")
+	cpu, err := metricsetMetrics.GetValue("cpu")
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cpu key")
 	}
@@ -116,7 +117,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if !ok {
 		return errors.Wrap(err, "failure casting cpu to float64")
 	}
-	_, err = event.Put("cpu", cpuUtil/100.0)
+	_, err = metricsetMetrics.Put("cpu", cpuUtil/100.0)
 	if err != nil {
 		return errors.Wrap(err, "failure updating cpu key")
 	}
@@ -124,6 +125,13 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "failure applying module schema")
 	}
-	r.Event(mb.Event{MetricSetFields: event, ModuleFields: moduleMetrics})
+	timestamp, _ := moduleMetrics.GetValue("now")
+	moduleMetrics.Delete("now")
+	evt := mb.Event{
+		MetricSetFields: metricsetMetrics,
+		ModuleFields:    moduleMetrics,
+		Timestamp: timestamp.(time.Time),
+	}
+	r.Event(evt)
 	return nil
 }

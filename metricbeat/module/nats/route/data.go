@@ -19,6 +19,7 @@ package route
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
@@ -71,9 +72,12 @@ func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Eve
 		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
+	timestamp, _ := moduleFields.GetValue("now")
+	moduleFields.Delete("now")
 	event := mb.Event{
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,
+		Timestamp: timestamp.(time.Time),
 	}
 	return event, nil
 }

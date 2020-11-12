@@ -19,6 +19,7 @@ package connections
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -40,22 +41,28 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var event mb.Event
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing NATS connections API response")
 	}
-	event.MetricSetFields, err = connectionsSchema.Apply(inInterface)
+	metricSetFields, err := connectionsSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying connections schema")
 
 	}
 
-	event.ModuleFields, err = moduleSchema.Apply(inInterface)
+	moduleFields, err := moduleSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying module schema")
+	}
+	timestamp, _ := moduleFields.GetValue("now")
+	moduleFields.Delete("now")
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		ModuleFields:    moduleFields,
+		Timestamp: timestamp.(time.Time),
 	}
 	r.Event(event)
 	return nil

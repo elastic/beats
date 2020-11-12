@@ -3,12 +3,12 @@
 
 - module: nats
   metricsets:
-    - "connections"
-    - "routes"
-    - "stats"
-    - "subscriptions"
-    - "connection"
-    - "route"
+    #- "connections"
+    #- "routes"
+    #- "stats"
+    #- "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"

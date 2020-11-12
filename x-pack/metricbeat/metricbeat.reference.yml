@@ -1032,8 +1032,8 @@ metricbeat.modules:
     - "routes"
     - "stats"
     - "subscriptions"
-    - "connection"
-    - "route"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
