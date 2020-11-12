@@ -527,49 +527,6 @@ type: keyword
 --
 
 
-*`user.effective.id`*::
-+
---
-One or multiple unique identifiers of the user.
-
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Short name or login of the user.
-
-
-type: keyword
-
-example: albert
-
---
-
-*`user.effective.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Name of the group.
-
-
-type: keyword
-
---
-
-
 *`user.filesystem.id`*::
 +
 --
