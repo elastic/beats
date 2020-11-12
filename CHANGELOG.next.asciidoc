@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
+- Update to ECS 1.7.0. {pull}22571[22571]
 
 *Auditbeat*
 
