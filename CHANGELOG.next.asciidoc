@@ -390,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add add_resource_metadata option setting (always enabled) for add_kubernetes_metadata setting. {pull}22189[22189]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
+- Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 
 *Auditbeat*
 

@@ -47,9 +47,23 @@ var withECSVersion = processing.WithFields(common.MapStr{
 	},
 })
 
-// RootCmd to handle beats CLI.
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
-	Name:          Name,
-	HasDashboards: true,
-	Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
-})
+// RootCmd to handle beats cli
+var RootCmd *cmd.BeatsRootCmd
+
+// WinlogbeatSettings contains the default settings for winlogbeat
+func WinlogbeatSettings() instance.Settings {
+	return instance.Settings{
+		Name:          Name,
+		HasDashboards: true,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+	}
+}
+
+// Initialize initializes the entrypoint commands for packetbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	return cmd.GenRootCmdWithSettings(beater.New, settings)
+}
+
+func init() {
+	RootCmd = Initialize(WinlogbeatSettings())
+}
