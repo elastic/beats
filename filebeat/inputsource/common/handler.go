@@ -79,6 +79,9 @@ func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback Me
 					return errors.Wrap(err, string(family)+" split_client error")
 				}
 				r.Reset()
+
+				// Scanner.Bytes() returns a byte slice whose life span is only the span of `callback()`. Copies should
+				// be made in case asynchronous processing is done.
 				callback(scanner.Bytes(), metadata)
 			}
 
