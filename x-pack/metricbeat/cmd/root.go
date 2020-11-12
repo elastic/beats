@@ -52,7 +52,7 @@ func init() {
 		Name:            Name,
 		HasDashboards:   true,
 		ElasticLicensed: true,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
