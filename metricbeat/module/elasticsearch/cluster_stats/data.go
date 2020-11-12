@@ -36,13 +36,12 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"count": c.Ifc("count"),
+			"stats": c.Ifc("count"),
+			"count": c.Ifc("count.total"),
 			"ingest": s.Object{
 				"pipelines": s.Object{
 					"count": c.Int("ingest.number_of_pipelines"),
 				},
-				//TODO Not sure if to remove this one
-				"processor_stats": c.Ifc("ingest.processor_stats"),
 			},
 			"jvm": c.Dict("jvm", s.Schema{
 				"threads": s.Object{
@@ -146,7 +145,6 @@ var (
 							"bytes": c.Int("term_vectors_memory_in_bytes"),
 						},
 					},
-					//"file_sizes": Unknown format
 				},
 				"max_unsafe_auto_id": s.Object{
 					"ms": c.Int("max_unsafe_auto_id_timestamp"),
@@ -183,7 +181,6 @@ var (
 					"stats": c.Ifc("policy_stats"),
 				},
 			}),
-			//"watcher": c.Ifc("watcher"),
 			"ml": c.Dict("ml", s.Schema{
 				"node": s.Object{
 					"total": c.Int("node_count"),
@@ -396,10 +393,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
-	metricSetFields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure applying cluster stats schema")
-	}
+	metricSetFields, _ := schema.Apply(data)
 
 	stackData, _ := stackSchema.Apply(stackStats)
 
