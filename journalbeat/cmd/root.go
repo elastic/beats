@@ -53,7 +53,7 @@ func JournalbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
 		HasDashboards: false,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 }
 
