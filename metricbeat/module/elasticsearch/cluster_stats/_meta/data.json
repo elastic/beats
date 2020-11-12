@@ -1,42 +1,58 @@
 {
-    "@timestamp": "2020-11-12T20:56:52.177Z",
+    "@timestamp": "2020-11-12T22:03:10.342Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
-    "host": {
-        "name": "mcastro"
-    },
-    "agent": {
-        "ephemeral_id": "191bbbc2-eb93-46bb-b086-893418c73306",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro",
-        "type": "metricbeat",
-        "version": "8.0.0"
-    },
-    "service": {
-        "address": "http://localhost:9200",
-        "type": "elasticsearch"
-    },
     "elasticsearch": {
         "cluster": {
             "name": "docker-cluster",
-            "id": "qLpojBarQtytEy6-_HO9pA",
+            "id": "XJzzZVnGRle1j_sVxgM_0g",
             "stats": {
+                "version": "8.0.0-SNAPSHOT",
+                "cluster_name": "docker-cluster",
+                "state": {
+                    "nodes": {
+                        "9nJogxTpSNC6XBlyX98caA": {
+                            "name": "4bc12bacc641",
+                            "ephemeral_id": "FsOXP8rIQsudK-OGbbgHrg",
+                            "transport_address": "127.0.0.1:9300",
+                            "attributes": {
+                                "ml.max_jvm_size": "1073741824",
+                                "ml.machine_memory": "2088206336",
+                                "xpack.installed": "true",
+                                "transform.node": "true",
+                                "ml.max_open_jobs": "20"
+                            }
+                        }
+                    },
+                    "nodes_hash": 1174564187,
+                    "status": "green",
+                    "cluster_uuid": "XJzzZVnGRle1j_sVxgM_0g",
+                    "version": 62,
+                    "state_uuid": "Ri6xPJSBQ--ycai6aOfOyw",
+                    "master_node": "9nJogxTpSNC6XBlyX98caA"
+                },
                 "status": "green",
                 "nodes": {
+                    "count": 1,
+                    "ingest": {
+                        "pipelines": {
+                            "count": 1
+                        }
+                    },
                     "jvm": {
                         "threads": {
-                            "total": 70
+                            "total": 51
                         },
                         "max_uptime": {
-                            "ms": 11047703
+                            "ms": 63688
                         },
                         "memory": {
                             "heap": {
                                 "used": {
-                                    "bytes": 141296384
+                                    "bytes": 154840064
                                 },
                                 "max": {
                                     "bytes": 1073741824
@@ -45,43 +61,65 @@
                         }
                     },
                     "fs": {
+                        "free": {
+                            "bytes": 58742173696
+                        },
                         "available": {
-                            "bytes": 145662771200
+                            "bytes": 55525617664
                         },
                         "total": {
-                            "bytes": 958613114880
-                        },
-                        "free": {
-                            "bytes": 194429104128
+                            "bytes": 62722478080
                         }
                     },
                     "stats": {
-                        "ingest": 1,
+                        "transform": 1,
+                        "data_cold": 1,
                         "master": 1,
+                        "data_warm": 1,
                         "ml": 1,
                         "remote_cluster_client": 1,
-                        "data": 1,
-                        "data_warm": 0,
-                        "transform": 1,
+                        "voting_only": 0,
                         "total": 1,
                         "coordinating_only": 0,
-                        "data_cold": 0,
-                        "data_hot": 0,
-                        "data_content": 0,
-                        "voting_only": 0
-                    },
-                    "count": 1,
-                    "ingest": {
-                        "pipelines": {
-                            "count": 1
-                        }
+                        "data_hot": 1,
+                        "data": 1,
+                        "data_content": 1,
+                        "ingest": 1
                     }
                 },
                 "indices": {
-                    "query_cache": {
-                        "cache": {
-                            "total": 0
+                    "count": 6,
+                    "shards": {
+                        "index": {
+                            "replication": {
+                                "min": 0,
+                                "max": 0,
+                                "avg": 0
+                            },
+                            "shards": {
+                                "min": 1,
+                                "max": 1,
+                                "avg": 1
+                            },
+                            "primaries": {
+                                "avg": 1,
+                                "min": 1,
+                                "max": 1
+                            }
                         },
+                        "count": 6,
+                        "primaries": 6,
+                        "replication": 0
+                    },
+                    "store": {
+                        "reserved": {
+                            "bytes": 0
+                        },
+                        "size": {
+                            "bytes": 10982796
+                        }
+                    },
+                    "query_cache": {
                         "evictions": 0,
                         "cache_size": {
                             "bytes": 0
@@ -95,38 +133,41 @@
                         },
                         "miss": {
                             "total": 0
+                        },
+                        "cache": {
+                            "total": 0
                         }
                     },
                     "segments": {
                         "memory": {
-                            "stored_fields": {
-                                "bytes": 6344
-                            },
-                            "version_map": {
-                                "bytes": 0
-                            },
                             "terms": {
+                                "bytes": 24800,
                                 "vectors": {
                                     "bytes": 0
-                                },
-                                "bytes": 23680
+                                }
                             },
                             "points": {
                                 "bytes": 0
                             },
+                            "stored_fields": {
+                                "bytes": 6344
+                            },
+                            "doc_values": {
+                                "bytes": 2676
+                            },
+                            "version_map": {
+                                "bytes": 0
+                            },
+                            "fixed_bit_set": {
+                                "bytes": 528
+                            },
                             "index_writer": {
                                 "bytes": 0
                             },
-                            "doc_values": {
-                                "bytes": 14380
-                            },
                             "norms": {
-                                "bytes": 1408
+                                "bytes": 1728
                             },
-                            "bytes": 45812,
-                            "fixed_bit_set": {
-                                "bytes": 536
-                            }
+                            "bytes": 35548
                         },
                         "max_unsafe_auto_id": {
                             "ms": -1
@@ -135,173 +176,18 @@
                     },
                     "fielddata": {
                         "memory": {
-                            "bytes": 0
+                            "bytes": 736
                         }
                     },
                     "docs": {
                         "deleted": {
-                            "total": 524
+                            "total": 15
                         },
-                        "total": 35
-                    },
-                    "count": 6,
-                    "shards": {
-                        "count": 6,
-                        "primaries": 6,
-                        "replication": 0,
-                        "index": {
-                            "replication": {
-                                "avg": 0,
-                                "min": 0,
-                                "max": 0
-                            },
-                            "shards": {
-                                "min": 1,
-                                "max": 1,
-                                "avg": 1
-                            },
-                            "primaries": {
-                                "min": 1,
-                                "max": 1,
-                                "avg": 1
-                            }
-                        }
-                    },
-                    "store": {
-                        "size": {
-                            "bytes": 11148381
-                        },
-                        "reserved": {
-                            "bytes": 0
-                        }
+                        "total": 20
                     }
                 },
                 "stack": {
-                    "apm": {
-                        "found": false
-                    },
                     "xpack": {
-                        "security": {
-                            "enabled": false,
-                            "available": true
-                        },
-                        "spatial": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "ilm": {
-                            "policy": {
-                                "total": 8,
-                                "stats": [
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            },
-                                            "delete": {
-                                                "min_age": 7.776e+09,
-                                                "actions": [
-                                                    "delete"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 1
-                                    },
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 0
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "delete": {
-                                                "actions": [
-                                                    "delete"
-                                                ],
-                                                "min_age": 6.048e+08
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            },
-                                            "delete": {
-                                                "min_age": 7.776e+09,
-                                                "actions": [
-                                                    "delete"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 1
-                                    },
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 0
-                                    },
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 0
-                                    },
-                                    {
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            }
-                                        },
-                                        "indices_managed": 0
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "hot": {
-                                                "min_age": 0,
-                                                "actions": [
-                                                    "rollover"
-                                                ]
-                                            },
-                                            "delete": {
-                                                "min_age": 7.776e+09,
-                                                "actions": [
-                                                    "delete"
-                                                ]
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        },
                         "ml": {
                             "node": {
                                 "total": 1
@@ -312,36 +198,15 @@
                                 "total": 0
                             }
                         },
-                        "slm": {
-                            "enabled": true,
-                            "available": true
+                        "voting_only": {
+                            "available": true,
+                            "enabled": true
+                        },
+                        "spatial": {
+                            "available": true,
+                            "enabled": true
                         },
                         "transform": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "ccr": {
-                            "auto_follow_patterns_count": 0,
-                            "available": false,
-                            "enabled": true,
-                            "follower_indices_count": 0
-                        },
-                        "frozen_indices": {
-                            "available": true,
-                            "enabled": true,
-                            "indices_count": 0
-                        },
-                        "vectors": {
-                            "available": true,
-                            "enabled": true,
-                            "dense_vector_fields_count": 0,
-                            "dense_vector_dims_avg_count": 0
-                        },
-                        "logstash": {
-                            "available": false,
-                            "enabled": true
-                        },
-                        "rollup": {
                             "available": true,
                             "enabled": true
                         },
@@ -353,75 +218,211 @@
                                 "local": 1
                             }
                         },
+                        "searchable_snapshots": {
+                            "available": false,
+                            "enabled": true,
+                            "indices_count": 0
+                        },
                         "data_streams": {
+                            "available": true,
                             "enabled": true,
                             "data_streams": 0,
-                            "indices_count": 0,
-                            "available": true
+                            "indices_count": 0
+                        },
+                        "rollup": {
+                            "available": true,
+                            "enabled": true
                         },
                         "graph": {
                             "available": false,
                             "enabled": true
                         },
-                        "voting_only": {
+                        "vectors": {
                             "available": true,
+                            "enabled": true,
+                            "dense_vector_fields_count": 0,
+                            "dense_vector_dims_avg_count": 0
+                        },
+                        "ilm": {
+                            "policy": {
+                                "total": 8,
+                                "stats": [
+                                    {
+                                        "indices_managed": 1,
+                                        "phases": {
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            },
+                                            "delete": {
+                                                "min_age": 7.776e+09,
+                                                "actions": [
+                                                    "delete"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "phases": {
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    },
+                                    {
+                                        "phases": {
+                                            "delete": {
+                                                "min_age": 6.048e+08,
+                                                "actions": [
+                                                    "delete"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    },
+                                    {
+                                        "indices_managed": 1,
+                                        "phases": {
+                                            "delete": {
+                                                "min_age": 7.776e+09,
+                                                "actions": [
+                                                    "delete"
+                                                ]
+                                            },
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "phases": {
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    },
+                                    {
+                                        "phases": {
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    },
+                                    {
+                                        "phases": {
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    },
+                                    {
+                                        "phases": {
+                                            "delete": {
+                                                "min_age": 7.776e+09,
+                                                "actions": [
+                                                    "delete"
+                                                ]
+                                            },
+                                            "hot": {
+                                                "min_age": 0,
+                                                "actions": [
+                                                    "rollover"
+                                                ]
+                                            }
+                                        },
+                                        "indices_managed": 0
+                                    }
+                                ]
+                            }
+                        },
+                        "logstash": {
+                            "available": false,
                             "enabled": true
                         },
-                        "searchable_snapshots": {
-                            "available": false,
+                        "security": {
+                            "available": true,
+                            "enabled": false
+                        },
+                        "frozen_indices": {
+                            "available": true,
                             "enabled": true,
                             "indices_count": 0
+                        },
+                        "ccr": {
+                            "follower_indices_count": 0,
+                            "auto_follow_patterns_count": 0,
+                            "available": false,
+                            "enabled": true
+                        },
+                        "slm": {
+                            "enabled": true,
+                            "available": true
                         }
+                    },
+                    "apm": {
+                        "found": false
                     }
                 },
                 "license": {
+                    "issue_date": "2020-11-12T22:02:32.738Z",
+                    "issue_date_in_millis": 1605218552738,
                     "issuer": "elasticsearch",
-                    "start_date_in_millis": -1,
-                    "status": "active",
-                    "type": "basic",
-                    "issue_date": "2020-11-12T12:06:43.055Z",
-                    "issue_date_in_millis": 1605182803055,
-                    "uid": "f47c3d44-ad10-42ab-aebb-49b20fc4aaa3",
-                    "issued_to": "docker-cluster",
+                    "uid": "e9546d96-5979-4513-b582-260dd7fb729d",
                     "max_nodes": 1000,
+                    "issued_to": "docker-cluster",
+                    "start_date_in_millis": -1,
+                    "type": "basic",
+                    "status": "active",
                     "cluster_needs_tls": false
-                },
-                "version": "8.0.0-SNAPSHOT",
-                "cluster_name": "docker-cluster",
-                "state": {
-                    "nodes_hash": 688412241,
-                    "status": "green",
-                    "cluster_uuid": "qLpojBarQtytEy6-_HO9pA",
-                    "version": 87,
-                    "state_uuid": "pR_k1cYqTjCOzmITFXs8WQ",
-                    "master_node": "biHSdANMTyKAu__OIZm6DA",
-                    "nodes": {
-                        "biHSdANMTyKAu__OIZm6DA": {
-                            "name": "bd220c4ddb61",
-                            "ephemeral_id": "I0Giu7NzS9Sww2kTAEdVrA",
-                            "transport_address": "127.0.0.1:9300",
-                            "attributes": {
-                                "ml.machine_memory": "33300463616",
-                                "xpack.installed": "true",
-                                "transform.node": "true",
-                                "ml.max_open_jobs": "20"
-                            }
-                        }
-                    }
                 }
             }
         }
     },
+    "agent": {
+        "ephemeral_id": "ade285db-d0b0-451b-beb5-ad8d9ee56c2f",
+        "id": "abfbaa55-b79d-4ae5-b412-fd35b933c6d3",
+        "name": "privacys-MBP",
+        "type": "metricbeat",
+        "version": "8.0.0"
+    },
+    "ecs": {
+        "version": "1.6.0"
+    },
+    "host": {
+        "name": "privacys-MBP"
+    },
     "event": {
         "dataset": "elasticsearch.cluster.stats",
         "module": "elasticsearch",
-        "duration": 67727122
+        "duration": 523950829
     },
     "metricset": {
         "name": "cluster_stats",
         "period": 10000
     },
-    "ecs": {
-        "version": "1.6.0"
+    "service": {
+        "address": "http://localhost:9200",
+        "type": "elasticsearch"
     }
 }

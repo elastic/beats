@@ -37,7 +37,9 @@ var (
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
 			"stats": c.Ifc("count"),
-			"count": c.Ifc("count.total"),
+			"count":  c.Int("count.total"),
+			"master": c.Int("count.master"),
+			"data":   c.Int("count.data"),
 			"ingest": s.Object{
 				"pipelines": s.Object{
 					"count": c.Int("ingest.number_of_pipelines"),
@@ -74,13 +76,13 @@ var (
 			}),
 		}),
 		"indices": c.Dict("indices", s.Schema{
+			"total": c.Int("count"),
 			"docs": c.Dict("docs", s.Schema{
 				"total": c.Int("count"),
 				"deleted": s.Object{
 					"total": c.Int("deleted"),
 				},
 			}),
-			"count": c.Int("count"),
 			"shards": c.Dict("shards", s.Schema{
 				"count":       c.Int("total"),
 				"primaries":   c.Int("primaries"),
