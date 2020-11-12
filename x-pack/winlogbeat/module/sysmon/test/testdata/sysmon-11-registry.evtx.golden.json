@@ -14,7 +14,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
       "executable": "C:\\Windows\\regedit.exe",
       "name": "regedit.exe",
       "pid": 6072
@@ -48,14 +48,11 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2682,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 2
     }
@@ -75,7 +72,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -103,14 +100,11 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2686,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 2
     }
@@ -130,7 +124,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
       "executable": "C:\\Windows\\regedit.exe",
       "name": "regedit.exe",
       "pid": 6072
@@ -164,14 +158,11 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2687,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 2
     }
@@ -191,7 +182,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -219,14 +210,11 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2690,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 2
     }
@@ -246,7 +234,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -274,14 +262,11 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2691,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 2
     }

@@ -54,7 +54,6 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch 'master' }
           steps {
-            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -62,7 +61,6 @@ pipeline {
           options { skipDefaultCheckout() }
           when { branch '*.x' }
           steps {
-            // TODO: to use the git commit that triggered the upstream build
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
         }
@@ -79,7 +77,7 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             not {
-              allOf {
+              anyOf {
                 branch comparator: 'REGEXP', pattern: '(master|.*x)'
                 changeRequest()
               }
@@ -96,14 +94,28 @@ pipeline {
 }
 
 def runBeatsTesterJob(Map args = [:]) {
-  if (args.apm && args.beats) {
+  def apm = args.get('apm', '')
+  def beats = args.get('beats', '')
+  def version = args.version
+
+  if (isUpstreamTrigger()) {
+    copyArtifacts(filter: 'beats-tester.properties',
+                  flatten: true,
+                  projectName: "Beats/packaging/${env.JOB_BASE_NAME}",
+                  selector: upstream(fallbackToLastSuccessful: true))
+    def props = readProperties(file: 'beats-tester.properties')
+    apm = props.get('APM_URL_BASE', '')
+    beats = props.get('BEATS_URL_BASE', '')
+    version = props.get('VERSION', '8.0.0-SNAPSHOT')
+  }
+  if (apm?.trim() || beats?.trim()) {
     build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
           parameters: [
-            string(name: 'APM_URL_BASE', value: args.apm),
-            string(name: 'BEATS_URL_BASE', value: args.beats),
-            string(name: 'VERSION', value: args.version)
+            string(name: 'APM_URL_BASE', value: apm),
+            string(name: 'BEATS_URL_BASE', value: beats),
+            string(name: 'VERSION', value: version)
           ])
   } else {
-    build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false, parameters: [ string(name: 'VERSION', value: args.version) ])
+    build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false, parameters: [ string(name: 'VERSION', value: version) ])
   }
 }

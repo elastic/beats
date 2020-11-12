@@ -2,6 +2,10 @@
 description: Pipeline for Filebeat NetFlow
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+
   # IP Geolocation Lookup
   - geoip:
         if: ctx.source?.geo == null

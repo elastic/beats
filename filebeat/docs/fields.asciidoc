@@ -16,7 +16,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
-* <<exported-fields-awscloudwatch>>
+* <<exported-fields-aws-cloudwatch>>
 * <<exported-fields-azure>>
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
@@ -65,6 +65,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-o365>>
 * <<exported-fields-okta>>
+* <<exported-fields-oracle>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -2292,21 +2293,21 @@ type: keyword
 
 --
 
-[[exported-fields-awscloudwatch]]
-== awscloudwatch fields
+[[exported-fields-aws-cloudwatch]]
+== aws-cloudwatch fields
 
 Fields from AWS CloudWatch logs.
 
 
 
 [float]
-=== awscloudwatch
+=== aws-cloudwatch
 
 Fields from AWS CloudWatch logs.
 
 
 
-*`awscloudwatch.log_group`*::
+*`aws-cloudwatch.log_group`*::
 +
 --
 The name of the log group to which this event belongs.
@@ -2315,7 +2316,7 @@ type: keyword
 
 --
 
-*`awscloudwatch.log_stream`*::
+*`aws-cloudwatch.log_stream`*::
 +
 --
 The name of the log stream to which this event belongs.
@@ -2324,7 +2325,7 @@ type: keyword
 
 --
 
-*`awscloudwatch.ingestion_time`*::
+*`aws-cloudwatch.ingestion_time`*::
 +
 --
 The time the event was ingested in AWS CloudWatch.
@@ -89347,6 +89348,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
@@ -108267,6 +108278,157 @@ Geolocation information.
 
 
 type: geo_point
+
+--
+
+[[exported-fields-oracle]]
+== Oracle fields
+
+Oracle Module
+
+
+
+[float]
+=== oracle
+
+Fields from Oracle logs.
+
+
+
+[float]
+=== database_audit
+
+Module for parsing Oracle Database audit logs
+
+
+
+*`oracle.database_audit.status`*::
++
+--
+Database Audit Status.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.session_id`*::
++
+--
+Indicates the audit session ID number.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client.terminal`*::
++
+--
+If available, the client terminal type, for example "pty".
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client.address`*::
++
+--
+The IP Address or Domain used by the client.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.client.user`*::
++
+--
+The user running the client or connection to the database.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.database.user`*::
++
+--
+The database user used to authenticate.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.privilege`*::
++
+--
+The privilege group related to the database user.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.entry.id`*::
++
+--
+Indicates the current audit entry number, assigned to each audit trail record. The audit entry.id sequence number is shared between fine-grained audit records and regular audit records.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.database.host`*::
++
+--
+Client host machine name.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.action`*::
++
+--
+The action performed during the audit event. This could for example be the raw query.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.action_number`*::
++
+--
+Action is a numeric value representing the action the user performed. The corresponding name of the action type is in the AUDIT_ACTIONS table. For example, action 100 refers to LOGON.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.database.id`*::
++
+--
+Database identifier calculated when the database is created. It corresponds to the DBID column of the V$DATABASE data dictionary view.
+
+
+type: keyword
+
+--
+
+*`oracle.database_audit.length`*::
++
+--
+Refers to the total number of bytes used in this audit record. This number includes the trailing newline bytes (\n), if any, at the end of the audit record.
+
+
+type: long
 
 --
 

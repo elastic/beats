@@ -69,6 +69,10 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		// wrong type or not set
 		return event, nil
 	}
+	if hasMetadataFields(event) {
+		// nothing to do, fields already present
+		return event, nil
+	}
 	app, err := d.client.GetAppByGuid(val)
 	if err != nil {
 		d.log.Debugf("failed to get application info for GUID(%s): %v", val, err)
@@ -107,4 +111,22 @@ func (d *addCloudFoundryMetadata) Close() error {
 		return errors.Wrap(err, "closing client")
 	}
 	return nil
+}
+
+var metadataFields = []string{
+	"cloudfoundry.app.id",
+	"cloudfoundry.app.name",
+	"cloudfoundry.space.id",
+	"cloudfoundry.space.name",
+	"cloudfoundry.org.id",
+	"cloudfoundry.org.name",
+}
+
+func hasMetadataFields(event *beat.Event) bool {
+	for _, name := range metadataFields {
+		if value, err := event.GetValue(name); value == "" || err != nil {
+			return false
+		}
+	}
+	return true
 }
