@@ -38,7 +38,7 @@ packetbeat.flows:
 
 packetbeat.protocols:
 - type: icmp
-  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
+  # Enable ICMPv4 and ICMPv6 monitoring. Default: true
   enabled: true
 
 - type: amqp
