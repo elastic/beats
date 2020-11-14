@@ -47,7 +47,8 @@ packetbeat.protocols:
   ports: [5672]
 
 - type: cassandra
-  #Cassandra port for traffic monitoring.
+  # Configure the ports where to listen for cassandra traffic. You can disable
+  # the cassandra protocol by commenting out the list of ports.
   ports: [9042]
 
 - type: dhcpv4
