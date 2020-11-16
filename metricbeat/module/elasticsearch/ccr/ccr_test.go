@@ -30,8 +30,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func startESServer(esVersion, license string, ccrEnabled bool) *httptest.Server {
-
+func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
 	}
@@ -50,9 +49,6 @@ func startESServer(esVersion, license string, ccrEnabled bool) *httptest.Server 
 	xpackHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "features": { "ccr": { "enabled": ` + strconv.FormatBool(ccrEnabled) + `}}}`))
 	}
-	ccrStatsHandler := func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "this should never have been called", 418)
-	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/_nodes/_local/nodes", http.HandlerFunc(nodesLocalHandler))
@@ -61,9 +57,8 @@ func startESServer(esVersion, license string, ccrEnabled bool) *httptest.Server 
 	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/_xpack", http.HandlerFunc(xpackHandler))
-	mux.Handle("/_ccr/stats", http.HandlerFunc(ccrStatsHandler))
 
-	return httptest.NewServer(mux)
+	return mux
 }
 
 func TestCCRNotAvailable(t *testing.T) {
@@ -95,7 +90,12 @@ func TestCCRNotAvailable(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			server := startESServer(test.esVersion, test.license, test.ccrEnabled)
+			mux := createEsMuxer(test.esVersion, test.license, test.ccrEnabled)
+			mux.Handle("/_ccr/stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "this should never have been called", 418)
+			}))
+
+			server := httptest.NewServer(mux)
 			defer server.Close()
 
 			ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
