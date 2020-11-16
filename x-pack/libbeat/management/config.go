@@ -47,7 +47,7 @@ const ManagedConfigTemplate = `
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
+# "publisher", "service".
 #logging.selectors: ["*"]
 
 #============================== X-Pack Monitoring ===============================

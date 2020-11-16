@@ -1,0 +1,46 @@
+description: Pipeline for parsing Zoom account webhooks
+processors:
+- append:
+    field: event.category
+    value: iam
+- append:
+    field: event.type
+    value: user
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'account.created'
+- append:
+    field: event.type
+    value: change
+    if: "['account.updated', 'account.settings_updated', 'account.disassociated'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.account_id
+    target_field: zoom.master_account_id
+    ignore_missing: true
+- rename:
+    field: zoom.object.id
+    target_field: zoom.sub_account_id
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.zoom?.time_stamp != null
+    ignore_failure: true
+- rename:
+    field: zoom.object
+    target_field: zoom.account
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{zoom.account.owner_id}}"
+    if: ctx?.zoom?.account?.owner_id != null
+- remove:
+    field: zoom.time_stamp
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

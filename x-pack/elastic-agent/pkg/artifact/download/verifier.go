@@ -4,7 +4,9 @@
 
 package download
 
+import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 // Verifier is an interface verifying GPG key of a downloaded artifact
 type Verifier interface {
-	Verify(programName, version string) (bool, error)
+	Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error)
 }

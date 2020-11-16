@@ -76,6 +76,7 @@ func newReader(path string, c Config, done chan struct{}, state checkpoint.Journ
 	instance.AddJournalToMonitor(c.Path, journal)
 
 	return &Reader{
+		r:       r,
 		journal: journal,
 		config:  c,
 		done:    done,

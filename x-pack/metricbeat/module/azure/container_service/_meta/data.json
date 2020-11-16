@@ -7,21 +7,21 @@
             }
         },
         "dimensions": {
-            "status": "true"
+            "condition": "PIDPressure",
+            "node": "aks-agentpool-38582116-vmss000000",
+            "status": "false"
         },
         "namespace": "Microsoft.ContainerService/managedClusters",
         "resource": {
             "group": "obs-infrastructure",
+            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerService/managedClusters/obskube",
+            "name": "obskube",
             "type": "Microsoft.ContainerService/managedClusters"
         },
-        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
         "timegrain": "PT5M"
     },
     "cloud": {
-        "instance": {
-            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerService/managedClusters/obskube",
-            "name": "obskube"
-        },
         "provider": "azure",
         "region": "westeurope"
     },

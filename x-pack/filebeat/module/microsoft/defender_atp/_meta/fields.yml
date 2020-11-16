@@ -1,4 +1,4 @@
-- name: defender_atp
+- name: microsoft.defender_atp
   type: group
   release: beta
   default_field: false

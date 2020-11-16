@@ -55,7 +55,7 @@ func (e *ensureWriter) Write(p []byte) (int, error) {
 	for len(p) > 0 {
 		n, err := e.w.Write(p)
 		N, p = N+n, p[n:]
-		if isRetryErr(err) {
+		if err != nil && !isRetryErr(err) {
 			return N, err
 		}
 	}

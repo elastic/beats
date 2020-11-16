@@ -39,7 +39,7 @@
         "source.ip": "192.168.33.1",
         "url.original": "/hello",
         "user.name": "-",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:50.0) Gecko/20100101 Firefox/50.0",
         "user_agent.os.full": "Mac OS X 10.12",

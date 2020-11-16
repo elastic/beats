@@ -18,6 +18,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -65,4 +66,20 @@ func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]strin
 // IsEqual checks if the two states point to the same file.
 func (s *State) IsEqual(c *State) bool {
 	return s.Id == c.Id
+}
+
+// String returns string representation of the struct
+func (s *State) String() string {
+	return fmt.Sprintf(
+		"{Id: %v, Finished: %v, Fileinfo: %v, Source: %v, Offset: %v, Timestamp: %v, TTL: %v, Type: %v, Meta: %v, FileStateOS: %v}",
+		s.Id,
+		s.Finished,
+		s.Fileinfo,
+		s.Source,
+		s.Offset,
+		s.Timestamp,
+		s.TTL,
+		s.Type,
+		s.Meta,
+		s.FileStateOS)
 }

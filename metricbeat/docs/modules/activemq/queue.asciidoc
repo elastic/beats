@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-activemq-queue]]
+[role="xpack"]
 === ActiveMQ queue metricset
 
 include::../../../../x-pack/metricbeat/module/activemq/queue/_meta/docs.asciidoc[]

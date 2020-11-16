@@ -49,3 +49,7 @@ func (r *LimitReader) Next() (reader.Message, error) {
 	}
 	return message, err
 }
+
+func (r *LimitReader) Close() error {
+	return r.reader.Close()
+}

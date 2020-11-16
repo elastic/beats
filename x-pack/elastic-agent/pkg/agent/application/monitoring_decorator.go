@@ -7,6 +7,7 @@ package application
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
@@ -28,7 +29,7 @@ const (
 	defaultOutputName = "default"
 )
 
-func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
+func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
 	var err error
 	monitoringProgram := program.Program{
 		Spec: program.Spec{
@@ -63,7 +64,7 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	}
 
 	ast := rootAst.Clone()
-	if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
+	if err := getMonitoringRule(monitoringOutputName).Apply(agentInfo, ast); err != nil {
 		return programsToRun, err
 	}
 

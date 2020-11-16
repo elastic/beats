@@ -42,6 +42,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 6153,
+        "related.hosts": [
+            "sist1803.mail.local"
+        ],
         "rsa.internal.messageid": "01490504",
         "rsa.misc.log_session_id": "deF",
         "rsa.misc.severity": "medium",
@@ -364,8 +367,8 @@
         "observer.vendor": "F5",
         "process.pid": 2289,
         "related.ip": [
-            "10.204.123.107",
-            "10.225.160.182"
+            "10.225.160.182",
+            "10.204.123.107"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "eFinib",
@@ -809,6 +812,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 7589,
+        "related.hosts": [
+            "dolores2519.mail.host"
+        ],
         "related.user": [
             "tob"
         ],
@@ -839,6 +845,9 @@
         "observer.type": "Access",
         "observer.vendor": "F5",
         "process.pid": 5899,
+        "related.hosts": [
+            "luptat2979.internal.local"
+        ],
         "related.user": [
             "iqua"
         ],
@@ -1556,8 +1565,8 @@
         "observer.vendor": "F5",
         "process.pid": 1973,
         "related.ip": [
-            "10.47.99.72",
-            "10.187.64.126"
+            "10.187.64.126",
+            "10.47.99.72"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.category": "oremipsu",

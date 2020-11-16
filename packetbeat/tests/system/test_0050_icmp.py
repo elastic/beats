@@ -68,7 +68,7 @@ class Test(BaseTest):
     def assert_common_fields(self, objs):
         assert all([o["type"] == "icmp" for o in objs])
         assert all([o["event.dataset"] == "icmp" for o in objs])
-        assert all([o["event.category"] == ['network_traffic', 'network'] for o in objs])
+        assert all([o["event.category"] == ['network'] for o in objs])
         assert all([o["event.type"] == ["connection"] for o in objs])
         assert all([o["source.bytes"] == 4 for o in objs])
         assert all([o["destination.bytes"] == 4 for o in objs])

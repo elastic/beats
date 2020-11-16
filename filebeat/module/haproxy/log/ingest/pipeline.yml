@@ -1,6 +1,9 @@
 description: Pipeline for parsing HAProxy http, tcp and default logs. Requires the
   geoip plugin.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:

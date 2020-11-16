@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-database_account]]
+[role="xpack"]
 === Azure database_account metricset
 
 include::../../../../x-pack/metricbeat/module/azure/database_account/_meta/docs.asciidoc[]

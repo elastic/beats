@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-tomcat-memory]]
+[role="xpack"]
 === Tomcat memory metricset
 
 beta[]

@@ -20,9 +20,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7880,
+        "related.hosts": [
+            "boNemoe4402.www.invalid",
+            "litesse6379.api.domain"
+        ],
         "related.ip": [
-            "10.150.92.220",
-            "10.102.123.34"
+            "10.102.123.34",
+            "10.150.92.220"
         ],
         "related.user": [
             "sumdo"
@@ -75,9 +79,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4539,
+        "related.hosts": [
+            "olupt4880.api.home",
+            "gnaali6189.internal.localhost"
+        ],
         "related.ip": [
-            "10.149.203.46",
-            "10.33.212.159"
+            "10.33.212.159",
+            "10.149.203.46"
         ],
         "related.user": [
             "mipsumq"
@@ -130,9 +138,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 445,
+        "related.hosts": [
+            "aqu1628.internal.domain",
+            "quis1130.internal.corp"
+        ],
         "related.ip": [
-            "10.118.175.9",
-            "10.173.116.41"
+            "10.173.116.41",
+            "10.118.175.9"
         ],
         "related.user": [
             "uame"
@@ -185,6 +197,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5712,
+        "related.hosts": [
+            "tinculp2940.internal.local",
+            "reprehe189.internal.home"
+        ],
         "related.ip": [
             "10.134.137.177",
             "10.202.204.154"
@@ -240,9 +256,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6557,
+        "related.hosts": [
+            "rad2103.api.domain",
+            "enimad2283.internal.domain"
+        ],
         "related.ip": [
-            "10.245.142.250",
-            "10.70.0.60"
+            "10.70.0.60",
+            "10.245.142.250"
         ],
         "related.user": [
             "eos"
@@ -295,6 +315,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2061,
+        "related.hosts": [
+            "enim5316.www5.local",
+            "doloreeu3553.www5.home"
+        ],
         "related.ip": [
             "10.200.188.142",
             "10.202.72.124"
@@ -350,6 +374,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5722,
+        "related.hosts": [
+            "reetdolo2770.www5.local",
+            "iutal13.api.localdomain"
+        ],
         "related.ip": [
             "10.214.225.125",
             "10.12.44.169"
@@ -405,6 +433,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5037,
+        "related.hosts": [
+            "isiu1114.internal.corp",
+            "uovol492.www.localhost"
+        ],
         "related.ip": [
             "10.66.108.11",
             "10.198.136.50"
@@ -460,9 +492,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 776,
+        "related.hosts": [
+            "usmodte1296.www.corp",
+            "osquir6997.corp"
+        ],
         "related.ip": [
-            "10.178.244.31",
-            "10.69.20.77"
+            "10.69.20.77",
+            "10.178.244.31"
         ],
         "related.user": [
             "umdolor"
@@ -515,9 +551,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6096,
+        "related.hosts": [
+            "tatno4987.www5.localhost",
+            "eniam7007.api.invalid"
+        ],
         "related.ip": [
-            "10.54.231.100",
-            "10.203.5.162"
+            "10.203.5.162",
+            "10.54.231.100"
         ],
         "related.user": [
             "umdolore"
@@ -570,6 +610,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7307,
+        "related.hosts": [
+            "tatno6787.internal.localhost",
+            "snulapar3794.api.domain"
+        ],
         "related.ip": [
             "10.136.252.240",
             "10.65.83.160"
@@ -625,6 +669,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2703,
+        "related.hosts": [
+            "essecill2595.mail.local",
+            "liq5883.localdomain"
+        ],
         "related.ip": [
             "10.57.40.29",
             "10.210.213.18"
@@ -680,6 +728,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5166,
+        "related.hosts": [
+            "ali6446.localhost",
+            "rsint7026.test"
+        ],
         "related.ip": [
             "10.144.82.69",
             "10.200.156.102"
@@ -735,9 +787,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7668,
+        "related.hosts": [
+            "torev7118.internal.domain",
+            "qua2945.www.local"
+        ],
         "related.ip": [
-            "10.72.58.135",
-            "10.109.232.112"
+            "10.109.232.112",
+            "10.72.58.135"
         ],
         "related.user": [
             "xea"
@@ -790,9 +846,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1044,
+        "related.hosts": [
+            "dolore6103.www5.example",
+            "luptat6494.www.example"
+        ],
         "related.ip": [
-            "10.38.22.45",
-            "10.72.29.73"
+            "10.72.29.73",
+            "10.38.22.45"
         ],
         "related.user": [
             "onproide"
@@ -845,9 +905,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7183,
+        "related.hosts": [
+            "errorsi6996.www.domain",
+            "moenimi6317.internal.invalid"
+        ],
         "related.ip": [
-            "10.76.72.111",
-            "10.70.95.74"
+            "10.70.95.74",
+            "10.76.72.111"
         ],
         "related.user": [
             "ivelits"
@@ -900,6 +964,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6907,
+        "related.hosts": [
+            "lumquido5839.api.corp",
+            "tion1761.home"
+        ],
         "related.ip": [
             "10.19.201.13",
             "10.73.69.75"
@@ -955,9 +1023,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 499,
+        "related.hosts": [
+            "aperia4409.www5.invalid",
+            "santium4235.api.local"
+        ],
         "related.ip": [
-            "10.84.105.75",
-            "10.78.151.178"
+            "10.78.151.178",
+            "10.84.105.75"
         ],
         "related.user": [
             "iquaUten"
@@ -1010,6 +1082,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1531,
+        "related.hosts": [
+            "tem2496.api.lan",
+            "CSed2857.www5.example"
+        ],
         "related.ip": [
             "10.135.233.146",
             "10.25.192.202"
@@ -1065,9 +1141,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6051,
+        "related.hosts": [
+            "eme6710.mail.invalid",
+            "equep5085.mail.domain"
+        ],
         "related.ip": [
-            "10.104.134.200",
-            "10.121.219.204"
+            "10.121.219.204",
+            "10.104.134.200"
         ],
         "related.user": [
             "uptat"
@@ -1120,6 +1200,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6994,
+        "related.hosts": [
+            "ihilm1669.mail.invalid",
+            "conseq557.mail.lan"
+        ],
         "related.ip": [
             "10.191.105.82",
             "10.225.160.182"
@@ -1175,9 +1259,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5200,
+        "related.hosts": [
+            "umexerci1284.internal.localdomain",
+            "ite2026.www.invalid"
+        ],
         "related.ip": [
-            "10.161.57.8",
-            "10.141.44.153"
+            "10.141.44.153",
+            "10.161.57.8"
         ],
         "related.user": [
             "quisnos"
@@ -1230,6 +1318,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3365,
+        "related.hosts": [
+            "adol485.example",
+            "lit5929.test"
+        ],
         "related.ip": [
             "10.6.167.7",
             "10.153.111.103"
@@ -1285,9 +1377,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1835,
+        "related.hosts": [
+            "evita5008.www.localdomain",
+            "oru6938.invalid"
+        ],
         "related.ip": [
-            "10.134.148.219",
-            "10.248.204.182"
+            "10.248.204.182",
+            "10.134.148.219"
         ],
         "related.user": [
             "uioffi"
@@ -1340,6 +1436,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2019,
+        "related.hosts": [
+            "tsedqu2456.www5.invalid",
+            "etdol5473.local"
+        ],
         "related.ip": [
             "10.163.5.243",
             "10.178.77.231"
@@ -1395,9 +1495,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2493,
+        "related.hosts": [
+            "ris3314.mail.invalid",
+            "nimid893.mail.corp"
+        ],
         "related.ip": [
-            "10.177.194.18",
-            "10.221.89.228"
+            "10.221.89.228",
+            "10.177.194.18"
         ],
         "related.user": [
             "aliquam"
@@ -1450,6 +1554,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3022,
+        "related.hosts": [
+            "reme622.mail.example",
+            "rumwritt6003.host"
+        ],
         "related.ip": [
             "10.32.239.1",
             "10.241.65.49"
@@ -1505,9 +1613,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2328,
+        "related.hosts": [
+            "non3341.mail.invalid",
+            "xeacomm6855.api.corp"
+        ],
         "related.ip": [
-            "10.168.90.81",
-            "10.101.57.120"
+            "10.101.57.120",
+            "10.168.90.81"
         ],
         "related.user": [
             "eporr"
@@ -1560,9 +1672,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1156,
+        "related.hosts": [
+            "ris727.api.local",
+            "icabo4125.mail.domain"
+        ],
         "related.ip": [
-            "10.14.211.43",
-            "10.130.14.60"
+            "10.130.14.60",
+            "10.14.211.43"
         ],
         "related.user": [
             "litse"
@@ -1615,6 +1731,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6003,
+        "related.hosts": [
+            "stquido5705.api.host",
+            "ionofdeF5643.www.localhost"
+        ],
         "related.ip": [
             "10.60.129.15",
             "10.248.101.25"
@@ -1670,9 +1790,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5651,
+        "related.hosts": [
+            "etcons7378.api.lan",
+            "orem6702.invalid"
+        ],
         "related.ip": [
-            "10.72.93.28",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.72.93.28"
         ],
         "related.user": [
             "niamqui"
@@ -1725,6 +1849,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3470,
+        "related.hosts": [
+            "vita2681.www5.local",
+            "oin6780.mail.domain"
+        ],
         "related.ip": [
             "10.27.14.168",
             "10.66.2.232"
@@ -1780,6 +1908,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6932,
+        "related.hosts": [
+            "tnulapa7592.www.local",
+            "eprehen3224.www5.localdomain"
+        ],
         "related.ip": [
             "10.75.99.127",
             "10.195.2.130"
@@ -1835,6 +1967,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6945,
+        "related.hosts": [
+            "lup2134.www.localhost",
+            "ptasn6599.www.localhost"
+        ],
         "related.ip": [
             "10.245.104.182",
             "10.201.238.90"
@@ -1890,9 +2026,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 853,
+        "related.hosts": [
+            "tanimid3337.mail.corp",
+            "nisist2752.home"
+        ],
         "related.ip": [
-            "10.105.91.31",
-            "10.217.150.196"
+            "10.217.150.196",
+            "10.105.91.31"
         ],
         "related.user": [
             "con"
@@ -1945,9 +2085,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4153,
+        "related.hosts": [
+            "eumiu765.api.lan",
+            "gitsedqu2649.mail.lan"
+        ],
         "related.ip": [
-            "10.184.18.202",
-            "10.4.157.1"
+            "10.4.157.1",
+            "10.184.18.202"
         ],
         "related.user": [
             "oditem"
@@ -2000,6 +2144,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1693,
+        "related.hosts": [
+            "mquelau5326.mail.lan",
+            "entsunt3962.www.example"
+        ],
         "related.ip": [
             "10.113.95.59",
             "10.255.39.252"
@@ -2055,6 +2203,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 337,
+        "related.hosts": [
+            "idestlab2631.www.lan",
+            "tut2703.www.host"
+        ],
         "related.ip": [
             "10.83.177.2",
             "10.27.16.118"
@@ -2110,6 +2262,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7041,
+        "related.hosts": [
+            "inesci6789.test",
+            "entorev160.test"
+        ],
         "related.ip": [
             "10.167.227.44",
             "10.38.54.72"
@@ -2165,6 +2321,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3854,
+        "related.hosts": [
+            "ccaeca7077.internal.corp",
+            "proide3714.mail.localdomain"
+        ],
         "related.ip": [
             "10.215.205.216",
             "10.216.54.184"
@@ -2220,6 +2380,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 55,
+        "related.hosts": [
+            "ima2031.api.corp",
+            "tot5313.mail.invalid"
+        ],
         "related.ip": [
             "10.9.12.248",
             "10.9.18.237"
@@ -2275,9 +2439,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 228,
+        "related.hosts": [
+            "ian867.internal.corp",
+            "rumet3801.internal.domain"
+        ],
         "related.ip": [
-            "10.41.123.102",
-            "10.83.130.226"
+            "10.83.130.226",
+            "10.41.123.102"
         ],
         "related.user": [
             "tenim"
@@ -2330,6 +2498,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4253,
+        "related.hosts": [
+            "lorin4249.corp",
+            "liqua2834.www5.lan"
+        ],
         "related.ip": [
             "10.175.112.197",
             "10.80.152.108"
@@ -2385,6 +2557,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2200,
+        "related.hosts": [
+            "gnaaliqu3935.api.test",
+            "sequat7273.api.host"
+        ],
         "related.ip": [
             "10.142.25.100",
             "10.134.18.114"
@@ -2440,9 +2616,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5717,
+        "related.hosts": [
+            "nsequat1859.internal.localhost",
+            "uidol4575.localhost"
+        ],
         "related.ip": [
-            "10.28.118.160",
-            "10.223.119.218"
+            "10.223.119.218",
+            "10.28.118.160"
         ],
         "related.user": [
             "ntsunt"
@@ -2495,6 +2675,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4469,
+        "related.hosts": [
+            "ritin2495.api.corp",
+            "oremq2000.api.corp"
+        ],
         "related.ip": [
             "10.47.28.48",
             "10.110.114.175"
@@ -2550,6 +2734,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5524,
+        "related.hosts": [
+            "tetur2694.mail.local",
+            "oremi1485.api.localhost"
+        ],
         "related.ip": [
             "10.40.251.202",
             "10.90.33.138"
@@ -2605,9 +2793,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3624,
+        "related.hosts": [
+            "rem7043.localhost",
+            "sequatD5469.www5.lan"
+        ],
         "related.ip": [
-            "10.227.173.252",
-            "10.65.2.106"
+            "10.65.2.106",
+            "10.227.173.252"
         ],
         "related.user": [
             "itation"
@@ -2660,6 +2852,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1609,
+        "related.hosts": [
+            "emqu2846.internal.home",
+            "item2738.test"
+        ],
         "related.ip": [
             "10.28.84.106",
             "10.193.233.229"
@@ -2715,6 +2911,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6248,
+        "related.hosts": [
+            "dqu6144.api.localhost",
+            "iosamnis1047.internal.localdomain"
+        ],
         "related.ip": [
             "10.150.245.88",
             "10.210.89.183"
@@ -2770,9 +2970,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7224,
+        "related.hosts": [
+            "giatquov1918.internal.example",
+            "orroq6677.internal.example"
+        ],
         "related.ip": [
-            "10.85.185.13",
-            "10.180.195.43"
+            "10.180.195.43",
+            "10.85.185.13"
         ],
         "related.user": [
             "voluptas"
@@ -2825,6 +3029,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 430,
+        "related.hosts": [
+            "estl5804.internal.local",
+            "onevo4326.internal.local"
+        ],
         "related.ip": [
             "10.210.28.247",
             "10.207.211.230"
@@ -2880,6 +3088,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3589,
+        "related.hosts": [
+            "Sedut1775.www.domain",
+            "itaedict7233.mail.localdomain"
+        ],
         "related.ip": [
             "10.248.165.185",
             "10.86.11.48"
@@ -2935,6 +3147,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4814,
+        "related.hosts": [
+            "mac7484.www5.test",
+            "numquam5869.internal.example"
+        ],
         "related.ip": [
             "10.47.125.38",
             "10.118.6.177"
@@ -2990,6 +3206,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 276,
+        "related.hosts": [
+            "oin1140.mail.localhost",
+            "onu6137.api.home"
+        ],
         "related.ip": [
             "10.50.233.155",
             "10.60.142.127"
@@ -3045,9 +3265,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2452,
+        "related.hosts": [
+            "naaliq3710.api.local",
+            "aecatcup2241.www5.test"
+        ],
         "related.ip": [
-            "10.28.82.189",
-            "10.120.10.211"
+            "10.120.10.211",
+            "10.28.82.189"
         ],
         "related.user": [
             "rcit"
@@ -3100,9 +3324,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3453,
+        "related.hosts": [
+            "volupta3552.internal.localhost",
+            "labor6360.mail.local"
+        ],
         "related.ip": [
-            "10.6.38.163",
-            "10.31.237.225"
+            "10.31.237.225",
+            "10.6.38.163"
         ],
         "related.user": [
             "olup"
@@ -3155,9 +3383,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2302,
+        "related.hosts": [
+            "onse380.internal.localdomain",
+            "mveleum4322.www5.host"
+        ],
         "related.ip": [
-            "10.226.5.189",
-            "10.125.165.144"
+            "10.125.165.144",
+            "10.226.5.189"
         ],
         "related.user": [
             "mvolu"
@@ -3210,6 +3442,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7079,
+        "related.hosts": [
+            "queips4947.mail.example",
+            "archite1843.mail.home"
+        ],
         "related.ip": [
             "10.46.56.204",
             "10.97.149.97"
@@ -3265,9 +3501,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5773,
+        "related.hosts": [
+            "oloreseo5039.test",
+            "itanim4024.api.example"
+        ],
         "related.ip": [
-            "10.218.0.197",
-            "10.28.105.124"
+            "10.28.105.124",
+            "10.218.0.197"
         ],
         "related.user": [
             "ntNe"
@@ -3320,6 +3560,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1586,
+        "related.hosts": [
+            "minim459.mail.local",
+            "nreprehe715.api.home"
+        ],
         "related.ip": [
             "10.123.199.198",
             "10.17.87.79"
@@ -3375,9 +3619,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5137,
+        "related.hosts": [
+            "eratv211.api.host",
+            "unte893.internal.host"
+        ],
         "related.ip": [
-            "10.38.86.177",
-            "10.115.68.40"
+            "10.115.68.40",
+            "10.38.86.177"
         ],
         "related.user": [
             "mpo"
@@ -3430,9 +3678,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5704,
+        "related.hosts": [
+            "aparia1179.www.localdomain",
+            "aspe951.mail.domain"
+        ],
         "related.ip": [
-            "10.193.118.163",
-            "10.115.174.107"
+            "10.115.174.107",
+            "10.193.118.163"
         ],
         "related.user": [
             "exeacomm"
@@ -3485,6 +3737,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2310,
+        "related.hosts": [
+            "iatqu6203.mail.corp",
+            "dipiscin4957.www.home"
+        ],
         "related.ip": [
             "10.77.77.208",
             "10.37.128.49"
@@ -3540,9 +3796,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5398,
+        "related.hosts": [
+            "ptasnula6576.api.invalid",
+            "econs2687.internal.localdomain"
+        ],
         "related.ip": [
-            "10.1.96.93",
-            "10.54.73.158"
+            "10.54.73.158",
+            "10.1.96.93"
         ],
         "related.user": [
             "lloinven"
@@ -3595,6 +3855,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2465,
+        "related.hosts": [
+            "mag1506.internal.domain",
+            "tiumto5834.api.lan"
+        ],
         "related.ip": [
             "10.182.152.242",
             "10.131.126.109"
@@ -3650,9 +3914,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6064,
+        "related.hosts": [
+            "fugits1163.host",
+            "iutal6032.www.test"
+        ],
         "related.ip": [
-            "10.77.229.168",
-            "10.181.247.224"
+            "10.181.247.224",
+            "10.77.229.168"
         ],
         "related.user": [
             "adol"
@@ -3705,9 +3973,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2861,
+        "related.hosts": [
+            "gitse2463.www5.invalid",
+            "inculp2078.host"
+        ],
         "related.ip": [
-            "10.72.162.6",
-            "10.235.116.121"
+            "10.235.116.121",
+            "10.72.162.6"
         ],
         "related.user": [
             "oinv"
@@ -3760,9 +4032,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3559,
+        "related.hosts": [
+            "temse6953.www.example",
+            "mexerc2757.internal.home"
+        ],
         "related.ip": [
-            "10.149.193.117",
-            "10.28.124.236"
+            "10.28.124.236",
+            "10.149.193.117"
         ],
         "related.user": [
             "mullam"
@@ -3815,9 +4091,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1710,
+        "related.hosts": [
+            "deriti6952.mail.domain",
+            "squira4455.api.domain"
+        ],
         "related.ip": [
-            "10.196.96.162",
-            "10.34.131.224"
+            "10.34.131.224",
+            "10.196.96.162"
         ],
         "related.user": [
             "tnonproi"
@@ -3870,9 +4150,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4984,
+        "related.hosts": [
+            "abor1370.www.domain",
+            "emveleum3661.localhost"
+        ],
         "related.ip": [
-            "10.77.78.180",
-            "10.97.236.123"
+            "10.97.236.123",
+            "10.77.78.180"
         ],
         "related.user": [
             "nisi"
@@ -3925,9 +4209,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3421,
+        "related.hosts": [
+            "emullamc5418.mail.test",
+            "sedquiac6517.internal.localhost"
+        ],
         "related.ip": [
-            "10.45.54.107",
-            "10.82.133.66"
+            "10.82.133.66",
+            "10.45.54.107"
         ],
         "related.user": [
             "olorem"
@@ -3980,6 +4268,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4020,
+        "related.hosts": [
+            "squirati7050.www5.lan",
+            "veniam3148.www5.home"
+        ],
         "related.ip": [
             "10.170.252.219",
             "10.180.180.230"
@@ -4035,9 +4327,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 617,
+        "related.hosts": [
+            "venia2079.mail.example",
+            "unt3559.www.home"
+        ],
         "related.ip": [
-            "10.65.144.51",
-            "10.5.11.205"
+            "10.5.11.205",
+            "10.65.144.51"
         ],
         "related.user": [
             "uptat"
@@ -4090,6 +4386,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 487,
+        "related.hosts": [
+            "snostrum3450.www5.localhost",
+            "rere5274.mail.domain"
+        ],
         "related.ip": [
             "10.76.122.196",
             "10.195.223.82"
@@ -4145,6 +4445,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2442,
+        "related.hosts": [
+            "gelitsed3249.corp",
+            "uaeabi3728.www5.invalid"
+        ],
         "related.ip": [
             "10.225.255.211",
             "10.138.210.116"
@@ -4200,6 +4504,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6311,
+        "related.hosts": [
+            "dolor7082.internal.localhost",
+            "uamqu2804.test"
+        ],
         "related.ip": [
             "10.250.81.189",
             "10.219.1.151"
@@ -4255,9 +4563,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 7128,
+        "related.hosts": [
+            "totam6886.api.localhost",
+            "olor5201.host"
+        ],
         "related.ip": [
-            "10.76.125.70",
-            "10.54.23.133"
+            "10.54.23.133",
+            "10.76.125.70"
         ],
         "related.user": [
             "oloreeu"
@@ -4310,6 +4622,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2780,
+        "related.hosts": [
+            "laborum5749.www.example",
+            "eufug3348.www.lan"
+        ],
         "related.ip": [
             "10.189.42.62",
             "10.36.110.69"
@@ -4365,9 +4681,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3284,
+        "related.hosts": [
+            "lup3313.api.home",
+            "stquidol239.www5.invalid"
+        ],
         "related.ip": [
-            "10.183.202.82",
-            "10.47.179.68"
+            "10.47.179.68",
+            "10.183.202.82"
         ],
         "related.user": [
             "umfugi"
@@ -4420,6 +4740,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2314,
+        "related.hosts": [
+            "edq5397.www.test",
+            "gia6531.mail.invalid"
+        ],
         "related.ip": [
             "10.73.28.165",
             "10.221.206.74"
@@ -4475,6 +4799,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5284,
+        "related.hosts": [
+            "udan6536.www5.test",
+            "lamcola4879.www5.localdomain"
+        ],
         "related.ip": [
             "10.85.104.146",
             "10.14.204.36"
@@ -4530,6 +4858,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3990,
+        "related.hosts": [
+            "rumet6923.www5.lan",
+            "edquian330.mail.local"
+        ],
         "related.ip": [
             "10.30.246.132",
             "10.208.18.210"
@@ -4585,6 +4917,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4337,
+        "related.hosts": [
+            "itse522.internal.localdomain",
+            "santi837.api.domain"
+        ],
         "related.ip": [
             "10.106.249.91",
             "10.19.119.17"
@@ -4640,6 +4976,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5275,
+        "related.hosts": [
+            "amc3059.local",
+            "lpaquiof804.internal.invalid"
+        ],
         "related.ip": [
             "10.29.109.126",
             "10.181.41.154"
@@ -4695,9 +5035,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2286,
+        "related.hosts": [
+            "enbyCi3813.api.domain",
+            "nonn4478.host"
+        ],
         "related.ip": [
-            "10.164.207.42",
-            "10.164.120.197"
+            "10.164.120.197",
+            "10.164.207.42"
         ],
         "related.user": [
             "pta"
@@ -4750,9 +5094,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2990,
+        "related.hosts": [
+            "liquipex1155.mail.corp",
+            "amquaer3985.www5.example"
+        ],
         "related.ip": [
-            "10.183.189.133",
-            "10.154.191.225"
+            "10.154.191.225",
+            "10.183.189.133"
         ],
         "related.user": [
             "ita"
@@ -4805,6 +5153,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 226,
+        "related.hosts": [
+            "isn3991.local",
+            "orem6317.local"
+        ],
         "related.ip": [
             "10.103.189.199",
             "10.29.120.226"
@@ -4860,9 +5212,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4691,
+        "related.hosts": [
+            "iumtotam1010.www5.corp",
+            "velill3230.www.corp"
+        ],
         "related.ip": [
-            "10.210.153.7",
-            "10.133.254.23"
+            "10.133.254.23",
+            "10.210.153.7"
         ],
         "related.user": [
             "voluptas"
@@ -4915,9 +5271,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5647,
+        "related.hosts": [
+            "onsecte91.www5.localdomain",
+            "orumS757.www5.corp"
+        ],
         "related.ip": [
-            "10.91.2.135",
-            "10.126.245.73"
+            "10.126.245.73",
+            "10.91.2.135"
         ],
         "related.user": [
             "olore"
@@ -4970,6 +5330,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 2313,
+        "related.hosts": [
+            "abori7686.internal.host",
+            "emi4534.www.localdomain"
+        ],
         "related.ip": [
             "10.183.243.246",
             "10.137.85.123"
@@ -5025,6 +5389,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1585,
+        "related.hosts": [
+            "reprehen3513.test",
+            "inimav1576.mail.example"
+        ],
         "related.ip": [
             "10.61.225.196",
             "10.10.86.55"
@@ -5080,9 +5448,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 3141,
+        "related.hosts": [
+            "orroquis284.api.domain",
+            "aturQu7083.mail.host"
+        ],
         "related.ip": [
-            "10.79.73.195",
-            "10.125.143.153"
+            "10.125.143.153",
+            "10.79.73.195"
         ],
         "related.user": [
             "emip"
@@ -5135,6 +5507,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6331,
+        "related.hosts": [
+            "tionula2060.www5.localhost",
+            "lumqui7769.mail.local"
+        ],
         "related.ip": [
             "10.64.139.17",
             "10.240.216.85"
@@ -5190,6 +5566,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4474,
+        "related.hosts": [
+            "rumSecti111.www5.domain",
+            "siarc6339.internal.corp"
+        ],
         "related.ip": [
             "10.87.90.49",
             "10.222.245.80"
@@ -5245,9 +5625,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4855,
+        "related.hosts": [
+            "olores7881.local",
+            "ptatev6552.www.test"
+        ],
         "related.ip": [
-            "10.143.53.214",
-            "10.87.144.208"
+            "10.87.144.208",
+            "10.143.53.214"
         ],
         "related.user": [
             "psumq"
@@ -5300,9 +5684,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 1729,
+        "related.hosts": [
+            "tDuis3281.www5.localdomain",
+            "byC5766.internal.home"
+        ],
         "related.ip": [
-            "10.105.97.134",
-            "10.204.178.19"
+            "10.204.178.19",
+            "10.105.97.134"
         ],
         "related.user": [
             "mexercit"
@@ -5355,6 +5743,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 4493,
+        "related.hosts": [
+            "uptasnul2751.www5.corp",
+            "hender6628.local"
+        ],
         "related.ip": [
             "10.194.67.223",
             "10.161.64.168"
@@ -5410,6 +5802,10 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 6094,
+        "related.hosts": [
+            "upt6017.api.localdomain",
+            "xercit7649.www5.home"
+        ],
         "related.ip": [
             "10.120.148.241",
             "10.100.154.220"
@@ -5465,9 +5861,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Fortinet",
         "process.pid": 5012,
+        "related.hosts": [
+            "tpers2217.internal.lan",
+            "porissu1470.domain"
+        ],
         "related.ip": [
-            "10.180.90.112",
-            "10.116.153.19"
+            "10.116.153.19",
+            "10.180.90.112"
         ],
         "related.user": [
             "itessequ"

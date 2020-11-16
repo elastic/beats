@@ -1,8 +1,11 @@
 description: Pipeline for normalizing Zeek files.log
 processors:
 - set:
-    field: event.created
+    field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.created
+    value: '{{@timestamp}}'
 - date:
     field: zeek.files.ts
     formats:
@@ -47,7 +50,7 @@ processors:
 - set:
     field: client.ip
     value: "{{zeek.files.rx_host}}"
-    if: "ctx?.zeek?.files?.rx_host != null"    
+    if: "ctx?.zeek?.files?.rx_host != null"
 - append:
     field: related.hash
     value: "{{file.hash.md5}}"

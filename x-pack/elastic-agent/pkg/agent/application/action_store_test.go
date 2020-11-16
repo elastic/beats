@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -20,10 +19,6 @@ import (
 )
 
 func TestActionStore(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on windows see https://github.com/elastic/beats/issues/19919")
-	}
-
 	log, _ := logger.New("action_store")
 	withFile := func(fn func(t *testing.T, file string)) func(*testing.T) {
 		return func(t *testing.T) {
@@ -62,10 +57,10 @@ func TestActionStore(t *testing.T) {
 
 	t.Run("can save to disk known action type",
 		withFile(func(t *testing.T, file string) {
-			actionConfigChange := &fleetapi.ActionConfigChange{
+			ActionPolicyChange := &fleetapi.ActionPolicyChange{
 				ActionID:   "abc123",
-				ActionType: "CONFIG_CHANGE",
-				Config: map[string]interface{}{
+				ActionType: "POLICY_CHANGE",
+				Policy: map[string]interface{}{
 					"hello": "world",
 				},
 			}
@@ -75,7 +70,7 @@ func TestActionStore(t *testing.T) {
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
-			store.Add(actionConfigChange)
+			store.Add(ActionPolicyChange)
 			err = store.Save()
 			require.NoError(t, err)
 			require.Equal(t, 1, len(store.Actions()))
@@ -87,12 +82,12 @@ func TestActionStore(t *testing.T) {
 			actions := store1.Actions()
 			require.Equal(t, 1, len(actions))
 
-			require.Equal(t, actionConfigChange, actions[0])
+			require.Equal(t, ActionPolicyChange, actions[0])
 		}))
 
 	t.Run("when we ACK we save to disk",
 		withFile(func(t *testing.T, file string) {
-			actionConfigChange := &fleetapi.ActionConfigChange{
+			ActionPolicyChange := &fleetapi.ActionPolicyChange{
 				ActionID: "abc123",
 			}
 
@@ -103,7 +98,7 @@ func TestActionStore(t *testing.T) {
 			acker := newActionStoreAcker(&testAcker{}, store)
 			require.Equal(t, 0, len(store.Actions()))
 
-			require.NoError(t, acker.Ack(context.Background(), actionConfigChange))
+			require.NoError(t, acker.Ack(context.Background(), ActionPolicyChange))
 			require.Equal(t, 1, len(store.Actions()))
 		}))
 }

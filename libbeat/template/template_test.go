@@ -113,6 +113,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 7.x", func(t *testing.T) {
@@ -120,6 +121,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
@@ -127,6 +129,7 @@ func TestTemplate(t *testing.T) {
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("settings.index.max_docvalue_fields_search", 200)
 	})
 }
 
@@ -134,7 +137,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 	beatVersion = getVersion(beatVersion)
 	esVersion = getVersion(esVersion)
 	ver := common.MustNewVersion(esVersion)
-	template, err := New(beatVersion, "testbeat", *ver, config, false)
+	template, err := New(beatVersion, "testbeat", false, *ver, config, false)
 	if err != nil {
 		t.Fatalf("Failed to create the template: %+v", err)
 	}

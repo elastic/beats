@@ -45,7 +45,7 @@ This file is generated! See scripts/docs_collector.py
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml", encoding='utf_8') as f:
-            fields = yaml.load(f.read())
+            fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
 
         modules_list[module] = title
@@ -61,7 +61,7 @@ For a description of each field in the module, see the
 """
 
         # Write module docs
-        docs_path = os.path.join(os.path.abspath("docs"), "modules",  module + ".asciidoc")
+        docs_path = os.path.join(os.path.abspath("docs"), "modules", module + ".asciidoc")
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 

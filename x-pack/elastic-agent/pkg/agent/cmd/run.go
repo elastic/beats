@@ -5,20 +5,30 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/service"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	agentName = "elastic-agent"
 )
 
 func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -34,9 +44,30 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 	}
 }
 
-func run(flags *globalFlags, streams *cli.IOStreams) error {
+func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+	// After this is run, the service is considered by the OS to be stopped.
+	// This must be the first deferred cleanup task (last to execute).
+	defer service.NotifyTermination()
+
+	locker := application.NewAppLocker(paths.Data())
+	if err := locker.TryLock(); err != nil {
+		return err
+	}
+	defer locker.Unlock()
+
+	service.BeforeRun()
+	defer service.Cleanup()
+
+	// register as a service
+	stop := make(chan bool)
+	_, cancel := context.WithCancel(context.Background())
+	var stopBeat = func() {
+		close(stop)
+	}
+	service.HandleSignals(stopBeat, cancel)
+
 	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
@@ -57,13 +88,25 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
-	locker := application.NewAppLocker(paths.Data())
-	if err := locker.TryLock(); err != nil {
+	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
+		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+	}
+
+	execPath, err := reexecPath()
+	if err != nil {
 		return err
 	}
-	defer locker.Unlock()
+	rexLogger := logger.Named("reexec")
+	rex := reexec.NewManager(rexLogger, execPath)
 
-	app, err := application.New(logger, pathConfigFile)
+	// start the control listener
+	control := server.New(logger.Named("control"), rex, nil)
+	if err := control.Start(); err != nil {
+		return err
+	}
+	defer control.Stop()
+
+	app, err := application.New(logger, pathConfigFile, rex, control)
 	if err != nil {
 		return err
 	}
@@ -72,11 +115,52 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
-	// listen for kill signal
+	// listen for signals
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	reexecing := false
+	for {
+		breakout := false
+		select {
+		case <-stop:
+			breakout = true
+		case <-rex.ShutdownChan():
+			reexecing = true
+			breakout = true
+		case sig := <-signals:
+			if sig == syscall.SIGHUP {
+				rexLogger.Infof("SIGHUP triggered re-exec")
+				rex.ReExec()
+			} else {
+				breakout = true
+			}
+		}
+		if breakout {
+			if !reexecing {
+				logger.Info("Shutting down Elastic Agent and sending last events...")
+			}
+			break
+		}
+	}
 
-	<-signals
+	err = app.Stop()
+	if !reexecing {
+		logger.Info("Shutting down completed.")
+		return err
+	}
+	rex.ShutdownComplete()
+	return err
+}
 
-	return app.Stop()
+func reexecPath() (string, error) {
+	// set executable path to symlink instead of binary
+	// in case of updated symlinks we should spin up new agent
+	potentialReexec := filepath.Join(paths.Top(), agentName)
+
+	// in case it does not exists fallback to executable
+	if _, err := os.Stat(potentialReexec); os.IsNotExist(err) {
+		return os.Executable()
+	}
+
+	return potentialReexec, nil
 }

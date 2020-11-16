@@ -1,6 +1,9 @@
 description: Pipeline for Google Cloud audit logs
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - user_agent:
       field: user_agent.original
       ignore_missing: true

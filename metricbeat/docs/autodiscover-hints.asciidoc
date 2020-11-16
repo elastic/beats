@@ -152,7 +152,7 @@ The above configuration would spin up two metricbeat module configurations to en
 polled every 60s whereas the "/metrics" endpoint is polled every 60s.
 
 [float]
-===== Configuring Namespace Defaults
+=====  Namespace Defaults
 
 Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
 The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
@@ -166,7 +166,7 @@ metricbeat.autodiscover:
       hints.enabled: true
       add_resource_metadata:
         namespace:
-          enabled: true
+          include_annotations: ["nsannotation1"]
 -------------------------------------------------------------------------------------
 
 
@@ -193,5 +193,5 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
-The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
-of the Docker container every 1 minute.
+The above labels would allow {beatname_uc} to run the nginx module and poll port `80`
+of the Docker container every 10 seconds.

@@ -4,6 +4,8 @@
 You can use {beatname_uc} <<running-on-docker,Docker images>> on Kubernetes to
 retrieve and ship container logs.
 
+TIP: Running {ecloud} on Kubernetes? See {eck-ref}/k8s-beat.html[Run {beats} on ECK].
+
 ifeval::["{release-state}"=="unreleased"]
 
 However, version {version} of {beatname_uc} has not yet been

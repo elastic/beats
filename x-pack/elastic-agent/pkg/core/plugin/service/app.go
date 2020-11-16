@@ -13,6 +13,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -40,7 +42,7 @@ type Application struct {
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         app.Specifier
+	desc         *app.Descriptor
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
@@ -70,14 +72,14 @@ func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
 	credsPort int,
-	spec app.Specifier,
+	desc *app.Descriptor,
 	srv *server.Server,
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
 	monitor monitoring.Monitor) (*Application, error) {
 
-	s := spec.Spec()
+	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
@@ -90,7 +92,7 @@ func NewApplication(
 		name:          appName,
 		pipelineID:    pipelineID,
 		logLevel:      logLevel,
-		spec:          spec,
+		desc:          desc,
 		srv:           srv,
 		processConfig: cfg.ProcessConfig,
 		logger:        logger,
@@ -106,6 +108,11 @@ func NewApplication(
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// Spec returns the program spec of this app.
+func (a *Application) Spec() program.Spec {
+	return a.desc.Spec()
 }
 
 // State returns the application state.
@@ -171,7 +178,7 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
+	if err := a.monitor.Prepare(a.desc.Spec(), a.pipelineID, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -220,21 +227,25 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()
-	defer a.appLock.Unlock()
+	srvState := a.srvState
+	a.appLock.Unlock()
 
-	if a.srvState == nil {
+	if srvState == nil {
 		return
 	}
 
-	if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+	if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
+		a.appLock.Lock()
 		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error(), nil)
 	} else {
+		a.appLock.Lock()
 		a.setState(state.Stopped, "Stopped", nil)
 	}
 	a.srvState = nil
 
 	a.cleanUp()
 	a.stopCredsListener()
+	a.appLock.Unlock()
 }
 
 // Shutdown disconnects the service, but doesn't signal it to stop.
@@ -303,7 +314,7 @@ func (a *Application) setState(status state.Status, msg string, payload map[stri
 }
 
 func (a *Application) cleanUp() {
-	a.monitor.Cleanup(a.name, a.pipelineID)
+	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
 }
 
 func (a *Application) startCredsListener() error {

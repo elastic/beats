@@ -66,6 +66,9 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
+	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
+	// vs what does not.
+	IsUpdated func(old, new interface{}) bool
 }
 
 type item struct {
@@ -100,6 +103,19 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	if opts.IsUpdated == nil {
+		opts.IsUpdated = func(o, n interface{}) bool {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				return true
+			}
+			return false
+		}
+	}
+
 	w := &watcher{
 		client:   client,
 		informer: informer,
@@ -119,11 +135,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 			w.enqueue(o, delete)
 		},
 		UpdateFunc: func(o, n interface{}) {
-			old, _ := accessor.ResourceVersion(o.(runtime.Object))
-			new, _ := accessor.ResourceVersion(n.(runtime.Object))
-
-			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
-			if old != new {
+			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
 			}
 		},

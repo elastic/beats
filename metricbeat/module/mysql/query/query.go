@@ -32,11 +32,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/mysql"
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("mysql", "query", New,
-		mb.DefaultMetricSet(),
+		mb.WithHostParser(mysql.ParseDSN),
 	)
 }
 
