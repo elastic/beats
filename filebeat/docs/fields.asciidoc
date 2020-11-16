@@ -3112,6 +3112,16 @@ type: keyword
 
 --
 
+*`azure.platformlogs.status`*::
++
+--
+Status
+
+
+type: keyword
+
+--
+
 [float]
 === properties
 

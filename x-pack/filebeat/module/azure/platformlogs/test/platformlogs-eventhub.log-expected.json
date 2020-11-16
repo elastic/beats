@@ -20,7 +20,7 @@
                 "group" : "OBS-TEST"
             },
             "platformlogs" : {
-                "Status" : "Succeeded",
+                "status" : "Succeeded",
                 "SubscriptionId" : "7657426d-c4c3-44ac-88a2-3b2cd59e6dba",
                 "Caller" : "Portal",
                 "ActivityId" : "30ed877c-a36b-491a-bd4d-ddd847fe55b8",

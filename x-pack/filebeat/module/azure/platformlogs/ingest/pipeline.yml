@@ -134,6 +134,10 @@ processors:
     field: azure.platformlogs.properties.statusCode
     target_field: azure.platformlogs.properties.status_code
     ignore_missing: true
+- rename:
+    field: azure.platformlogs.Status
+    target_field: azure.platformlogs.status
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: geo

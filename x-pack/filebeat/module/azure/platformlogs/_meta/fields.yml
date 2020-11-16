@@ -25,6 +25,10 @@
       type: keyword
       description: >
         Event Category
+    - name: status
+      type: keyword
+      description: >
+        Status
     - name: properties
       type: group
       description: >
