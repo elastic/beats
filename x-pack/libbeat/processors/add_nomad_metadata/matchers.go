@@ -31,13 +31,16 @@ type Matcher interface {
 	MetadataIndex(event common.MapStr) string
 }
 
+// Matchers holds a collections of Matcher objects and the associated lock
 type Matchers struct {
 	sync.RWMutex
 	matchers []Matcher
 }
 
+// MatcherConstructor builds a new Matcher from its settings
 type MatcherConstructor func(config common.Config) (Matcher, error)
 
+// NewMatchers builds a Matchers object from its configurations
 func NewMatchers(configs PluginConfig) *Matchers {
 	matchers := []Matcher{}
 	for _, pluginConfigs := range configs {
@@ -78,6 +81,7 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 	return ""
 }
 
+// Empty returns true if the matchers list is empty
 func (m *Matchers) Empty() bool {
 	m.RLock()
 	defer m.RUnlock()
@@ -88,10 +92,12 @@ func (m *Matchers) Empty() bool {
 	return false
 }
 
+// FieldMatcher represents a list of fields to match
 type FieldMatcher struct {
 	MatchFields []string
 }
 
+// NewFieldMatcher builds a new list of fields to match from lookup_fields
 func NewFieldMatcher(cfg common.Config) (Matcher, error) {
 	config := struct {
 		LookupFields []string `config:"lookup_fields"`
@@ -109,6 +115,7 @@ func NewFieldMatcher(cfg common.Config) (Matcher, error) {
 	return &FieldMatcher{MatchFields: config.LookupFields}, nil
 }
 
+// MetadataIndex returns the first key of an event that satisfies a matcher
 func (f *FieldMatcher) MetadataIndex(event common.MapStr) string {
 	for _, field := range f.MatchFields {
 		keyIface, err := event.GetValue(field)
@@ -123,10 +130,12 @@ func (f *FieldMatcher) MetadataIndex(event common.MapStr) string {
 	return ""
 }
 
+// FieldFormatMatcher represents a special field formatter that its created given a custom format
 type FieldFormatMatcher struct {
 	Codec codec.Codec
 }
 
+// NewFieldFormatMatcher creates a custom FieldFormtMatcher given a configuration (`format` key)
 func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
@@ -147,6 +156,8 @@ func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
 
 }
 
+// MetadataIndex returns the content of the dynamic field defined by the FieldFormatMatcher, usually,
+// but not limited to, a concatenation of multiple fields
 func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
 	bytes, err := f.Codec.Encode("", &beat.Event{
 		Fields: event,

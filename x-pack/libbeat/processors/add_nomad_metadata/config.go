@@ -15,8 +15,8 @@ type nomadAnnotatorConfig struct {
 	Namespace       string        `config:"namespace"`
 	SyncPeriod      time.Duration `config:"sync_period"`
 	RefreshInterval time.Duration `config:"refresh_interval"`
-	// Annotations are kept after pod is removed, until they haven't been accessed
-	// for a full `cleanup_timeout`:
+	// Annotations are kept after the allocations is removed, until they haven't been accessed for a
+	// full `cleanup_timeout`:
 	CleanupTimeout  time.Duration `config:"cleanup_timeout"`
 	Indexers        PluginConfig  `config:"indexers"`
 	Matchers        PluginConfig  `config:"matchers"`

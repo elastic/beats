@@ -18,25 +18,25 @@ const (
 	AllocationUUIDIndexerName = "allocation_uid"
 )
 
-// Indexer take known pods and generate all the metadata we need to enrich
-// events in a efficient way. By preindexing the metadata in the way it will be
-// checked when matching events
+// Indexer takes an allocation and generate all the metadata we need to enrich events in a efficient
+// way. By preindexing the metadata in the way it will be checked when matching events
 type Indexer interface {
-	// GetMetadata generates event metadata for the given pod, then returns the
+	// GetMetadata generates event metadata for the given allocation, then returns the
 	// list of indexes to create, with the metadata to put on them
 	GetMetadata(alloc *nomad.Resource) []MetadataIndex
 
-	// GetIndexes return the list of indexes the given pod belongs to. This function
-	// must return the same indexes than GetMetadata
+	// GetIndexes return the list of indexes the given allocation belongs to. This function must
+	// return the same indexes than GetMetadata
 	GetIndexes(alloc *nomad.Resource) []string
 }
 
-// MetadataIndex holds a pair of index -> metadata info
+// MetadataIndex holds a pair of index to metadata
 type MetadataIndex struct {
 	Index string
 	Data  common.MapStr
 }
 
+// Indexers holds a collections of Indexer objects and the associated lock
 type Indexers struct {
 	sync.RWMutex
 	indexers []Indexer
@@ -45,7 +45,7 @@ type Indexers struct {
 // IndexerConstructor builds a new indexer from its settings
 type IndexerConstructor func(config common.Config, metaGen nomad.MetaGenerator) (Indexer, error)
 
-// NewIndexers builds indexers object
+// NewIndexers builds an Indexers object from its configurations
 func NewIndexers(configs PluginConfig, metaGen nomad.MetaGenerator) *Indexers {
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
@@ -120,7 +120,7 @@ func NewAllocationNameIndexer(_ common.Config, metaGen nomad.MetaGenerator) (Ind
 	return &AllocationNameIndexer{metaGen: metaGen}, nil
 }
 
-// GetMetadata returns metadata for the given pod, if it matches the index
+// GetMetadata returns metadata for the given resource, if it matches the index
 func (p *AllocationNameIndexer) GetMetadata(alloc *nomad.Resource) []MetadataIndex {
 	meta := p.metaGen.ResourceMetadata(*alloc)
 
@@ -132,12 +132,12 @@ func (p *AllocationNameIndexer) GetMetadata(alloc *nomad.Resource) []MetadataInd
 	}
 }
 
-// GetIndexes returns the indexes for the given Pod
+// GetIndexes returns the indexes for the given allocation
 func (p *AllocationNameIndexer) GetIndexes(alloc *nomad.Resource) []string {
 	return []string{fmt.Sprintf("%s/%s", alloc.Namespace, alloc.Name)}
 }
 
-// AllocationUUIDIndexer indexes pods based on the pod UID
+// AllocationUUIDIndexer indexes allocations based on the allocation id
 type AllocationUUIDIndexer struct {
 	metaGen nomad.MetaGenerator
 }
@@ -147,7 +147,7 @@ func NewAllocationUUIDIndexer(_ common.Config, metaGen nomad.MetaGenerator) (Ind
 	return &AllocationUUIDIndexer{metaGen: metaGen}, nil
 }
 
-// GetMetadata returns the composed metadata from AllocationNameIndexer and the pod UID
+// GetMetadata returns the composed metadata from AllocationNameIndexer and the allocation id
 func (p *AllocationUUIDIndexer) GetMetadata(alloc *nomad.Resource) []MetadataIndex {
 	data := p.metaGen.ResourceMetadata(*alloc)
 
@@ -159,7 +159,7 @@ func (p *AllocationUUIDIndexer) GetMetadata(alloc *nomad.Resource) []MetadataInd
 	}
 }
 
-// GetIndexes returns the indexes for the given Pod
+// GetIndexes returns the indexes for the given allocation
 func (p *AllocationUUIDIndexer) GetIndexes(alloc *nomad.Resource) []string {
 	return []string{alloc.ID}
 }

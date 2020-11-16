@@ -165,20 +165,6 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 
 	// emit per-task separated events
 	for _, task := range tasks {
-		taskName, ok := task["name"]
-		if !ok {
-			logp.Err("A task must contain a name property")
-			continue
-		}
-
-		// avoid emitting events when the associated task is in a TaskStatePending state
-		if taskState, ok := obj.TaskStates[fmt.Sprintf("%v", taskName)]; ok {
-			if flag != "stop" && taskState.State == nomad.TaskStatePending {
-				logp.Debug("nomad", "Skipping pending allocation: %s", fmt.Sprintf("%s-%s", obj.ID, task["name"]))
-				continue
-			}
-		}
-
 		event := bus.Event{
 			"provider": p.uuid,
 			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
@@ -196,7 +182,6 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	}
 }
 
-// deltaQuery="SELECT ID FROM MSDS_Master WHERE Last_Updated_Date >= '${dih.last_index_time}'"
 func (p *Provider) publish(event bus.Event) {
 	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
@@ -231,7 +216,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
-		e["meta"] = meta
+		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
 			tags = rawAnn.(common.MapStr)
 

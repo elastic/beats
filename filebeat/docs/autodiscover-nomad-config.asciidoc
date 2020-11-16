@@ -11,18 +11,18 @@ filebeat.autodiscover:
       templates:
         - condition:
             equals:
-              meta.namespace: web
+              nomad.namespace: web
           config:
             - type: log
               paths:
-                - /var/lib/nomad/alloc/${data.meta.alloc_id}/alloc/logs/${data.meta.task.name}.stderr.[0-9]*
+                - /var/lib/nomad/alloc/${data.nomad.alloc_id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
 This configuration launches a `log` input for all jobs under the `web` Nomad namespace.
 
 If you are using modules, you can override the default input and customize it to read from the
-`${data.meta.task.name}.stdout` and/or `${data.meta.task.name}.stderr` files.
+`${data.nomad.task.name}.stdout` and/or `${data.nomad.task.name}.stderr` files.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -32,14 +32,14 @@ filebeat.autodiscover:
       templates:
         - condition:
             equals:
-              meta.task.service.tags: "redis"
+              nomad.task.service.tags: "redis"
           config:
             - module: redis
               log:
                 input:
                   type: log
                   paths:
-                    - /var/lib/nomad/alloc/${data.meta.alloc_id}/alloc/logs/${data.meta.task.name}.*
+                    - /var/lib/nomad/alloc/${data.nomad.alloc_id}/alloc/logs/${data.nomad.task.name}.*
 -------------------------------------------------------------------------------------
 
 WARNING: The `docker` input is currently not supported. Nomad doesn't expose the container id

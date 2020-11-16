@@ -29,15 +29,14 @@ func TestGenerateHints(t *testing.T) {
 		result bus.Event
 	}{
 		// Empty events should return empty hints
-		// {
-		// 	event:  bus.Event{},
-		// 	result: bus.Event{},
-		// },
+		{
+			event:  bus.Event{},
+			result: bus.Event{},
+		},
 		// Scenarios being tested:
-		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
-		// metrics/module must be found in hints.metrics
-		// not.to.include must not be part of hints
-		// period is annotated at both container and pod level. Container level value must be in hints
+		// - logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// - metrics/module must be found in hints.metrics
+		// - not.to.include must not be part of hints
 		{
 			event: bus.Event{
 				"nomad": common.MapStr{
@@ -57,7 +56,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			result: bus.Event{
-				"meta": common.MapStr{
+				"nomad": common.MapStr{
 					"task": getNestedAnnotations(common.MapStr{
 						"alloc_id":       "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
 						"not.to.include": "true",

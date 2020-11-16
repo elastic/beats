@@ -352,23 +352,23 @@ experimental[]
 
 The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
 
-These are the available fields during config templating. The `meta.*` fields will be available
+These are the available fields during config templating. The `nomad.*` fields will be available
 on each emitted event.
 
 * host
 * id
-* meta.name
-* meta.job
-* meta.namespace
-* meta.datacenters
-* meta.region
-* meta.type
-* meta.alloc_id
-* meta.status
-* meta.task.name
-* meta.task.service.name
-* meta.task.service.tags
-* meta.task.service.canary_tags
+* nomad.name
+* nomad.job
+* nomad.namespace
+* nomad.datacenters
+* nomad.region
+* nomad.type
+* nomad.alloc_id
+* nomad.status
+* nomad.task.name
+* nomad.task.service.name
+* nomad.task.service.tags
+* nomad.task.service.canary_tags
 
 If the `include_labels` config is added to the provider config, then the list of labels present in
 the config will be added to the event.

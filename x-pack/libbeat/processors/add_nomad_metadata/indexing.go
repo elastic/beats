@@ -14,7 +14,7 @@ import (
 // are stored
 var Indexing = NewRegister()
 
-// Register contains Indexer and Matchers to use on pod indexing and event matching
+// Register contains Indexer and Matchers to use on allocation indexing and event matching
 type Register struct {
 	sync.RWMutex
 	indexers map[string]IndexerConstructor
