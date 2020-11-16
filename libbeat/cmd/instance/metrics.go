@@ -45,7 +45,7 @@ func setupMetrics(name string) error {
 
 	//if the beat name is longer than 15 characters, truncate it so we don't fail process checks later on
 	// On *nix, the process name comes from /proc/PID/stat, which uses a comm value of 16 bytes, plus the null byte
-	if len(name) > 15 {
+	if (runtime.GOOS == "linux" || runtime.GOOS == "darwin") && len(name) > 15 {
 		name = name[:15]
 	}
 
