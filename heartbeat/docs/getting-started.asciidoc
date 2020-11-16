@@ -81,7 +81,7 @@ heartbeat.monitors:
 - type: http
   schedule: '@every 5s'
   urls: ["http://example.net"]
-  service_name: apm-service-name <4>
+  service.name: apm-service-name <4>
   id: my-http-service
   name: My HTTP Service
 ----------------------------------------------------------------------
@@ -92,7 +92,7 @@ https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementatio
 was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 `cronexpr` package.
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
-<4> The `service_name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
+<4> The `service.name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
 
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
