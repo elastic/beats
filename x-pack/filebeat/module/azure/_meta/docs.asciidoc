@@ -28,7 +28,8 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 [float]
 === Module configuration
 
-```
+[source,yaml]
+----
 - module: azure
   activitylogs:
     enabled: true
@@ -60,7 +61,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
        storage_account_key: ""
        resource_manager_endpoint: ""
 
-```
+----
 
 
 `eventhub` ::
@@ -101,11 +102,6 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
-
-[float]
-=== Compatibility
-
-TODO: document with what versions of the software is this tested
 
 [float]
 === Dashboards

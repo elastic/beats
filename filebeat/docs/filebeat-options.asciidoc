@@ -62,11 +62,12 @@ subdirectories of a directory.
 
 You can configure {beatname_uc} to use the following inputs:
 
+* <<{beatname_lc}-input-aws-cloudwatch>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-docker>>
-* <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-gcp-pubsub>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
 * <<{beatname_lc}-input-kafka>>
@@ -84,7 +85,7 @@ You can configure {beatname_uc} to use the following inputs:
 
 include::multiline.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-awscloudwatch.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
@@ -96,7 +97,7 @@ include::inputs/input-docker.asciidoc[]
 
 include::inputs/input-filestream.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-gcp-pubsub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]
 

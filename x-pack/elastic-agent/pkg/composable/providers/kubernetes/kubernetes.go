@@ -15,6 +15,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+const (
+	// PodPriority is the priority that pod mappings are added to the provider.
+	PodPriority = 0
+	// ContainerPriority is the priority that container mappings are added to the provider.
+	ContainerPriority = 1
+)
+
 func init() {
 	composable.Providers.AddDynamicProvider("kubernetes", DynamicProviderBuilder)
 }
@@ -54,13 +61,13 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
+	p.logger.Infof("Kubernetes provider started with %s scope", p.config.Scope)
 	if p.config.Scope == "node" {
+		p.logger.Debugf("Initializing Kubernetes watcher using node: %v", p.config.Node)
 		p.config.Node = kubernetes.DiscoverKubernetesNode(p.logger, p.config.Node, kubernetes.IsInCluster(p.config.KubeConfig), client)
 	} else {
 		p.config.Node = ""
 	}
-	p.logger.Infof("Kubernetes provider started with %s scope", p.config.Scope)
-	p.logger.Debugf("Initializing Kubernetes watcher using node: %v", p.config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: p.config.SyncPeriod,
@@ -70,7 +77,6 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher")
 	}
-
 	watcher.AddEventHandler(&eventWatcher{p.logger, p.config.CleanupTimeout, comm})
 
 	err = watcher.Start()
@@ -104,7 +110,7 @@ func (p *eventWatcher) emitRunning(pod *kubernetes.Pod) {
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
 	// get Pod metadata (not specific to any container)
-	p.comm.AddOrUpdate(string(pod.GetUID()), mapping, processors)
+	p.comm.AddOrUpdate(string(pod.GetUID()), PodPriority, mapping, processors)
 
 	// Emit all containers in the pod
 	p.emitContainers(pod, pod.Spec.Containers, pod.Status.ContainerStatuses)
@@ -161,7 +167,7 @@ func (p *eventWatcher) emitContainers(pod *kubernetes.Pod, containers []kubernet
 		}
 
 		// Emit the container
-		p.comm.AddOrUpdate(eventID, mapping, processors)
+		p.comm.AddOrUpdate(eventID, ContainerPriority, mapping, processors)
 	}
 }
 

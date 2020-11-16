@@ -1,0 +1,134 @@
+[
+    {
+        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "NONE",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 573,
+        "oracle.database_audit.action": "SELECT moving_window_size FROM AWR_PDB_baseline_metadata WHERE baseline_id = :num AND dbid = :dbid",
+        "oracle.database_audit.action_number": "3",
+        "oracle.database_audit.client.terminal": "UNKNOWN",
+        "oracle.database_audit.database.id": "2824230686",
+        "oracle.database_audit.length": 370,
+        "oracle.database_audit.session_id": "20003",
+        "oracle.database_audit.status": "0",
+        "process.pid": "28264",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "SYS",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "NONE",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 990,
+        "oracle.database_audit.action": "SELECT moving_window_size FROM AWR_PDB_baseline_metadata WHERE baseline_id = :num AND dbid = :dbid",
+        "oracle.database_audit.action_number": "3",
+        "oracle.database_audit.client.terminal": "UNKNOWN",
+        "oracle.database_audit.database.id": "2824230686",
+        "oracle.database_audit.length": 370,
+        "oracle.database_audit.session_id": "20003",
+        "oracle.database_audit.status": "0",
+        "process.pid": "28264",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "SYS",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "NONE",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1407,
+        "oracle.database_audit.action": "SELECT nvl(min(snap_id), 0), nvl(max(snap_id), 0) FROM AWR_PDB_snapshot WHERE end_interval_time >= (SYSDATE - :num) AND dbid = :dbid",
+        "oracle.database_audit.action_number": "3",
+        "oracle.database_audit.client.terminal": "UNKNOWN",
+        "oracle.database_audit.database.id": "2824230686",
+        "oracle.database_audit.length": 411,
+        "oracle.database_audit.session_id": "20003",
+        "oracle.database_audit.status": "0",
+        "process.pid": "28264",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "SYS",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "NONE",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1865,
+        "oracle.database_audit.action": "SELECT nvl(min(snap_id), 0), nvl(max(snap_id), 0) FROM AWR_PDB_snapshot WHERE end_interval_time >= (SYSDATE - :num) AND dbid = :dbid",
+        "oracle.database_audit.action_number": "3",
+        "oracle.database_audit.client.terminal": "UNKNOWN",
+        "oracle.database_audit.database.id": "2824230686",
+        "oracle.database_audit.length": 411,
+        "oracle.database_audit.session_id": "20003",
+        "oracle.database_audit.status": "0",
+        "process.pid": "28264",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "SYS",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]
