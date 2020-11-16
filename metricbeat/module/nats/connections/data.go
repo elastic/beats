@@ -19,6 +19,7 @@ package connections
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
@@ -44,6 +45,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var event mb.Event
 	var inInterface map[string]interface{}
 
+	fmt.Println("test")
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing NATS connections API response")
