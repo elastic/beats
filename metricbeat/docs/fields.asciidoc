@@ -42901,6 +42901,24 @@ type: keyword
 
 --
 
+*`system.service.unit_file.state`*::
++
+--
+The state of the unit file
+
+type: keyword
+
+--
+
+*`system.service.unit_file.vendor_preset`*::
++
+--
+The default state of the unit file
+
+type: keyword
+
+--
+
 [float]
 === resources
 
