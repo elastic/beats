@@ -4,76 +4,63 @@
 
 // +build windows
 
-package application_pool
+package website
 
 import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-	"github.com/elastic/go-sysinfo"
+"github.com/elastic/beats/v7/libbeat/common"
+"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+"github.com/elastic/go-sysinfo"
 
-	"github.com/pkg/errors"
+"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+"github.com/elastic/beats/v7/libbeat/logp"
+"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 const ecsProcessId = "process.pid"
 
 // Reader will contain the config options
-type AppPoolReader struct {
-	applicationPools []ApplicationPool
-	workerProcesses  map[string]string
+type WebsiteReader struct {
 	query            pdh.Query    // PDH Query
 	executed         bool         // Indicates if the query has been executed.
 	log              *logp.Logger //
 	config           iis.Config       // Metricset configuration
 }
 
-// ApplicationPool struct contains the list of applications and their worker processes
-type ApplicationPool struct {
-	name             string
-	workerProcessIds []int
-	counters         map[string]string
-}
 
-// WorkerProcess struct contains the worker process details
-type WorkerProcess struct {
-	processId    int
-	instanceName string
-}
+var websiteCounters = map[string]string{
+		"network.total_bytes_received":      "\\Web Service(*)\\Total Bytes Received",
+		"network.total_bytes_sent":          "\\Web Service(*)\\Total Bytes Sent",
+		"network.bytes_sent_per_sec":        "\\Web Service(*)\\Bytes Sent/sec",
+		"network.bytes_received_per_sec":    "\\Web Service(*)\\Bytes Received/sec",
+		"network.current_connections":       "\\Web Service(*)\\Current Connections",
+		"network.maximum_connections":       "\\Web Service(*)\\Maximum Connections",
+		"network.total_connection_attempts": "\\Web Service(*)\\Total Connection Attempts (all instances)",
+		"network.total_get_requests":        "\\Web Service(*)\\Total Get Requests",
+		"network.get_requests_per_sec":      "\\Web Service(*)\\Get Requests/sec",
+		"network.total_post_requests":       "\\Web Service(*)\\Total Post Requests",
+		"network.post_requests_per_sec":     "\\Web Service(*)\\Post Requests/sec",
+		"network.total_delete_requests":     "\\Web Service(*)\\Total Delete Requests",
+		"network.delete_requests_per_sec":   "\\Web Service(*)\\Delete Requests/sec",
+		"network.service_uptime":            "\\Web Service(*)\\Service Uptime",
+		"network.total_put_requests":        "\\Web Service(*)\\Total PUT Requests",
+		"network.put_requests_per_sec":      "\\Web Service(*)\\PUT Requests/sec",
+	}
 
-var appPoolCounters = map[string]string{
-	"process.pid":                          "\\Process(w3wp*)\\ID Process",
-	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
-	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
-	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
-	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
-	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
-	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
-	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
-	"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
-	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
-	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
-	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
-	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
-	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
-}
 
 // newReader creates a new instance of Reader.
-func NewReader(config iis.Config) (*AppPoolReader, error) {
+func NewReader(config iis.Config) (*WebsiteReader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
-	r := &AppPoolReader{
+	r := &WebsiteReader{
 		query:           query,
-		log:             logp.NewLogger("application_pool"),
+		log:             logp.NewLogger("iis"),
 		config:          config,
-		workerProcesses: make(map[string]string),
 	}
 
 	err := r.InitCounters()
@@ -83,19 +70,9 @@ func NewReader(config iis.Config) (*AppPoolReader, error) {
 	return r, nil
 }
 
-// InitCounters will check for any new instances and add them to the counter list
-func (r *AppPoolReader) InitCounters() error {
-	apps, err := getApplicationPools(r.config.AppPools)
-	if err != nil {
-		return errors.Wrap(err, "failed retrieving running worker processes")
-	}
-	r.applicationPools = apps
-	if len(apps) == 0 {
-		r.log.Info("no running application pools found")
-		return nil
-	}
-	var newQueries []string
-	r.workerProcesses = make(map[string]string)
+// initAppPools will check for any new instances and add them to the counter list
+func (r *WebsiteReader) InitCounters() error {
+
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
@@ -130,7 +107,7 @@ func (r *AppPoolReader) InitCounters() error {
 }
 
 // read executes a query and returns those values in an event.
-func (r *AppPoolReader) Read() ([]mb.Event, error) {
+func (r *WebsiteReader) Read() ([]mb.Event, error) {
 	if len(r.applicationPools) == 0 {
 		r.executed = true
 		return nil, nil
@@ -158,7 +135,7 @@ func (r *AppPoolReader) Read() ([]mb.Event, error) {
 	return results, nil
 }
 
-func (r *AppPoolReader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.Event {
+func (r *WebsiteReader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.Event {
 	workers := getProcessIds(values)
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
@@ -200,7 +177,7 @@ func (r *AppPoolReader) mapEvents(values map[string][]pdh.CounterValue) map[stri
 }
 
 // close will close the PDH query for now.
-func (r *AppPoolReader) Close() error {
+func (r *WebsiteReader) Close() error {
 	return r.query.Close()
 }
 
@@ -284,3 +261,4 @@ func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool
 	}
 	return false
 }
+

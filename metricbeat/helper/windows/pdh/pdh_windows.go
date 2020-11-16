@@ -42,6 +42,7 @@ import (
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 //sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
 //sys _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) [failretval!=0] = pdh.PdhEnumObjectItemsW
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat,  bufsize *uint32, bufcnt *uint32, item *PDH_FMT_COUNTERVALUE_ITEM) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 
 type PdhQueryHandle uintptr
 

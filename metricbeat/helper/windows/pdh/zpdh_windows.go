@@ -67,6 +67,7 @@ var (
 	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
 	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
+	procPdhGetFormattedCounterArrayW        = modpdh.NewProc("PdhGetFormattedCounterArrayW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
