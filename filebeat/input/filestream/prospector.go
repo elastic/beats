@@ -26,6 +26,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -38,17 +39,27 @@ const (
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	filewatcher  loginp.FSWatcher
-	identifier   fileIdentifier
-	ignoreOlder  time.Duration
-	cleanRemoved bool
+	filewatcher       loginp.FSWatcher
+	identifier        fileIdentifier
+	ignoreOlder       time.Duration
+	cleanRemoved      bool
+	stateChangeCloser stateChangeCloserConfig
 }
 
 func newFileProspector(
 	paths []string,
-	ignoreOlder time.Duration,
+	cfg *common.Config,
 	fileWatcherNs, identifierNs *common.ConfigNamespace,
 ) (loginp.Prospector, error) {
+
+	config := struct {
+		Prospector  prospectorConfig        `config:"prospector"`
+		StateChange stateChangeCloserConfig `config:"state_change"`
+	}{Prospector: defaultProspectorConfig(), StateChange: defaultStateChangeCloserConfig()}
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, err
+	}
 
 	filewatcher, err := newFileWatcher(paths, fileWatcherNs)
 	if err != nil {
@@ -61,10 +72,11 @@ func newFileProspector(
 	}
 
 	return &fileProspector{
-		filewatcher:  filewatcher,
-		identifier:   identifier,
-		ignoreOlder:  ignoreOlder,
-		cleanRemoved: true,
+		filewatcher:       filewatcher,
+		identifier:        identifier,
+		ignoreOlder:       config.Prospector.IgnoreOlder,
+		cleanRemoved:      config.Prospector.CleanRemoved,
+		stateChangeCloser: config.StateChange,
 	}, nil
 }
 
@@ -114,6 +126,8 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
 
+	defer p.stopHarvesterGroup(log, hg)
+
 	var tg unison.MultiErrGroup
 
 	tg.Go(func() error {
@@ -151,16 +165,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			case loginp.OpDelete:
 				log.Debugf("File %s has been removed", fe.OldPath)
 
+				if p.stateChangeCloser.Removed {
+					log.Debugf("Stopping harvester as file %s has been removed and close.on_state_change.removed is enabled.", src.Name())
+					hg.Stop(src)
+				}
+
 				if p.cleanRemoved {
 					log.Debugf("Remove state for file as file removed: %s", fe.OldPath)
 
-					err := s.Remove(src.Name())
+					err := s.Remove(src)
 					if err != nil {
 						log.Errorf("Error while removing state from statestore: %v", err)
 					}
 				}
-
-				// TODO close_removed
 
 			case loginp.OpRename:
 				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
@@ -172,7 +189,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					hg.Stop(prevSrc)
 
 					log.Debugf("Remove state for file as file renamed and path file_identity is configured: %s", fe.OldPath)
-					err := s.Remove(prevSrc.Name())
+					err := s.Remove(prevSrc)
 					if err != nil {
 						log.Errorf("Error while removing old state of renamed file (%s): %v", fe.OldPath, err)
 					}
@@ -180,15 +197,17 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					hg.Start(ctx, src)
 				} else {
 					// update file metadata as the path has changed
-					id := src.Name()
 					var meta fileMeta
-					err := s.FindCursorMeta(id, meta)
+					err := s.FindCursorMeta(src, meta)
 					if err != nil {
-						log.Errorf("Error while getting cursor meta data of entry %s: %v", id, err)
+						log.Errorf("Error while getting cursor meta data of entry %s: %v", src.Name(), err)
 					}
-					s.UpdateMetadata(id, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
+					s.UpdateMetadata(src, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
 
-					// TODO close_renamed
+					if p.stateChangeCloser.Renamed {
+						log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
+						hg.Stop(src)
+					}
 				}
 
 			default:
@@ -201,6 +220,13 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	errs := tg.Wait()
 	if len(errs) > 0 {
 		log.Error("%s", sderr.WrapAll(errs, "running prospector failed"))
+	}
+}
+
+func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
+	err := hg.StopGroup()
+	if err != nil {
+		log.Errorf("Error while stopping harverster group: %v", err)
 	}
 }
 

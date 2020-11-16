@@ -43,13 +43,13 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file"},
 			},
-			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
 			},
-			expectedSources: []string{"filestream::path::/path/to/file"},
+			expectedSources: []string{"path::/path/to/file"},
 		},
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
@@ -81,7 +81,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				},
 			},
 			ignoreOlder:     5 * time.Minute,
-			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
 		},
 	}
 
@@ -135,11 +135,11 @@ func TestProspectorDeletedFile(t *testing.T) {
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 			testStore := newMockMetadataUpdater()
-			testStore.set("filestream::path::/path/to/file")
+			testStore.set("path::/path/to/file")
 
 			p.Run(ctx, testStore, getTestHarvesterGroup())
 
-			has := testStore.has("filestream::path::/path/to/file")
+			has := testStore.has("path::/path/to/file")
 
 			if test.cleanRemoved {
 				assert.False(t, has)
@@ -163,6 +163,10 @@ func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 
 func (t *testHarvesterGroup) Stop(_ loginp.Source) {
 	return
+}
+
+func (t *testHarvesterGroup) StopGroup() error {
+	return nil
 }
 
 type mockFileWatcher struct {
@@ -198,17 +202,17 @@ func (mu *mockMetadataUpdater) has(id string) bool {
 	return ok
 }
 
-func (mu *mockMetadataUpdater) FindCursorMeta(key string, v interface{}) error {
+func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
 	return nil
 }
 
-func (mu *mockMetadataUpdater) UpdateMetadata(key string, v interface{}) error {
-	mu.table[key] = v
+func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
+	mu.table[s.Name()] = v
 	return nil
 }
 
-func (mu *mockMetadataUpdater) Remove(id string) error {
-	delete(mu.table, id)
+func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
+	delete(mu.table, s.Name())
 	return nil
 }
 

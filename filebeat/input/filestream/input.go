@@ -89,7 +89,10 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 
 	prospector, err := newFileProspector(
 		config.Paths,
-		config.IgnoreOlder,
+		common.MustNewConfigFrom(map[string]interface{}{
+			"prospector":   config.prospectorConfig,
+			"state_change": config.Close.OnStateChange,
+		}),
 		config.FileWatcher,
 		config.FileIdentity,
 	)

@@ -86,8 +86,12 @@ func (r *readerGroup) remove(id string) {
 // HarvesterGroup is responsible for running the
 // Harvesters started by the Prospector.
 type HarvesterGroup interface {
+	// Start starts a Harvester and adds it to the readers list.
 	Start(input.Context, Source)
+	// Stop cancels the reader of a given Source.
 	Stop(Source)
+	// StopGroup cancels all running Harvesters.
+	StopGroup() error
 }
 
 type defaultHarvesterGroup struct {
@@ -105,7 +109,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 	log := ctx.Logger.With("source", s.Name())
 	log.Debug("Starting harvester for file")
 
-	go func() {
+	hg.tg.Go(func(canceler unison.Canceler) error {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -114,10 +118,9 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 		}()
 		defer log.Debug("Stopped harvester for file")
 
-		harvesterCtx, cancelHarvester, err := hg.readers.newContext(s.Name(), ctx.Cancelation)
+		harvesterCtx, cancelHarvester, err := hg.readers.newContext(s.Name(), canceler)
 		if err != nil {
-			log.Errorf("error while adding new reader to the bookkeeper %v", err)
-			return
+			return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
 		}
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
@@ -125,8 +128,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 
 		resource, err := hg.locker.Lock(ctx, s.Name())
 		if err != nil {
-			log.Errorf("Error while locking resource: %v", err)
-			return
+			return fmt.Errorf("error while locking resource: %v", err)
 		}
 		defer releaseResource(resource)
 
@@ -135,8 +137,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 			ACKHandler: newInputACKHandler(ctx.Logger),
 		})
 		if err != nil {
-			log.Errorf("error while connecting to output with pipeline: %v", err)
-			return
+			return fmt.Errorf("error while connecting to output with pipeline: %v", err)
 		}
 		defer client.Close()
 
@@ -146,17 +147,25 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 
 		err = hg.harvester.Run(ctx, s, cursor, publisher)
 		if err != nil {
-			log.Errorf("Harvester stopped: %v", err)
+			return fmt.Errorf("error while running harvester: %v", err)
 		}
-	}()
+		return nil
+	})
 }
 
 // Stop stops the running Harvester for a given Source.
 func (hg *defaultHarvesterGroup) Stop(s Source) {
-	hg.readers.remove(s.Name())
+	hg.tg.Go(func(_ unison.Canceler) error {
+		hg.readers.remove(s.Name())
+		return nil
+	})
 }
 
 func releaseResource(resource *resource) {
 	resource.lock.Unlock()
 	resource.Release()
+}
+
+func (hg *defaultHarvesterGroup) StopGroup() error {
+	return hg.tg.Stop()
 }

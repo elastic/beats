@@ -30,11 +30,13 @@ import (
 )
 
 type managedInput struct {
-	locker       resourceLocker
-	store        *store
-	prospector   Prospector
-	harvester    Harvester
-	cleanTimeout time.Duration
+	userID           string
+	locker           resourceLocker
+	sourceIdentifier sourceIder
+	store            *store
+	prospector       Prospector
+	harvester        Harvester
+	cleanTimeout     time.Duration
 }
 
 // Name is required to implement the v2.Input interface
@@ -69,7 +71,11 @@ func (inp *managedInput) Run(
 		tg:           unison.TaskGroup{},
 	}
 
-	inp.prospector.Run(ctx, inp.store, hg)
+	inp.store.Retain()
+	sourceStore := newSourceStore(inp.store, inp.sourceIdentifier)
+	defer inp.store.Release()
+
+	inp.prospector.Run(ctx, sourceStore, hg)
 
 	return nil
 }

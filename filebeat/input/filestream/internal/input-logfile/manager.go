@@ -76,6 +76,12 @@ type Source interface {
 	Name() string
 }
 
+// SourceIder generates an ID for a Source.
+type sourceIder interface {
+	ID(Source) string
+}
+
+// resourceLocker locks a resource with a given full ID.
 type resourceLocker interface {
 	Lock(input.Context, string) (*resource, error)
 	UpdateTTL(*resource, time.Duration)
@@ -180,11 +186,13 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	return &managedInput{
-		locker:       newResourceLocker(cim),
-		store:        cim.passStore(),
-		prospector:   prospector,
-		harvester:    harvester,
-		cleanTimeout: settings.CleanTimeout,
+		userID:           settings.ID,
+		locker:           newResourceLocker(cim),
+		store:            cim.passStore(),
+		sourceIdentifier: newSourceIdentifier(cim.Type, settings.ID),
+		prospector:       prospector,
+		harvester:        harvester,
+		cleanTimeout:     settings.CleanTimeout,
 	}, nil
 }
 
@@ -192,6 +200,24 @@ func (cim *InputManager) passStore() *store {
 	store := cim.store
 	store.Retain()
 	return store
+}
+
+type sourceIdentifier struct {
+	prefix string
+}
+
+func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
+	inputPrefix := pluginName + "::"
+	if userID != "" {
+		inputPrefix = inputPrefix + "::" + userID
+	}
+	return &sourceIdentifier{
+		prefix: inputPrefix,
+	}
+}
+
+func (i *sourceIdentifier) ID(s Source) string {
+	return i.prefix + "::" + s.Name()
 }
 
 type resourceLock struct {

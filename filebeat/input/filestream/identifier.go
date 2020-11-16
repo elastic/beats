@@ -96,7 +96,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                pluginName + identitySep + i.name + identitySep + file.GetOSState(e.Info).String(),
+		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
 		identifierGenerator: i.name,
 	}
 }
@@ -124,7 +124,7 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                pluginName + identitySep + p.name + identitySep + path,
+		name:                p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}
 }

@@ -98,7 +98,7 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
-		name:                fmt.Sprintf("%s%s%s-%s", i.name, identitySep, osstate.InodeString(), i.markerContents()),
+		name:                i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
 	}
 }

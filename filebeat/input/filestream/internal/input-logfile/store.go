@@ -32,6 +32,13 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// sourceStore is a store which can access resources using the Source
+// from an input.
+type sourceStore struct {
+	identifier sourceIder
+	store      *store
+}
+
 // store encapsulates the persistent store and the in memory state store, that
 // can be ahead of the the persistent store.
 // The store lifetime is managed by a reference counter. Once all owners (the
@@ -152,6 +159,28 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
+func newSourceStore(s *store, identifier sourceIder) *sourceStore {
+	return &sourceStore{
+		store:      s,
+		identifier: identifier,
+	}
+}
+
+func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+	key := s.identifier.ID(src)
+	return s.store.findCursorMeta(key, v)
+}
+
+func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+	key := s.identifier.ID(src)
+	return s.store.updateMetadata(key, v)
+}
+
+func (s *sourceStore) Remove(src Source) error {
+	key := s.identifier.ID(src)
+	return s.store.remove(key)
+}
+
 func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
@@ -185,18 +214,6 @@ func (s *store) CleanIf(pred func(key string, v Value) bool) {
 	}
 }
 
-func (s *store) FindCursorMeta(key string, to interface{}) error {
-	resource := s.ephemeralStore.Find(key, false)
-	if resource == nil {
-		return fmt.Errorf("resource '%s' not found", key)
-	}
-	return typeconv.Convert(to, resource.cursorMeta)
-}
-
-func (r *resource) UnpackCursorMeta(to interface{}) error {
-	return typeconv.Convert(to, r.cursorMeta)
-}
-
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
 func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (bool, string, interface{})) {
@@ -214,7 +231,15 @@ func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (bool, stri
 	}
 }
 
-func (s *store) UpdateMetadata(key string, meta interface{}) error {
+func (s *store) findCursorMeta(key string, to interface{}) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+	return typeconv.Convert(to, resource.cursorMeta)
+}
+
+func (s *store) updateMetadata(key string, meta interface{}) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -225,7 +250,7 @@ func (s *store) UpdateMetadata(key string, meta interface{}) error {
 }
 
 // Removes marks an entry for removal by setting its TTL to zero.
-func (s *store) Remove(key string) error {
+func (s *store) remove(key string) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -324,6 +349,10 @@ func (r *resource) UnpackCursor(to interface{}) error {
 		return typeconv.Convert(to, r.cursor)
 	}
 	return typeconv.Convert(to, r.pendingCursor)
+}
+
+func (r *resource) UnpackCursorMeta(to interface{}) error {
+	return typeconv.Convert(to, r.cursorMeta)
 }
 
 // syncStateSnapshot returns the current insync state based on already ACKed update operations.
