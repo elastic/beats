@@ -9,7 +9,7 @@ include::uninstall.asciidoc[tag=uninstall-tip]
 
 [source,shell]
 ----
-./elastic-agent uninstall
+elastic-agent uninstall
 ----
 
 // end::mac[]
@@ -20,7 +20,7 @@ include::uninstall.asciidoc[tag=uninstall-tip]
 
 [source,shell]
 ----
-./elastic-agent uninstall
+elastic-agent uninstall
 ----
 
 // end::linux[]
@@ -34,7 +34,7 @@ and run:
 
 [source,shell]
 ----
-.\elastic-agent.exe uninstall
+C:\Program Files\Elastic\Agent\elastic-agent.exe uninstall
 ----
 
 // end::win[]
