@@ -19,6 +19,7 @@ package connection
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -31,8 +32,7 @@ import (
 var (
 	moduleSchema = s.Schema{
 		"server": s.Object{
-			"id":   c.Str("server_id"),
-			"time": c.Str("now"),
+			"id": c.Str("server_id"),
 		},
 	}
 	connectionsSchema = s.Schema{
@@ -54,7 +54,7 @@ var (
 
 // Connections stores connections related information
 type Connections struct {
-	Now         string                   `json:"now"`
+	Now         time.Time                `json:"now"`
 	ServerID    string                   `json:"server_id"`
 	Connections []map[string]interface{} `json:"connections,omitempty"`
 }
@@ -81,15 +81,12 @@ func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Eve
 		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
-	timestamp, err := util.GetNatsTimestamp(moduleFields)
-	moduleFields.Delete("server.time")
 	if err != nil {
 		return mb.Event{}, errors.Wrap(err, "failure parsing server timestamp")
 	}
 	event := mb.Event{
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,
-		Timestamp:       timestamp,
 	}
 	return event, nil
 }
@@ -105,12 +102,12 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	for _, con := range connections.Connections {
 		var evt mb.Event
 		con["server_id"] = connections.ServerID
-		con["now"] = connections.Now
 		evt, err = eventMapping(con, connectionsSchema)
 		if err != nil {
 			r.Error(errors.Wrap(err, "error mapping connection event"))
 			continue
 		}
+		evt.Timestamp = connections.Now
 		if !r.Event(evt) {
 			return nil
 		}
