@@ -25,6 +25,7 @@
 - Fix missing elastic_agent event data {pull}21994[21994]
 - Ensure shell wrapper path exists before writing wrapper on install {pull}22144[22144]
 - Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
+- Fix composable input processor promotion to fix duplicates {pull}22344[22344]
 
 ==== New features
 
@@ -47,3 +48,5 @@
 - Update `install` command to perform enroll before starting Elastic Agent {pull}21772[21772]
 - Update `fleet.kibana.path` from a POLICY_CHANGE {pull}21804[21804]
 - Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]
+- Add `priority` to `AddOrUpdate` on dynamic composable input providers communication channel {pull}22352[22352]
+- Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]

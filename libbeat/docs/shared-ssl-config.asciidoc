@@ -104,7 +104,7 @@ NOTE: SSL settings are disabled if either `enabled` is set to `false` or the
 [float]
 ==== `certificate_authorities`
 
-The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used. If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 By default you can specify a list of file that +{beatname_lc} will read, but you can also embed a certificate directly in the `YAML` configuration:
 
 [source,yaml]

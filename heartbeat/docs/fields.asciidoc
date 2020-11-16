@@ -8961,6 +8961,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
