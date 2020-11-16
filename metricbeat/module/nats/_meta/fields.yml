@@ -13,3 +13,8 @@
           type: keyword
           description: >
             The server ID
+        - name: server.time
+          type: date
+          deprecated: 8.0.0
+          description: >
+            Server time of metric creation

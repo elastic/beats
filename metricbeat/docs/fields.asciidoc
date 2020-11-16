@@ -35474,6 +35474,19 @@ type: keyword
 
 --
 
+*`nats.server.time`*::
++
+--
+
+deprecated:[8.0.0]
+
+Server time of metric creation
+
+
+type: date
+
+--
+
 [float]
 === connection
 

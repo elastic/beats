@@ -58,7 +58,6 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure applying module schema")
 	}
 	timestamp, err := util.GetNatsTimestamp(moduleFields)
-	moduleFields.Delete("server.time")
 	if err != nil {
 		return errors.Wrap(err, "failure parsing server timestamp")
 	}
