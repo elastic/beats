@@ -29,6 +29,30 @@
       type: keyword
       description: >
         Status
+    - name: ccpNamespace
+      type: keyword
+      description: >
+        ccpNamespace
+    - name: Cloud
+      type: keyword
+      description: >
+        Cloud
+    - name: Environment
+      type: keyword
+      description: >
+        Environment
+    - name: Caller
+      type: keyword
+      description: >
+        Caller
+    - name: ScaleUnit
+      type: keyword
+      description: >
+        ScaleUnit
+    - name: ActivityId
+      type: keyword
+      description: >
+        ActivityId
     - name: properties
       type: group
       description: >
@@ -38,5 +62,4 @@
           type: keyword
           description: >
             Status code
-
 

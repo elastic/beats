@@ -22,8 +22,6 @@
             "operation_name":"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
             "Cloud":"AzureCloud",
             "Environment":"prod",
-            "UnderlayClass":"hcp-underlay",
-            "UnderlayName":"hcp-underlay-westeurope-cx-316",
             "category":"kube-audit",
             "event_category":"Administrative",
             "properties":{

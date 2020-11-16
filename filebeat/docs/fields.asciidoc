@@ -3122,6 +3122,66 @@ type: keyword
 
 --
 
+*`azure.platformlogs.ccpNamespace`*::
++
+--
+ccpNamespace
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Cloud`*::
++
+--
+Cloud
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Environment`*::
++
+--
+Environment
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Caller`*::
++
+--
+Caller
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.ScaleUnit`*::
++
+--
+ScaleUnit
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.ActivityId`*::
++
+--
+ActivityId
+
+
+type: keyword
+
+--
+
 [float]
 === properties
 
