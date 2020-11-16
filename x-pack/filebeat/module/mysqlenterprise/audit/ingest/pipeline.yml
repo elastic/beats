@@ -13,8 +13,20 @@ processors:
     field: event.category
     value: database
 - append:
+    field: event.category
+    value: network
+    if: ctx?.mysqlenterprise?.audit?.event == 'connect'
+- append:
+    field: event.category
+    value: iam
+    if: '["create_user", "delete_user", "grant", "flush_privileges"].contains(ctx.mysqlenterprise.audit?.general_data?.sql_command)'
+- append:
     field: event.type
     value: access
+    if: ctx?.mysqlenterprise?.audit?.class != 'audit'
+- append:
+    field: event.type
+    value: connection
     if: ctx?.mysqlenterprise?.audit?.class != 'audit'
 - append:
     field: event.type
@@ -85,9 +97,31 @@ processors:
     target_field: host.os.full
     ignore_missing: true
 - rename:
+    field: mysqlenterprise.audit.startup_data.mysql_version
+    target_field: service.version
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.startup_data.server_id
+    target_field: service.id
+    ignore_missing: true
+- rename:
     field: mysqlenterprise.audit.startup_data.args
     target_field: process.args
     ignore_missing: true
+- set:
+    field: process.name
+    value: mysqld
+- join:
+    field: process.args
+    target_field: process.command_line
+    separator: " "
+    ignore_failure: true
+- script:
+    lang: painless
+    if: ctx?.process?.args != null
+    source: |
+      ctx.process.args_count = ctx.process.args.length - 1;
+      ctx.process.executable = ctx.process.args[0];
 # Attributes starting with _ is only supported by MySQL 8.0.19 and above.
 - convert:
     field: mysqlenterprise.audit.connection_data.connection_attributes._pid

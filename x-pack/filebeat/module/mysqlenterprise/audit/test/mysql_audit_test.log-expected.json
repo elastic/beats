@@ -16,16 +16,24 @@
         "mysqlenterprise.audit.class": "audit",
         "mysqlenterprise.audit.connection_id": 0,
         "mysqlenterprise.audit.id": 0,
-        "mysqlenterprise.audit.startup_data.mysql_version": "8.0.22-commercial",
-        "mysqlenterprise.audit.startup_data.server_id": 1,
         "process.args": [
-            "/usr/sbin/mysqld"
+            "/usr/local/mysql/bin/mysqld",
+            "--loose-audit-log-format=JSON",
+            "--log-error=log.err",
+            "--pid-file=mysqld.pid",
+            "--port=3306"
         ],
+        "process.args_count": 4,
+        "process.command_line": "/usr/local/mysql/bin/mysqld --loose-audit-log-format=JSON --log-error=log.err --pid-file=mysqld.pid --port=3306",
+        "process.executable": "/usr/local/mysql/bin/mysqld",
+        "process.name": "mysqld",
         "related.user": [
             "skip-grants user"
         ],
         "server.user.name": "skip-grants user",
+        "service.id": 1,
         "service.type": "mysqlenterprise",
+        "service.version": "8.0.22-commercial",
         "tags": [
             "mysqlenterprise-audit"
         ]
@@ -35,7 +43,8 @@
         "client.domain": "localhost",
         "event.action": "mysql-connect",
         "event.category": [
-            "database"
+            "database",
+            "network"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
@@ -43,11 +52,12 @@
         "event.outcome": "success",
         "event.type": [
             "access",
+            "connection",
             "start"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 355,
+        "log.offset": 462,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "8.0.22",
@@ -59,6 +69,7 @@
         "mysqlenterprise.audit.connection_id": 13,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "process.pid": 33038,
         "related.user": [
             "root"
@@ -81,11 +92,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 818,
+        "log.offset": 925,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 13,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -94,6 +106,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -116,16 +129,18 @@
         "event.outcome": "unknown",
         "event.type": [
             "access",
+            "connection",
             "end"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 1164,
+        "log.offset": 1271,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_type": "socket",
         "mysqlenterprise.audit.connection_id": 13,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -140,7 +155,8 @@
         "client.domain": "localhost",
         "event.action": "mysql-connect",
         "event.category": [
-            "database"
+            "database",
+            "network"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
@@ -148,11 +164,12 @@
         "event.outcome": "success",
         "event.type": [
             "access",
+            "connection",
             "start"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 1446,
+        "log.offset": 1553,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "8.0.22",
@@ -164,6 +181,7 @@
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "process.pid": 33197,
         "related.user": [
             "root"
@@ -186,11 +204,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 1909,
+        "log.offset": 2016,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -199,6 +218,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -213,18 +233,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 2255,
+        "log.offset": 2362,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -233,6 +255,7 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -247,18 +270,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 2637,
+        "log.offset": 2744,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -267,6 +292,7 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -281,18 +307,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 3019,
+        "log.offset": 3126,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -301,6 +329,7 @@
         "mysqlenterprise.audit.general_data.status": 1064,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -315,18 +344,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 3410,
+        "log.offset": 3517,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -335,6 +366,7 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -349,18 +381,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 3767,
+        "log.offset": 3874,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -369,6 +403,7 @@
         "mysqlenterprise.audit.general_data.status": 1396,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -383,18 +418,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 4153,
+        "log.offset": 4260,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -403,6 +440,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -417,18 +455,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 4538,
+        "log.offset": 4645,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -437,6 +477,7 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -451,18 +492,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 4924,
+        "log.offset": 5031,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -471,6 +514,7 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -485,18 +529,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "failure",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 5301,
+        "log.offset": 5408,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -505,6 +551,7 @@
         "mysqlenterprise.audit.general_data.status": 1410,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -519,18 +566,20 @@
         "client.domain": "localhost",
         "event.action": "mysql-status",
         "event.category": [
-            "database"
+            "database",
+            "iam"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 5678,
+        "log.offset": 5785,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -539,6 +588,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -554,7 +604,8 @@
         "client.ip": "192.168.2.5",
         "event.action": "mysql-connect",
         "event.category": [
-            "database"
+            "database",
+            "network"
         ],
         "event.dataset": "mysqlenterprise.audit",
         "event.kind": "event",
@@ -562,11 +613,12 @@
         "event.outcome": "success",
         "event.type": [
             "access",
+            "connection",
             "start"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 6053,
+        "log.offset": 6160,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
         "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "5.7.30",
@@ -577,6 +629,7 @@
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "process.pid": 394499,
         "related.ip": [
             "192.168.2.5"
@@ -603,11 +656,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 6531,
+        "log.offset": 6638,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -616,6 +670,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -641,11 +696,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 6913,
+        "log.offset": 7020,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -654,6 +710,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -679,11 +736,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 7292,
+        "log.offset": 7399,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -692,6 +750,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -717,11 +776,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 7659,
+        "log.offset": 7766,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Init DB",
@@ -729,6 +789,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -754,11 +815,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 7997,
+        "log.offset": 8104,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -767,6 +829,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 2,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -792,11 +855,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 8369,
+        "log.offset": 8476,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -805,6 +869,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 3,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -830,11 +895,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 8735,
+        "log.offset": 8842,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -843,6 +909,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -868,11 +935,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "unknown",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 9166,
+        "log.offset": 9273,
         "mysqlenterprise.audit.class": "table_access",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
@@ -881,6 +949,7 @@
         "mysqlenterprise.audit.table_access_data.query": "INSERT INTO audit_test_table values ('John', 'Smith')",
         "mysqlenterprise.audit.table_access_data.sql_command": "insert",
         "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -906,11 +975,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 9595,
+        "log.offset": 9702,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -919,6 +989,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -944,11 +1015,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "unknown",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 9998,
+        "log.offset": 10105,
         "mysqlenterprise.audit.class": "table_access",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
@@ -957,6 +1029,7 @@
         "mysqlenterprise.audit.table_access_data.query": "select * from audit_test_table",
         "mysqlenterprise.audit.table_access_data.sql_command": "select",
         "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -982,11 +1055,12 @@
         "event.module": "mysqlenterprise",
         "event.outcome": "success",
         "event.type": [
-            "access"
+            "access",
+            "connection"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 10402,
+        "log.offset": 10509,
         "mysqlenterprise.audit.class": "general",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.general_data.command": "Query",
@@ -995,6 +1069,7 @@
         "mysqlenterprise.audit.general_data.status": 0,
         "mysqlenterprise.audit.id": 1,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -1021,16 +1096,18 @@
         "event.outcome": "unknown",
         "event.type": [
             "access",
+            "connection",
             "end"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 10782,
+        "log.offset": 10889,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_type": "ssl",
         "mysqlenterprise.audit.connection_id": 16,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
         "related.ip": [
             "192.168.2.5"
         ],
@@ -1056,16 +1133,18 @@
         "event.outcome": "unknown",
         "event.type": [
             "access",
+            "connection",
             "end"
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 11097,
+        "log.offset": 11204,
         "mysqlenterprise.audit.class": "connection",
         "mysqlenterprise.audit.connection_data.connection_type": "socket",
         "mysqlenterprise.audit.connection_id": 15,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
         "related.user": [
             "root"
         ],
@@ -1087,11 +1166,12 @@
         "event.outcome": "unknown",
         "fileset.name": "audit",
         "input.type": "log",
-        "log.offset": 11379,
+        "log.offset": 11486,
         "mysqlenterprise.audit.class": "audit",
         "mysqlenterprise.audit.connection_id": 0,
         "mysqlenterprise.audit.id": 0,
         "mysqlenterprise.audit.shutdown_data.server_id": 1,
+        "process.name": "mysqld",
         "service.type": "mysqlenterprise",
         "tags": [
             "mysqlenterprise-audit"
