@@ -211,7 +211,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  node(args.label) {
+  withNode(args.label) {
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -226,7 +226,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    node(args.label) {
+    withNode(args.label) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -271,7 +271,7 @@ def target(Map args = [:]) {
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
-  node(args.label) {
+  withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -678,6 +678,18 @@ def notifyBuildReason() {
   archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
   if (isPR()) {
     echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
+  }
+}
+
+/**
+* Guarantee a specific worker can only be used for a specific build. This was not the case
+* with the customise node provisioner that reuses workers when there is peak load.
+*/
+def withNode(def label, Closure body) {
+  def uuid = UUID.randomUUID().toString()
+  def labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
+  node("${labels}") {
+    body()
   }
 }
 
