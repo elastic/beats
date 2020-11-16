@@ -34,6 +34,7 @@ IF ERRORLEVEL 1 (
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
 go env
+go get gotest.tools/gotestsum
 go get github.com/magefile/mage
 where mage
 mage -version

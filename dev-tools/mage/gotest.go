@@ -28,12 +28,10 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/jstemmer/go-junit-report/formatter"
 	"github.com/jstemmer/go-junit-report/parser"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -189,31 +187,43 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
-	// Build args list to Go.
-	args := []string{"test"}
-	args = append(args, "-v")
+	toolsArgs := []string{"-f", "standard-quiet", "--no-color"}
+	if params.JUnitReportFile != "" {
+		CreateDir(params.JUnitReportFile)
+		toolsArgs = append(toolsArgs, "--junitfile", params.JUnitReportFile)
+	}
+	if params.OutputFile != "" {
+		CreateDir(params.OutputFile)
+		toolsArgs = append(toolsArgs, "--jsonfile", params.OutputFile+".json")
+	}
+
+	var testArgs []string
 
 	// -race is only supported on */amd64
 	if os.Getenv("DEV_ARCH") == "amd64" {
 		if params.Race {
-			args = append(args, "-race")
+			testArgs = append(testArgs, "-race")
 		}
 	}
 	if len(params.Tags) > 0 {
-		args = append(args, "-tags", strings.Join(params.Tags, " "))
+		params := strings.Join(params.Tags, " ")
+		if params != "" {
+			testArgs = append(testArgs, "-tags", params)
+		}
 	}
 	if params.CoverageProfileFile != "" {
 		params.CoverageProfileFile = createDir(filepath.Clean(params.CoverageProfileFile))
-		args = append(args,
+		testArgs = append(testArgs,
 			"-covermode=atomic",
 			"-coverprofile="+params.CoverageProfileFile,
 		)
 	}
-	args = append(args, params.ExtraFlags...)
-	args = append(args, params.Packages...)
+	testArgs = append(testArgs, params.ExtraFlags...)
+	testArgs = append(testArgs, params.Packages...)
 
-	goTest := makeCommand(ctx, params.Env, "go", args...)
+	args := append(toolsArgs, append([]string{"--"}, testArgs...)...)
 
+	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
 	// Wire up the outputs.
 	bufferOutput := new(bytes.Buffer)
 	outputs := []io.Writer{bufferOutput}
@@ -229,16 +239,13 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	output := io.MultiWriter(outputs...)
 	goTest.Stdout = output
 	goTest.Stderr = output
-
 	if mg.Verbose() {
 		goTest.Stdout = io.MultiWriter(output, os.Stdout)
 		goTest.Stderr = io.MultiWriter(output, os.Stderr)
 	}
 
-	// Execute 'go test' and measure duration.
-	start := time.Now()
 	err := goTest.Run()
-	duration := time.Since(start)
+
 	var goTestErr *exec.ExitError
 	if err != nil {
 		// Command ran.
@@ -251,28 +258,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		goTestErr = exitErr
 	}
 
-	// Parse the verbose test output.
-	report, err := parser.Parse(bytes.NewBuffer(bufferOutput.Bytes()), BeatName)
-	if err != nil {
-		return errors.Wrap(err, "failed to parse go test output")
-	}
-	if goTestErr != nil && len(report.Packages) == 0 {
+	if goTestErr != nil {
 		// No packages were tested. Probably the code didn't compile.
-		fmt.Println(bytes.NewBuffer(bufferOutput.Bytes()).String())
 		return errors.Wrap(goTestErr, "go test returned a non-zero value")
-	}
-
-	// Generate a JUnit XML report.
-	if params.JUnitReportFile != "" {
-		junitReport, err := os.Create(createDir(params.JUnitReportFile))
-		if err != nil {
-			return errors.Wrap(err, "failed to create junit report")
-		}
-		defer junitReport.Close()
-
-		if err = formatter.JUnitReportXML(report, false, runtime.Version(), junitReport); err != nil {
-			return errors.Wrap(err, "failed to write junit report")
-		}
 	}
 
 	// Generate a HTML code coverage report.
@@ -288,27 +276,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		}
 	}
 
-	// Summarize the results and log to stdout.
-	summary, err := NewGoTestSummary(duration, report, map[string]string{
-		"Output File":     params.OutputFile,
-		"JUnit Report":    params.JUnitReportFile,
-		"Coverage Report": htmlCoverReport,
-	})
-	if err != nil {
-		return err
-	}
-	if !mg.Verbose() && summary.Fail > 0 {
-		fmt.Println(summary.Failures())
-	}
-	fmt.Println(summary.String())
-
 	// Return an error indicating that testing failed.
-	if summary.Fail > 0 || goTestErr != nil {
+	if goTestErr != nil {
 		fmt.Println(">> go test:", params.TestName, "Test Failed")
-		if summary.Fail > 0 {
-			return errors.Errorf("go test failed: %d test failures", summary.Fail)
-		}
-
 		return errors.Wrap(goTestErr, "go test returned a non-zero value")
 	}
 
@@ -329,6 +299,7 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
 	log.Println("exec:", cmd, strings.Join(args, " "))
+	fmt.Println("exec:", cmd, strings.Join(args, " "))
 	return c
 }
 

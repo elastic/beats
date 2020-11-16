@@ -5,3 +5,4 @@ set -exuo pipefail
 .ci/scripts/install-docker-compose.sh
 .ci/scripts/install-terraform.sh
 make mage
+go get gotest.tools/gotestsum
