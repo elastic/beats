@@ -8,7 +8,7 @@
         "ingested":"2020-11-16T11:31:07.522993300Z",
         "kind":"event"
     },
-    "message" : """{"kind":"Event","apiVersion":"audit.k8s.io/v1","level":"Metadata","auditID":"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe","stage":"ResponseComplete","requestURI":"/apis/admissionregistration.k8s.io/v1beta1?timeout=32s","verb":"get","user":{"username":"system:serviceaccount:kube-system:resourcequota-controller","uid":"33917550-525b-11ea-a4aa-168268435a05","groups":["system:serviceaccounts","system:serviceaccounts:kube-system","system:authenticated"]},"sourceIPs":["172.31.38.231"],"userAgent":"hyperkube/v1.14.8 (linux/amd64) kubernetes/ea670c3/system:serviceaccount:kube-system:resourcequota-controller","responseStatus":{"metadata":{},"code":200},"requestReceivedTimestamp":"2020-11-09T10:57:31.643810Z","stageTimestamp":"2020-11-09T10:57:31.643954Z","annotations":{"authorization.k8s.io/decision":"allow","authorization.k8s.io/reason":"RBAC: allowed by ClusterRoleBinding \"system:discovery\" of ClusterRole \"system:discovery\" to Group \"system:authenticated\""}}""",
+    "message" : "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io/v1\",\"level\":\"Metadata\",\"auditID\":\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\"}",
     "azure":{
         "subscription_id":"70BD6E77-4B1E-4835-8896-DB77B8EEF364",
         "resource":{
