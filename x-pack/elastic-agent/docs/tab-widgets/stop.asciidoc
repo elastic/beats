@@ -38,13 +38,9 @@ Get the process ID (PID) of the `elastic-agent` process:
 
 [source,shell]
 ----
-ps | grep elastic-agent
+ps | grep elastic-agent <1>
 ----
-
-//REVIEWERS: This doesn't work on macOS. ^^ Does not seem to return the ID
-//of a actual process (ID doesn't match what I see in the activity monitor). 
-
-//TODO: move deb/rpm tabs to the end of the widget.
+<1> Make sure you list processes as the root user.
 
 Then kill the process, replacing the PID in this example with the PID from
 the grep command:
