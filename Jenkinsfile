@@ -683,18 +683,11 @@ def notifyBuildReason() {
 
 /**
 * Guarantee a specific worker can only be used for a specific build. This was not the case
-* with the customise node provisioner that reuses workers in some cases when there is a peak load.
+* with the customise node provisioner that reuses workers when there is peak load.
 */
 def withNode(def label, Closure body) {
-  def labels
-  // There are immutable workers and static ones, so the static ones are only metal, macosx and arm
-  if (label.contains('arm') || label.contains('macosx') || label.contains('metal')) {
-    labels = label
-  } else {
-    // Otherwise use the dynamic UUID for the gobld
-    def uuid = UUID.randomUUID().toString()
-    labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
-  }
+  def uuid = UUID.randomUUID().toString()
+  def labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
   node("${labels}") {
     body()
   }
