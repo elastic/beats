@@ -37,11 +37,11 @@ type Prospector interface {
 
 // StateMetadataUpdater updates and removes the state information for a given Source.
 type StateMetadataUpdater interface {
-	// FindCursorMeta retrieves and unpacks a cursor metadata of an entry.
+	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.
 	FindCursorMeta(s Source, v interface{}) error
-	// UpdateMetadata updates the source metadata of a registry entry for a given ID.
+	// UpdateMetadata updates the source metadata of a registry entry of a given Source.
 	UpdateMetadata(s Source, v interface{}) error
-	// Remove marks a state for deletion with a given ID.
+	// Remove marks a state for deletion of a given Source.
 	Remove(s Source) error
 }
 
