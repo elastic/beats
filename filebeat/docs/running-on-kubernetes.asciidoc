@@ -142,7 +142,7 @@ metadata added by the <<add-kubernetes-metadata>> processor.
 
 It is common case when collecting logs from workloads running on Kubernetes that these
 applications are logging in json format. In these case, special handling can be applied so as to
-parse these json logs properly and decode them into fields. Bellow there are provided 3 different ways
+parse these json logs properly and decode them into fields. Bellow there are provided 2 different ways
 of configuring <<configuration-autodiscover, filebeat's autodiscover>> so as to identify and parse json logs.
 We will use an example of one Pod with 2 containers where only one of these logs in json format.
 
@@ -151,7 +151,8 @@ Example log:
 {"type":"log","@timestamp":"2020-11-16T14:30:13+00:00","tags":["warning","plugins","licensing"],"pid":7,"message":"License information could not be obtained from Elasticsearch due to Error: No Living connections error"}
 ```
 
-. Using `decode_json_fields` processor
+
+. Using `json.*` options with templates
 +
 [source,yaml]
 ------------------------------------------------
@@ -174,46 +175,9 @@ filebeat.autodiscover:
               - type: container
                 paths:
                   - "/var/log/containers/*-${data.kubernetes.container.id}.log"
-                processors:
-                  - decode_json_fields:
-                      fields:
-                        - message
-                      target: ""
-                      overwrite_keys: true
-                      add_error_key: true
-------------------------------------------------
-
-
-. Using `json.*` options
-+
-[source,yaml]
-------------------------------------------------
-filebeat.autodiscover:
-  providers:
-      - type: kubernetes
-        node: ${NODE_NAME}
-        templates:
-          - condition:
-              contains:
-                kubernetes.container.name: "no-json-logging"
-            config:
-              - type: container
-                paths:
-                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
-          - condition:
-              contains:
-                kubernetes.container.name: "json-logging"
-            config:
-              - type: container
-                paths:
-                  - "/var/log/containers/*-${data.kubernetes.container.id}.log"
-                processors:
-                  - decode_json_fields:
-                      fields:
-                        - message
-                      target: ""
-                      overwrite_keys: true
-                      add_error_key: true
+                json.keys_under_root: true
+                json.add_error_key: true
+                json.message_key: message
 ------------------------------------------------
 
 . Using `json.*` options with hints
