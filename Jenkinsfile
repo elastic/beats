@@ -30,7 +30,7 @@ pipeline {
   }
   options {
     timeout(time: 3, unit: 'HOURS')
-    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
     disableResume()
@@ -688,14 +688,15 @@ def notifyBuildReason() {
 def withNode(def label, Closure body) {
   def labels
   // There are immutable workers and static ones, so the static ones are only metal, macosx and arm
-  if (label.contains('arm') || label.contains('macosx') || label.contains('metal')) {
+  if (label?.contains('arm') || label?.contains('macosx') || label?.contains('metal')) {
     labels = label
   } else {
     // Otherwise use the dynamic UUID for the gobld
     def uuid = UUID.randomUUID().toString()
-    labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
+    // Ensure no double quotes are added to the labels.
+    labels = label?.trim() ? "${label} && extra/${uuid}".replaceAll('"', '') : "extra/${uuid}"
   }
-  node("${labels}") {
+  node(labels) {
     body()
   }
 }
