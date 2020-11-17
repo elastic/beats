@@ -119,7 +119,6 @@ var (
 				"count": c.Int("number_of_successful_follow_indices"),
 			},
 		},
-		//"recent_errors": c.Ifc("recent_auto_follow_errors"),
 	}
 )
 
