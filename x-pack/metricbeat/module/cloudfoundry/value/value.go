@@ -6,10 +6,11 @@ package value
 
 import (
 	"fmt"
+	"math"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
 )
 
 // init registers the MetricSet with the central registry.
@@ -41,5 +42,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	m.mod.RunValueReporter(reporter)
+	m.mod.RunValueReporter(&valueReporter{reporter, m.Logger()})
+}
+
+type valueReporter struct {
+	mb.PushReporterV2
+
+	logger *logp.Logger
+}
+
+func (r *valueReporter) Event(event mb.Event) bool {
+	valueKey := "cloudfoundry.value.value"
+	nameKey := "cloudfoundry.value.name"
+	if v, err := event.RootFields.GetValue(valueKey); err == nil {
+		if v, ok := v.(float64); ok && (math.IsNaN(v) || math.IsInf(v, 0)) {
+			name, _ := event.RootFields.GetValue(nameKey)
+			r.logger.Debugf("Ignored event with value that is not a number on field %s: %v", name, v)
+			return true
+		}
+	}
+	return r.PushReporterV2.Event(event)
 }
