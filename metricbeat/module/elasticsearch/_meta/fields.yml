@@ -33,18 +33,6 @@
         - name: number_of_successful_follow_indices
           type: alias
           path: elasticsearch.ccr.auto_follow.success.follow_indices.count
-        - name: recent_auto_follow_errors.leader_index
-          type: alias
-          path: elasticsearch.ccr.auto_follow.recent_errors.leader_index
-        - name: recent_auto_follow_errors.timestamp
-          type: alias
-          path: elasticsearch.ccr.auto_follow.recent_errors.timestamp
-        - name: recent_auto_follow_errors.exception.type
-          type: alias
-          path: elasticsearch.ccr.auto_follow.exception.type
-        - name: recent_auto_follow_errors.exception.reason
-          type: alias
-          path: elasticsearch.ccr.auto_follow.exception.reason
     - name: ccr_stats
       type: group
       fields:
@@ -110,7 +98,7 @@
           path: elasticsearch.ccr.requests.failed.read.count
         - name: operations_read
           type: alias
-          path: elasticsearch.ccr.operations.read.count
+          path: elasticsearch.ccr.follower.operations.read.count
         - name: operations_written
           type: alias
           path: elasticsearch.ccr.follower.operations_written
@@ -126,24 +114,6 @@
         - name: failed_write_requests
           type: alias
           path: elasticsearch.ccr.requests.failed.write.count
-        - name: read_exceptions.from_seq_no
-          type: alias
-          path: elasticsearch.ccr.read_exceptions.from_seq_no
-        - name: read_exceptions.retries
-          type: alias
-          path: elasticsearch.ccr.read_exceptions.retries
-        - name: read_exceptions.exception.type
-          type: alias
-          path: elasticsearch.ccr.read_exceptions.exception.type
-        - name: read_exceptions.exception.reason
-          type: alias
-          path: elasticsearch.ccr.read_exceptions.exception.reason
-        - name: fatal_exception.type
-          type: alias
-          path: elasticsearch.ccr.fatal_exception.type
-        - name: fatal_exception.reason
-          type: alias
-          path: elasticsearch.ccr.fatal_exception.reason
 
     - name: node_stats
       type: group

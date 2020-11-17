@@ -102,7 +102,6 @@ var (
 					"count": c.Int("outstanding_write_requests"),
 				},
 			},
-			"read_exceptions": c.Ifc("read_exceptions"),
 		},
 	}
 
@@ -120,7 +119,7 @@ var (
 				"count": c.Int("number_of_successful_follow_indices"),
 			},
 		},
-		"recent_errors": c.Ifc("recent_auto_follow_errors"),
+		//"recent_errors": c.Ifc("recent_auto_follow_errors"),
 	}
 )
 

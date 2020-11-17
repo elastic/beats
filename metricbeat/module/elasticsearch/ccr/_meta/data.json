@@ -11,7 +11,6 @@
                         "count": 0
                     }
                 },
-                "recent_errors": [],
                 "success": {
                     "follow_indices": {
                         "count": 1
@@ -59,7 +58,6 @@
                         "count": 2
                     }
                 },
-                "read_exceptions": [],
                 "successful": {
                     "read": {
                         "count": 32
@@ -104,7 +102,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:41239",
+        "address": "127.0.0.1:42127",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

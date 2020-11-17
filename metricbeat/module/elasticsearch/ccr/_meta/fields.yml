@@ -47,20 +47,6 @@
               type: long
             - name: write.count
               type: long
-        - name: read_exceptions
-          type: nested
-          fields:
-            - name: from_seq_no
-              type: long
-            - name: retries
-              type: integer
-            - name: exception
-              type: group
-              fields:
-                - name: type
-                  type: keyword
-                - name: reason
-                  type: text
 
     - name: write_buffer
       type: group
@@ -69,14 +55,6 @@
           type: long
         - name: operation.count
           type: long
-
-    - name: fatal_exceptions
-      type: group
-      fields:
-        - name: type
-          type: keyword
-        - name: reason
-          type: text
 
     - name: auto_follow
       type: group
@@ -93,20 +71,6 @@
           fields:
             - name: follow_indices.count
               type: long
-        - name: recent_errors
-          type: nested
-          fields:
-            - name: leader_index
-              type: keyword
-            - name: timestamp
-              type: long
-            - name: exception
-              type: group
-              fields:
-                - name: type
-                  type: keyword
-                - name: reason
-                  type: text
 
     - name: leader
       type: group

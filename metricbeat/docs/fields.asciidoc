@@ -17669,42 +17669,6 @@ alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 
 --
 
-*`ccr_auto_follow_stats.recent_auto_follow_errors.leader_index`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.auto_follow.recent_errors.leader_index
-
---
-
-*`ccr_auto_follow_stats.recent_auto_follow_errors.timestamp`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.auto_follow.recent_errors.timestamp
-
---
-
-*`ccr_auto_follow_stats.recent_auto_follow_errors.exception.type`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.auto_follow.exception.type
-
---
-
-*`ccr_auto_follow_stats.recent_auto_follow_errors.exception.reason`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.auto_follow.exception.reason
-
---
-
 
 *`ccr_stats.shard_id`*::
 +
@@ -17891,7 +17855,7 @@ alias to: elasticsearch.ccr.requests.failed.read.count
 --
 type: alias
 
-alias to: elasticsearch.ccr.operations.read.count
+alias to: elasticsearch.ccr.follower.operations.read.count
 
 --
 
@@ -17937,60 +17901,6 @@ alias to: elasticsearch.ccr.requests.successful.write.count
 type: alias
 
 alias to: elasticsearch.ccr.requests.failed.write.count
-
---
-
-*`ccr_stats.read_exceptions.from_seq_no`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.read_exceptions.from_seq_no
-
---
-
-*`ccr_stats.read_exceptions.retries`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.read_exceptions.retries
-
---
-
-*`ccr_stats.read_exceptions.exception.type`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.read_exceptions.exception.type
-
---
-
-*`ccr_stats.read_exceptions.exception.reason`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.read_exceptions.exception.reason
-
---
-
-*`ccr_stats.fatal_exception.type`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.fatal_exception.type
-
---
-
-*`ccr_stats.fatal_exception.reason`*::
-+
---
-type: alias
-
-alias to: elasticsearch.ccr.fatal_exception.reason
 
 --
 
@@ -18719,13 +18629,6 @@ type: long
 
 --
 
-*`elasticsearch.ccr.requests.read_exceptions`*::
-+
---
-type: nested
-
---
-
 
 *`elasticsearch.ccr.write_buffer.size.bytes`*::
 +
@@ -18738,21 +18641,6 @@ type: long
 +
 --
 type: long
-
---
-
-
-*`elasticsearch.ccr.fatal_exceptions.type`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.ccr.fatal_exceptions.reason`*::
-+
---
-type: text
 
 --
 
@@ -18777,13 +18665,6 @@ type: long
 +
 --
 type: long
-
---
-
-*`elasticsearch.ccr.auto_follow.recent_errors`*::
-+
---
-type: nested
 
 --
 
