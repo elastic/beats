@@ -17,7 +17,7 @@
 
 // +build integration
 
-package subscriptions
+package route
 
 import (
 	"testing"
@@ -28,6 +28,7 @@ import (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "nats")
+	compose.EnsureUp(t, "nats-routes")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	m.WriteEvents(t, "")
@@ -35,6 +36,7 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "nats")
+	compose.EnsureUp(t, "nats-routes")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
@@ -48,7 +50,7 @@ func TestFetch(t *testing.T) {
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nats",
-		"metricsets": []string{"subscriptions"},
+		"metricsets": []string{"route"},
 		"hosts":      []string{host},
 	}
 }

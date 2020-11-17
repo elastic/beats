@@ -15,40 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
-
-package subscriptions
+package connection
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
-
-	m := mbtest.NewFetcher(t, getConfig(service.Host()))
-	m.WriteEvents(t, "")
+func TestEventMapping(t *testing.T) {
+	content, err := ioutil.ReadFile("./_meta/test/connectionsmetrics.json")
+	assert.NoError(t, err)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, content)
+	assert.NoError(t, err)
 }
 
-func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
+func TestFetchEventContent(t *testing.T) {
+	absPath, _ := filepath.Abs("./_meta/test")
 
+	response, _ := ioutil.ReadFile(absPath + "/connectionsmetrics.json")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json;")
+		w.Write([]byte(response))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "nats",
+		"metricsets": []string{"connection"},
+		"hosts":      []string{server.URL},
+	}
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
-}
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "nats",
-		"metricsets": []string{"subscriptions"},
-		"hosts":      []string{host},
-	}
 }
