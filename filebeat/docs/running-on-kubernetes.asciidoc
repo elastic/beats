@@ -151,7 +151,7 @@ Example log:
 {"type":"log","@timestamp":"2020-11-16T14:30:13+00:00","tags":["warning","plugins","licensing"],"pid":7,"message":"License information could not be obtained from Elasticsearch due to Error: No Living connections error"}
 ```
 
-1. Using `decode_json_fields` processor:
+====== Using `decode_json_fields` processor
 
 [source,yaml]
 ------------------------------------------------
@@ -184,7 +184,7 @@ filebeat.autodiscover:
 ------------------------------------------------
 
 
-2. Using `json.*` options:
+====== Using `json.*` options
 
 [source,yaml]
 ------------------------------------------------
@@ -216,7 +216,7 @@ filebeat.autodiscover:
                       add_error_key: true
 ------------------------------------------------
 
-3. Using `json.*` options with hints:
+====== Using `json.*` options with hints
 
 Key part here is to properly annotate the Pod to only parse logs of the correct container
 as json logs. In this, annotation should be constructed like this:
