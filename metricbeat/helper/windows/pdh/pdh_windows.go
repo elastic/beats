@@ -42,7 +42,7 @@ import (
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 //sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
 //sys _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) [failretval!=0] = pdh.PdhEnumObjectItemsW
-//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat,  bufsize *uint32, bufcnt *uint32, item *PDH_FMT_COUNTERVALUE_ITEM) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufsize *uint32, bufcnt *uint32, item *PdhFmtCounterValueItem) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 
 type PdhQueryHandle uintptr
 
@@ -99,6 +99,19 @@ type PdhCounterValueLong struct {
 	Pad_cgo_0 [4]byte
 	Value     int32
 	Pad_cgo_1 [4]byte
+}
+
+// PdhFmtCounterValue for counter arrays
+type PdhFmtCounterValue struct {
+	CStatus uint32
+	padding uint32
+	Value   uint64
+}
+
+// PdhCounterValueArray.
+type PdhCounterValueArray struct {
+	buf   []byte
+	Items []PdhFmtCounterValueItem
 }
 
 // PdhOpenQuery creates a new query.
@@ -316,3 +329,33 @@ func (e PdhErrno) Error() string {
 	}
 	return string(utf16.Decode(b[:n]))
 }
+
+// PdhGetFormattedCounterValueLong computes a displayable long value for the specified counter.
+func PdhGetFormattedCounterArray(counter PdhCounterHandle) (*PdhCounterValueArray, error) {
+	array := new(PdhCounterValueArray)
+	var size, count uint32
+	var p *PdhFmtCounterValueItem
+	if len(array.buf) > 0 {
+		size = uint32(len(array.buf))
+		p = (*PdhFmtCounterValueItem)(unsafe.Pointer(&array.buf[0]))
+	}
+	err := _PdhGetFormattedCounterArray(counter, PdhFmtLong|PdhFmtNoCap100, &size, &count, p)
+	if err!= nil {
+		if err!= PDH_MORE_DATA {
+			return nil, err
+		}
+		array.buf = make([]byte, size)
+		p = (*PdhFmtCounterValueItem)(unsafe.Pointer(&array.buf[0]))
+		err = _PdhGetFormattedCounterArray(counter, PdhFmtLong|PdhFmtNoCap100, &size, &count, p)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	array.Items = (*[1 << 20]PdhFmtCounterValueItem)(unsafe.Pointer(p))[:count]
+	return array, nil
+}
+
+
+
+

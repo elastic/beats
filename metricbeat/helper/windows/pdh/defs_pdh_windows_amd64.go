@@ -215,3 +215,8 @@ const (
 
 	PdhFmtMultiply1000 PdhCounterFormat = 0x2000
 )
+
+type PdhFmtCounterValueItem struct {
+	Name     *uint16
+	FmtValue PdhFmtCounterValue
+}

@@ -56,18 +56,18 @@ func errnoErr(e syscall.Errno) error {
 var (
 	modpdh = windows.NewLazySystemDLL("pdh.dll")
 
-	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
-	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
-	procPdhAddCounterW              = modpdh.NewProc("PdhAddCounterW")
-	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
-	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
-	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
-	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
-	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
-	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
-	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
-	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
-	procPdhGetFormattedCounterArrayW        = modpdh.NewProc("PdhGetFormattedCounterArrayW")
+	procPdhOpenQueryW                = modpdh.NewProc("PdhOpenQueryW")
+	procPdhAddEnglishCounterW        = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhAddCounterW               = modpdh.NewProc("PdhAddCounterW")
+	procPdhRemoveCounter             = modpdh.NewProc("PdhRemoveCounter")
+	procPdhCollectQueryData          = modpdh.NewProc("PdhCollectQueryData")
+	procPdhGetFormattedCounterValue  = modpdh.NewProc("PdhGetFormattedCounterValue")
+	procPdhCloseQuery                = modpdh.NewProc("PdhCloseQuery")
+	procPdhExpandWildCardPathW       = modpdh.NewProc("PdhExpandWildCardPathW")
+	procPdhExpandCounterPathW        = modpdh.NewProc("PdhExpandCounterPathW")
+	procPdhGetCounterInfoW           = modpdh.NewProc("PdhGetCounterInfoW")
+	procPdhEnumObjectItemsW          = modpdh.NewProc("PdhEnumObjectItemsW")
+	procPdhGetFormattedCounterArrayW = modpdh.NewProc("PdhGetFormattedCounterArrayW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
@@ -186,6 +186,14 @@ func _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpB
 
 func _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) {
 	r0, _, _ := syscall.Syscall9(procPdhEnumObjectItemsW.Addr(), 9, uintptr(dataSource), uintptr(machineName), uintptr(unsafe.Pointer(objectName)), uintptr(unsafe.Pointer(counterList)), uintptr(unsafe.Pointer(counterListSize)), uintptr(unsafe.Pointer(instanceList)), uintptr(unsafe.Pointer(instanceListSize)), uintptr(detailLevel), uintptr(flags))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufsize *uint32, bufcnt *uint32, item *PdhFmtCounterValueItem) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhGetFormattedCounterArrayW.Addr(), 5, uintptr(counter), uintptr(format), uintptr(unsafe.Pointer(bufsize)), uintptr(unsafe.Pointer(bufcnt)), uintptr(unsafe.Pointer(item)), 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

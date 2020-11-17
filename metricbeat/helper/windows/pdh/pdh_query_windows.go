@@ -184,6 +184,24 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 	return rtn, nil
 }
 
+// GetFormattedCounterValues returns an array of formatted values for a query.
+func (q *Query) GetFormattedCounterArrayValues() (map[string][]CounterValue, error) {
+	if q.Counters == nil || len(q.Counters) == 0 {
+		return nil, errors.New("no counter list found")
+	}
+	rtn := make(map[string][]CounterValue, len(q.Counters))
+	for path, counter := range q.Counters {
+		counterValue := CounterValue{Instance: counter.instanceName, Err: CounterValueError{CStatus: 0}}
+		value, err := PdhGetFormattedCounterArray(counter.handle)
+		_ = path
+		_= value
+		_= err
+		_= counterValue
+		//rtn[path] = append(rtn[path], q.PdhGetFormattedCounterArray(counter))
+	}
+	return rtn, nil
+}
+
 // GetCountersAndInstances returns a list of counters and instances for a given object
 func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
 	counters, instances, err := PdhEnumObjectItems(objectName)
