@@ -687,7 +687,14 @@ def notifyBuildReason() {
 */
 def withNode(def label, Closure body) {
   def uuid = UUID.randomUUID().toString()
-  def labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
+  def labels
+  // There are immutable workers and static ones, so the static ones are only metal, macosx and arm
+  if (label.contains('arm') || label.contains('macosx') || label.contains('metal')) {
+    labels = label
+  } else {
+    // Otherwise use the dynamic UUID for the gobld
+    labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
+  }
   node("${labels}") {
     body()
   }
