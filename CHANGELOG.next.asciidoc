@@ -215,6 +215,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed documentation for commands in beats dev guide {pull}22194[22194]
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
+- Fix errors in HAproxy module while timezone is emtpy. {pull}22637[22637]
 
 *Auditbeat*
 
