@@ -693,10 +693,11 @@ def withNode(def label, Closure body) {
   } else {
     // Otherwise use the dynamic UUID for the gobld
     def uuid = UUID.randomUUID().toString()
-    // Ensure no double quotes are added to the labels.
-    labels = label?.trim() ? "${label} && extra/${uuid}".replaceAll('"', '') : "extra/${uuid}"
+    labels = label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}"
   }
-  node(labels) {
+  log(level: 'INFO', text: "Allocating a worker with the labels '${labels}'.")
+  // Ensure no double quotes are added to the labels.
+  node(labels.replaceAll('"', '')) {
     body()
   }
 }
