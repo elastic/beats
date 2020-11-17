@@ -52,6 +52,13 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		return nil, err
 	}
 
+	// Update playwright, needs to run separately to ensure post-install hook is run that downloads
+	// chrome. See https://github.com/microsoft/playwright/issues/3712
+	err = runSimpleCommand(exec.Command("npm", "install", "playwright"), dir)
+	if err != nil {
+		return nil, err
+	}
+
 	cmdFactory, err := suiteCommandFactory(dir, suiteFile, "--dry-run")
 	if err != nil {
 		return nil, err
