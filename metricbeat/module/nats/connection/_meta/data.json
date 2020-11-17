@@ -15,8 +15,20 @@
             "id": "bUAdpRFtMWddIBWw80Yd9D",
             "time": "2018-12-28T12:33:53.026865597Z"
         },
-        "connections": {
-            "total": 1
+        "connection": {
+            "idle_time": 0,
+            "in": {
+                "bytes": 678867264,
+                "messages": 42429204
+            },
+            "name": "NATS Benchmark",
+            "out": {
+                "bytes": 0,
+                "messages": 0
+            },
+            "pending_bytes": 0,
+            "subscriptions": 0,
+            "uptime": 29
         }
     },
     "type":"metricsets"
