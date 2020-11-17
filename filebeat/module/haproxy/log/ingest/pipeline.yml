@@ -31,7 +31,7 @@ processors:
     pattern_definitions:
       HAPROXY_DATE: (%{MONTHDAY}[/-]%{MONTH}[/-]%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND})|%{SYSLOGTIMESTAMP}
 - date:
-    if: ctx.event.timezone == null
+    if: ctx?.event?.timezone == null
     field: haproxy.request_date
     target_field: '@timestamp'
     formats:
@@ -42,7 +42,7 @@ processors:
         field: error.message
         value: '{{ _ingest.on_failure_message }}'
 - date:
-    if: ctx.event.timezone != null
+    if: ctx?.event?.timezone != null
     field: haproxy.request_date
     target_field: '@timestamp'
     formats:
