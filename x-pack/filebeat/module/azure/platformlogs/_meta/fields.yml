@@ -53,13 +53,10 @@
       type: keyword
       description: >
         ActivityId
-    - name: properties
-      type: group
+    - name: properties.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
       description: >
         Properties
-      fields:
-        - name: status_code
-          type: keyword
-          description: >
-            Status code
 

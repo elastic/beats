@@ -3182,20 +3182,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.platformlogs.properties.*`*::
++
+--
 Properties
 
 
-
-*`azure.platformlogs.properties.status_code`*::
-+
---
-Status code
-
-
-type: keyword
+type: object
 
 --
 
