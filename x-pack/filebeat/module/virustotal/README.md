@@ -99,3 +99,23 @@ Configure filebeat to use the kafka input as show above, and run it until all ev
 ```shell
 ./filebeat -c filebeat.dev.yml -e
 ```
+
+
+## Delete all Kibana saved objects between test runs
+
+```bash
+#!/bin/bash
+
+export KIBANA_API_URL='http://127.0.0.1:5601'
+export OBJECTS=$(curl "${KIBANA_API_URL}/api/saved_objects/_find?fields=id&type=index-pattern&type=visualization&type=dashboard&type=search&type=index-pattern&type=timelion-sheet&type=map&per_page=1000" | jq -rc '.saved_objects[] | {"type": .type, "id": .id } | @base64')
+
+for item in ${OBJECTS};
+do
+  TYPE=$(echo "${item}" | base64 -d | jq -r '.type')
+  ID=$(echo "${item}" | base64 -d | jq -r '.id')
+
+  echo "Deleting ${TYPE} with ID ${ID}"
+  curl -s -H 'kbn-xsrf: true' -XDELETE "${KIBANA_API_URL}/api/saved_objects/${TYPE}/${ID}"
+
+done
+```

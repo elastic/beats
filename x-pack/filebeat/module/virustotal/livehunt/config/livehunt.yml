@@ -157,15 +157,13 @@ processors:
             - {from: file.elf.header.num_prog_headers,    to: file.elf.number_program_headers}
             - {from: file.elf.header.num_section_headers, to: file.elf.number_section_headers}
             - {from: virustotal.attributes.telfhash,      to: file.elf.hash.telfhash}
-
             - {from: virustotal.creation_date,            to: file.elf.creation_date}
-            # Flattened-typed ELF fields
-            - {from: file.elf.segment_list,     to: file.elf.flattened.segment_list}
 
             # Normalized binary info
             - {from: file.elf.import_list,                to: file.elf.imports}
             - {from: file.elf.export_list,                to: file.elf.exports}
             - {from: file.elf.section_list,               to: file.elf.sections}
+            - {from: file.elf.segment_list,               to: file.elf.segments}
 
       - script:
           lang: javascript
@@ -193,11 +191,10 @@ processors:
             - {from: file.pe.authentihash, to: file.pe.hash.authentihash}
             - {from: file.pe.rich_pe_header_hash, to: file.pe.hash.richpe_header}
 
+            # Normalized binary info
             - {from: file.pe.import_list,      to: file.pe.imports}
-            - {from: file.pe.export_list,      to: file.pe.exports}
 
             # Flattened fields
-            - {from: file.pe.sections,         to: file.pe.flattened.sections}
             - {from: file.pe.resource_langs,   to: file.pe.flattened.resource_languages}
             - {from: file.pe.resource_types,   to: file.pe.flattened.resource_types}
             - {from: file.pe.resource_details, to: file.pe.flattened.resource_details}
