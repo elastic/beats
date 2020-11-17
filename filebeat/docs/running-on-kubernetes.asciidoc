@@ -151,8 +151,8 @@ Example log:
 {"type":"log","@timestamp":"2020-11-16T14:30:13+00:00","tags":["warning","plugins","licensing"],"pid":7,"message":"License information could not be obtained from Elasticsearch due to Error: No Living connections error"}
 ```
 
-====== Using `decode_json_fields` processor
-
+. Using `decode_json_fields` processor
++
 [source,yaml]
 ------------------------------------------------
 filebeat.autodiscover:
@@ -184,8 +184,8 @@ filebeat.autodiscover:
 ------------------------------------------------
 
 
-====== Using `json.*` options
-
+. Using `json.*` options
++
 [source,yaml]
 ------------------------------------------------
 filebeat.autodiscover:
@@ -216,15 +216,15 @@ filebeat.autodiscover:
                       add_error_key: true
 ------------------------------------------------
 
-====== Using `json.*` options with hints
-
+. Using `json.*` options with hints
++
 Key part here is to properly annotate the Pod to only parse logs of the correct container
 as json logs. In this, annotation should be constructed like this:
-
++
 `co.elastic.logs.<container_name>/json.keys_under_root: "true"`
-
++
 Autodiscovery configuration:
-
++
 [source,yaml]
 ------------------------------------------------
 filebeat.autodiscover:
@@ -237,9 +237,9 @@ filebeat.autodiscover:
         paths:
           - /var/log/containers/*${data.kubernetes.container.id}.log
 ------------------------------------------------
-
++
 Then annotate the pod properly:
-
++
 [source,yaml]
 ------------------------------------------------
 annotations:
