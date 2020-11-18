@@ -590,6 +590,7 @@ same journal. {pull}18467[18467]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
+- Add unit file states to system/service {pull}22557[22557]
 
 *Packetbeat*
 
