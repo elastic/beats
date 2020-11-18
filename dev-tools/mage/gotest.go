@@ -187,7 +187,12 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
-	toolsArgs := []string{"-f", "standard-quiet", "--no-color"}
+	toolsArgs := []string{"--no-color"}
+	if mg.Verbose() {
+		toolsArgs = append(toolsArgs, "-f", "standard-quiet")
+	} else {
+		toolsArgs = append(toolsArgs, "-f", "standard-verbose")
+	}
 	if params.JUnitReportFile != "" {
 		CreateDir(params.JUnitReportFile)
 		toolsArgs = append(toolsArgs, "--junitfile", params.JUnitReportFile)
@@ -237,12 +242,8 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = output
-	goTest.Stderr = output
-	if mg.Verbose() {
-		goTest.Stdout = io.MultiWriter(output, os.Stdout)
-		goTest.Stderr = io.MultiWriter(output, os.Stderr)
-	}
+	goTest.Stdout = io.MultiWriter(output, os.Stdout)
+	goTest.Stderr = io.MultiWriter(output, os.Stderr)
 
 	err := goTest.Run()
 
