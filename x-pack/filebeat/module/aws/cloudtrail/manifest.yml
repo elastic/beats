@@ -21,6 +21,7 @@ var:
     default: true
   - name: process_insight_logs
     default: true
+  - name: fips_enabled
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
