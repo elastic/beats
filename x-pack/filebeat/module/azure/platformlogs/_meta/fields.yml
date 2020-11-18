@@ -41,6 +41,10 @@
       type: keyword
       description: >
         Environment
+    - name: EventTimeString
+      type: keyword
+      description: >
+        EventTimeString
     - name: Caller
       type: keyword
       description: >

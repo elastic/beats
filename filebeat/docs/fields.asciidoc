@@ -3152,6 +3152,16 @@ type: keyword
 
 --
 
+*`azure.platformlogs.EventTimeString`*::
++
+--
+EventTimeString
+
+
+type: keyword
+
+--
+
 *`azure.platformlogs.Caller`*::
 +
 --
