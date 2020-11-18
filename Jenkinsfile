@@ -261,9 +261,9 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
-* This method runs the given command supporting two kind of scenarios:
-*  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
-*  - mage then the dir(location) is required, aka by enabling isMage: true.
+* This method is a wrapper to run the runCommand method and retry if there are 
+* environmental issues. Therefore it passes the arguments to the runCommand.
+* For further details regarding the arguments please refers to the runCommand method.
 */
 def target(Map args = [:]) {
   try {
