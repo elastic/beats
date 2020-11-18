@@ -239,6 +239,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 	return typeconv.Convert(to, resource.cursorMeta)
 }
 
+// updateMetadata updates the cursor metadata in the persistent store.
 func (s *store) updateMetadata(key string, meta interface{}) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
@@ -246,6 +247,20 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 	}
 
 	resource.cursorMeta = meta
+
+	err := s.persistentStore.Set(resource.key, state{
+		TTL:     resource.internalState.TTL,
+		Updated: resource.internalState.Updated,
+		Cursor:  resource.cursor,
+		Meta:    cursorMeta,
+	})
+	if err != nil {
+		s.log.Errorf("Failed to update cursor metadata fields for '%v'", resource.key)
+		resource.internalInSync = false
+	} else {
+		resource.stored = true
+		resource.internalInSync = true
+	}
 	return nil
 }
 
