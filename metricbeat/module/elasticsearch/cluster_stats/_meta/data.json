@@ -372,6 +372,19 @@
                 },
                 "state": {
                     "master_node": "0sZBDd6VQ4ObLacVSh65jw",
+                    "nodes": {
+                        "0sZBDd6VQ4ObLacVSh65jw": {
+                            "attributes": {
+                                "ml.machine_memory": "33300463616",
+                                "ml.max_open_jobs": "20",
+                                "transform.node": "true",
+                                "xpack.installed": "true"
+                            },
+                            "ephemeral_id": "nqDXltxJTly70OWy95QfBw",
+                            "name": "7d86b192e7ce",
+                            "transport_address": "127.0.0.1:9300"
+                        }
+                    },
                     "nodes_hash": -575310727,
                     "state_uuid": "N0SOO0GZQICpIp19KZ27dg",
                     "status": "yellow"
@@ -391,7 +404,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:41345",
+        "address": "127.0.0.1:46169",
         "type": "elasticsearch"
     }
 }

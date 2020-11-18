@@ -357,6 +357,10 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 		return errors.Wrap(err, "failed to pass through state_uuid field")
 	}
 
+	if err = elasticsearch.PassThruField("nodes", clusterState, clusterStateReduced); err != nil {
+		return errors.Wrap(err, "failed to pass through nodes field")
+	}
+
 	nodesHash, err := computeNodesHash(clusterState)
 	if err != nil {
 		return errors.Wrap(err, "failed to compute nodes hash")
