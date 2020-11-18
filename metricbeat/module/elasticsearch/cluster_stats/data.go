@@ -36,7 +36,7 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"stats": c.Ifc("count"),
+			"stats":  c.Ifc("count"),
 			"count":  c.Int("count.total"),
 			"master": c.Int("count.master"),
 			"data":   c.Int("count.data"),
