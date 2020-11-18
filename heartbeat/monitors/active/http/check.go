@@ -134,73 +134,63 @@ func checkHeaders(headers map[string]string) respValidator {
 	}
 }
 
-func parseBody(b interface{}) ([]match.Matcher, []match.Matcher) {
-	var (
-		pm, nm []match.Matcher
-		positive = "positive"
-		negative = "negative"
-	)
+func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher) {
 	// run through this code block if there is no positive or negative keyword in response body
 	// in this case, there's only plain body
-	p, ok := b.([]interface{})
-	if ok {
+	if p, ok := b.([]interface{}); ok {
 		for _, pp := range p {
-			pat, ok := pp.(string)
-			if ok {
-				return append(pm, match.MustCompile(pat)), nm
+			if pat, ok := pp.(string); ok {
+				return append(positiveMatch, match.MustCompile(pat)), negativeMatch
 			}
 		}
 	}
 
 	// run through this part if there exists positive/negative keyword in response body
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
-	m, ok := b.(map[string]interface{})
-	if ok {
+	if m, ok := b.(map[string]interface{}); ok {
 		for checkType, v := range m {
-			params, ok := v.([]interface{})
-			if ok {
+			if params, ok := v.([]interface{}); ok {
 				for _, param := range params {
-					pat, ok := param.(string)
-					if ok {
-						if checkType == positive {
-							pm = append(pm, match.MustCompile(pat))
-						} else if checkType == negative {
-							nm = append(nm, match.MustCompile(pat))
+					if pat, ok := param.(string); ok {
+						if checkType == "positive" {
+							positiveMatch = append(positiveMatch, match.MustCompile(pat))
+						} else if checkType == "negative" {
+							negativeMatch = append(negativeMatch, match.MustCompile(pat))
 						} else {
-							return pm, nm
+							return positiveMatch, negativeMatch
 						}
 					}
 				}
 			}
 		}
 	}
-	return pm, nm
+	return positiveMatch, negativeMatch
 }
 
 /* checkBody accepts 2 parameters:
 1. positive check regex
 2. negative check regex
 */
-func checkBody(pm, nm []match.Matcher) bodyValidator {
-	if len(pm) <= 0 && len(nm) <= 0 {
+func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
+	if len(positiveMatch) <= 0 && len(negativeMatch) <= 0 {
 		// in case there's no valid positive / negative regex pattern at all
 		return func(r *http.Response, body string) error {
 			return errInvalidRegex
 		}
-	} else if len(pm) > 0 && len(nm) <= 0 {
+	} else if len(positiveMatch) > 0 && len(negativeMatch) <= 0 {
 		// in case there's only valid positive regex pattern
 		return func(r *http.Response, body string) error {
-			for _, pattern := range pm {
+			for _, pattern := range positiveMatch {
 				if pattern.MatchString(body) {
 					return nil
 				}
 			}
 			return errBodyMismatch
 		}
-	} else if len(pm) <= 0 && len(nm) > 0 {
+	} else if len(positiveMatch) <= 0 && len(negativeMatch) > 0 {
 		// in case there's only valid negative regex pattern
 		return func(r *http.Response, body string) error {
-			for _, pattern := range nm {
+			for _, pattern := range negativeMatch {
 				if pattern.MatchString(body) {
 					return errBodyMismatch
 				}
@@ -211,13 +201,13 @@ func checkBody(pm, nm []match.Matcher) bodyValidator {
 		// in case there's both valid positive and negative regex pattern
 		return func(r *http.Response, body string) error {
 			m := false
-			for _, pattern := range pm {
+			for _, pattern := range positiveMatch {
 				if pattern.MatchString(body) {
 					m = true
 					break
 				}
 			}
-			for _, pattern := range nm {
+			for _, pattern := range negativeMatch {
 				if pattern.MatchString(body) {
 					m = false
 					break
