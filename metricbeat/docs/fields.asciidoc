@@ -18516,8 +18516,7 @@ type: long
 
 --
 
-
-*`elasticsearch.enrich.coordinator_stats.queue.size`*::
+*`elasticsearch.enrich.queue.size`*::
 +
 --
 Number of search requests in the queue.
@@ -18527,7 +18526,7 @@ type: long
 
 --
 
-*`elasticsearch.enrich.coordinator_stats.executed_searches.count`*::
+*`elasticsearch.enrich.executed_searches.total`*::
 +
 --
 Number of search requests that enrich processors have executed since node startup.
@@ -18538,7 +18537,7 @@ type: long
 --
 
 
-*`elasticsearch.enrich.coordinator_stats.remote_requests.current`*::
+*`elasticsearch.enrich.remote_requests.current`*::
 +
 --
 Current number of outstanding remote requests.
@@ -18548,50 +18547,13 @@ type: long
 
 --
 
-*`elasticsearch.enrich.coordinator_stats.remote_requests.count`*::
+*`elasticsearch.enrich.remote_requests.total`*::
 +
 --
 Number of outstanding remote requests executed since node startup.
 
 
 type: long
-
---
-
-*`elasticsearch.enrich.queue.size`*::
-+
---
-type: alias
-
-alias to: elasticsearch.enrich.coordinator_stats.queue.size
-
---
-
-
-*`elasticsearch.enrich.remote_requests.current`*::
-+
---
-type: alias
-
-alias to: elasticsearch.coordinator_stats.remote_requests.current
-
---
-
-*`elasticsearch.enrich.remote_requests.total`*::
-+
---
-type: alias
-
-alias to: elasticsearch.coordinator_stats.remote_requests.count
-
---
-
-*`elasticsearch.enrich.executed_searches.total`*::
-+
---
-type: alias
-
-alias to: elasticsearch.coordinator_stats.executed_searches.count
 
 --
 
@@ -26760,6 +26722,16 @@ type: keyword
 +
 --
 Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
 
 
 type: keyword

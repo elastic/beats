@@ -29,43 +29,22 @@
                 type: long
               - name: running.nano
                 type: long
-
-    - name: coordinator_stats
-      type: group
-      fields:
-        - name: queue.size
-          type: long
-          description: >
-            Number of search requests in the queue.
-        - name: executed_searches.count
-          type: long
-          description: >
-            Number of search requests that enrich processors have executed since node startup.
-        - name: remote_requests
-          type: group
-          fields:
-            - name: current
-              type: long
-              description: >
-                Current number of outstanding remote requests.
-            - name: count
-              type: long
-              description: >
-                Number of outstanding remote requests executed since node startup.
-
-
     - name: queue.size
-      type: alias
-      path: elasticsearch.enrich.coordinator_stats.queue.size
+      type: long
+      description: >
+        Number of search requests in the queue.
+    - name: executed_searches.total
+      type: long
+      description: >
+        Number of search requests that enrich processors have executed since node startup.
     - name: remote_requests
       type: group
       fields:
         - name: current
-          type: alias
-          path: elasticsearch.coordinator_stats.remote_requests.current
+          type: long
+          description: >
+            Current number of outstanding remote requests.
         - name: total
-          type: alias
-          path: elasticsearch.coordinator_stats.remote_requests.count
-    - name: executed_searches.total
-      type: alias
-      path: elasticsearch.coordinator_stats.executed_searches.count
+          type: long
+          description: >
+            Number of outstanding remote requests executed since node startup.

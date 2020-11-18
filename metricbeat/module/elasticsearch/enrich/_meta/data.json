@@ -1,57 +1,37 @@
 {
-    "@timestamp": "2020-10-28T10:59:36.815Z",
-    "@metadata": {
-      "beat": "metricbeat",
-      "type": "_doc",
-      "version": "8.0.0"
-    },
-    "ecs": {
-      "version": "1.5.0"
-    },
-    "host": {
-      "name": "mcastro"
-    },
-    "agent": {
-      "version": "8.0.0",
-      "ephemeral_id": "6cabc132-5c4c-40dc-91d4-2b18cae42017",
-      "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-      "name": "mcastro",
-      "type": "metricbeat"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "elasticsearch": {
+        "cluster": {
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
+        },
+        "enrich": {
+            "executed_searches": {
+                "total": 0
+            },
+            "queue": {
+                "size": 0
+            },
+            "remote_requests": {
+                "current": 0,
+                "total": 0
+            }
+        },
+        "node": {
+            "id": "1sFM8cmSROZYhPxVsiWew"
+        }
     },
     "event": {
-      "dataset": "elasticsearch.enrich",
-      "module": "elasticsearch",
-      "duration": 14751446
+        "dataset": "elasticsearch.enrich",
+        "duration": 115000,
+        "module": "elasticsearch"
     },
     "metricset": {
-      "name": "enrich",
-      "period": 10000
+        "name": "enrich",
+        "period": 10000
     },
     "service": {
-      "address": "localhost:9200",
-      "type": "elasticsearch"
-    },
-    "elasticsearch": {
-      "cluster": {
-        "name": "docker-cluster",
-        "id": "d4VpgavMRlmVoAZ8AJ-syw"
-      },
-      "node": {
-        "id": "KcEGpHVpRRaCpD4eiKHIsA"
-      },
-      "enrich": {
-        "coordinator_stats": {
-          "queue": {
-            "size": 0
-          },
-          "remote_requests": {
-            "current": 0,
-            "total": 0
-          },
-          "executed_searches": {
-            "total": 0
-          }
-        }
-      }
+        "address": "127.0.0.1:51380",
+        "type": "elasticsearch"
     }
-  }
+}
