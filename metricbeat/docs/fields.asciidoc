@@ -17647,7 +17647,7 @@ alias to: elasticsearch.node.name
 --
 type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.count
+alias to: elasticsearch.cluster.stats.nodes.stats.count
 
 --
 
@@ -18376,11 +18376,11 @@ Nodes statistics.
 --
 type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.count.total
+alias to: elasticsearch.cluster.stats.nodes.stats.count
 
 --
 
-*`elasticsearch.cluster.stats.nodes.count.total`*::
+*`elasticsearch.cluster.stats.nodes.stats.count`*::
 +
 --
 Total number of nodes in cluster.
@@ -18395,11 +18395,11 @@ type: long
 --
 type: alias
 
-alias to: elasticsearch.cluster.stats.nodes.count.master
+alias to: elasticsearch.cluster.stats.nodes.stats.master
 
 --
 
-*`elasticsearch.cluster.stats.nodes.count.master`*::
+*`elasticsearch.cluster.stats.nodes.stats.master`*::
 +
 --
 Number of master-eligible nodes in cluster.
@@ -18414,11 +18414,11 @@ type: long
 --
 type: long
 
-alias to: elasticsearch.cluster.stats.nodes.count.data
+alias to: elasticsearch.cluster.stats.nodes.stats.data
 
 --
 
-*`elasticsearch.cluster.stats.nodes.count.data`*::
+*`elasticsearch.cluster.stats.nodes.stats.data`*::
 +
 --
 Number of data nodes in cluster.

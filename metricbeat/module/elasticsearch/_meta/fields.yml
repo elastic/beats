@@ -26,7 +26,7 @@
       fields:
         - name: nodes.count
           type: alias
-          path: elasticsearch.cluster.stats.nodes.count
+          path: elasticsearch.cluster.stats.nodes.stats.count
     - name: node_stats
       type: group
       fields:
