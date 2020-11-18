@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	statusCheckPeriod = 30 * time.Second
+	statusCheckPeriod        = 30 * time.Second
+	statusCheckMissesAllowed = 4 // enable 2 minute start
 )
 
 // ErrAgentStatusFailed is returned when agent reports FAILED status.
@@ -26,9 +27,10 @@ var ErrAgentStatusFailed = errors.New("agent in a failed state", errors.TypeAppl
 
 // ErrorChecker checks agent for status change and sends an error to a channel if found.
 type ErrorChecker struct {
-	notifyChan  chan error
-	log         *logger.Logger
-	agentClient client.Client
+	failuresCounter int
+	notifyChan      chan error
+	log             *logger.Logger
+	agentClient     client.Client
 }
 
 // NewErrorChecker creates a new error checker.
@@ -61,9 +63,17 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 			ch.agentClient.Disconnect()
 			if err != nil {
 				ch.log.Error("failed retrieving agent status", err)
+				ch.failuresCounter++
+
+				if failures := ch.failuresCounter; failures > statusCheckMissesAllowed {
+					ch.notifyChan <- errors.New(fmt.Sprintf("service failed to fetch agent status '%d' times in a row", failures))
+				}
 				// agent is probably not running and this will be detected by pid watcher
 				continue
 			}
+
+			// call was successful, reset counter
+			ch.failuresCounter = 0
 
 			if status.Status == client.Failed {
 				ch.log.Error("error checker notifying failure of agent")
