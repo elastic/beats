@@ -64,7 +64,7 @@ func TestFetchUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL, true, false)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
@@ -84,21 +84,31 @@ func TestShouldCollectUsage(t *testing.T) {
 	cases := map[string]struct {
 		usageLastCollectedOn time.Time
 		usageNextCollectOn   time.Time
+		statsExcludeUsage    bool
 		expectedResult       bool
 	}{
 		"within_usage_collection_period": {
 			usageLastCollectedOn: now.Add(-1 * usageCollectionPeriod),
+			statsExcludeUsage:    false,
 			expectedResult:       false,
 		},
 		"after_usage_collection_period_but_before_next_scheduled_collection": {
 			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
 			usageNextCollectOn:   now.Add(3 * time.Hour),
+			statsExcludeUsage:    false,
 			expectedResult:       false,
 		},
 		"after_usage_collection_period_and_after_next_scheduled_collection": {
 			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
 			usageNextCollectOn:   now.Add(-1 * time.Hour),
+			statsExcludeUsage:    false,
 			expectedResult:       true,
+		},
+		"any_time_when_exclude_usage_is_true": {
+			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
+			usageNextCollectOn:   now.Add(-1 * time.Hour),
+			statsExcludeUsage:    true,
+			expectedResult:       false,
 		},
 	}
 
@@ -107,6 +117,7 @@ func TestShouldCollectUsage(t *testing.T) {
 			m := MetricSet{
 				usageLastCollectedOn: test.usageLastCollectedOn,
 				usageNextCollectOn:   test.usageNextCollectOn,
+				statsExcludeUsage:    test.statsExcludeUsage,
 			}
 
 			actualResult := m.shouldCollectUsage(now)

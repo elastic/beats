@@ -18,7 +18,7 @@
 package mtest
 
 // GetConfig returns config for kibana module
-func GetConfig(metricset string, host string, xpackEnabled bool) map[string]interface{} {
+func GetConfig(metricset string, host string, xpackEnabled bool, statsExcludeUsage bool) map[string]interface{} {
 	config := map[string]interface{}{
 		"module":     "kibana",
 		"metricsets": []string{metricset},
@@ -26,6 +26,9 @@ func GetConfig(metricset string, host string, xpackEnabled bool) map[string]inte
 	}
 	if xpackEnabled {
 		config["xpack.enabled"] = true
+	}
+	if statsExcludeUsage == false {
+		config["stats.exclude_usage"] = false
 	}
 
 	return config

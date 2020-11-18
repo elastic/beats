@@ -38,7 +38,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host(), false, true)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -63,7 +63,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host(), false, true)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)

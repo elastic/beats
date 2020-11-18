@@ -19,12 +19,14 @@ package kibana
 
 // Config defines the structure for the Kibana module configuration options
 type Config struct {
-	XPackEnabled bool `config:"xpack.enabled"`
+	XPackEnabled      bool `config:"xpack.enabled"`
+	StatsExcludeUsage bool `config:"stats.exclude_usage"`
 }
 
 // DefaultConfig returns the default configuration for the Kibana module
 func DefaultConfig() Config {
 	return Config{
-		XPackEnabled: false,
+		XPackEnabled:      false,
+		StatsExcludeUsage: true,
 	}
 }

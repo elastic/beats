@@ -24,7 +24,8 @@ import (
 // MetricSet can be used to build other metricsets within the Kibana module.
 type MetricSet struct {
 	mb.BaseMetricSet
-	XPackEnabled bool
+	XPackEnabled      bool
+	StatsExcludeUsage bool
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -38,5 +39,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{
 		base,
 		config.XPackEnabled,
+		config.StatsExcludeUsage,
 	}, nil
 }

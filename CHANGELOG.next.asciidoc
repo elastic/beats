@@ -732,6 +732,7 @@ same journal. {pull}18467[18467]
 
 *Metricbeat*
 
+- `kibana` module: `stats` metricset now skips usage collection by default. Set `stats.exclude_usage: false` in the config flag to revert these changes. {pull}22654[22654]
 - Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]
 - Add DynamoDB AWS Metricbeat light module {pull}15097[15097]
 - Release elb module as GA. {pull}15485[15485]

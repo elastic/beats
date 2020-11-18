@@ -60,6 +60,7 @@ type MetricSet struct {
 	usageLastCollectedOn time.Time
 	usageNextCollectOn   time.Time
 	isUsageExcludable    bool
+	statsExcludeUsage    bool
 }
 
 // New create a new instance of the MetricSet
@@ -148,6 +149,8 @@ func (m *MetricSet) init() error {
 	m.statsHTTP = statsHTTP
 	m.settingsHTTP = settingsHTTP
 	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
+	// Copying the config to an internal property to make tests easier to implement
+	m.statsExcludeUsage = m.StatsExcludeUsage
 
 	return nil
 }
@@ -221,5 +224,6 @@ func (m *MetricSet) calculateIntervalMs() int64 {
 }
 
 func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
+	return m.statsExcludeUsage == false && // If the config claims we should exclude the usage, there is no need to check for the time
+		now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
 }
