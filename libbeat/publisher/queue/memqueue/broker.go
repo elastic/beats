@@ -56,6 +56,7 @@ type Settings struct {
 	FlushMinEvents int
 	FlushTimeout   time.Duration
 	WaitOnClose    bool
+	IntQueueSize   int
 }
 
 type ackChan struct {
@@ -82,7 +83,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, intQueueSize int,
 ) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -98,6 +99,7 @@ func create(
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
 		FlushTimeout:   config.FlushTimeout,
+		IntQueueSize:   intQueueSize,
 	}), nil
 }
 
@@ -108,15 +110,23 @@ func NewQueue(
 	logger logger,
 	settings Settings,
 ) queue.Queue {
-	// define internal channel size for producer/client requests
-	// to the broker
-	chanSize := 20
-
 	var (
 		sz           = settings.Events
 		minEvents    = settings.FlushMinEvents
 		flushTimeout = settings.FlushTimeout
 	)
+	// define internal channel size for producer/client requests
+	// to the broker. This is 20 by default, but the value can be
+	// increased to up to 10% of max numbers of events in queue.
+	const minIntQueueSize = 20
+	const maxIntQueueSizeRatio = 0.1
+	chanSize := settings.IntQueueSize
+	if max := int(float64(sz) * maxIntQueueSizeRatio); chanSize > max {
+		chanSize = max
+	}
+	if chanSize < minIntQueueSize {
+		chanSize = minIntQueueSize
+	}
 
 	if minEvents < 1 {
 		minEvents = 1

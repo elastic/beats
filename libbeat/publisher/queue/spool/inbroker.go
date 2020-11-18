@@ -67,8 +67,8 @@ type inBroker struct {
 }
 
 const (
-	inSigChannelSize   = 3
-	inEventChannelSize = 20
+	inSigChannelSize      = 3
+	minInEventChannelSize = 20
 )
 
 func newInBroker(
@@ -78,6 +78,7 @@ func newInBroker(
 	codec codecID,
 	flushTimeout time.Duration,
 	flushEvents uint,
+	intQueueSize int,
 ) (*inBroker, error) {
 	enc, err := newEncoder(codec)
 	if err != nil {
@@ -89,6 +90,10 @@ func newInBroker(
 		return nil, err
 	}
 
+	inEventChannelSize := intQueueSize
+	if inEventChannelSize < minInEventChannelSize {
+		inEventChannelSize = minInEventChannelSize
+	}
 	b := &inBroker{
 		ctx:         ctx,
 		ackListener: ackListener,

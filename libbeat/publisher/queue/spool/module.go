@@ -38,7 +38,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logp *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logp *logp.Logger, cfg *common.Config, intQueueSize int,
 ) (queue.Queue, error) {
 	cfgwarn.Beta("Spooling to disk is beta")
 
@@ -76,5 +76,6 @@ func create(
 			Prealloc: config.File.Prealloc,
 			Readonly: false,
 		},
+		IntQueueSize: intQueueSize,
 	})
 }

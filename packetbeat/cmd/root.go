@@ -60,10 +60,11 @@ func PacketbeatSettings() instance.Settings {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
 	return instance.Settings{
-		RunFlags:      runFlags,
-		Name:          Name,
-		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		RunFlags:          runFlags,
+		Name:              Name,
+		HasDashboards:     true,
+		Processing:        processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		InternalQueueSize: 400,
 	}
 }
 
