@@ -2316,7 +2316,7 @@ var security = (function () {
         .Add(addEventFields)
         .Add(addTrustInformation)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
@@ -2325,7 +2325,7 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
@@ -2335,7 +2335,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
             var oldSd = evt.Get("winlog.event_data.OldSd");
             var newSd = evt.Get("winlog.event_data.NewSd");
             if (oldSd) {
@@ -2350,14 +2350,14 @@ var security = (function () {
     var genericAuditChange = new processor.Chain()
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
     var event4908 = new processor.Chain()
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
             var sids = evt.Get("winlog.event_data.SidList");
             if (!sids) {
                 return;
@@ -2381,7 +2381,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
+            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
@@ -2524,6 +2524,7 @@ var security = (function () {
 
         // 4739 - A security-enabled global group was changed.
         4739: policyChange.Run,
+
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
 
