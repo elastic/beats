@@ -116,18 +116,11 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 		return nil, err
 	}
 
-	var t string
-	if runtime.GOOS == "windows" {
-		t = fs.TypeName
-	} else {
-		t = fs.SysTypeName
-	}
-
 	filesystem := FSStat{
 		FileSystemUsage: stat,
 		DevName:         fs.DevName,
 		Mount:           fs.DirName,
-		SysTypeName:     t,
+		SysTypeName:     fs.SysTypeName,
 	}
 
 	return &filesystem, nil

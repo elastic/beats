@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -154,6 +156,7 @@ func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
+func (*testMonitorableApp) Spec() program.Spec                                          { return program.Spec{} }
 func (*testMonitorableApp) State() state.State                                          { return state.State{} }
 func (*testMonitorableApp) SetState(_ state.Status, _ string, _ map[string]interface{}) {}
 func (a *testMonitorableApp) Monitor() monitoring.Monitor                               { return a.monitor }
@@ -167,20 +170,22 @@ type testMonitor struct {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []string { return args }
+func (b *testMonitor) EnrichArgs(_ program.Spec, _ string, args []string, _ bool) []string {
+	return args
+}
 
 // Cleanup cleans up all drops.
-func (b *testMonitor) Cleanup(string, string) error { return nil }
+func (b *testMonitor) Cleanup(program.Spec, string) error { return nil }
 
 // Close closes the monitor.
 func (b *testMonitor) Close() {}
 
 // Prepare executes steps in order for monitoring to work correctly
-func (b *testMonitor) Prepare(string, string, int, int) error { return nil }
+func (b *testMonitor) Prepare(program.Spec, string, int, int) error { return nil }
 
 // LogPath describes a path where application stores logs. Empty if
 // application is not monitorable
-func (b *testMonitor) LogPath(string, string) string {
+func (b *testMonitor) LogPath(program.Spec, string) string {
 	if !b.monitorLogs {
 		return ""
 	}
@@ -189,7 +194,7 @@ func (b *testMonitor) LogPath(string, string) string {
 
 // MetricsPath describes a location where application exposes metrics
 // collectable by metricbeat.
-func (b *testMonitor) MetricsPath(string, string) string {
+func (b *testMonitor) MetricsPath(program.Spec, string) string {
 	if !b.monitorMetrics {
 		return ""
 	}
@@ -197,7 +202,7 @@ func (b *testMonitor) MetricsPath(string, string) string {
 }
 
 // MetricsPathPrefixed return metrics path prefixed with http+ prefix.
-func (b *testMonitor) MetricsPathPrefixed(string, string) string {
+func (b *testMonitor) MetricsPathPrefixed(program.Spec, string) string {
 	return "http+path"
 }
 
