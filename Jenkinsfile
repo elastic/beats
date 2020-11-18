@@ -266,6 +266,23 @@ def k8sTest(Map args = [:]) {
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def target(Map args = [:]) {
+  try {
+    runCommand(args)
+  } catch (err) {
+    if(args.label.contains('windows-7')) {
+      sleep 10
+      // There are some environmental issues with windows-7
+      runCommand(args)
+    }
+  }
+}
+
+/**
+* This method runs the given command supporting two kind of scenarios:
+*  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
+*  - mage then the dir(location) is required, aka by enabling isMage: true.
+*/
+def runCommand(Map args = [:]) {
   def context = args.context
   def command = args.command
   def directory = args.get('directory', '')
@@ -345,7 +362,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
+      def noEnvironmentalIssue = true
       installTools()
+      def noEnvironmentalIssue = false
       if(isUnix()) {
         // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
         // See https://github.com/elastic/beats/issues/17787.
@@ -371,7 +390,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         upload = true
         error("Error '${err.toString()}'")
       } finally {
-        if (archive) {
+        if (archive && noEnvironmentalIssue) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         // Tear down the setup for the permamnent workers.
