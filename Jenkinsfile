@@ -363,7 +363,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
     dir("${env.BASE_DIR}") {
       def environmentalIssue = true
       installTools()
-      def environmentalIssue = false
       if(isUnix()) {
         // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
         // See https://github.com/elastic/beats/issues/17787.
@@ -373,6 +372,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
             git config --global user.name "beatsmachine"
           fi''')
       }
+      // Pre-requisites to configure the environment were ok.
+      environmentalIssue = false
       // Skip to upload the generated files by default.
       def upload = false
       try {
