@@ -16,21 +16,29 @@ mkdir %WORKSPACE%\bin
 
 REM If 32 bits then install the GVM accordingly
 IF NOT EXIST "%PROGRAMFILES(X86)%" (
-    curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
 )
 
 where /q gvm
 IF ERRORLEVEL 1 (
     IF EXIST "%PROGRAMFILES(X86)%" (
-        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
+        curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
     ) ELSE (
-        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+        curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
     )
     IF ERRORLEVEL 1 (
         exit /b 1
     )
     dir "%WORKSPACE%\bin" /b
 )
+
+if EXIST %WORKSPACE%\bin\gvm.exe (
+    gvm.exe version
+) else (
+    REM gvm.exe has not been installed for some unknown reasons
+    exit /b 1
+)
+
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
 go env
