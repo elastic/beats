@@ -17604,6 +17604,15 @@ Elasticsearch module
 
 
 
+*`cluster_state.nodes_hash`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.nodes_hash
+
+--
+
 *`timestamp`*::
 +
 --
@@ -18353,6 +18362,13 @@ type: long
 Cluster stats
 
 
+
+*`elasticsearch.cluster.stats.state.nodes_hash`*::
++
+--
+type: keyword
+
+--
 
 *`elasticsearch.cluster.stats.status`*::
 +

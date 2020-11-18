@@ -4,6 +4,8 @@
     Cluster stats
   release: ga
   fields:
+    - name: state.nodes_hash
+      type: keyword
     - name: status
       type: keyword
       description: >

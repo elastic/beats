@@ -6,6 +6,9 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: cluster_state.nodes_hash
+      type: alias
+      path: elasticsearch.cluster.stats.state.nodes_hash
     - name: timestamp
       type: alias
       path: "@timestamp"
