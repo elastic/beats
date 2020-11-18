@@ -31,13 +31,15 @@ import (
 // Config stores the options of a file stream.
 type config struct {
 	readerConfig
-	prospectorConfig
 
-	Paths         []string                `config:"paths"`
-	Close         closerConfig            `config:"close"`
-	FileWatcher   *common.ConfigNamespace `config:"prospector"`
-	FileIdentity  *common.ConfigNamespace `config:"file_identity"`
-	CleanInactive time.Duration           `config:"clean_inactive" validate:"min=0"` // TODO
+	Paths          []string                `config:"paths"`
+	Close          closerConfig            `config:"close"`
+	FileWatcher    *common.ConfigNamespace `config:"prospector"`
+	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
+	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool                    `config:"clean_removed"`
+	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
+	IgnoreOlder    time.Duration           `config:"ignore_older"`
 }
 
 type closerConfig struct {
@@ -70,12 +72,6 @@ type readerConfig struct {
 	Parsers []*common.ConfigNamespace `config:"parsers"` // TODO multiline, json, syslog?
 }
 
-type prospectorConfig struct {
-	CleanRemoved   bool          `config:"clean_removed"`
-	HarvesterLimit uint32        `config:"harvester_limit" validate:"min=0"`
-	IgnoreOlder    time.Duration `config:"ignore_older"`
-}
-
 type backoffConfig struct {
 	Init time.Duration `config:"init" validate:"nonzero"`
 	Max  time.Duration `config:"max" validate:"nonzero"`
@@ -83,34 +79,28 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
-		readerConfig:     defaultReaderConfig(),
-		prospectorConfig: defaultProspectorConfig(),
-		Paths:            []string{},
-		Close:            defaultCloserConfig(),
-		CleanInactive:    0,
+		readerConfig:   defaultReaderConfig(),
+		Paths:          []string{},
+		Close:          defaultCloserConfig(),
+		CleanInactive:  0,
+		CleanRemoved:   true,
+		HarvesterLimit: 0,
+		IgnoreOlder:    0,
 	}
 }
 
 func defaultCloserConfig() closerConfig {
 	return closerConfig{
-		OnStateChange: defaultStateChangeCloserConfig(),
-		Reader:        defaultReaderCloserConfig(),
-	}
-}
-
-func defaultStateChangeCloserConfig() stateChangeCloserConfig {
-	return stateChangeCloserConfig{
-		CheckInterval: 5 * time.Second,
-		Removed:       true,
-		Inactive:      0 * time.Second,
-		Renamed:       false,
-	}
-}
-
-func defaultReaderCloserConfig() readerCloserConfig {
-	return readerCloserConfig{
-		OnEOF:         false,
-		AfterInterval: 0 * time.Second,
+		OnStateChange: stateChangeCloserConfig{
+			CheckInterval: 5 * time.Second,
+			Removed:       true, // TODO check clean_removed option
+			Inactive:      0 * time.Second,
+			Renamed:       false,
+		},
+		Reader: readerCloserConfig{
+			OnEOF:         false,
+			AfterInterval: 0 * time.Second,
+		},
 	}
 }
 
@@ -125,14 +115,6 @@ func defaultReaderConfig() readerConfig {
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
 		Parsers:        nil,
-	}
-}
-
-func defaultProspectorConfig() prospectorConfig {
-	return prospectorConfig{
-		CleanRemoved:   true,
-		HarvesterLimit: 0,
-		IgnoreOlder:    0,
 	}
 }
 

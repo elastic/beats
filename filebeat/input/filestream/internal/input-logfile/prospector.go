@@ -50,7 +50,9 @@ type ProspectorCleaner interface {
 	// CleanIf removes an entry if the function returns true
 	CleanIf(func(key string, v Value) bool)
 	// UpdateIdentifiers updates ID in the registry.
-	UpdateIdentifiers(func(key string, v Value) (bool, string, interface{}))
+	// The function passed to UpdateIdentifiers must return an empty string if the key
+	// remains the same.
+	UpdateIdentifiers(func(key string, v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

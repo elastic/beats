@@ -87,17 +87,14 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	prospector, err := newFileProspector(
-		config.Paths,
-		common.MustNewConfigFrom(map[string]interface{}{
-			"prospector":   config.prospectorConfig,
-			"state_change": config.Close.OnStateChange,
-		}),
-		config.FileWatcher,
-		config.FileIdentity,
-	)
+	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error while creating filewatcher %v", err)
+	}
+
+	identifier, err := newFileIdentifier(config.FileIdentity)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
 
 	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
@@ -105,7 +102,15 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
 	}
 
-	return prospector, &filestream{
+	prospector := &fileProspector{
+		filewatcher:       filewatcher,
+		identifier:        identifier,
+		ignoreOlder:       config.IgnoreOlder,
+		cleanRemoved:      config.CleanRemoved,
+		stateChangeCloser: config.Close.OnStateChange,
+	}
+
+	filestream := &filestream{
 		readerConfig:    config.readerConfig,
 		bufferSize:      config.BufferSize,
 		encodingFactory: encodingFactory,
@@ -114,7 +119,9 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		includeLines:    config.IncludeLines,
 		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
-	}, nil
+	}
+
+	return prospector, filestream, nil
 }
 
 func (inp *filestream) Name() string { return pluginName }

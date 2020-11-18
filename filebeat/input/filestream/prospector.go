@@ -25,7 +25,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -44,40 +43,6 @@ type fileProspector struct {
 	ignoreOlder       time.Duration
 	cleanRemoved      bool
 	stateChangeCloser stateChangeCloserConfig
-}
-
-func newFileProspector(
-	paths []string,
-	cfg *common.Config,
-	fileWatcherNs, identifierNs *common.ConfigNamespace,
-) (loginp.Prospector, error) {
-
-	config := struct {
-		Prospector  prospectorConfig        `config:"prospector"`
-		StateChange stateChangeCloserConfig `config:"state_change"`
-	}{Prospector: defaultProspectorConfig(), StateChange: defaultStateChangeCloserConfig()}
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	filewatcher, err := newFileWatcher(paths, fileWatcherNs)
-	if err != nil {
-		return nil, err
-	}
-
-	identifier, err := newFileIdentifier(identifierNs)
-	if err != nil {
-		return nil, err
-	}
-
-	return &fileProspector{
-		filewatcher:       filewatcher,
-		identifier:        identifier,
-		ignoreOlder:       config.Prospector.IgnoreOlder,
-		cleanRemoved:      config.Prospector.CleanRemoved,
-		stateChangeCloser: config.StateChange,
-	}, nil
 }
 
 func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
@@ -99,22 +64,22 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	}
 
 	identifierName := p.identifier.Name()
-	cleaner.UpdateIdentifiers(func(key string, v loginp.Value) (bool, string, interface{}) {
+	cleaner.UpdateIdentifiers(func(key string, v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
-			return false, "", nil
+			return "", nil
 		}
 		if fm.IdentifierName != identifierName {
 			fi, err := os.Stat(fm.Source)
 			if err != nil {
-				return false, "", fm
+				return "", fm
 			}
 			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
 			fm.IdentifierName = identifierName
-			return true, newKey, fm
+			return newKey, fm
 		}
-		return false, "", nil
+		return "", nil
 	})
 
 	return nil
@@ -184,7 +149,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 				// if file_identity is based on path, the current reader has to be cancelled
 				// and a new one has to start.
-				if p.identifier.Name() == "path" {
+				if p.identifier.Supports(trackRename) {
 					prevSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
 					hg.Stop(prevSrc)
 

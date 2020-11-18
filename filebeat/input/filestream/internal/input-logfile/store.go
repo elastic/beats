@@ -35,7 +35,7 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-	identifier sourceIder
+	identifier *sourceIdentifier
 	store      *store
 }
 
@@ -159,7 +159,7 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
-func newSourceStore(s *store, identifier sourceIder) *sourceStore {
+func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
 	return &sourceStore{
 		store:      s,
 		identifier: identifier,
@@ -216,13 +216,13 @@ func (s *store) CleanIf(pred func(key string, v Value) bool) {
 
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
-func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (bool, string, interface{})) {
+func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (string, interface{})) {
 	s.ephemeralStore.mu.Lock()
 	defer s.ephemeralStore.mu.Unlock()
 
 	for key, res := range s.ephemeralStore.table {
-		update, newKey, updatedMeta := getNewID(key, res)
-		if update && res.internalState.TTL > 0 {
+		newKey, updatedMeta := getNewID(key, res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			s.ephemeralStore.table[newKey] = r

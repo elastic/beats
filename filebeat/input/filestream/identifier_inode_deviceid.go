@@ -106,3 +106,7 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 func (i *inodeMarkerIdentifier) Name() string {
 	return i.name
 }
+
+func (i *inodeMarkerIdentifier) Supports(_ identifierFeature) bool {
+	return false
+}

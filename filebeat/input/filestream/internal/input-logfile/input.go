@@ -31,9 +31,8 @@ import (
 
 type managedInput struct {
 	userID           string
-	locker           resourceLocker
-	sourceIdentifier sourceIder
-	store            *store
+	manager          *InputManager
+	sourceIdentifier *sourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration
@@ -52,8 +51,8 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
-	defer inp.locker.Release()
-	defer inp.store.Release()
+	groupStore := inp.manager.getRetainedStore()
+	defer groupStore.Release()
 
 	// Setup cancellation using a custom cancel context. All workers will be
 	// stopped if one failed badly by returning an error.
@@ -64,16 +63,15 @@ func (inp *managedInput) Run(
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
-		locker:       inp.locker,
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
-		store:        inp.store,
+		store:        groupStore,
 		tg:           unison.TaskGroup{},
 	}
 
-	inp.store.Retain()
-	sourceStore := newSourceStore(inp.store, inp.sourceIdentifier)
-	defer inp.store.Release()
+	prospectorStore := inp.manager.getRetainedStore()
+	defer prospectorStore.Release()
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 

@@ -76,18 +76,6 @@ type Source interface {
 	Name() string
 }
 
-// SourceIder generates an ID for a Source.
-type sourceIder interface {
-	ID(Source) string
-}
-
-// resourceLocker locks a resource with a given full ID.
-type resourceLocker interface {
-	Lock(input.Context, string) (*resource, error)
-	UpdateTTL(*resource, time.Duration)
-	Release()
-}
-
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
@@ -104,6 +92,7 @@ func (cim *InputManager) init() error {
 		}
 
 		log := cim.Logger.With("input_type", cim.Type)
+
 		var store *store
 		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
 		if cim.initErr != nil {
@@ -129,9 +118,8 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 
 	log := cim.Logger.With("input_type", cim.Type)
 
-	store := cim.store
+	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
-	store.Retain()
 	err := group.Go(func(canceler unison.Canceler) error {
 		defer cim.shutdown()
 		defer store.Release()
@@ -178,7 +166,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, errNoInputRunner
 	}
 
-	prospectorStore := cim.passStore()
+	prospectorStore := cim.getRetainedStore()
 	defer prospectorStore.Release()
 	err = prospector.Init(prospectorStore)
 	if err != nil {
@@ -186,17 +174,16 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	return &managedInput{
+		manager:          cim,
 		userID:           settings.ID,
-		locker:           newResourceLocker(cim),
-		store:            cim.passStore(),
-		sourceIdentifier: newSourceIdentifier(cim.Type, settings.ID),
 		prospector:       prospector,
 		harvester:        harvester,
+		sourceIdentifier: newSourceIdentifier(cim.Type, settings.ID),
 		cleanTimeout:     settings.CleanTimeout,
 	}, nil
 }
 
-func (cim *InputManager) passStore() *store {
+func (cim *InputManager) getRetainedStore() *store {
 	store := cim.store
 	store.Retain()
 	return store
@@ -218,44 +205,4 @@ func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
 
 func (i *sourceIdentifier) ID(s Source) string {
 	return i.prefix + "::" + s.Name()
-}
-
-type resourceLock struct {
-	store *store
-}
-
-func newResourceLocker(cim *InputManager) resourceLocker {
-	return &resourceLock{store: cim.passStore()}
-}
-
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
-// the cursor state and unlock the key.
-func (r *resourceLock) Lock(ctx input.Context, key string) (*resource, error) {
-	resource := r.store.Get(key)
-	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
-	if err != nil {
-		resource.Release()
-		return nil, err
-	}
-	return resource, nil
-}
-
-func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler) error {
-	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
-		err := resource.lock.LockContext(canceler)
-		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
-			return err
-		}
-	}
-	return nil
-}
-
-func (r *resourceLock) UpdateTTL(resource *resource, ttl time.Duration) {
-	r.store.UpdateTTL(resource, ttl)
-}
-
-func (r *resourceLock) Release() {
-	r.store.Release()
 }

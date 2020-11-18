@@ -246,17 +246,17 @@ func TestStore_UpdateIdentifiers(t *testing.T) {
 		store := testOpenStore(t, "test", backend)
 		defer store.Release()
 
-		store.UpdateIdentifiers(func(key string, v Value) (bool, string, interface{}) {
+		store.UpdateIdentifiers(func(key string, v Value) (string, interface{}) {
 			var m testMeta
 			err := v.UnpackCursorMeta(&m)
 			if err != nil {
 				t.Fatalf("cannot unpack meta: %v", err)
 			}
 			if m.IdentifierName == "method" {
-				return true, key + "::updated", testMeta{IdentifierName: "something"}
+				return key + "::updated", testMeta{IdentifierName: "something"}
 
 			}
-			return false, "", nil
+			return "", nil
 
 		})
 

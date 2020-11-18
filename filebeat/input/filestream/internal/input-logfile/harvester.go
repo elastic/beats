@@ -27,6 +27,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
@@ -54,8 +55,12 @@ func newReaderGroup() *readerGroup {
 	}
 }
 
-// newContext createas a new context, cancel function and adds it to the readers list.
-// the returned context does not have to be cancelled if the function returns an error.
+// newContext createas a new context, cancel function and associates it with the given id within
+// the reader group. Using the cancel function does not remvoe the association.
+// An error is returned if the id is already associated with a context. The cancel
+// function is nil in that case and must not be called.
+//
+// The context will be automatically cancelled once the ID is removed from the group. Calling `cancel` is optional.
 func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Context, context.CancelFunc, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -96,7 +101,6 @@ type HarvesterGroup interface {
 
 type defaultHarvesterGroup struct {
 	readers      *readerGroup
-	locker       resourceLocker
 	pipeline     beat.PipelineConnector
 	harvester    Harvester
 	cleanTimeout time.Duration
@@ -106,8 +110,10 @@ type defaultHarvesterGroup struct {
 
 // Start starts the Harvester for a Source. It does not block.
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
-	log := ctx.Logger.With("source", s.Name())
-	log.Debug("Starting harvester for file")
+	sourceName := s.Name()
+
+	ctx.Logger = ctx.Logger.With("source", sourceName)
+	ctx.Logger.Debug("Starting harvester for file")
 
 	hg.tg.Go(func(canceler unison.Canceler) error {
 		defer func() {
@@ -116,17 +122,17 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 			}
 		}()
-		defer log.Debug("Stopped harvester for file")
+		defer ctx.Logger.Debug("Stopped harvester for file")
 
-		harvesterCtx, cancelHarvester, err := hg.readers.newContext(s.Name(), canceler)
+		harvesterCtx, cancelHarvester, err := hg.readers.newContext(sourceName, canceler)
 		if err != nil {
 			return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
 		}
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
-		defer hg.readers.remove(s.Name())
+		defer hg.readers.remove(sourceName)
 
-		resource, err := hg.locker.Lock(ctx, s.Name())
+		resource, err := lock(ctx, hg.store, sourceName)
 		if err != nil {
 			return fmt.Errorf("error while locking resource: %v", err)
 		}
@@ -141,12 +147,12 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 		}
 		defer client.Close()
 
-		hg.locker.UpdateTTL(resource, hg.cleanTimeout)
+		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(hg.store, resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
 		err = hg.harvester.Run(ctx, s, cursor, publisher)
-		if err != nil {
+		if err != nil && err != context.Canceled {
 			return fmt.Errorf("error while running harvester: %v", err)
 		}
 		return nil
@@ -161,11 +167,36 @@ func (hg *defaultHarvesterGroup) Stop(s Source) {
 	})
 }
 
+// StopGroup stops all running Harvesters.
+func (hg *defaultHarvesterGroup) StopGroup() error {
+	return hg.tg.Stop()
+}
+
+// Lock locks a key for exclusive access and returns an resource that can be used to modify
+// the cursor state and unlock the key.
+func lock(ctx input.Context, store *store, key string) (*resource, error) {
+	resource := store.Get(key)
+	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
+	if err != nil {
+		resource.Release()
+		return nil, err
+	}
+	return resource, nil
+}
+
+func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler) error {
+	if !resource.lock.TryLock() {
+		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
+		err := resource.lock.LockContext(canceler)
+		if err != nil {
+			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
+			return err
+		}
+	}
+	return nil
+}
+
 func releaseResource(resource *resource) {
 	resource.lock.Unlock()
 	resource.Release()
-}
-
-func (hg *defaultHarvesterGroup) StopGroup() error {
-	return hg.tg.Stop()
 }

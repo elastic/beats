@@ -26,7 +26,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
+type identifierFeature uint8
+
 const (
+	// trackRename is a feature of an identifier which changes
+	// IDs if a source is renamed.
+	trackRename identifierFeature = iota
+
 	nativeName      = "native"
 	pathName        = "path"
 	inodeMarkerName = "inode_marker"
@@ -48,6 +54,7 @@ type identifierFactory func(*common.Config) (fileIdentifier, error)
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
 	Name() string
+	Supports(identifierFeature) bool
 }
 
 // fileSource implements the Source interface
@@ -105,6 +112,10 @@ func (i *inodeDeviceIdentifier) Name() string {
 	return i.name
 }
 
+func (i *inodeDeviceIdentifier) Supports(f identifierFeature) bool {
+	return false
+}
+
 type pathIdentifier struct {
 	name string
 }
@@ -133,6 +144,15 @@ func (p *pathIdentifier) Name() string {
 	return p.name
 }
 
+func (p *pathIdentifier) Supports(f identifierFeature) bool {
+	switch f {
+	case trackRename:
+		return true
+	default:
+	}
+	return false
+}
+
 // mockIdentifier is used for testing
 type MockIdentifier struct{}
 
@@ -141,3 +161,5 @@ func (m *MockIdentifier) GetSource(e loginp.FSEvent) fileSource {
 }
 
 func (m *MockIdentifier) Name() string { return "mock" }
+
+func (m *MockIdentifier) Supports(_ identifierFeature) bool { return false }
