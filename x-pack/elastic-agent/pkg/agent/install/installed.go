@@ -7,6 +7,8 @@ package install
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/kardianos/service"
 )
@@ -58,6 +60,15 @@ func RunningInstalled() bool {
 		execDir = filepath.Dir(filepath.Dir(execDir))
 		execPath = filepath.Join(execDir, execName)
 	}
+
+	// Windows filesystem is case insensitive and the following paths are the same.
+	// - C:\TMP
+	// - c:\tmp
+	// - c:\TMP
+	if runtime.GOOS == "windows" {
+		return strings.ToLower(expected) == strings.ToLower(execPath)
+	}
+
 	return expected == execPath
 }
 
