@@ -45,7 +45,7 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.a
 --
 
 Don't have a {fleet} enrollment key? Read the
-{ingest-guide}/ingest-management-getting-started.html[Quick start guide] to
+{ingest-guide}/fleet-quick-start.html[Quick start guide] to
 learn how to generate one.
 
 Because {agent} is installed as an auto-starting service, it will restart
