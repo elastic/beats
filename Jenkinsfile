@@ -269,9 +269,8 @@ def target(Map args = [:]) {
   try {
     runCommand(args)
   } catch (err) {
-    if(args.label.contains('windows-7')) {
+    if(fileExists('environmental-issue')) {
       sleep 10
-      // There are some environmental issues with windows-7
       runCommand(args)
     }
   }
@@ -362,9 +361,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
-      def noEnvironmentalIssue = true
+      def environmentalIssue = true
       installTools()
-      def noEnvironmentalIssue = false
+      def environmentalIssue = false
       if(isUnix()) {
         // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
         // See https://github.com/elastic/beats/issues/17787.
@@ -390,13 +389,16 @@ def withBeatsEnv(Map args = [:], Closure body) {
         upload = true
         error("Error '${err.toString()}'")
       } finally {
-        if (archive && noEnvironmentalIssue) {
+        if (archive && !environmentalIssue) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
+        // Tear down the setup for the permanent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           fixPermissions("${WORKSPACE}")
           deleteDir()
+        }
+        if (environmentalIssue) {
+          writeFile file: 'environmental-issue', text: 'environmental-issue'
         }
       }
     }
