@@ -1617,7 +1617,7 @@
             "forwarded"
         ],
         "url.domain": "cls-softwares.com",
-        "url.extension": "40013.exe",
+        "url.extension": "exe",
         "url.original": "cls-softwares.com/softwarefortubeview.40013.exe",
         "url.path": "/softwarefortubeview.40013.exe"
     },
@@ -4267,6 +4267,8 @@
         "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
+        "file.extension": "php",
+        "file.name": "controller.php",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4302,9 +4304,6 @@
         "panw.panos.threat.resource": "controller.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "controller.php"
-        ],
         "related.ip": [
             "204.232.231.46",
             "192.168.0.2",
@@ -4337,10 +4336,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "controller.php",
-        "url.original": "controller.php",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:37:32.000-02:00",
@@ -5253,6 +5249,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "uLLGRaXP.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5288,9 +5286,6 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "uLLGRaXP.exe"
-        ],
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
@@ -5323,10 +5318,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "uLLGRaXP.exe",
-        "url.original": "uLLGRaXP.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:36:27.000-02:00",
@@ -5452,6 +5444,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "FunkyEmoticons_setup.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5487,9 +5481,6 @@
         "panw.panos.threat.resource": "FunkyEmoticons_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "FunkyEmoticons_setup.exe"
-        ],
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
@@ -5522,10 +5513,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "FunkyEmoticons_setup.exe",
-        "url.original": "FunkyEmoticons_setup.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:54:33.000-02:00",
@@ -5551,6 +5539,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "52hxw.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5586,9 +5576,6 @@
         "panw.panos.threat.resource": "52hxw.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "52hxw.exe"
-        ],
         "related.ip": [
             "122.226.169.183",
             "192.168.0.2",
@@ -5620,10 +5607,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "52hxw.exe",
-        "url.original": "52hxw.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T05:01:00.000-02:00",
@@ -5749,6 +5733,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "setup.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5784,9 +5770,6 @@
         "panw.panos.threat.resource": "setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "setup.exe"
-        ],
         "related.ip": [
             "109.201.131.15",
             "192.168.0.2",
@@ -5816,10 +5799,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "setup.exe",
-        "url.original": "setup.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:46:16.000-02:00",
@@ -5845,6 +5825,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "Live-Player_setup.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5880,9 +5862,6 @@
         "panw.panos.threat.resource": "Live-Player_setup.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "Live-Player_setup.exe"
-        ],
         "related.ip": [
             "91.209.163.202",
             "192.168.0.2",
@@ -5915,10 +5894,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "Live-Player_setup.exe",
-        "url.original": "Live-Player_setup.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:42:39.000-02:00",
@@ -6235,6 +6211,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "uLLGRaXP.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6270,9 +6248,6 @@
         "panw.panos.threat.resource": "uLLGRaXP.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "uLLGRaXP.exe"
-        ],
         "related.ip": [
             "173.236.179.57",
             "192.168.0.2",
@@ -6305,10 +6280,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "uLLGRaXP.exe",
-        "url.original": "uLLGRaXP.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-10T04:09:01.000-02:00",
@@ -6444,6 +6416,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "aspx",
+        "file.name": "default.aspx",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6479,9 +6453,6 @@
         "panw.panos.threat.resource": "default.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "default.aspx"
-        ],
         "related.ip": [
             "192.168.0.6",
             "207.46.140.46",
@@ -6504,10 +6475,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "default.aspx",
-        "url.original": "default.aspx",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:18:29.000-02:00",
@@ -6533,6 +6501,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "aspx",
+        "file.name": "sck.aspx",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6568,9 +6538,6 @@
         "panw.panos.threat.resource": "sck.aspx",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "sck.aspx"
-        ],
         "related.ip": [
             "65.54.161.34",
             "192.168.0.6",
@@ -6603,10 +6570,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "sck.aspx",
-        "url.original": "sck.aspx",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:18:32.000-02:00",
@@ -6632,6 +6596,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "dll",
+        "file.name": "ADSAdClient31.dll",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6667,9 +6633,6 @@
         "panw.panos.threat.resource": "ADSAdClient31.dll",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "ADSAdClient31.dll"
-        ],
         "related.ip": [
             "65.55.5.231",
             "192.168.0.6",
@@ -6702,10 +6665,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "ADSAdClient31.dll",
-        "url.original": "ADSAdClient31.dll",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:18:33.000-02:00",
@@ -6741,6 +6701,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "gif",
+        "file.name": "c.gif",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6776,9 +6738,6 @@
         "panw.panos.threat.resource": "c.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "c.gif"
-        ],
         "related.ip": [
             "192.168.0.6",
             "65.54.71.11",
@@ -6801,10 +6760,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "c.gif",
-        "url.original": "c.gif",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:18:37.000-02:00",
@@ -6830,6 +6786,7 @@
         "event.type": [
             "allowed"
         ],
+        "file.name": "csi",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6865,9 +6822,6 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "csi"
-        ],
         "related.ip": [
             "74.125.239.17",
             "192.168.0.6",
@@ -6897,10 +6851,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "csi",
-        "url.original": "csi",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:50:12.000-02:00",
@@ -6933,6 +6884,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "com",
+        "file.name": "internal-tuner.pandora.com",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6968,9 +6921,6 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "internal-tuner.pandora.com"
-        ],
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
@@ -6993,10 +6943,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "internal-tuner.pandora.com",
-        "url.original": "internal-tuner.pandora.com",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:58:18.000-02:00",
@@ -7022,6 +6969,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7057,9 +7005,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
@@ -7089,10 +7034,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:22:27.000-02:00",
@@ -7118,6 +7060,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "exe",
+        "file.name": "about.exe",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7153,9 +7097,6 @@
         "panw.panos.threat.resource": "about.exe",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "about.exe"
-        ],
         "related.ip": [
             "188.190.124.75",
             "192.168.0.6",
@@ -7188,10 +7129,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "about.exe",
-        "url.original": "about.exe",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:11:43.000-02:00",
@@ -7217,6 +7155,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7252,9 +7191,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -7284,10 +7220,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:14:02.000-02:00",
@@ -7313,6 +7246,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7348,9 +7282,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
@@ -7380,10 +7311,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:14:39.000-02:00",
@@ -7409,6 +7337,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7444,9 +7373,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.239.3",
             "192.168.0.2",
@@ -7476,10 +7402,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:16:03.000-02:00",
@@ -7505,6 +7428,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7540,9 +7464,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -7572,10 +7493,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:18:14.000-02:00",
@@ -7608,6 +7526,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "gif",
+        "file.name": "__utm.gif",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7643,9 +7563,6 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "__utm.gif"
-        ],
         "related.ip": [
             "192.168.0.2",
             "74.125.239.6",
@@ -7668,10 +7585,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "__utm.gif",
-        "url.original": "__utm.gif",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:25:04.000-02:00",
@@ -7697,6 +7611,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7732,9 +7647,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.193",
             "192.168.0.2",
@@ -7764,10 +7676,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T07:36:04.000-02:00",
@@ -7793,6 +7702,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "png",
+        "file.name": "nav_logo107.png",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7828,9 +7739,6 @@
         "panw.panos.threat.resource": "nav_logo107.png",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "nav_logo107.png"
-        ],
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
@@ -7860,10 +7768,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "nav_logo107.png",
-        "url.original": "nav_logo107.png",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:08:08.000-02:00",
@@ -7889,6 +7794,7 @@
         "event.type": [
             "allowed"
         ],
+        "file.name": "Eadweard_Muybridge",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7924,9 +7830,6 @@
         "panw.panos.threat.resource": "Eadweard_Muybridge",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "Eadweard_Muybridge"
-        ],
         "related.ip": [
             "208.80.154.225",
             "192.168.0.2",
@@ -7956,10 +7859,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "Eadweard_Muybridge",
-        "url.original": "Eadweard_Muybridge",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:08:44.000-02:00",
@@ -7985,6 +7885,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "php",
+        "file.name": "load.php",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8020,9 +7922,6 @@
         "panw.panos.threat.resource": "load.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "load.php"
-        ],
         "related.ip": [
             "208.80.154.234",
             "192.168.0.2",
@@ -8052,10 +7951,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "load.php",
-        "url.original": "load.php",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T08:16:57.000-02:00",
@@ -8081,6 +7977,8 @@
         "event.type": [
             "denied"
         ],
+        "file.extension": "css",
+        "file.name": "8fe44cb728c0f40750c64ee906eb72.css",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8116,9 +8014,6 @@
         "panw.panos.threat.resource": "8fe44cb728c0f40750c64ee906eb72.css",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "8fe44cb728c0f40750c64ee906eb72.css"
-        ],
         "related.ip": [
             "65.54.75.25",
             "192.168.0.6",
@@ -8151,10 +8046,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "8fe44cb728c0f40750c64ee906eb72.css",
-        "url.original": "8fe44cb728c0f40750c64ee906eb72.css",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T04:06:41.000-02:00",
@@ -8180,6 +8072,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8215,9 +8108,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.206",
             "192.168.0.2",
@@ -8247,10 +8137,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T04:12:52.000-02:00",
@@ -8276,6 +8163,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8311,9 +8199,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
@@ -8343,10 +8228,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:07:49.000-02:00",
@@ -8372,6 +8254,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "xml",
+        "file.name": "appcast.xml",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8407,9 +8291,6 @@
         "panw.panos.threat.resource": "appcast.xml",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "appcast.xml"
-        ],
         "related.ip": [
             "207.178.96.34",
             "192.168.0.2",
@@ -8442,10 +8323,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "appcast.xml",
-        "url.original": "appcast.xml",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:48:44.000-02:00",
@@ -8471,6 +8349,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8506,9 +8385,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.195",
             "192.168.0.2",
@@ -8538,10 +8414,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:48:59.000-02:00",
@@ -8567,6 +8440,7 @@
         "event.type": [
             "allowed"
         ],
+        "file.name": "csi",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8602,9 +8476,6 @@
         "panw.panos.threat.resource": "csi",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "csi"
-        ],
         "related.ip": [
             "74.125.239.20",
             "192.168.0.2",
@@ -8634,10 +8505,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "csi",
-        "url.original": "csi",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:50:14.000-02:00",
@@ -8663,6 +8531,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "php",
+        "file.name": "index.php",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8698,9 +8568,6 @@
         "panw.panos.threat.resource": "index.php",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "index.php"
-        ],
         "related.ip": [
             "66.152.109.24",
             "192.168.0.2",
@@ -8733,10 +8600,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "index.php",
-        "url.original": "index.php",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:51:34.000-02:00",
@@ -8762,6 +8626,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8797,9 +8662,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -8829,10 +8691,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:53:41.000-02:00",
@@ -8865,6 +8724,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "gif",
+        "file.name": "__utm.gif",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8900,9 +8761,6 @@
         "panw.panos.threat.resource": "__utm.gif",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "__utm.gif"
-        ],
         "related.ip": [
             "192.168.0.2",
             "74.125.224.201",
@@ -8925,10 +8783,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "__utm.gif",
-        "url.original": "__utm.gif",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:54:35.000-02:00",
@@ -8954,6 +8809,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -8989,9 +8845,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9021,10 +8874,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T06:54:55.000-02:00",
@@ -9050,6 +8900,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9085,9 +8936,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9117,10 +8965,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:44:49.000-02:00",
@@ -9153,6 +8998,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "com",
+        "file.name": "internal-tuner.pandora.com",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9188,9 +9035,6 @@
         "panw.panos.threat.resource": "internal-tuner.pandora.com",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "internal-tuner.pandora.com"
-        ],
         "related.ip": [
             "192.168.0.2",
             "208.85.40.48",
@@ -9213,10 +9057,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "internal-tuner.pandora.com",
-        "url.original": "internal-tuner.pandora.com",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:45:45.000-02:00",
@@ -9242,6 +9083,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9277,9 +9119,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
@@ -9309,10 +9148,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:49:17.000-02:00",
@@ -9338,6 +9174,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9373,9 +9210,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.201",
             "192.168.0.2",
@@ -9405,10 +9239,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:53:41.000-02:00",
@@ -9434,6 +9265,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9469,9 +9301,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9501,10 +9330,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:55:23.000-02:00",
@@ -9530,6 +9356,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9565,9 +9392,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9597,10 +9421,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T03:55:52.000-02:00",
@@ -9626,6 +9447,8 @@
         "event.type": [
             "allowed"
         ],
+        "file.extension": "js",
+        "file.name": "ga.js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9661,9 +9484,6 @@
         "panw.panos.threat.resource": "ga.js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "ga.js"
-        ],
         "related.ip": [
             "74.125.224.198",
             "192.168.0.2",
@@ -9693,10 +9513,7 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "ga.js",
-        "url.original": "ga.js",
-        "url.path": ""
+        ]
     },
     {
         "@timestamp": "2012-04-09T04:03:55.000-02:00",
@@ -9722,6 +9539,7 @@
         "event.type": [
             "denied"
         ],
+        "file.name": "js",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -9757,9 +9575,6 @@
         "panw.panos.threat.resource": "js",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "any",
-        "related.hosts": [
-            "js"
-        ],
         "related.ip": [
             "74.125.224.200",
             "192.168.0.2",
@@ -9789,9 +9604,6 @@
         "tags": [
             "pan-os",
             "forwarded"
-        ],
-        "url.domain": "js",
-        "url.original": "js",
-        "url.path": ""
+        ]
     }
 ]

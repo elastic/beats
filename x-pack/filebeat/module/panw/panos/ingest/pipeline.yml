@@ -447,7 +447,13 @@ processors:
      value: "{{panw.panos.ruleset}}"
      ignore_empty_value: true
 
-# Set url values
+# Set url and file values
+ - rename:
+     if: 'ctx?.panw?.panos?.sub_type != "url"'
+     field: url.original
+     target_field: file.name
+     ignore_missing: true
+
  - grok:
      field: url.original
      patterns:
@@ -460,16 +466,27 @@ processors:
        PATH: '[^\?#]*'
        QUERY: '[^#]*'
        ANY: '.*'
-     if: 'ctx?.url?.original != null && ctx?.url?.original != "-/"'
+     if: 'ctx?.url?.original != null && ctx?.url?.original != "-/" && ctx?.url?.original != ""'
+
  - grok:
      field: url.path
      patterns:
-       - '%{FILENAME}(\.%{ANY:url.extension})?'
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:url.extension}))?'
      ignore_missing: true
      pattern_definitions:
-       FILENAME: '[^\.]*'
+       FILENAME: '[^\.]+'
        ANY: '.*'
-     if: 'ctx?.url?.path != null'
+     if: 'ctx?.url?.path != null && ctx?.url?.path != ""'
+
+ - grok:
+     field: file.name
+     patterns:
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:file.extension}))?'
+     ignore_missing: true
+     pattern_definitions:
+       FILENAME: '[^\.]+'
+       ANY: '.*'
+     if: 'ctx?.file?.name != null && ctx?.file?.name != ""'
 
  - append:
      field: related.user
