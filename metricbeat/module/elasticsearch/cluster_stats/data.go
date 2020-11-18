@@ -344,7 +344,8 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	}
 	clusterState.Delete("cluster_name")
 
-	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
+	clusterStateReduced := common.MapStr{}
+	if err = elasticsearch.PassThruField("status", clusterStats, clusterStateReduced); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")
 	}
 
@@ -352,7 +353,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	if err != nil {
 		return errors.Wrap(err, "failed to compute nodes hash")
 	}
-	clusterState.Put("nodes_hash", nodesHash)
+	clusterStateReduced.Put("nodes_hash", nodesHash)
 
 	usage, err := elasticsearch.GetStackUsage(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
@@ -403,7 +404,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	metricSetFields.Put("license", l)
 	metricSetFields.Put("version", info.Version.Number.String())
 	metricSetFields.Put("cluster_name", clusterName)
-	metricSetFields.Put("state", clusterState)
+	metricSetFields.Put("state", clusterStateReduced)
 
 	event.MetricSetFields = metricSetFields
 
