@@ -35,16 +35,18 @@ const (
 
 // Init initializes os dependent properties.
 func (ch *CrashChecker) Init(ctx context.Context) error {
-	ch.sc = &pidProvider{}
+	ch.sc = &darwinPidProvider{}
 
 	return nil
 }
 
-type pidProvider struct{}
+type darwinPidProvider struct{}
 
-func (p *pidProvider) Close() {}
+func (p *darwinPidProvider) Name() string { return "launchd" }
 
-func (p *pidProvider) PID(ctx context.Context) (int, error) {
+func (p *darwinPidProvider) Close() {}
+
+func (p *darwinPidProvider) PID(ctx context.Context) (int, error) {
 	piders := []func(context.Context) (int, error){
 		// list of services differs when using sudo and not
 		// agent should be included in sudo one but in case it's not
@@ -66,7 +68,7 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	return 0, pidErrors
 }
 
-func (p *pidProvider) piderFromCmd(ctx context.Context, name string, args ...string) func(context.Context) (int, error) {
+func (p *darwinPidProvider) piderFromCmd(ctx context.Context, name string, args ...string) func(context.Context) (int, error) {
 	return func(context.Context) (int, error) {
 		listCmd := exec.Command(name, args...)
 		listCmd.SysProcAttr = &syscall.SysProcAttr{

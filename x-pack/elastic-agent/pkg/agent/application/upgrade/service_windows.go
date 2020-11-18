@@ -45,6 +45,8 @@ type pidProvider struct {
 
 func (p *pidProvider) Close() {}
 
+func (p *pidProvider) Name() string { return "Windows Service Manager" }
+
 func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	svc, err := p.winManager.OpenService(install.ServiceName)
 	if err != nil {

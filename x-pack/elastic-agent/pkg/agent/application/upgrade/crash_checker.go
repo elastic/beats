@@ -23,6 +23,7 @@ const (
 
 type serviceHandler interface {
 	PID(ctx context.Context) (int, error)
+	Name() string
 	Close()
 }
 
@@ -52,6 +53,8 @@ func NewCrashChecker(ctx context.Context, ch chan error, log *logger.Logger) (*C
 	if err := c.Init(ctx); err != nil {
 		return nil, err
 	}
+
+	log.Debugf("running checks using '%s' controller", c.sc.Name())
 
 	return c, nil
 }

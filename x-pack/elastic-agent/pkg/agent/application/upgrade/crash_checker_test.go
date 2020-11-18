@@ -158,3 +158,5 @@ func (p *testPider) PID(ctx context.Context) (int, error) {
 }
 
 func (p *testPider) Close() {}
+
+func (p *testPider) Name() string { return "testPider" }
