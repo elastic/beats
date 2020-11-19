@@ -4,7 +4,10 @@
 
 package task_stats
 
-import helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+import (
+	"github.com/elastic/beats/v7/libbeat/common"
+	helpers "github.com/elastic/beats/v7/libbeat/common/docker"
+)
 
 // container is a struct representation of a container
 type container struct {
@@ -30,4 +33,16 @@ func getContainerStats(c *container) *container {
 		Name:     helpers.ExtractContainerName([]string{c.Name}),
 		Labels:   deDotLabels(c.Labels),
 	}
+}
+
+func deDotLabels(labels map[string]string) map[string]string {
+	outputLabels := map[string]string{}
+	for k, v := range labels {
+		// This is necessary so that ES does not interpret '.' fields as new
+		// nested JSON objects, and also makes this compatible with ES 2.x.
+		label := common.DeDot(k)
+		outputLabels[label] = v
+	}
+
+	return outputLabels
 }

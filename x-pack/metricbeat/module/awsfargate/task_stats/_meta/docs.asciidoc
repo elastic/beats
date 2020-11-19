@@ -33,7 +33,7 @@ Create secret ELASTIC_CLOUD_AUTH:
 aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_AUTH --secret-string XXX
 ----
 
-Create secret ELASTIC_CLOUD_AUTH:
+Create secret ELASTIC_CLOUD_ID:
 ----
 aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_ID --secret-string YYYY
 ----
