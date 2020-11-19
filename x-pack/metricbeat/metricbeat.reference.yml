@@ -1027,13 +1027,21 @@ metricbeat.modules:
 
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
-  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  metricsets:
+    - "connections"
+    - "routes"
+    - "stats"
+    - "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
   #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -2616,7 +2624,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 

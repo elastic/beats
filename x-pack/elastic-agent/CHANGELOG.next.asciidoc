@@ -26,6 +26,7 @@
 - Ensure shell wrapper path exists before writing wrapper on install {pull}22144[22144]
 - Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
 - Fix composable input processor promotion to fix duplicates {pull}22344[22344]
+- Fix sysv init files for deb/rpm installation {pull}22543[22543]
 
 ==== New features
 

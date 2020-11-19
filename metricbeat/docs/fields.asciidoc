@@ -37503,10 +37503,134 @@ type: keyword
 *`nats.server.time`*::
 +
 --
+
+deprecated:[8.0.0]
+
 Server time of metric creation
 
 
 type: date
+
+--
+
+[float]
+=== connection
+
+Contains nats connection related metrics
+
+
+
+*`nats.connection.name`*::
++
+--
+The name of the connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.connection.pending_bytes`*::
++
+--
+The number of pending bytes of this connection
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nats.connection.uptime`*::
++
+--
+The period the connection is up (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+*`nats.connection.idle_time`*::
++
+--
+The period the connection is idle (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.connection.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.connection.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.connection.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.connection.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -37524,6 +37648,121 @@ The number of currently active clients
 
 
 type: integer
+
+--
+
+[float]
+=== route
+
+Contains nats route related metrics
+
+
+
+*`nats.route.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.route.remote_id`*::
++
+--
+The remote id on which the route is connected to
+
+
+type: keyword
+
+--
+
+*`nats.route.pending_size`*::
++
+--
+The number of pending routes
+
+
+type: long
+
+--
+
+*`nats.route.port`*::
++
+--
+The port of the route
+
+
+type: integer
+
+--
+
+*`nats.route.ip`*::
++
+--
+The ip of the route
+
+
+type: ip
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.route.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.route.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.route.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.route.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -44906,6 +45145,24 @@ type: date
 +
 --
 The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+*`system.service.unit_file.state`*::
++
+--
+The state of the unit file
+
+type: keyword
+
+--
+
+*`system.service.unit_file.vendor_preset`*::
++
+--
+The default state of the unit file
 
 type: keyword
 

@@ -6,10 +6,10 @@ You can unenroll an agent to invalidate the API key used to connect to {es}.
 
 . In {fleet}, select **Agents**.
 
-. Under Agents, choose **Unenroll** from the **Actions** menu next to the agent
-you want to unenroll.
+. Under Agents, choose **Unenroll agent** from the **Actions** menu next to the
+agent you want to unenroll.
 
-. Click **Unenroll**. 
+. Click **Unenroll agent**. 
 +
 The agent will continue to run, but will not be able to send data. It will show
 this error instead: `invalid api key to authenticate with fleet`.
