@@ -27,12 +27,14 @@ processors:
     field: snyk.audit.event
     target_field: event.action
     ignore_missing: true
-- rename:
+- date:
     field: snyk.audit.created
-    target_field: event.created
-    ignore_missing: true
+    target_field: "@timestamp"
+    formats:
+      - ISO8601
 - remove:
     field:
+    - snyk.audit.created
     - message
     ignore_missing: true
 on_failure:
