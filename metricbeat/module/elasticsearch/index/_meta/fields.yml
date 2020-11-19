@@ -134,10 +134,6 @@
           type: long
           description: >
             Total number of deleted documents in the index.
-        - name: segments.count
-          type: long
-          description: >
-            Total number of index segments.
         - name: store.size_in_bytes
           format: bytes
           type: long
@@ -169,8 +165,6 @@
               type: long
             - name: miss_count
               type: long
-        - name: request_cache.miss_count
-          type: long
         - name: merges.total_size_in_bytes
           type: long
         - name: refresh.total_time_in_millis
@@ -191,6 +185,8 @@
               type: long
             - name: count
               type: long
+              description: >
+                Total number of index segments.
             - name: doc_values_memory_in_bytes
               type: long
             - name: norms_memory_in_bytes

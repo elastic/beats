@@ -19212,16 +19212,6 @@ type: long
 
 --
 
-*`elasticsearch.index.total.segments.count`*::
-+
---
-Total number of index segments.
-
-
-type: long
-
---
-
 *`elasticsearch.index.total.store.size_in_bytes`*::
 +
 --
@@ -19306,13 +19296,6 @@ type: long
 
 --
 
-*`elasticsearch.index.total.request_cache.miss_count`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.index.total.merges.total_size_in_bytes`*::
 +
 --
@@ -19364,6 +19347,9 @@ type: long
 *`elasticsearch.index.total.segments.count`*::
 +
 --
+Total number of index segments.
+
+
 type: long
 
 --

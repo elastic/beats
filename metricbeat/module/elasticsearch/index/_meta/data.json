@@ -144,7 +144,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:50556",
+        "address": "127.0.0.1:53560",
         "type": "elasticsearch"
     }
 }
