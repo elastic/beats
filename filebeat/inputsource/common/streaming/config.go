@@ -15,27 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package unix
+package streaming
 
 import (
 	"time"
 
-	"github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 )
 
-type config struct {
-	unix.Config `config:",inline"`
-}
-
-func defaultConfig() config {
-	return config{
-		Config: unix.Config{
-			Timeout:        time.Minute * 5,
-			MaxMessageSize: 20 * humanize.MiByte,
-			SocketType:     unix.StreamSocket,
-			LineDelimiter:  "\n",
-		},
-	}
+// ListenerConfig exposes the shared listener configuration.
+type ListenerConfig struct {
+	Timeout        time.Duration
+	MaxMessageSize cfgtype.ByteSize
+	MaxConnections int
 }

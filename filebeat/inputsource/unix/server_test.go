@@ -18,7 +18,6 @@
 package unix
 
 import (
-	"bufio"
 	"fmt"
 	"math/rand"
 	"net"
@@ -36,7 +35,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -72,93 +70,82 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 	tests := []struct {
 		name             string
 		cfg              map[string]interface{}
-		splitFunc        bufio.SplitFunc
 		expectedMessages []string
 		messageSent      string
 	}{
 		{
 			name:             "NewLine",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\n"),
 		},
 		{
 			name:             "NewLineWithCR",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\r\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\r\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\r\n"),
 		},
 		{
 			name:             "CustomDelimiter",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, ";"),
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, "\n"),
 		},
 		{
 			name:             "CustomLargeMessagePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, ";"),
 		},
 		{
 			name:             "ReadRandomLargePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: []string{randomGeneratedText},
 			messageSent:      randomGeneratedText,
 		},
 		{
-			name:      "MaxReadBufferReachedUserConfigured",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			name: "MaxReadBufferReachedUserConfigured",
 			cfg: map[string]interface{}{
+				"line_delimiter":   "\n",
 				"max_message_size": 50000,
 			},
 			expectedMessages: []string{},
 			messageSent:      randomGeneratedText,
 		},
 		{
-			name:      "MaxBufferSizeSet",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			name: "MaxBufferSizeSet",
 			cfg: map[string]interface{}{
+				"line_delimiter":   "\n",
 				"max_message_size": 66 * 1024,
 			},
 			expectedMessages: extraLargeMessages,
@@ -182,8 +169,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
-			server, err := New(&config, factory)
+			server, err := New(logp.L(), &config, to)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -242,8 +228,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 	err = cfg.Unpack(&config)
 	require.NoError(t, err)
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -273,8 +258,7 @@ func TestSocketCleanup(t *testing.T) {
 	})
 	config := defaultConfig
 	require.NoError(t, cfg.Unpack(&config))
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -297,8 +281,7 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	})
 	config := defaultConfig
 	require.NoError(t, cfg.Unpack(&config))
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.Error(t, err)
@@ -328,9 +311,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
-
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, to)
 	if !assert.NoError(t, err) {
 		return
 	}
