@@ -1,3 +1,8 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-snyk]]
 [role="xpack"]
 
 :modulename: snyk
@@ -64,3 +69,11 @@ The module will map the below Snyk and ECS fields:
 |============================================================|
 
 :modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-snyk,exported fields>> section.
+

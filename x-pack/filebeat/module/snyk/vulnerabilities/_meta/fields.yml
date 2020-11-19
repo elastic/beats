@@ -1,4 +1,4 @@
-- name: vulnerability
+- name: vulnerabilities
   type: group
   release: beta
   description: >

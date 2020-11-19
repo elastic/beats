@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-11-19T21:45:42.351Z",
+        "@timestamp": "2020-11-19T21:59:49.537Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -14,30 +14,30 @@
         "snyk.project.source": "github",
         "snyk.project.target_file": "package.json",
         "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
-        "snyk.vulnerability.credit": [
+        "snyk.vulnerabilities.credit": [
             "Snyk Security Research Team"
         ],
-        "snyk.vulnerability.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
-        "snyk.vulnerability.disclosure_time": "2016-11-27T22:00:00.000Z",
-        "snyk.vulnerability.exploit_maturity": "no-known-exploit",
-        "snyk.vulnerability.id": "npm:ejs:20161128",
-        "snyk.vulnerability.identifiers.alternative": [
+        "snyk.vulnerabilities.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "snyk.vulnerabilities.disclosure_time": "2016-11-27T22:00:00.000Z",
+        "snyk.vulnerabilities.exploit_maturity": "no-known-exploit",
+        "snyk.vulnerabilities.id": "npm:ejs:20161128",
+        "snyk.vulnerabilities.identifiers.alternative": [
             "SNYK-JS-EJS-10218"
         ],
-        "snyk.vulnerability.identifiers.cwe": [
+        "snyk.vulnerabilities.identifiers.cwe": [
             "CWE-94"
         ],
-        "snyk.vulnerability.introduced_date": "2020-04-07",
-        "snyk.vulnerability.is_fixed": false,
-        "snyk.vulnerability.is_ignored": false,
-        "snyk.vulnerability.is_patchable": false,
-        "snyk.vulnerability.is_patched": false,
-        "snyk.vulnerability.is_pinnable": false,
-        "snyk.vulnerability.is_upgradable": false,
-        "snyk.vulnerability.language": "js",
-        "snyk.vulnerability.package": "ejs",
-        "snyk.vulnerability.package_manager": "npm",
-        "snyk.vulnerability.patches": [
+        "snyk.vulnerabilities.introduced_date": "2020-04-07",
+        "snyk.vulnerabilities.is_fixed": false,
+        "snyk.vulnerabilities.is_ignored": false,
+        "snyk.vulnerabilities.is_patchable": false,
+        "snyk.vulnerabilities.is_patched": false,
+        "snyk.vulnerabilities.is_pinnable": false,
+        "snyk.vulnerabilities.is_upgradable": false,
+        "snyk.vulnerabilities.language": "js",
+        "snyk.vulnerabilities.package": "ejs",
+        "snyk.vulnerabilities.package_manager": "npm",
+        "snyk.vulnerabilities.patches": [
             {
                 "comments": [],
                 "id": "patch:npm:ejs:20161128:0",
@@ -48,19 +48,19 @@
                 "version": "<2.5.3 >=2.2.4"
             }
         ],
-        "snyk.vulnerability.priority_score": 4.05,
-        "snyk.vulnerability.publication_time": "2016-11-28T18:44:12.000Z",
-        "snyk.vulnerability.reachability": "No Info",
-        "snyk.vulnerability.semver.vulnerable": [
+        "snyk.vulnerabilities.priority_score": 4.05,
+        "snyk.vulnerabilities.publication_time": "2016-11-28T18:44:12.000Z",
+        "snyk.vulnerabilities.reachability": "No Info",
+        "snyk.vulnerabilities.semver.vulnerable": [
             "<2.5.3"
         ],
-        "snyk.vulnerability.title": "Arbitrary Code Execution",
-        "snyk.vulnerability.type": "vuln",
-        "snyk.vulnerability.unique_severities_list": [
+        "snyk.vulnerabilities.title": "Arbitrary Code Execution",
+        "snyk.vulnerabilities.type": "vuln",
+        "snyk.vulnerabilities.unique_severities_list": [
             "high"
         ],
-        "snyk.vulnerability.url": "https://snyk.io/vuln/npm:ejs:20161128",
-        "snyk.vulnerability.version": "0.8.8",
+        "snyk.vulnerabilities.url": "https://snyk.io/vuln/npm:ejs:20161128",
+        "snyk.vulnerabilities.version": "0.8.8",
         "tags": [
             "snyk-vulnerabilities",
             "forwarded"
@@ -76,7 +76,7 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2020-11-19T21:45:42.351Z",
+        "@timestamp": "2020-11-19T21:59:49.538Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -90,30 +90,30 @@
         "snyk.project.source": "github",
         "snyk.project.target_file": "foldername/package.json",
         "snyk.project.url": "https://snyk.io/org/orgid231/project/projectid321",
-        "snyk.vulnerability.credit": [
+        "snyk.vulnerabilities.credit": [
             "Snyk Security Research Team"
         ],
-        "snyk.vulnerability.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
-        "snyk.vulnerability.disclosure_time": "2016-11-27T22:00:00.000Z",
-        "snyk.vulnerability.exploit_maturity": "no-known-exploit",
-        "snyk.vulnerability.id": "npm:ejs:20161128",
-        "snyk.vulnerability.identifiers.alternative": [
+        "snyk.vulnerabilities.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "snyk.vulnerabilities.disclosure_time": "2016-11-27T22:00:00.000Z",
+        "snyk.vulnerabilities.exploit_maturity": "no-known-exploit",
+        "snyk.vulnerabilities.id": "npm:ejs:20161128",
+        "snyk.vulnerabilities.identifiers.alternative": [
             "SNYK-JS-EJS-10218"
         ],
-        "snyk.vulnerability.identifiers.cwe": [
+        "snyk.vulnerabilities.identifiers.cwe": [
             "CWE-94"
         ],
-        "snyk.vulnerability.introduced_date": "2020-11-13",
-        "snyk.vulnerability.is_fixed": false,
-        "snyk.vulnerability.is_ignored": false,
-        "snyk.vulnerability.is_patchable": false,
-        "snyk.vulnerability.is_patched": false,
-        "snyk.vulnerability.is_pinnable": false,
-        "snyk.vulnerability.is_upgradable": false,
-        "snyk.vulnerability.language": "js",
-        "snyk.vulnerability.package": "ejs",
-        "snyk.vulnerability.package_manager": "npm",
-        "snyk.vulnerability.patches": [
+        "snyk.vulnerabilities.introduced_date": "2020-11-13",
+        "snyk.vulnerabilities.is_fixed": false,
+        "snyk.vulnerabilities.is_ignored": false,
+        "snyk.vulnerabilities.is_patchable": false,
+        "snyk.vulnerabilities.is_patched": false,
+        "snyk.vulnerabilities.is_pinnable": false,
+        "snyk.vulnerabilities.is_upgradable": false,
+        "snyk.vulnerabilities.language": "js",
+        "snyk.vulnerabilities.package": "ejs",
+        "snyk.vulnerabilities.package_manager": "npm",
+        "snyk.vulnerabilities.patches": [
             {
                 "comments": [],
                 "id": "patch:npm:ejs:20161128:0",
@@ -124,19 +124,19 @@
                 "version": "<2.5.3 >=2.2.4"
             }
         ],
-        "snyk.vulnerability.priority_score": 619,
-        "snyk.vulnerability.publication_time": "2016-11-28T18:44:12.000Z",
-        "snyk.vulnerability.reachability": "No Info",
-        "snyk.vulnerability.semver.vulnerable": [
+        "snyk.vulnerabilities.priority_score": 619,
+        "snyk.vulnerabilities.publication_time": "2016-11-28T18:44:12.000Z",
+        "snyk.vulnerabilities.reachability": "No Info",
+        "snyk.vulnerabilities.semver.vulnerable": [
             "<2.5.3"
         ],
-        "snyk.vulnerability.title": "Arbitrary Code Execution",
-        "snyk.vulnerability.type": "vuln",
-        "snyk.vulnerability.unique_severities_list": [
+        "snyk.vulnerabilities.title": "Arbitrary Code Execution",
+        "snyk.vulnerabilities.type": "vuln",
+        "snyk.vulnerabilities.unique_severities_list": [
             "high"
         ],
-        "snyk.vulnerability.url": "https://snyk.io/vuln/npm:ejs:20161128",
-        "snyk.vulnerability.version": "0.8.8",
+        "snyk.vulnerabilities.url": "https://snyk.io/vuln/npm:ejs:20161128",
+        "snyk.vulnerabilities.version": "0.8.8",
         "tags": [
             "snyk-vulnerabilities",
             "forwarded"
@@ -154,7 +154,7 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2020-11-19T21:45:42.351Z",
+        "@timestamp": "2020-11-19T21:59:49.538Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -168,49 +168,49 @@
         "snyk.project.source": "cli",
         "snyk.project.target_file": "folder/go.mod",
         "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
-        "snyk.vulnerability.credit": [
+        "snyk.vulnerabilities.credit": [
             "josselin-c"
         ],
-        "snyk.vulnerability.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
-        "snyk.vulnerability.disclosure_time": "2018-03-23T08:57:24.000Z",
-        "snyk.vulnerability.exploit_maturity": "no-known-exploit",
-        "snyk.vulnerability.id": "SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
-        "snyk.vulnerability.identifiers.cwe": [
+        "snyk.vulnerabilities.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "snyk.vulnerabilities.disclosure_time": "2018-03-23T08:57:24.000Z",
+        "snyk.vulnerabilities.exploit_maturity": "no-known-exploit",
+        "snyk.vulnerabilities.id": "SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
+        "snyk.vulnerabilities.identifiers.cwe": [
             "CWE-338"
         ],
-        "snyk.vulnerability.introduced_date": "2020-11-17",
-        "snyk.vulnerability.is_fixed": false,
-        "snyk.vulnerability.is_ignored": false,
-        "snyk.vulnerability.is_patchable": false,
-        "snyk.vulnerability.is_patched": false,
-        "snyk.vulnerability.is_pinnable": false,
-        "snyk.vulnerability.is_upgradable": false,
-        "snyk.vulnerability.language": "golang",
-        "snyk.vulnerability.package": "github.com/satori/go.uuid",
-        "snyk.vulnerability.package_manager": "golang",
-        "snyk.vulnerability.patches": [],
-        "snyk.vulnerability.priority_score": 405,
-        "snyk.vulnerability.publication_time": "2018-10-24T08:56:41.000Z",
-        "snyk.vulnerability.reachability": "No Info",
-        "snyk.vulnerability.semver.hashesRange": [
+        "snyk.vulnerabilities.introduced_date": "2020-11-17",
+        "snyk.vulnerabilities.is_fixed": false,
+        "snyk.vulnerabilities.is_ignored": false,
+        "snyk.vulnerabilities.is_patchable": false,
+        "snyk.vulnerabilities.is_patched": false,
+        "snyk.vulnerabilities.is_pinnable": false,
+        "snyk.vulnerabilities.is_upgradable": false,
+        "snyk.vulnerabilities.language": "golang",
+        "snyk.vulnerabilities.package": "github.com/satori/go.uuid",
+        "snyk.vulnerabilities.package_manager": "golang",
+        "snyk.vulnerabilities.patches": [],
+        "snyk.vulnerabilities.priority_score": 405,
+        "snyk.vulnerabilities.publication_time": "2018-10-24T08:56:41.000Z",
+        "snyk.vulnerabilities.reachability": "No Info",
+        "snyk.vulnerabilities.semver.hashesRange": [
             ">=0ef6afb2f6cdd6cdaeee3885a95099c63f18fc8c <d91630c8510268e75203009fe7daf2b8e1d60c45"
         ],
-        "snyk.vulnerability.semver.vulnerable": [
+        "snyk.vulnerabilities.semver.vulnerable": [
             "=1.2.0"
         ],
-        "snyk.vulnerability.semver.vulnerableHashes": [
+        "snyk.vulnerabilities.semver.vulnerableHashes": [
             "c596ec57260fd2ad47b2ae6809d6890a2f99c3b2",
             "36e9d2ebbde5e3f13ab2e25625fd453271d6522e",
             "f6920249aa08fc2a2c2e8274ea9648d0bb1e9364",
             "0ef6afb2f6cdd6cdaeee3885a95099c63f18fc8c"
         ],
-        "snyk.vulnerability.title": "Insecure Randomness",
-        "snyk.vulnerability.type": "vuln",
-        "snyk.vulnerability.unique_severities_list": [
+        "snyk.vulnerabilities.title": "Insecure Randomness",
+        "snyk.vulnerabilities.type": "vuln",
+        "snyk.vulnerabilities.unique_severities_list": [
             "high"
         ],
-        "snyk.vulnerability.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
-        "snyk.vulnerability.version": "#000000000000",
+        "snyk.vulnerabilities.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
+        "snyk.vulnerabilities.version": "#000000000000",
         "tags": [
             "snyk-vulnerabilities",
             "forwarded"
@@ -226,7 +226,7 @@
         "vulnerability.severity": "high"
     },
     {
-        "@timestamp": "2020-11-19T21:45:42.351Z",
+        "@timestamp": "2020-11-19T21:59:49.538Z",
         "event.dataset": "snyk.vulnerabilities",
         "event.module": "snyk",
         "event.timezone": "-02:00",
@@ -240,37 +240,37 @@
         "snyk.project.source": "cli",
         "snyk.project.target_file": "foldername/go.mod",
         "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
-        "snyk.vulnerability.credit": [
+        "snyk.vulnerabilities.credit": [
             "Unknown"
         ],
-        "snyk.vulnerability.cvss3": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
-        "snyk.vulnerability.disclosure_time": "2020-03-26T11:30:05.000Z",
-        "snyk.vulnerability.exploit_maturity": "no-known-exploit",
-        "snyk.vulnerability.id": "SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
-        "snyk.vulnerability.identifiers.cwe": [
+        "snyk.vulnerabilities.cvss3": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+        "snyk.vulnerabilities.disclosure_time": "2020-03-26T11:30:05.000Z",
+        "snyk.vulnerabilities.exploit_maturity": "no-known-exploit",
+        "snyk.vulnerabilities.id": "SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
+        "snyk.vulnerabilities.identifiers.cwe": [
             "CWE-1050"
         ],
-        "snyk.vulnerability.introduced_date": "2020-04-29",
-        "snyk.vulnerability.is_fixed": false,
-        "snyk.vulnerability.is_ignored": false,
-        "snyk.vulnerability.is_patchable": false,
-        "snyk.vulnerability.is_patched": false,
-        "snyk.vulnerability.is_pinnable": false,
-        "snyk.vulnerability.is_upgradable": false,
-        "snyk.vulnerability.language": "golang",
-        "snyk.vulnerability.package": "github.com/go-yaml/yaml",
-        "snyk.vulnerability.package_manager": "golang",
-        "snyk.vulnerability.patches": [],
-        "snyk.vulnerability.priority_score": 325,
-        "snyk.vulnerability.publication_time": "2020-04-02T11:29:49.000Z",
-        "snyk.vulnerability.reachability": "No Info",
-        "snyk.vulnerability.semver.hashesRange": [
+        "snyk.vulnerabilities.introduced_date": "2020-04-29",
+        "snyk.vulnerabilities.is_fixed": false,
+        "snyk.vulnerabilities.is_ignored": false,
+        "snyk.vulnerabilities.is_patchable": false,
+        "snyk.vulnerabilities.is_patched": false,
+        "snyk.vulnerabilities.is_pinnable": false,
+        "snyk.vulnerabilities.is_upgradable": false,
+        "snyk.vulnerabilities.language": "golang",
+        "snyk.vulnerabilities.package": "github.com/go-yaml/yaml",
+        "snyk.vulnerabilities.package_manager": "golang",
+        "snyk.vulnerabilities.patches": [],
+        "snyk.vulnerabilities.priority_score": 325,
+        "snyk.vulnerabilities.publication_time": "2020-04-02T11:29:49.000Z",
+        "snyk.vulnerabilities.reachability": "No Info",
+        "snyk.vulnerabilities.semver.hashesRange": [
             "53403b58ad1b561927d19068c655246f2db79d48"
         ],
-        "snyk.vulnerability.semver.vulnerable": [
+        "snyk.vulnerabilities.semver.vulnerable": [
             "<2.2.8"
         ],
-        "snyk.vulnerability.semver.vulnerableHashes": [
+        "snyk.vulnerabilities.semver.vulnerableHashes": [
             "dd8f49ae7840d1fc6810d53ee7b05356da92f81f",
             "d4766d1dff71f8a135a57e1fcff946c8c1a140ab",
             "2aba0a492be00f1eb4d95483b08930ebe4968b64",
@@ -550,13 +550,13 @@
             "bef53efd0c76e49e6de55ead051f886bea7e9420",
             "9eade332f0ceebc6b7c9e24893574cad4c51722b"
         ],
-        "snyk.vulnerability.title": "Denial of Service (DoS)",
-        "snyk.vulnerability.type": "vuln",
-        "snyk.vulnerability.unique_severities_list": [
+        "snyk.vulnerabilities.title": "Denial of Service (DoS)",
+        "snyk.vulnerabilities.type": "vuln",
+        "snyk.vulnerabilities.unique_severities_list": [
             "medium"
         ],
-        "snyk.vulnerability.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
-        "snyk.vulnerability.version": "2.1.0",
+        "snyk.vulnerabilities.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
+        "snyk.vulnerabilities.version": "2.1.0",
         "tags": [
             "snyk-vulnerabilities",
             "forwarded"
