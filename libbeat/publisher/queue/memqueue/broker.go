@@ -115,18 +115,8 @@ func NewQueue(
 		minEvents    = settings.FlushMinEvents
 		flushTimeout = settings.FlushTimeout
 	)
-	// define internal channel size for producer/client requests
-	// to the broker. This is 20 by default, but the value can be
-	// increased to up to 10% of max numbers of events in queue.
-	const minIntQueueSize = 20
-	const maxIntQueueSizeRatio = 0.1
-	chanSize := settings.InternalQueueSize
-	if max := int(float64(sz) * maxIntQueueSizeRatio); chanSize > max {
-		chanSize = max
-	}
-	if chanSize < minIntQueueSize {
-		chanSize = minIntQueueSize
-	}
+
+	chanSize := queue.AdjustInternalQueueSize(settings.InternalQueueSize, sz)
 
 	if minEvents < 1 {
 		minEvents = 1

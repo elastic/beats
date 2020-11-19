@@ -67,8 +67,7 @@ type inBroker struct {
 }
 
 const (
-	inSigChannelSize      = 3
-	minInEventChannelSize = 20
+	inSigChannelSize = 3
 )
 
 func newInBroker(
@@ -90,10 +89,8 @@ func newInBroker(
 		return nil, err
 	}
 
-	inEventChannelSize := intQueueSize
-	if inEventChannelSize < minInEventChannelSize {
-		inEventChannelSize = minInEventChannelSize
-	}
+	inEventChannelSize := queue.AdjustInternalQueueSize(intQueueSize, 0)
+
 	b := &inBroker{
 		ctx:         ctx,
 		ackListener: ackListener,

@@ -26,6 +26,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
+const (
+	minInternalQueueSize      = 20
+	maxInternalQueueSizeRatio = 0.1
+)
+
 // Factory for creating a queue used by a pipeline instance.
 type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
 
@@ -121,4 +126,16 @@ type Consumer interface {
 type Batch interface {
 	Events() []publisher.Event
 	ACK()
+}
+
+// AdjustInternalQueueSize decides the size for the internal queue used by most queue implementations.
+func AdjustInternalQueueSize(requested, mainQueueSize int) (actual int) {
+	actual = requested
+	if max := int(float64(mainQueueSize) * maxInternalQueueSizeRatio); mainQueueSize > 0 && actual > max {
+		actual = max
+	}
+	if actual < minInternalQueueSize {
+		actual = minInternalQueueSize
+	}
+	return actual
 }
