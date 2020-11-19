@@ -129,7 +129,7 @@ func TestXPackEnabled(t *testing.T) {
 	metricSetToTypesMap := map[string][]string{
 		"ccr":            []string{}, // no longer indexed into .monitoring-es-*
 		"cluster_stats":  []string{"cluster_stats"},
-		"enrich":         []string{"enrich_coordinator_stats"},
+		"enrich":         []string{}, // no longer indexed into .monitoring-es-*
 		"index_recovery": []string{"index_recovery"},
 		"index_summary":  []string{}, // no longer indexed into .monitoring-es-*
 		"ml_job":         []string{"job_stats"},

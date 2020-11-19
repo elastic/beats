@@ -17,7 +17,7 @@ Follow the prompts to confirm that you want to uninstall {agent}. The command
 stops and uninstalls any managed programs, such as {beats} and
 {elastic-endpoint}, before it stops and uninstalls {agent}.
 
-If you run into problems, see <<ingest-management-troubleshooting>>.
+If you run into problems, see <<fleet-troubleshooting>>.
 
 // Add Javascript and CSS for tabbed panels
 include::tab-widgets/code.asciidoc[]
