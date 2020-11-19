@@ -134,9 +134,6 @@
           type: long
           description: >
             Total number of deleted documents in the index.
-        - name: store.size.bytes
-          type: alias
-          path: elasticsearch.index.total.store.size_in_bytes
         - name: segments.count
           type: long
           description: >
@@ -146,9 +143,6 @@
           type: long
           description: >
               Total size of the index in bytes.
-        - name: segments.memory.bytes
-          type: alias
-          path: elasticsearch.index.total.segments.memory_in_bytes
         - name: query_cache
           type: group
           fields:

@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, m, *info, content)
+	return eventsMapping(r, m.HTTP, *info, content)
 }
 
 func (m *MetricSet) updateServicePath(esVersion common.Version) error {

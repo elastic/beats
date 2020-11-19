@@ -18738,10 +18738,79 @@ Enrich stats
 
 
 
+
+*`elasticsearch.enrich.executing_policy.name`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.id`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.task`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.action`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.cancellable`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.parent_task_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.time.start.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.time.running.nano`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.enrich.queue.size`*::
 +
 --
 Number of search requests in the queue.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -18763,16 +18832,6 @@ type: long
 +
 --
 Number of outstanding remote requests executed since node startup.
-
-
-type: long
-
---
-
-*`elasticsearch.enrich.executed_searches.total`*::
-+
---
-Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -19153,15 +19212,6 @@ type: long
 
 --
 
-*`elasticsearch.index.total.store.size.bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.index.total.store.size_in_bytes
-
---
-
 *`elasticsearch.index.total.segments.count`*::
 +
 --
@@ -19181,15 +19231,6 @@ Total size of the index in bytes.
 type: long
 
 format: bytes
-
---
-
-*`elasticsearch.index.total.segments.memory.bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.index.total.segments.memory_in_bytes
 
 --
 

@@ -20,6 +20,7 @@ package index
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"strconv"
@@ -129,9 +130,9 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
 	clusterStateMetrics := []string{"metadata", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
 	}
@@ -141,7 +142,7 @@ func eventsMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conte
 		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
-	indicesSettings, err := elasticsearch.GetIndicesSettings(m.HTTP, m.HTTP.GetURI())
+	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
 	}
@@ -239,7 +240,7 @@ func getClusterStateMetricForIndex(clusterState common.MapStr, index, metricKey 
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "'"+fieldKey+"'")
 	}
 
 	metric, ok := value.(map[string]interface{})

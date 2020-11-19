@@ -20,11 +20,15 @@
 package index
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -36,17 +40,41 @@ var info = elasticsearch.Info{
 }
 
 func TestMapper(t *testing.T) {
-	//elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventsMapping)
+	t.Skip("Skipping until fixing test with stats.623.json, stats.700-alpha1 and stats.800.bench.json")
+
+	mux := createEsMuxer("7.6.0", "platinum", false)
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{
+		ConnectTimeout: 30 * time.Second,
+		Timeout:        30 * time.Second,
+	}, mb.HostData{
+		URI:          "http://localhost:9200",
+		SanitizedURI: "http://localhost:9200",
+		Host:         "http://localhost:9200",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	elasticsearch.TestMapperWithHttpHelper(t, "../index/_meta/test/stats.*.json", httpClient, eventsMapping)
 }
 
-//func TestEmpty(t *testing.T) {
-//	input, err := ioutil.ReadFile("./_meta/test/empty.512.json")
-//	require.NoError(t, err)
-//
-//	reporter := &mbtest.CapturingReporterV2{}
-//	eventsMapping(reporter, info, input)
-//	require.Equal(t, 0, len(reporter.GetEvents()))
-//}
+func TestEmpty(t *testing.T) {
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	input, err := ioutil.ReadFile("./_meta/test/empty.512.json")
+	require.NoError(t, err)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	eventsMapping(reporter, httpClient, info, input)
+	require.Equal(t, 0, len(reporter.GetEvents()))
+}
 
 func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
