@@ -20,6 +20,10 @@
 package index_recovery
 
 import (
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -27,4 +31,54 @@ import (
 
 func TestMapper(t *testing.T) {
 	elasticsearch.TestMapperWithInfo(t, "./_meta/test/recovery.*.json", eventsMapping)
+}
+
+func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
+	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
+	}
+	clusterStateMasterHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"master_node": "foobar"}`))
+	}
+	rootHandler := func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+		}
+
+		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		w.Write(input)
+	}
+	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/_nodes/_local/nodes", http.HandlerFunc(nodesLocalHandler))
+	mux.Handle("/_cluster/state/master_node", http.HandlerFunc(clusterStateMasterHandler))
+	mux.Handle("/", http.HandlerFunc(rootHandler))
+	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
+	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
+
+	return mux
+}
+
+func TestData(t *testing.T) {
+	mux := createEsMuxer("7.6.0", "platinum", false)
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":                     elasticsearch.ModuleName,
+		"metricsets":                 []string{"index_recovery"},
+		"hosts":                      []string{host},
+		"index_recovery.active_only": false,
+	}
 }

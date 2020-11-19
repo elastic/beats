@@ -1,110 +1,92 @@
 {
-    "@timestamp": "2020-11-04T22:28:11.901Z",
-    "@metadata": {
-      "beat": "metricbeat",
-      "type": "_doc",
-      "version": "8.0.0"
-    },
-    "agent": {
-      "ephemeral_id": "c50b2c97-8d98-4201-8bc9-a77abab6d0e3",
-      "id": "abfbaa55-b79d-4ae5-b412-fd35b933c6d3",
-      "name": "privacys-MBP",
-      "type": "metricbeat",
-      "version": "8.0.0"
-    },
-    "ecs": {
-      "version": "1.5.0"
-    },
-    "host": {
-      "name": "privacys-MBP"
-    },
-    "service": {
-      "name": "elasticsearch",
-      "address": "localhost:9200",
-      "type": "elasticsearch"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "elasticsearch": {
+        "cluster": {
+            "id": "RAwvZ-UnSTiUYHJ6fGjxmg",
+            "name": "docker-cluster"
+        },
+        "index": {
+            "name": "metricbeat-8.0.0-2020.11.19-000001",
+            "recovery": {
+                "id": 0,
+                "index": {
+                    "files": {
+                        "count": 0,
+                        "recovered": 0,
+                        "reused": 0
+                    },
+                    "size": {
+                        "recovered": {
+                            "bytes": 0
+                        },
+                        "reused": {
+                            "bytes": 0
+                        },
+                        "total": {
+                            "bytes": 0
+                        }
+                    },
+                    "throttle_time": {
+                        "source": {
+                            "ms": 0
+                        },
+                        "target": {
+                            "ms": 0
+                        }
+                    },
+                    "total_time": {
+                        "ms": 48
+                    }
+                },
+                "primary": true,
+                "source": {},
+                "stage": "DONE",
+                "start_time": {
+                    "ms": 1605821233207
+                },
+                "stop_time": {
+                    "ms": 1605821233384
+                },
+                "target": {
+                    "host": "127.0.0.1",
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "name": "082618b4bb36"
+                },
+                "total_time": {
+                    "ms": 176
+                },
+                "translog": {
+                    "count": 0,
+                    "recovered": 0,
+                    "total_on_start": 0,
+                    "total_time": {
+                        "ms": 116
+                    }
+                },
+                "type": "EMPTY_STORE",
+                "verify_index": {
+                    "check_index_time": {
+                        "ms": 0
+                    },
+                    "total_time": {
+                        "ms": 0
+                    }
+                }
+            }
+        }
     },
     "event": {
-      "dataset": "elasticsearch.index.recovery",
-      "module": "elasticsearch",
-      "duration": 13551341
+        "dataset": "elasticsearch.index.recovery",
+        "duration": 115000,
+        "module": "elasticsearch"
     },
     "metricset": {
-      "name": "index_recovery",
-      "period": 10000
+        "name": "index_recovery",
+        "period": 10000
     },
-    "elasticsearch": {
-      "cluster": {
-        "name": "docker-cluster",
-        "id": "xpHqTdNHR42BOj6-SponHw"
-      },
-      "index": {
-        "recovery": {
-          "total_time": {
-            "ms": 153
-          },
-          "primary": true,
-          "translog": {
-            "count": 0,
-            "total_on_start": 0,
-            "total_time": {
-              "ms": 68
-            },
-            "recovered": 0
-          },
-          "source": {},
-          "stop_time": {
-            "ms": 1604526809526
-          },
-          "start_time": {
-            "ms": 1604526809372
-          },
-          "stage": "DONE",
-          "id": 0,
-          "index": {
-            "size": {
-              "recovered": {
-                "bytes": 0
-              },
-              "total": {
-                "bytes": 0
-              },
-              "reused": {
-                "bytes": 0
-              }
-            },
-            "files": {
-              "count": 0,
-              "reused": 0,
-              "recovered": 0
-            },
-            "total_time": {
-              "ms": 75
-            },
-            "throttle_time": {
-              "source": {
-                "ms": 0
-              },
-              "target": {
-                "ms": 0
-              }
-            }
-          },
-          "verify_index": {
-            "check_index_time": {
-              "ms": 0
-            },
-            "total_time": {
-              "ms": 0
-            }
-          },
-          "type": "EMPTY_STORE",
-          "target": {
-            "host": "127.0.0.1",
-            "name": "a2627996e0b2",
-            "id": "SRIb1RkRRV2s08DGkteVMQ"
-          }
-        },
-        "name": ".kibana_1"
-      }
+    "service": {
+        "address": "localhost:9200",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }
