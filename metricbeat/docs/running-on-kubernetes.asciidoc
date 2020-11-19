@@ -203,4 +203,4 @@ Metrics should start flowing to Elasticsearch.
 The size and the number of nodes in a Kubernetes cluster can be fairly large at times, and in such cases
 the Pod that will be collecting cluster level metrics might face performance issues due to
 resources limitations. In this case users might consider to avoid using the leader election strategy
-and instead run a dedicated, standalone Metribceat instance using a Deployment in addition to the DaemonSet.
+and instead run a dedicated, standalone {beatname_uc} instance using a Deployment in addition to the DaemonSet.

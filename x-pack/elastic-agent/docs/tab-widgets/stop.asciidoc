@@ -38,8 +38,9 @@ Get the process ID (PID) of the `elastic-agent` process:
 
 [source,shell]
 ----
-ps | grep elastic-agent
+ps | grep elastic-agent <1>
 ----
+<1> Make sure you list processes as the root user.
 
 Then kill the process, replacing the PID in this example with the PID from
 the grep command:
@@ -49,7 +50,7 @@ the grep command:
 kill -9 90682
 ----
 
-NOTE: {agent} will NOT restart automatically if the system is rebooted.
+NOTE: {agent} will restart automatically if the system is rebooted.
 
 // end::kill-process[]
 // end::mac[]
