@@ -51,12 +51,12 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener    queue.ACKListener
-	Events         int
-	FlushMinEvents int
-	FlushTimeout   time.Duration
-	WaitOnClose    bool
-	IntQueueSize   int
+	ACKListener       queue.ACKListener
+	Events            int
+	FlushMinEvents    int
+	FlushTimeout      time.Duration
+	WaitOnClose       bool
+	InternalQueueSize int
 }
 
 type ackChan struct {
@@ -95,11 +95,11 @@ func create(
 	}
 
 	return NewQueue(logger, Settings{
-		ACKListener:    ackListener,
-		Events:         config.Events,
-		FlushMinEvents: config.FlushMinEvents,
-		FlushTimeout:   config.FlushTimeout,
-		IntQueueSize:   intQueueSize,
+		ACKListener:       ackListener,
+		Events:            config.Events,
+		FlushMinEvents:    config.FlushMinEvents,
+		FlushTimeout:      config.FlushTimeout,
+		InternalQueueSize: intQueueSize,
 	}), nil
 }
 
@@ -120,7 +120,7 @@ func NewQueue(
 	// increased to up to 10% of max numbers of events in queue.
 	const minIntQueueSize = 20
 	const maxIntQueueSizeRatio = 0.1
-	chanSize := settings.IntQueueSize
+	chanSize := settings.InternalQueueSize
 	if max := int(float64(sz) * maxIntQueueSizeRatio); chanSize > max {
 		chanSize = max
 	}
