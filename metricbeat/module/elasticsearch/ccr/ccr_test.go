@@ -43,7 +43,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.json")
+		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
