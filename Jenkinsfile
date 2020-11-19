@@ -404,7 +404,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
           fixPermissions("${WORKSPACE}")
           deleteDir()
         }
-        analyseEnvironmentalIssues(isEnvironmentalIssue: environmentalIssue)
+        analyseEnvironmentalIssues(id: args.id, isEnvironmentalIssue: environmentalIssue)
       }
     }
   }
@@ -418,7 +418,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
 * such as, not able to access the docker registry, or failed when pulling some docker images.
 */
 def analyseEnvironmentalIssues(args) {
-  environmentalIssues[args.id] = environmentalIssue
+  environmentalIssues[args.id] = args.environmentalIssue
 }
 
 /**
