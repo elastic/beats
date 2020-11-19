@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -85,21 +85,12 @@ func Cleanup(currentHash string, removeMarker bool) error {
 		}
 
 		hashedDir := filepath.Join(paths.Data(), dir)
-		if cleanupErr := os.RemoveAll(hashedDir); cleanupErr != nil && !isErrorExpected(cleanupErr) {
+		if cleanupErr := install.RemovePath(hashedDir); cleanupErr != nil {
 			err = multierror.Append(err, cleanupErr)
 		}
 	}
 
 	return err
-}
-
-func isErrorExpected(err error) bool {
-	// cannot remove self, this is expected
-	// fails with  remove {path}}\elastic-agent.exe: Access is denied
-	if runtime.GOOS == "windows" && strings.Contains(err.Error(), "elastic-agent.exe") && strings.Contains(err.Error(), "Access is denied") {
-		return true
-	}
-	return false
 }
 
 // InvokeWatcher invokes an agent instance using watcher argument for watching behavior of

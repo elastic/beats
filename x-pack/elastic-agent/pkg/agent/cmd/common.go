@@ -20,9 +20,10 @@ import (
 )
 
 const (
-	defaultConfig = "elastic-agent.yml"
-	hashLen       = 6
-	commitFile    = ".elastic-agent.active.commit"
+	defaultConfig     = "elastic-agent.yml"
+	hashLen           = 6
+	commitFile        = ".elastic-agent.active.commit"
+	agentLockFileName = "agent.lock"
 )
 
 type globalFlags struct {

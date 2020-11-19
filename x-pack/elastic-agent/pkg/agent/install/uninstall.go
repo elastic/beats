@@ -7,7 +7,10 @@ package install
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/kardianos/service"
 
@@ -60,4 +63,36 @@ func Uninstall() error {
 	}
 
 	return nil
+}
+
+// RemovePath helps with removal path where there is a probability
+// of running into self which might prevent removal.
+// Removal will be initiated 2 seconds after a call.
+func RemovePath(path string) error {
+	cleanupErr := os.RemoveAll(path)
+	if cleanupErr != nil && isBlockingOnSelf(cleanupErr) {
+		delayedRemoval(path)
+	}
+
+	return cleanupErr
+}
+
+func isBlockingOnSelf(err error) bool {
+	// cannot remove self, this is expected on windows
+	// fails with  remove {path}}\elastic-agent.exe: Access is denied
+	return runtime.GOOS == "windows" &&
+		err != nil &&
+		strings.Contains(err.Error(), "elastic-agent.exe") &&
+		strings.Contains(err.Error(), "Access is denied")
+}
+
+func delayedRemoval(path string) {
+	// The installation path will still exists because we are executing from that
+	// directory. So cmd.exe is spawned that sleeps for 2 seconds (using ping, recommend way from
+	// from Windows) then rmdir is performed.
+	rmdir := exec.Command(
+		filepath.Join(os.Getenv("windir"), "system32", "cmd.exe"),
+		"/C", "ping", "-n", "2", "127.0.0.1", "&&", "rmdir", "/s", "/q", path)
+	_ = rmdir.Start()
+
 }

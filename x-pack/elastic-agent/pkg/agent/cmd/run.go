@@ -50,7 +50,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := application.NewAppLocker(paths.Data())
+	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}

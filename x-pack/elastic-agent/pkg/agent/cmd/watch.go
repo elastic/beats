@@ -29,7 +29,8 @@ const (
 	// period during which we monitor for failures resulting in a rollback
 	gracePeriodDuration = 10 * time.Minute
 
-	watcherName = "elastic-agent-watcher"
+	watcherName     = "elastic-agent-watcher"
+	watcherLockFile = "watcher.lock"
 )
 
 func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -65,9 +66,9 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return nil
 	}
 
-	locker := upgrade.NewLocker(paths.Top())
+	locker := application.NewAppLocker(paths.Top(), watcherLockFile)
 	if err := locker.TryLock(); err != nil {
-		if err == upgrade.ErrAlreadyLocked {
+		if err == application.ErrAppAlreadyRunning {
 			log.Debugf("exiting, lock already exists")
 			return nil
 		}
