@@ -39,7 +39,9 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 		}
-		w.Write([]byte(`{"name":"a14cf47ef7f2","cluster_name":"docker-cluster","cluster_uuid":"8l_zoGznQRmtoX9iSC-goA","version":{"number":"`+ esVersion + `","build_flavor":"default","build_type":"docker","build_hash":"43884496262f71aa3f33b34ac2f2271959dbf12a","build_date":"2020-10-28T09:54:14.068503Z","build_snapshot":true,"lucene_version":"8.7.0","minimum_wire_compatibility_version":"7.11.0","minimum_index_compatibility_version":"7.0.0"},"tagline":"You Know, for Search"}`))
+
+		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
