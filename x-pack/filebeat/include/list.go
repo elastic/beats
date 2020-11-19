@@ -49,6 +49,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/radware"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/snort"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/snyk"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sonicwall"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sophos"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/squid"

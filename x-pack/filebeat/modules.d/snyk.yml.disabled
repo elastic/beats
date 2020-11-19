@@ -1,0 +1,33 @@
+# Module: snyk
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-snyk.html
+
+- module: snyk
+  audit:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: httpjson
+
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Snyk API URL
+    #var.url:
+
+    # Snyk API Token
+    #var.api_token:
+
+  vulnerabilities:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: httpjson
+
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Snyk API URL
+    #var.url:
+
+    # Snyk API Token
+    #var.api_token:

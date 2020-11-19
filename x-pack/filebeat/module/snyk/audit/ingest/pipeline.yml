@@ -1,0 +1,41 @@
+description: Pipeline for Snyk Audit logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: json
+    target_field: snyk.audit
+    ignore_missing: true
+- rename:
+    field: snyk.audit.groupId
+    target_field: user.group.id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.orgId
+    target_field: snyk.audit.org_id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.projectId
+    target_field: snyk.audit.project_id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.userId
+    target_field: user.id
+    ignore_missing: true
+- rename:
+    field: snyk.audit.event
+    target_field: event.action
+    ignore_missing: true
+- rename:
+    field: snyk.audit.created
+    target_field: event.created
+    ignore_missing: true
+- remove:
+    field:
+    - message
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -1,0 +1,12 @@
+- key: snyk
+  title: Snyk
+  description: >
+    Snyk module
+  fields:
+    - name: snyk
+      type: group
+      release: beta
+      description: >
+        Module for parsing Snyk project vulnerabilities.
+      fields:
+
