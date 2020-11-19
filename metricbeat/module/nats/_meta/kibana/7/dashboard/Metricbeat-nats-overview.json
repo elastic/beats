@@ -35,7 +35,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_0",
             "title": "Subscriptions Info",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -51,7 +51,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_1",
             "title": "Server Uptime",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -60,30 +60,14 @@
             "gridData": {
               "h": 10,
               "i": "12",
-              "w": 16,
-              "x": 15,
+              "w": 13,
+              "x": 11,
               "y": 28
             },
             "panelIndex": "12",
             "panelRefName": "panel_2",
             "title": "Subscriptions Stats Timeline",
-            "version": "7.9.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Slow Consumers Timeline"
-            },
-            "gridData": {
-              "h": 10,
-              "i": "13",
-              "w": 15,
-              "x": 0,
-              "y": 28
-            },
-            "panelIndex": "13",
-            "panelRefName": "panel_3",
-            "title": "Slow Consumers Timeline",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -92,14 +76,14 @@
             "gridData": {
               "h": 10,
               "i": "18",
-              "w": 17,
-              "x": 31,
+              "w": 12,
+              "x": 24,
               "y": 28
             },
             "panelIndex": "18",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_3",
             "title": "Cache Hit Rate Timeline",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -113,9 +97,9 @@
               "y": 0
             },
             "panelIndex": "4ffa8ccd-bd36-4eaf-973e-688b3025e95c",
-            "panelRefName": "panel_5",
+            "panelRefName": "panel_4",
             "title": "Memory Usage",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -129,9 +113,9 @@
               "y": 0
             },
             "panelIndex": "b07d6b97-c0b5-4663-8507-8d3cc2a63367",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_5",
             "title": "Incoming Bytes Rate",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -145,9 +129,9 @@
               "y": 0
             },
             "panelIndex": "eb420bb0-754e-4544-bc1f-027568db1c8c",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_6",
             "title": "Connection Incoming Bytes",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -161,9 +145,9 @@
               "y": 8
             },
             "panelIndex": "1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_7",
             "title": "Incoming Messages Rate",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -177,9 +161,9 @@
               "y": 8
             },
             "panelIndex": "ed6181bc-4274-400a-a9d8-a84a027a4a77",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_8",
             "title": "Connections",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -193,9 +177,9 @@
               "y": 8
             },
             "panelIndex": "7862e4cd-22db-493b-a3be-247570eaaa8a",
-            "panelRefName": "panel_10",
+            "panelRefName": "panel_9",
             "title": "Connections Uptime",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -209,9 +193,9 @@
               "y": 18
             },
             "panelIndex": "5c6f0fdf-67e6-4a39-8543-d46c3f833ac6",
-            "panelRefName": "panel_11",
+            "panelRefName": "panel_10",
             "title": "Total Routes",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -225,9 +209,9 @@
               "y": 18
             },
             "panelIndex": "258a5243-55f6-4195-90cb-ef3ec94707db",
-            "panelRefName": "panel_12",
+            "panelRefName": "panel_11",
             "title": "Total Connections",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
           },
           {
             "embeddableConfig": {
@@ -241,9 +225,43 @@
               "y": 18
             },
             "panelIndex": "0e68fd8a-abd9-4391-b2d0-026e79714835",
-            "panelRefName": "panel_13",
+            "panelRefName": "panel_12",
             "title": "Connection Pending Bytes",
-            "version": "7.9.0-SNAPSHOT"
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Slow Consumers"
+            },
+            "gridData": {
+              "h": 10,
+              "i": "3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+              "w": 11,
+              "x": 0,
+              "y": 28
+            },
+            "panelIndex": "3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+            "panelRefName": "panel_13",
+            "title": "Slow Consumers",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Subscriptions Cache Actions"
+            },
+            "gridData": {
+              "h": 10,
+              "i": "0b07a14d-fa84-463a-9251-7caaef27d184",
+              "w": 12,
+              "x": 36,
+              "y": 28
+            },
+            "panelIndex": "0b07a14d-fa84-463a-9251-7caaef27d184",
+            "panelRefName": "panel_14",
+            "title": "Subscriptions Cache Actions",
+            "version": "7.10.0"
           }
         ],
         "timeRestore": false,
@@ -252,7 +270,7 @@
       },
       "id": "Metricbeat-Nats-Dashboard-ecs",
       "migrationVersion": {
-        "dashboard": "7.3.0"
+        "dashboard": "7.9.3"
       },
       "namespaces": [
         "default"
@@ -274,64 +292,69 @@
           "type": "visualization"
         },
         {
-          "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
+          "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
+          "id": "b877eb90-2988-11eb-8245-71f739a9f622",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "b877eb90-2988-11eb-8245-71f739a9f622",
+          "id": "d3142a50-2987-11eb-8245-71f739a9f622",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "d3142a50-2987-11eb-8245-71f739a9f622",
+          "id": "5146f2a0-2987-11eb-8245-71f739a9f622",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "5146f2a0-2987-11eb-8245-71f739a9f622",
+          "id": "eeb33da0-2987-11eb-8245-71f739a9f622",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "eeb33da0-2987-11eb-8245-71f739a9f622",
+          "id": "431edfc0-2988-11eb-8245-71f739a9f622",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "431edfc0-2988-11eb-8245-71f739a9f622",
+          "id": "898d2fe0-2986-11eb-8245-71f739a9f622",
           "name": "panel_9",
           "type": "visualization"
         },
         {
-          "id": "898d2fe0-2986-11eb-8245-71f739a9f622",
+          "id": "3a670a80-2986-11eb-8245-71f739a9f622",
           "name": "panel_10",
           "type": "visualization"
         },
         {
-          "id": "3a670a80-2986-11eb-8245-71f739a9f622",
+          "id": "55c2d340-2986-11eb-8245-71f739a9f622",
           "name": "panel_11",
           "type": "visualization"
         },
         {
-          "id": "55c2d340-2986-11eb-8245-71f739a9f622",
+          "id": "68d40020-2987-11eb-8245-71f739a9f622",
           "name": "panel_12",
           "type": "visualization"
         },
         {
-          "id": "68d40020-2987-11eb-8245-71f739a9f622",
+          "id": "84e60a90-2a79-11eb-952d-594e5c56d011",
           "name": "panel_13",
+          "type": "visualization"
+        },
+        {
+          "id": "cc1c9740-2a78-11eb-952d-594e5c56d011",
+          "name": "panel_14",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-11-18T10:47:54.487Z",
-      "version": "WzkwNCwyXQ=="
+      "updated_at": "2020-11-19T15:15:32.887Z",
+      "version": "WzY3NCwxXQ=="
     },
     {
       "attributes": {
@@ -459,7 +482,7 @@
       },
       "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -472,8 +495,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-18T09:52:47.839Z",
-      "version": "WzU0OCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzMiwxXQ=="
     },
     {
       "attributes": {
@@ -554,7 +577,7 @@
       },
       "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -567,8 +590,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:28:42.392Z",
-      "version": "Wzg3MCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzMywxXQ=="
     },
     {
       "attributes": {
@@ -602,10 +625,17 @@
               "enabled": true,
               "id": "2",
               "params": {
+                "drop_partials": false,
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
-                "min_doc_count": 1
+                "min_doc_count": 0,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
               },
               "schema": "segment",
               "type": "date_histogram"
@@ -616,36 +646,6 @@
               "params": {
                 "customLabel": "Cache Fanout Max",
                 "field": "nats.subscriptions.cache.fanout.max"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Inserts",
-                "field": "nats.subscriptions.inserts"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "6",
-              "params": {
-                "customLabel": "Removes",
-                "field": "nats.subscriptions.removes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "7",
-              "params": {
-                "customLabel": "Matches",
-                "field": "nats.subscriptions.matches"
               },
               "schema": "metric",
               "type": "avg"
@@ -678,6 +678,7 @@
                 "color": "#eee"
               }
             },
+            "labels": {},
             "legendPosition": "right",
             "seriesParams": [
               {
@@ -703,44 +704,15 @@
                 "showCircles": true,
                 "type": "line",
                 "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "5",
-                  "label": "Inserts"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "6",
-                  "label": "Removes"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "7",
-                  "label": "Matches"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
               }
             ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
             "times": [],
             "type": "line",
             "valueAxes": [
@@ -773,7 +745,7 @@
       },
       "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -786,139 +758,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-18T09:52:47.839Z",
-      "version": "WzU1MywyXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Slow Consumers",
-                "field": "nats.stats.slow_consumers"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              }
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Slow Consumers"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": "true",
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "line",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Slow Consumers"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
-          "type": "line"
-        }
-      },
-      "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
-      "migrationVersion": {
-        "visualization": "7.8.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-11-18T09:52:47.839Z",
-      "version": "WzU1NCwyXQ=="
+      "updated_at": "2020-11-19T15:13:41.661Z",
+      "version": "WzY1NiwxXQ=="
     },
     {
       "attributes": {
@@ -1035,7 +876,7 @@
       },
       "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
@@ -1048,20 +889,14 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-18T09:52:47.839Z",
-      "version": "WzU1OSwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzNiwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Memory Usage [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1122,27 +957,21 @@
       },
       "id": "b877eb90-2988-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:27:55.209Z",
-      "version": "Wzg1MiwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzNywxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Incoming Bytes Rate [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1202,27 +1031,21 @@
       },
       "id": "d3142a50-2987-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:21:30.357Z",
-      "version": "WzgyNCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzOCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Connection Incoming Bytes [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1282,27 +1105,21 @@
       },
       "id": "5146f2a0-2987-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:17:52.586Z",
-      "version": "WzgxMCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzMzOSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Incoming Messages Rate [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1363,27 +1180,21 @@
       },
       "id": "eeb33da0-2987-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:22:16.698Z",
-      "version": "WzgyNSwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0MCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Connections [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1444,27 +1255,21 @@
       },
       "id": "431edfc0-2988-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:24:38.331Z",
-      "version": "WzgyOCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0MSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Connections Uptime [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1524,27 +1329,21 @@
       },
       "id": "898d2fe0-2986-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:15:44.599Z",
-      "version": "WzgwOSwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0MiwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Total Routes [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1603,27 +1402,21 @@
       },
       "id": "3a670a80-2986-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:10:04.711Z",
-      "version": "WzgwNCwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0MywxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Total Connections [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1683,27 +1476,21 @@
       },
       "id": "55c2d340-2986-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:10:50.612Z",
-      "version": "WzgwNSwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0NCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Connection Pending Bytes [Metricbeat NATS]",
         "uiStateJSON": {},
@@ -1763,16 +1550,190 @@
       },
       "id": "68d40020-2987-11eb-8245-71f739a9f622",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.10.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-18T10:18:32.097Z",
-      "version": "WzgxMSwyXQ=="
+      "updated_at": "2020-11-19T14:51:19.404Z",
+      "version": "WzM0NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Slow Consumers [Metricbeat NATS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": 0,
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "e4c53250-2985-11eb-9192-5db805fbad79",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#6092C0",
+                "fill": 0,
+                "formatter": "number",
+                "id": "e4c53251-2985-11eb-9192-5db805fbad79",
+                "label": "Slow Consumers",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "nats.stats.slow_consumers",
+                    "id": "e4c53252-2985-11eb-9192-5db805fbad79",
+                    "type": "avg",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "nats.server.id",
+                "type": "timeseries",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "Slow Consumers [Metricbeat NATS]",
+          "type": "metrics"
+        }
+      },
+      "id": "84e60a90-2a79-11eb-952d-594e5c56d011",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-11-19T15:11:37.401Z",
+      "version": "WzU5MywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Subscriptions Cache Actions [Metricbeat NATS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": 0,
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "e4c53250-2985-11eb-9192-5db805fbad79",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#6092C0",
+                "fill": 0,
+                "formatter": "number",
+                "id": "e4c53251-2985-11eb-9192-5db805fbad79",
+                "label": "Cache Actions",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "nats.subscriptions.inserts",
+                    "id": "e4c53252-2985-11eb-9192-5db805fbad79",
+                    "type": "positive_rate",
+                    "unit": ""
+                  },
+                  {
+                    "field": "nats.subscriptions.matches",
+                    "id": "4d15d290-2a78-11eb-8a2c-718f96219964",
+                    "type": "positive_rate",
+                    "unit": ""
+                  },
+                  {
+                    "field": "nats.subscriptions.removes",
+                    "id": "b97fba90-2a78-11eb-8a2c-718f96219964",
+                    "type": "positive_rate",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_field": "nats.server.id",
+                "type": "timeseries",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "Subscriptions Cache Actions [Metricbeat NATS]",
+          "type": "metrics"
+        }
+      },
+      "id": "cc1c9740-2a78-11eb-952d-594e5c56d011",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-11-19T15:10:34.250Z",
+      "version": "WzU4MywxXQ=="
     }
   ],
-  "version": "7.9.0-SNAPSHOT"
+  "version": "7.10.0"
 }
