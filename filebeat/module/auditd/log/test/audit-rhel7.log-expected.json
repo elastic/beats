@@ -54,7 +54,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 419,
-        "message": "",
         "process.executable": "/usr/lib/systemd/systemd-update-utmp",
         "process.name": "systemd-update-utmp",
         "process.pid": 273,
@@ -253,7 +252,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.827Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.sequence": 17,
         "auditd.log.table": "filter",
@@ -305,7 +304,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.858Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.sequence": 18,
         "auditd.log.table": "raw",
@@ -357,7 +356,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.870Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.sequence": 19,
         "auditd.log.table": "security",
@@ -409,7 +408,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.877Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.sequence": 20,
         "auditd.log.table": "mangle",
@@ -461,7 +460,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.931Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.sequence": 21,
         "auditd.log.table": "nat",
@@ -618,7 +617,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.982Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.sequence": 27,
         "auditd.log.table": "filter",
@@ -754,7 +753,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.069Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.sequence": 32,
         "auditd.log.table": "raw",
@@ -827,7 +826,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.099Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.sequence": 34,
         "auditd.log.table": "security",
@@ -879,7 +878,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.128Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.sequence": 35,
         "auditd.log.table": "mangle",
@@ -1099,7 +1098,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.191Z",
-        "auditd.log.entries": "0",
+        "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.sequence": 44,
         "auditd.log.table": "nat",
@@ -1172,7 +1171,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.528Z",
-        "auditd.log.entries": "5",
+        "auditd.log.entries": 5,
         "auditd.log.family": "2",
         "auditd.log.sequence": 46,
         "auditd.log.table": "nat",
@@ -1224,7 +1223,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.532Z",
-        "auditd.log.entries": "5",
+        "auditd.log.entries": 5,
         "auditd.log.family": "2",
         "auditd.log.sequence": 47,
         "auditd.log.table": "nat",
@@ -1276,7 +1275,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.534Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 48,
         "auditd.log.table": "mangle",
@@ -1328,7 +1327,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.537Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 49,
         "auditd.log.table": "mangle",
@@ -1380,7 +1379,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.538Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.sequence": 50,
         "auditd.log.table": "security",
@@ -1432,7 +1431,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.542Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.sequence": 51,
         "auditd.log.table": "security",
@@ -1484,7 +1483,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.543Z",
-        "auditd.log.entries": "3",
+        "auditd.log.entries": 3,
         "auditd.log.family": "2",
         "auditd.log.sequence": 52,
         "auditd.log.table": "raw",
@@ -1536,7 +1535,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.546Z",
-        "auditd.log.entries": "3",
+        "auditd.log.entries": 3,
         "auditd.log.family": "2",
         "auditd.log.sequence": 53,
         "auditd.log.table": "raw",
@@ -1588,7 +1587,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.548Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.sequence": 54,
         "auditd.log.table": "filter",
@@ -1640,7 +1639,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.552Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.sequence": 55,
         "auditd.log.table": "filter",
@@ -1692,7 +1691,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.553Z",
-        "auditd.log.entries": "5",
+        "auditd.log.entries": 5,
         "auditd.log.family": "10",
         "auditd.log.sequence": 56,
         "auditd.log.table": "nat",
@@ -1744,7 +1743,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.556Z",
-        "auditd.log.entries": "5",
+        "auditd.log.entries": 5,
         "auditd.log.family": "10",
         "auditd.log.sequence": 57,
         "auditd.log.table": "nat",
@@ -1796,7 +1795,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.557Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "10",
         "auditd.log.sequence": 58,
         "auditd.log.table": "mangle",
@@ -1848,7 +1847,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.560Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "10",
         "auditd.log.sequence": 59,
         "auditd.log.table": "mangle",
@@ -1900,7 +1899,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.562Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.sequence": 60,
         "auditd.log.table": "security",
@@ -1952,7 +1951,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.566Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.sequence": 61,
         "auditd.log.table": "security",
@@ -2004,7 +2003,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.569Z",
-        "auditd.log.entries": "3",
+        "auditd.log.entries": 3,
         "auditd.log.family": "10",
         "auditd.log.sequence": 62,
         "auditd.log.table": "raw",
@@ -2056,7 +2055,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.573Z",
-        "auditd.log.entries": "3",
+        "auditd.log.entries": 3,
         "auditd.log.family": "10",
         "auditd.log.sequence": 63,
         "auditd.log.table": "raw",
@@ -2108,7 +2107,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.575Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.sequence": 64,
         "auditd.log.table": "filter",
@@ -2160,7 +2159,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.578Z",
-        "auditd.log.entries": "4",
+        "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.sequence": 65,
         "auditd.log.table": "filter",
@@ -2212,7 +2211,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.580Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 66,
         "auditd.log.table": "mangle",
@@ -2264,7 +2263,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.582Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 67,
         "auditd.log.table": "mangle",
@@ -2316,7 +2315,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.583Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 68,
         "auditd.log.table": "mangle",
@@ -2368,7 +2367,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.585Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 69,
         "auditd.log.table": "mangle",
@@ -2420,7 +2419,7 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.587Z",
-        "auditd.log.entries": "6",
+        "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.sequence": 70,
         "auditd.log.table": "mangle",
