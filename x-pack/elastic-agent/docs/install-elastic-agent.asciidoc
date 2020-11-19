@@ -21,10 +21,10 @@ TIP: We recommend using {fleet} management because it makes the management and
 upgrade of your agents considerably easier. If you want to run standalone
 agents, instead of using {fleet}, see <<run-elastic-agent-standalone>>.
 
-//TODO: Remove this when docs are building.
-[[elastic-agent-install-service-macos]]
-
 To install {agent} and enroll it in {fleet}:
+
+. If you're running {agent} 7.9 or earlier, stop the agent and manually remove
+it from your host.
 
 . On your host, download and extract the installation package.
 +
@@ -44,10 +44,17 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.a
 
 --
 
+Don't have a {fleet} enrollment key? Read the
+{ingest-guide}/fleet-quick-start.html[Quick start guide] to
+learn how to generate one.
+
+Because {agent} is installed as an auto-starting service, it will restart
+automatically if the system is rebooted.
+
 To confirm that {agent} is installed and running, go to the **Agents** tab in
 {fleet}. 
 
-If you run into problems, see <<ingest-management-troubleshooting>>.
+If you run into problems, see <<fleet-troubleshooting>>.
 
 [discrete]
 [[installation-layout]]

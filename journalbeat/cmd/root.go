@@ -32,4 +32,18 @@ import (
 var Name = "journalbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: false})
+var RootCmd *cmd.BeatsRootCmd
+
+// JournalbeatSettings contains the default settings for journalbeat
+func JournalbeatSettings() instance.Settings {
+	return instance.Settings{Name: Name, HasDashboards: false}
+}
+
+// Initialize initializes the entrypoint commands for journalbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	return cmd.GenRootCmdWithSettings(beater.New, settings)
+}
+
+func init() {
+	RootCmd = Initialize(JournalbeatSettings())
+}
