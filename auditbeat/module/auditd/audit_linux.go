@@ -163,7 +163,9 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
 		go func() {
-			defer client.Close()
+			defer func() { // Close the most recently allocated "client" instance.
+				client.Close()
+			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
 			defer timer.Stop()
 			for {
@@ -175,6 +177,13 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
+						if err = client.Close(); err != nil {
+							ms.log.Errorw("Error closing audit monitoring client", "error", err)
+						}
+						client, err = libaudit.NewAuditClient(nil)
+						if err != nil {
+							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+						}
 					}
 				}
 			}
