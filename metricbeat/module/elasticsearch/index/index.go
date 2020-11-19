@@ -77,10 +77,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if err := m.updateServicePath(*info.Version.Number); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 

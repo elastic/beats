@@ -17776,7 +17776,7 @@ alias to: elasticsearch.index.total.refresh.total_time_in_millis
 --
 type: alias
 
-alias to: elasticsearch.index.total.store.size.bytes
+alias to: elasticsearch.index.total.store.size_in_bytes
 
 --
 
@@ -27506,6 +27506,16 @@ type: keyword
 +
 --
 Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
 
 
 type: keyword

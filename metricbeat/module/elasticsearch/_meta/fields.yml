@@ -77,7 +77,7 @@
               path: elasticsearch.index.total.refresh.total_time_in_millis
             - name: store.size_in_bytes
               type: alias
-              path: elasticsearch.index.total.store.size.bytes
+              path: elasticsearch.index.total.store.size_in_bytes
             - name: indexing
               type: group
               fields:
