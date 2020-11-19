@@ -45,6 +45,9 @@ REM Install the given go version
 REM Configure the given go version
 FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
+REM List the gvm installation for debugging purposes
+DIR /A /S %GOROOT%
+
 go env
 go get github.com/magefile/mage
 where mage
