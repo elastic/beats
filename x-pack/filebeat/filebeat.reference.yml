@@ -1402,6 +1402,18 @@ filebeat.modules:
     #var.url: https://yourOktaDomain/api/v1/logs
     #var.api_key: 'yourApiTokenHere'
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  database_audit:
+    enabled: true
+
+    # Set which input to use between syslog or file (default).
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths: /home/user/oracleauditlogs/*.aud
+
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:
@@ -2388,7 +2400,7 @@ filebeat.inputs:
 
 #---------------------------- Google Cloud Pub/Sub Input -----------------------
 # Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: google-pubsub
+- type: gcp-pubsub
   enabled: false
 
   # Google Cloud project ID. Required.
@@ -3731,7 +3743,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 

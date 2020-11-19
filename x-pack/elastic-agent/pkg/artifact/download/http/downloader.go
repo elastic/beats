@@ -14,6 +14,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
@@ -51,7 +53,7 @@ func NewDownloaderWithClient(config *artifact.Config, client http.Client) *Downl
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(ctx context.Context, programName, artifactName, version string) (_ string, err error) {
+func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (_ string, err error) {
 	downloadedFiles := make([]string, 0, 2)
 	defer func() {
 		if err != nil {
@@ -62,13 +64,13 @@ func (e *Downloader) Download(ctx context.Context, programName, artifactName, ve
 	}()
 
 	// download from source to dest
-	path, err := e.download(ctx, e.config.OS(), programName, artifactName, version)
+	path, err := e.download(ctx, e.config.OS(), spec, version)
 	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
 		return "", err
 	}
 
-	hashPath, err := e.downloadHash(ctx, e.config.OS(), programName, artifactName, version)
+	hashPath, err := e.downloadHash(ctx, e.config.OS(), spec, version)
 	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
@@ -90,27 +92,27 @@ func (e *Downloader) composeURI(artifactName, packageName string) (string, error
 	return uri.String(), nil
 }
 
-func (e *Downloader) download(ctx context.Context, operatingSystem, programName, artifactName, version string) (string, error) {
-	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+func (e *Downloader) download(ctx context.Context, operatingSystem string, spec program.Spec, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(spec, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
 	if err != nil {
 		return "", errors.New(err, "generating package path failed")
 	}
 
-	return e.downloadFile(ctx, artifactName, filename, fullPath)
+	return e.downloadFile(ctx, spec.Artifact, filename, fullPath)
 }
 
-func (e *Downloader) downloadHash(ctx context.Context, operatingSystem, programName, artifactName, version string) (string, error) {
-	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+func (e *Downloader) downloadHash(ctx context.Context, operatingSystem string, spec program.Spec, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(spec, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
 	if err != nil {
 		return "", errors.New(err, "generating package path failed")
 	}
@@ -118,7 +120,7 @@ func (e *Downloader) downloadHash(ctx context.Context, operatingSystem, programN
 	filename = filename + ".sha512"
 	fullPath = fullPath + ".sha512"
 
-	return e.downloadFile(ctx, artifactName, filename, fullPath)
+	return e.downloadFile(ctx, spec.Artifact, filename, fullPath)
 }
 
 func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, fullPath string) (string, error) {

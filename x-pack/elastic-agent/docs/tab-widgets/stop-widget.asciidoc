@@ -3,18 +3,6 @@
   <div role="tablist" aria-label="Stop the agent">
     <button role="tab"
             aria-selected="true"
-            aria-controls="deb-tab-stop"
-            id="deb-stop">
-      DEB
-    </button>
-    <button role="tab"
-            aria-selected="false"
-            aria-controls="rpm-tab-stop"
-            id="rpm-stop">
-      RPM
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="mac-tab-stop"
             id="mac-stop">
       MacOS
@@ -33,33 +21,25 @@
             tabindex="-1">
       Windows
     </button>
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="deb-tab-stop"
-       aria-labelledby="deb-stop">
-++++
-
-include::stop.asciidoc[tag=deb]
-
-++++
-  </div> 
-  <div tabindex="0"
-       role="tabpanel"
-       id="rpm-tab-stop"
-       aria-labelledby="rpm-stop"
-       hidden="">
-++++
-
-include::stop.asciidoc[tag=rpm]
-
-++++
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="deb-tab-stop"
+            id="deb-stop"
+            tabindex="-1">
+      DEB
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="rpm-tab-stop"
+            id="rpm-stop"
+            tabindex="-1">
+      RPM
+    </button>
   </div>
   <div tabindex="0"
        role="tabpanel"
        id="mac-tab-stop"
-       aria-labelledby="mac-stop"
-       hidden="">
+       aria-labelledby="mac-stop">
 ++++
 
 include::stop.asciidoc[tag=mac]
@@ -85,6 +65,28 @@ include::stop.asciidoc[tag=linux]
 ++++
 
 include::stop.asciidoc[tag=win]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="deb-tab-stop"
+       aria-labelledby="deb-stop"
+       hidden="">
+++++
+
+include::stop.asciidoc[tag=deb]
+
+++++
+  </div> 
+  <div tabindex="0"
+       role="tabpanel"
+       id="rpm-tab-stop"
+       aria-labelledby="rpm-stop"
+       hidden="">
+++++
+
+include::stop.asciidoc[tag=rpm]
 
 ++++
   </div>

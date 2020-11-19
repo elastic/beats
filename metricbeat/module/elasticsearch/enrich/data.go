@@ -44,6 +44,22 @@ var (
 			"total": c.Int("executed_searches_total"),
 		},
 	}
+
+	task = s.Schema{
+		"id":     c.Int("id"),
+		"type":   c.Str("type"),
+		"action": c.Str("action"),
+		"time": s.Object{
+			"start": s.Object{
+				"ms": c.Int("start_time_in_millis"),
+			},
+			"running": s.Object{
+				"nano": c.Int("running_time_in_nanos"),
+			},
+		},
+		"cancellable":    c.Bool("cancellable"),
+		"parent_task_id": c.Str("parent_task_id"),
+	}
 )
 
 type response struct {
@@ -62,8 +78,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	for _, stat := range data.CoordinatorStats {
 
 		event := mb.Event{}
-		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
@@ -84,6 +98,46 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		fields.Delete("node_id")
 
 		event.MetricSetFields = fields
+
+		r.Event(event)
+	}
+
+	for _, policy := range data.ExecutingPolicies {
+		event := mb.Event{}
+
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("cluster.name", info.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		event.MetricSetFields = common.MapStr{}
+
+		policyName, ok := policy["name"]
+		if !ok {
+			// No name found for policy. Ignore because all policies require a name
+			errs = append(errs, errors.New("found an 'executing policy' without a name. Omitting."))
+			continue
+		}
+
+		taskData, ok := policy["task"]
+		if !ok {
+			// No task found for policy. Ignore because all policies must contain a task
+			errs = append(errs, errors.New("found an 'executing policy' without a task. Omitting."))
+			continue
+		}
+
+		taskMapstr, ok := taskData.(map[string]interface{})
+		if !ok {
+			errs = append(errs, errors.New("error trying to convert interface of task data into a map"))
+			continue
+		}
+
+		fields, err := task.Apply(taskMapstr)
+		if err != nil {
+			errs = append(errs, errors.Wrap(err, "failure applying enrich coordinator stats schema"))
+			continue
+		}
+
+		event.MetricSetFields.Put("executing_policy.name", policyName)
+		event.MetricSetFields.Put("executing_policy.task", fields)
 
 		r.Event(event)
 	}

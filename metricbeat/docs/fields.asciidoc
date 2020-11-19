@@ -18457,10 +18457,79 @@ Enrich stats
 
 
 
+
+*`elasticsearch.enrich.executing_policy.name`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.id`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.task`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.action`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.cancellable`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.parent_task_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.enrich.executing_policy.task.time.start.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.enrich.executing_policy.task.time.running.nano`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.enrich.queue.size`*::
 +
 --
 Number of search requests in the queue.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -18482,16 +18551,6 @@ type: long
 +
 --
 Number of outstanding remote requests executed since node startup.
-
-
-type: long
-
---
-
-*`elasticsearch.enrich.executed_searches.total`*::
-+
---
-Number of search requests that enrich processors have executed since node startup.
 
 
 type: long
@@ -19026,6 +19085,110 @@ Total number of memory used by the segments in bytes.
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.index.summary.total.indexing.index.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.indexing.is_throttled`*::
++
+--
+TODO
+
+type: boolean
+
+--
+
+*`elasticsearch.index.summary.total.indexing.throttle_time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+
+*`elasticsearch.index.summary.total.search.query.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.search.query.time.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.operations.count`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.size.bytes`*::
++
+--
+TODO
+
+type: long
+
+--
+
+
+*`elasticsearch.index.summary.total.bulk.time.count.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.time.avg.ms`*::
++
+--
+TODO
+
+type: long
+
+--
+
+*`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
++
+--
+TODO
+
+type: long
 
 --
 
@@ -26794,6 +26957,16 @@ type: keyword
 +
 --
 Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
 
 
 type: keyword
@@ -36781,10 +36954,134 @@ type: keyword
 *`nats.server.time`*::
 +
 --
+
+deprecated:[8.0.0]
+
 Server time of metric creation
 
 
 type: date
+
+--
+
+[float]
+=== connection
+
+Contains nats connection related metrics
+
+
+
+*`nats.connection.name`*::
++
+--
+The name of the connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.connection.pending_bytes`*::
++
+--
+The number of pending bytes of this connection
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nats.connection.uptime`*::
++
+--
+The period the connection is up (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+*`nats.connection.idle_time`*::
++
+--
+The period the connection is idle (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.connection.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.connection.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.connection.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.connection.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -36802,6 +37099,121 @@ The number of currently active clients
 
 
 type: integer
+
+--
+
+[float]
+=== route
+
+Contains nats route related metrics
+
+
+
+*`nats.route.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.route.remote_id`*::
++
+--
+The remote id on which the route is connected to
+
+
+type: keyword
+
+--
+
+*`nats.route.pending_size`*::
++
+--
+The number of pending routes
+
+
+type: long
+
+--
+
+*`nats.route.port`*::
++
+--
+The port of the route
+
+
+type: integer
+
+--
+
+*`nats.route.ip`*::
++
+--
+The ip of the route
+
+
+type: ip
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.route.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.route.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.route.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.route.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -44184,6 +44596,24 @@ type: date
 +
 --
 The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+*`system.service.unit_file.state`*::
++
+--
+The state of the unit file
+
+type: keyword
+
+--
+
+*`system.service.unit_file.vendor_preset`*::
++
+--
+The default state of the unit file
 
 type: keyword
 

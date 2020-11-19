@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 const (
@@ -22,18 +23,22 @@ const (
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
 )
 
-func getMonitoringEndpoint(program, operatingSystem, pipelineID string) string {
-	if operatingSystem == "windows" {
-		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, program)
+func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
+	if endpoint, ok := spec.MetricEndpoints[operatingSystem]; ok {
+		return endpoint
 	}
-
-	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, program, program)
+	if operatingSystem == "windows" {
+		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, spec.Cmd)
+	}
+	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, spec.Cmd, spec.Cmd)
 }
 
-func getLoggingFile(program, operatingSystem, installPath, pipelineID string) string {
-	if operatingSystem == "windows" {
-		return fmt.Sprintf(logFileFormatWin, paths.Home(), pipelineID, program)
+func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID string) string {
+	if path, ok := spec.LogPaths[operatingSystem]; ok {
+		return path
 	}
-
-	return fmt.Sprintf(logFileFormat, paths.Home(), pipelineID, program)
+	if operatingSystem == "windows" {
+		return fmt.Sprintf(logFileFormatWin, paths.Home(), pipelineID, spec.Cmd)
+	}
+	return fmt.Sprintf(logFileFormat, paths.Home(), pipelineID, spec.Cmd)
 }

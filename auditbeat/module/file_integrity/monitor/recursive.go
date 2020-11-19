@@ -36,16 +36,19 @@ type recursiveWatcher struct {
 	addC    chan string
 	addErrC chan error
 	log     *logp.Logger
+
+	isExcludedPath func(path string) bool
 }
 
-func newRecursiveWatcher(inner *fsnotify.Watcher) *recursiveWatcher {
+func newRecursiveWatcher(inner *fsnotify.Watcher, IsExcludedPath func(path string) bool) *recursiveWatcher {
 	return &recursiveWatcher{
-		inner:   inner,
-		tree:    FileTree{},
-		eventC:  make(chan fsnotify.Event, 1),
-		addC:    make(chan string),
-		addErrC: make(chan error),
-		log:     logp.NewLogger(moduleName),
+		inner:          inner,
+		tree:           FileTree{},
+		eventC:         make(chan fsnotify.Event, 1),
+		addC:           make(chan string),
+		addErrC:        make(chan error),
+		log:            logp.NewLogger(moduleName),
+		isExcludedPath: IsExcludedPath,
 	}
 }
 
@@ -82,8 +85,16 @@ func (watcher *recursiveWatcher) ErrorChannel() <-chan error {
 }
 
 func (watcher *recursiveWatcher) addRecursive(path string) error {
+	if watcher.isExcludedPath(path) {
+		return nil
+	}
+
 	var errs multierror.Errors
 	err := filepath.Walk(path, func(path string, info os.FileInfo, fnErr error) error {
+		if watcher.isExcludedPath(path) {
+			return nil
+		}
+
 		if fnErr != nil {
 			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
 			// If FileInfo is not nil, the directory entry can be processed
