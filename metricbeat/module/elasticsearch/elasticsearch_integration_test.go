@@ -42,7 +42,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
@@ -221,21 +220,23 @@ func TestGetAllIndices(t *testing.T) {
 		// Check that we have events for both indices we created
 		var idxVisibleExists, idxHiddenExists bool
 		for _, event := range events {
-			v, err := event.RootFields.GetValue("index_stats")
-			require.NoError(t, err)
 
-			idx, ok := v.(index.Index)
-			if !ok {
-				t.FailNow()
-			}
+			name, ok := event.MetricSetFields["name"]
+			require.True(t, ok)
 
-			switch idx.Index {
+			hidden, ok := event.MetricSetFields["hidden"]
+			require.True(t, ok)
+
+			isHidden, ok := hidden.(bool)
+			require.True(t, ok)
+
+			switch name {
 			case indexVisible:
 				idxVisibleExists = true
-				require.False(t, idx.Hidden)
+				require.False(t, isHidden)
 			case indexHidden:
 				idxHiddenExists = true
-				require.True(t, idx.Hidden)
+				require.True(t, isHidden)
 			}
 		}
 
