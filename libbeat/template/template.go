@@ -304,8 +304,10 @@ func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
 }
 
 func (t *Template) generateIndex(properties common.MapStr) common.MapStr {
-	tmpl := t.generateLegacy(properties)
+	tmpl := t.generateComponent(properties)
 	tmpl["priority"] = t.priority
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	tmpl[keyPattern] = patterns
 	delete(tmpl, "order")
 	return tmpl
 }
