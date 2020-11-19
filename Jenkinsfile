@@ -8,6 +8,11 @@ import groovy.transform.Field
 */
 @Field def stashedTestReports = [:]
 
+/**
+ This is required to store any environmental issues to retry if so
+*/
+@Field def environmentalIssues = [:]
+
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
@@ -269,7 +274,7 @@ def target(Map args = [:]) {
   try {
     runCommand(args)
   } catch (err) {
-    if(fileExists('environmental-issue')) {
+    if(environmentalIssues?.get(args.id, false)) {
       sleep 10
       runCommand(args)
     }
@@ -390,6 +395,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         upload = true
         error("Error '${err.toString()}'")
       } finally {
+        // If there are environmental issues then let's avoid the archiving of none files.
         if (archive && !environmentalIssue) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
@@ -398,12 +404,21 @@ def withBeatsEnv(Map args = [:], Closure body) {
           fixPermissions("${WORKSPACE}")
           deleteDir()
         }
-        if (environmentalIssue) {
-          writeFile file: 'environmental-issue', text: 'environmental-issue'
-        }
+        analyseEnvironmentalIssues(isEnvironmentalIssue: environmentalIssue)
       }
     }
   }
+}
+
+/**
+* This method analyse if the existing stage failed with some enviornmental issues.
+* So far the analysis is just purelly based on a boolean that detects if the installation of
+* the required tools for building and testing in the agent were successfully installed.
+* We can use this method in the future to analyse the build logs for searching specific patterns
+* such as, not able to access the docker registry, or failed when pulling some docker images.
+*/
+def analyseEnvironmentalIssues(args) {
+  environmentalIssues[args.id] = environmentalIssue
 }
 
 /**
