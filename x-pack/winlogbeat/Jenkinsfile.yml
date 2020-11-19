@@ -19,7 +19,7 @@ stages:
           make -C x-pack/winlogbeat update;
           make check-no-changes;
         platforms:             ## override default labels in this specific stage.
-            - "linux && ubuntu-18"
+            - "immutable && ubuntu-18"
     build:
         mage: "mage build unitTest"
         withModule: true
