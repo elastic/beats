@@ -169,7 +169,7 @@ func loadOutput(
 func createQueueBuilder(
 	config common.ConfigNamespace,
 	monitors Monitors,
-	intQueueSize int,
+	inQueueSize int,
 ) (func(queue.ACKListener) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
@@ -192,6 +192,6 @@ func createQueueBuilder(
 	}
 
 	return func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return queueFactory(ackListener, monitors.Logger, queueConfig, intQueueSize)
+		return queueFactory(ackListener, monitors.Logger, queueConfig, inQueueSize)
 	}, nil
 }

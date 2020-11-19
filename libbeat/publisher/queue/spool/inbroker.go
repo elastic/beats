@@ -77,7 +77,7 @@ func newInBroker(
 	codec codecID,
 	flushTimeout time.Duration,
 	flushEvents uint,
-	intQueueSize int,
+	inQueueSize int,
 ) (*inBroker, error) {
 	enc, err := newEncoder(codec)
 	if err != nil {
@@ -89,7 +89,7 @@ func newInBroker(
 		return nil, err
 	}
 
-	inEventChannelSize := queue.AdjustInternalQueueSize(intQueueSize, 0)
+	inEventChannelSize := queue.AdjustInternalQueueSize(inQueueSize, 0)
 
 	b := &inBroker{
 		ctx:         ctx,

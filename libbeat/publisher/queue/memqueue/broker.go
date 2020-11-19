@@ -83,7 +83,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, intQueueSize int,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, inQueueSize int,
 ) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -99,7 +99,7 @@ func create(
 		Events:            config.Events,
 		FlushMinEvents:    config.FlushMinEvents,
 		FlushTimeout:      config.FlushTimeout,
-		InternalQueueSize: intQueueSize,
+		InternalQueueSize: inQueueSize,
 	}), nil
 }
 
