@@ -249,18 +249,18 @@
           {
             "embeddableConfig": {
               "hidePanelTitles": false,
-              "title": "Subscriptions Cache Actions"
+              "title": "Subscription Cache Actions"
             },
             "gridData": {
               "h": 10,
-              "i": "0b07a14d-fa84-463a-9251-7caaef27d184",
+              "i": "66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
               "w": 12,
               "x": 36,
               "y": 28
             },
-            "panelIndex": "0b07a14d-fa84-463a-9251-7caaef27d184",
+            "panelIndex": "66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
             "panelRefName": "panel_14",
-            "title": "Subscriptions Cache Actions",
+            "title": "Subscription Cache Actions",
             "version": "7.10.0"
           }
         ],
@@ -347,14 +347,14 @@
           "type": "visualization"
         },
         {
-          "id": "cc1c9740-2a78-11eb-952d-594e5c56d011",
+          "id": "d80d4c30-2a81-11eb-9625-31ed579c09b3",
           "name": "panel_14",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-11-19T15:15:32.887Z",
-      "version": "WzY3NCwxXQ=="
+      "updated_at": "2020-11-19T16:12:16.796Z",
+      "version": "WzM3MDAsMV0="
     },
     {
       "attributes": {
@@ -495,8 +495,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzMiwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1MywxXQ=="
     },
     {
       "attributes": {
@@ -590,8 +590,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzMywxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1NCwxXQ=="
     },
     {
       "attributes": {
@@ -758,8 +758,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-19T15:13:41.661Z",
-      "version": "WzY1NiwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1NSwxXQ=="
     },
     {
       "attributes": {
@@ -889,8 +889,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzNiwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1NiwxXQ=="
     },
     {
       "attributes": {
@@ -964,8 +964,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzNywxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1NywxXQ=="
     },
     {
       "attributes": {
@@ -1038,8 +1038,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzOCwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1OCwxXQ=="
     },
     {
       "attributes": {
@@ -1112,8 +1112,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzMzOSwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI1OSwxXQ=="
     },
     {
       "attributes": {
@@ -1187,8 +1187,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0MCwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2MCwxXQ=="
     },
     {
       "attributes": {
@@ -1262,8 +1262,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0MSwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2MSwxXQ=="
     },
     {
       "attributes": {
@@ -1336,8 +1336,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0MiwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2MiwxXQ=="
     },
     {
       "attributes": {
@@ -1409,8 +1409,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0MywxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2MywxXQ=="
     },
     {
       "attributes": {
@@ -1483,8 +1483,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0NCwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2NCwxXQ=="
     },
     {
       "attributes": {
@@ -1557,8 +1557,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T14:51:19.404Z",
-      "version": "WzM0NSwxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2NSwxXQ=="
     },
     {
       "attributes": {
@@ -1638,8 +1638,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T15:11:37.401Z",
-      "version": "WzU5MywxXQ=="
+      "updated_at": "2020-11-19T15:52:48.969Z",
+      "version": "WzI2NiwxXQ=="
     },
     {
       "attributes": {
@@ -1653,7 +1653,7 @@
             }
           }
         },
-        "title": "Subscriptions Cache Actions [Metricbeat NATS]",
+        "title": "Subscription Cache Actions [Metricbeat NATS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1669,8 +1669,8 @@
               "language": "kuery",
               "query": ""
             },
-            "id": "e4c53250-2985-11eb-9192-5db805fbad79",
-            "index_pattern": "metricbeat-*",
+            "id": "a9b96760-2a81-11eb-8cd4-770b42226f97",
+            "index_pattern": "metric*",
             "interval": "auto",
             "isModelInvalid": false,
             "series": [
@@ -1680,36 +1680,98 @@
                 "color": "#6092C0",
                 "fill": 0,
                 "formatter": "number",
-                "id": "e4c53251-2985-11eb-9192-5db805fbad79",
-                "label": "Cache Actions",
+                "id": "a9b96761-2a81-11eb-8cd4-770b42226f97",
+                "label": "rate(inserts)",
                 "line_width": 2,
                 "metrics": [
                   {
                     "field": "nats.subscriptions.inserts",
-                    "id": "e4c53252-2985-11eb-9192-5db805fbad79",
-                    "type": "positive_rate",
-                    "unit": ""
+                    "id": "a9b96762-2a81-11eb-8cd4-770b42226f97",
+                    "type": "max"
                   },
                   {
-                    "field": "nats.subscriptions.matches",
-                    "id": "4d15d290-2a78-11eb-8a2c-718f96219964",
-                    "type": "positive_rate",
-                    "unit": ""
+                    "field": "a9b96762-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b96764-2a81-11eb-8cd4-770b42226f97",
+                    "type": "derivative",
+                    "unit": "1s"
                   },
                   {
-                    "field": "nats.subscriptions.removes",
-                    "id": "b97fba90-2a78-11eb-8a2c-718f96219964",
-                    "type": "positive_rate",
-                    "unit": ""
+                    "field": "a9b96764-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b96763-2a81-11eb-8cd4-770b42226f97",
+                    "type": "positive_only"
                   }
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "nats.server.id",
-                "type": "timeseries",
-                "value_template": "{{value}}"
+                "value_template": "{{value}}/s"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#D36086",
+                "fill": 0,
+                "formatter": "number",
+                "id": "a9b96765-2a81-11eb-8cd4-770b42226f97",
+                "label": "rate(removes)",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "nats.subscriptions.removes",
+                    "id": "a9b96766-2a81-11eb-8cd4-770b42226f97",
+                    "type": "max"
+                  },
+                  {
+                    "field": "a9b96766-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b96768-2a81-11eb-8cd4-770b42226f97",
+                    "type": "derivative",
+                    "unit": "1s"
+                  },
+                  {
+                    "field": "a9b96768-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b96767-2a81-11eb-8cd4-770b42226f97",
+                    "type": "positive_only"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}/s"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#54B399",
+                "fill": 0,
+                "formatter": "number",
+                "id": "a9b96769-2a81-11eb-8cd4-770b42226f97",
+                "label": "rate(matches)",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "nats.subscriptions.matches",
+                    "id": "a9b9676a-2a81-11eb-8cd4-770b42226f97",
+                    "type": "max"
+                  },
+                  {
+                    "field": "a9b9676a-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b9676c-2a81-11eb-8cd4-770b42226f97",
+                    "type": "derivative",
+                    "unit": "1s"
+                  },
+                  {
+                    "field": "a9b9676c-2a81-11eb-8cd4-770b42226f97",
+                    "id": "a9b9676b-2a81-11eb-8cd4-770b42226f97",
+                    "type": "positive_only"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}/s"
               }
             ],
             "show_grid": 1,
@@ -1718,11 +1780,11 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "Subscriptions Cache Actions [Metricbeat NATS]",
+          "title": "Subscription Cache Actions [Metricbeat NATS]",
           "type": "metrics"
         }
       },
-      "id": "cc1c9740-2a78-11eb-952d-594e5c56d011",
+      "id": "d80d4c30-2a81-11eb-9625-31ed579c09b3",
       "migrationVersion": {
         "visualization": "7.10.0"
       },
@@ -1731,8 +1793,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-11-19T15:10:34.250Z",
-      "version": "WzU4MywxXQ=="
+      "updated_at": "2020-11-19T16:11:12.882Z",
+      "version": "WzMyNjEsMV0="
     }
   ],
   "version": "7.10.0"
