@@ -130,7 +130,7 @@ func TestXPackEnabled(t *testing.T) {
 		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
 		"cluster_stats":  []string{"cluster_stats"},
 		"enrich":         []string{}, // no longer indexed into .monitoring-es-*
-		"index_recovery": []string{"index_recovery"},
+		"index_recovery": []string{}, // no longer indexed into .monitoring-es-*
 		"index_summary":  []string{}, // no longer indexed into .monitoring-es-*
 		"ml_job":         []string{"job_stats"},
 		"node_stats":     []string{}, // no longer indexed into .monitoring-es-*
