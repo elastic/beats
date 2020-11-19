@@ -1219,6 +1219,7 @@ class Test(BaseTest):
         # Check that offset is set to the end of the file
         assert data[0]["offset"] == os.path.getsize(testfile_path1)
 
+    @unittest.skipIf(platform.system() == 'Darwin', 'Flaky test: https://github.com/elastic/beats/issues/22407')
     def test_ignore_older_state_clean_inactive(self):
         """
         Check that state for ignore_older is not persisted when falling under clean_inactive

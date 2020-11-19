@@ -7,6 +7,7 @@ package operation
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/hashicorp/go-multierror"
 
@@ -346,7 +347,7 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Spec(), o.pipelineID)
 		if logPath != "" {
-			paths[a.Name()] = append(paths[a.Name()], logPath)
+			paths[strings.ReplaceAll(a.Name(), "-", "_")] = append(paths[a.Name()], logPath)
 		}
 	}
 
@@ -362,7 +363,7 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 	for _, a := range o.apps {
 		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Spec(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
+			endpoints[strings.ReplaceAll(a.Name(), "-", "_")] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
 
