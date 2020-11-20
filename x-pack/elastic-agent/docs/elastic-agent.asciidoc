@@ -19,6 +19,7 @@ To learn how to install, configure, and run your {agent}s, see:
 * <<uninstall-elastic-agent>>
 * <<upgrade-elastic-agent>>
 * <<run-elastic-agent-standalone>>
+* <<start-elastic-agent>>
 * <<stop-elastic-agent>>
 * <<unenroll-elastic-agent>>
 * <<elastic-agent-cmd-options>>
@@ -31,6 +32,8 @@ include::uninstall-elastic-agent.asciidoc[leveloffset=+1]
 include::upgrade-elastic-agent.asciidoc[leveloffset=+1]
 
 include::run-elastic-agent-standalone.asciidoc[leveloffset=+1]
+
+include::start-elastic-agent.asciidoc[leveloffset=+1]
 
 include::stop-elastic-agent.asciidoc[leveloffset=+1]
 
