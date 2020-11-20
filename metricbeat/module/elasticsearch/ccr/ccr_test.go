@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -44,6 +45,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 		}
 
 		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input = []byte(strings.Replace(string(input), "7.10.0", esVersion, -1))
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
