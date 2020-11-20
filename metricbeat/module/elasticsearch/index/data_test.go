@@ -40,7 +40,7 @@ var info = elasticsearch.Info{
 }
 
 func TestMapper(t *testing.T) {
-	t.Skip("Skipping until fixing test with stats.623.json, stats.700-alpha1 and stats.800.bench.json")
+	t.Skip("Skipping to fix in a follow up")
 
 	mux := createEsMuxer("7.6.0", "platinum", false)
 
@@ -51,9 +51,9 @@ func TestMapper(t *testing.T) {
 		ConnectTimeout: 30 * time.Second,
 		Timeout:        30 * time.Second,
 	}, mb.HostData{
-		URI:          "http://localhost:9200",
-		SanitizedURI: "http://localhost:9200",
-		Host:         "http://localhost:9200",
+		URI:          server.URL,
+		SanitizedURI: server.URL,
+		Host:         server.URL,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +94,9 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			return
 		}
 
-		w.Write([]byte(`{"name":"a14cf47ef7f2","cluster_name":"docker-cluster","cluster_uuid":"8l_zoGznQRmtoX9iSC-goA","version":{"number":"8.0.0-SNAPSHOT","build_flavor":"default","build_type":"docker","build_hash":"43884496262f71aa3f33b34ac2f2271959dbf12a","build_date":"2020-10-28T09:54:14.068503Z","build_snapshot":true,"lucene_version":"8.7.0","minimum_wire_compatibility_version":"7.11.0","minimum_index_compatibility_version":"7.0.0"},"tagline":"You Know, for Search"}`))
+		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		w.Write(input)
+
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
