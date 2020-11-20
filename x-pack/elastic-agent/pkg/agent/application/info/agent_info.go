@@ -4,11 +4,32 @@
 
 package info
 
-import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
 
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
-	agentID string
+	agentID  string
+	logLevel string
+}
+
+// NewAgentInfoWithLog creates a new agent information.
+// In case when agent ID was already created it returns,
+// this created ID otherwise it generates
+// new unique identifier for agent.
+// If agent config file does not exist it gets created.
+// Initiates log level to predefined value.
+func NewAgentInfoWithLog(level string) (*AgentInfo, error) {
+	agentInfo, err := loadAgentInfo(false, level)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AgentInfo{
+		agentID:  agentInfo.ID,
+		logLevel: agentInfo.LogLevel,
+	}, nil
 }
 
 // NewAgentInfo creates a new agent information.
@@ -17,29 +38,17 @@ type AgentInfo struct {
 // new unique identifier for agent.
 // If agent config file does not exist it gets created.
 func NewAgentInfo() (*AgentInfo, error) {
-	agentInfo, err := loadAgentInfo(false)
-	if err != nil {
-		return nil, err
-	}
-
-	return &AgentInfo{
-		agentID: agentInfo.ID,
-	}, nil
+	return NewAgentInfoWithLog(defaultLogLevel)
 }
 
-// ForceNewAgentInfo creates a new agent information.
-// Generates new unique identifier for agent regardless
-// of any existing ID.
-// If agent config file does not exist it gets created.
-func ForceNewAgentInfo() (*AgentInfo, error) {
-	agentInfo, err := loadAgentInfo(true)
-	if err != nil {
-		return nil, err
+// LogLevel updates log level of agent.
+func (i *AgentInfo) LogLevel(level string) error {
+	if err := updateLogLevel(level); err != nil {
+		return err
 	}
 
-	return &AgentInfo{
-		agentID: agentInfo.ID,
-	}, nil
+	i.logLevel = level
+	return nil
 }
 
 // AgentID returns an agent identifier.

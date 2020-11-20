@@ -54,7 +54,7 @@ func new(name string, cfg *Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	internal, err := makeInternalFileOutput()
+	internal, err := makeInternalFileOutput(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func DefaultLoggingConfig() *Config {
 // makeInternalFileOutput creates a zapcore.Core logger that cannot be changed with configuration.
 //
 // This is the logger that the spawned filebeat expects to read the log file from and ship to ES.
-func makeInternalFileOutput() (zapcore.Core, error) {
+func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
@@ -115,5 +115,24 @@ func makeInternalFileOutput() (zapcore.Core, error) {
 	}
 
 	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
-	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
+	// return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapLevel(cfg.Level))), nil
+}
+
+func zapLevel(level logp.Level) zapcore.Level {
+	zapLevel := zapcore.DebugLevel
+	switch level {
+	case logp.DebugLevel:
+		zapLevel = zapcore.DebugLevel
+	case logp.InfoLevel:
+		zapLevel = zapcore.InfoLevel
+	case logp.WarnLevel:
+		zapLevel = zapcore.WarnLevel
+	case logp.ErrorLevel:
+		zapLevel = zapcore.ErrorLevel
+	case logp.CriticalLevel:
+		zapLevel = zapcore.ErrorLevel
+	}
+
+	return zapLevel
 }
