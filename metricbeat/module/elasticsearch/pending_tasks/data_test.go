@@ -111,7 +111,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 	}{
 		{"./_meta/test/empty.json", []mb.Event(nil)},
 		{"./_meta/test/task.622.json", []mb.Event{
-			mb.Event{
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -129,12 +129,12 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 					"time_in_queue.ms": int64(86),
 					"insert_order":     int64(101),
 				},
-				Timestamp: time.Time{},
-				Took:      0,
-			},
+							Timestamp: time.Time{},
+							Took:      0,
+						},
 		}},
 		{"./_meta/test/tasks.622.json", []mb.Event{
-			mb.Event{
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -152,10 +152,10 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 					"time_in_queue.ms": int64(86),
 					"insert_order":     int64(101),
 				},
-				Timestamp: time.Time{},
-				Took:      0,
-			},
-			mb.Event{
+							Timestamp: time.Time{},
+							Took:      0,
+						},
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -173,8 +173,8 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 					"insert_order":     int64(46),
 				},
 				Timestamp: time.Time{},
-				Took:      0,
-			}, mb.Event{
+							Took:      0,
+						}, {
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -192,8 +192,8 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 					"time_in_queue.ms": int64(858),
 					"insert_order":     int64(45),
 				}, Timestamp: time.Time{},
-				Took: 0,
-			},
+							Took:         0,
+						},
 		}},
 	}
 
