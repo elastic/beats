@@ -326,7 +326,7 @@ class TestCommandSetupTemplate(BaseTest):
     @pytest.mark.tag('integration')
     def test_setup_template_index(self):
         """
-        Test template setup with config options
+        Test template setup of new index templates
         """
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
@@ -340,7 +340,7 @@ class TestCommandSetupTemplate(BaseTest):
     @pytest.mark.tag('integration')
     def test_setup_template_component(self):
         """
-        Test template setup with config options
+        Test template setup of component index templates
         """
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
