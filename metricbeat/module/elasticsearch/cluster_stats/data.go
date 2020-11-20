@@ -20,6 +20,11 @@ package cluster_stats
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"hash/fnv"
+	"sort"
+	"strings"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -27,9 +32,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/pkg/errors"
-	"hash/fnv"
-	"sort"
-	"strings"
 )
 
 var (
@@ -296,10 +298,10 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
-func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
+func getClusterMetadataSettings(httpClient *helper.HTTP) (common.MapStr, error) {
 	// For security reasons we only get the display_name setting
 	filterPaths := []string{"*.cluster.metadata.display_name"}
-	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(m.HTTP, m.HTTP.GetURI(), filterPaths)
+	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(httpClient, httpClient.GetURI(), filterPaths)
 	if err != nil {
 		return nil, errors.Wrap(err, "failure to get cluster settings")
 	}
@@ -312,7 +314,7 @@ func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
 	return clusterSettings, nil
 }
 
-func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -332,13 +334,13 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	}
 	clusterStats.Delete("cluster_name")
 
-	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
+	license, err := elasticsearch.GetLicense(httpClient, httpClient.GetURI())
 	if err != nil {
 		return errors.Wrap(err, "failed to get license from Elasticsearch")
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
@@ -367,7 +369,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	}
 	clusterStateReduced.Put("nodes_hash", nodesHash)
 
-	usage, err := elasticsearch.GetStackUsage(m.HTTP, m.HTTP.GetURI())
+	usage, err := elasticsearch.GetStackUsage(httpClient, httpClient.GetURI())
 	if err != nil {
 		return errors.Wrap(err, "failed to get stack usage from Elasticsearch")
 	}
@@ -400,7 +402,7 @@ func eventMapping(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, conten
 	event.ModuleFields.Put("cluster.name", info.ClusterName)
 	event.ModuleFields.Put("cluster.id", info.ClusterID)
 
-	clusterSettings, err := getClusterMetadataSettings(m)
+	clusterSettings, err := getClusterMetadataSettings(httpClient)
 	if err != nil {
 		return err
 	}

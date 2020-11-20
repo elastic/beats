@@ -20,15 +20,19 @@
 package cluster_stats
 
 import (
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/stretchr/testify/require"
 )
 
-func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
+func createEsMuxer(license string) *http.ServeMux {
 	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
 	}
@@ -81,10 +85,25 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	return mux
 }
 
-func TestData(t *testing.T) {
-	//elasticsearch.TestMapperWithInfo(t, "./_meta/test/cluster_stats.*.json", eventMapping)
+func TestMapper(t *testing.T) {
+	mux := createEsMuxer("platinum")
 
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	httpHelper, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{
+		URI:          server.URL,
+		SanitizedURI: server.URL,
+		Host:         server.URL,
+	})
+	require.NoError(t, err)
+
+	elasticsearch.TestMapperWithHttpHelper(t, "./_meta/test/cluster_stats.*.json",
+		httpHelper, eventMapping)
+}
+
+func TestData(t *testing.T) {
+	mux := createEsMuxer("platinum")
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
