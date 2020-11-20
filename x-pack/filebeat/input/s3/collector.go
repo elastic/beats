@@ -82,17 +82,11 @@ type s3Context struct {
 	errC chan error
 }
 
-var (
-	// The maximum number of messages to return. Amazon SQS never returns more messages
-	// than this value (however, fewer messages might be returned).
-	maxNumberOfMessage uint8 = 10
-
-	// The duration (in seconds) for which the call waits for a message to arrive
-	// in the queue before returning. If a message is available, the call returns
-	// sooner than WaitTimeSeconds. If no messages are available and the wait time
-	// expires, the call returns successfully with an empty list of messages.
-	waitTimeSecond uint8 = 10
-)
+// The duration (in seconds) for which the call waits for a message to arrive
+// in the queue before returning. If a message is available, the call returns
+// sooner than WaitTimeSeconds. If no messages are available and the wait time
+// expires, the call returns successfully with an empty list of messages.
+var waitTimeSecond uint8 = 10
 
 func (c *s3Collector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
@@ -148,8 +142,7 @@ func (c *s3Collector) processMessage(svcS3 s3iface.ClientAPI, message sqs.Messag
 	// read from s3 object and create event for each log line
 	err = c.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
-		err = fmt.Errorf("handleS3Objects failed: %w", err)
-		c.logger.Error(err)
+		c.logger.Error(fmt.Errorf("handleS3Objects failed: %w", err))
 		return err
 	}
 	c.logger.Debugf("handleS3Objects succeed")
@@ -163,7 +156,12 @@ func (c *s3Collector) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.
 			return nil
 		case err := <-errC:
 			if err != nil {
-				c.logger.Warn("Processing message failed, updating visibility timeout")
+				if err == context.DeadlineExceeded {
+					c.logger.Info("Context deadline exceeded, updating visibility timeout")
+				} else {
+					c.logger.Warnf("Processing message failed '%w', updating visibility timeout", err)
+				}
+
 				err := c.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
 					c.logger.Error(fmt.Errorf("SQS ChangeMessageVisibilityRequest failed: %w", err))
@@ -201,7 +199,7 @@ func (c *s3Collector) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeou
 		&sqs.ReceiveMessageInput{
 			QueueUrl:              &c.config.QueueURL,
 			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   awssdk.Int64(int64(maxNumberOfMessage)),
+			MaxNumberOfMessages:   awssdk.Int64(int64(c.config.MaxNumberOfMessages)),
 			VisibilityTimeout:     &visibilityTimeout,
 			WaitTimeSeconds:       awssdk.Int64(int64(waitTimeSecond)),
 		})
@@ -298,8 +296,7 @@ func (c *s3Collector) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, e
 		c.logger.Debugf("Processing file from s3 bucket \"%s\" with name \"%s\"", info.name, info.key)
 		err := c.createEventsFromS3Info(svc, info, s3Ctx)
 		if err != nil {
-			err = fmt.Errorf("createEventsFromS3Info failed processing file from s3 bucket \"%s\" with name \"%s\": %w", info.name, info.key, err)
-			c.logger.Error(err)
+			c.logger.Error(fmt.Errorf("createEventsFromS3Info failed processing file from s3 bucket \"%s\" with name \"%s\": %w", info.name, info.key, err))
 			s3Ctx.setError(err)
 		}
 	}
@@ -326,8 +323,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = fmt.Errorf("s3 GetObjectRequest canceled for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
-				c.logger.Error(err)
+				c.logger.Error(fmt.Errorf("s3 GetObjectRequest canceled for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
 				return err
 			}
 
@@ -345,16 +341,14 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	isS3ObjGzipped, err := isStreamGzipped(reader)
 	if err != nil {
-		err = fmt.Errorf("could not determine if S3 object is gzipped: %w", err)
-		c.logger.Error(err)
+		c.logger.Error(fmt.Errorf("could not determine if S3 object is gzipped: %w", err))
 		return err
 	}
 
 	if isS3ObjGzipped {
 		gzipReader, err := gzip.NewReader(reader)
 		if err != nil {
-			err = fmt.Errorf("gzip.NewReader failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
-			c.logger.Error(err)
+			c.logger.Error(fmt.Errorf("gzip.NewReader failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
 			return err
 		}
 		reader = bufio.NewReader(gzipReader)
@@ -366,31 +360,28 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		decoder := json.NewDecoder(reader)
 		err := c.decodeJSON(decoder, objectHash, info, s3Ctx)
 		if err != nil {
-			err = fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
-			c.logger.Error(err)
+			c.logger.Error(fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
 			return err
 		}
 		return nil
 	}
 
 	// handle s3 objects that are not json content-type
-	offset := 0
+	var offset int64
 	for {
 		log, err := readStringAndTrimDelimiter(reader)
 		if err == io.EOF {
 			// create event for last line
-			offset += len([]byte(log))
+			offset += int64(len(log))
 			event := createEvent(log, offset, info, objectHash, s3Ctx)
 			err = c.forwardEvent(event)
 			if err != nil {
-				err = fmt.Errorf("forwardEvent failed: %w", err)
-				c.logger.Error(err)
+				c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
 				return err
 			}
 			return nil
 		} else if err != nil {
-			err = fmt.Errorf("readStringAndTrimDelimiter failed: %w", err)
-			c.logger.Error(err)
+			c.logger.Error(fmt.Errorf("readStringAndTrimDelimiter failed: %w", err))
 			return err
 		}
 
@@ -399,12 +390,11 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 		}
 
 		// create event per log line
-		offset += len([]byte(log))
+		offset += int64(len(log))
 		event := createEvent(log, offset, info, objectHash, s3Ctx)
 		err = c.forwardEvent(event)
 		if err != nil {
-			err = fmt.Errorf("forwardEvent failed: %w", err)
-			c.logger.Error(err)
+			c.logger.Error(fmt.Errorf("forwardEvent failed: %w", err))
 			return err
 		}
 	}
@@ -412,7 +402,7 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 }
 
 func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Info s3Info, s3Ctx *s3Context) error {
-	offset := 0
+	var offset int64
 	for {
 		var jsonFields interface{}
 		err := decoder.Decode(&jsonFields)
@@ -440,7 +430,7 @@ func (c *s3Collector) decodeJSON(decoder *json.Decoder, objectHash string, s3Inf
 	}
 }
 
-func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int, error) {
+func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
 		if s3Info.expandEventListFromField != "" {
@@ -493,11 +483,11 @@ func (c *s3Collector) jsonFieldsType(jsonFields interface{}, offset int, objectH
 	return offset, nil
 }
 
-func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int, error) {
+func (c *s3Collector) convertJSONToEvent(jsonFields interface{}, offset int64, objectHash string, s3Info s3Info, s3Ctx *s3Context) (int64, error) {
 	vJSON, _ := json.Marshal(jsonFields)
 	logOriginal := string(vJSON)
 	log := trimLogDelimiter(logOriginal)
-	offset += len([]byte(log))
+	offset += int64(len(log))
 	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
 
 	err := c.forwardEvent(event)
@@ -548,7 +538,7 @@ func readStringAndTrimDelimiter(reader *bufio.Reader) (string, error) {
 	return trimLogDelimiter(logOriginal), nil
 }
 
-func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
+func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
 	s3Ctx.Inc()
 
 	event := beat.Event{
@@ -576,9 +566,13 @@ func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *
 		},
 		Private: s3Ctx,
 	}
-	event.SetID(objectHash + "-" + fmt.Sprintf("%012d", offset))
+	event.SetID(objectID(objectHash, offset))
 
 	return event
+}
+
+func objectID(objectHash string, offset int64) string {
+	return fmt.Sprintf("%s-%012d", objectHash, offset)
 }
 
 func constructObjectURL(info s3Info) string {

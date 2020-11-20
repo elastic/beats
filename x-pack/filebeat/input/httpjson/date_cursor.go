@@ -41,7 +41,9 @@ func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 	c.urlField = config.DateCursor.URLField
 	c.initialInterval = config.DateCursor.InitialInterval
 	c.dateFormat = config.DateCursor.getDateFormat()
-	c.valueTpl = config.DateCursor.ValueTemplate.Template
+	if config.DateCursor.ValueTemplate != nil {
+		c.valueTpl = config.DateCursor.ValueTemplate.Template
+	}
 
 	return c
 }

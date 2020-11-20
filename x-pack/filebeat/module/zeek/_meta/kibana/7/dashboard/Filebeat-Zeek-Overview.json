@@ -736,7 +736,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "zeek.ssl.server_name",
+                "field": "zeek.ssl.server.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

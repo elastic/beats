@@ -29,6 +29,7 @@ func RunPubSub(ctx context.Context, m gpubsub.Message) error {
 		ConfigOverrides: config.FunctionOverrides,
 	}
 
+	cfgfile.SetConfigPath("/srv/src/pubsub")
 	cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 
 	return instance.Run(settings, initFunctionbeat(ctx, m))

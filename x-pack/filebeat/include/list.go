@@ -10,7 +10,7 @@ import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/googlepubsub"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/s3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
@@ -43,6 +43,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/netscout"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/o365"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/okta"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/oracle"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/panw"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/proofpoint"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/rabbitmq"

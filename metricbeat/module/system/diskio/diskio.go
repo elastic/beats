@@ -21,6 +21,7 @@ package diskio
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
@@ -104,9 +105,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				"time":  counters.WriteTime,
 				"bytes": counters.WriteBytes,
 			},
-			"io": common.MapStr{
-				"time": counters.IoTime,
-			},
 		}
 
 		// accumulate values from all interfaces
@@ -114,12 +112,16 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		diskWriteBytes += counters.WriteBytes
 
 		//Add linux-only data if agent is off as not to make breaking changes.
-		if !m.IsAgent {
+		if !m.IsAgent && runtime.GOOS == "linux" {
 			result, err := m.statistics.CalcIOStatistics(counters)
 			if err != nil {
 				return errors.Wrap(err, "error calculating iostat")
 			}
 			event["iostat"] = iostat.AddLinuxIOStat(result)
+		}
+
+		if runtime.GOOS != "windows" {
+			event.Put("io.time", counters.IoTime)
 		}
 
 		if counters.SerialNumber != "" {

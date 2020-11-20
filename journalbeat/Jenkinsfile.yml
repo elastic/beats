@@ -11,7 +11,25 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "journalbeat"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        make: |
+          make -C journalbeat check;
+          make -C journalbeat update;
+          make check-no-changes;
+    arm:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "arm"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test journalbeat for arm"
+            labels:
+                - "arm"
+            parameters:
+                - "armTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
     unitTest:
         mage: "mage build unitTest"

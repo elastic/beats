@@ -5,6 +5,7 @@
 package add_cloudfoundry_metadata
 
 import (
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,6 +33,11 @@ const selector = "add_cloudfoundry_metadata"
 // New constructs a new add_cloudfoundry_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	var config cloudfoundry.Config
+
+	// ShardID is required in cloudfoundry config to consume from the firehose,
+	// but not for metadata requests, randomly generate one and use it.
+	config.ShardID = uuid.Must(uuid.NewV4()).String()
+
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
@@ -61,6 +67,10 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	val, _ := valI.(string)
 	if val == "" {
 		// wrong type or not set
+		return event, nil
+	}
+	if hasMetadataFields(event) {
+		// nothing to do, fields already present
 		return event, nil
 	}
 	app, err := d.client.GetAppByGuid(val)
@@ -101,4 +111,22 @@ func (d *addCloudFoundryMetadata) Close() error {
 		return errors.Wrap(err, "closing client")
 	}
 	return nil
+}
+
+var metadataFields = []string{
+	"cloudfoundry.app.id",
+	"cloudfoundry.app.name",
+	"cloudfoundry.space.id",
+	"cloudfoundry.space.name",
+	"cloudfoundry.org.id",
+	"cloudfoundry.org.name",
+}
+
+func hasMetadataFields(event *beat.Event) bool {
+	for _, name := range metadataFields {
+		if value, err := event.GetValue(name); value == "" || err != nil {
+			return false
+		}
+	}
+	return true
 }

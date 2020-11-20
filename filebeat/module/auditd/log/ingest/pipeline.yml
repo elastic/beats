@@ -11,11 +11,12 @@ processors:
       AUDIT_NODE: "node=%{IPORHOST:auditd.log.node} "
       AUDIT_PREFIX: "^(?:%{AUDIT_NODE})?%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
       AUDIT_KEY_VALUES: "%{WORD}=%{GREEDYDATA}"
+      ANY: ".*"
     patterns:
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid}
       new auid=%{NUMBER:auditd.log.new_auid} old ses=%{NUMBER:auditd.log.old_ses}
       new ses=%{NUMBER:auditd.log.new_ses}"
-    - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=['\"]%{AUDIT_KEY_VALUES:auditd.log.sub_kv}['\"]"
+    - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=['\"]([^=]*\\s)?%{ANY:auditd.log.sub_kv}['\"]"
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv}"
     - "%{AUDIT_PREFIX}"
     - "%{AUDIT_TYPE} %{AUDIT_KEY_VALUES:auditd.log.kv}"
@@ -48,10 +49,14 @@ processors:
 - remove:
     field: auditd.log.epoch
     ignore_failure: true
-- convert:
-    field: auditd.log.sequence
-    type: integer
-    ignore_missing: true
+- rename:
+    ignore_failure: true
+    field: auditd.log.old-auid
+    target_field: auditd.log.old_auid
+- rename:
+    ignore_failure: true
+    field: auditd.log.old-ses
+    target_field: auditd.log.old_ses
 - script:
     lang: painless
     source: |
@@ -136,6 +141,38 @@ processors:
     params:
       single_quote: "'"
       double_quote: "\""
+- convert:
+    field: auditd.log.sequence
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.lport
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.rport
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.entries
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.dst_prefixlen
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.ksize
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.size
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.src_prefixlen
+    type: long
+    ignore_missing: true
 - set:
     field: event.kind
     value: event
@@ -223,6 +260,10 @@ processors:
     target_field: user.name
 - rename:
     ignore_failure: true
+    field: auditd.log.user
+    target_field: user.name
+- rename:
+    ignore_failure: true
     field: auditd.log.uid
     target_field: user.id
 - rename:
@@ -301,6 +342,10 @@ processors:
     ignore_failure: true
     field: process.args
     separator: "\\s+"
+- rename:
+    ignore_failure: true
+    field: auditd.log.argc
+    target_field: process.args_count
 - script:
     if: "ctx?.process?.args != null"
     lang: painless
@@ -308,6 +353,10 @@ processors:
       if (ctx.process.args instanceof List) {
         ctx.process.args_count = ctx.process.args.length;
       }
+- convert:
+    ignore_missing: true
+    field: process.args_count
+    type: long
 - rename:
     ignore_failure: true
     field: auditd.log.exit
@@ -343,6 +392,11 @@ processors:
     ignore_failure: true
     field: auditd.log.src
     target_field: source.address
+- rename:
+    ignore_failure: true
+    field: auditd.log.addr
+    target_field: source.address
+    if: ctx?.source?.address == null
 - rename:
     ignore_failure: true
     field: auditd.log.dst

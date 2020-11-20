@@ -116,18 +116,11 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 		return nil, err
 	}
 
-	var t string
-	if runtime.GOOS == "windows" {
-		t = fs.TypeName
-	} else {
-		t = fs.SysTypeName
-	}
-
 	filesystem := FSStat{
 		FileSystemUsage: stat,
 		DevName:         fs.DevName,
 		Mount:           fs.DirName,
-		SysTypeName:     t,
+		SysTypeName:     fs.SysTypeName,
 	}
 
 	return &filesystem, nil
@@ -151,14 +144,14 @@ func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
 		"available":   fsStat.Avail,
-		"files":       fsStat.Files,
+		"free":        fsStat.Free,
 		"used": common.MapStr{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
 		},
 	}
 	if runtime.GOOS != "windows" {
-		evt.Put("free", fsStat.Free)
+		evt.Put("files", fsStat.Files)
 		evt.Put("free_files", fsStat.FreeFiles)
 	}
 	return evt

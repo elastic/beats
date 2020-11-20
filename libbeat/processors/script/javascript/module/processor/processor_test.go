@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,6 +36,7 @@ import (
 
 func init() {
 	RegisterPlugin("Mock", newMock)
+	RegisterPlugin("MockWithCloser", newMockWithCloser)
 }
 
 func testEvent() *beat.Event {
@@ -67,14 +69,10 @@ function process(evt) {
 
 	logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	checkEvent(t, evt, "added", "new_value")
 }
@@ -107,20 +105,32 @@ function process(evt) {
 
 	logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// checking if hello world is added to the event in different languages
 	checkEvent(t, evt, "helló", "világ")
 	checkEvent(t, evt, "hola", "mundo")
 	checkEvent(t, evt, "hello", "world")
 	checkEvent(t, evt, "hallo", "Welt")
+}
+
+func TestProcessorWithCloser(t *testing.T) {
+	const script = `
+var processor = require('processor');
+
+var processorWithCloser = new processor.MockWithCloser().Build()
+
+function process(evt) {
+    processorWithCloser.Run(evt);
+}
+`
+
+	logp.TestingSetup()
+	_, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	require.Error(t, err, "processor that implements Closer() shouldn't be allowed")
 }
 
 func checkEvent(t *testing.T, evt *beat.Event, key, value string) {
@@ -161,4 +171,24 @@ func (m *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (m *mockProcessor) String() string {
 	s, _ := json.Marshal(m.fields)
 	return fmt.Sprintf("mock=%s", s)
+}
+
+type mockProcessorWithCloser struct{}
+
+func newMockWithCloser(c *common.Config) (processors.Processor, error) {
+	return &mockProcessorWithCloser{}, nil
+}
+
+func (m *mockProcessorWithCloser) Run(event *beat.Event) (*beat.Event, error) {
+	// Nothing to do, we only want this struct to implement processors.Closer
+	return event, nil
+}
+
+func (m *mockProcessorWithCloser) Close() error {
+	// Nothing to do, we only want this struct to implement processors.Closer
+	return nil
+}
+
+func (m *mockProcessorWithCloser) String() string {
+	return "mockWithCloser"
 }
