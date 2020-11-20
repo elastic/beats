@@ -333,7 +333,8 @@ func (h *Harvester) Run() error {
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			case reader.ErrLineUnparsable:
 				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
-				//line unparsable, go to next line
+				//line unparsable, update offset and go to next line
+				h.state.Offset += int64(message.Bytes)
 				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
