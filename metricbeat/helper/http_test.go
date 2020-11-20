@@ -97,7 +97,7 @@ func TestTimeout(t *testing.T) {
 		SanitizedURI: ts.URL,
 	}
 
-	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	h, err := NewHTTPFromConfig(cfg, hostData)
 	require.NoError(t, err)
 
 	checkTimeout(t, h)
@@ -114,7 +114,7 @@ func TestConnectTimeout(t *testing.T) {
 		SanitizedURI: uri,
 	}
 
-	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	h, err := NewHTTPFromConfig(cfg, hostData)
 	require.NoError(t, err)
 
 	checkTimeout(t, h)
@@ -138,7 +138,7 @@ func TestAuthentication(t *testing.T) {
 		URI:          ts.URL,
 		SanitizedURI: ts.URL,
 	}
-	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	h, err := NewHTTPFromConfig(cfg, hostData)
 	require.NoError(t, err)
 
 	response, err := h.FetchResponse()
@@ -153,7 +153,7 @@ func TestAuthentication(t *testing.T) {
 		User:         expectedUser,
 		Password:     expectedPassword,
 	}
-	h, err = newHTTPFromConfig(cfg, "test", hostData)
+	h, err = NewHTTPFromConfig(cfg, hostData)
 	require.NoError(t, err)
 
 	response, err = h.FetchResponse()
@@ -168,7 +168,7 @@ func TestSetHeader(t *testing.T) {
 		"Override": "default",
 	}
 
-	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	h, err := NewHTTPFromConfig(cfg, mb.HostData{})
 	require.NoError(t, err)
 
 	h.SetHeader("Override", "overridden")
@@ -182,7 +182,7 @@ func TestSetHeaderDefault(t *testing.T) {
 		"Override": "default",
 	}
 
-	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	h, err := NewHTTPFromConfig(cfg, mb.HostData{})
 	require.NoError(t, err)
 
 	h.SetHeaderDefault("Override", "overridden")
@@ -222,7 +222,7 @@ func TestOverUnixSocket(t *testing.T) {
 			SanitizedURI: "http://unix",
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
@@ -260,7 +260,7 @@ func TestOverUnixSocket(t *testing.T) {
 			SanitizedURI: uri,
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()

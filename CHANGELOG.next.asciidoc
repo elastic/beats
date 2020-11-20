@@ -548,6 +548,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
+- Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 
 *Filebeat*
 
@@ -721,6 +722,7 @@ from being added to events by default. {pull}18159[18159]
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 - Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
+- Improve panw ECS url fields mapping. {pull}22481[22481]
 
 *Heartbeat*
 
