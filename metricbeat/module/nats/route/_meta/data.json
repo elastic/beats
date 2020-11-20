@@ -16,7 +16,19 @@
             "time": "2018-12-28T12:33:53.026865597Z"
         },
         "routes": {
-            "total": 2
+            "in": {
+                "bytes": 0,
+                "messages": 0
+            },
+            "ip": "172.25.255.2",
+            "out": {
+                "bytes": 0,
+                "messages": 0
+            },
+            "pending_size": 0,
+            "port": 60736,
+            "remote_id": "NCYX4P3ZCXZT3UF4BBZUG46S7EU224XXXLUTUBUDOIAUAIR5WJV73BV5",
+            "subscriptions": 0,
         }
     },
     "type":"metricsets"
