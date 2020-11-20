@@ -27,7 +27,7 @@ func GetConfig(metricset string, host string, xpackEnabled bool, statsExcludeUsa
 	if xpackEnabled {
 		config["xpack.enabled"] = true
 	}
-	if statsExcludeUsage == false {
+	if !statsExcludeUsage {
 		config["stats.exclude_usage"] = false
 	}
 
