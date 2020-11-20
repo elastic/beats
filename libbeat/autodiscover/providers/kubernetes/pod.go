@@ -75,43 +75,34 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
 	}
 
-	var nodeMeta, namespaceMeta metadata.MetaGen
-	var nodeWatcher, namespaceWatcher kubernetes.Watcher
-	metaConf := config.AddResourceMetadata
-	if metaConf != nil {
-		if metaConf.Node != nil && metaConf.Node.Enabled() {
-			options := kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-				Node:        config.Node,
-			}
-			if config.Namespace != "" {
-				options.Namespace = config.Namespace
-			}
-			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-			}
-
-			nodeMeta = metadata.NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
-		}
-
-		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
-			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-			}, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-			}
-
-			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
-		}
+	options := kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Node:        config.Node,
 	}
+	if config.Namespace != "" {
+		options.Namespace = config.Namespace
+	}
+	metaConf := config.AddResourceMetadata
+	if metaConf == nil {
+		metaConf = metadata.GetDefaultResourceMetadataConfig()
+	}
+	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+	}
+	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	}
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 	p := &pod{
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nodeMeta, namespaceMeta),
+		metagen:          metaGen,
 		logger:           logger,
 		watcher:          watcher,
 		nodeWatcher:      nodeWatcher,
