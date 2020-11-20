@@ -100,7 +100,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-
 *Journalbeat*
 
 - Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
@@ -341,6 +340,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
 
 *Journalbeat*
 
@@ -434,6 +434,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add interval information to `monitor` metricset in azure. {pull}22152[22152]
 - Change Session ID type from int to string {pull}22359[22359]
 - Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
+- Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
 
 *Packetbeat*
 
@@ -529,6 +530,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add add_resource_metadata option setting (always enabled) for add_kubernetes_metadata setting. {pull}22189[22189]
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
+- Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 
 *Auditbeat*
 
@@ -546,6 +548,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
+- Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 
 *Filebeat*
 
@@ -714,6 +717,13 @@ from being added to events by default. {pull}18159[18159]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Added support for MySQL Enterprise audit logs. {pull}22273[22273]
+- Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
+- Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
+- Copy tag names from MISP data into events. {pull}21664[21664]
+- Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
+- Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
+- Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
+- Improve panw ECS url fields mapping. {pull}22481[22481]
 
 *Heartbeat*
 
@@ -833,6 +843,8 @@ same journal. {pull}18467[18467]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
+- Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
+- Add unit file states to system/service {pull}22557[22557]
 
 *Packetbeat*
 
