@@ -21,6 +21,100 @@
         - name: name
           type: alias
           path: elasticsearch.node.name
+    - name: ccr_auto_follow_stats
+      type: group
+      fields:
+        - name: number_of_failed_follow_indices
+          type: alias
+          path: elasticsearch.ccr.auto_follow.failed.follow_indices.count
+        - name: number_of_failed_remote_cluster_state_requests
+          type: alias
+          path: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count
+        - name: number_of_successful_follow_indices
+          type: alias
+          path: elasticsearch.ccr.auto_follow.success.follow_indices.count
+    - name: ccr_stats
+      type: group
+      fields:
+        - name: shard_id
+          type: alias
+          path: elasticsearch.ccr.shard_id
+        - name: remote_cluster
+          type: alias
+          path: elasticsearch.ccr.remote_cluster
+        - name: leader_index
+          type: alias
+          path: elasticsearch.ccr.leader.index
+        - name: follower_index
+          type: alias
+          path: elasticsearch.ccr.follower.index
+        - name: leader_global_checkpoint
+          type: alias
+          path: elasticsearch.ccr.leader.global_checkpoint
+        - name: leader_max_seq_no
+          type: alias
+          path: elasticsearch.ccr.leader.max_seq_no
+        - name: follower_global_checkpoint
+          type: alias
+          path: elasticsearch.ccr.follower.global_checkpoint
+        - name: follower_max_seq_no
+          type: alias
+          path: elasticsearch.ccr.follower.max_seq_no
+        - name: last_requested_seq_no
+          type: alias
+          path: elasticsearch.ccr.last_requested_seq_no
+        - name: outstanding_read_requests
+          type: alias
+          path: elasticsearch.ccr.requests.outstanding.read.count
+        - name: outstanding_write_requests
+          type: alias
+          path: elasticsearch.ccr.requests.outstanding.write.count
+        - name: write_buffer_operation_count
+          type: alias
+          path: elasticsearch.ccr.write_buffer.operation.count
+        - name: write_buffer_size_in_bytes
+          type: alias
+          path: elasticsearch.ccr.write_buffer.size.bytes
+        - name: follower_mapping_version
+          type: alias
+          path: elasticsearch.ccr.follower.mapping_version
+        - name: follower_settings_version
+          type: alias
+          path: elasticsearch.ccr.follower.settings_version
+        - name: follower_aliases_version
+          type: alias
+          path: elasticsearch.ccr.follower.aliases_version
+        - name: total_read_time_millis
+          type: alias
+          path: elasticsearch.ccr.total_time.read.ms
+        - name: total_read_remote_exec_time_millis
+          type: alias
+          path: elasticsearch.ccr.total_time.read.remote_exec.ms
+        - name: successful_read_requests
+          type: alias
+          path: elasticsearch.ccr.requests.successful.read.count
+        - name: failed_read_requests
+          type: alias
+          path: elasticsearch.ccr.requests.failed.read.count
+        - name: operations_read
+          type: alias
+          path: elasticsearch.ccr.follower.operations.read.count
+        - name: operations_written
+          type: alias
+          path: elasticsearch.ccr.follower.operations_written
+        - name: bytes_read
+          type: alias
+          path: elasticsearch.ccr.bytes_read
+        - name: total_write_time_millis
+          type: alias
+          path: elasticsearch.ccr.total_time.write.ms
+        - name: successful_write_requests
+          type: alias
+          path: elasticsearch.ccr.requests.successful.write.count
+        - name: failed_write_requests
+          type: alias
+          path: elasticsearch.ccr.requests.failed.write.count
+
     - name: node_stats
       type: group
       fields:
