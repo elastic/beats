@@ -14,21 +14,19 @@ IF ERRORLEVEL 1 (
 )
 mkdir %WORKSPACE%\bin
 
-REM If 32 bits then install the GVM accordingly
-IF NOT EXIST "%PROGRAMFILES(X86)%" (
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+IF EXIST "%PROGRAMFILES(X86)%" (
+    SET GVM_FILE=gvm-windows-amd64.exe
+) ELSE (
+    SET GVM_FILE=gvm-windows-386.exe
 )
 
 set GVM_BIN=gvm
 where /q %GVM_BIN%
 IF ERRORLEVEL 1 (
     set GVM_BIN=gvm.exe
-    IF EXIST "%PROGRAMFILES(X86)%" (
-        curl -L -o %WORKSPACE%\bin\%GVM_BIN% https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
-    ) ELSE (
-        curl -L -o %WORKSPACE%\bin\%GVM_BIN% https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
-    )
+    curl -L -o %WORKSPACE%\bin\%GVM_BIN% https://github.com/andrewkroh/gvm/releases/download/v0.2.2/%GVM_FILE%
     IF ERRORLEVEL 1 (
+        REM The download of gvm has failed.
         exit /b 1
     )
     if EXIST %WORKSPACE%\bin\%GVM_BIN% (
@@ -45,10 +43,16 @@ REM Install the given go version
 REM Configure the given go version
 FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
-REM List the gvm installation for debugging purposes
-DIR /A /S %GOROOT%
-
 go env
+IF ERRORLEVEL 1 (
+    REM Fallback the go installation with choco, since gvm in some workers doesn't install go correctly
+    choco install golang -y -r --no-progress --version=%GO_VERSION%
+    IF NOT ERRORLEVEL 0 (
+        exit /b 1
+    )
+    go env
+)
+
 go get github.com/magefile/mage
 where mage
 mage -version
