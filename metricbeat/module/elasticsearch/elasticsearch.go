@@ -81,11 +81,14 @@ const ModuleName = "elasticsearch"
 
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
-	ClusterName string `json:"cluster_name"`
-	ClusterID   string `json:"cluster_uuid"`
-	Version     struct {
-		Number *common.Version `json:"number"`
-	} `json:"version"`
+	ClusterName string  `json:"cluster_name"`
+	ClusterID   string  `json:"cluster_uuid"`
+	Version     Version `json:"version"`
+}
+
+// Version contains the semver formatted version of ES
+type Version struct {
+	Number *common.Version `json:"number"`
 }
 
 // NodeInfo struct cotains data about the node.

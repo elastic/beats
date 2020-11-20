@@ -20,13 +20,14 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/helper"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -105,7 +106,8 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 }
 
 // TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
-func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP, mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte) error) {
+func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP,
+	mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte) error) {
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -114,6 +116,11 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 	info := Info{
 		ClusterID:   "1234",
 		ClusterName: "helloworld",
+		Version: Version{Number: &common.Version{
+			Major:  7,
+			Minor:  6,
+			Bugfix: 0,
+		}},
 	}
 
 	for _, f := range files {
