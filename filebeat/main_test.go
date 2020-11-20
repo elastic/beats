@@ -36,7 +36,7 @@ var fbCommand *cmd.BeatsRootCmd
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	fbCommand = fbcmd.Filebeat(inputs.Init)
+	fbCommand = fbcmd.Filebeat(inputs.Init, fbcmd.FilebeatSettings())
 	fbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 	fbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
@@ -51,5 +51,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, fbCommand.Name())
+	template.TestTemplate(t, fbCommand.Name(), false)
 }

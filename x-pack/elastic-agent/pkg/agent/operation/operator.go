@@ -256,9 +256,9 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return a, nil
 	}
 
-	specifier, ok := p.(app.Specifier)
+	desc, ok := p.(*app.Descriptor)
 	if !ok {
-		return nil, fmt.Errorf("descriptor is not an app.Specifier")
+		return nil, fmt.Errorf("descriptor is not an app.Descriptor")
 	}
 
 	// TODO: (michal) join args into more compact options version
@@ -272,7 +272,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			p.BinaryName(),
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
-			specifier,
+			desc,
 			o.srv,
 			o.config,
 			o.logger,
@@ -288,7 +288,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),
-			specifier,
+			desc,
 			o.srv,
 			o.config,
 			o.logger,

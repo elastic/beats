@@ -172,7 +172,7 @@ The above configuration would generate two input configurations. The first input
 tokenizer. The second input handles everything but debug logs.
 
 [float]
-===== Configuring Namespace Defaults
+=====  Namespace Defaults
 
 Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
 The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
@@ -186,7 +186,7 @@ filebeat.autodiscover:
       hints.enabled: true
       add_resource_metadata:
         namespace:
-          enabled: true
+          include_annotations: ["nsannotation1"]
 -------------------------------------------------------------------------------------
 
 
