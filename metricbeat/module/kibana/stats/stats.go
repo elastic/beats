@@ -224,6 +224,6 @@ func (m *MetricSet) calculateIntervalMs() int64 {
 }
 
 func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return m.statsExcludeUsage == false && // If the config claims we should exclude the usage, there is no need to check for the time
+	return !m.statsExcludeUsage && // If the config claims we should exclude the usage, there is no need to check for the time
 		now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
 }
