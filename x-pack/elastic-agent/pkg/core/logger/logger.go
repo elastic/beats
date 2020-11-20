@@ -86,7 +86,7 @@ func toCommonConfig(cfg *Config) (*common.Config, error) {
 func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
-	cfg.Level = logp.DebugLevel
+	cfg.Level = logp.InfoLevel
 	cfg.Files.Path = paths.Logs()
 	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
 
@@ -115,24 +115,5 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	}
 
 	encoder := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(logp.JSONEncoderConfig()))
-	// return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapcore.DebugLevel)), nil
-	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, zapLevel(cfg.Level))), nil
-}
-
-func zapLevel(level logp.Level) zapcore.Level {
-	zapLevel := zapcore.DebugLevel
-	switch level {
-	case logp.DebugLevel:
-		zapLevel = zapcore.DebugLevel
-	case logp.InfoLevel:
-		zapLevel = zapcore.InfoLevel
-	case logp.WarnLevel:
-		zapLevel = zapcore.WarnLevel
-	case logp.ErrorLevel:
-		zapLevel = zapcore.ErrorLevel
-	case logp.CriticalLevel:
-		zapLevel = zapcore.ErrorLevel
-	}
-
-	return zapLevel
+	return ecszap.WrapCore(zapcore.NewCore(encoder, rotator, cfg.Level.ZapLevel())), nil
 }

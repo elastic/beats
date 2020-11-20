@@ -26,7 +26,7 @@ const agentInfoKey = "agent"
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
 
-const defaultLogLevel = "debug"
+const defaultLogLevel = "info"
 
 type persistentAgentInfo struct {
 	ID       string `json:"id" yaml:"id" config:"id"`
