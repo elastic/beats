@@ -3,7 +3,7 @@
 = Stop {agent}
 
 To stop {agent} and its related executables, stop the {agent} service. Use the
-commands that work for your system. 
+commands that work with your system: 
 
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/stop-widget.asciidoc[]
 
