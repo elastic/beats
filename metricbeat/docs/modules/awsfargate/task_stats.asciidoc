@@ -6,7 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 === AWS Fargate task_stats metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/awsfargate/task_stats/_meta/docs.asciidoc[]
 

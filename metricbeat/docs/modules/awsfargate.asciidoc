@@ -6,7 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == AWS Fargate module
 
-experimental[]
+beta[]
 
 Amazon ECS on Fargate provides a method to retrieve various metadata, network
 metrics, and Docker stats about tasks and containers. This is referred to as the

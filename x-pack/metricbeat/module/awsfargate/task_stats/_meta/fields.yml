@@ -2,7 +2,7 @@
   type: group
   description: >
     `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
-  release: experimental
+  release: beta
   fields:
     - name: cpu
       type: group
