@@ -89203,6 +89203,105 @@ kibana Module
 
 
 
+*`kibana.space_id`*::
++
+--
+The id of the space associated with this request.
+
+type: keyword
+
+example: default
+
+--
+
+*`kibana.saved_object.type`*::
++
+--
+The type of the saved object associated with this request.
+
+type: keyword
+
+example: dashboard
+
+--
+
+*`kibana.saved_object.id`*::
++
+--
+The id of the saved object associated with this request.
+
+type: keyword
+
+example: 6295bdd0-0a0e-11e7-825f-6748cda7d858
+
+--
+
+*`kibana.add_to_spaces`*::
++
+--
+The set of space ids that a saved object was shared to.
+
+type: keyword
+
+example: ['default', 'marketing']
+
+--
+
+*`kibana.delete_from_spaces`*::
++
+--
+The set of space ids that a saved object was removed from.
+
+type: keyword
+
+example: ['default', 'marketing']
+
+--
+
+*`kibana.authentication_provider`*::
++
+--
+The authentication provider associated with a login event.
+
+type: keyword
+
+example: basic1
+
+--
+
+*`kibana.authentication_type`*::
++
+--
+The authentication provider type associated with a login event.
+
+type: keyword
+
+example: basic
+
+--
+
+*`kibana.authentication_realm`*::
++
+--
+The Elasticsearch authentication realm name which fulfilled a login event.
+
+type: keyword
+
+example: native
+
+--
+
+*`kibana.lookup_realm`*::
++
+--
+The Elasticsearch lookup realm which fulfilled a login event.
+
+type: keyword
+
+example: native
+
+--
+
 [float]
 === log
 
