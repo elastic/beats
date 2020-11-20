@@ -17642,6 +17642,269 @@ alias to: elasticsearch.node.name
 --
 
 
+*`ccr_auto_follow_stats.number_of_failed_follow_indices`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.failed.follow_indices.count
+
+--
+
+*`ccr_auto_follow_stats.number_of_failed_remote_cluster_state_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count
+
+--
+
+*`ccr_auto_follow_stats.number_of_successful_follow_indices`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
+
+--
+
+
+*`ccr_stats.shard_id`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.shard_id
+
+--
+
+*`ccr_stats.remote_cluster`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.remote_cluster
+
+--
+
+*`ccr_stats.leader_index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.index
+
+--
+
+*`ccr_stats.follower_index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.index
+
+--
+
+*`ccr_stats.leader_global_checkpoint`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.global_checkpoint
+
+--
+
+*`ccr_stats.leader_max_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.leader.max_seq_no
+
+--
+
+*`ccr_stats.follower_global_checkpoint`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.global_checkpoint
+
+--
+
+*`ccr_stats.follower_max_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.max_seq_no
+
+--
+
+*`ccr_stats.last_requested_seq_no`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.last_requested_seq_no
+
+--
+
+*`ccr_stats.outstanding_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.outstanding.read.count
+
+--
+
+*`ccr_stats.outstanding_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.outstanding.write.count
+
+--
+
+*`ccr_stats.write_buffer_operation_count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.write_buffer.operation.count
+
+--
+
+*`ccr_stats.write_buffer_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.write_buffer.size.bytes
+
+--
+
+*`ccr_stats.follower_mapping_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.mapping_version
+
+--
+
+*`ccr_stats.follower_settings_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.settings_version
+
+--
+
+*`ccr_stats.follower_aliases_version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.aliases_version
+
+--
+
+*`ccr_stats.total_read_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.read.ms
+
+--
+
+*`ccr_stats.total_read_remote_exec_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.read.remote_exec.ms
+
+--
+
+*`ccr_stats.successful_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.successful.read.count
+
+--
+
+*`ccr_stats.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
+
+--
+
+*`ccr_stats.operations_read`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.operations.read.count
+
+--
+
+*`ccr_stats.operations_written`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.follower.operations_written
+
+--
+
+*`ccr_stats.bytes_read`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.bytes_read
+
+--
+
+*`ccr_stats.total_write_time_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.total_time.write.ms
+
+--
+
+*`ccr_stats.successful_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.successful.write.count
+
+--
+
+*`ccr_stats.failed_write_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.write.count
+
+--
+
+
 
 
 *`node_stats.fs.total.available_in_bytes`*::
@@ -18270,6 +18533,141 @@ Cross-cluster replication stats
 
 
 
+*`elasticsearch.ccr.remote_cluster`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.ccr.bytes_read`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.last_requested_seq_no`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.shard_id`*::
++
+--
+type: integer
+
+--
+
+
+*`elasticsearch.ccr.total_time.read.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.total_time.read.remote_exec.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.total_time.write.ms`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.ccr.requests.successful.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.successful.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.requests.failed.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.failed.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.requests.outstanding.read.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.requests.outstanding.write.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.write_buffer.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.write_buffer.operation.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.ccr.auto_follow.failed.follow_indices.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ccr.auto_follow.success.follow_indices.count`*::
++
+--
+type: long
+
+--
+
 
 *`elasticsearch.ccr.leader.index`*::
 +
@@ -18287,6 +18685,13 @@ type: keyword
 Maximum sequence number of operation on the leader shard
 
 
+type: long
+
+--
+
+*`elasticsearch.ccr.leader.global_checkpoint`*::
++
+--
 type: long
 
 --
@@ -18338,6 +18743,44 @@ type: long
 Global checkpoint value on follower shard
 
 
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.max_seq_no`*::
++
+--
+Maximum sequence number of operation on the follower shard
+
+
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.mapping_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.settings_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.aliases_version`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ccr.follower.operations.read.count`*::
++
+--
 type: long
 
 --
