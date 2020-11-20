@@ -33,7 +33,7 @@ func TestMapper(t *testing.T) {
 	elasticsearch.TestMapperWithInfo(t, "./_meta/test/recovery.*.json", eventsMapping)
 }
 
-func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
+func createEsMuxer(license string) *http.ServeMux {
 	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
 	}
@@ -55,15 +55,19 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.Handle("/_nodes/_local/nodes", http.HandlerFunc(nodesLocalHandler))
 	mux.Handle("/_cluster/state/master_node", http.HandlerFunc(clusterStateMasterHandler))
-	mux.Handle("/", http.HandlerFunc(rootHandler))
 	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
+	mux.Handle("/", http.HandlerFunc(rootHandler))
+	mux.Handle("/_recovery", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		content, _ := ioutil.ReadFile("./_meta/test/recovery.710.json")
+		w.Write(content)
+	}))
 
 	return mux
 }
 
 func TestData(t *testing.T) {
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	mux := createEsMuxer("platinum")
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
