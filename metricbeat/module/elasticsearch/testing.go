@@ -20,6 +20,7 @@
 package elasticsearch
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"io/ioutil"
 	"path/filepath"
@@ -115,6 +116,11 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 	info := Info{
 		ClusterID:   "1234",
 		ClusterName: "helloworld",
+		Version: Version{Number: &common.Version{
+			Major:  7,
+			Minor:  6,
+			Bugfix: 0,
+		}},
 	}
 
 	for _, f := range files {
