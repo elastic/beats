@@ -93,7 +93,7 @@
       description: >
         The date the vulnerability was initially found.
     - name: is_fixed
-      type: date
+      type: boolean
       description: >
         If the related vulnerability has been resolved.
     - name: credit

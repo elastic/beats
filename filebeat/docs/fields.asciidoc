@@ -125834,7 +125834,7 @@ type: date
 If the related vulnerability has been resolved.
 
 
-type: date
+type: boolean
 
 --
 
