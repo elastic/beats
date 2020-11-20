@@ -77,6 +77,13 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 				},
 			}
 
+			if stdMonFields.AgentPackage != nil {
+				fieldsToMerge["package"] = common.MapStr{
+					"name": stdMonFields.AgentPackage.Name,
+					"version": stdMonFields.AgentPackage.Version,
+				}
+			}
+
 			if stdMonFields.Service.Name != "" {
 				fieldsToMerge["service"] = common.MapStr{
 					"name": stdMonFields.Service.Name,

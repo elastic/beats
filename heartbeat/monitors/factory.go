@@ -18,6 +18,8 @@
 package monitors
 
 import (
+	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -29,12 +31,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
+const (
+	FORMAT_AGENTLESS = iota
+	FORMAT_AGENT_INPUT
+)
+
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
 	info         beat.Info
 	sched        *scheduler.Scheduler
 	allowWatches bool
+	format       int
 }
 
 type publishSettings struct {
@@ -56,25 +64,35 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, sched *scheduler.Scheduler, allowWatches bool) *RunnerFactory {
-	return &RunnerFactory{info, sched, allowWatches}
+func NewFactory(info beat.Info, sched *scheduler.Scheduler, allowWatches bool, format int) *RunnerFactory {
+	return &RunnerFactory{info, sched, allowWatches, format}
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runner, error) {
+	if f.format == FORMAT_AGENT_INPUT {
+		ai, err := monitorcfg.UnpackAgentInput(c)
+		if err != nil {
+			return nil, fmt.Errorf("could not unpack agent input: %w", err)
+		}
+
+		c = ai.StandardConfig
+		//agentPkg = ai.Meta.Pkg
+	}
+
 	configEditor, err := newCommonPublishConfigs(f.info, c)
 	if err != nil {
 		return nil, err
 	}
 
 	p = pipetool.WithClientConfigEdit(p, configEditor)
-	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches)
+	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches, f.format)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
+	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches, f.format)
 }
 
 func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.ConfigEditor, error) {

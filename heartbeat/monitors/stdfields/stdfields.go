@@ -19,6 +19,7 @@ package stdfields
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
 	"time"
 
 	"github.com/pkg/errors"
@@ -44,10 +45,12 @@ type StdMonitorFields struct {
 	Service           ServiceFields      `config:"service"`
 	LegacyServiceName string             `config:"service_name"`
 	Enabled           bool               `config:"enabled"`
+	AgentPackage *monitorcfg.AgentPackage
+
 }
 
-func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
-	mpi := StdMonitorFields{Enabled: true}
+func ConfigToStdMonitorFields(config *common.Config, ap *monitorcfg.AgentPackage) (StdMonitorFields, error) {
+	mpi := StdMonitorFields{Enabled: true, AgentPackage: ap}
 
 	if err := config.Unpack(&mpi); err != nil {
 		fmt.Printf("HIER %s", err)

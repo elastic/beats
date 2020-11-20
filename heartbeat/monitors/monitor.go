@@ -23,12 +23,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/monitorcfg"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/watcher"
@@ -71,8 +71,8 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
-	m, err := newMonitor(config, registrar, nil, nil, allowWatches)
+func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool, format int) error {
+	m, err := newMonitor(config, registrar, nil, nil, allowWatches, format)
 	if m != nil {
 		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	}
@@ -100,8 +100,9 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
+	format int,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches, format)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -116,11 +117,15 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
+	format int,
 ) (*Monitor, error) {
+	// TODO: Delete this maybe? We'll figure out where this data goes
+	var agentPkg *monitorcfg.AgentPackage
+
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have
-	stdFields, err := stdfields.ConfigToStdMonitorFields(config)
+	stdFields, err := stdfields.ConfigToStdMonitorFields(config, agentPkg)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +206,7 @@ func (m *Monitor) configHash() (uint64, error) {
 }
 
 func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
-	mtConf := jobConfig{}
+	mtConf := monitorcfg.JobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}

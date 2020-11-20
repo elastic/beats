@@ -21,20 +21,12 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- type: http
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
-  id: my-monitor
-  # Human readable display name for this service in Uptime UI and elsewhere
-  name: My Monitor
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-  # Configure task schedule
-  schedule: '@every 10s'
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service.name: my-apm-service-name
-
+- id: "cd8256b0-e86a-11ea-9199-e12923f35450"
+  index: "synthetics-monitor-default"
+  name: "fwae"
+  schedule: "@every 10s"
+  type: "http"
+  urls: "http://www.elastic.co"
 # ======================= Elasticsearch template setting =======================
 
 setup.template.settings:
@@ -102,8 +94,8 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
