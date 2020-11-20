@@ -1670,7 +1670,7 @@
               "query": ""
             },
             "id": "a9b96760-2a81-11eb-8cd4-770b42226f97",
-            "index_pattern": "metric*",
+            "index_pattern": "metricbeat-*",
             "interval": "auto",
             "isModelInvalid": false,
             "series": [
