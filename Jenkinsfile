@@ -404,7 +404,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
           fixPermissions("${WORKSPACE}")
           deleteDir()
         }
-        analyseEnvironmentalIssues(id: args.id, isEnvironmentalIssue: environmentalIssue)
+        analyseEnvironmentalIssues(id: args.id, environmentalIssue: environmentalIssue)
       }
     }
   }
