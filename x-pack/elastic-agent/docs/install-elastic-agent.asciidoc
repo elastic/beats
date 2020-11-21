@@ -45,6 +45,9 @@ from {fleet}.
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.asciidoc[]
 --
++
+This step installs the {agent} files into the directory locations described
+in <<installation-layout>>.
 
 Because {agent} is installed as an auto-starting service, it will restart
 automatically if the system is rebooted.

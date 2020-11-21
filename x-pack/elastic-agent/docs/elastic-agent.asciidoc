@@ -16,9 +16,9 @@ collect data and send it to the {stack}. Behind the scenes, {agent} runs the
 To learn how to install, configure, and run your {agent}s, see:
 
 * <<elastic-agent-installation>>
+* <<run-elastic-agent-standalone>>
 * <<uninstall-elastic-agent>>
 * <<upgrade-elastic-agent>>
-* <<run-elastic-agent-standalone>>
 * <<stop-elastic-agent>>
 * <<unenroll-elastic-agent>>
 * <<elastic-agent-cmd-options>>
@@ -26,11 +26,11 @@ To learn how to install, configure, and run your {agent}s, see:
 
 include::install-elastic-agent.asciidoc[leveloffset=+1]
 
+include::run-elastic-agent-standalone.asciidoc[leveloffset=+1]
+
 include::uninstall-elastic-agent.asciidoc[leveloffset=+1]
 
 include::upgrade-elastic-agent.asciidoc[leveloffset=+1]
-
-include::run-elastic-agent-standalone.asciidoc[leveloffset=+1]
 
 include::stop-elastic-agent.asciidoc[leveloffset=+1]
 

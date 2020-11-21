@@ -30,8 +30,7 @@ uninstall {agent} on DEB or RPM:
 . On your host, <<stop-elastic-agent,stop the agent>>.
 . Manually remove the agent files from your system.
 
-//REVIEWERS: We need something like this for deb/rpm users. Please confirm the
-//process or suggest alternatives.
+//TODO: Confirm this procedure.
 
 // Add Javascript and CSS for tabbed panels
 include::tab-widgets/code.asciidoc[]
