@@ -115,19 +115,11 @@ downloaded the Beats source code yet, follow the instructions in <<setting-up-de
 Before running the Beat generator, you must decide on a name for your Beat. The name should be one word with
 the first letter capitalized. In our example, we use `Countbeat`.
 
-Now create a directory under $GOPATH for your repository and change to the new directory:
+Now run the mage script to generate the custom beat:
 
 [source,shell]
 --------------------
-mkdir ${GOPATH}/src/github.com/{user}
-cd ${GOPATH}/src/github.com/{user}
---------------------
-
-Run the mage script to generate the custom beat:
-
-
-[source,shell]
---------------------
+cd ${GOPATH}/src/github.com/elastic/beats
 mage GenerateCustomBeat
 --------------------
 
