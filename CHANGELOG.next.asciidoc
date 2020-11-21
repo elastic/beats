@@ -844,6 +844,7 @@ same journal. {pull}18467[18467]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
 - Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
 - Add unit file states to system/service {pull}22557[22557]
+- Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 
 *Packetbeat*
 
