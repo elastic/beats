@@ -8,7 +8,9 @@ The policy settings for {fleet}-managed agents are specified through the UI.
 You do not set them explicitly in a configuration file.
 
 For standalone agents, you need to configure settings in the `elastic-agent.yml`
-file. 
+file. Prior to installation, edit the file located in the extracted {agent}
+package. After installation, edit the file located in the directory
+described in <<installation-layout>>. 
 
 TIP: To get started quickly, you can use {fleet} to generate a standalone
 configuration. For more information, see <<run-elastic-agent-standalone>>.
