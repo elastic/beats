@@ -14,10 +14,9 @@ IF ERRORLEVEL 1 (
 )
 mkdir %WORKSPACE%\bin
 
-SET GVM_BIN=gvm
-SET GVM_VERSION=v0.2.2
 IF EXIST "%PROGRAMFILES(X86)%" (
     REM Force the gvm installation.
+    SET GVM_BIN=gvm.exe
     curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
@@ -25,7 +24,6 @@ IF EXIST "%PROGRAMFILES(X86)%" (
     )
 ) ELSE (
     REM Windows 7 workers got a broken gvm installation.
-    SET GVM_BIN=gvm.exe
     curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
@@ -33,7 +31,8 @@ IF EXIST "%PROGRAMFILES(X86)%" (
     )
 )
 
-where /q %GVM_BIN%
+SET GVM_BIN=gvm.exe
+WHERE /q %GVM_BIN%
 %GVM_BIN% version
 
 REM Install the given go version
