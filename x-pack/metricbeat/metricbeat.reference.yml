@@ -237,6 +237,12 @@ metricbeat.modules:
     - usage
     - vpn
 
+#----------------------------- AWS Fargate Module -----------------------------
+- module: awsfargate
+  period: 10s
+  metricsets:
+    - task_stats
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   metricsets:
