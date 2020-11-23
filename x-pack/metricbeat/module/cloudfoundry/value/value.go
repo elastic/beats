@@ -56,8 +56,11 @@ func (r *valueReporter) Event(event mb.Event) bool {
 	nameKey := "cloudfoundry.value.name"
 	if v, err := event.RootFields.GetValue(valueKey); err == nil {
 		if v, ok := v.(float64); ok && (math.IsNaN(v) || math.IsInf(v, 0)) {
-			name, _ := event.RootFields.GetValue(nameKey)
-			r.logger.Debugf("Ignored event with value that is not a number on field %s: %v", name, v)
+			if name, err := event.RootFields.GetValue(nameKey); err == nil {
+				r.logger.Debugf("Ignored event with value that is not a number on field %s: %v", name, v)
+			} else {
+				r.logger.Debugf("Ignored event with value that is not a number (couldn't get %s field): %v", nameKey, v)
+			}
 			return true
 		}
 	}
