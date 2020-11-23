@@ -41500,6 +41500,16 @@ type: long
 
 --
 
+*`system.diskio.io.ops`*::
++
+--
+The total number of I/Os in progress.
+
+
+type: long
+
+--
+
 *`system.diskio.iostat.read.request.merges_per_sec`*::
 +
 --
