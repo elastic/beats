@@ -24,9 +24,9 @@ func (t *valueTpl) Unpack(in string) error {
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
 			"now":                 now,
-			"hour":                hour,
 			"parseDate":           parseDate,
 			"formatDate":          formatDate,
+			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
@@ -42,12 +42,14 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal string, log *logp.Logger) (val string) {
+func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := r.(error)
 			log.Infof("template execution: %v", err)
-			val = defaultVal
+			if defaultVal != nil {
+				val = defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
+			}
 		}
 	}()
 
@@ -67,12 +69,12 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		log.Infof("template execution: %v", err)
-		return defaultVal
+		return defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
 	}
 
 	val = buf.String()
 	if val == "" || strings.Contains(val, "<no value>") {
-		val = defaultVal
+		val = defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
 	}
 	return val
 }
@@ -94,15 +96,16 @@ var (
 )
 
 func now(add ...time.Duration) time.Time {
-	now := timeNow()
+	now := timeNow().UTC()
 	if len(add) == 0 {
 		return now
 	}
 	return now.Add(add[0])
 }
 
-func hour(n int) time.Duration {
-	return time.Duration(n) * time.Hour
+func parseDuration(s string) time.Duration {
+	d, _ := time.ParseDuration(s)
+	return d
 }
 
 func parseDate(date string, layout ...string) time.Time {
@@ -121,7 +124,7 @@ func parseDate(date string, layout ...string) time.Time {
 		return time.Time{}
 	}
 
-	return t
+	return t.UTC()
 }
 
 func formatDate(date time.Time, layouttz ...string) string {
@@ -149,15 +152,15 @@ func formatDate(date time.Time, layouttz ...string) string {
 }
 
 func parseTimestamp(s int64) time.Time {
-	return time.Unix(s, 0)
+	return time.Unix(s, 0).UTC()
 }
 
 func parseTimestampMilli(ms int64) time.Time {
-	return time.Unix(0, ms*1e6)
+	return time.Unix(0, ms*1e6).UTC()
 }
 
 func parseTimestampNano(ns int64) time.Time {
-	return time.Unix(0, ns)
+	return time.Unix(0, ns).UTC()
 }
 
 var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)

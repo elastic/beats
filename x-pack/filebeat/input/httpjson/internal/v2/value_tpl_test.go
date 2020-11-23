@@ -41,6 +41,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render default value if execute fails",
 			value: "{{.last_response.body.does_not_exist}}",
 			paramCtx: transformContext{
+				lastEvent:    &common.MapStr{},
 				lastResponse: emptyTransformable(),
 			},
 			paramTr:     emptyTransformable(),
@@ -62,8 +63,8 @@ func TestValueTpl(t *testing.T) {
 			expected:    "25",
 		},
 		{
-			name:     "func hour",
-			value:    `{{ hour -1 }}`,
+			name:     "func parseDuration",
+			value:    `{{ parseDuration "-1h" }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "-1h0m0s",
@@ -81,7 +82,7 @@ func TestValueTpl(t *testing.T) {
 			name:     "func now with duration",
 			setup:    func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown: func() { timeNow = time.Now },
-			value:    `{{ now (-1|hour) }}`,
+			value:    `{{ now (parseDuration "-1h") }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05 12:25:32 +0000 UTC",
@@ -102,7 +103,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:     "func parseDate with custom layout",
-			value:    `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC }}`,
+			value:    `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006") }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05 12:25:32 +0000 UTC",
@@ -136,21 +137,21 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:     "func parseTimestamp",
-			value:    `{{ (parseTimestamp 1604582732).UTC }}`,
+			value:    `{{ (parseTimestamp 1604582732) }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseTimestampMilli",
-			value:    `{{ (parseTimestampMilli 1604582732000).UTC }}`,
+			value:    `{{ (parseTimestampMilli 1604582732000) }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseTimestampNano",
-			value:    `{{ (parseTimestampNano 1604582732000000000).UTC }}`,
+			value:    `{{ (parseTimestampNano 1604582732000000000) }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05 13:25:32 +0000 UTC",
@@ -200,7 +201,7 @@ func TestValueTpl(t *testing.T) {
 			name:     "can execute functions pipeline",
 			setup:    func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown: func() { timeNow = time.Now },
-			value:    `{{ -1 | hour | now | formatDate }}`,
+			value:    `{{ (parseDuration "-1h") | now | formatDate }}`,
 			paramCtx: emptyTransformContext(),
 			paramTr:  emptyTransformable(),
 			expected: "2020-11-05T12:25:32Z",
@@ -218,7 +219,9 @@ func TestValueTpl(t *testing.T) {
 			}
 			tpl := &valueTpl{}
 			assert.NoError(t, tpl.Unpack(tc.value))
-			got := tpl.Execute(tc.paramCtx, tc.paramTr, tc.paramDefVal, logp.NewLogger(""))
+			defTpl := &valueTpl{}
+			assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
+			got := tpl.Execute(tc.paramCtx, tc.paramTr, defTpl, logp.NewLogger(""))
 			assert.Equal(t, tc.expected, got)
 		})
 	}

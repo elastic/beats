@@ -14,6 +14,8 @@ import (
 )
 
 func TestSplit(t *testing.T) {
+	registerResponseTransforms()
+	t.Cleanup(func() { registeredTransforms = newRegistry() })
 	cases := []struct {
 		name             string
 		config           *splitConfig
@@ -135,6 +137,60 @@ func TestSplit(t *testing.T) {
 					"this_is":            "also kept",
 					"entities.id":        "id2",
 					"entities.something": "else 2",
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "A nested array with a nested map with transforms",
+			config: &splitConfig{
+				Target: "body.alerts",
+				Type:   "array",
+				Split: &splitConfig{
+					Target: "body.entities",
+					Type:   "map",
+					Transforms: transformsConfig{
+						common.MustNewConfigFrom(map[string]interface{}{
+							"set": map[string]interface{}{
+								"target": "body.foo",
+								"value":  "set for each",
+							},
+						}),
+					},
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: &transformable{
+				body: common.MapStr{
+					"this": "is not kept",
+					"alerts": []interface{}{
+						map[string]interface{}{
+							"this_is": "kept",
+							"entities": map[string]interface{}{
+								"id1": map[string]interface{}{
+									"something": "else",
+								},
+							},
+						},
+						map[string]interface{}{
+							"this_is": "also not kept",
+							"entities": map[string]interface{}{
+								"id2": map[string]interface{}{
+									"something": "else 2",
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"something": "else",
+					"foo":       "set for each",
+				},
+				{
+					"something": "else 2",
+					"foo":       "set for each",
 				},
 			},
 			expectedErr: nil,

@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEmptyTransformContext(t *testing.T) {

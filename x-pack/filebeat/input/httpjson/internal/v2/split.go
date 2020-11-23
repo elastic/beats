@@ -71,13 +71,6 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 
 func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMsg) error {
 	respCpy := resp.clone()
-	var err error
-	for _, t := range s.transforms {
-		respCpy, err = t.run(ctx, respCpy)
-		if err != nil {
-			return err
-		}
-	}
 
 	v, err := respCpy.body.GetValue(s.targetInfo.Name)
 	if err != nil && err != common.ErrKeyNotFound {
@@ -155,6 +148,14 @@ func (s *split) sendEvent(ctx transformContext, resp *transformable, key string,
 		_, _ = resp.body.Put(s.targetInfo.Name, m)
 	} else {
 		resp.body = m
+	}
+
+	var err error
+	for _, t := range s.transforms {
+		resp, err = t.run(ctx, resp)
+		if err != nil {
+			return err
+		}
 	}
 
 	if s.split != nil {

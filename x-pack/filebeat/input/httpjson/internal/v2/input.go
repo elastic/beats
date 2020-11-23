@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -184,7 +184,7 @@ func checkRedirect(config *requestConfig) func(*http.Request, []*http.Request) e
 			return fmt.Errorf("stopped after %d redirects", config.RedirectMaxRedirects)
 		}
 
-		if !config.RedirectHeadersForward || len(via) == 0 {
+		if !config.RedirectForwardHeaders || len(via) == 0 {
 			return nil
 		}
 
@@ -192,10 +192,8 @@ func checkRedirect(config *requestConfig) func(*http.Request, []*http.Request) e
 
 		req.Header = prev.Header.Clone()
 
-		if !config.RedirectLocationTrusted {
-			for _, k := range config.RedirectHeadersBanList {
-				req.Header.Del(k)
-			}
+		for _, k := range config.RedirectHeadersBanList {
+			req.Header.Del(k)
 		}
 
 		return nil

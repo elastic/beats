@@ -19,7 +19,7 @@ type config struct {
 
 type cursorConfig map[string]struct {
 	Value   *valueTpl `config:"value"`
-	Default string    `config:"default"`
+	Default *valueTpl `config:"default"`
 }
 
 func (c config) Validate() error {
@@ -31,14 +31,21 @@ func (c config) Validate() error {
 
 func defaultConfig() config {
 	timeout := 30 * time.Second
+	maxAttempts := 5
+	waitMin := time.Second
+	waitMax := time.Minute
 	return config{
 		Interval: time.Minute,
 		Auth:     &authConfig{},
 		Request: &requestConfig{
-			Timeout:                 &timeout,
-			Method:                  "GET",
-			RedirectHeadersForward:  true,
-			RedirectLocationTrusted: false,
+			Timeout: &timeout,
+			Method:  "GET",
+			Retry: retryConfig{
+				MaxAttempts: &maxAttempts,
+				WaitMin:     &waitMin,
+				WaitMax:     &waitMax,
+			},
+			RedirectForwardHeaders: true,
 			RedirectHeadersBanList: []string{
 				"WWW-Authenticate",
 				"Authorization",

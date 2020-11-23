@@ -21,14 +21,14 @@ const setName = "set"
 type setConfig struct {
 	Target  string    `config:"target"`
 	Value   *valueTpl `config:"value"`
-	Default string    `config:"default"`
+	Default *valueTpl `config:"default"`
 }
 
 type set struct {
 	log          *logp.Logger
 	targetInfo   targetInfo
 	value        *valueTpl
-	defaultValue string
+	defaultValue *valueTpl
 
 	runFunc func(ctx transformContext, transformable *transformable, key, val string) error
 }
