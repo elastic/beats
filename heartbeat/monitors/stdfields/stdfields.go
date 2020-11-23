@@ -37,15 +37,16 @@ type ServiceFields struct {
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID                  string             `config:"id"`
-	Name                string             `config:"name"`
-	Type            string             `config:"type" validate:"required"`
-	Schedule        *schedule.Schedule `config:"schedule" validate:"required"`
-	Timeout             time.Duration      `config:"timeout"`
+	ID                string             `config:"id"`
+	Name              string             `config:"name"`
+	Type              string             `config:"type" validate:"required"`
+	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
+	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
 	LegacyServiceName string             `config:"service_name"`
-	Enabled             bool               `config:"enabled"`
+	Enabled           bool               `config:"enabled"`
 	AgentPackage *monitorcfg.AgentPackage
+
 }
 
 func ConfigToStdMonitorFields(config *common.Config, ap *monitorcfg.AgentPackage) (StdMonitorFields, error) {
