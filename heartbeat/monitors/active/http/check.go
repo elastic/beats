@@ -70,8 +70,9 @@ type respValidator func(*http.Response) error
 type bodyValidator func(*http.Response, string) error
 
 var (
-	errBodyMismatch = errors.New("body mismatch")
-	errInvalidRegex = errors.New("invalid regex")
+	errBodyMismatch         = errors.New("all positive and negative pattern mismatch")
+	errBodyPostiveMismatch  = errors.New("negative pattern match, but positive pattern mismatch")
+	errBodyNegativeMismatch = errors.New("positive pattern match, but negative pattern mismatch")
 )
 
 func makeValidateResponse(config *responseParameters) (multiValidator, error) {
@@ -172,52 +173,47 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher) {
 2. negative check regex
 */
 func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
-	if len(positiveMatch) <= 0 && len(negativeMatch) <= 0 {
-		// in case there's no valid positive / negative regex pattern at all
-		return func(r *http.Response, body string) error {
-			return errInvalidRegex
+	// in case there's both valid positive and negative regex pattern
+	return func(r *http.Response, body string) error {
+		positiveMatchFlag := false
+		negativeMatchFlag := true
+		// positive match loop
+		for _, pattern := range positiveMatch {
+			if pattern.MatchString(body) {
+				positiveMatchFlag = true
+				break
+			}
 		}
-	} else if len(positiveMatch) > 0 && len(negativeMatch) <= 0 {
-		// in case there's only valid positive regex pattern
-		return func(r *http.Response, body string) error {
-			for _, pattern := range positiveMatch {
-				if pattern.MatchString(body) {
-					return nil
-				}
-			}
-			return errBodyMismatch
-		}
-	} else if len(positiveMatch) <= 0 && len(negativeMatch) > 0 {
-		// in case there's only valid negative regex pattern
-		return func(r *http.Response, body string) error {
-			for _, pattern := range negativeMatch {
-				if pattern.MatchString(body) {
-					return errBodyMismatch
-				}
-			}
-			return nil
-		}
-	} else {
-		// in case there's both valid positive and negative regex pattern
-		return func(r *http.Response, body string) error {
-			m := false
-			for _, pattern := range positiveMatch {
-				if pattern.MatchString(body) {
-					m = true
-					break
-				}
-			}
-			for _, pattern := range negativeMatch {
-				if pattern.MatchString(body) {
-					m = false
-					break
-				}
-			}
-			if m {
+		// return the result of positive check immediately if there is no negative match
+		if len(negativeMatch) == 0 {
+			if positiveMatchFlag {
 				return nil
 			}
-			return errBodyMismatch
+			return errBodyPostiveMismatch
 		}
+
+		// force positiveMatchFlag to true if positiveMatch is empty
+		// to tolerate the case there is only negativeMatch
+		if len(positiveMatch) == 0 {
+			positiveMatchFlag = true
+		}
+
+		// negative match loop
+		for _, pattern := range negativeMatch {
+			if pattern.MatchString(body) {
+				negativeMatchFlag = false
+				break
+			}
+		}
+
+		// in case positiveMatch and negativeMatch are both not empty
+		if positiveMatchFlag && negativeMatchFlag {
+			return nil
+		}
+		if positiveMatchFlag {
+			return errBodyNegativeMismatch
+		}
+		return errBodyPostiveMismatch
 	}
 }
 
