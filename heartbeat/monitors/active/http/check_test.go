@@ -152,6 +152,13 @@ func TestCheckBody(t *testing.T) {
 			[]string{"healthy"},
 			false,
 		},
+		{
+			"Positive and negative check are both empty",
+			"'status': 'green', 'cluster': 'healthy'",
+			nil,
+			nil,
+			false,
+		},
 	}
 
 	for _, test := range matchTests {
