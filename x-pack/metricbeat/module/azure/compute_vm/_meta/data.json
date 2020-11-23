@@ -2,77 +2,77 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "azure": {
         "compute_vm": {
-            "cpu_credits_consumed": {
-                "avg": 0.01
-            },
-            "cpu_credits_remaining": {
-                "avg": 288
-            },
             "disk_read_bytes": {
-                "total": 4019543.24
+                "total": 0
             },
             "disk_read_operations_per_sec": {
-                "avg": 0.0605
+                "avg": 0
             },
             "disk_write_bytes": {
-                "total": 16739967.27
+                "total": 2969709.4
             },
             "disk_write_operations_per_sec": {
-                "avg": 1.9525
+                "avg": 0.7809999999999999
             },
             "inbound_flows": {
-                "avg": 31
+                "avg": 10
             },
             "inbound_flows_maximum_creation_rate": {
-                "avg": 0.8
+                "avg": 10.6
             },
             "network_in": {
-                "total": 1501534
+                "total": 1478232
             },
             "network_in_total": {
-                "total": 1806936
+                "total": 1569665
             },
             "network_out": {
-                "total": 1647640
+                "total": 793344
             },
             "network_out_total": {
-                "total": 3633130
+                "total": 1074624
+            },
+            "os_disk_bandwidth_consumed_percentage": {
+                "avg": 0
+            },
+            "os_disk_iops_consumed_percentage": {
+                "avg": 0
             },
             "os_disk_queue_depth": {
-                "avg": 0
+                "avg": 0.002
             },
             "os_disk_read_bytes_per_sec": {
-                "avg": 13398.475
-            },
-            "os_disk_read_operations_per_sec": {
-                "avg": 0.121
-            },
-            "os_disk_write_bytes_per_sec": {
-                "avg": 55799.886
-            },
-            "os_disk_write_operations_per_sec": {
-                "avg": 3.905
-            },
-            "os_per_disk_qd": {
                 "avg": 0
             },
+            "os_disk_read_operations_per_sec": {
+                "avg": 0
+            },
+            "os_disk_write_bytes_per_sec": {
+                "avg": 9899.025
+            },
+            "os_disk_write_operations_per_sec": {
+                "avg": 1.5619999999999998
+            },
+            "os_per_disk_qd": {
+                "avg": 0.002
+            },
             "os_per_disk_read_bytes_per_sec": {
-                "avg": 13398.475
+                "avg": 0
             },
             "os_per_disk_read_operations_per_sec": {
-                "avg": 0.121
+                "avg": 0
             },
             "os_per_disk_write_bytes_per_sec": {
-                "avg": 55799.886
+                "avg": 9899.025
             },
             "os_per_disk_write_operations_per_sec": {
-                "avg": 3.905
+                "avg": 1.5619999999999998
             },
             "outbound_flows": {
-                "avg": 31
+                "avg": 10
             },
             "outbound_flows_maximum_creation_rate": {
-                "avg": 0.8
+                "avg": 10.6
             },
             "per_disk_qd": {
                 "avg": 0
@@ -90,30 +90,41 @@
                 "avg": 0
             },
             "percentage_cpu": {
-                "avg": 1.585
+                "avg": 1.8719999999999999
             },
-            "premium_os_disk_cache_read_hit": {
-                "avg": 100
+            "vm_cached_bandwidth_consumed_percentage": {
+                "avg": 0
             },
-            "premium_os_disk_cache_read_miss": {
+            "vm_cached_iops_consumed_percentage": {
+                "avg": 0
+            },
+            "vm_uncached_bandwidth_consumed_percentage": {
+                "avg": 0
+            },
+            "vm_uncached_iops_consumed_percentage": {
                 "avg": 0
             }
         },
         "namespace": "Microsoft.Compute/virtualMachines",
         "resource": {
-            "group": "obs-test",
+            "group": "obs-infrastructure",
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/testaz",
+            "name": "testaz",
             "type": "Microsoft.Compute/virtualMachines"
         },
-        "subscription_id": "7657426d-c4c3-44ac-88a2-3b2cd59e6dba",
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
+        "account": {
+            "id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6"
+        },
         "instance": {
-            "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
-            "name": "perfmon-test"
+            "id": "490fe4cf-2b33-4ead-a016-7e614c2f48ad",
+            "name": "testaz"
         },
         "machine": {
-            "type": "Standard_B1ms"
+            "type": "Standard_A1_v2"
         },
         "provider": "azure",
         "region": "westeurope"
@@ -125,26 +136,26 @@
     },
     "host": {
         "cpu": {
-            "pct": 0.01585
+            "pct": 0.01872
         },
         "disk": {
             "read": {
-                "bytes": 4019543.24
+                "bytes": 0
             },
             "write": {
-                "bytes": 16739967.27
+                "bytes": 2969709.4
             }
         },
-        "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
-        "name": "perfmon-test",
+        "id": "490fe4cf-2b33-4ead-a016-7e614c2f48ad",
+        "name": "testaz",
         "network": {
             "in": {
-                "bytes": 1806936,
-                "packets": 1501534
+                "bytes": 1569665,
+                "packets": 1478232
             },
             "out": {
-                "bytes": 3633130,
-                "packets": 1647640
+                "bytes": 1074624,
+                "packets": 793344
             }
         }
     },

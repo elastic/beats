@@ -73,4 +73,4 @@ class Test(metricbeat.BaseTest):
         self.common_checks(output)
 
     def get_host(self, proto):
-        return proto + "://" + self.compose_host(service="uwsgi_"+proto)
+        return proto + "://" + self.compose_host(service="uwsgi_" + proto)

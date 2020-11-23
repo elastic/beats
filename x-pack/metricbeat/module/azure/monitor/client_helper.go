@@ -16,6 +16,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
+const missingNamespace = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case."
+
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
@@ -27,7 +29,11 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
 			}
 			if len(*metricDefinitions.Value) == 0 {
-				return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
+				if metric.IgnoreUnsupported {
+					client.Log.Infof(missingNamespace, *resource.ID, metric.Namespace)
+					continue
+				}
+				return nil, errors.Errorf(missingNamespace, *resource.ID, metric.Namespace)
 			}
 
 			// validate metric names and filter on the supported metrics
@@ -54,7 +60,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, resource, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
 			}
 		}
 	}
@@ -72,20 +78,20 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 		}
 	} else {
 		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
-		supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metricConfig.Name, metricDefinitions)
-		if len(unsupportedMetricNames) > 0 {
+		supportedMetricNames, unsupportedMetricNames = filterConfiguredMetrics(metricConfig.Name, metricDefinitions)
+		if len(unsupportedMetricNames) > 0 && !metricConfig.IgnoreUnsupported {
 			return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
 				strings.Join(unsupportedMetricNames, ","), resourceId, metricConfig.Namespace)
 		}
 	}
-	if len(supportedMetricNames) == 0 {
+	if len(supportedMetricNames) == 0 && !metricConfig.IgnoreUnsupported {
 		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metricConfig.Name, ","), resourceId, metricConfig.Namespace)
 	}
 	return supportedMetricNames, nil
 }
 
-// filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
-func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
+// filterConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
+func filterConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
 	var allMetrics string

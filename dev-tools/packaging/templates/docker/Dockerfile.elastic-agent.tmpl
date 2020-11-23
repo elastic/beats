@@ -8,18 +8,22 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
+RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
+    find {{ $beatHome }}/data -type d -exec chmod 0770 {} \; && \
+    find {{ $beatHome }}/data -type f -exec chmod 0660 {} \; && \
+    rm {{ $beatBinary }} && \
+    ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
+    chmod 0750 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+    true
 
 FROM {{ .from }}
 
@@ -39,7 +43,7 @@ LABEL \
   org.label-schema.vendor="{{ .BeatVendor }}" \
   org.label-schema.license="{{ .License }}" \
   org.label-schema.name="{{ .BeatName }}" \
-  org.label-schema.version="{{ beat_version }}" \
+  org.label-schema.version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
   org.label-schema.url="{{ .BeatURL }}" \
   org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   org.label-schema.vcs-ref="{{ commit }}" \
@@ -52,7 +56,7 @@ LABEL \
   name="{{ .BeatName }}" \
   maintainer="infra@elastic.co" \
   vendor="{{ .BeatVendor }}" \
-  version="{{ beat_version }}" \
+  version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
   release="1" \
   url="{{ .BeatURL }}" \
   summary="{{ .BeatName }}" \
@@ -66,6 +70,10 @@ COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
 COPY --from=home {{ $beatHome }} {{ $beatHome }}
+
+# Elastic Agent needs group permissions in the home itself to be able to
+# create fleet.yml when running as non-root.
+RUN chmod 0770 {{ $beatHome }}
 
 RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses

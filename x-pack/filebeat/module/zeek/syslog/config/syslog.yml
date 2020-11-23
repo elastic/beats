@@ -53,10 +53,8 @@ processors:
       target: event
       fields:
         kind: event
-{{ if .community_id }}
   - community_id:
-{{ end }}
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

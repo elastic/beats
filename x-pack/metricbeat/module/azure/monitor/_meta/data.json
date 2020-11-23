@@ -3,31 +3,29 @@
     "azure": {
         "metrics": {
             "data_usage": {
-                "total": 0
+                "total": 131072
             },
             "document_count": {
-                "total": 0
+                "total": 2
             },
             "document_quota": {
-                "total": 53687091200
+                "total": 107374182400
             }
         },
         "namespace": "Microsoft.DocumentDb/databaseAccounts",
         "resource": {
             "group": "obs-infrastructure",
+            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "name": "obsaccount",
             "tags": {
                 "defaultExperience": "Core (SQL)"
             },
             "type": "Microsoft.DocumentDb/databaseAccounts"
         },
-        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
         "timegrain": "PT5M"
     },
     "cloud": {
-        "instance": {
-            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
-            "name": "obsaccount"
-        },
         "provider": "azure",
         "region": "westeurope"
     },

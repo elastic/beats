@@ -159,7 +159,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                   extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=true",
                                               "-E", "setup.ilm.overwrite=false",
-                                              "-E", "setup.ilm.policy_name="+policy_name])
+                                              "-E", "setup.ilm.policy_name=" + policy_name])
         assert exit_code == 0
         resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
         assert "delete" in resp[policy_name]["policy"]["phases"]
@@ -170,7 +170,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                   extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=true",
                                               "-E", "setup.ilm.overwrite=true",
-                                              "-E", "setup.ilm.policy_name="+policy_name])
+                                              "-E", "setup.ilm.policy_name=" + policy_name])
         assert exit_code == 0
         resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
         assert "delete" not in resp[policy_name]["policy"]["phases"]

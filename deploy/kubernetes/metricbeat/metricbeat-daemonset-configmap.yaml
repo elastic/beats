@@ -16,45 +16,42 @@ data:
 
     metricbeat.autodiscover:
       providers:
+        - type: kubernetes
+          scope: cluster
+          node: ${NODE_NAME}
+          unique: true
+          templates:
+            - config:
+                - module: kubernetes
+                  hosts: ["kube-state-metrics:8080"]
+                  period: 10s
+                  add_metadata: true
+                  metricsets:
+                    - state_node
+                    - state_deployment
+                    - state_daemonset
+                    - state_replicaset
+                    - state_pod
+                    - state_container
+                    - state_cronjob
+                    - state_resourcequota
+                    - state_statefulset
+                - module: kubernetes
+                  metricsets:
+                    - apiserver
+                  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+                  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  ssl.certificate_authorities:
+                    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                  period: 30s
+                # Uncomment this to get k8s events:
+                #- module: kubernetes
+                #  metricsets:
+                #    - event
         # To enable hints based autodiscover uncomment this:
         #- type: kubernetes
         #  node: ${NODE_NAME}
         #  hints.enabled: true
-        # Uncomment the following to enable leader election provider that handles
-        # singleton instance configuration across the Daemonset Pods of the whole cluster
-        # in order to monitor some unique data sources, like kube-state-metrics.
-        # When enabling this remember to also delete the Deployment or just set the replicas of the
-        # Deployment to 0.
-        #- type: kubernetes
-        #  scope: cluster
-        #  node: ${NODE_NAME}
-        #  unique: true
-        #  # identifier: <lease_lock_name>
-        #  templates:
-        #    - config:
-        #        - module: kubernetes
-        #          hosts: ["kube-state-metrics:8080"]
-        #          period: 10s
-        #          add_metadata: true
-        #          metricsets:
-        #            - state_node
-        #            - state_deployment
-        #            - state_replicaset
-        #            - state_pod
-        #            - state_container
-        #            - state_cronjob
-        #            - state_resourcequota
-        #            - state_statefulset
-        #            # Uncomment this to get k8s events:
-        #            #- event
-        #        - module: kubernetes
-        #          metricsets:
-        #            - apiserver
-        #          hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
-        #          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        #          ssl.certificate_authorities:
-        #            - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        #          period: 30s
 
     processors:
       - add_cloud_metadata:

@@ -27,3 +27,11 @@ test_cases:
   - name: TLS 1.3
     pcap: pcaps/tls-version-13.pcap
     config: {}
+
+  - name: SIP
+    pcap: pcaps/sip.pcap
+    config: {}
+
+  - name: SIP Authenticated Register
+    pcap: pcaps/sip_authenticated_register.pcap
+    config: {}

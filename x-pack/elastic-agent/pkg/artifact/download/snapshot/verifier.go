@@ -12,10 +12,10 @@ import (
 
 // NewVerifier creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewVerifier(config *artifact.Config, downloaders ...download.Downloader) (download.Verifier, error) {
-	cfg, err := snapshotConfig(config)
+func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte, versionOverride string) (download.Verifier, error) {
+	cfg, err := snapshotConfig(config, versionOverride)
 	if err != nil {
 		return nil, err
 	}
-	return http.NewVerifier(cfg)
+	return http.NewVerifier(cfg, allowEmptyPgp, pgp)
 }

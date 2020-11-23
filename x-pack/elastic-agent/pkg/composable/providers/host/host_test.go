@@ -7,8 +7,6 @@ package host
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-
 	"sync"
 	"testing"
 	"time"
@@ -18,6 +16,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	ctesting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable/testing"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func TestContextProvider(t *testing.T) {
@@ -31,7 +31,9 @@ func TestContextProvider(t *testing.T) {
 	})
 	require.NoError(t, err)
 	builder, _ := composable.Providers.GetContextProvider("host")
-	provider, err := builder(c)
+	log, err := logger.New("host_test")
+	require.NoError(t, err)
+	provider, err := builder(log, c)
 	require.NoError(t, err)
 
 	hostProvider := provider.(*contextProvider)

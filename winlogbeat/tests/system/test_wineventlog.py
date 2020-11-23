@@ -311,23 +311,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assertEqual(evts[0]["message"], "selected")
 
-    def test_unknown_eventlog_config(self):
-        """
-        wineventlog - Unknown config parameter
-        """
-        self.render_config_template(
-            event_logs=[
-                {
-                    "name": self.providerName,
-                    "api": self.api,
-                    "forwarded": False,
-                    "invalid": "garbage"}
-            ]
-        )
-        self.start_beat().check_wait(exit_code=1)
-        assert self.log_contains(
-            "1 error: invalid event log key 'invalid' found.")
-
     def test_utf16_characters(self):
         """
         wineventlog - UTF-16 characters

@@ -36,8 +36,8 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
+* <<exported-fields-gcp>>
 * <<exported-fields-golang>>
-* <<exported-fields-googlecloud>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -1569,13 +1569,172 @@ type: object
 
 
 
-
-*`aws.billing.metrics.EstimatedCharges.max`*::
+*`aws.billing.EstimatedCharges`*::
 +
 --
 Maximum estimated charges for AWS acccount.
 
 type: long
+
+--
+
+*`aws.billing.Currency`*::
++
+--
+Estimated charges currency unit.
+
+type: keyword
+
+--
+
+*`aws.billing.ServiceName`*::
++
+--
+Service name for the maximum estimated charges.
+
+type: keyword
+
+--
+
+
+*`aws.billing.AmortizedCost.amount`*::
++
+--
+Amortized cost amount
+
+type: double
+
+--
+
+*`aws.billing.AmortizedCost.unit`*::
++
+--
+Amortized cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.BlendedCost.amount`*::
++
+--
+Blended cost amount
+
+type: double
+
+--
+
+*`aws.billing.BlendedCost.unit`*::
++
+--
+Blended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.NormalizedUsageAmount.amount`*::
++
+--
+Normalized usage amount
+
+type: double
+
+--
+
+*`aws.billing.NormalizedUsageAmount.unit`*::
++
+--
+Normalized usage amount unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.UnblendedCost.amount`*::
++
+--
+Unblended cost amount
+
+type: double
+
+--
+
+*`aws.billing.UnblendedCost.unit`*::
++
+--
+Unblended cost unit
+
+type: keyword
+
+--
+
+
+*`aws.billing.UsageQuantity.amount`*::
++
+--
+Usage quantity amount
+
+type: double
+
+--
+
+*`aws.billing.UsageQuantity.unit`*::
++
+--
+Usage quantity unit
+
+type: keyword
+
+--
+
+*`aws.billing.start_date`*::
++
+--
+Start date for retrieving AWS costs
+
+type: keyword
+
+--
+
+*`aws.billing.end_date`*::
++
+--
+End date for retrieving AWS costs
+
+type: keyword
+
+--
+
+
+*`aws.billing.group_definition.key`*::
++
+--
+The string that represents a key for a specified group
+
+type: keyword
+
+--
+
+*`aws.billing.group_definition.type`*::
++
+--
+The string that represents the type of group
+
+type: keyword
+
+--
+
+*`aws.billing.group_by.*`*::
++
+--
+Cost explorer group by key values
+
+
+type: object
 
 --
 
@@ -4510,10 +4669,30 @@ type: keyword
 
 --
 
+*`azure.application_id`*::
++
+--
+The application ID
+
+
+type: keyword
+
+--
+
 *`azure.dimensions.*`*::
 +
 --
 Azure metric dimensions.
+
+
+type: object
+
+--
+
+*`azure.metrics.*.*`*::
++
+--
+Metrics returned.
 
 
 type: object
@@ -4526,16 +4705,6 @@ type: object
 application insights
 
 
-
-*`azure.app_insights.application_id`*::
-+
---
-The application ID
-
-
-type: keyword
-
---
 
 *`azure.app_insights.start_date`*::
 +
@@ -4564,6 +4733,213 @@ The metrics
 
 
 type: object
+
+--
+
+[float]
+=== app_state
+
+application state
+
+
+
+*`azure.app_state.start_date`*::
++
+--
+The start date
+
+
+type: date
+
+--
+
+*`azure.app_state.end_date`*::
++
+--
+The end date
+
+
+type: date
+
+--
+
+*`azure.app_state.requests_count.sum`*::
++
+--
+Request count
+
+
+type: float
+
+--
+
+*`azure.app_state.requests_failed.sum`*::
++
+--
+Request failed count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_count.unique`*::
++
+--
+User count
+
+
+type: float
+
+--
+
+*`azure.app_state.sessions_count.unique`*::
++
+--
+Session count
+
+
+type: float
+
+--
+
+*`azure.app_state.users_authenticated.unique`*::
++
+--
+Authenticated users count
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_network_duration.avg`*::
++
+--
+Browser timings network duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_send_duration.avg`*::
++
+--
+Browser timings send duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_receive_uration.avg`*::
++
+--
+Browser timings receive duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_processing_duration.avg`*::
++
+--
+Browser timings processing duration
+
+
+type: float
+
+--
+
+*`azure.app_state.browser_timings_total_duration.avg`*::
++
+--
+Browser timings total duration
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_count.sum`*::
++
+--
+Exception count
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_browser.sum`*::
++
+--
+Exception count at browser level
+
+
+type: float
+
+--
+
+*`azure.app_state.exceptions_server.sum`*::
++
+--
+Exception count at server level
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_memory_available_bytes.avg`*::
++
+--
+Performance counters memory available bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_private_bytes.avg`*::
++
+--
+Performance counters process private bytes
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage_total.avg`*::
++
+--
+Performance counters process cpu percentage total
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_process_cpu_percentage.avg`*::
++
+--
+Performance counters process cpu percentage
+
+
+type: float
+
+--
+
+*`azure.app_state.performance_counters_processiobytes_per_second.avg`*::
++
+--
+Performance counters process IO bytes per second
+
+
+type: float
 
 --
 
@@ -4749,17 +5125,6 @@ type: object
 
 monitor
 
-
-
-*`azure.monitor.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
 
 *`azure.storage.*.*`*::
 +
@@ -9006,8 +9371,15 @@ Stats collected from Dropwizard.
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +
@@ -19473,6 +19845,947 @@ type: integer
 
 --
 
+[[exported-fields-gcp]]
+== Google Cloud Platform fields
+
+GCP module
+
+
+
+
+*`gcp.labels`*::
++
+--
+GCP monitoring metrics labels
+
+
+type: object
+
+--
+
+*`gcp.metrics.*.*.*.*`*::
++
+--
+Metrics that returned from Google Cloud API query.
+
+
+type: object
+
+--
+
+[float]
+=== billing
+
+Google Cloud Billing metrics
+
+
+*`gcp.billing.cost_type`*::
++
+--
+Cost types include regular, tax, adjustment, and rounding_error.
+
+type: keyword
+
+--
+
+*`gcp.billing.invoice_month`*::
++
+--
+Billing report month.
+
+type: keyword
+
+--
+
+*`gcp.billing.project_id`*::
++
+--
+Project ID of the billing report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.billing.total`*::
++
+--
+Total billing amount.
+
+type: float
+
+--
+
+[float]
+=== compute
+
+Google Cloud Compute metrics
+
+
+
+
+*`gcp.compute.instance.firewall.dropped_bytes_count.value`*::
++
+--
+Incoming bytes dropped by the firewall
+
+type: long
+
+--
+
+*`gcp.compute.instance.firewall.dropped_packets_count.value`*::
++
+--
+Incoming packets dropped by the firewall
+
+type: long
+
+--
+
+
+*`gcp.compute.instance.cpu.reserved_cores.value`*::
++
+--
+Number of cores reserved on the host of the instance
+
+type: double
+
+--
+
+*`gcp.compute.instance.cpu.utilization.value`*::
++
+--
+The fraction of the allocated CPU that is currently in use on the instance
+
+type: double
+
+--
+
+*`gcp.compute.instance.cpu.usage_time.value`*::
++
+--
+Usage for all cores in seconds
+
+type: double
+
+--
+
+
+*`gcp.compute.instance.disk.read_bytes_count.value`*::
++
+--
+Count of bytes read from disk
+
+type: long
+
+--
+
+*`gcp.compute.instance.disk.read_ops_count.value`*::
++
+--
+Count of disk read IO operations
+
+type: long
+
+--
+
+*`gcp.compute.instance.disk.write_bytes_count.value`*::
++
+--
+Count of bytes written to disk
+
+type: long
+
+--
+
+*`gcp.compute.instance.disk.write_ops_count.value`*::
++
+--
+Count of disk write IO operations
+
+type: long
+
+--
+
+*`gcp.compute.instance.uptime.value`*::
++
+--
+How long the VM has been running, in seconds
+
+type: long
+
+--
+
+
+*`gcp.compute.instance.network.received_bytes_count.value`*::
++
+--
+Count of bytes received from the network
+
+type: long
+
+--
+
+*`gcp.compute.instance.network.received_packets_count.value`*::
++
+--
+Count of packets received from the network
+
+type: long
+
+--
+
+*`gcp.compute.instance.network.sent_bytes_count.value`*::
++
+--
+Count of bytes sent over the network
+
+type: long
+
+--
+
+*`gcp.compute.instance.network.sent_packets_count.value`*::
++
+--
+Count of packets sent over the network
+
+type: long
+
+--
+
+
+*`gcp.compute.instance.memory.balloon.ram_size.value`*::
++
+--
+The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.ram_used.value`*::
++
+--
+Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
++
+--
+The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
++
+--
+The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+[float]
+=== loadbalancing
+
+Google Cloud Load Balancing metrics
+
+
+[float]
+=== https
+
+Google Cloud Load Balancing metrics
+
+
+*`gcp.loadbalancing.https.backend_request_bytes_count.value`*::
++
+--
+The number of bytes sent as requests from HTTP/S load balancer to backends.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.https.backend_request_count.value`*::
++
+--
+The number of requests served by backends of HTTP/S load balancer.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.https.request_bytes_count.value`*::
++
+--
+The number of bytes sent as requests from clients to HTTP/S load balancer.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.https.request_count.value`*::
++
+--
+The number of requests served by HTTP/S load balancer.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.https.response_bytes_count.value`*::
++
+--
+The number of bytes sent as responses from HTTP/S load balancer to clients.
+
+type: long
+
+--
+
+[float]
+=== l3.internal
+
+Google Cloud Load Balancing metrics
+
+
+*`gcp.loadbalancing.l3.internal.egress_bytes_count.value`*::
++
+--
+The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
+
+type: long
+
+--
+
+*`gcp.loadbalancing.l3.internal.egress_packets_count.value`*::
++
+--
+The number of packets sent from ILB backend to client of the flow.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.l3.internal.ingress_bytes_count.value`*::
++
+--
+The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
+
+type: long
+
+--
+
+*`gcp.loadbalancing.l3.internal.ingress_packets_count.value`*::
++
+--
+The number of packets sent from client to ILB backend.
+
+type: long
+
+--
+
+[float]
+=== tcp_ssl_proxy
+
+Google Cloud Load Balancing metrics
+
+
+*`gcp.loadbalancing.tcp_ssl_proxy.closed_connections.value`*::
++
+--
+Number of connections that were terminated over TCP/SSL proxy.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value`*::
++
+--
+Number of bytes sent from VM to client using proxy.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value`*::
++
+--
+Number of bytes sent from client to VM using proxy.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.new_connections.value`*::
++
+--
+Number of connections that were created over TCP/SSL proxy.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.open_connections.value`*::
++
+--
+Current number of outstanding connections through the TCP/SSL proxy.
+
+type: long
+
+--
+
+[float]
+=== pubsub
+
+Google Cloud PubSub metrics
+
+
+[float]
+=== subscription
+
+Suscription related metrics
+
+
+*`gcp.pubsub.subscription.ack_message_count.value`*::
++
+--
+Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.backlog_bytes.value`*::
++
+--
+Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.num_outstanding_messages.value`*::
++
+--
+Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.num_undelivered_messages.value`*::
++
+--
+Number of unacknowledged messages (a.k.a. backlog messages) in a subscription.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.oldest_unacked_message_age.value`*::
++
+--
+Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.pull_ack_message_operation_count.value`*::
++
+--
+Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.pull_ack_request_count.value`*::
++
+--
+Cumulative count of acknowledge requests, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.pull_message_operation_count.value`*::
++
+--
+Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.pull_request_count.value`*::
++
+--
+Cumulative count of pull requests, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.push_request_count.value`*::
++
+--
+Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.push_request_latencies.value`*::
++
+--
+Distribution of push request latencies (in microseconds), grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.sent_message_count.value`*::
++
+--
+Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_ack_message_operation_count.value`*::
++
+--
+Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_ack_request_count.value`*::
++
+--
+Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_message_operation_count.value`*::
++
+--
+Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_response_count.value`*::
++
+--
+Cumulative count of streaming pull responses, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.dead_letter_message_count.value`*::
++
+--
+Cumulative count of messages published to dead letter topic, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.mod_ack_deadline_message_count.value`*::
++
+--
+Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.mod_ack_deadline_message_operation_count.value`*::
++
+--
+Cumulative count of ModifyAckDeadline message operations, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.mod_ack_deadline_request_count.value`*::
++
+--
+Cumulative count of ModifyAckDeadline requests, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.oldest_retained_acked_message_age.value`*::
++
+--
+Age (in seconds) of the oldest acknowledged message retained in a subscription.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.oldest_retained_acked_message_age_by_region.value`*::
++
+--
+Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.oldest_unacked_message_age_by_region.value`*::
++
+--
+Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.retained_acked_bytes.value`*::
++
+--
+Total byte size of the acknowledged messages retained in a subscription.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.retained_acked_bytes_by_region.value`*::
++
+--
+Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.seek_request_count.value`*::
++
+--
+Cumulative count of seek attempts, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation_count.value`*::
++
+--
+Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_request_count.value`*::
++
+--
+Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.byte_cost.value`*::
++
+--
+Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.config_updates_count.value`*::
++
+--
+Cumulative count of configuration changes for each subscription, grouped by operation type and result.
+
+type: long
+
+--
+
+*`gcp.pubsub.subscription.unacked_bytes_by_region.value`*::
++
+--
+Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
+
+type: long
+
+--
+
+[float]
+=== topic
+
+Topic related metrics
+
+
+*`gcp.pubsub.topic.streaming_pull_response_count.value`*::
++
+--
+Cumulative count of streaming pull responses, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.send_message_operation_count.value`*::
++
+--
+Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.send_request_count.value`*::
++
+--
+Cumulative count of publish requests, grouped by result.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.oldest_retained_acked_message_age_by_region.value`*::
++
+--
+Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.oldest_unacked_message_age_by_region.value`*::
++
+--
+Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.retained_acked_bytes_by_region.value`*::
++
+--
+Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.byte_cost.value`*::
++
+--
+Cost of operations, measured in bytes. This is used to measure utilization for quotas.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.config_updates_count.value`*::
++
+--
+Cumulative count of configuration changes, grouped by operation type and result.
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.message_sizes.value`*::
++
+--
+Distribution of publish message sizes (in bytes)
+
+type: long
+
+--
+
+*`gcp.pubsub.topic.unacked_bytes_by_region.value`*::
++
+--
+Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
+
+type: long
+
+--
+
+[float]
+=== snapshot
+
+Snapshot related metrics
+
+
+*`gcp.pubsub.snapshot.oldest_message_age.value`*::
++
+--
+Age (in seconds) of the oldest message retained in a snapshot.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.oldest_message_age_by_region.value`*::
++
+--
+Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.backlog_bytes.value`*::
++
+--
+Total byte size of the messages retained in a snapshot.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.backlog_bytes_by_region.value`*::
++
+--
+Total byte size of the messages retained in a snapshot, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.num_messages.value`*::
++
+--
+Number of messages retained in a snapshot.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.num_messages_by_region.value`*::
++
+--
+Number of messages retained in a snapshot, broken down by Cloud region.
+
+type: long
+
+--
+
+*`gcp.pubsub.snapshot.config_updates_count.value`*::
++
+--
+Cumulative count of configuration changes, grouped by operation type and result.
+
+type: long
+
+--
+
+[float]
+=== storage
+
+Google Cloud Storage metrics
+
+
+
+*`gcp.storage.api.request_count.value`*::
++
+--
+Delta count of API calls, grouped by the API method name and response code.
+
+type: long
+
+--
+
+
+*`gcp.storage.authz.acl_based_object_access_count.value`*::
++
+--
+Delta count of requests that result in an object being granted access solely due to object ACLs.
+
+type: long
+
+--
+
+*`gcp.storage.authz.acl_operations_count.value`*::
++
+--
+Usage of ACL operations broken down by type.
+
+type: long
+
+--
+
+*`gcp.storage.authz.object_specific_acl_mutation_count.value`*::
++
+--
+Delta count of changes made to object specific ACLs.
+
+type: long
+
+--
+
+
+*`gcp.storage.network.received_bytes_count.value`*::
++
+--
+Delta count of bytes received over the network, grouped by the API method name and response code.
+
+type: long
+
+--
+
+*`gcp.storage.network.sent_bytes_count.value`*::
++
+--
+Delta count of bytes sent over the network, grouped by the API method name and response code.
+
+type: long
+
+--
+
+
+*`gcp.storage.storage.object_count.value`*::
++
+--
+Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
+
+type: long
+
+--
+
+*`gcp.storage.storage.total_byte_seconds.value`*::
++
+--
+Delta count of bytes received over the network, grouped by the API method name and response code.
+
+type: long
+
+--
+
+*`gcp.storage.storage.total_bytes.value`*::
++
+--
+Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
+
+type: long
+
+--
+
 [[exported-fields-golang]]
 == Golang fields
 
@@ -19781,905 +21094,6 @@ Bytes in non-idle span.
 type: long
 
 format: bytes
-
---
-
-[[exported-fields-googlecloud]]
-== Google Cloud Platform fields
-
-GCP module
-
-
-
-
-*`googlecloud.labels`*::
-+
---
-Google cloud monitoring metrics labels
-
-
-type: object
-
---
-
-*`googlecloud.metrics.*.*.*.*`*::
-+
---
-Metrics that returned from Google Cloud API query.
-
-
-type: object
-
---
-
-[float]
-=== compute
-
-Google Cloud Compute metrics
-
-
-
-
-*`googlecloud.compute.instance.firewall.dropped_bytes_count.value`*::
-+
---
-Incoming bytes dropped by the firewall
-
-type: long
-
---
-
-*`googlecloud.compute.instance.firewall.dropped_packets_count.value`*::
-+
---
-Incoming packets dropped by the firewall
-
-type: long
-
---
-
-
-*`googlecloud.compute.instance.cpu.reserved_cores.value`*::
-+
---
-Number of cores reserved on the host of the instance
-
-type: double
-
---
-
-*`googlecloud.compute.instance.cpu.utilization.value`*::
-+
---
-The fraction of the allocated CPU that is currently in use on the instance
-
-type: double
-
---
-
-*`googlecloud.compute.instance.cpu.usage_time.value`*::
-+
---
-Usage for all cores in seconds
-
-type: double
-
---
-
-
-*`googlecloud.compute.instance.disk.read_bytes_count.value`*::
-+
---
-Count of bytes read from disk
-
-type: long
-
---
-
-*`googlecloud.compute.instance.disk.read_ops_count.value`*::
-+
---
-Count of disk read IO operations
-
-type: long
-
---
-
-*`googlecloud.compute.instance.disk.write_bytes_count.value`*::
-+
---
-Count of bytes written to disk
-
-type: long
-
---
-
-*`googlecloud.compute.instance.disk.write_ops_count.value`*::
-+
---
-Count of disk write IO operations
-
-type: long
-
---
-
-*`googlecloud.compute.instance.uptime.value`*::
-+
---
-How long the VM has been running, in seconds
-
-type: long
-
---
-
-
-*`googlecloud.compute.instance.network.received_bytes_count.value`*::
-+
---
-Count of bytes received from the network
-
-type: long
-
---
-
-*`googlecloud.compute.instance.network.received_packets_count.value`*::
-+
---
-Count of packets received from the network
-
-type: long
-
---
-
-*`googlecloud.compute.instance.network.sent_bytes_count.value`*::
-+
---
-Count of bytes sent over the network
-
-type: long
-
---
-
-*`googlecloud.compute.instance.network.sent_packets_count.value`*::
-+
---
-Count of packets sent over the network
-
-type: long
-
---
-
-
-*`googlecloud.compute.instance.memory.balloon.ram_size.value`*::
-+
---
-The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`googlecloud.compute.instance.memory.balloon.ram_used.value`*::
-+
---
-Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`googlecloud.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
-+
---
-The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`googlecloud.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
-+
---
-The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-[float]
-=== loadbalancing
-
-Google Cloud Load Balancing metrics
-
-
-[float]
-=== https
-
-Google Cloud Load Balancing metrics
-
-
-*`googlecloud.loadbalancing.https.backend_request_bytes_count.value`*::
-+
---
-The number of bytes sent as requests from HTTP/S load balancer to backends.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.backend_request_count.value`*::
-+
---
-The number of requests served by backends of HTTP/S load balancer.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.request_bytes_count.value`*::
-+
---
-The number of bytes sent as requests from clients to HTTP/S load balancer.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.request_count.value`*::
-+
---
-The number of requests served by HTTP/S load balancer.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.https.response_bytes_count.value`*::
-+
---
-The number of bytes sent as responses from HTTP/S load balancer to clients.
-
-type: long
-
---
-
-[float]
-=== l3.internal
-
-Google Cloud Load Balancing metrics
-
-
-*`googlecloud.loadbalancing.l3.internal.egress_bytes_count.value`*::
-+
---
-The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.egress_packets_count.value`*::
-+
---
-The number of packets sent from ILB backend to client of the flow.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.ingress_bytes_count.value`*::
-+
---
-The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.l3.internal.ingress_packets_count.value`*::
-+
---
-The number of packets sent from client to ILB backend.
-
-type: long
-
---
-
-[float]
-=== tcp_ssl_proxy
-
-Google Cloud Load Balancing metrics
-
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.closed_connections.value`*::
-+
---
-Number of connections that were terminated over TCP/SSL proxy.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value`*::
-+
---
-Number of bytes sent from VM to client using proxy.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value`*::
-+
---
-Number of bytes sent from client to VM using proxy.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.new_connections.value`*::
-+
---
-Number of connections that were created over TCP/SSL proxy.
-
-type: long
-
---
-
-*`googlecloud.loadbalancing.tcp_ssl_proxy.open_connections.value`*::
-+
---
-Current number of outstanding connections through the TCP/SSL proxy.
-
-type: long
-
---
-
-[float]
-=== pubsub
-
-Google Cloud PubSub metrics
-
-
-[float]
-=== subscription
-
-Suscription related metrics
-
-
-*`googlecloud.pubsub.subscription.ack_message_count.value`*::
-+
---
-Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.backlog_bytes.value`*::
-+
---
-Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.num_outstanding_messages.value`*::
-+
---
-Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.num_undelivered_messages.value`*::
-+
---
-Number of unacknowledged messages (a.k.a. backlog messages) in a subscription.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.oldest_unacked_message_age.value`*::
-+
---
-Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.pull_ack_message_operation_count.value`*::
-+
---
-Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.pull_ack_request_count.value`*::
-+
---
-Cumulative count of acknowledge requests, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.pull_message_operation_count.value`*::
-+
---
-Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.pull_request_count.value`*::
-+
---
-Cumulative count of pull requests, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.push_request_count.value`*::
-+
---
-Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.push_request_latencies.value`*::
-+
---
-Distribution of push request latencies (in microseconds), grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.sent_message_count.value`*::
-+
---
-Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_ack_message_operation_count.value`*::
-+
---
-Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_ack_request_count.value`*::
-+
---
-Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_message_operation_count.value`*::
-+
---
-Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_response_count.value`*::
-+
---
-Cumulative count of streaming pull responses, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.dead_letter_message_count.value`*::
-+
---
-Cumulative count of messages published to dead letter topic, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.mod_ack_deadline_message_count.value`*::
-+
---
-Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.mod_ack_deadline_message_operation_count.value`*::
-+
---
-Cumulative count of ModifyAckDeadline message operations, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.mod_ack_deadline_request_count.value`*::
-+
---
-Cumulative count of ModifyAckDeadline requests, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age.value`*::
-+
---
-Age (in seconds) of the oldest acknowledged message retained in a subscription.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age_by_region.value`*::
-+
---
-Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.oldest_unacked_message_age_by_region.value`*::
-+
---
-Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.retained_acked_bytes.value`*::
-+
---
-Total byte size of the acknowledged messages retained in a subscription.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.retained_acked_bytes_by_region.value`*::
-+
---
-Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.seek_request_count.value`*::
-+
---
-Cumulative count of seek attempts, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation_count.value`*::
-+
---
-Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_request_count.value`*::
-+
---
-Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.byte_cost.value`*::
-+
---
-Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.config_updates_count.value`*::
-+
---
-Cumulative count of configuration changes for each subscription, grouped by operation type and result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.subscription.unacked_bytes_by_region.value`*::
-+
---
-Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
-
-type: long
-
---
-
-[float]
-=== topic
-
-Topic related metrics
-
-
-*`googlecloud.pubsub.topic.streaming_pull_response_count.value`*::
-+
---
-Cumulative count of streaming pull responses, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.send_message_operation_count.value`*::
-+
---
-Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.send_request_count.value`*::
-+
---
-Cumulative count of publish requests, grouped by result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.value`*::
-+
---
-Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.value`*::
-+
---
-Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.retained_acked_bytes_by_region.value`*::
-+
---
-Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.byte_cost.value`*::
-+
---
-Cost of operations, measured in bytes. This is used to measure utilization for quotas.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.config_updates_count.value`*::
-+
---
-Cumulative count of configuration changes, grouped by operation type and result.
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.message_sizes.value`*::
-+
---
-Distribution of publish message sizes (in bytes)
-
-type: long
-
---
-
-*`googlecloud.pubsub.topic.unacked_bytes_by_region.value`*::
-+
---
-Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
-
-type: long
-
---
-
-[float]
-=== snapshot
-
-Snapshot related metrics
-
-
-*`googlecloud.pubsub.snapshot.oldest_message_age.value`*::
-+
---
-Age (in seconds) of the oldest message retained in a snapshot.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.oldest_message_age_by_region.value`*::
-+
---
-Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.backlog_bytes.value`*::
-+
---
-Total byte size of the messages retained in a snapshot.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.backlog_bytes_by_region.value`*::
-+
---
-Total byte size of the messages retained in a snapshot, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.num_messages.value`*::
-+
---
-Number of messages retained in a snapshot.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.num_messages_by_region.value`*::
-+
---
-Number of messages retained in a snapshot, broken down by Cloud region.
-
-type: long
-
---
-
-*`googlecloud.pubsub.snapshot.config_updates_count.value`*::
-+
---
-Cumulative count of configuration changes, grouped by operation type and result.
-
-type: long
-
---
-
-[float]
-=== storage
-
-Google Cloud Storage metrics
-
-
-
-*`googlecloud.storage.api.request_count.value`*::
-+
---
-Delta count of API calls, grouped by the API method name and response code.
-
-type: long
-
---
-
-
-*`googlecloud.storage.authz.acl_based_object_access_count.value`*::
-+
---
-Delta count of requests that result in an object being granted access solely due to object ACLs.
-
-type: long
-
---
-
-*`googlecloud.storage.authz.acl_operations_count.value`*::
-+
---
-Usage of ACL operations broken down by type.
-
-type: long
-
---
-
-*`googlecloud.storage.authz.object_specific_acl_mutation_count.value`*::
-+
---
-Delta count of changes made to object specific ACLs.
-
-type: long
-
---
-
-
-*`googlecloud.storage.network.received_bytes_count.value`*::
-+
---
-Delta count of bytes received over the network, grouped by the API method name and response code.
-
-type: long
-
---
-
-*`googlecloud.storage.network.sent_bytes_count.value`*::
-+
---
-Delta count of bytes sent over the network, grouped by the API method name and response code.
-
-type: long
-
---
-
-
-*`googlecloud.storage.storage.object_count.value`*::
-+
---
-Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
-
-type: long
-
---
-
-*`googlecloud.storage.storage.total_byte_seconds.value`*::
-+
---
-Delta count of bytes received over the network, grouped by the API method name and response code.
-
-type: long
-
---
-
-*`googlecloud.storage.storage.total_bytes.value`*::
-+
---
-Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
-
-type: long
 
 --
 
@@ -24456,16 +24870,6 @@ type: long
 
 --
 
-*`kafka.partition.partition.isr`*::
-+
---
-List of isr ids.
-
-
-type: keyword
-
---
-
 *`kafka.partition.partition.replica`*::
 +
 --
@@ -25076,6 +25480,16 @@ type: keyword
 +
 --
 Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
 
 
 type: keyword
@@ -28753,6 +29167,7 @@ linux module
 [float]
 === linux
 
+linux system metrics
 
 
 
@@ -28851,6 +29266,147 @@ type: long
 --
 
 [float]
+=== iostat
+
+iostat
+
+
+
+*`linux.iostat.read.request.merges_per_sec`*::
++
+--
+The number of read requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.merges_per_sec`*::
++
+--
+The number of write requests merged per second that were queued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.read.request.per_sec`*::
++
+--
+The number of read requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.write.request.per_sec`*::
++
+--
+The number of write requests that were issued to the device per second
+
+
+type: float
+
+--
+
+*`linux.iostat.read.per_sec.bytes`*::
++
+--
+The number of Bytes read from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.read.await`*::
++
+--
+The average time spent for read requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.write.per_sec.bytes`*::
++
+--
+The number of Bytes write from the device per second.
+
+
+type: float
+
+format: bytes
+
+--
+
+*`linux.iostat.write.await`*::
++
+--
+The average time spent for write requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.request.avg_size`*::
++
+--
+The average size (in bytes) of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.queue.avg_size`*::
++
+--
+The average queue length of the requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.await`*::
++
+--
+The average time spent for requests issued to the device to be served.
+
+
+type: float
+
+--
+
+*`linux.iostat.service_time`*::
++
+--
+The average service time (in milliseconds) for I/O requests that were issued to the device.
+
+
+type: float
+
+--
+
+*`linux.iostat.busy`*::
++
+--
+Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+type: float
+
+--
+
+[float]
 === ksm
 
 ksm
@@ -28921,6 +29477,186 @@ Number of duplicated KSM pages.
 
 
 type: long
+
+--
+
+[float]
+=== memory
+
+Linux memory data
+
+
+
+[float]
+=== page_stats
+
+memory page statistics
+
+
+*`linux.memory.page_stats.pgscan_kswapd.pages`*::
++
+--
+pages scanned by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgscan_direct.pages`*::
++
+--
+pages scanned directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgfree.pages`*::
++
+--
+pages freed by the system
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_kswapd.pages`*::
++
+--
+number of pages reclaimed by kswapd
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.pgsteal_direct.pages`*::
++
+--
+number of pages reclaimed directly
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.page_stats.direct_efficiency.pct`*::
++
+--
+direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.page_stats.kswapd_efficiency.pct`*::
++
+--
+kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== hugepages
+
+This group contains statistics related to huge pages usage on the system.
+
+
+*`linux.memory.hugepages.total`*::
++
+--
+Number of huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.used.bytes`*::
++
+--
+Memory used in allocated huge pages.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.hugepages.used.pct`*::
++
+--
+Percentage of huge pages used.
+
+
+type: long
+
+format: percent
+
+--
+
+*`linux.memory.hugepages.free`*::
++
+--
+Number of available huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.reserved`*::
++
+--
+Number of reserved but not allocated huge pages in the pool.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.surplus`*::
++
+--
+Number of overcommited huge pages.
+
+
+type: long
+
+format: number
+
+--
+
+*`linux.memory.hugepages.default_size`*::
++
+--
+Default size for huge pages.
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -34741,10 +35477,134 @@ type: keyword
 *`nats.server.time`*::
 +
 --
+
+deprecated:[8.0.0]
+
 Server time of metric creation
 
 
 type: date
+
+--
+
+[float]
+=== connection
+
+Contains nats connection related metrics
+
+
+
+*`nats.connection.name`*::
++
+--
+The name of the connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.connection.pending_bytes`*::
++
+--
+The number of pending bytes of this connection
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nats.connection.uptime`*::
++
+--
+The period the connection is up (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+*`nats.connection.idle_time`*::
++
+--
+The period the connection is idle (sec)
+
+
+type: long
+
+format: duration
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.connection.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.connection.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.connection.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.connection.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -34762,6 +35622,121 @@ The number of currently active clients
 
 
 type: integer
+
+--
+
+[float]
+=== route
+
+Contains nats route related metrics
+
+
+
+*`nats.route.subscriptions`*::
++
+--
+The number of subscriptions in this connection
+
+
+type: integer
+
+--
+
+*`nats.route.remote_id`*::
++
+--
+The remote id on which the route is connected to
+
+
+type: keyword
+
+--
+
+*`nats.route.pending_size`*::
++
+--
+The number of pending routes
+
+
+type: long
+
+--
+
+*`nats.route.port`*::
++
+--
+The port of the route
+
+
+type: integer
+
+--
+
+*`nats.route.ip`*::
++
+--
+The ip of the route
+
+
+type: ip
+
+--
+
+[float]
+=== in
+
+The amount of incoming data
+
+
+
+*`nats.route.in.messages`*::
++
+--
+The amount of incoming messages
+
+
+type: long
+
+--
+
+*`nats.route.in.bytes`*::
++
+--
+The amount of incoming bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== out
+
+The amount of outgoing data
+
+
+
+*`nats.route.out.messages`*::
++
+--
+The amount of outgoing messages
+
+
+type: long
+
+--
+
+*`nats.route.out.bytes`*::
++
+--
+The amount of outgoing bytes
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -35906,7 +36881,7 @@ type: keyword
 *`php_fpm.process.last_request_cpu`*::
 +
 --
-The max amount of memory the last request consumed (it is always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated)
+The CPU percentage the last request consumed. It's always 0 if the process is not in Idle state because CPU calculation is done when the request processing has terminated
 
 
 type: long
@@ -35916,7 +36891,7 @@ type: long
 *`php_fpm.process.last_request_memory`*::
 +
 --
-The content length of the request (only with POST) (of the current request)
+The max amount of memory the last request consumed. It's always 0 if the process is not in Idle state because memory calculation is done when the request processing has terminated
 
 
 type: integer
@@ -40295,7 +41270,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files.
+Total number of files. Not on Windows.
 
 type: long
 
@@ -41157,7 +42132,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes. Not available on Windows.
 
 
 type: long
@@ -41169,7 +42144,31 @@ format: bytes
 *`system.process.memory.rss.pct`*::
 +
 --
-The percentage of memory the process occupied in main memory (RAM).
+The percentage of memory the process occupied in main memory (RAM). Not available on Windows.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`system.process.memory.wss.bytes`*::
++
+--
+The Working Set Size. The amount of memory the process occupied in main memory (RAM). Windows only.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.memory.wss.pct`*::
++
+--
+The percentage of memory the process occupied in main memory (RAM). Windows only.
 
 
 type: scaled_float
@@ -41181,7 +42180,7 @@ format: percent
 *`system.process.memory.share`*::
 +
 --
-The shared memory the process uses.
+The shared memory the process uses. Not available on Windows.
 
 
 type: long
@@ -42120,6 +43119,24 @@ type: date
 +
 --
 The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+*`system.service.unit_file.state`*::
++
+--
+The state of the unit file
+
+type: keyword
+
+--
+
+*`system.service.unit_file.vendor_preset`*::
++
+--
+The default state of the unit file
 
 type: keyword
 
