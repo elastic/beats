@@ -348,7 +348,7 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.type=component"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_component_template_loaded(self.index_name)
 
 
 class TestCommandExportTemplate(BaseTest):

@@ -69,6 +69,15 @@ class IdxMgmt(unittest.TestCase):
                 found = True
         assert found
 
+    def assert_component_template_loaded(self, template):
+        resp = self._client.transport.perform_request('GET', '/_component_template/' + template)
+        found = False
+        print(resp)
+        for index_template in resp['component_templates']:
+            if index_template['name'] == template:
+                found = True
+        assert found
+
     def assert_ilm_template_loaded(self, template, policy, alias):
         resp = self._client.transport.perform_request('GET', '/_template/' + template)
         assert resp[template]["settings"]["index"]["lifecycle"]["name"] == policy
