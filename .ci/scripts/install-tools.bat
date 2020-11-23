@@ -54,6 +54,7 @@ IF ERRORLEVEL 1 (
     IF NOT ERRORLEVEL 0 (
         exit /b 1
     )
+    refreshenv
     go env
 )
 
