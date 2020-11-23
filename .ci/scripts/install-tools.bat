@@ -48,9 +48,7 @@ IF ERRORLEVEL 1 (
     IF NOT ERRORLEVEL 0 (
         exit /b 1
     )
-    REM Even if it failed let's move forward
-    refreshenv || echo "WARNING - refreshing env variables failed"
-    go env || echo "WARNING - go env failed"
+    refreshenv
 )
 
 go get github.com/magefile/mage
