@@ -215,7 +215,7 @@ agent.logging.to_stderr: true
 
 # Docker provides inventory information from Docker.
 #  docker:
-#    enabled: false
+#    enabled: true
 #    host: "unix:///var/run/docker.sock"
 #    cleanup_timeout: 60
 
