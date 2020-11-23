@@ -22,8 +22,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile/pq"
 )
@@ -69,7 +67,8 @@ type inBroker struct {
 }
 
 const (
-	inSigChannelSize = 3
+	inSigChannelSize   = 3
+	inEventChannelSize = 20
 )
 
 func newInBroker(
@@ -79,7 +78,6 @@ func newInBroker(
 	codec codecID,
 	flushTimeout time.Duration,
 	flushEvents uint,
-	inQueueSize int,
 ) (*inBroker, error) {
 	enc, err := newEncoder(codec)
 	if err != nil {
@@ -90,8 +88,6 @@ func newInBroker(
 	if err != nil {
 		return nil, err
 	}
-
-	inEventChannelSize := memqueue.AdjustInputQueueSize(inQueueSize, 0)
 
 	b := &inBroker{
 		ctx:         ctx,

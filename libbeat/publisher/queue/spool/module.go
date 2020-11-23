@@ -76,6 +76,5 @@ func create(
 			Prealloc: config.File.Prealloc,
 			Readonly: false,
 		},
-		InputQueueSize: inQueueSize,
 	})
 }
