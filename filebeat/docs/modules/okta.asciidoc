@@ -32,12 +32,6 @@ the logs while honoring any
 https://developer.okta.com/docs/reference/rate-limits/[rate-limiting] headers
 sent by Okta.
 
-NOTE: This module does not persist the timestamp of the last read event in
-order to facilitate resuming on restart. This feature will be coming in a future
-version. When you restart the module will read events from the beginning of the
-log. To minimize duplicates documents the module uses the event's Okta UUID
-value as the Elasticsearch `_id`.
-
 This is an example configuration for the module.
 
 [source,yaml]
@@ -97,6 +91,15 @@ information.
 ----
     var.ssl:
       supported_protocols: [TLSv1.2]
+----
+
+*`var.initial_interval`*::
+
+An initial interval can be defined. The first time the module starts, will fetch events from the current moment minus the initial interval value. Following restarts will fetch events starting from the last event read. It defaults to `24h`.
++
+[source,yaml]
+----
+    var.initial_interval: 24h # will fetch events starting 24h ago.
 ----
 
 [float]

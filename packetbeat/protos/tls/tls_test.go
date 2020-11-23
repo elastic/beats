@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -66,7 +67,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, nil)
+	tls, err := New(true, results.publish, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		return nil, nil
 	}

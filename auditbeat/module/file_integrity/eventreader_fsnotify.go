@@ -46,7 +46,7 @@ func NewEventReader(c Config) (EventProducer, error) {
 }
 
 func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := monitor.New(r.config.Recursive)
+	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
 	if err != nil {
 		return nil, err
 	}

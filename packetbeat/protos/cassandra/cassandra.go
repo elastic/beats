@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 
@@ -34,6 +35,7 @@ type cassandra struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
 	transConfig  transactionConfig
+	watcher      procs.ProcessesWatcher
 	pub          transPub
 }
 
@@ -60,6 +62,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &cassandra{}
@@ -70,17 +73,18 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (cassandra *cassandra) init(results protos.Reporter, config *cassandraConfig) error {
+func (cassandra *cassandra) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *cassandraConfig) error {
 	if err := cassandra.setFromConfig(config); err != nil {
 		return err
 	}
 	cassandra.pub.results = results
+	cassandra.watcher = watcher
 	return nil
 }
 
@@ -193,7 +197,7 @@ func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *conne
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
-		conn.trans.init(&cassandra.transConfig, cassandra.pub.onTransaction)
+		conn.trans.init(&cassandra.transConfig, cassandra.watcher, cassandra.pub.onTransaction)
 	}
 	return conn
 }
