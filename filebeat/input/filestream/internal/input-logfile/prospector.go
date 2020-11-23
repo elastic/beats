@@ -26,7 +26,7 @@ import (
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
 	// Init runs the cleanup processes before starting the prospector.
-	Init(ProspectorCleaner) error
+	Init(inputPrefix string, userIDConfigured bool, c ProspectorCleaner) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)

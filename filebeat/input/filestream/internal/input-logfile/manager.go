@@ -166,9 +166,10 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, errNoInputRunner
 	}
 
+	sourceIdentifier := newSourceIdentifier(cim.Type, settings.ID)
 	prospectorStore := cim.getRetainedStore()
 	defer prospectorStore.Release()
-	err = prospector.Init(prospectorStore)
+	err = prospector.Init(sourceIdentifier.prefix, settings.ID != "", prospectorStore)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +179,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		userID:           settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
-		sourceIdentifier: newSourceIdentifier(cim.Type, settings.ID),
+		sourceIdentifier: sourceIdentifier,
 		cleanTimeout:     settings.CleanTimeout,
 	}, nil
 }
@@ -194,9 +195,9 @@ type sourceIdentifier struct {
 }
 
 func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
-	inputPrefix := pluginName + "::"
+	inputPrefix := pluginName
 	if userID != "" {
-		inputPrefix = inputPrefix + "::" + userID
+		inputPrefix = inputPrefix + "-" + userID
 	}
 	return &sourceIdentifier{
 		prefix: inputPrefix,

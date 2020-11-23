@@ -113,6 +113,11 @@ func (i *inodeDeviceIdentifier) Name() string {
 }
 
 func (i *inodeDeviceIdentifier) Supports(f identifierFeature) bool {
+	switch f {
+	case trackRename:
+		return true
+	default:
+	}
 	return false
 }
 
@@ -145,11 +150,6 @@ func (p *pathIdentifier) Name() string {
 }
 
 func (p *pathIdentifier) Supports(f identifierFeature) bool {
-	switch f {
-	case trackRename:
-		return true
-	default:
-	}
 	return false
 }
 

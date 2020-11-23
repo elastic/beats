@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/urso/sderr"
@@ -45,9 +46,12 @@ type fileProspector struct {
 	stateChangeCloser stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
-	if p.cleanRemoved {
+func (p *fileProspector) Init(inputPrefix string, userIDConfigured bool, cleaner loginp.ProspectorCleaner) error {
+	if p.cleanRemoved && userIDConfigured {
 		cleaner.CleanIf(func(key string, v loginp.Value) bool {
+			if !strings.HasPrefix(key, inputPrefix) {
+				return false
+			}
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
@@ -65,6 +69,10 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 
 	identifierName := p.identifier.Name()
 	cleaner.UpdateIdentifiers(func(key string, v loginp.Value) (string, interface{}) {
+		if !strings.HasPrefix(key, inputPrefix) {
+			return "", nil
+		}
+
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -149,7 +157,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 				// if file_identity is based on path, the current reader has to be cancelled
 				// and a new one has to start.
-				if p.identifier.Supports(trackRename) {
+				if !p.identifier.Supports(trackRename) {
 					prevSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
 					hg.Stop(prevSrc)
 

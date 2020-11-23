@@ -107,6 +107,11 @@ func (i *inodeMarkerIdentifier) Name() string {
 	return i.name
 }
 
-func (i *inodeMarkerIdentifier) Supports(_ identifierFeature) bool {
+func (i *inodeMarkerIdentifier) Supports(f identifierFeature) bool {
+	switch f {
+	case trackRename:
+		return true
+	default:
+	}
 	return false
 }

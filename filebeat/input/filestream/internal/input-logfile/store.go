@@ -252,7 +252,7 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 		TTL:     resource.internalState.TTL,
 		Updated: resource.internalState.Updated,
 		Cursor:  resource.cursor,
-		Meta:    cursorMeta,
+		Meta:    resource.cursorMeta,
 	})
 	if err != nil {
 		s.log.Errorf("Failed to update cursor metadata fields for '%v'", resource.key)
