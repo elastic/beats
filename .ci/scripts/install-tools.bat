@@ -42,7 +42,7 @@ IF ERRORLEVEL 1 (
 )
 
 REM Install the given go version
-%GVM_BIN% install %GO_VERSION%
+%GVM_BIN% --debug install %GO_VERSION%
 
 REM Configure the given go version
 FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
