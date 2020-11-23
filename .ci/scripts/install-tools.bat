@@ -48,7 +48,8 @@ IF ERRORLEVEL 1 (
     IF NOT ERRORLEVEL 0 (
         exit /b 1
     )
-    refreshenv
+    REM use choco refresh approach (see https://github.com/chocolatey/choco/issues/1461)
+    call RefreshEnv.cmd
     go env
 )
 
