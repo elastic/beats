@@ -90,7 +90,7 @@ type Settings struct {
 
 	Processors processing.Supporter
 
-	InternalQueueSize int
+	InputQueueSize int
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.

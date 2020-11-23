@@ -91,7 +91,7 @@ func newInBroker(
 		return nil, err
 	}
 
-	inEventChannelSize := memqueue.AdjustInternalQueueSize(inQueueSize, 0)
+	inEventChannelSize := memqueue.AdjustInputQueueSize(inQueueSize, 0)
 
 	b := &inBroker{
 		ctx:         ctx,

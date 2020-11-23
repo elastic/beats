@@ -72,7 +72,7 @@ type settings struct {
 
 	Codec codecID
 
-	InternalQueueSize int
+	InputQueueSize int
 }
 
 const minInFlushTimeout = 100 * time.Millisecond
@@ -139,7 +139,7 @@ func newDiskSpool(logger logger, path string, settings settings) (*diskSpool, er
 	inBroker, err := newInBroker(
 		inCtx, settings.ACKListener, queue, settings.Codec,
 		inFlushTimeout, settings.WriteFlushEvents,
-		settings.InternalQueueSize)
+		settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}

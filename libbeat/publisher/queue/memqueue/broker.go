@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	minInternalQueueSize      = 20
-	maxInternalQueueSizeRatio = 0.1
+	minInputQueueSize      = 20
+	maxInputQueueSizeRatio = 0.1
 )
 
 type broker struct {
@@ -56,12 +56,12 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener       queue.ACKListener
-	Events            int
-	FlushMinEvents    int
-	FlushTimeout      time.Duration
-	WaitOnClose       bool
-	InternalQueueSize int
+	ACKListener    queue.ACKListener
+	Events         int
+	FlushMinEvents int
+	FlushTimeout   time.Duration
+	WaitOnClose    bool
+	InputQueueSize int
 }
 
 type ackChan struct {
@@ -100,11 +100,11 @@ func create(
 	}
 
 	return NewQueue(logger, Settings{
-		ACKListener:       ackListener,
-		Events:            config.Events,
-		FlushMinEvents:    config.FlushMinEvents,
-		FlushTimeout:      config.FlushTimeout,
-		InternalQueueSize: inQueueSize,
+		ACKListener:    ackListener,
+		Events:         config.Events,
+		FlushMinEvents: config.FlushMinEvents,
+		FlushTimeout:   config.FlushTimeout,
+		InputQueueSize: inQueueSize,
 	}), nil
 }
 
@@ -121,7 +121,7 @@ func NewQueue(
 		flushTimeout = settings.FlushTimeout
 	)
 
-	chanSize := AdjustInternalQueueSize(settings.InternalQueueSize, sz)
+	chanSize := AdjustInputQueueSize(settings.InputQueueSize, sz)
 
 	if minEvents < 1 {
 		minEvents = 1
@@ -304,14 +304,14 @@ func (l *chanList) reverse() {
 	}
 }
 
-// AdjustInternalQueueSize decides the size for the internal queue used by most queue implementations.
-func AdjustInternalQueueSize(requested, mainQueueSize int) (actual int) {
+// AdjustInputQueueSize decides the size for the input queue.
+func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 	actual = requested
-	if max := int(float64(mainQueueSize) * maxInternalQueueSizeRatio); mainQueueSize > 0 && actual > max {
+	if max := int(float64(mainQueueSize) * maxInputQueueSizeRatio); mainQueueSize > 0 && actual > max {
 		actual = max
 	}
-	if actual < minInternalQueueSize {
-		actual = minInternalQueueSize
+	if actual < minInputQueueSize {
+		actual = minInputQueueSize
 	}
 	return actual
 }

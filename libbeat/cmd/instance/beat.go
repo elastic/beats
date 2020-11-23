@@ -83,7 +83,7 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processing processing.Supporter
 
-	InternalQueueSize int // Size of the internal producer queue used by most queues.
+	InputQueueSize int // Size of the producer queue used by most queues.
 }
 
 type beatConfig struct {
@@ -346,12 +346,12 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		WaitClose:         0,
-		WaitCloseMode:     pipeline.NoWaitOnClose,
-		Processors:        b.processing,
-		InternalQueueSize: b.InternalQueueSize,
+		WaitClose:      0,
+		WaitCloseMode:  pipeline.NoWaitOnClose,
+		Processors:     b.processing,
+		InputQueueSize: b.InputQueueSize,
 	}
-	if settings.InternalQueueSize > 0 {
+	if settings.InputQueueSize > 0 {
 		publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	} else {
 		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
@@ -589,7 +589,7 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	b.InternalQueueSize = settings.InternalQueueSize
+	b.InputQueueSize = settings.InputQueueSize
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
