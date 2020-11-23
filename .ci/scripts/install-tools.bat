@@ -17,29 +17,24 @@ mkdir %WORKSPACE%\bin
 SET GVM_BIN=gvm
 SET GVM_VERSION=v0.2.2
 IF EXIST "%PROGRAMFILES(X86)%" (
-    SET GVM_URL=https://github.com/andrewkroh/gvm/releases/download/%GVM_VERSION%/gvm-windows-amd64.exe
+    REM Force the gvm installation.
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
+    IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
+        exit /b 1
+    )
 ) ELSE (
     REM Windows 7 workers got a broken gvm installation.
     SET GVM_BIN=gvm.exe
-    SET GVM_URL=https://github.com/andrewkroh/gvm/releases/download/%GVM_VERSION%/gvm-windows-386.exe
-    curl -L -o %WORKSPACE%\bin\gvm.exe %GVM_URL%
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
+    IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
+        exit /b 1
+    )
 )
 
 where /q %GVM_BIN%
-IF ERRORLEVEL 1 (
-    SET GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\%GVM_BIN% %GVM_URL%
-    IF ERRORLEVEL 1 (
-        REM The download of gvm has failed.
-        exit /b 1
-    )
-    if EXIST %WORKSPACE%\bin\%GVM_BIN% (
-        %GVM_BIN% version
-    ) else (
-        REM gvm.exe has not been installed for some unknown reasons
-        exit /b 1
-    )
-)
+%GVM_BIN% version
 
 REM Install the given go version
 %GVM_BIN% --debug install %GO_VERSION%
