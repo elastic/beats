@@ -22,6 +22,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/go-txfile/pq"
 )
@@ -89,7 +91,7 @@ func newInBroker(
 		return nil, err
 	}
 
-	inEventChannelSize := queue.AdjustInternalQueueSize(inQueueSize, 0)
+	inEventChannelSize := memqueue.AdjustInternalQueueSize(inQueueSize, 0)
 
 	b := &inBroker{
 		ctx:         ctx,

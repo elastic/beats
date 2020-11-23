@@ -27,6 +27,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
+const (
+	minInternalQueueSize      = 20
+	maxInternalQueueSizeRatio = 0.1
+)
+
 type broker struct {
 	done chan struct{}
 
@@ -116,7 +121,7 @@ func NewQueue(
 		flushTimeout = settings.FlushTimeout
 	)
 
-	chanSize := queue.AdjustInternalQueueSize(settings.InternalQueueSize, sz)
+	chanSize := AdjustInternalQueueSize(settings.InternalQueueSize, sz)
 
 	if minEvents < 1 {
 		minEvents = 1
@@ -297,4 +302,16 @@ func (l *chanList) reverse() {
 	for !tmp.empty() {
 		l.prepend(tmp.pop())
 	}
+}
+
+// AdjustInternalQueueSize decides the size for the internal queue used by most queue implementations.
+func AdjustInternalQueueSize(requested, mainQueueSize int) (actual int) {
+	actual = requested
+	if max := int(float64(mainQueueSize) * maxInternalQueueSizeRatio); mainQueueSize > 0 && actual > max {
+		actual = max
+	}
+	if actual < minInternalQueueSize {
+		actual = minInternalQueueSize
+	}
+	return actual
 }
