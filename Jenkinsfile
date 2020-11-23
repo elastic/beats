@@ -345,16 +345,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
-      installTools()
-      if(isUnix()) {
-        // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
-        // See https://github.com/elastic/beats/issues/17787.
-        sh(label: 'check git config', script: '''
-          if [ -z "$(git config --get user.email)" ]; then
-            git config --global user.email "beatsmachine@users.noreply.github.com"
-            git config --global user.name "beatsmachine"
-          fi''')
-      }
+      installTools(args)
       // Skip to upload the generated files by default.
       def upload = false
       try {
@@ -403,11 +394,19 @@ def fixPermissions(location) {
 * This method installs the required dependencies that are for some reason not available in the
 * CI Workers.
 */
-def installTools() {
+def installTools(args) {
+  def stepHeader = "${args.id?.trim() ? args.id : env.STAGE_NAME}"
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+    // See https://github.com/elastic/beats/issues/17787.
+    sh(label: 'check git config', script: '''
+      if [ -z "$(git config --get user.email)" ]; then
+        git config --global user.email "beatsmachine@users.noreply.github.com"
+        git config --global user.name "beatsmachine"
+      fi''')
   } else {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
