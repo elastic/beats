@@ -1,7 +1,7 @@
 name: APM-Server
 cmd: apm-server
 artifact: apm-server
-args: ["-E", "management.enabled=true", "-E", "management.mode=x-pack-fleet"]
+args: ["-E", "management.enabled=true", "-E", "management.mode=x-pack-fleet", "-E", "apm-server.data_streams.enabled=true"]
 rules:
   - fix_stream: {}
   - filter_values:
