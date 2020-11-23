@@ -14,21 +14,21 @@ IF ERRORLEVEL 1 (
 )
 mkdir %WORKSPACE%\bin
 
-set GVM_BIN=gvm
-SET GVM_URL=https://github.com/andrewkroh/gvm/releases/download/v0.2.2
+SET GVM_BIN=gvm
+SET GVM_VERSION=v0.2.2
 IF EXIST "%PROGRAMFILES(X86)%" (
-    SET GVM_FILE=gvm-windows-amd64.exe
+    SET GVM_URL=https://github.com/andrewkroh/gvm/releases/download/%GVM_VERSION%/gvm-windows-amd64.exe
 ) ELSE (
     REM Windows 7 workers got a broken gvm installation.
-    SET GVM_FILE=gvm-windows-386.exe
-    set GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\%GVM_BIN% %GVM_URL%/%GVM_FILE%
+    SET GVM_BIN=gvm.exe
+    SET GVM_URL=https://github.com/andrewkroh/gvm/releases/download/%GVM_VERSION%/gvm-windows-386.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe %GVM_URL%
 )
 
 where /q %GVM_BIN%
 IF ERRORLEVEL 1 (
-    set GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\%GVM_BIN% %GVM_URL%/%GVM_FILE%
+    SET GVM_BIN=gvm.exe
+    curl -L -o %WORKSPACE%\bin\%GVM_BIN% %GVM_URL%
     IF ERRORLEVEL 1 (
         REM The download of gvm has failed.
         exit /b 1
