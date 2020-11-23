@@ -88,29 +88,36 @@ func init() {
 	}
 }
 
-var currentInstance *MetricSet
+var (
+	// Singleton to instantiate one socket dataset at a time.
+	instance      *MetricSet
+	instanceMutex sync.Mutex
+)
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	instanceMutex.Lock()
+	defer instanceMutex.Unlock()
+
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %s config", fullName)
 	}
-	if currentInstance != nil {
+	if instance != nil {
 		// Do not instantiate a new dataset if the config hasn't changed.
 		// This is necessary when run under config reloader even though the
 		// reloader itself already checks the config for changes, because
 		// the first time it runs it will allocate two consecutive instances
 		// (one for checking the config, one for running). This saves
 		// running the guesses twice on startup.
-		if config.Equals(currentInstance.config) {
-			return currentInstance, nil
+		if config.Equals(instance.config) {
+			return instance, nil
 		}
-		currentInstance.terminated.Wait()
+		instance.terminated.Wait()
 	}
 	var err error
-	currentInstance, err = newSocketMetricset(config, base)
-	return currentInstance, err
+	instance, err = newSocketMetricset(config, base)
+	return instance, err
 }
 
 func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
