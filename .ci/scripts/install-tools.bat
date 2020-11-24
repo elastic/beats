@@ -43,14 +43,8 @@ FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
 go env
 IF ERRORLEVEL 1 (
-    REM Fallback the go installation with choco, since gvm in some workers doesn't install go correctly
-    choco install golang -y -r --no-progress --version=%GO_VERSION%
-    IF NOT ERRORLEVEL 0 (
-        exit /b 1
-    )
-    REM use choco refresh approach (see https://github.com/chocolatey/choco/issues/1461)
-    call RefreshEnv.cmd
-    go env
+    REM go is not configured correctly.
+    exit /b 1
 )
 
 go get github.com/magefile/mage
