@@ -7,9 +7,11 @@
         "@timestamp" : "2020-11-03T09:06:42.000Z",
         "event" : {
             "action" : "Retreive ConsumerGroup",
-            "ingested" : "2020-11-05T12:51:52.507448200Z",
+            "dataset" : "azure.platformlogs",
             "kind" : "event",
-            "outcome" : "succeeded"
+            "outcome" : "succeeded",
+            "module": "azure",
+            "duration": 0
         },
         "azure" : {
             "subscription_id" : "7657426D-C4C3-44AC-88A2-3B2CD59E6DBA",
