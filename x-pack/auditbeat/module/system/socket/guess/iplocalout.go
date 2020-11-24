@@ -39,7 +39,7 @@ const (
 )
 
 func init() {
-	if err := Registry.AddGuess(&guessIPLocalOut{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessIPLocalOut{} }); err != nil {
 		panic(err)
 	}
 }
