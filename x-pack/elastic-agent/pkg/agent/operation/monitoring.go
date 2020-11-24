@@ -14,8 +14,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 )
 
 const (
@@ -24,6 +26,7 @@ const (
 	logsProcessName    = "filebeat"
 	metricsProcessName = "metricbeat"
 	artifactPrefix     = "beats"
+	agentName          = "elastic-agent"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -324,6 +327,58 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			},
 		})
 	}
+
+	// setup cpu, memory and fd monitors for agents
+	modules = append(modules, map[string]interface{}{
+		"module":      "system",
+		"period":      "10s",
+		"metricsets":  []string{"process", "memory", "cpu"},
+		"cpu.metrics": []string{"percentages", "normalized_percentages", "ticks"},
+		"index":       fmt.Sprintf("metrics-elastic_agent.%s-default", agentName),
+		"processes":   []string{install.BinaryName},
+		"processors": []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"target": "data_stream",
+					"fields": map[string]interface{}{
+						"type":      "metrics",
+						"dataset":   fmt.Sprintf("elastic_agent.%s", agentName),
+						"namespace": "default",
+					},
+				},
+			},
+			{
+				"add_fields": map[string]interface{}{
+					"target": "event",
+					"fields": map[string]interface{}{
+						"dataset": fmt.Sprintf("elastic_agent.%s", agentName),
+					},
+				},
+			},
+			{
+				"add_fields": map[string]interface{}{
+					"target": "elastic_agent",
+					"fields": map[string]interface{}{
+						"id":       o.agentInfo.AgentID(),
+						"version":  o.agentInfo.Version(),
+						"snapshot": o.agentInfo.Snapshot(),
+					},
+				},
+			},
+			{
+				"drop_event": map[string]interface{}{
+					"when": map[string]interface{}{
+						"not": map[string]interface{}{
+							"equals": map[string]interface{}{
+								"process.name": install.BinaryName,
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+
 	result := map[string]interface{}{
 		"metricbeat": map[string]interface{}{
 			"modules": modules,
@@ -366,6 +421,10 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 			endpoints[strings.ReplaceAll(a.Name(), "-", "_")] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
+
+	// add agent endpoint
+	agentEndpoint := beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS())
+	endpoints[agentName] = []string{agentEndpoint}
 
 	return endpoints
 }

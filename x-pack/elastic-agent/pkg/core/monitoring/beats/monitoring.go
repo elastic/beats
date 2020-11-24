@@ -21,7 +21,25 @@ const (
 	mbEndpointFileFormat = "unix:///tmp/elastic-agent/%s/%s/%s.sock"
 	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
+
+	// args: pipeline name, application name
+	agentMbEndpointFileFormat = "unix:///tmp/elastic-agent/elastic-agent.sock"
+	// args: pipeline name, application name
+	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 )
+
+// AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
+func AgentMonitoringEndpoint(operatingSystem string) string {
+	if operatingSystem == "windows" {
+		return agentMbEndpointFileFormatWin
+	}
+	return agentMbEndpointFileFormat
+}
+
+// AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
+func AgentPrefixedMonitoringEndpoint(operatingSystem string) string {
+	return httpPlusPrefix + AgentMonitoringEndpoint(operatingSystem)
+}
 
 func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
 	if endpoint, ok := spec.MetricEndpoints[operatingSystem]; ok {

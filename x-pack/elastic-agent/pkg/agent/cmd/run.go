@@ -14,16 +14,25 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/host"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/service"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -75,10 +84,22 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
+	if err := getOverwrites(rawConfig); err != nil {
+		return errors.New(err, "could not read overwrites")
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
+	if err != nil {
+		return errors.New(err,
+			"could not load agent info",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
@@ -106,10 +127,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, control)
+	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo)
 	if err != nil {
 		return err
 	}
+
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS())
+	if err != nil {
+		return err
+	}
+	defer serverStopFn()
 
 	if err := app.Start(); err != nil {
 		return err
@@ -148,6 +175,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		logger.Info("Shutting down completed.")
 		return err
 	}
+
 	rex.ShutdownComplete()
 	return err
 }
@@ -163,4 +191,125 @@ func reexecPath() (string, error) {
 	}
 
 	return potentialReexec, nil
+}
+
+func getOverwrites(rawConfig *config.Config) error {
+	path := info.AgentConfigFile()
+
+	store := storage.NewDiskStore(path)
+	reader, err := store.Load()
+	if err != nil && errors.Is(err, os.ErrNotExist) {
+		// no fleet file ignore
+		return nil
+	} else if err != nil {
+		return errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	err = rawConfig.Merge(config)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	return nil
+}
+
+func defaultLogLevel(cfg *configuration.Configuration) string {
+	if application.IsStandalone(cfg.Fleet) {
+		// for standalone always take the one from config and don't override
+		return ""
+	}
+
+	defaultLogLevel := logger.DefaultLoggingConfig().Level.String()
+	if configuredLevel := cfg.Settings.LoggingConfig.Level.String(); configuredLevel != "" && configuredLevel != defaultLogLevel {
+		// predefined log level
+		return configuredLevel
+	}
+
+	return defaultLogLevel
+}
+
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string) (func() error, error) {
+	agentID := agentInfo.AgentID()
+	ecsMetadata, err := agentInfo.ECSMetadata()
+	if err != nil {
+		return nil, err
+	}
+
+	reg := monitoring.Default.GetRegistry("libbeat")
+	if reg == nil {
+		reg = monitoring.Default.NewRegistry("libbeat")
+		metrics := reg.NewRegistry("output")
+		outputs.NewStats(metrics)
+		monitoring.NewString(metrics, "type").Set("")
+	}
+
+	// use libbeat to setup metrics
+	if err := metrics.SetupMetrics(agentName); err != nil {
+		return nil, err
+	}
+
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "version").Set(agentInfo.Version())
+	monitoring.NewString(infoRegistry, "beat").Set(agentName)
+	monitoring.NewString(infoRegistry, "name").Set(agentName)
+	monitoring.NewString(infoRegistry, "hostname").Set(ecsMetadata.Host.Hostname)
+	monitoring.NewString(infoRegistry, "uuid").Set(agentID)
+
+	// Add additional info to state registry. This is also reported to monitoring
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+
+	serviceRegistry := stateRegistry.NewRegistry("service")
+	monitoring.NewString(serviceRegistry, "version").Set(agentInfo.Version())
+	monitoring.NewString(serviceRegistry, "name").Set(agentName)
+	monitoring.NewString(serviceRegistry, "id").Set(agentID)
+
+	mgmt := stateRegistry.NewRegistry("management")
+	monitoring.NewBool(mgmt, "enabled").Set(false)
+
+	beatRegistry := stateRegistry.NewRegistry("beat")
+	monitoring.NewString(beatRegistry, "name").Set(agentName)
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
+
+	// TODO: when having output provide metrics, so far empty name
+	outputRegistry := stateRegistry.NewRegistry("output")
+	monitoring.NewString(outputRegistry, "name").Set("")
+
+	queueRegistry := stateRegistry.NewRegistry("queue")
+	monitoring.NewString(queueRegistry, "name").Set("")
+
+	moduleRegistry := stateRegistry.NewRegistry("module")
+	monitoring.NewInt(moduleRegistry, "count").Set(0)
+
+	// start server for stats
+	endpointConfig := api.Config{
+		Enabled: true,
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
+	}
+
+	cfg, err := common.NewConfigFrom(endpointConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err := api.NewWithDefaultRoutes(logger, cfg, monitoring.GetNamespace)
+	if err != nil {
+		return nil, errors.New(err, "could not start the HTTP server for the API")
+	}
+	s.Start()
+
+	// return server stopper
+	return s.Stop, nil
 }
