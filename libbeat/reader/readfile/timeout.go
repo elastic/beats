@@ -68,6 +68,7 @@ func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *Time
 func (r *TimeoutReader) Next() (reader.Message, error) {
 	if !r.running {
 		r.running = true
+		r.done = make(chan struct{})
 		go func() {
 			for {
 				message, err := r.reader.Next()
@@ -98,7 +99,9 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 }
 
 func (r *TimeoutReader) Close() error {
-	close(r.done)
-
+	if r.running {
+		close(r.done)
+	}
+	r.running = false
 	return r.reader.Close()
 }

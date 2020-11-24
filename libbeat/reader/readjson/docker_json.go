@@ -48,6 +48,9 @@ type DockerJSONReader struct {
 	stripNewLine func(msg *reader.Message)
 
 	logger *logp.Logger
+
+	// previous state for reading truncated log which split between two files
+	prevState *state
 }
 
 type logLine struct {
@@ -57,6 +60,11 @@ type logLine struct {
 	Stream    string            `json:"stream"`
 	Log       string            `json:"log"`
 	Attrs     map[string]string `json:"attrs"`
+}
+
+type state struct {
+	bytes   int
+	message reader.Message
 }
 
 // New creates a new reader renaming a field
@@ -187,26 +195,36 @@ func (p *DockerJSONReader) parseAuto(message *reader.Message, msg *logLine) erro
 // Next returns the next line.
 func (p *DockerJSONReader) Next() (reader.Message, error) {
 	var bytes int
+
 	for {
-		message, err := p.reader.Next()
-
-		// keep the right bytes count even if we return an error
-		bytes += message.Bytes
-		message.Bytes = bytes
-
-		if err != nil {
-			return message, err
-		}
-
+		var err error
+		var message reader.Message
 		var logLine logLine
-		err = p.parseLine(&message, &logLine)
-		if err != nil {
-			p.logger.Errorf("Parse line error: %v", err)
-			return message, reader.ErrLineUnparsable
+
+		if p.prevState != nil {
+			bytes = p.prevState.bytes
+			message = p.prevState.message
+		} else {
+			message, err = p.reader.Next()
+
+			// keep the right bytes count even if we return an error
+			bytes += message.Bytes
+			message.Bytes = bytes
+
+			if err != nil {
+				return message, err
+			}
+
+			err = p.parseLine(&message, &logLine)
+			if err != nil {
+				p.logger.Errorf("Parse line error: %v", err)
+				return message, reader.ErrLineUnparsable
+			}
 		}
 
 		// Handle multiline messages, join partial lines
-		for p.partial && logLine.Partial {
+		for (p.partial && logLine.Partial) || p.prevState != nil {
+			p.prevState = nil
 			next, err := p.reader.Next()
 
 			// keep the right bytes count even if we return an error
@@ -214,6 +232,11 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			message.Bytes = bytes
 
 			if err != nil {
+				// save state to call next Next
+				p.prevState = &state{
+					message: message,
+					bytes:   bytes,
+				}
 				return message, err
 			}
 			err = p.parseLine(&next, &logLine)

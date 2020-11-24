@@ -71,6 +71,10 @@ type Input struct {
 	meta                map[string]string
 	stopOnce            sync.Once
 	fileStateIdentifier file.StateIdentifier
+
+	// used, when ReadLogrotate is true
+	// readers from harvesters. for one source we have only one reader
+	sourceReaders map[string]*harvesterReader
 }
 
 // NewInput instantiates a new Log
@@ -140,11 +144,12 @@ func NewInput(
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
+		sourceReaders:       make(map[string]*harvesterReader),
 	}
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(file.State{}, nil)
+	_, err = p.createHarvester(file.State{}, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -669,7 +674,7 @@ func subOutletWrap(outlet channel.Outleter) func() channel.Outleter {
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harvester, error) {
+func (p *Input) createHarvester(state file.State, reader *harvesterReader, onTerminate func()) (*Harvester, error) {
 	// Each wraps the outlet, for closing the outlet individually
 	h, err := NewHarvester(
 		p.cfg,
@@ -679,6 +684,7 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 			return p.stateOutlet.OnEvent(beat.Event{Private: state})
 		},
 		subOutletWrap(p.outlet),
+		reader,
 	)
 	if err == nil {
 		h.onTerminate = onTerminate
@@ -698,8 +704,19 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	state.Finished = false
 	state.Offset = offset
 
-	// Create harvester with state
-	h, err := p.createHarvester(state, func() { p.numHarvesters.Dec() })
+	// find previous reader from other harvester but same source
+	var previousReader *harvesterReader
+	if reader, exist := p.sourceReaders[state.Source]; p.config.ReadLogrotate && exist {
+		// if reader found, but still used skip createHarvester until next scan
+		if reader.IsUsed() {
+			logp.Debug("input", "wait reader for %s, skip now", state.Source)
+			return nil
+		}
+		previousReader = reader
+	}
+
+	// Create harvester with state and previous source reader if found
+	h, err := p.createHarvester(state, previousReader, func() { p.numHarvesters.Dec() })
 	if err != nil {
 		p.numHarvesters.Dec()
 		return err
@@ -709,6 +726,11 @@ func (p *Input) startHarvester(state file.State, offset int64) error {
 	if err != nil {
 		p.numHarvesters.Dec()
 		return fmt.Errorf("error setting up harvester: %s", err)
+	}
+
+	// save source reader for other same source harvesters
+	if p.config.ReadLogrotate {
+		p.sourceReaders[state.Source] = h.GetReader()
 	}
 
 	// Update state before staring harvester

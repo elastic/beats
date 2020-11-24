@@ -57,6 +57,8 @@ type config struct {
 	RecursiveGlob  bool                    `config:"recursive_glob.enabled"`
 	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
 
+	ReadLogrotate bool `config:"read_logrotate"`
+
 	// Harvester
 	BufferSize int    `config:"harvester_buffer_size"`
 	Encoding   string `config:"encoding"`
@@ -192,6 +194,14 @@ func (c *config) Validate() error {
 		if _, ok := ValidScanOrder[c.ScanOrder]; !ok {
 			return fmt.Errorf("Invalid scan order: %v", c.ScanOrder)
 		}
+	}
+
+	if c.ReadLogrotate && c.CloseInactive == 0 {
+		return fmt.Errorf("close_inactive must be enabled when read_logrotate is used")
+	}
+
+	if c.ReadLogrotate && (c.CloseRenamed || c.CloseEOF) {
+		return fmt.Errorf("read_logrotate not able work with close_renamed and close_eof")
 	}
 
 	return nil

@@ -97,6 +97,7 @@ type Harvester struct {
 	reader          reader.Reader
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
+	wrapReader      *wrapReader
 
 	// event/state publishing
 	outletFactory OutletFactory
@@ -125,6 +126,7 @@ func NewHarvester(
 	states *file.States,
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
+	hReader *harvesterReader,
 ) (*Harvester, error) {
 
 	id, err := uuid.NewV4()
@@ -142,6 +144,11 @@ func NewHarvester(
 		doneWg:        &sync.WaitGroup{},
 		id:            id,
 		outletFactory: outletFactory,
+	}
+
+	if hReader != nil {
+		h.reader = hReader.r
+		h.wrapReader = hReader.wrapReader
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -632,6 +639,37 @@ func (h *Harvester) cleanup() {
 	harvesterClosed.Add(1)
 }
 
+type wrapReader struct {
+	sync.Mutex
+	r reader.Reader
+
+	notUsed bool
+}
+
+func (w *wrapReader) ReplaceReader(r reader.Reader) {
+	w.Lock()
+	defer w.Unlock()
+	w.r = r
+	w.notUsed = false
+}
+
+func (w *wrapReader) Close() error {
+	w.Lock()
+	defer w.Unlock()
+	w.notUsed = true
+	return w.r.Close()
+}
+
+func (w *wrapReader) Next() (reader.Message, error) {
+	return w.r.Next()
+}
+
+func (w *wrapReader) IsUsed() bool {
+	w.Lock()
+	defer w.Unlock()
+	return !w.notUsed
+}
+
 // newLogFileReader creates a new reader to read log files
 //
 // It creates a chain of readers which looks as following:
@@ -680,6 +718,18 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	// if already exist reader, we need just replace low-level reader
+	if h.wrapReader != nil && h.reader != nil {
+		h.wrapReader.ReplaceReader(r)
+		return h.reader, nil
+	}
+
+	// wrap low-level reader for replace it in next time
+	if h.config.ReadLogrotate {
+		h.wrapReader = &wrapReader{r: r}
+		r = h.wrapReader
+	}
+
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
 		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags)
@@ -699,4 +749,17 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	}
 
 	return readfile.NewLimitReader(r, h.config.MaxBytes), nil
+}
+
+// return reader + wrap_reader if exist
+func (h *Harvester) GetReader() *harvesterReader {
+	return &harvesterReader{
+		r:          h.reader,
+		wrapReader: h.wrapReader,
+	}
+}
+
+type harvesterReader struct {
+	r reader.Reader
+	*wrapReader
 }

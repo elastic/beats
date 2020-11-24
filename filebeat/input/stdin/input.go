@@ -93,6 +93,7 @@ func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 		func() channel.Outleter {
 			return p.outlet
 		},
+		nil,
 	)
 
 	return h, err

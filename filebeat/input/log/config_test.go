@@ -70,3 +70,34 @@ func TestCleanOlderIgnoreOlder(t *testing.T) {
 	err := config.Validate()
 	assert.NoError(t, err)
 }
+
+func TestReadLogrotateConfig(t *testing.T) {
+	t.Run("valid config", func(t *testing.T) {
+		config := config{
+			ReadLogrotate: true,
+			LogConfig: LogConfig{
+				CloseInactive: time.Second,
+			},
+		}
+
+		assert.NoError(t, config.Validate())
+	})
+
+	t.Run("logrotate without close_inactive", func(t *testing.T) {
+		config := config{
+			ReadLogrotate: true,
+		}
+		assert.EqualError(t, config.Validate(), "close_inactive must be enabled when read_logrotate is used")
+	})
+
+	t.Run("logrotate with close eof", func(t *testing.T) {
+		config := config{
+			ReadLogrotate: true,
+			LogConfig: LogConfig{
+				CloseEOF:      true,
+				CloseInactive: time.Second,
+			},
+		}
+		assert.EqualError(t, config.Validate(), "read_logrotate not able work with close_renamed and close_eof")
+	})
+}
