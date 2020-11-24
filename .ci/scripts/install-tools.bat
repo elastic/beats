@@ -43,23 +43,8 @@ FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
 go env
 IF ERRORLEVEL 1 (
-    REM go is not configured correctly let's fallback with some scripting
-    where /q unzip
-    IF ERRORLEVEL 1 (
-        choco install unzip -y --no-progress --skipdownloadcache
-    )
-    IF EXIST "%PROGRAMFILES(X86)%" (
-        curl -L -o %USERPROFILE%\.gvm\go.zip https://storage.googleapis.com/golang/go%GO_VERSION%.windows-amd64.zip
-        unzip -q -u -o %USERPROFILE%\.gvm\go.zip -d %USERPROFILE%\.gvm\.go
-        MOVE %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.amd64 %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.amd64.old
-        MOVE /Y .go\go %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.amd64
-    ) ELSE (
-        curl -L -o %USERPROFILE%\.gvm\go.zip https://storage.googleapis.com/golang/go%GO_VERSION%.windows-386.zip
-        unzip -q -u -o %USERPROFILE%\.gvm\go.zip -d %USERPROFILE%\.gvm\.go
-        MOVE %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.386 %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.386.old
-        MOVE /Y .go\go %USERPROFILE%\.gvm\versions\go%GO_VERSION%.windows.386
-    )
-    go env
+    REM go is not configured correctly.
+    exit /b 1
 )
 
 go get github.com/magefile/mage
