@@ -40,6 +40,9 @@ type AgentECSMeta struct {
 	BuildOriginal string `json:"build.original"`
 	// Upgradeable is a flag specifying if it is possible for agent to be upgraded.
 	Upgradeable bool `json:"upgradeable"`
+	// LogLevel describes currently set log level.
+	// Possible values: "debug"|"info"|"warning"|"error"
+	LogLevel string `json:"log_level"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -140,6 +143,7 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
 				Upgradeable: release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
+				LogLevel:    i.logLevel,
 			},
 		},
 		Host: &HostECSMeta{
