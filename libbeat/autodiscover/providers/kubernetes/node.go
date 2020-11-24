@@ -168,8 +168,8 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		return
 	}
 
-	// If the node is not in ready state then dont monitor it
-	if !isNodeReady(node) {
+	// If the node is not in ready state then dont monitor it unless its a stop event
+	if !isNodeReady(node) && flag != "stop" {
 		return
 	}
 
