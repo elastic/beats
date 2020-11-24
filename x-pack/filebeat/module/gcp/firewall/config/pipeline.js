@@ -189,7 +189,7 @@ function FirewallProcessor(keep_original_message, debug) {
         fail_on_error: false
     }));
 
-    // Set network.transport from iana_number. googlecloud Firewall only supports
+    // Set network.transport from iana_number. GCP Firewall only supports
     // logging of tcp and udp connections, added icmp just in case as it's the
     // other protocol supported by firewall rules.
     builder.Add("transportFromIANA", makeMapper({
