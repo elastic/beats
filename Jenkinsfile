@@ -293,7 +293,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags
+  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
   if(isUnix()) {
     if (isArm() && is64arm()) {
@@ -315,7 +315,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     def goArch = is32() ? '386' : 'amd64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-    goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
+    userProfile="${env.WORKSPACE}"
+    goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
     path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
@@ -340,7 +341,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
-    "USERPROFILE=${env.WORKSPACE}"
+    "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
