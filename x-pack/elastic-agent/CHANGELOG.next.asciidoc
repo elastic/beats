@@ -51,3 +51,4 @@
 - Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]
 - Add `priority` to `AddOrUpdate` on dynamic composable input providers communication channel {pull}22352[22352]
 - Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]
+- Log level reloadable from fleet {pull}22690[22690]
