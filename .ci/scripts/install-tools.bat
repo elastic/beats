@@ -17,7 +17,7 @@ mkdir %WORKSPACE%\bin
 IF EXIST "%PROGRAMFILES(X86)%" (
     REM Force the gvm installation.
     SET GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.3/gvm-windows-amd64.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://s3.us-east-1.amazonaws.com/deploy.andrewkroh.com/gvm/gvm-windows-amd64.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
         exit /b 1
