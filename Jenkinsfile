@@ -341,6 +341,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
+    "OLD_USERPROFILE=${env.USERPROFILE}",
     "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
