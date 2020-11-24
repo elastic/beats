@@ -46,8 +46,12 @@ Resources:
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
-        - Name: deployment-task-metricbeat-container
-          Image: kaiyansheng/metricbeat-awsfargate:v1
+        - Name: nginx-container
+          Image: nginx:1.17.7
+          PortMappings:
+            - ContainerPort: 80
+        - Name: metricbeat-container
+          Image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
           Secrets:
             - Name: ELASTIC_CLOUD_ID
               ValueFrom: <ELASTIC_CLOUD_ID_ARN>
@@ -63,7 +67,7 @@ Resources:
             - sh
             - -c
           Command:
-            - ./metricbeat setup && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+            - ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
       RequiresCompatibilities:
         - EC2
         - FARGATE
