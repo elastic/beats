@@ -10,8 +10,19 @@
             "dataset" : "azure.platformlogs",
             "kind" : "event",
             "outcome" : "succeeded",
-            "module": "azure",
-            "duration": 0
+            "module": "azure"
+        },
+        "fileset": {
+            "name": "platformlogs"
+        },
+        "service": {
+            "type": "azure"
+        },
+        "input": {
+            "type": "log"
+        },
+        "log": {
+            "offset": 0
         },
         "azure" : {
             "subscription_id" : "7657426D-C4C3-44AC-88A2-3B2CD59E6DBA",
@@ -38,8 +49,6 @@
                 }
             }
         },
-        "input.type": "log",
-        "service.type": "azure",
         "tags": [
             "forwarded"
         ]

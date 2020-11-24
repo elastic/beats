@@ -1,36 +1,54 @@
+[
 {
-    "cloud":{
-        "provider":"azure"
+    "cloud": {
+        "provider": "azure"
     },
-    "@timestamp":"2020-11-09T10:57:31.000Z",
-    "event":{
-        "action":"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
-        "dataset" : "azure.platformlogs",
-        "kind":"event",
-        "module": "azure",
-        "duration": 0
+    "@timestamp": "2020-11-09T10:57:31.000Z",
+    "fileset": {
+        "name": "platformlogs"
     },
-    "message" : "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io/v1\",\"level\":\"Metadata\",\"auditID\":\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\"}",
-    "azure":{
-        "subscription_id":"70BD6E77-4B1E-4835-8896-DB77B8EEF364",
-        "resource":{
-            "name":"OBSKUBE",
-            "id":"/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE",
-            "provider":"MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS",
-            "group":"OBS-INFRASTRUCTURE"
+    "service": {
+        "type": "azure"
+    },
+    "input": {
+        "type": "log"
+    },
+    "log": {
+        "offset": 0
+    },
+    "event": {
+        "action": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+        "dataset": "azure.platformlogs",
+        "kind": "event",
+        "module": "azure"
+    },
+    "message": "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io/v1\",\"level\":\"Metadata\",\"auditID\":\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\"}",
+    "azure": {
+        "subscription_id": "70BD6E77-4B1E-4835-8896-DB77B8EEF364",
+        "resource": {
+            "name": "OBSKUBE",
+            "id": "/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE",
+            "provider": "MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS",
+            "group": "OBS-INFRASTRUCTURE"
         },
-        "platformlogs":{
-            "ccpNamespace":"5e4bf4baee195b00017cdbfa",
-            "operation_name":"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
-            "Cloud":"AzureCloud",
-            "Environment":"prod",
-            "category":"kube-audit",
-            "event_category":"Administrative",
-            "properties":{
-                "pod":"kube-apiserver-666bd4b459-hjgdc",
-                "stream":"stdout"
+        "platformlogs": {
+            "ccpNamespace": "5e4bf4baee195b00017cdbfa",
+            "operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+            "Cloud": "AzureCloud",
+            "Environment": "prod",
+            "category": "kube-audit",
+            "event_category": "Administrative",
+            "properties": {
+                "pod": "kube-apiserver-666bd4b459-hjgdc",
+                "stream": "stdout"
             }
         }
-    }
+    },
+    "tags": [
+        "forwarded"
+    ]
 }
+    ]
+
+
 
