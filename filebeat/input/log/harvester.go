@@ -335,6 +335,7 @@ func (h *Harvester) Run() error {
 				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
 				//line unparsable, update offset and go to next line
 				h.state.Offset += int64(message.Bytes)
+				h.metrics.readOffset.Set(h.state.Offset)
 				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
