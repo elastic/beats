@@ -846,6 +846,7 @@ same journal. {pull}18467[18467]
 - Add awsfargate module task_stats metricset to monitor AWS ECS Fargate. {pull}22034[22034]
 - Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
 - Add unit file states to system/service {pull}22557[22557]
+- Add AWS Fargate overview dashboard. {pull}22745[22745]
 
 *Packetbeat*
 
