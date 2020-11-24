@@ -435,6 +435,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change Session ID type from int to string {pull}22359[22359]
 - Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
 - Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
+- Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
 
 *Packetbeat*
 
@@ -842,8 +843,10 @@ same journal. {pull}18467[18467]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
+- Add awsfargate module task_stats metricset to monitor AWS ECS Fargate. {pull}22034[22034]
 - Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
 - Add unit file states to system/service {pull}22557[22557]
+- Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 
 *Packetbeat*
 
