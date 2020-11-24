@@ -331,6 +331,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
+    "GOX_FLAGS=${gox_flags}",
     "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
     "MODULE=${module}",
@@ -339,7 +340,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
-    "GOX_FLAGS=${gox_flags}"
+    "USERPROFILE=${env.WORKSPACE}"
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
