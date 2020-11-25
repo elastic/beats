@@ -45,13 +45,13 @@ import (
 const maxSafePayload = 508
 
 func init() {
-	if err := Registry.AddGuess(&guessSkBuffLen{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSkBuffLen{} }); err != nil {
 		panic(err)
 	}
-	if err := Registry.AddGuess(&guessSkBuffProto{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSkBuffProto{} }); err != nil {
 		panic(err)
 	}
-	if err := Registry.AddGuess(&guessSkBuffDataPtr{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSkBuffDataPtr{} }); err != nil {
 		panic(err)
 	}
 }

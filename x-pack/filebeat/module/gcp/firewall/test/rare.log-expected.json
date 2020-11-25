@@ -7,10 +7,10 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1dobeotg13df9f5",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
@@ -57,7 +57,7 @@
             "10.128.0.16"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.142.0.10",
         "source.domain": "test-es",
         "source.ip": "10.142.0.10",
@@ -74,10 +74,10 @@
         "destination.port": 57794,
         "event.action": "firewall-rule",
         "event.category": "network",
-        "event.dataset": "googlecloud.firewall",
+        "event.dataset": "gcp.firewall",
         "event.id": "1dobeotg13df9f7",
         "event.kind": "event",
-        "event.module": "googlecloud",
+        "event.module": "gcp",
         "event.type": [
             "connection",
             "denied"
@@ -124,7 +124,7 @@
             "10.128.0.10"
         ],
         "rule.name": "network:default/firewall:adrian-test-3",
-        "service.type": "googlecloud",
+        "service.type": "gcp",
         "source.address": "10.142.0.16",
         "source.domain": "local-adrian-test",
         "source.ip": "10.142.0.16",
