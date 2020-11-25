@@ -1,4 +1,6 @@
-# googlecloud module is deprecated, please use gcp instead
+# Module: gcp
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-gcp.html
+
 - module: gcp
   vpcflow:
     enabled: true
