@@ -2,17 +2,15 @@ module_version: "1.0"
 
 var:
   - name: input
-    default: gcp-pubsub
+    default: google-pubsub
   - name: project_id
     default: SET_PROJECT_NAME
   - name: topic
-    default: stackdriver-firewall
+    default: stackdriver-vpcflow
   - name: subscription_name
-    default: filebeat-googlecloud-firewall
+    default: filebeat-gcp-vpcflow
   - name: credentials_file
   - name: credentials_json
-  - name: debug
-    default: false
   - name: keep_original_message
     default: false
   - name: tags
