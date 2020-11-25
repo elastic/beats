@@ -18,6 +18,7 @@
 package unix
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net"
@@ -345,12 +346,14 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			}
 			defer server.Stop()
 
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 			samples := generateMessages(eventsCount, 1024)
 			for w := 0; w < workers; w++ {
 				if socketType == "stream" {
-					go sendOverUnixStream(t, path, samples)
+					go sendOverUnixStream(t, ctx, path, samples)
 				} else if socketType == "datagram" {
-					go sendOverUnixDatagram(t, path, samples)
+					go sendOverUnixDatagram(t, ctx, path, samples)
 				}
 			}
 
@@ -375,34 +378,35 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	}
 }
 
-func sendOverUnixStream(t *testing.T, path string, samples []string) {
+func sendOverUnixStream(t *testing.T, ctx context.Context, path string, samples []string) {
 	conn, err := net.Dial("unix", path)
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer func() {
-		fmt.Println("Closing stream connection")
-		conn.Close()
-	}()
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
+	}
+
+	select {
+	case <-ctx.Done():
+		conn.Close()
 	}
 
 }
 
-func sendOverUnixDatagram(t *testing.T, path string, samples []string) {
+func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, samples []string) {
 	conn, err := net.Dial("unixgram", path)
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer func() {
-		fmt.Println("Closing datagram connection")
-		conn.Close()
-	}()
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
 
+	select {
+	case <-ctx.Done():
+		conn.Close()
+	}
 }
 
 func randomString(l int) string {
