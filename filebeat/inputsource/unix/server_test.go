@@ -355,9 +355,18 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			}
 
 			var events []*info
+			prevId := -1
 			for len(events) < eventsCount*workers {
 				select {
 				case event := <-ch:
+					parts := strings.Split(event.message, "-")
+					id, _ := strconv.Atoi(strings.TrimSuffix(parts[1], "\n"))
+					if id <= prevId {
+						fmt.Println("current ID is not bigger than prev ID, prev:", prevId, "current:", id)
+					} else {
+						fmt.Println("difference between two IDs:", strconv.Itoa(id-prevId), id, prevId)
+					}
+					prevId = id
 					events = append(events, event)
 				default:
 				}
@@ -402,7 +411,7 @@ func randomString(l int) string {
 func generateMessages(c int, l int) []string {
 	messages := make([]string, c)
 	for i := range messages {
-		messages[i] = randomString(l)
+		messages[i] = randomString(l) + "-" + strconv.Itoa(i)
 	}
 	return messages
 }
