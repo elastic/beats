@@ -170,6 +170,10 @@ func (l *Listener) unregisterHandler() {
 
 // SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
 func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
+	if len(lineDelimiter) == 0 {
+		return nil
+	}
+
 	ld := []byte(lineDelimiter)
 	if bytes.Equal(ld, []byte("\n")) {
 		// This will work for most usecases and will also strip \r if present.

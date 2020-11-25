@@ -53,11 +53,20 @@ type info struct {
 	mt      inputsource.NetworkMetadata
 }
 
-func TestErrorOnEmptyLineDelimiterWhenStreamSocket(t *testing.T) {
-	c := common.NewConfig()
-	config := defaultConfig()
-	config.Path = "my-random-path"
-	err := c.Unpack(&config)
+func TestErrorOnInvalidSocketType(t *testing.T) {
+	config := &Config{
+		SocketType: SocketType(7),
+	}
+	_, err := New(logp.L(), config, nil)
+	assert.Error(t, err)
+}
+
+func TestErrorOnEmptyLineDelimiter(t *testing.T) {
+	config := &Config{
+		SocketType:    StreamSocket,
+		LineDelimiter: "",
+	}
+	_, err := New(logp.L(), config, nil)
 	assert.Error(t, err)
 }
 
@@ -312,9 +321,10 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 				ch <- &info{message: string(message), mt: mt}
 			}
 			cfg, err := common.NewConfigFrom(map[string]interface{}{
-				"path":           path,
-				"line_delimiter": "\n",
-				"socket_type":    socketType,
+				"path":            path,
+				"line_delimiter":  "\n",
+				"socket_type":     socketType,
+				"max_connections": 2,
 			})
 			if !assert.NoError(t, err) {
 				return
