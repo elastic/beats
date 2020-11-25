@@ -319,6 +319,17 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
+	if n := len(e.errors); n > 0 {
+		errors := make([]string, n)
+		for idx, err := range e.errors {
+			errors[idx] = err.Error()
+		}
+		if n == 1 {
+			out.MetricSetFields.Put("error.message", errors[0])
+		} else {
+			out.MetricSetFields.Put("error.message", errors)
+		}
+	}
 	return out
 }
 

@@ -22,7 +22,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -31,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
@@ -292,6 +295,121 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		}
 	}
 	assert.Equal(t, wanted, got)
+}
+
+func TestErrorReporting(t *testing.T) {
+	if runtime.GOOS == "darwin" {
+		// FSEvents doesn't generate write events during this test,
+		// either it needs the file to be closed before generating
+		// events or the non-readable permissions trick it somehow.
+		t.Skip("Skip this test on Darwin")
+	}
+	defer abtest.SetupDataDir(t)()
+
+	dir, err := ioutil.TempDir("", "audit-file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	path := filepath.Join(dir, "unreadable.txt")
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+
+	makeFileNonReadable(t, path)
+
+	config := getConfig(dir)
+	config["scan_at_start"] = false
+	ms := mbtest.NewPushMetricSetV2(t, config)
+
+	done := make(chan struct{}, 1)
+	go func() {
+		for {
+			f.WriteString("can't read this\n")
+			f.Sync()
+			select {
+			case <-done:
+				return
+			default:
+				time.Sleep(time.Second / 10)
+			}
+		}
+	}()
+
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 10, ms)
+	close(done)
+
+	getField := func(ev *mb.Event, field string) interface{} {
+		v, _ := ev.MetricSetFields.GetValue(field)
+		return v
+	}
+	match := func(ev *mb.Event) bool {
+		return ev != nil &&
+			reflect.DeepEqual(getField(ev, "event.type"), []string{"change"}) &&
+			getField(ev, "file.type") == "file" &&
+			getField(ev, "file.extension") == "txt"
+	}
+
+	var event *mb.Event
+	for idx, ev := range events {
+		t.Log("event[", idx, "] = ", ev)
+		if match(&ev) {
+			event = &ev
+			break
+		}
+	}
+
+	if !assert.NotNil(t, event) {
+		t.Fatal("target event not found")
+	}
+
+	if event.Error != nil {
+		t.Fatalf("received error: %+v", event.Error)
+	}
+
+	errors := getField(event, "error.message")
+	if !assert.NotNil(t, errors) {
+		t.Fatal("no error.message in event")
+	}
+
+	var errList []string
+	switch v := errors.(type) {
+	case string:
+		errList = []string{v}
+	case []interface{}:
+		for _, val := range v {
+			str, ok := val.(string)
+			if !ok {
+				t.Fatalf("Unexpected type %T in error.message list: %v", val, val)
+			}
+			errList = append(errList, str)
+		}
+
+	case []string:
+		errList = v
+
+	default:
+		t.Fatalf("Unexpected type %T in error.message: %v", v, v)
+	}
+
+	found := false
+	assert.NotEmpty(t, errList)
+	for _, msg := range errList {
+		if strings.Contains(msg, "hashing") {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found)
 }
 
 func getConfig(path ...string) map[string]interface{} {
