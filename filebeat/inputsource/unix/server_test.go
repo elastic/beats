@@ -296,60 +296,88 @@ func TestSocketCleanupRefusal(t *testing.T) {
 }
 
 func TestReceiveNewEventsConcurrently(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
-		return
-	}
-	workers := 4
-	eventsCount := 100
-	path := filepath.Join(os.TempDir(), "test.sock")
-	ch := make(chan *info, eventsCount*workers)
-	defer close(ch)
-	to := func(message []byte, mt inputsource.NetworkMetadata) {
-		ch <- &info{message: string(message), mt: mt}
-	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"path": path, "line_delimiter": "\n"})
-	if !assert.NoError(t, err) {
-		return
-	}
-	config := defaultConfig()
-	err = cfg.Unpack(&config)
-	if !assert.NoError(t, err) {
-		return
-	}
+	for socketType, _ := range socketTypes {
+		if runtime.GOOS == "windows" {
+			t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+			return
+		}
 
-	server, err := New(logp.L(), &config, to)
-	if !assert.NoError(t, err) {
-		return
-	}
-	err = server.Start()
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer server.Stop()
-
-	samples := generateMessages(eventsCount, 1024)
-	for w := 0; w < workers; w++ {
-		go func() {
-			conn, err := net.Dial("unix", path)
+		t.Run("socket_type "+socketType, func(t *testing.T) {
+			workers := 4
+			eventsCount := 100
+			path := filepath.Join(os.TempDir(), "test.sock")
+			ch := make(chan *info, eventsCount*workers)
+			defer close(ch)
+			to := func(message []byte, mt inputsource.NetworkMetadata) {
+				ch <- &info{message: string(message), mt: mt}
+			}
+			cfg, err := common.NewConfigFrom(map[string]interface{}{
+				"path":           path,
+				"line_delimiter": "\n",
+				"socket_type":    socketType,
+			})
 			if !assert.NoError(t, err) {
 				return
 			}
-			defer conn.Close()
-			for _, sample := range samples {
-				fmt.Fprintln(conn, sample)
+			config := defaultConfig()
+			err = cfg.Unpack(&config)
+			if !assert.NoError(t, err) {
+				return
 			}
-		}()
+
+			server, err := New(logp.L(), &config, to)
+			if !assert.NoError(t, err) {
+				return
+			}
+			err = server.Start()
+			if !assert.NoError(t, err) {
+				return
+			}
+			defer server.Stop()
+
+			samples := generateMessages(eventsCount, 1024)
+			for w := 0; w < workers; w++ {
+				if socketType == "stream" {
+					go sendOverUnixStream(t, path, samples)
+				} else if socketType == "datagram" {
+					go sendOverUnixDatagram(t, path, samples)
+				}
+			}
+
+			var events []*info
+			for len(events) < eventsCount*workers {
+				select {
+				case event := <-ch:
+					events = append(events, event)
+				default:
+				}
+			}
+		})
+	}
+}
+
+func sendOverUnixStream(t *testing.T, path string, samples []string) {
+	conn, err := net.Dial("unix", path)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer conn.Close()
+	for _, sample := range samples {
+		fmt.Fprintln(conn, sample)
 	}
 
-	var events []*info
-	for len(events) < eventsCount*workers {
-		select {
-		case event := <-ch:
-			events = append(events, event)
-		default:
-		}
+}
+
+func sendOverUnixDatagram(t *testing.T, path string, samples []string) {
+	conn, err := net.Dial("unixgram", path)
+	if !assert.NoError(t, err) {
+		return
 	}
+	defer conn.Close()
+	for _, sample := range samples {
+		fmt.Fprintln(conn, sample)
+	}
+
 }
 
 func randomString(l int) string {
