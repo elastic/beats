@@ -152,7 +152,7 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	var content []byte
 	var err error
 
-	// Collect usage stats only once every usageCollectionPeriod
+	// Add exclude_usage=true if the Kibana Version supports it
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
 		defer m.statsHTTP.SetURI(origURI)
