@@ -53,10 +53,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			// elasticsearch output config but not in kibana, initKibanaConfig
 			// will attach the username and password into kibana config as a
 			// part of the initialization.
-			initConfig, err := instance.InitKibanaConfig(b.Config)
-			if err != nil {
-				fatalf("error InitKibanaConfig: %v", err)
-			}
+			initConfig := instance.InitKibanaConfig(b.Config)
 
 			client, err := kibana.NewKibanaClient(initConfig)
 			if err != nil {
