@@ -75,6 +75,9 @@ type MetricSet struct {
 	scanStart    time.Time
 	scanChan     <-chan Event
 	fsnotifyChan <-chan Event
+
+	// Used when a hash can't be calculated
+	nullHashes map[HashType]Digest
 }
 
 // New returns a new file.MetricSet.
@@ -96,6 +99,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger(moduleName),
 	}
 
+	ms.nullHashes = make(map[HashType]Digest, len(config.HashTypes))
+	for _, hashType := range ms.config.HashTypes {
+		// One byte is enough so that the hashes are persisted to the datastore.
+		// The comparison function doesn't care if the lengths are not the expected
+		// for the given algorithms.
+		ms.nullHashes[hashType] = Digest{0x00}
+	}
 	ms.log.Debugf("Initialized the file event reader. Running as euid=%v", os.Geteuid())
 
 	return ms, nil
@@ -230,6 +240,19 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool 
 			ms.log.Errorw("Failed during DB delete", "error", err)
 		}
 	} else {
+		if event.hashFailed {
+			// If hashing failed, persist the previous hashes, so it can detect
+			// a future change to the file. Otherwise the next update event will
+			// be reported as a config change.
+			// Hashing usually fails while the file is being updated under Windows
+			// if open in exclusive mode, and succeeds once the file is closed
+			// and its mtime is updated.
+			if lastEvent != nil {
+				event.Hashes = lastEvent.Hashes
+			} else {
+				event.Hashes = ms.nullHashes
+			}
+		}
 		if err := store(ms.bucket, event); err != nil {
 			ms.log.Errorw("Failed during DB store", "error", err)
 		}
@@ -247,9 +270,13 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 
 	action, changed := diffEvents(lastEvent, event)
 	if event.Action == None || event.Action&Updated > 0 {
-		event.Action = action
+		if event.hashFailed && !changed {
+			event.Action = Updated
+		} else {
+			event.Action = action
+		}
+		changed = event.Action != None
 	}
-
 	if changed {
 		ms.log.Debugw("File changed since it was last seen",
 			"file_path", event.Path, "took", event.rtt,

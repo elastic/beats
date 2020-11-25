@@ -412,6 +412,263 @@ func TestErrorReporting(t *testing.T) {
 	assert.True(t, found)
 }
 
+type testReporter struct {
+	events []mb.Event
+	errors []error
+}
+
+func (t *testReporter) Event(event mb.Event) bool {
+	t.events = append(t.events, event)
+	return true
+}
+
+func (t *testReporter) Error(err error) bool {
+	t.errors = append(t.errors, err)
+	return true
+}
+
+func (t *testReporter) Done() <-chan struct{} {
+	return nil
+}
+
+func (t *testReporter) Clear() {
+	t.events = nil
+	t.errors = nil
+}
+
+func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]interface{}) {
+	var reporter testReporter
+	if !ms.reportEvent(&reporter, input) {
+		t.Fatal("reportEvent failed", title)
+	}
+	if !assert.Empty(t, reporter.errors, title) {
+		t.Fatal("errors during reportEvent", reporter.errors, title)
+	}
+	if expected == nil {
+		assert.Empty(t, reporter.events)
+		return
+	}
+	if !assert.NotEmpty(t, reporter.events) {
+		t.Fatal("no event received", title)
+	}
+	if !assert.Len(t, reporter.events, 1) {
+		t.Fatal("more than one event received", title)
+	}
+	ev := reporter.events[0]
+	t.Log("got title=", title, "event=", ev)
+	for k, v := range expected {
+		iface, err := ev.MetricSetFields.GetValue(k)
+		if v == nil {
+			assert.Error(t, err, title)
+			continue
+		}
+		if err != nil {
+			t.Fatal("failed to fetch key", k, title)
+		}
+		assert.Equal(t, v, iface, title)
+	}
+}
+
+type expectedEvent struct {
+	title    string
+	input    Event
+	expected map[string]interface{}
+}
+
+func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
+	checkExpectedEvent(t, ms, e.title, &e.input, e.expected)
+}
+
+type expectedEvents []expectedEvent
+
+func (e expectedEvents) validate(t *testing.T, ms *MetricSet) {
+	for _, ev := range e {
+		ev.validate(t, ms)
+	}
+}
+
+func TestEventFailedHash(t *testing.T) {
+	store, err := ioutil.TempFile("", "bucket")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	defer os.Remove(store.Name())
+	ds := datastore.New(store.Name(), 0644)
+	bucket, err := ds.OpenBucket(bucketName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bucket.Close()
+	config := getConfig("somepath")
+	config["hash_types"] = []string{"sha1"}
+	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	if !assert.True(t, ok) {
+		t.Fatal("can't create metricset")
+	}
+	ms.bucket = bucket.(datastore.BoltBucket)
+
+	baseTime := time.Now()
+	t.Run("failed hash on update", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "creation event",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/some/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("11111111111111111111"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": Digest("11111111111111111111"),
+				},
+			},
+			expectedEvent{
+				title: "update with hash",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Updated,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("22222222222222222222"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"updated"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": Digest("22222222222222222222"),
+				},
+			},
+			expectedEvent{
+				title: "update with failed hash",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Source:     SourceFSNotify,
+					Action:     Updated,
+					hashFailed: true,
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"updated"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": nil,
+				},
+			},
+			expectedEvent{
+				title: "update again now with hash",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/path",
+					Info: &Metadata{
+						CTime: baseTime,
+						MTime: baseTime,
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Updated,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("33333333333333333333"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"updated"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": Digest("33333333333333333333"),
+				},
+			},
+			expectedEvent{
+				title: "new modification time",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/path",
+					Info: &Metadata{
+						CTime: baseTime,
+						MTime: baseTime.Add(time.Second),
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Updated,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("33333333333333333333"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"attributes_modified"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": Digest("33333333333333333333"),
+				},
+			},
+		}.validate(t, ms)
+	})
+	t.Run("failed hash on creation", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "creation event with failed hash",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/some/other/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action:     Created,
+					Source:     SourceFSNotify,
+					hashFailed: true,
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": nil,
+				},
+			},
+			expectedEvent{
+				title: "update with hash",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/other/path",
+					Info: &Metadata{
+						MTime: baseTime.Add(time.Second),
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Updated,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("22222222222222222222"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"updated", "attributes_modified"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": Digest("22222222222222222222"),
+				},
+			},
+		}.validate(t, ms)
+	})
+}
+
 func getConfig(path ...string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":        "file_integrity",

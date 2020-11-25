@@ -119,8 +119,9 @@ type Event struct {
 	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 
 	// Metadata
-	rtt    time.Duration // Time taken to collect the info.
-	errors []error       // Errors that occurred while collecting the info.
+	rtt        time.Duration // Time taken to collect the info.
+	errors     []error       // Errors that occurred while collecting the info.
+	hashFailed bool          // Set when hashing the file failed.
 }
 
 // Metadata contains file metadata.
@@ -186,6 +187,7 @@ func NewEventFromFileInfo(
 			hashes, err := hashFile(event.Path, hashTypes...)
 			if err != nil {
 				event.errors = append(event.errors, err)
+				event.hashFailed = true
 			} else {
 				event.Hashes = hashes
 			}
