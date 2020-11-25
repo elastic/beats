@@ -40,9 +40,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var defaultConfig = Config{
-	Timeout:        time.Minute * 5,
-	MaxMessageSize: 20 * humanize.MiByte,
+func defaultConfig() Config {
+	return Config{
+		Timeout:        time.Minute * 5,
+		MaxMessageSize: 20 * humanize.MiByte,
+		SocketType:     StreamSocket,
+	}
 }
 
 type info struct {
@@ -50,9 +53,10 @@ type info struct {
 	mt      inputsource.NetworkMetadata
 }
 
-func TestErrorOnEmptyLineDelimiter(t *testing.T) {
+func TestErrorOnEmptyLineDelimiterWhenStreamSocket(t *testing.T) {
 	c := common.NewConfig()
-	config := defaultConfig
+	config := defaultConfig()
+	config.Path = "my-random-path"
 	err := c.Unpack(&config)
 	assert.Error(t, err)
 }
@@ -163,7 +167,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			path := filepath.Join(os.TempDir(), "test.sock")
 			test.cfg["path"] = path
 			cfg, _ := common.NewConfigFrom(test.cfg)
-			config := defaultConfig
+			config := defaultConfig()
 			err := cfg.Unpack(&config)
 			if !assert.NoError(t, err) {
 				return
@@ -220,11 +224,12 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 
 	path := filepath.Join(os.TempDir(), "test.sock")
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path":  path,
-		"group": group.Name,
-		"mode":  "0740",
+		"path":           path,
+		"group":          group.Name,
+		"mode":           "0740",
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	err = cfg.Unpack(&config)
 	require.NoError(t, err)
 
@@ -254,9 +259,10 @@ func TestSocketCleanup(t *testing.T) {
 	defer mockStaleSocket.Close()
 
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path": path,
+		"path":           path,
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
 	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
@@ -277,9 +283,10 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	defer os.Remove(path)
 
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path": path,
+		"path":           path,
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
 	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
@@ -301,11 +308,11 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"path": path})
+	cfg, err := common.NewConfigFrom(map[string]interface{}{"path": path, "line_delimiter": "\n"})
 	if !assert.NoError(t, err) {
 		return
 	}
-	config := defaultConfig
+	config := defaultConfig()
 	err = cfg.Unpack(&config)
 	if !assert.NoError(t, err) {
 		return
@@ -325,8 +332,10 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	for w := 0; w < workers; w++ {
 		go func() {
 			conn, err := net.Dial("unix", path)
+			if !assert.NoError(t, err) {
+				return
+			}
 			defer conn.Close()
-			assert.NoError(t, err)
 			for _, sample := range samples {
 				fmt.Fprintln(conn, sample)
 			}

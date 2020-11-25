@@ -60,7 +60,12 @@ func (c *Config) Validate() error {
 	if len(c.Path) == 0 {
 		return fmt.Errorf("need to specify the path to the unix socket")
 	}
+
+	if c.SocketType == StreamSocket && c.LineDelimiter == "" {
+		return fmt.Errorf("line_delimiter cannot be empty when using stream socket")
+	}
 	return nil
+
 }
 
 func (s *SocketType) Unpack(value string) error {
