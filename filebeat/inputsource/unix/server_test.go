@@ -383,15 +383,13 @@ func sendOverUnixStream(t *testing.T, ctx context.Context, path string, samples 
 	if !assert.NoError(t, err) {
 		return
 	}
+	defer conn.Close()
+
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
 
-	select {
-	case <-ctx.Done():
-		conn.Close()
-	}
-
+	<-ctx.Done()
 }
 
 func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, samples []string) {
@@ -399,14 +397,13 @@ func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, sample
 	if !assert.NoError(t, err) {
 		return
 	}
+	defer conn.Close()
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
 
-	select {
-	case <-ctx.Done():
-		conn.Close()
-	}
+	<-ctx.Done()
+	fmt.Println("closing UNIX DGRAM connection")
 }
 
 func randomString(l int) string {
