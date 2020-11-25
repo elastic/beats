@@ -120,7 +120,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat GoogleCloud] Audit",
+        "title": "[Filebeat GCP] Audit",
         "version": 1
       },
       "id": "6576c480-73a2-11ea-a345-f985c61fe654",
@@ -198,9 +198,9 @@
           "type": "Polygon"
         },
         "description": "",
-        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"866b5ce1-6ca0-47db-a6f2-54c5e0dcd2f0\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"79ec6461-7561-45e4-a6a2-9d6fbd4cf986\",\"geoField\":\"source.geo.location\",\"filterByMapBounds\":true,\"scalingType\":\"LIMIT\",\"topHitsSize\":1,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"279da950-e9a7-4287-ab37-25906e448455\",\"label\":\"Source Locations\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[],\"query\":{\"query\":\"event.dataset:googlecloud.audit\",\"language\":\"kuery\"}}]",
+        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"866b5ce1-6ca0-47db-a6f2-54c5e0dcd2f0\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"79ec6461-7561-45e4-a6a2-9d6fbd4cf986\",\"geoField\":\"source.geo.location\",\"filterByMapBounds\":true,\"scalingType\":\"LIMIT\",\"topHitsSize\":1,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"279da950-e9a7-4287-ab37-25906e448455\",\"label\":\"Source Locations\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[],\"query\":{\"query\":\"event.dataset:gcp.audit\",\"language\":\"kuery\"}}]",
         "mapStateJSON": "{\"zoom\":1.97,\"center\":{\"lon\":0,\"lat\":19.94277},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[]}",
-        "title": "Audit Source Locations [Filebeat GoogleCloud]",
+        "title": "Audit Source Locations [Filebeat GCP]",
         "uiStateJSON": {
           "isLayerTOCOpen": true,
           "openTOCDetails": []
@@ -231,7 +231,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Audit Events Outcome over time [Filebeat GoogleCloud]",
+        "title": "Audit Events Outcome over time [Filebeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -356,7 +356,7 @@
               }
             ]
           },
-          "title": "Audit Event Outcome over time [Filebeat GoogleCloud]",
+          "title": "Audit Event Outcome over time [Filebeat GCP]",
           "type": "histogram"
         }
       },
@@ -388,7 +388,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Audit Event Action [Filebeat GoogleCloud]",
+        "title": "Audit Event Action [Filebeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -430,7 +430,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Audit Event Action [Filebeat GoogleCloud]",
+          "title": "Audit Event Action [Filebeat GCP]",
           "type": "pie"
         }
       },
@@ -462,7 +462,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Audit Top User Email [Filebeat GoogleCloud]",
+        "title": "Audit Top User Email [Filebeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -498,7 +498,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Audit Top User Email [Filebeat GoogleCloud]",
+          "title": "Audit Top User Email [Filebeat GCP]",
           "type": "tagcloud"
         }
       },
@@ -530,7 +530,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Audit User Agent [Filebeat GoogleCloud]",
+        "title": "Audit User Agent [Filebeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -572,7 +572,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Audit User Agent [Filebeat GoogleCloud]",
+          "title": "Audit User Agent [Filebeat GCP]",
           "type": "pie"
         }
       },
@@ -604,7 +604,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Audit Resource Name [Filebeat GoogleCloud]",
+        "title": "Audit Resource Name [Filebeat GCP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -620,7 +620,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "googlecloud.audit.resource_name",
+                "field": "gcp.audit.resource_name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -646,7 +646,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Audit Resource Name [Filebeat GoogleCloud]",
+          "title": "Audit Resource Name [Filebeat GCP]",
           "type": "pie"
         }
       },
@@ -670,7 +670,7 @@
         "columns": [
           "user.email",
           "service.name",
-          "googlecloud.audit.type",
+          "gcp.audit.type",
           "event.action",
           "event.outcome",
           "source.ip",
@@ -692,13 +692,13 @@
                   "key": "event.dataset",
                   "negate": false,
                   "params": {
-                    "query": "googlecloud.audit"
+                    "query": "gcp.audit"
                   },
                   "type": "phrase"
                 },
                 "query": {
                   "match_phrase": {
-                    "event.dataset": "googlecloud.audit"
+                    "event.dataset": "gcp.audit"
                   }
                 }
               }
@@ -713,7 +713,7 @@
           }
         },
         "sort": [],
-        "title": "Audit [Filebeat GoogleCloud]",
+        "title": "Audit [Filebeat GCP]",
         "version": 1
       },
       "id": "d88364c0-73a1-11ea-a345-f985c61fe654",
