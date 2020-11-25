@@ -514,6 +514,7 @@ from being added to events by default. {pull}18159[18159]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
 - Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
 - Improve panw ECS url fields mapping. {pull}22481[22481]
+- Improve Nats filebeat dashboard. {pull}22726[22726]
 
 *Heartbeat*
 
