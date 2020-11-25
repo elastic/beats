@@ -312,7 +312,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		}
 
 		t.Run("socket_type "+socketType, func(t *testing.T) {
-			workers := 4
+			workers := 1
 			eventsCount := 100
 			path := filepath.Join(os.TempDir(), "test.sock")
 			ch := make(chan *info, eventsCount*workers)
