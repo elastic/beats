@@ -15,8 +15,6 @@ manage upgrades.
 NOTE: The upgrade feature is not supported for upgrading DEB/RPM packages or
 Docker images. 
 
-//REVIEWERS: Are bulk actions supported in Basic or just Gold?
-
 To upgrade {agent} to a new version:
 
 . In {fleet}, select **Agents**.

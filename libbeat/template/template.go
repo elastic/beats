@@ -235,9 +235,8 @@ func (t *Template) loadMinimalComponent() common.MapStr {
 }
 
 func (t *Template) loadMinimalIndex() common.MapStr {
-	m := t.loadMinimalLegacy()
+	m := t.loadMinimalComponent()
 	m["priority"] = t.priority
-	delete(m, "order")
 	return m
 }
 
@@ -304,9 +303,10 @@ func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
 }
 
 func (t *Template) generateIndex(properties common.MapStr) common.MapStr {
-	tmpl := t.generateLegacy(properties)
+	tmpl := t.generateComponent(properties)
 	tmpl["priority"] = t.priority
-	delete(tmpl, "order")
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	tmpl[keyPattern] = patterns
 	return tmpl
 }
 
