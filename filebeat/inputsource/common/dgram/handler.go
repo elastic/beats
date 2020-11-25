@@ -19,6 +19,7 @@ package dgram
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"runtime"
 	"strings"
@@ -57,6 +58,9 @@ func DatagramReaderFactory(
 				// On Unix based system, the buffer will be truncated but no error will be returned.
 				length, addr, err := conn.ReadFrom(buffer)
 				if err != nil {
+					if family == inputsource.FamilyUnix {
+						fmt.Println("connection handler error", err)
+					}
 					// don't log any deadline events.
 					e, ok := err.(net.Error)
 					if ok && e.Timeout() {
@@ -85,6 +89,7 @@ func DatagramReaderFactory(
 					callback(buffer[:length], inputsource.NetworkMetadata{RemoteAddr: addr})
 				}
 			}
+			fmt.Println("end of connection handling")
 			return nil
 		})
 	}

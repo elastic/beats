@@ -380,7 +380,10 @@ func sendOverUnixStream(t *testing.T, path string, samples []string) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		fmt.Println("Closing stream connection")
+		conn.Close()
+	}()
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
@@ -392,7 +395,10 @@ func sendOverUnixDatagram(t *testing.T, path string, samples []string) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		fmt.Println("Closing datagram connection")
+		conn.Close()
+	}()
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
