@@ -24,7 +24,7 @@ IF EXIST "%PROGRAMFILES(X86)%" (
     )
 ) ELSE (
     REM Windows 7 workers got a broken gvm installation.
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.3/gvm-windows-386.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://s3.us-east-1.amazonaws.com/deploy.andrewkroh.com/gvm/gvm-windows-386.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
         exit /b 1
