@@ -43,7 +43,7 @@ LABEL \
   org.label-schema.vendor="{{ .BeatVendor }}" \
   org.label-schema.license="{{ .License }}" \
   org.label-schema.name="{{ .BeatName }}" \
-  org.label-schema.version="{{ beat_version }}" \
+  org.label-schema.version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
   org.label-schema.url="{{ .BeatURL }}" \
   org.label-schema.vcs-url="{{ $repoInfo.RootImportPath }}" \
   org.label-schema.vcs-ref="{{ commit }}" \
@@ -56,7 +56,7 @@ LABEL \
   name="{{ .BeatName }}" \
   maintainer="infra@elastic.co" \
   vendor="{{ .BeatVendor }}" \
-  version="{{ beat_version }}" \
+  version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
   release="1" \
   url="{{ .BeatURL }}" \
   summary="{{ .BeatName }}" \

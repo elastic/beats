@@ -17,6 +17,8 @@
 
 package conditions
 
+import "strings"
+
 // And is a compound condition that combines multiple conditions with logical AND.
 type And []Condition
 
@@ -36,9 +38,10 @@ func (c And) Check(event ValuesMap) bool {
 }
 
 func (c And) String() (s string) {
-	for _, cond := range c {
-		s = s + cond.String() + " and "
+	var strSlice = make([]string, len(c))
+
+	for i, cond := range c {
+		strSlice[i] = cond.String()
 	}
-	s = s[:len(s)-len(" and ")] //delete the last and
-	return s
+	return strings.Join(strSlice, " and ")
 }
