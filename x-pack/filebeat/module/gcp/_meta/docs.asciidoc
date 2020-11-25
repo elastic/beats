@@ -1,6 +1,6 @@
 [role="xpack"]
 
-:modulename: googlecloud
+:modulename: gcp
 :has-dashboards: false
 
 == Google Cloud module
@@ -24,18 +24,18 @@ include::../include/config-option-intro.asciidoc[]
 ==== `audit` fileset settings
 
 [role="screenshot"]
-image::./images/filebeat-googlecloud-audit.png[]
+image::./images/filebeat-gcp-audit.png[]
 
 Example config:
 
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   audit:
     enabled: true
     var.project_id: my-gcp-project-id
-    var.topic: googlecloud-vpc-audit
-    var.subscription_name: filebeat-googlecloud-audit-sub
+    var.topic: gcp-vpc-audit
+    var.subscription_name: filebeat-gcp-audit-sub
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
     var.keep_original_message: false
 ----
@@ -75,12 +75,12 @@ Example config:
 
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   vpcflow:
     enabled: true
     var.project_id: my-gcp-project-id
-    var.topic: googlecloud-vpc-flowlogs
-    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+    var.topic: gcp-vpc-flowlogs
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
     var.keep_original_message: false
 ----
@@ -120,12 +120,12 @@ Example config:
 
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   firewall:
     enabled: true
     var.project_id: my-gcp-project-id
-    var.topic: googlecloud-vpc-firewall
-    var.subscription_name: filebeat-googlecloud-vpc-firewall-sub
+    var.topic: gcp-vpc-firewall
+    var.subscription_name: filebeat-gcp-vpc-firewall-sub
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
     var.keep_original_message: false
 ----

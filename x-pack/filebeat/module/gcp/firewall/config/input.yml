@@ -27,10 +27,11 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - script:
       lang: javascript
-      id: googlecloud_audit_script
-      file: ${path.home}/module/googlecloud/audit/config/pipeline.js
+      id: gcp_firewall_script
       params:
+        debug: {{ .debug }}
         keep_original_message: {{ .keep_original_message }}
+      file: ${path.home}/module/gcp/firewall/config/pipeline.js
   - add_fields:
       target: ''
       fields:
