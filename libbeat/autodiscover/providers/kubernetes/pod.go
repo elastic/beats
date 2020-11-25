@@ -75,43 +75,34 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
 	}
 
-	var nodeMeta, namespaceMeta metadata.MetaGen
-	var nodeWatcher, namespaceWatcher kubernetes.Watcher
-	metaConf := config.AddResourceMetadata
-	if metaConf != nil {
-		if metaConf.Node != nil && metaConf.Node.Enabled() {
-			options := kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-				Node:        config.Node,
-			}
-			if config.Namespace != "" {
-				options.Namespace = config.Namespace
-			}
-			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-			}
-
-			nodeMeta = metadata.NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
-		}
-
-		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
-			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-			}, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-			}
-
-			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
-		}
+	options := kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Node:        config.Node,
 	}
+	if config.Namespace != "" {
+		options.Namespace = config.Namespace
+	}
+	metaConf := config.AddResourceMetadata
+	if metaConf == nil {
+		metaConf = metadata.GetDefaultResourceMetadataConfig()
+	}
+	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+	}
+	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	}
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 	p := &pod{
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nodeMeta, namespaceMeta),
+		metagen:          metaGen,
 		logger:           logger,
 		watcher:          watcher,
 		nodeWatcher:      nodeWatcher,
@@ -266,11 +257,33 @@ func (p *pod) Stop() {
 }
 
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
+	containers, statuses := getContainersInPod(pod)
+	p.emitEvents(pod, flag, containers, statuses)
+}
+
+// getContainersInPod returns all the containers defined in a pod and their statuses.
+// It includes init and ephemeral containers.
+func getContainersInPod(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
+	var containers []kubernetes.Container
+	var statuses []kubernetes.PodContainerStatus
+
 	// Emit events for all containers
-	p.emitEvents(pod, flag, pod.Spec.Containers, pod.Status.ContainerStatuses)
+	containers = append(containers, pod.Spec.Containers...)
+	statuses = append(statuses, pod.Status.ContainerStatuses...)
 
 	// Emit events for all initContainers
-	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+	containers = append(containers, pod.Spec.InitContainers...)
+	statuses = append(statuses, pod.Status.InitContainerStatuses...)
+
+	// Emit events for all ephemeralContainers
+	// Ephemeral containers are alpha feature in k8s and this code may require some changes, if their
+	// api change in the future.
+	for _, c := range pod.Spec.EphemeralContainers {
+		containers = append(containers, kubernetes.Container(c.EphemeralContainerCommon))
+	}
+	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+
+	return containers, statuses
 }
 
 func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,

@@ -43,6 +43,12 @@ func init() {
 func setupMetrics(name string) error {
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
 
+	//if the beat name is longer than 15 characters, truncate it so we don't fail process checks later on
+	// On *nix, the process name comes from /proc/PID/stat, which uses a comm value of 16 bytes, plus the null byte
+	if (runtime.GOOS == "linux" || runtime.GOOS == "darwin") && len(name) > 15 {
+		name = name[:15]
+	}
+
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
 		EnvWhitelist: nil,
