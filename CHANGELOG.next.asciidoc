@@ -601,6 +601,19 @@ same journal. {pull}18467[18467]
 - Add awsfargate module task_stats metricset to monitor AWS ECS Fargate. {pull}22034[22034]
 - Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
 - Add unit file states to system/service {pull}22557[22557]
+- Add io.ops in fields exported by system.diskio. {pull}22066[22066]
+- `kibana` module: `stats` metricset no-longer collects usage-related data. {pull}22732[22732]
+
+*Packetbeat*
+
+- Add an example to packetbeat.yml of using the `forwarded` tag to disable
+  `host` metadata fields when processing network data from network tap or mirror
+  port. {pull}19209[19209]
+- Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
+- Add 100-continue support {issue}15830[15830] {pull}19349[19349]
+- Add initial SIP protocol support {pull}21221[21221]
+- Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
+- Change build process for x-pack distribution {pull}21979[21979]
 
 *Packetbeat*
 
