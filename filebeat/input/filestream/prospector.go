@@ -19,7 +19,6 @@ package filestream
 
 import (
 	"os"
-	"strings"
 	"time"
 
 	"github.com/urso/sderr"
@@ -46,12 +45,9 @@ type fileProspector struct {
 	stateChangeCloser stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(inputPrefix string, userIDConfigured bool, cleaner loginp.ProspectorCleaner) error {
-	if p.cleanRemoved && userIDConfigured {
-		cleaner.CleanIf(func(key string, v loginp.Value) bool {
-			if !strings.HasPrefix(key, inputPrefix) {
-				return false
-			}
+func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+	if p.cleanRemoved {
+		cleaner.CleanIf(func(v loginp.Value) bool {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
@@ -68,11 +64,7 @@ func (p *fileProspector) Init(inputPrefix string, userIDConfigured bool, cleaner
 	}
 
 	identifierName := p.identifier.Name()
-	cleaner.UpdateIdentifiers(func(key string, v loginp.Value) (string, interface{}) {
-		if !strings.HasPrefix(key, inputPrefix) {
-			return "", nil
-		}
-
+	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {

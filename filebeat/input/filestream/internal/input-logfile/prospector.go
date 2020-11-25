@@ -26,7 +26,7 @@ import (
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
 	// Init runs the cleanup processes before starting the prospector.
-	Init(inputPrefix string, userIDConfigured bool, c ProspectorCleaner) error
+	Init(c ProspectorCleaner) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
@@ -48,11 +48,11 @@ type StateMetadataUpdater interface {
 // ProspectorCleaner cleans the state store before it starts running.
 type ProspectorCleaner interface {
 	// CleanIf removes an entry if the function returns true
-	CleanIf(func(key string, v Value) bool)
+	CleanIf(func(v Value) bool)
 	// UpdateIdentifiers updates ID in the registry.
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
-	UpdateIdentifiers(func(key string, v Value) (string, interface{}))
+	UpdateIdentifiers(func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

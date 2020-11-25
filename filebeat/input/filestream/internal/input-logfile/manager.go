@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"errors"
+	"strings"
 	"sync"
 	"time"
 
@@ -167,9 +168,10 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	sourceIdentifier := newSourceIdentifier(cim.Type, settings.ID)
-	prospectorStore := cim.getRetainedStore()
-	defer prospectorStore.Release()
-	err = prospector.Init(sourceIdentifier.prefix, settings.ID != "", prospectorStore)
+	pStore := cim.getRetainedStore()
+	defer pStore.Release()
+	prospectorStore := newSourceStore(pStore, sourceIdentifier)
+	err = prospector.Init(prospectorStore)
 	if err != nil {
 		return nil, err
 	}
@@ -191,19 +193,27 @@ func (cim *InputManager) getRetainedStore() *store {
 }
 
 type sourceIdentifier struct {
-	prefix string
+	prefix           string
+	configuredUserID bool
 }
 
 func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
 	inputPrefix := pluginName
+	configuredUserID := false
 	if userID != "" {
 		inputPrefix = inputPrefix + "-" + userID
+		configuredUserID = true
 	}
 	return &sourceIdentifier{
-		prefix: inputPrefix,
+		prefix:           inputPrefix,
+		configuredUserID: configuredUserID,
 	}
 }
 
 func (i *sourceIdentifier) ID(s Source) string {
 	return i.prefix + "::" + s.Name()
+}
+
+func (i *sourceIdentifier) MatchesInput(id string) bool {
+	return strings.Contains(id, i.prefix)
 }

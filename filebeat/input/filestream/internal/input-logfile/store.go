@@ -181,6 +181,63 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
+// CleanIf sets the TTL of a resource if the predicate return true.
+func (s *sourceStore) CleanIf(pred func(v Value) bool) {
+	if !s.identifier.configuredUserID {
+		return
+	}
+
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			continue
+		}
+
+		remove := pred(res)
+		if remove {
+			s.store.UpdateTTL(res, 0)
+		}
+		res.lock.Unlock()
+	}
+}
+
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			continue
+		}
+
+		newKey, updatedMeta := getNewID(res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
+			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
+				res.lock.Unlock()
+				continue
+			}
+
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			s.store.ephemeralStore.table[newKey] = r
+		}
+
+		res.lock.Unlock()
+	}
+}
+
 func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
@@ -201,36 +258,6 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-// CleanIf sets the TTL of a resource if the predicate return true.
-func (s *store) CleanIf(pred func(key string, v Value) bool) {
-	s.ephemeralStore.mu.Lock()
-	defer s.ephemeralStore.mu.Unlock()
-
-	for key, res := range s.ephemeralStore.table {
-		remove := pred(key, res)
-		if remove {
-			s.UpdateTTL(res, 0)
-		}
-	}
-}
-
-// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
-// for removal.
-func (s *store) UpdateIdentifiers(getNewID func(key string, v Value) (string, interface{})) {
-	s.ephemeralStore.mu.Lock()
-	defer s.ephemeralStore.mu.Unlock()
-
-	for key, res := range s.ephemeralStore.table {
-		newKey, updatedMeta := getNewID(key, res)
-		if len(newKey) > 0 && res.internalState.TTL > 0 {
-			r := res.copyWithNewKey(newKey)
-			r.cursorMeta = updatedMeta
-			s.ephemeralStore.table[newKey] = r
-			s.UpdateTTL(res, 0)
-		}
-	}
-}
-
 func (s *store) findCursorMeta(key string, to interface{}) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
@@ -248,20 +275,21 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 
 	resource.cursorMeta = meta
 
-	err := s.persistentStore.Set(resource.key, state{
-		TTL:     resource.internalState.TTL,
-		Updated: resource.internalState.Updated,
-		Cursor:  resource.cursor,
-		Meta:    resource.cursorMeta,
-	})
-	if err != nil {
-		s.log.Errorf("Failed to update cursor metadata fields for '%v'", resource.key)
-		resource.internalInSync = false
-	} else {
-		resource.stored = true
-		resource.internalInSync = true
-	}
+	s.writeState(resource)
 	return nil
+}
+
+// writeState writes the state to the persistent store.
+// WARNING! it does not lock the store
+func (s *store) writeState(r *resource) {
+	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
+	if err != nil {
+		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
+		r.internalInSync = false
+	} else {
+		r.stored = true
+		r.internalInSync = true
+	}
 }
 
 // Removes marks an entry for removal by setting its TTL to zero.
@@ -291,19 +319,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		resource.internalState.Updated = time.Now()
 	}
 
-	err := s.persistentStore.Set(resource.key, state{
-		TTL:     resource.internalState.TTL,
-		Updated: resource.internalState.Updated,
-		Cursor:  resource.cursor,
-		Meta:    resource.cursorMeta,
-	})
-	if err != nil {
-		s.log.Errorf("Failed to update resource management fields for '%v'", resource.key)
-		resource.internalInSync = false
-	} else {
-		resource.stored = true
-		resource.internalInSync = true
-	}
+	s.writeState(resource)
 }
 
 // Find returns the resource for a given key. If the key is unknown and create is set to false nil will be returned.
