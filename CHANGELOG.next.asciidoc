@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
+- Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 
 *Auditbeat*
 
