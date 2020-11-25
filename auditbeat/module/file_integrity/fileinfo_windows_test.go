@@ -20,43 +20,38 @@ package file_integrity
 import (
 	"io/ioutil"
 	"os"
-	"syscall"
 	"testing"
-	"unsafe"
 
+	"github.com/hectane/go-acl"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetNamedSecurityInfo(t *testing.T) {
-	// Create a temp file that we will use in checking the owner.
-	file, err := ioutil.TempFile("", "go")
+// TestFileInfoPermissions tests obtaining metadata of a file
+// when we don't have permissions to open the file for reading.
+// This prevents us to get the file owner of a file unless we use
+// a method that doesn't need to open the file for reading.
+// (GetNamedSecurityInfo vs CreateFile+GetSecurityInfo)
+func TestFileInfoPermissions(t *testing.T) {
+	f, err := ioutil.TempFile("", "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(file.Name())
-	defer file.Close()
-
-	name, err := syscall.UTF16PtrFromString(file.Name())
+	name := f.Name()
+	defer func() {
+		f.Close()
+		os.Remove(f.Name())
+	}()
+	if err = acl.Chmod(f.Name(), 0); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Stat(name)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Get the file owner.
-	var securityID *syscall.SID
-	var securityDescriptor *SecurityDescriptor
-	if err = GetNamedSecurityInfo(name, FileObject,
-		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
+	meta, err := NewMetadata(name, info)
+	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}
-
-	_, err = securityID.String()
-	assert.NoError(t, err)
-	_, _, _, err = securityID.LookupAccount("")
-	assert.NoError(t, err)
-
-	// Freeing the security descriptor releases the memory used by the SID.
-	_, err = syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
-	if err != nil {
-		t.Fatal(err)
-	}
+	t.Log(meta.Owner)
+	assert.NotEqual(t, "", meta.Owner)
 }
