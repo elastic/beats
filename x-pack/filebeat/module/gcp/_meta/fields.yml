@@ -1,5 +1,5 @@
-- key: googlecloud
-  title: Google Cloud
+- key: gcp
+  title: Google Cloud Platform (GCP)
   description: >
     Module for handling logs from Google Cloud.
   fields:

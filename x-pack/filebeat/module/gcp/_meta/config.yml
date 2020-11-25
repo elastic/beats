@@ -1,4 +1,3 @@
-# googlecloud module is deprecated, please use gcp instead
 - module: gcp
   vpcflow:
     enabled: true

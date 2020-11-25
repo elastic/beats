@@ -37,7 +37,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-f5>>
 * <<exported-fields-fortinet>>
-* <<exported-fields-googlecloud>>
+* <<exported-fields-gcp>>
 * <<exported-fields-gsuite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -68450,8 +68450,8 @@ type: integer
 
 --
 
-[[exported-fields-googlecloud]]
-== Google Cloud fields
+[[exported-fields-gcp]]
+== Google Cloud Platform (GCP) fields
 
 Module for handling logs from Google Cloud.
 
