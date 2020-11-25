@@ -241,6 +241,8 @@ func (imp Importer) ImportArchive() error {
 			if err != nil {
 				return err
 			}
+		} else {
+			imp.loader.statusMsg("Skipping import of %s directory. Beat name: %s, base dir name: %s.", dir, imp.cfg.Beat, filepath.Base(dir))
 		}
 	}
 	return nil
