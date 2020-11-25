@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2020-11-09T10:57:31.000Z",
+        "azure.platformlogs.Cloud": "AzureCloud",
+        "azure.platformlogs.Environment": "prod",
+        "azure.platformlogs.category": "kube-audit",
+        "azure.platformlogs.ccpNamespace": "5e4bf4baee195b00017cdbfa",
+        "azure.platformlogs.event_category": "Administrative",
+        "azure.platformlogs.operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+        "azure.platformlogs.properties.pod": "kube-apiserver-666bd4b459-hjgdc",
+        "azure.platformlogs.properties.stream": "stdout",
+        "azure.resource.group": "OBS-INFRASTRUCTURE",
+        "azure.resource.id": "/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE",
+        "azure.resource.name": "OBSKUBE",
+        "azure.resource.provider": "MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS",
+        "azure.subscription_id": "70BD6E77-4B1E-4835-8896-DB77B8EEF364",
+        "cloud.provider": "azure",
+        "event.action": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+        "event.dataset": "azure.platformlogs",
+        "event.kind": "event",
+        "event.module": "azure",
+        "fileset.name": "platformlogs",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io/v1\",\"level\":\"Metadata\",\"auditID\":\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\"}",
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]
