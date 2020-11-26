@@ -215,5 +215,5 @@ func (i *sourceIdentifier) ID(s Source) string {
 }
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
-	return strings.Contains(id, i.prefix)
+	return strings.HasPrefix(id, i.prefix)
 }

@@ -229,6 +229,11 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 				continue
 			}
 
+			// Pending updates due to events that have not yet been ACKed
+			// are not included in the copy. Collection on
+			// the copy start from the last known ACKed position.
+			// This might lead to duplicates if configurations are adapted
+			// for inputs with the same ID are changed.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
