@@ -1,0 +1,23 @@
+[[dot-expand]]
+=== Expand dot-separated fields into nested objects
+
+++++
+<titleabbrev>dot_expand</titleabbrev>
+++++
+
+experimental[]
+
+The `dot_expand` processor expands fields with dots into a nested object
+structure, merging objects as necessary. For example, fields `log.level`
+and `log.logger` will be expanded and merged into
+`log: {level: ..., logger: ...}`. Where merging would lead to a conflict
+due to a mix of object and non-object keys, an error will occur and expansion
+will halt.
+
+The configuration below enables the processor with the default settings.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+  - dot_expand: ~
+-------------------------------------------------------------------------------

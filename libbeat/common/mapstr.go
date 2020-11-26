@@ -282,7 +282,7 @@ func (m MapStr) Expand() (MapStr, error) {
 		_, oldIsMap := tryToMapStr(old)
 		_, newIsMap := tryToMapStr(f[k])
 		if oldIsMap != newIsMap {
-			return e, fmt.Errorf("incompatable types expanded for %s: old: %T new: %T", k, old, f[k])
+			return e, fmt.Errorf("incompatible types expanded for %q: old: %T new: %T", k, old, f[k])
 		}
 	}
 	return e, nil
