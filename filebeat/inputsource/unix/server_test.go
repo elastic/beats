@@ -393,7 +393,7 @@ func sendOverUnixStream(t *testing.T, ctx context.Context, path string, samples 
 }
 
 func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, samples []string) {
-	conn, err := net.Dial("unixgram", path)
+	conn, err := net.DialUnix("unixgram", nil, &net.UnixAddr{path, "unixgram"})
 	if !assert.NoError(t, err) {
 		return
 	}
