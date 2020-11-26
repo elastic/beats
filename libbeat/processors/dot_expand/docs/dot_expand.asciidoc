@@ -1,4 +1,4 @@
-[[dot-expand]]
+[[processor-dot-expand]]
 === Expand dot-separated fields into nested objects
 
 ++++
