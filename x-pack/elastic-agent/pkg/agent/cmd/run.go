@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -299,6 +300,9 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
 	}
 
+	// create agent config path
+	createAgentMonitoringDrop(endpointConfig.Host)
+
 	cfg, err := common.NewConfigFrom(endpointConfig)
 	if err != nil {
 		return nil, err
@@ -312,4 +316,30 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 
 	// return server stopper
 	return s.Stop, nil
+}
+
+func createAgentMonitoringDrop(drop string) error {
+	if drop == "" {
+		return nil
+	}
+
+	_, err := os.Stat(drop)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+
+		// create
+		if err := os.MkdirAll(drop, 0775); err != nil {
+			return err
+		}
+	}
+
+	if runtime.GOOS != "windows" {
+		if err := os.Chown(drop, os.Geteuid(), os.Getegid()); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
