@@ -330,12 +330,11 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 
 	// setup cpu, memory and fd monitors for agents
 	modules = append(modules, map[string]interface{}{
-		"module":      "system",
-		"period":      "10s",
-		"metricsets":  []string{"process", "memory", "cpu"},
-		"cpu.metrics": []string{"percentages", "normalized_percentages", "ticks"},
-		"index":       fmt.Sprintf("metrics-elastic_agent.%s-default", agentName),
-		"processes":   []string{install.BinaryName},
+		"module":     "system",
+		"period":     "10s",
+		"metricsets": []string{"process"},
+		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", agentName),
+		"processes":  []string{install.BinaryName},
 		"processors": []map[string]interface{}{
 			{
 				"add_fields": map[string]interface{}{
