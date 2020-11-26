@@ -19,6 +19,8 @@ const (
 	ActionTypeUnenroll = "UNENROLL"
 	// ActionTypePolicyChange specifies policy change action.
 	ActionTypePolicyChange = "POLICY_CHANGE"
+	// ActionTypeSettings specifies change of agent settings.
+	ActionTypeSettings = "SETTINGS"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -145,6 +147,34 @@ func (a *ActionUnenroll) ID() string {
 	return a.ActionID
 }
 
+// ActionSettings is a request to change agent settings.
+type ActionSettings struct {
+	ActionID   string
+	ActionType string
+	LogLevel   string `json:"log_level"`
+}
+
+func (a *ActionSettings) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	s.WriteString(", log_level: ")
+	s.WriteString(a.LogLevel)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionSettings) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionSettings) ID() string {
+	return a.ActionID
+}
+
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
 type Actions []Action
 
@@ -193,6 +223,17 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
 					"fail to decode UPGRADE_ACTION action",
+					errors.TypeConfig)
+			}
+		case ActionTypeSettings:
+			action = &ActionSettings{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
+
+			if err := json.Unmarshal(response.Data, action); err != nil {
+				return errors.New(err,
+					"fail to decode SETTINGS_ACTION action",
 					errors.TypeConfig)
 			}
 		default:

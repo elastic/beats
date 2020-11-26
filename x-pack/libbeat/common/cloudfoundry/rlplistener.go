@@ -79,7 +79,7 @@ func (c *RlpListener) Start(ctx context.Context) {
 				for i := range envelopes {
 					v1s := conversion.ToV1(envelopes[i])
 					for _, v := range v1s {
-						evt := envelopeToEvent(v)
+						evt := EnvelopeToEvent(v)
 						if evt.EventType() == EventTypeHttpAccess && c.callbacks.HttpAccess != nil {
 							c.callbacks.HttpAccess(evt.(*EventHttpAccess))
 						} else if evt.EventType() == EventTypeLog && c.callbacks.Log != nil {
