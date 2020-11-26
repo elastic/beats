@@ -336,6 +336,9 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 				return
 			}
 
+			if socketType == "datagram" {
+				config.Timeout = 0
+			}
 			server, err := New(logp.L(), &config, to)
 			if !assert.NoError(t, err) {
 				return
