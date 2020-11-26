@@ -1,0 +1,830 @@
+[
+    {
+        "@timestamp": "2020-11-11T09:51:38.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/e2313e43-44a5-sdgfd-8708-123543",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/12354373906b43b5347",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/e2313e43-44a5-sdgfd-8708-123543/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.196.22",
+                "mac": "aa:d9:ac:af:1d:ad"
+            },
+            {
+                "ip": "192.168.120.1",
+                "mac": "12:24:56:c2:00:01"
+            },
+            {
+                "ip": "192.168.160.1",
+                "mac": "12:50:56:c2:53:08"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T09:51:38+00:00",
+        "cisco.amp.detection": "W32.Trojan.22gp.1201",
+        "cisco.amp.detection_id": "12365423467",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "aa:d9:ac:af:1d:ad",
+            "12:24:56:c2:00:01",
+            "12:50:56:c2:53:08"
+        ],
+        "cisco.amp.severity": "Medium",
+        "cisco.amp.timestamp_nanoseconds": 153000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "Threat Detected",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.md5": "9a8557b98ed1469272fa0ace91d63477",
+        "file.hash.sha1": "d0c4192b65e36553fvfd2b83f3113f6ae8390baa",
+        "file.hash.sha256": "e678899d7ea9702184067b56655f91b69f8a0bdc9df65613762252c055c2cdvc",
+        "file.name": "HYXiN3hY.exe.part",
+        "file.path": "\\\\?\\C:\\Users\\elastic\\AppData\\Local\\Temp\\HYXiN3hY.exe.part",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "host.user.name": "user@domain",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.parent.hash.md5": "e50ab86d5409d4d0ad386b27ea7f78fb",
+        "process.parent.hash.sha1": "d539afb0991e823c7cdf824b610a5a5d7655a2da",
+        "process.parent.hash.sha256": "a7ca534327103ec5fac749f5ab8b7a1fe81209aa580a52df656284ef6215f0ab",
+        "process.parent.name": "firefox.exe",
+        "process.parent.pid": 88,
+        "related.ip": [
+            "192.168.196.22",
+            "192.168.120.1",
+            "192.168.160.1"
+        ],
+        "related.user": [
+            "user@domain"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-11T09:51:38.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/e2313e43-44a5-sdgfd-8708-123543",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/12354373906b43b5347",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/e2313e43-44a5-sdgfd-8708-123543/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.196.22",
+                "mac": "aa:d9:bb:af:22:fd"
+            },
+            {
+                "ip": "192.168.120.1",
+                "mac": "00:52:12:c0:11:01"
+            },
+            {
+                "ip": "192.168.160.1",
+                "mac": "01:51:56:c0:c2:08"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T09:51:38+00:00",
+        "cisco.amp.detection_id": "12365423467",
+        "cisco.amp.event_type_id": 553648143,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "aa:d9:bb:af:22:fd",
+            "00:52:12:c0:11:01",
+            "01:51:56:c0:c2:08"
+        ],
+        "cisco.amp.severity": "Medium",
+        "cisco.amp.timestamp_nanoseconds": 163000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "Threat Quarantined",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.sha256": "e678899d7ea9702184167b56655f91a69f8a0bdc9df65612762252c053c2cd7c",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "input.type": "log",
+        "log.offset": 1512,
+        "related.ip": [
+            "192.168.196.22",
+            "192.168.120.1",
+            "192.168.160.1"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-11T09:08:48.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/cad0e0c8-asdf5234-42346-82aa-1235",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/0c246ccd-45123214-4d30-900f-12454354354423",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/cad0e0c8-asdf5234-42346-82aa-1235/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.1.1.1",
+                "mac": "av:1d:13:a2:21:1f"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T09:08:48+00:00",
+        "cisco.amp.detection_id": "12365423467",
+        "cisco.amp.event_type_id": 1090519103,
+        "cisco.amp.file.attack_details.application": "powershell.exe",
+        "cisco.amp.file.attack_details.attacked_module": "Script Control:System.Management.Automation.dll",
+        "cisco.amp.file.attack_details.base_address": "0x000F0000",
+        "cisco.amp.file.attack_details.indicators": [
+            {
+                "MITRE_Tactic": [
+                    {
+                        "name": "Execution",
+                        "tactic_id": "TA0002"
+                    }
+                ],
+                "MITRE_Technique": [
+                    {
+                        "name": "PowerShell",
+                        "technique_id": "T1086",
+                        "tehcnique_id": "T1086"
+                    }
+                ],
+                "description": "A PowerShell command with a very long command line argument that may indicate an obfuscated script has been detected. PowerShell is an extensible Windows scripting language present on all versions of Windows. Malware authors use PowerShell in an attempt to evade security software or other monitoring that is not tuned to detect PowerShell based threats.",
+                "id": 123578990,
+                "severity": "medium",
+                "short_description": "Excessively long PowerShell command detected"
+            }
+        ],
+        "cisco.amp.file.attack_details.suspicious_files": [
+            ""
+        ],
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "av:1d:13:a2:21:1f"
+        ],
+        "cisco.amp.severity": "Medium",
+        "cisco.amp.timestamp_nanoseconds": 183000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "Exploit Prevention",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.md5": "bcc2a6493e0641bb1e60cbf640169e579",
+        "file.hash.sha1": "22643e8613bb0dd90888b17367007489fe16693e4",
+        "file.hash.sha256": "2262a4766bc394b4cb2d658144b207183ff23a3039121cd74e615ab64e6e57d6",
+        "file.name": "powershell.exe",
+        "file.path": "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "host.user.name": "uuser@domain",
+        "input.type": "log",
+        "log.offset": 2509,
+        "process.parent.hash.md5": "6a262b4af012ec81ffeb36f5faf70311",
+        "process.parent.hash.sha1": "90d3a389307ag2a7fbv8726502077b69ab0fd79a0",
+        "process.parent.hash.sha256": "a6d1aa0df1c23eb8b7563245082ed2eddf00e3da62cbeb41ac701123vasce927f465d",
+        "process.parent.name": "OfficeSetup.exe",
+        "process.parent.pid": 7328,
+        "related.ip": [
+            "192.1.1.1"
+        ],
+        "related.user": [
+            "uuser@domain"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-11T08:52:30.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/11ac0afb-123456-45b5-84bc-543asbvdcasd",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/0c246ccd-45123214-4d30-900f-12454354354423",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/11ac0afb-123456-45b5-84bc-543asbvdcasd/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.1.184",
+                "mac": "av:6b:fc:23:a1:29"
+            },
+            {
+                "ip": "192.168.2.1",
+                "mac": "00:50:24:c0:01:01"
+            },
+            {
+                "ip": "192.168.12.1",
+                "mac": "55:50:22:c0:12:11"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T08:52:30+00:00",
+        "cisco.amp.error.description": "File not found",
+        "cisco.amp.error.error_code": 3240099848,
+        "cisco.amp.event_type_id": 2164260910,
+        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "av:6b:fc:23:a1:29",
+            "00:50:24:c0:01:01",
+            "55:50:22:c0:12:11"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 736000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "File Fetch Failed",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.sha256": "a8b424b65d1550c87b531f7a14523bvdf982d8f869976f99fa1cef5342ausdy",
+        "file.name": "setup.exe",
+        "file.path": "\\\\?\\C:\\Users\\elastic\\AppData\\Local\\Temp\\somezip.zip\\Visual_install\\setup.exe",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "input.type": "log",
+        "log.offset": 4724,
+        "related.ip": [
+            "192.168.1.184",
+            "192.168.2.1",
+            "192.168.12.1"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-11T07:28:54.000Z",
+        "cisco.amp.cloud_ioc.description": "A process was seen whitelisting/restoring a file from quarantine. This is an uncommon task, and warrants further investigation as OS X is not known to quarantine files unnecessarily. This is also known to be part of the Mitre Att&amp;ck Framework, technique T1144.",
+        "cisco.amp.cloud_ioc.short_description": "OSX.QuarantineExclusion.ioc",
+        "cisco.amp.command_line.arguments": "sudo /usr/bin/xattr -r -d com.apple.quarantine uTorrent.app",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/1224532-sadf-dsf2134-bb5b-1235213",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/64535234-123dfsg-3245sdf-123",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/1224532-sadf-dsf2134-bb5b-123512/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.2.2",
+                "mac": "ac:aa:22:00:11:55"
+            },
+            {
+                "ip": "192.168.228.70",
+                "mac": "f2:18:12:75:55:12"
+            },
+            {
+                "ip": "192.12.52.12",
+                "mac": "65:29:8f:97:04:ea"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T07:28:54+00:00",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "ac:aa:22:00:11:55",
+            "f2:18:12:75:55:12",
+            "65:29:8f:97:04:ea"
+        ],
+        "cisco.amp.severity": "Medium",
+        "cisco.amp.start_date": "2020-11-11T07:28:53+00:00",
+        "cisco.amp.start_timestamp": 1605079733,
+        "cisco.amp.tactics": [
+            "TA0005"
+        ],
+        "cisco.amp.techniques": [
+            "T1144"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 24000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "Cloud IOC",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.sha256": "123dfsdg234b7ba3d5ff63033129fa1b96975ad124sdgasdf1sdf",
+        "file.name": "sudo",
+        "file.path": "file:///usr/bin/sudo",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "input.type": "log",
+        "log.offset": 5893,
+        "process.parent.hash.sha256": "sadgf234643sdaffee7a9bd309a4123sdfag9523e8b152123sdfgdfsf2",
+        "related.ip": [
+            "192.168.2.2",
+            "192.168.228.70",
+            "192.12.52.12"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-11T07:22:33.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/1234d-sadf-234-sdf-123",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/123543-sdgfdf234-sadf13-123",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/1234d-sadf-234-sdf-123/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.1.2",
+                "mac": "11:50:f1:12:23:23"
+            },
+            {
+                "ip": "192.168.1.1",
+                "mac": "0a:12:27:52:00:12"
+            },
+            {
+                "ip": "192.168.2.1",
+                "mac": "00:c1:12:c0:22:12"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-11T07:22:33+00:00",
+        "cisco.amp.event_type_id": 553648173,
+        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "11:50:f1:12:23:23",
+            "0a:12:27:52:00:12",
+            "00:c1:12:c0:22:12"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 170000000,
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "File Fetch Completed",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.md5": "asdgsdrf2346523279149285c8ddc8",
+        "file.hash.sha1": "asdfsadf1234140de34a45db0124e5c518bf612",
+        "file.hash.sha256": "asdf123sdfaac359fcb0d488ca489e2d55645ce34709fdafb78e336405cb",
+        "file.name": "locale.exe",
+        "file.path": "\\\\?\\C:\\tools\\msys64\\usr\\bin\\locale.exe",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "input.type": "log",
+        "log.offset": 7566,
+        "related.ip": [
+            "192.168.1.2",
+            "192.168.1.1",
+            "192.168.2.1"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-11-10T17:42:13.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.links.computer": "https://api.eu.amp.cisco.com/v1/computers/124324df-2123-523-41231",
+        "cisco.amp.computer.links.group": "https://api.eu.amp.cisco.com/v1/groups/1235643-sdf123123",
+        "cisco.amp.computer.links.trajectory": "https://api.eu.amp.cisco.com/v1/computers/124324df123-523-41231/trajectory",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.2.42",
+                "mac": "av:17:1b:fe:v2:f0"
+            },
+            {
+                "ip": "192.168.1.1",
+                "mac": "00:42:v2:3c:12:12"
+            },
+            {
+                "ip": "192.168.6.1",
+                "mac": "1f:12:27:00:00:52"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.date": "2020-11-10T17:42:13+00:00",
+        "cisco.amp.event_type_id": 1107296279,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "av:17:1b:fe:v2:f0",
+            "00:42:v2:3c:12:12",
+            "1f:12:27:00:00:52"
+        ],
+        "cisco.amp.severity": "Low",
+        "cisco.amp.start_date": "2020-11-10T17:42:11+00:00",
+        "cisco.amp.start_timestamp": 1605030131,
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "cisco.amp.vulnerabilities": [
+            {
+                "cve": "CVE-2014-0566",
+                "name": "Adobe Acrobat Reader",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0566",
+                "version": "15.007.20033"
+            },
+            {
+                "cve": "CVE-2015-3095",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-3095"
+            },
+            {
+                "cve": "CVE-2015-4435",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4435"
+            },
+            {
+                "cve": "CVE-2015-4438",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4438"
+            },
+            {
+                "cve": "CVE-2015-4441",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4441"
+            },
+            {
+                "cve": "CVE-2015-4445",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4445"
+            },
+            {
+                "cve": "CVE-2015-4446",
+                "score": "7.5",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4446"
+            },
+            {
+                "cve": "CVE-2015-4447",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4447"
+            },
+            {
+                "cve": "CVE-2015-4448",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4448"
+            },
+            {
+                "cve": "CVE-2015-4451",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4451"
+            },
+            {
+                "cve": "CVE-2015-4452",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-4452"
+            },
+            {
+                "cve": "CVE-2015-5085",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5085"
+            },
+            {
+                "cve": "CVE-2015-5086",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5086"
+            },
+            {
+                "cve": "CVE-2015-5087",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5087"
+            },
+            {
+                "cve": "CVE-2015-5090",
+                "score": "7.2",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5090"
+            },
+            {
+                "cve": "CVE-2015-5091",
+                "score": "7.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5091"
+            },
+            {
+                "cve": "CVE-2015-5093",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5093"
+            },
+            {
+                "cve": "CVE-2015-5094",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5094"
+            },
+            {
+                "cve": "CVE-2015-5095",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5095"
+            },
+            {
+                "cve": "CVE-2015-5096",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5096"
+            },
+            {
+                "cve": "CVE-2015-5097",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5097"
+            },
+            {
+                "cve": "CVE-2015-5098",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5098"
+            },
+            {
+                "cve": "CVE-2015-5099",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5099"
+            },
+            {
+                "cve": "CVE-2015-5100",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5100"
+            },
+            {
+                "cve": "CVE-2015-5101",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5101"
+            },
+            {
+                "cve": "CVE-2015-5102",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5102"
+            },
+            {
+                "cve": "CVE-2015-5103",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5103"
+            },
+            {
+                "cve": "CVE-2015-5104",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5104"
+            },
+            {
+                "cve": "CVE-2015-5105",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5105"
+            },
+            {
+                "cve": "CVE-2015-5106",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5106"
+            },
+            {
+                "cve": "CVE-2015-5108",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5108"
+            },
+            {
+                "cve": "CVE-2015-5109",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5109"
+            },
+            {
+                "cve": "CVE-2015-5110",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5110"
+            },
+            {
+                "cve": "CVE-2015-5111",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5111"
+            },
+            {
+                "cve": "CVE-2015-5113",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5113"
+            },
+            {
+                "cve": "CVE-2015-5114",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5114"
+            },
+            {
+                "cve": "CVE-2015-5115",
+                "score": "10.0",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5115"
+            },
+            {
+                "cve": "CVE-2017-11211",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11211"
+            },
+            {
+                "cve": "CVE-2017-11212",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11212"
+            },
+            {
+                "cve": "CVE-2017-11214",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11214"
+            },
+            {
+                "cve": "CVE-2017-11216",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11216"
+            },
+            {
+                "cve": "CVE-2017-11218",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11218"
+            },
+            {
+                "cve": "CVE-2017-11219",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11219"
+            },
+            {
+                "cve": "CVE-2017-11220",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11220"
+            },
+            {
+                "cve": "CVE-2017-11221",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11221"
+            },
+            {
+                "cve": "CVE-2017-11222",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11222"
+            },
+            {
+                "cve": "CVE-2017-11223",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11223"
+            },
+            {
+                "cve": "CVE-2017-11224",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11224"
+            },
+            {
+                "cve": "CVE-2017-11226",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11226"
+            },
+            {
+                "cve": "CVE-2017-11227",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11227"
+            },
+            {
+                "cve": "CVE-2017-11228",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11228"
+            },
+            {
+                "cve": "CVE-2017-11229",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11229"
+            },
+            {
+                "cve": "CVE-2017-11234",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11234"
+            },
+            {
+                "cve": "CVE-2017-11235",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11235"
+            },
+            {
+                "cve": "CVE-2017-11237",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11237"
+            },
+            {
+                "cve": "CVE-2017-11241",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11241"
+            },
+            {
+                "cve": "CVE-2017-11251",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11251"
+            },
+            {
+                "cve": "CVE-2017-11254",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11254"
+            },
+            {
+                "cve": "CVE-2017-11256",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11256"
+            },
+            {
+                "cve": "CVE-2017-11257",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11257"
+            },
+            {
+                "cve": "CVE-2017-11259",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11259"
+            },
+            {
+                "cve": "CVE-2017-11260",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11260"
+            },
+            {
+                "cve": "CVE-2017-11261",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11261"
+            },
+            {
+                "cve": "CVE-2017-11262",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11262"
+            },
+            {
+                "cve": "CVE-2017-11263",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11263"
+            },
+            {
+                "cve": "CVE-2017-11267",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11267"
+            },
+            {
+                "cve": "CVE-2017-11269",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11269"
+            },
+            {
+                "cve": "CVE-2017-11270",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11270"
+            },
+            {
+                "cve": "CVE-2017-11271",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11271"
+            }
+        ],
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.action": "Vulnerable Application Detected",
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.module": "cisco",
+        "file.hash.sha256": "5643234fsadgef6644b8b69e999c454c045a2d8ec476c4b6165df4ed03",
+        "file.name": "AcroRd32.exe",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "input.type": "log",
+        "log.offset": 9613,
+        "process.parent.hash.sha256": "agdfsdaf987sdf036070cca561bff5337c472313c0cb4ad",
+        "related.ip": [
+            "192.168.2.42",
+            "192.168.1.1",
+            "192.168.6.1"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    }
+]

@@ -5,11 +5,10 @@
   description: >
     Module for parsing Cisco AMP logs.
   fields:
-    - name: confidence_level
-      type: integer
-      overwrite: true
+    - name: related.mac
+      type: keyword
       description: >
-        Confidence level determined by ThreatCloud.
+        An array of the related MAC addresses
 
     - name: calc_desc
       type: keyword
@@ -17,4 +16,3 @@
       description: >
         Log description.
 
-    
