@@ -275,13 +275,11 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			"test::key1::updated": state{
 				Updated: s.Get("test::key1::updated").internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    testMeta{IdentifierName: "something"},
+				Meta:    map[string]interface{}{"identifiername": "something"},
 			},
 		}
 
-		//checkEqualStoreState(t, want, storeMemorySnapshot(s))
-		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
-		//checkEqualStoreState(t, want, backend.snapshot())
+		checkEqualStoreState(t, want, backend.snapshot())
 	})
 }
 
