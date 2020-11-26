@@ -127,6 +127,8 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
+        sock.close()
+
         output = self.read_output()
 
         assert len(output) == 2
@@ -281,8 +283,6 @@ def send_stream_socket(path, message):
 
 def send_datagram_socket(path, message):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-
-    sock.connect(path)
 
     for n in range(0, 2):
         message = message.format(n)
