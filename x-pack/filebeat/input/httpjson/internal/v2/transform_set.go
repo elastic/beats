@@ -121,6 +121,9 @@ func (set *set) run(ctx transformContext, transformable *transformable) (*transf
 }
 
 func setToCommonMap(m common.MapStr, key, val string) error {
+	if val == "" {
+		return nil
+	}
 	if _, err := m.Put(key, val); err != nil {
 		return err
 	}
@@ -132,11 +135,17 @@ func setBody(ctx transformContext, transformable *transformable, key, value stri
 }
 
 func setHeader(ctx transformContext, transformable *transformable, key, value string) error {
+	if value == "" {
+		return nil
+	}
 	transformable.header.Add(key, value)
 	return nil
 }
 
 func setURLParams(ctx transformContext, transformable *transformable, key, value string) error {
+	if value == "" {
+		return nil
+	}
 	q := transformable.url.Query()
 	q.Set(key, value)
 	transformable.url.RawQuery = q.Encode()

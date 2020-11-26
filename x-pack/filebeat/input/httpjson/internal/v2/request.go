@@ -46,7 +46,7 @@ func (c *httpClient) do(stdCtx context.Context, trCtx transformContext, req *htt
 	return resp, nil
 }
 
-func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []basicTransform) (*transformable, error) {
+func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []basicTransform, log *logp.Logger) (*transformable, error) {
 	req := emptyTransformable()
 	req.url = url
 
@@ -61,6 +61,8 @@ func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []ba
 			return nil, err
 		}
 	}
+
+	log.Debugf("new request: %#v", req)
 
 	return req, nil
 }
@@ -93,7 +95,7 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 }
 
 func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transformContext) (*http.Request, error) {
-	trReq, err := newRequest(trCtx, rf.body, rf.url, rf.transforms)
+	trReq, err := newRequest(trCtx, rf.body, rf.url, rf.transforms, rf.log)
 	if err != nil {
 		return nil, err
 	}

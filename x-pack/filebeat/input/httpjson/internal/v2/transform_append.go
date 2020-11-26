@@ -116,6 +116,9 @@ func (append *appendt) run(ctx transformContext, transformable *transformable) (
 }
 
 func appendToCommonMap(m common.MapStr, key, val string) error {
+	if val == "" {
+		return nil
+	}
 	var value interface{} = val
 	if found, _ := m.HasKey(key); found {
 		prev, _ := m.GetValue(key)
@@ -140,11 +143,17 @@ func appendBody(ctx transformContext, transformable *transformable, key, value s
 }
 
 func appendHeader(ctx transformContext, transformable *transformable, key, value string) error {
+	if value == "" {
+		return nil
+	}
 	transformable.header.Add(key, value)
 	return nil
 }
 
 func appendURLParams(ctx transformContext, transformable *transformable, key, value string) error {
+	if value == "" {
+		return nil
+	}
 	q := transformable.url.Query()
 	q.Add(key, value)
 	transformable.url.RawQuery = q.Encode()
