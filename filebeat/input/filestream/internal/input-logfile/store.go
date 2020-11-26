@@ -231,7 +231,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
-			s.store.ephemeralStore.table[newKey] = r
+			s.store.writeState(r)
 		}
 
 		res.lock.Unlock()

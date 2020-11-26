@@ -279,8 +279,8 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			},
 		}
 
-		checkEqualStoreState(t, want, storeMemorySnapshot(s))
-		//checkEqualStoreState(t, want, storeInSyncSnapshot(s))
+		//checkEqualStoreState(t, want, storeMemorySnapshot(s))
+		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
 		//checkEqualStoreState(t, want, backend.snapshot())
 	})
 }
