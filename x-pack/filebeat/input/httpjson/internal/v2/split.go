@@ -85,7 +85,9 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 		}
 
 		if len(arr) == 0 {
-			return errEmtpyField
+			if err := s.sendEvent(ctx, respCpy, "", nil, ch); err != nil {
+				return err
+			}
 		}
 
 		for _, a := range arr {
@@ -106,7 +108,9 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 		}
 
 		if len(ms) == 0 {
-			return errEmtpyField
+			if err := s.sendEvent(ctx, respCpy, "", nil, ch); err != nil {
+				return err
+			}
 		}
 
 		for k, v := range ms {
@@ -123,6 +127,9 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 
 func toMapStr(v interface{}) (common.MapStr, bool) {
 	var m common.MapStr
+	if v == nil {
+		return m, true
+	}
 	switch ts := v.(type) {
 	case common.MapStr:
 		m = ts

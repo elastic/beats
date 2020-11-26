@@ -43,13 +43,20 @@ func (t *valueTpl) Unpack(in string) error {
 }
 
 func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
+	fallback := func(err error) string {
+		if err != nil {
+			log.Debugf("template execution failed: %v", err)
+		}
+		if defaultVal != nil {
+			log.Debugf("template execution: falling back to default value")
+			return defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
+		}
+		return ""
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
-			err := r.(error)
-			log.Infof("template execution: %v", err)
-			if defaultVal != nil {
-				val = defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
-			}
+			val = fallback(r.(error))
 		}
 	}()
 
@@ -68,13 +75,12 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	_, _ = data.Put("last_response.url.params", trCtx.lastResponse.url.Query())
 
 	if err := t.Template.Execute(buf, data); err != nil {
-		log.Infof("template execution: %v", err)
-		return defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
+		return fallback(err)
 	}
 
 	val = buf.String()
 	if val == "" || strings.Contains(val, "<no value>") {
-		val = defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
+		return fallback(nil)
 	}
 	return val
 }

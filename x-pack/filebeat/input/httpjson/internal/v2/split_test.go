@@ -195,6 +195,89 @@ func TestSplit(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+		{
+			name: "A nested array with a nested array in an object",
+			config: &splitConfig{
+				Target: "body.response",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:     "body.Event.Attributes",
+					KeepParent: true,
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: &transformable{
+				body: common.MapStr{
+					"response": []interface{}{
+						map[string]interface{}{
+							"Event": map[string]interface{}{
+								"timestamp": "1606324417",
+								"Attributes": []interface{}{
+									map[string]interface{}{
+										"key": "value",
+									},
+									map[string]interface{}{
+										"key2": "value2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"Event": common.MapStr{
+						"timestamp": "1606324417",
+						"Attributes": common.MapStr{
+							"key": "value",
+						},
+					},
+				},
+				{
+					"Event": common.MapStr{
+						"timestamp": "1606324417",
+						"Attributes": common.MapStr{
+							"key2": "value2",
+						},
+					},
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "A nested array with an empty nested array in an object",
+			config: &splitConfig{
+				Target: "body.response",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:     "body.Event.Attributes",
+					KeepParent: true,
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: &transformable{
+				body: common.MapStr{
+					"response": []interface{}{
+						map[string]interface{}{
+							"Event": map[string]interface{}{
+								"timestamp":  "1606324417",
+								"Attributes": []interface{}{},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"Event": common.MapStr{
+						"timestamp":  "1606324417",
+						"Attributes": common.MapStr{},
+					},
+				},
+			},
+			expectedErr: nil,
+		},
 	}
 
 	for _, tc := range cases {

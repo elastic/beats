@@ -24,6 +24,7 @@ func newCursor(cfg cursorConfig, log *logp.Logger) *cursor {
 
 func (c *cursor) load(cursor *inputcursor.Cursor) {
 	if c == nil || cursor == nil || cursor.IsNew() {
+		c.log.Debug("new cursor: nothing loaded")
 		return
 	}
 
