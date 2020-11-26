@@ -385,12 +385,12 @@ This specifies the maximum time to wait before a retry is attempted. Default: `6
 [float]
 ==== `request.redirect.forward_headers`
 
-This specifies if headers are forwarded in case of a redirect. Default: `true`.
+This specifies if headers are forwarded in case of a redirect. Default: `false`.
 
 [float]
 ==== `request.redirect.headers_ban_list`
 
-When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list, will be forwarded. Default: `["WWW-Authenticate", "Authorization"]`.
+When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list, will be forwarded. Default: `[]`.
 
 [float]
 ==== `request.redirect.max_redirects`

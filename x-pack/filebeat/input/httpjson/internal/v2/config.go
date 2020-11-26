@@ -45,12 +45,8 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders: true,
-			RedirectHeadersBanList: []string{
-				"WWW-Authenticate",
-				"Authorization",
-			},
-			RedirectMaxRedirects: 10,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
 		},
 		Response: &responseConfig{},
 	}

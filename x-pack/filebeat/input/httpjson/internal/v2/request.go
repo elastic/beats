@@ -46,23 +46,29 @@ func (c *httpClient) do(stdCtx context.Context, trCtx transformContext, req *htt
 	return resp, nil
 }
 
-func newRequest(ctx transformContext, body *common.MapStr, url url.URL, trs []basicTransform, log *logp.Logger) (*transformable, error) {
+func (rf *requestFactory) newRequest(ctx transformContext) (*transformable, error) {
 	req := emptyTransformable()
-	req.url = url
+	req.url = rf.url
 
-	if body != nil {
-		req.body.DeepUpdate(*body)
+	if rf.body != nil {
+		req.body.DeepUpdate(*rf.body)
+	}
+
+	req.header.Set("Accept", "application/json")
+	req.header.Set("User-Agent", userAgent)
+	if rf.method == "POST" {
+		req.header.Set("Content-Type", "application/json")
 	}
 
 	var err error
-	for _, t := range trs {
+	for _, t := range rf.transforms {
 		req, err = t.run(ctx, req)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	log.Debugf("new request: %#v", req)
+	rf.log.Debugf("new request: %#v", req)
 
 	return req, nil
 }
@@ -95,7 +101,7 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 }
 
 func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transformContext) (*http.Request, error) {
-	trReq, err := newRequest(trCtx, rf.body, rf.url, rf.transforms, rf.log)
+	trReq, err := rf.newRequest(trCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -120,12 +126,7 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transform
 
 	req = req.WithContext(stdCtx)
 
-	req.Header = trReq.header
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", userAgent)
-	if rf.method == "POST" {
-		req.Header.Set("Content-Type", "application/json")
-	}
+	req.Header = trReq.header.Clone()
 
 	if rf.user != "" || rf.password != "" {
 		req.SetBasicAuth(rf.user, rf.password)

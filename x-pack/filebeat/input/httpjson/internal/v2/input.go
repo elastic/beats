@@ -155,7 +155,7 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 				DisableKeepAlives: true,
 			},
 			Timeout:       timeout,
-			CheckRedirect: checkRedirect(config.Request),
+			CheckRedirect: checkRedirect(config.Request, log),
 		},
 		Logger:       newRetryLogger(),
 		RetryWaitMin: config.Request.Retry.getWaitMin(),
@@ -178,21 +178,26 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
 }
 
-func checkRedirect(config *requestConfig) func(*http.Request, []*http.Request) error {
+func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
+		log.Debug("http client: checking redirect")
 		if len(via) >= config.RedirectMaxRedirects {
+			log.Debug("http client: max redirects exceeded")
 			return fmt.Errorf("stopped after %d redirects", config.RedirectMaxRedirects)
 		}
 
 		if !config.RedirectForwardHeaders || len(via) == 0 {
+			log.Debugf("http client: nothing to do while checking redirects - forward_headers: %v, via: %#v", config.RedirectForwardHeaders, via)
 			return nil
 		}
 
 		prev := via[len(via)-1] // previous request to get headers from
 
+		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
 		req.Header = prev.Header.Clone()
 
 		for _, k := range config.RedirectHeadersBanList {
+			log.Debugf("http client: ban header %v", k)
 			req.Header.Del(k)
 		}
 
