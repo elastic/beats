@@ -269,7 +269,7 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 	}
 
 	action, changed := diffEvents(lastEvent, event)
-	if event.Action == None || event.Action&Updated > 0 {
+	if uint8(event.Action)&^uint8(Updated) == 0 {
 		if event.hashFailed && !changed {
 			event.Action = Updated
 		} else {

@@ -667,6 +667,92 @@ func TestEventFailedHash(t *testing.T) {
 			},
 		}.validate(t, ms)
 	})
+	t.Run("delete", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "creation event",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/some/other/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("22222222222222222222"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": Digest("22222222222222222222"),
+				},
+			},
+			expectedEvent{
+				title: "delete",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/other/path",
+					Info:      nil,
+					Source:    SourceFSNotify,
+					// FSEvents likes to add extra flags to delete events.
+					Action: Deleted,
+					Hashes: nil,
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"deleted"},
+					"event.type":     []string{"deletion"},
+					"file.hash.sha1": nil,
+				},
+			},
+		}.validate(t, ms)
+	})
+	t.Run("move", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "creation event",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/some/other/path",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: []byte("22222222222222222222"),
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": Digest("22222222222222222222"),
+				},
+			},
+			expectedEvent{
+				title: "delete",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/some/other/path",
+					Info:      nil,
+					Source:    SourceFSNotify,
+					// FSEvents likes to add extra flags to delete events.
+					Action: Moved,
+					Hashes: nil,
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"moved"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": nil,
+				},
+			},
+		}.validate(t, ms)
+	})
 }
 
 func getConfig(path ...string) map[string]interface{} {
