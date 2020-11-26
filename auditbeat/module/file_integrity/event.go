@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -184,12 +185,16 @@ func NewEventFromFileInfo(
 	switch event.Info.Type {
 	case FileType:
 		if event.Info.Size <= maxFileSize {
-			hashes, err := hashFile(event.Path, hashTypes...)
+			hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
 			if err != nil {
 				event.errors = append(event.errors, err)
 				event.hashFailed = true
-			} else {
+			} else if hashes != nil {
+				// hashFile returns nil hashes and no error when:
+				// - There's no hashes configured.
+				// - File size at the time of hashing is larger than configured limit.
 				event.Hashes = hashes
+				event.Info.Size = nbytes
 			}
 		}
 	case SymlinkType:
@@ -402,9 +407,9 @@ func diffEvents(old, new *Event) (Action, bool) {
 	return result, result != None
 }
 
-func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
+func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map[HashType]Digest, nbytes uint64, err error) {
 	if len(hashType) == 0 {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	var hashes []hash.Hash
@@ -446,27 +451,40 @@ func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 		case XXH64:
 			hashes = append(hashes, xxhash.New())
 		default:
-			return nil, errors.Errorf("unknown hash type '%v'", name)
+			return nil, 0, errors.Errorf("unknown hash type '%v'", name)
 		}
 	}
 
 	f, err := file.ReadOpen(name)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open file for hashing")
+		return nil, 0, errors.Wrap(err, "failed to open file for hashing")
 	}
 	defer f.Close()
 
 	hashWriter := multiWriter(hashes)
-	if _, err := io.Copy(hashWriter, f); err != nil {
-		return nil, errors.Wrap(err, "failed to calculate file hashes")
+	// Make sure it hashes up to the limit in case the file is growing
+	// since its size was checked.
+	validSizeLimit := maxSize < math.MaxInt64-1
+	var r io.Reader = f
+	if validSizeLimit {
+		r = io.LimitReader(r, int64(maxSize+1))
+	}
+	written, err := io.Copy(hashWriter, r)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "failed to calculate file hashes")
 	}
 
-	nameToHash := make(map[HashType]Digest, len(hashes))
+	// The file grew larger than configured limit.
+	if validSizeLimit && written > int64(maxSize) {
+		return nil, 0, nil
+	}
+
+	nameToHash = make(map[HashType]Digest, len(hashes))
 	for i, h := range hashes {
 		nameToHash[hashType[i]] = h.Sum(nil)
 	}
 
-	return nameToHash, nil
+	return nameToHash, uint64(written), nil
 }
 
 func multiWriter(hash []hash.Hash) io.Writer {
