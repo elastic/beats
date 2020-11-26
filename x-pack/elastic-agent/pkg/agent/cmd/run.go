@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -319,27 +320,26 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 }
 
 func createAgentMonitoringDrop(drop string) error {
-	if drop == "" {
+	if drop == "" || runtime.GOOS == "windows" {
 		return nil
 	}
 
-	_, err := os.Stat(drop)
+	path := strings.TrimPrefix(drop, "unix://")
+	if strings.HasSuffix(path, ".sock") {
+		path = filepath.Dir(path)
+	}
+
+	_, err := os.Stat(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return err
 		}
 
 		// create
-		if err := os.MkdirAll(drop, 0775); err != nil {
+		if err := os.MkdirAll(path, 0775); err != nil {
 			return err
 		}
 	}
 
-	if runtime.GOOS != "windows" {
-		if err := os.Chown(drop, os.Geteuid(), os.Getegid()); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return os.Chown(path, os.Geteuid(), os.Getegid())
 }
