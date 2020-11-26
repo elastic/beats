@@ -90,6 +90,7 @@ The state has the following elements:
 - `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. (before any transform)
+- `last_response.page`: A number indicating the page number of the last response.
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
 - `url.value`: The full URL with params and fragments. Will make reference to the request URL for configs under `request.*` and for the last successful request under `response.*`.
 - `url.params`: A map containing the URL params. Will make reference to the request URL for configs under `request.*` and for the last successful request under `response.*`.
@@ -181,6 +182,8 @@ Some built in helper functions are provided to work with the input state inside 
 - `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Go lang predefined layouts or a custom one. Example: `{{ parseDate "2020-11-05T12:25:32Z" }}`, `{{ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" }}`, `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC }}`.
 - `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Go lang predefined layouts or a custom one. It will default to UTC timezone when formatting but optionally a different timezone can be specified. If the timezone is incorrect will default to UTC. Example: `{{ formatDate (now) "UnixDate" }}`, `{{ formatDate (now) "UnixDate" "America/New_York" }}`.
 - `getRFC5988Link`: it extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when we are parsing header values for pagination, for example. Example: `{{ getRFC5988Link "next" .last_response.header.Link }}`
+- `toInt`: converts a string to an integer, returns 0 if it fails.
+- `add`: adds a list of integers and returns their sum.
 
 In addition to the provided functions, any of the native functions for `time.Time` and `http.Header` types can be used on the corresponding objects. Examples: `{{(now).Day}}`, `{{.last_response.header.Get "key"}}`
 
@@ -761,7 +764,7 @@ This will output:
 [float]
 ==== `cursor`
 
-Cursor is a list of key value objects where an arbitrary values are defined. The values are interpreted as value templates and a default template can be set. Cursor state is kept between input restarts.
+Cursor is a list of key value objects where an arbitrary values are defined. The values are interpreted as value templates and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
 Can read state from: [`.last_response.*`, `.last_event.*`].
 

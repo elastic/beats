@@ -24,6 +24,7 @@ type transforms []transform
 type transformContext struct {
 	cursor       *cursor
 	lastEvent    *common.MapStr
+	lastPage     *int
 	lastResponse *transformable
 }
 
@@ -31,6 +32,7 @@ func emptyTransformContext() transformContext {
 	return transformContext{
 		cursor:       &cursor{},
 		lastEvent:    &common.MapStr{},
+		lastPage:     new(int),
 		lastResponse: emptyTransformable(),
 	}
 }

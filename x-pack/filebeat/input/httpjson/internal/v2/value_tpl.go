@@ -7,6 +7,7 @@ package v2
 import (
 	"bytes"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -31,6 +32,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
 			"getRFC5988Link":      getRFC5988Link,
+			"toInt":               toInt,
+			"add":                 add,
 		}).
 		Parse(in)
 	if err != nil {
@@ -58,6 +61,7 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 		if r := recover(); r != nil {
 			val = fallback(r.(error))
 		}
+		log.Debugf("template execution: evaluated template %q", val)
 	}()
 
 	buf := new(bytes.Buffer)
@@ -69,6 +73,7 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	_, _ = data.Put("url.params", tr.url.Query())
 	_, _ = data.Put("cursor", trCtx.cursor.clone())
 	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
+	_, _ = data.Put("last_response.page", trCtx.lastPage)
 	_, _ = data.Put("last_response.body", trCtx.lastResponse.body.Clone())
 	_, _ = data.Put("last_response.header", trCtx.lastResponse.header.Clone())
 	_, _ = data.Put("last_response.url.value", trCtx.lastResponse.url.String())
@@ -190,4 +195,17 @@ func getRFC5988Link(rel string, links []string) string {
 	}
 
 	return ""
+}
+
+func toInt(s string) int {
+	i, _ := strconv.ParseInt(s, 10, 64)
+	return int(i)
+}
+
+func add(vs ...int) int {
+	var sum int
+	for _, v := range vs {
+		sum += v
+	}
+	return sum
 }

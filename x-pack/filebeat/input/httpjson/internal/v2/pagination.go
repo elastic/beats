@@ -74,6 +74,8 @@ type pageIterator struct {
 
 	isFirst bool
 	done    bool
+
+	n int
 }
 
 func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformContext, resp *http.Response) *pageIterator {
@@ -86,9 +88,9 @@ func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformCont
 	}
 }
 
-func (iter *pageIterator) next() (*transformable, bool, error) {
+func (iter *pageIterator) next() (*transformable, int, bool, error) {
 	if iter == nil || iter.resp == nil || iter.done {
-		return nil, false, nil
+		return nil, 0, false, nil
 	}
 
 	if iter.isFirst {
@@ -96,13 +98,13 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 		iter.isFirst = false
 		tr, err := iter.getPage()
 		if err != nil {
-			return nil, false, err
+			return nil, 0, false, err
 		}
 		if iter.pagination.requestFactory == nil {
 			iter.pagination.log.Debug("last page")
 			iter.done = true
 		}
-		return tr, true, nil
+		return tr, iter.n, true, nil
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
@@ -112,30 +114,30 @@ func (iter *pageIterator) next() (*transformable, bool, error) {
 			// did not find any new value and we can stop paginating without error
 			iter.pagination.log.Debug("last page")
 			iter.done = true
-			return nil, false, nil
+			return nil, 0, false, nil
 		}
-		return nil, false, err
+		return nil, 0, false, err
 	}
 
 	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
 	if err != nil {
-		return nil, false, err
+		return nil, 0, false, err
 	}
 
 	iter.resp = resp
 
 	tr, err := iter.getPage()
 	if err != nil {
-		return nil, false, err
+		return nil, 0, false, err
 	}
 
 	if len(tr.body) == 0 {
 		iter.pagination.log.Debug("finished pagination because there is no body")
 		iter.done = true
-		return nil, false, nil
+		return nil, 0, false, nil
 	}
 
-	return tr, true, nil
+	return tr, iter.n, true, nil
 }
 
 func (iter *pageIterator) getPage() (*transformable, error) {
@@ -154,6 +156,8 @@ func (iter *pageIterator) getPage() (*transformable, error) {
 			return nil, err
 		}
 	}
+
+	iter.n += 1
 
 	return tr, nil
 }

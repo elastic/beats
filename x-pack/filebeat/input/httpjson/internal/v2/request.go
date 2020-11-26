@@ -191,9 +191,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 		}
 
 		*trCtx.lastEvent = maybeMsg.msg
-		trCtx.cursor.update(trCtx)
 		n += 1
 	}
+	trCtx.cursor.update(trCtx)
 
 	r.log.Infof("request finished: %d events published", n)
 	return nil

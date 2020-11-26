@@ -52,7 +52,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
 		for {
-			page, hasNext, err := iter.next()
+			page, pageN, hasNext, err := iter.next()
 			if err != nil {
 				ch <- maybeMsg{err: err}
 				return
@@ -62,13 +62,15 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				return
 			}
 
+			*trCtx.lastPage = pageN
 			*trCtx.lastResponse = *page.clone()
 
-			rp.log.Debugf("last received page: %v", trCtx.lastResponse)
+			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
 
 			for _, t := range rp.transforms {
 				page, err = t.run(trCtx, page)
 				if err != nil {
+					rp.log.Debug("error transforming page")
 					ch <- maybeMsg{err: err}
 					return
 				}
@@ -76,15 +78,17 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 
 			if rp.split == nil {
 				ch <- maybeMsg{msg: page.body}
+				rp.log.Debug("no split found: continuing to next page")
 				continue
 			}
 
 			if err := rp.split.run(trCtx, page, ch); err != nil {
-				if err == errEmtpyField {
-					// nothing else to send
-					return
+				if err == errEmptyField {
+					// nothing else to send for this page
+					rp.log.Debug("split operation finished")
+					continue
 				}
-
+				rp.log.Debug("split operation failed")
 				ch <- maybeMsg{err: err}
 				return
 			}

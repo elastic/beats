@@ -12,9 +12,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var errEmtpyField = errors.New("the requested field is emtpy")
+var (
+	errEmptyField    = errors.New("the requested field is emtpy")
+	errEmptyTopField = errors.New("the requested top split field is emtpy")
+)
 
 type split struct {
+	log        *logp.Logger
 	targetInfo targetInfo
 	kind       string
 	transforms []basicTransform
@@ -60,6 +64,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}
 
 	return &split{
+		log:        log,
 		targetInfo: ti,
 		kind:       c.Type,
 		keepParent: c.KeepParent,
@@ -70,6 +75,10 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 }
 
 func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMsg) error {
+	return s.runChild(ctx, resp, ch, false)
+}
+
+func (s *split) runChild(ctx transformContext, resp *transformable, ch chan<- maybeMsg, isChild bool) error {
 	respCpy := resp.clone()
 
 	v, err := respCpy.body.GetValue(s.targetInfo.Name)
@@ -79,19 +88,23 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 
 	switch s.kind {
 	case "", splitTypeArr:
+		if v == nil {
+			s.log.Debug("array field is nil, sending main body")
+			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
+		}
+
 		arr, ok := v.([]interface{})
 		if !ok {
 			return fmt.Errorf("field %s needs to be an array to be able to split on it but it is %T", s.targetInfo.Name, v)
 		}
 
 		if len(arr) == 0 {
-			if err := s.sendEvent(ctx, respCpy, "", nil, ch); err != nil {
-				return err
-			}
+			s.log.Debug("array field is empty, sending main body")
+			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
 		}
 
 		for _, a := range arr {
-			if err := s.sendEvent(ctx, respCpy, "", a, ch); err != nil {
+			if err := s.sendEvent(ctx, respCpy, "", a, ch, isChild); err != nil {
 				return err
 			}
 		}
@@ -99,7 +112,8 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 		return nil
 	case splitTypeMap:
 		if v == nil {
-			return errEmtpyField
+			s.log.Debug("object field is nil, sending main body")
+			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
 		}
 
 		ms, ok := toMapStr(v)
@@ -108,13 +122,12 @@ func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMs
 		}
 
 		if len(ms) == 0 {
-			if err := s.sendEvent(ctx, respCpy, "", nil, ch); err != nil {
-				return err
-			}
+			s.log.Debug("object field is empty, sending main body")
+			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
 		}
 
 		for k, v := range ms {
-			if err := s.sendEvent(ctx, respCpy, k, v, ch); err != nil {
+			if err := s.sendEvent(ctx, respCpy, k, v, ch, isChild); err != nil {
 				return err
 			}
 		}
@@ -141,7 +154,11 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 	return m, true
 }
 
-func (s *split) sendEvent(ctx transformContext, resp *transformable, key string, val interface{}, ch chan<- maybeMsg) error {
+func (s *split) sendEvent(ctx transformContext, resp *transformable, key string, val interface{}, ch chan<- maybeMsg, isChild bool) error {
+	if val == nil && !isChild && !s.keepParent {
+		return errEmptyTopField
+	}
+
 	m, ok := toMapStr(val)
 	if !ok {
 		return errors.New("split can only be applied on object lists")
@@ -166,10 +183,14 @@ func (s *split) sendEvent(ctx transformContext, resp *transformable, key string,
 	}
 
 	if s.split != nil {
-		return s.split.run(ctx, resp, ch)
+		return s.split.runChild(ctx, resp, ch, true)
 	}
 
 	ch <- maybeMsg{msg: resp.body.Clone()}
+
+	if val == nil {
+		return errEmptyField
+	}
 
 	return nil
 }
