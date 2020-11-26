@@ -18,7 +18,6 @@
 package unix
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
 	"net"
@@ -306,9 +305,14 @@ func TestSocketCleanupRefusal(t *testing.T) {
 }
 
 func TestReceiveNewEventsConcurrently(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		return
+	}
+
 	for socketType, _ := range socketTypes {
-		if runtime.GOOS == "windows" {
-			t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
+		if runtime.GOOS == "darwin" && socketType == "datagram" {
+			t.Skip("test is only supported on linux. See https://github.com/elastic/beats/issues/22775")
 			return
 		}
 
@@ -322,10 +326,9 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 				ch <- &info{message: string(message), mt: mt}
 			}
 			cfg, err := common.NewConfigFrom(map[string]interface{}{
-				"path":            path,
-				"line_delimiter":  "\n",
-				"socket_type":     socketType,
-				"max_connections": 2,
+				"path":           path,
+				"line_delimiter": "\n",
+				"socket_type":    socketType,
 			})
 			if !assert.NoError(t, err) {
 				return
@@ -336,9 +339,6 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 				return
 			}
 
-			if socketType == "datagram" {
-				config.Timeout = 0
-			}
 			server, err := New(logp.L(), &config, to)
 			if !assert.NoError(t, err) {
 				return
@@ -349,30 +349,19 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 			}
 			defer server.Stop()
 
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
 			samples := generateMessages(eventsCount, 1024)
 			for w := 0; w < workers; w++ {
 				if socketType == "stream" {
-					go sendOverUnixStream(t, ctx, path, samples)
+					go sendOverUnixStream(t, path, samples)
 				} else if socketType == "datagram" {
-					go sendOverUnixDatagram(t, ctx, path, samples)
+					go sendOverUnixDatagram(t, path, samples)
 				}
 			}
 
 			var events []*info
-			prevId := -1
 			for len(events) < eventsCount*workers {
 				select {
 				case event := <-ch:
-					parts := strings.Split(event.message, "-")
-					id, _ := strconv.Atoi(strings.TrimSuffix(parts[1], "\n"))
-					if id <= prevId {
-						fmt.Println("current ID is not bigger than prev ID, prev:", prevId, "current:", id)
-					} else {
-						fmt.Println("difference between two IDs:", strconv.Itoa(id-prevId), id, prevId)
-					}
-					prevId = id
 					events = append(events, event)
 				default:
 				}
@@ -381,7 +370,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	}
 }
 
-func sendOverUnixStream(t *testing.T, ctx context.Context, path string, samples []string) {
+func sendOverUnixStream(t *testing.T, path string, samples []string) {
 	conn, err := net.Dial("unix", path)
 	if !assert.NoError(t, err) {
 		return
@@ -391,12 +380,10 @@ func sendOverUnixStream(t *testing.T, ctx context.Context, path string, samples 
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
-
-	<-ctx.Done()
 }
 
-func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, samples []string) {
-	conn, err := net.DialUnix("unixgram", nil, &net.UnixAddr{Name: path, Net: "unixgram"})
+func sendOverUnixDatagram(t *testing.T, path string, samples []string) {
+	conn, err := net.Dial("unixgram", path)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -404,9 +391,6 @@ func sendOverUnixDatagram(t *testing.T, ctx context.Context, path string, sample
 	for _, sample := range samples {
 		fmt.Fprintln(conn, sample)
 	}
-
-	<-ctx.Done()
-	fmt.Println("closing UNIX DGRAM connection")
 }
 
 func randomString(l int) string {
