@@ -30,8 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
 
-// MaxValidFileSizeLimit is the largest possible value for `max_file_size`
-// 8192 PiB should be enough.
+// MaxValidFileSizeLimit is the largest possible value for `max_file_size`.
 const MaxValidFileSizeLimit = math.MaxInt64 - 1
 
 // HashType identifies a cryptographic algorithm.
