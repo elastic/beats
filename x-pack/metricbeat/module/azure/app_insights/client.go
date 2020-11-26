@@ -23,9 +23,6 @@ type Client struct {
 	Log     *logp.Logger
 }
 
-type MetricValue struct {
-}
-
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
 	service, err := NewService(config)

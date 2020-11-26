@@ -14,6 +14,8 @@ API key. For different clusters, you need to use an API key per cluster.
 NOTE: For security reasons, we recommend using a unique API key per {beatname_uc} instance.
 You can create as many API keys per user as necessary.
 
+IMPORTANT: Review <<feature-roles>> before creating API keys for {beatname_uc}.
+
 [float]
 [[beats-api-key-publish]]
 === Create an API key for publishing
@@ -40,6 +42,8 @@ POST /_security/api_key
 ------------------------------------------------------------
 <1> Name of the API key
 <2> Granted privileges, see <<feature-roles>>
+
+NOTE: See <<privileges-to-publish-events>> for the list of privileges required to publish events.
 
 The return value will look something like this:
 
@@ -88,6 +92,8 @@ POST /_security/api_key
 ------------------------------------------------------------
 <1> Name of the API key
 <2> Granted privileges, see <<feature-roles>>
+
+NOTE: See <<privileges-to-publish-monitoring>> for the list of privileges required to send monitoring data.
 
 The return value will look something like this:
 

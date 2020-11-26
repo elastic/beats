@@ -3,6 +3,7 @@
   description: >
     Fields from fortinet FortiOS
   fields:
+
     - name: file.hash.crc32
       type: keyword
       description: >
@@ -1126,7 +1127,7 @@
             Fabric medium count
 
         - name: mem
-          type: keyword
+          type: integer
           description: >
             Memory usage system statistics
 

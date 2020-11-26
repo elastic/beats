@@ -20,6 +20,7 @@ package debug
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -78,8 +79,9 @@ func testCheckContent(t *testing.T) {
 	s.WriteString("hello world")
 	s.WriteByte(0x00)
 	s.WriteString("hello world")
+	r := ioutil.NopCloser(&s)
 
-	reader, _ := NewReader(logp.L(), &s, 5, 3, check)
+	reader, _ := NewReader(logp.L(), r, 5, 3, check)
 
 	_, err := reader.Read(make([]byte, 20))
 	if !assert.NoError(t, err) {
@@ -91,7 +93,7 @@ func testCheckContent(t *testing.T) {
 
 func testConsumeAll(t *testing.T) {
 	c, _ := common.RandomBytes(2000)
-	reader := bytes.NewReader(c)
+	reader := ioutil.NopCloser(bytes.NewReader(c))
 	var buf bytes.Buffer
 	consumed := 0
 	debug, _ := NewReader(logp.L(), reader, 8, 20, makeNullCheck(logp.L(), 1))
@@ -106,8 +108,8 @@ func testConsumeAll(t *testing.T) {
 }
 
 func testEmptyBuffer(t *testing.T) {
-	var buf bytes.Buffer
-	debug, _ := NewReader(logp.L(), &buf, 8, 20, makeNullCheck(logp.L(), 1))
+	buf := ioutil.NopCloser(&bytes.Buffer{})
+	debug, _ := NewReader(logp.L(), buf, 8, 20, makeNullCheck(logp.L(), 1))
 	data := make([]byte, 33)
 	n, err := debug.Read(data)
 	assert.Equal(t, io.EOF, err)
@@ -134,8 +136,9 @@ func testSilent(t *testing.T) {
 	b.Write([]byte{'a', 'b', 'c', 'd', 0x00, 'e'})
 	b.Write([]byte{'a', 'b', 'c', 'd', 0x00, 'e'})
 	b.Write([]byte{'a', 'b', 'c', 'd', 0x00, 'e'})
+	r := ioutil.NopCloser(&b)
 
-	debug, _ := NewReader(logp.L(), &b, 3, 2, check)
+	debug, _ := NewReader(logp.L(), r, 3, 2, check)
 	consumed := 0
 	for consumed < b.Len() {
 		n, _ := debug.Read(make([]byte, 3))

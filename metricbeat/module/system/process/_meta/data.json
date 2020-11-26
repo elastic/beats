@@ -1,29 +1,24 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.process",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "process"
+        "name": "process",
+        "period": 10000
     },
     "process": {
         "args": [
-            "/usr/bin/dockerd",
-            "-H",
-            "unix://"
+            "/sbin/init",
+            "splash"
         ],
-        "executable": "/usr/bin/dockerd-ce",
-        "name": "dockerd",
-        "pgid": 2080,
-        "pid": 2080,
-        "ppid": 1,
-        "working_directory": "/"
+        "command_line": "/sbin/init splash",
+        "name": "systemd",
+        "pgid": 1,
+        "pid": 1,
+        "ppid": 0
     },
     "service": {
         "type": "system"
@@ -32,11 +27,11 @@
         "process": {
             "cgroup": {
                 "blkio": {
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "total": {
-                        "bytes": 844576104448,
-                        "ios": 54869430
+                        "bytes": 573440,
+                        "ios": 140
                     }
                 },
                 "cpu": {
@@ -49,8 +44,8 @@
                         },
                         "shares": 1024
                     },
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "rt": {
                         "period": {
                             "us": 0
@@ -68,38 +63,46 @@
                     }
                 },
                 "cpuacct": {
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "percpu": {
-                        "1": 7058282754012,
-                        "2": 7053634662537,
-                        "3": 7069386293853,
-                        "4": 7050055153087
+                        "1": 571119313,
+                        "10": 282248474,
+                        "11": 363773369,
+                        "12": 855691122,
+                        "2": 735154670,
+                        "3": 458174215,
+                        "4": 281192882,
+                        "5": 563599363,
+                        "6": 415888016,
+                        "7": 396270851,
+                        "8": 550242795,
+                        "9": 419970811
                     },
                     "stats": {
                         "system": {
-                            "ns": 7202920000000
+                            "ns": 1700000000
                         },
                         "user": {
-                            "ns": 19573240000000
+                            "ns": 1920000000
                         }
                     },
                     "total": {
-                        "ns": 28231358863489
+                        "ns": 5893325881
                     }
                 },
-                "id": "docker.service",
+                "id": "init.scope",
                 "memory": {
-                    "id": "docker.service",
+                    "id": "init.scope",
                     "kmem": {
                         "failures": 0,
                         "limit": {
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 21139456,
+                            "bytes": 16871424,
                             "max": {
-                                "bytes": 480030720
+                                "bytes": 17829888
                             }
                         }
                     },
@@ -121,9 +124,9 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 3337703424,
+                            "bytes": 21827584,
                             "max": {
-                                "bytes": 5245300736
+                                "bytes": 30121984
                             }
                         }
                     },
@@ -139,16 +142,16 @@
                             }
                         }
                     },
-                    "path": "/system.slice/docker.service",
+                    "path": "/init.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 779677696
+                            "bytes": 4055040
                         },
                         "active_file": {
-                            "bytes": 1753378816
+                            "bytes": 405504
                         },
                         "cache": {
-                            "bytes": 2127810560
+                            "bytes": 643072
                         },
                         "hierarchical_memory_limit": {
                             "bytes": 9223372036854771712
@@ -157,23 +160,23 @@
                             "bytes": 0
                         },
                         "inactive_anon": {
-                            "bytes": 409075712
+                            "bytes": 270336
                         },
                         "inactive_file": {
-                            "bytes": 374431744
+                            "bytes": 0
                         },
-                        "major_page_faults": 53164,
+                        "major_page_faults": 0,
                         "mapped_file": {
-                            "bytes": 7491584
+                            "bytes": 0
                         },
-                        "page_faults": 21923702,
-                        "pages_in": 57261049,
-                        "pages_out": 56521859,
+                        "page_faults": 117447,
+                        "pages_in": 52008,
+                        "pages_out": 50851,
                         "rss": {
-                            "bytes": 1188753408
+                            "bytes": 4009984
                         },
                         "rss_huge": {
-                            "bytes": 56623104
+                            "bytes": 0
                         },
                         "swap": {
                             "bytes": 0
@@ -183,33 +186,26 @@
                         }
                     }
                 },
-                "path": "/system.slice/docker.service"
+                "path": "/init.scope"
             },
-            "cmdline": "/usr/bin/dockerd -H unix://",
+            "cmdline": "/sbin/init splash",
             "cpu": {
-                "start_time": "2019-01-08T17:06:39.000Z",
+                "start_time": "2020-11-03T17:55:56.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0049
+                        "pct": 0
                     },
-                    "pct": 0.0195,
-                    "value": 27827810
+                    "pct": 0,
+                    "value": 5580
                 }
-            },
-            "fd": {
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                },
-                "open": 68
             },
             "memory": {
                 "rss": {
-                    "bytes": 1187336192,
-                    "pct": 0.0716
+                    "bytes": 13414400,
+                    "pct": 0.0004
                 },
-                "share": 8253440,
-                "size": 4438523904
+                "share": 8531968,
+                "size": 173076480
             },
             "state": "sleeping"
         }

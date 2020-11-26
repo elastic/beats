@@ -165,6 +165,51 @@ inputs:
 			},
 		},
 
+		"inject agent info": {
+			givenYAML: `
+inputs:
+  - name: No processors
+    type: file
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+`,
+			expectedYAML: `
+inputs:
+  - name: No processors
+    type: file
+    processors:
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectAgentInfo(),
+				},
+			},
+		},
+
 		"extract items from array": {
 			givenYAML: `
 streams:
@@ -615,7 +660,7 @@ logs:
 			a, err := makeASTFromYAML(test.givenYAML)
 			require.NoError(t, err)
 
-			err = test.rule.Apply(a)
+			err = test.rule.Apply(FakeAgentInfo(), a)
 			require.NoError(t, err)
 
 			v := &MapVisitor{}
@@ -750,4 +795,22 @@ func TestSerialization(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, value, v)
 	})
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
+}
+
+func FakeAgentInfo() AgentInfo {
+	return &fakeAgentInfo{}
 }

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -111,7 +112,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, cfg)
+	dns, err := New(false, callback, procs.ProcessesWatcher{}, cfg)
 	if err != nil {
 		panic(err)
 	}

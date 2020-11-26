@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const checkingPath = "/api/ingest_manager/fleet/agents/%s/checkin"
+const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
@@ -49,7 +49,6 @@ func (e *CheckinRequest) Validate() error {
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
 	Actions Actions `json:"actions"`
-	Success bool    `json:"success"`
 }
 
 // Validate validates the response send from the server.

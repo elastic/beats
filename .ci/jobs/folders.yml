@@ -4,3 +4,8 @@
     name: Beats
     description: Beats
     project-type: folder
+
+- job:
+    name: Beats/Release
+    description: Jobs for release preparation
+    project-type: folder

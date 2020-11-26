@@ -4,82 +4,69 @@
 
 beta[]
 
-Download and install the Agent on each system you want to monitor.
+Install an {agent} on each host that you want to monitor. These steps assume
+that you're running a fresh installation. If {agent} is already running on your
+system and you want to upgrade to a new version, see <<upgrade-elastic-agent>>.
 
-//TODO: Replace with tabbed panel when the code is stable. 
+Before running the installation, decide whether you want to use {fleet} to
+manage your agents in a central location in {kib} (recommended), or run
+standalone agents.
 
+With {fleet}, you enroll each agent in a policy defined in {kib}. The policy
+specifies how to collect observability data from the services you want to
+monitor. The agent connects to a trusted {kib} instance to retrieve the policy
+and report agent events.
+
+TIP: We recommend using {fleet} management because it makes the management and
+upgrade of your agents considerably easier. If you want to run standalone
+agents, instead of using {fleet}, see <<run-elastic-agent-standalone>>.
+
+To install {agent} and enroll it in {fleet}:
+
+. If you're running {agent} 7.9 or earlier, stop the agent and manually remove
+it from your host.
+
+. On your host, download and extract the installation package.
++
+--
 // tag::install-elastic-agent[]
 
-To download and install {elastic-agent}, use the commands that work with your
-system:
-
-*mac:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {agent} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-darwin-x86_64.tar.gz
-tar xzvf elastic-agent-{version}-darwin-x86_64.tar.gz
-----
-
-endif::[]
-
-*linux:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {agent} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-----
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-linux-x86_64.tar.gz
-tar xzvf elastic-agent-{version}-linux-x86_64.tar.gz
-----
-
-endif::[]
-
-*win:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {agent} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-. Download the {agent} Windows zip file from the
-https://www.elastic.co/downloads/elastic-agent[downloads page].
-
-. Extract the contents of the zip file into `C:\Program Files`.
-
-. Rename the `elastic-agent-<version>-windows` directory to `Elastic-Agent`.
-
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
-
-. From the PowerShell prompt, run the following commands to install Filebeat as a
-Windows service:
-+
-[source,shell]
-----
-PS > cd 'C:\Program Files\Elastic-Agent'
-PS C:\Program Files\Elastic-Agent> .\install-service-elastic-agent.ps1
-----
-
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
-
-endif::[]
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/download-widget.asciidoc[]
 
 // end::install-elastic-agent[]
+--
 
+. From the agent directory, run the appropriate command to install {agent} as
+a managed service, enroll it in {fleet}, and start the service. Don't have a
+{fleet} enrollment key? Read the
+{ingest-guide}/fleet-quick-start.html[Quick start guide] to learn how to get one
+from {fleet}.
++
+--
+include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.asciidoc[]
+--
++
+This step installs the {agent} files into the directory locations described
+in <<installation-layout>>.
+
+Because {agent} is installed as an auto-starting service, it will restart
+automatically if the system is rebooted.
+
+To confirm that {agent} is installed and running, go to the **Agents** tab in
+{fleet}. 
+
+If you run into problems, see <<fleet-troubleshooting>>.
+
+[discrete]
+[[installation-layout]]
+== Installation layout
+
+When you run the `install` command, {agent} installs files in the following
+locations. You cannot override these installation paths because they are
+required for upgrades.
+
+include::tab-widgets/install-layout-widget.asciidoc[]
+
+
+// Add Javascript and CSS for tabbed panels
+include::tab-widgets/code.asciidoc[]

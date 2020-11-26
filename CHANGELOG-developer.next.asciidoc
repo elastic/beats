@@ -51,6 +51,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `common.MapStrPointer` parameter from `cfgfile.Runnerfactory` interface. {pull}19135[19135]
 - Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
+- Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
 
 ==== Bugfixes
 
@@ -98,3 +99,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove vendor folder from repository. {pull}18655[18655]
 - Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
 - Update Go version to 1.14.4. {pull}19753[19753]
+- Update Go version to 1.14.7. {pull}20508[20508]
+- Add packaging for docker image based on UBI minimal 8. {pull}20576[20576]
+- Make the mage binary used by the build process in the docker container to be statically compiled. {pull}20827[20827]
+- Update ecszap to v0.3.0 for using ECS 1.6.0 in logs {pull}22267[22267]

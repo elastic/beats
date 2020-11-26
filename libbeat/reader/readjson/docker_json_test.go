@@ -365,3 +365,5 @@ func (m *mockReader) Next() (reader.Message, error) {
 		Bytes:   len(message),
 	}, nil
 }
+
+func (m *mockReader) Close() error { return nil }

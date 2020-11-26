@@ -18,7 +18,8 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("oracle", "tablespace", New)
+	mb.Registry.MustAddMetricSet("oracle", "tablespace", New,
+		mb.WithHostParser(oracle.HostParser))
 }
 
 // MetricSet holds any configuration or state information. It must implement

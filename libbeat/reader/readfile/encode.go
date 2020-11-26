@@ -43,7 +43,7 @@ type Config struct {
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncodeReader(r io.Reader, config Config) (EncoderReader, error) {
+func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
 	eReader, err := NewLineReader(r, config)
 	return EncoderReader{eReader}, err
 }
@@ -58,4 +58,8 @@ func (r EncoderReader) Next() (reader.Message, error) {
 		Content: bytes.Trim(c, "\xef\xbb\xbf"),
 		Bytes:   sz,
 	}, err
+}
+
+func (r EncoderReader) Close() error {
+	return r.reader.Close()
 }

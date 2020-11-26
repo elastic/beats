@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -108,6 +109,34 @@ func (inp *o365input) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
+	for ctx.Cancelation.Err() == nil {
+		err := inp.runOnce(ctx, src, cursor, publisher)
+		if err == nil {
+			break
+		}
+		if ctx.Cancelation.Err() != err && err != context.Canceled {
+			msg := common.MapStr{}
+			msg.Put("error.message", err.Error())
+			msg.Put("event.kind", "pipeline_error")
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    msg,
+			}
+			publisher.Publish(event, nil)
+			ctx.Logger.Errorf("Input failed: %v", err)
+			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
+			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
+		}
+	}
+	return nil
+}
+
+func (inp *o365input) runOnce(
+	ctx v2.Context,
+	src cursor.Source,
+	cursor cursor.Cursor,
+	publisher cursor.Publisher,
+) error {
 	stream := src.(*stream)
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
@@ -156,18 +185,7 @@ func (inp *o365input) Run(
 	}
 
 	log.Infow("Start fetching events", "cursor", start)
-	err = poller.Run(action)
-	if err != nil && ctx.Cancelation.Err() != err && err != context.Canceled {
-		msg := common.MapStr{}
-		msg.Put("error.message", err.Error())
-		msg.Put("event.kind", "pipeline_error")
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields:    msg,
-		}
-		publisher.Publish(event, nil)
-	}
-	return err
+	return poller.Run(action)
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duration) checkpoint {

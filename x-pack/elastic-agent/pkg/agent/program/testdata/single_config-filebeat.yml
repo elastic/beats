@@ -18,6 +18,12 @@ filebeat:
           target: "event"
           fields:
             dataset: generic
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
   - type: log
     paths:
       - /var/log/hello3.log
@@ -36,6 +42,12 @@ filebeat:
           target: "event"
           fields:
             dataset: generic
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
 output:
   elasticsearch:
     hosts:

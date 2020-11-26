@@ -3,10 +3,10 @@
     "azure": {
         "compute_vm_scaleset": {
             "cpu_credits_consumed": {
-                "avg": 0.019
+                "avg": 0.006999999999999999
             },
             "cpu_credits_remaining": {
-                "avg": 97.99
+                "avg": 84.72
             },
             "os_per_disk_qd": {
                 "avg": 0
@@ -18,23 +18,27 @@
                 "avg": 0
             },
             "os_per_disk_write_bytes_per_sec": {
-                "avg": 19201.653
+                "avg": 3846.531
             },
             "os_per_disk_write_operations_per_sec": {
-                "avg": 1.0366666666666666
+                "avg": 0.5519999999999999
             }
         },
         "namespace": "Microsoft.Compute/virtualMachineScaleSets",
         "resource": {
             "group": "obs-infrastructure",
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/obslinuxvmss",
+            "name": "obslinuxvmss",
             "type": "Microsoft.Compute/virtualMachineScaleSets"
         },
         "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
         "timegrain": "PT5M"
     },
     "cloud": {
+        "account": {
+            "id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6"
+        },
         "instance": {
-            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachineScaleSets/obslinuxvmss",
             "name": "obslinuxvmss"
         },
         "machine": {
@@ -47,6 +51,9 @@
         "dataset": "azure.compute_vm_scaleset",
         "duration": 115000,
         "module": "azure"
+    },
+    "host": {
+        "name": "obslinuxvmss"
     },
     "metricset": {
         "name": "compute_vm_scaleset",
