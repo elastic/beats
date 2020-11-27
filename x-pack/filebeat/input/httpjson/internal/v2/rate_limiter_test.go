@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,6 +30,7 @@ func TestGetRateLimitCase1(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
+		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
 	epoch, err := rateLimit.getRateLimit(resp)
@@ -52,6 +54,7 @@ func TestGetRateLimitCase2(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
+		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
 	epoch, err := rateLimit.getRateLimit(resp)
@@ -79,6 +82,7 @@ func TestGetRateLimitCase3(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
+		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
 	epoch2, err := rateLimit.getRateLimit(resp)

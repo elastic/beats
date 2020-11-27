@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	errEmptyField    = errors.New("the requested field is emtpy")
-	errEmptyTopField = errors.New("the requested top split field is emtpy")
+	errEmptyField    = errors.New("the requested field is empty")
+	errEmptyTopField = errors.New("the requested top split field is empty")
 )
 
 type split struct {

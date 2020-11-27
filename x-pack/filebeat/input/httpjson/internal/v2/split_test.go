@@ -246,7 +246,7 @@ func TestSplit(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "A nested array with an empty nested array in an object",
+			name: "A nested array with an empty nested array in an object published and returns error",
 			config: &splitConfig{
 				Target: "body.response",
 				Type:   "array",
@@ -276,7 +276,26 @@ func TestSplit(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: nil,
+			expectedErr: errEmptyField,
+		},
+		{
+			name: "First level split skips publish if no events and keep_parent: false",
+			config: &splitConfig{
+				Target: "body.response",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:     "body.Event.Attributes",
+					KeepParent: false,
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: &transformable{
+				body: common.MapStr{
+					"response": []interface{}{},
+				},
+			},
+			expectedMessages: []common.MapStr{},
+			expectedErr:      errEmptyTopField,
 		},
 	}
 

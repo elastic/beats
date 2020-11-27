@@ -24,16 +24,14 @@ type transforms []transform
 type transformContext struct {
 	cursor       *cursor
 	lastEvent    *common.MapStr
-	lastPage     *int
-	lastResponse *transformable
+	lastResponse *response
 }
 
 func emptyTransformContext() transformContext {
 	return transformContext{
 		cursor:       &cursor{},
 		lastEvent:    &common.MapStr{},
-		lastPage:     new(int),
-		lastResponse: emptyTransformable(),
+		lastResponse: &response{},
 	}
 }
 
@@ -61,6 +59,15 @@ func (t *transformable) clone() *transformable {
 			return t.header.Clone()
 		}(),
 		url: t.url,
+	}
+}
+
+func (t *transformable) templateValues() common.MapStr {
+	return common.MapStr{
+		"header":     t.header.Clone(),
+		"body":       t.body.Clone(),
+		"url.value":  t.url.String(),
+		"url.params": t.url.Query(),
 	}
 }
 

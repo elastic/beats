@@ -18,7 +18,7 @@ func TestEmptyTransformContext(t *testing.T) {
 	ctx := emptyTransformContext()
 	assert.Equal(t, &cursor{}, ctx.cursor)
 	assert.Equal(t, &common.MapStr{}, ctx.lastEvent)
-	assert.Equal(t, emptyTransformable(), ctx.lastResponse)
+	assert.Equal(t, &response{}, ctx.lastResponse)
 }
 
 func TestEmptyTransformable(t *testing.T) {

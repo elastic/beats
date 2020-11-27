@@ -88,23 +88,21 @@ func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformCont
 	}
 }
 
-func (iter *pageIterator) next() (*transformable, int, bool, error) {
+func (iter *pageIterator) next() (*response, bool, error) {
 	if iter == nil || iter.resp == nil || iter.done {
-		return nil, 0, false, nil
+		return nil, false, nil
 	}
 
 	if iter.isFirst {
-		iter.pagination.log.Debug("first page requested")
 		iter.isFirst = false
 		tr, err := iter.getPage()
 		if err != nil {
-			return nil, 0, false, err
+			return nil, false, err
 		}
 		if iter.pagination.requestFactory == nil {
-			iter.pagination.log.Debug("last page")
 			iter.done = true
 		}
-		return tr, iter.n, true, nil
+		return tr, true, nil
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
@@ -112,52 +110,52 @@ func (iter *pageIterator) next() (*transformable, int, bool, error) {
 		if err == errNewURLValueNotSet {
 			// if this error happens here it means the transform used to pick the new url.value
 			// did not find any new value and we can stop paginating without error
-			iter.pagination.log.Debug("last page")
 			iter.done = true
-			return nil, 0, false, nil
+			return nil, false, nil
 		}
-		return nil, 0, false, err
+		return nil, false, err
 	}
 
 	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
 	if err != nil {
-		return nil, 0, false, err
+		return nil, false, err
 	}
 
 	iter.resp = resp
 
-	tr, err := iter.getPage()
+	r, err := iter.getPage()
 	if err != nil {
-		return nil, 0, false, err
+		return nil, false, err
 	}
 
-	if len(tr.body) == 0 {
+	if r.body == nil {
 		iter.pagination.log.Debug("finished pagination because there is no body")
 		iter.done = true
-		return nil, 0, false, nil
+		return nil, false, nil
 	}
 
-	return tr, iter.n, true, nil
+	return r, true, nil
 }
 
-func (iter *pageIterator) getPage() (*transformable, error) {
+func (iter *pageIterator) getPage() (*response, error) {
 	bodyBytes, err := ioutil.ReadAll(iter.resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	iter.resp.Body.Close()
 
-	tr := emptyTransformable()
-	tr.header = iter.resp.Header
-	tr.url = *iter.resp.Request.URL
+	var r response
+	r.header = iter.resp.Header
+	r.url = *iter.resp.Request.URL
+	r.page = iter.n
 
 	if len(bodyBytes) > 0 {
-		if err := json.Unmarshal(bodyBytes, &tr.body); err != nil {
+		if err := json.Unmarshal(bodyBytes, &r.body); err != nil {
 			return nil, err
 		}
 	}
 
 	iter.n += 1
 
-	return tr, nil
+	return &r, nil
 }

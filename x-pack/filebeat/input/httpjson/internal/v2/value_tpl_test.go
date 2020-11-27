@@ -31,7 +31,7 @@ func TestValueTpl(t *testing.T) {
 			value: "{{.last_response.body.param}}",
 			paramCtx: transformContext{
 				lastEvent:    &common.MapStr{},
-				lastResponse: newTestTransformable(common.MapStr{"param": 25}, nil, ""),
+				lastResponse: newTestResponse(common.MapStr{"param": 25}, nil, ""),
 			},
 			paramTr:     emptyTransformable(),
 			paramDefVal: "",
@@ -41,8 +41,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render default value if execute fails",
 			value: "{{.last_response.body.does_not_exist}}",
 			paramCtx: transformContext{
-				lastEvent:    &common.MapStr{},
-				lastResponse: emptyTransformable(),
+				lastEvent: &common.MapStr{},
 			},
 			paramTr:     emptyTransformable(),
 			paramDefVal: "25",
@@ -161,7 +160,7 @@ func TestValueTpl(t *testing.T) {
 			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
 			paramCtx: transformContext{
 				lastEvent: &common.MapStr{},
-				lastResponse: newTestTransformable(
+				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
 						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
@@ -177,7 +176,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "func getRFC5988Link does not match",
 			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
 			paramCtx: transformContext{
-				lastResponse: newTestTransformable(
+				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
 						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>`,
@@ -227,16 +226,18 @@ func TestValueTpl(t *testing.T) {
 	}
 }
 
-func newTestTransformable(body common.MapStr, header http.Header, url string) *transformable {
-	tr := emptyTransformable()
+func newTestResponse(body common.MapStr, header http.Header, url string) *response {
+	resp := &response{
+		header: http.Header{},
+	}
 	if len(body) > 0 {
-		tr.body = body
+		resp.body = body
 	}
 	if len(header) > 0 {
-		tr.header = header
+		resp.header = header
 	}
 	if url != "" {
-		tr.url = newURL(url)
+		resp.url = newURL(url)
 	}
-	return tr
+	return resp
 }

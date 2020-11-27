@@ -12,7 +12,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -65,19 +64,10 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	}()
 
 	buf := new(bytes.Buffer)
-	data := common.MapStr{}
-
-	_, _ = data.Put("header", tr.header.Clone())
-	_, _ = data.Put("body", tr.body.Clone())
-	_, _ = data.Put("url.value", tr.url.String())
-	_, _ = data.Put("url.params", tr.url.Query())
+	data := tr.templateValues()
 	_, _ = data.Put("cursor", trCtx.cursor.clone())
 	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
-	_, _ = data.Put("last_response.page", trCtx.lastPage)
-	_, _ = data.Put("last_response.body", trCtx.lastResponse.body.Clone())
-	_, _ = data.Put("last_response.header", trCtx.lastResponse.header.Clone())
-	_, _ = data.Put("last_response.url.value", trCtx.lastResponse.url.String())
-	_, _ = data.Put("last_response.url.params", trCtx.lastResponse.url.Query())
+	_, _ = data.Put("last_response", trCtx.lastResponse.templateValues())
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		return fallback(err)

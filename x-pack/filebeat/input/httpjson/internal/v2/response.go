@@ -7,7 +7,9 @@ package v2
 import (
 	"context"
 	"net/http"
+	"net/url"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -17,6 +19,13 @@ func registerResponseTransforms() {
 	registerTransform(responseNamespace, appendName, newAppendResponse)
 	registerTransform(responseNamespace, deleteName, newDeleteResponse)
 	registerTransform(responseNamespace, setName, newSetResponse)
+}
+
+type response struct {
+	page   int
+	url    url.URL
+	header http.Header
+	body   interface{}
 }
 
 type responseProcessor struct {
@@ -52,48 +61,97 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
 		for {
-			page, pageN, hasNext, err := iter.next()
+			page, hasNext, err := iter.next()
 			if err != nil {
 				ch <- maybeMsg{err: err}
 				return
 			}
 
-			if !hasNext || len(page.body) == 0 {
+			if !hasNext {
 				return
 			}
 
-			*trCtx.lastPage = pageN
-			*trCtx.lastResponse = *page.clone()
+			respTrs := page.asTransformables(rp.log)
+
+			if len(respTrs) == 0 {
+				return
+			}
+
+			*trCtx.lastResponse = *page
 
 			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
 
-			for _, t := range rp.transforms {
-				page, err = t.run(trCtx, page)
-				if err != nil {
-					rp.log.Debug("error transforming page")
+			for _, tr := range respTrs {
+				for _, t := range rp.transforms {
+					tr, err = t.run(trCtx, tr)
+					if err != nil {
+						ch <- maybeMsg{err: err}
+						return
+					}
+				}
+
+				if rp.split == nil {
+					ch <- maybeMsg{msg: tr.body}
+					rp.log.Debug("no split found: continuing")
+					continue
+				}
+
+				if err := rp.split.run(trCtx, tr, ch); err != nil {
+					if err == errEmptyField {
+						// nothing else to send for this page
+						rp.log.Debug("split operation finished")
+						continue
+					}
+					rp.log.Debug("split operation failed")
 					ch <- maybeMsg{err: err}
 					return
 				}
-			}
-
-			if rp.split == nil {
-				ch <- maybeMsg{msg: page.body}
-				rp.log.Debug("no split found: continuing to next page")
-				continue
-			}
-
-			if err := rp.split.run(trCtx, page, ch); err != nil {
-				if err == errEmptyField {
-					// nothing else to send for this page
-					rp.log.Debug("split operation finished")
-					continue
-				}
-				rp.log.Debug("split operation failed")
-				ch <- maybeMsg{err: err}
-				return
 			}
 		}
 	}()
 
 	return ch, nil
+}
+
+func (resp *response) asTransformables(log *logp.Logger) []*transformable {
+	var ts []*transformable
+
+	convertAndAppend := func(m map[string]interface{}) {
+		tr := emptyTransformable()
+		tr.header = resp.header.Clone()
+		tr.url = resp.url
+		tr.body = common.MapStr(m).Clone()
+		ts = append(ts, tr)
+	}
+
+	switch tresp := resp.body.(type) {
+	case []interface{}:
+		for _, v := range tresp {
+			m, ok := v.(map[string]interface{})
+			if !ok {
+				log.Debugf("events must be JSON objects, but got %T: skipping", v)
+				continue
+			}
+			convertAndAppend(m)
+		}
+	case map[string]interface{}:
+		convertAndAppend(tresp)
+	default:
+		log.Debugf("response is not a valid JSON")
+	}
+
+	return ts
+}
+
+func (resp *response) templateValues() common.MapStr {
+	if resp == nil {
+		return common.MapStr{}
+	}
+	return common.MapStr{
+		"header":    resp.header.Clone(),
+		"page":      resp.page,
+		"url.value": resp.url.String(),
+		"params":    resp.url.Query(),
+		"body":      resp.body,
+	}
 }
