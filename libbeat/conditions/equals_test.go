@@ -59,7 +59,7 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 	})
 }
 
-func BenchmarkEquals_Check(b *testing.B) {
+func BenchmarkEqualsCheck(b *testing.B) {
 	e, err := NewEqualsCondition(map[string]interface{}{
 		"type":     "process",
 		"proc.pid": 305,
