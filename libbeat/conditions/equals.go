@@ -27,6 +27,8 @@ type equalsValue struct {
 	Int  uint64
 	Str  string
 	Bool bool
+
+	t interface{}
 }
 
 // Equals is a Condition for testing string equality.
@@ -39,19 +41,19 @@ func NewEqualsCondition(fields map[string]interface{}) (c Equals, err error) {
 	for field, value := range fields {
 		uintValue, err := ExtractInt(value)
 		if err == nil {
-			c[field] = equalsValue{Int: uintValue}
+			c[field] = equalsValue{Int: uintValue, t: uint64(0)}
 			continue
 		}
 
 		sValue, err := ExtractString(value)
 		if err == nil {
-			c[field] = equalsValue{Str: sValue}
+			c[field] = equalsValue{Str: sValue, t: ""}
 			continue
 		}
 
 		bValue, err := ExtractBool(value)
 		if err == nil {
-			c[field] = equalsValue{Bool: bValue}
+			c[field] = equalsValue{Bool: bValue, t: false}
 			continue
 		}
 
@@ -70,31 +72,36 @@ func (c Equals) Check(event ValuesMap) bool {
 			return false
 		}
 
-		intValue, err := ExtractInt(value)
-		if err == nil {
-			if intValue != equalValue.Int {
-				return false
+		switch equalValue.t.(type) {
+		case uint64:
+			intValue, err := ExtractInt(value)
+			if err == nil {
+				if intValue != equalValue.Int {
+					return false
+				}
+
+				continue
 			}
 
-			continue
-		}
+		case string:
+			sValue, err := ExtractString(value)
+			if err == nil {
+				if sValue != equalValue.Str {
+					return false
+				}
 
-		sValue, err := ExtractString(value)
-		if err == nil {
-			if sValue != equalValue.Str {
-				return false
+				continue
 			}
 
-			continue
-		}
+		case bool:
+			bValue, err := ExtractBool(value)
+			if err == nil {
+				if bValue != equalValue.Bool {
+					return false
+				}
 
-		bValue, err := ExtractBool(value)
-		if err == nil {
-			if bValue != equalValue.Bool {
-				return false
+				continue
 			}
-
-			continue
 		}
 
 		logp.L().Named(logName).Warnf("unexpected type %T in equals condition as it accepts only integers, strings, or booleans.", value)

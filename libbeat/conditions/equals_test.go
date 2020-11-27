@@ -58,3 +58,15 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 		}},
 	})
 }
+
+func BenchmarkEquals_Check(b *testing.B) {
+	e, err := NewEqualsCondition(map[string]interface{}{
+		"type":     "process",
+		"proc.pid": 305,
+		"final":    false,
+	})
+	assert.NoError(b, err)
+	for i := 0; i < b.N; i++ {
+		e.Check(secdTestEvent)
+	}
+}
