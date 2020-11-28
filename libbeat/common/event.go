@@ -44,6 +44,7 @@ type EventConverter interface {
 type GenericEventConverter struct {
 	log      *logp.Logger
 	keepNull bool
+	keys     []string
 }
 
 // NewGenericEventConverter creates an EventConverter with the given configuration options
@@ -51,6 +52,7 @@ func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 	return &GenericEventConverter{
 		log:      logp.NewLogger("event"),
 		keepNull: keepNull,
+		keys:     make([]string, 0, 10),
 	}
 }
 
@@ -59,8 +61,7 @@ func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 // Nil values in maps are dropped during the conversion. Any unsupported types
 // that are found in the MapStr are dropped and warnings are logged.
 func (e *GenericEventConverter) Convert(m MapStr) MapStr {
-	keys := make([]string, 0, 10)
-	event, errs := e.normalizeMap(m, keys...)
+	event, errs := e.normalizeMap(m, e.keys[:0]...)
 	if len(errs) > 0 {
 		e.log.Warnf("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
