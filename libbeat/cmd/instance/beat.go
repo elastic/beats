@@ -774,10 +774,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
-		kibanaConfig, err := initKibanaConfig(b.Config)
-		if err != nil {
-			return fmt.Errorf("error initKibanaConfig: %v", err)
-		}
+		kibanaConfig := InitKibanaConfig(b.Config)
 
 		client, err := kibana.NewKibanaClient(kibanaConfig)
 		if err != nil {
@@ -1041,7 +1038,7 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
 
-func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
+func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	var esConfig *common.Config
 	if beatConfig.Output.Name() == "elasticsearch" {
 		esConfig = beatConfig.Output.Config()
@@ -1064,7 +1061,7 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 			kibanaConfig.SetString("password", -1, password)
 		}
 	}
-	return kibanaConfig, nil
+	return kibanaConfig
 }
 
 func initPaths(cfg *common.Config) error {
