@@ -26,6 +26,8 @@ const agentInfoKey = "agent"
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
 
+const defaultAgentAckTokenFile = "action_ack_token.yml"
+
 type persistentAgentInfo struct {
 	ID string `json:"id" yaml:"id" config:"id"`
 }
@@ -43,6 +45,10 @@ func AgentConfigFile() string {
 // AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 func AgentActionStoreFile() string {
 	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
+}
+
+func AgentAckTokenFile() string {
+	return filepath.Join(paths.Home(), defaultAgentAckTokenFile)
 }
 
 func generateAgentID() (string, error) {
