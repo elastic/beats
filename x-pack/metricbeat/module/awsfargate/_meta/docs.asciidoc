@@ -56,7 +56,9 @@ As it was already mentioned running containers on ECS EC2 launches containers th
 One can monitor these containers by deploying Metricbeat on the corresponding EC2 instances with the
 Metricbeat Docker module enabled.
 
-In order to achieve this one will need to have access to these EC2 instances using ssh keys
+In order to achieve this one will need:
+
+. to ensure access to these EC2 instances using ssh keys
 coupled with EC2 instances (attach ssh keys on cluster creation using `Key pair` option)
-and enabling shh access for the instances with the
+. to enable shh access for the instances with the
 proper https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html[inbound rules].
