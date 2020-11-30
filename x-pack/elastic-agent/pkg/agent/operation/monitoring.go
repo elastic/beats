@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 )
 
 const (
@@ -427,10 +426,6 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 			endpoints[strings.ReplaceAll(a.Name(), "-", "_")] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
-
-	// add agent endpoint
-	agentEndpoint := beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS())
-	endpoints[agentName] = []string{agentEndpoint}
 
 	return endpoints
 }

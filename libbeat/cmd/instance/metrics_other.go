@@ -19,13 +19,13 @@
 // +build !freebsd !cgo
 // +build !linux,!windows
 
-package metrics
+package instance
 
 import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func SetupMetrics(name string) error {
+func setupMetrics(name string) error {
 	logp.Warn("Metrics not implemented for this OS.")
 	return nil
 }

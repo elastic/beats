@@ -17,7 +17,7 @@
 
 // +build darwin,cgo freebsd,cgo linux windows
 
-package metrics
+package instance
 
 import (
 	"fmt"
@@ -40,7 +40,7 @@ func init() {
 	systemMetrics = monitoring.Default.NewRegistry("system")
 }
 
-func SetupMetrics(name string) error {
+func setupMetrics(name string) error {
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
 
 	//if the beat name is longer than 15 characters, truncate it so we don't fail process checks later on

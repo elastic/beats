@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package instance
 
 import (
 	"time"
@@ -41,11 +41,6 @@ func init() {
 	if err != nil {
 		logp.Err("Error while generating ephemeral ID for Beat")
 	}
-}
-
-// EphemeralID returns generated EphemeralID
-func EphemeralID() uuid.UUID {
-	return ephemeralID
 }
 
 func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {

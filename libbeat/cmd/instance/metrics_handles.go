@@ -17,7 +17,7 @@
 
 // +build windows
 
-package metrics
+package instance
 
 import (
 	"github.com/elastic/beats/v7/libbeat/logp"
