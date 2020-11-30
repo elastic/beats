@@ -205,13 +205,13 @@ func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
 		configuredUserID = true
 	}
 	return &sourceIdentifier{
-		prefix:           inputPrefix,
+		prefix:           inputPrefix + "::",
 		configuredUserID: configuredUserID,
 	}
 }
 
 func (i *sourceIdentifier) ID(s Source) string {
-	return i.prefix + "::" + s.Name()
+	return i.prefix + s.Name()
 }
 
 func (i *sourceIdentifier) MatchesInput(id string) bool {
