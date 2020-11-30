@@ -62,12 +62,8 @@ func newManaged(
 	log *logger.Logger,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
-	}
-
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
@@ -238,6 +234,15 @@ func newManaged(
 		&handlerUpgrade{
 			upgrader: managedApplication.upgrader,
 			log:      log,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionSettings{},
+		&handlerSettings{
+			log:       log,
+			reexec:    reexec,
+			agentInfo: agentInfo,
 		},
 	)
 

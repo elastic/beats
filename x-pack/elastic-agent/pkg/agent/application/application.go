@@ -31,7 +31,7 @@ type upgraderControl interface {
 }
 
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, uc upgraderControl) (Application, error) {
+func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, uc upgraderControl, agentInfo *info.AgentInfo) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
@@ -44,7 +44,7 @@ func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, uc upg
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig, reexec, uc)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, uc, agentInfo)
 }
 
 func createApplication(
@@ -53,6 +53,7 @@ func createApplication(
 	rawConfig *config.Config,
 	reexec reexecManager,
 	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (Application, error) {
 	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
@@ -63,16 +64,16 @@ func createApplication(
 		return nil, err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, uc)
+		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, uc, agentInfo)
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, rawConfig, reexec)
+	return newManaged(ctx, log, rawConfig, reexec, agentInfo)
 }
 
-// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+// IsStandalone decides based on missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func IsStandalone(cfg *configuration.FleetAgentConfig) bool {
 	return cfg == nil || !cfg.Enabled
 }

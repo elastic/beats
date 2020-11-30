@@ -24,6 +24,9 @@ The module contains the following filesets:
 `activitylogs` ::
 Will retrieve azure activity logs. Control-plane events on Azure Resource Manager resources. Activity logs provide insight into the operations that were performed on resources in your subscription.
 
+`platformlogs` ::
+Will retrieve azure platform logs. Platform logs provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on.
+
 `signinlogs` ::
 Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities.
 
@@ -33,7 +36,8 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 [float]
 === Module configuration
 
-```
+[source,yaml]
+----
 - module: azure
   activitylogs:
     enabled: true
@@ -44,6 +48,16 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
       storage_account: ""
       storage_account_key: ""
       resource_manager_endpoint: ""
+
+   platformlogs:
+     enabled: false
+     var:
+       eventhub: ""
+       consumer_group: "$Default"
+       connection_string: ""
+       storage_account: ""
+       storage_account_key: ""
+       resource_manager_endpoint: ""
 
    auditlogs:
      enabled: false
@@ -65,7 +79,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
        storage_account_key: ""
        resource_manager_endpoint: ""
 
-```
+----
 
 
 `eventhub` ::
@@ -106,11 +120,6 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
-
-[float]
-=== Compatibility
-
-TODO: document with what versions of the software is this tested
 
 [float]
 === Dashboards

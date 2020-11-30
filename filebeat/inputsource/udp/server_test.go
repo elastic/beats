@@ -75,7 +75,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			conn, err := net.Dial("udp", s.Listener.LocalAddr().String())
+			conn, err := net.Dial("udp", s.localaddress)
 			if !assert.NoError(t, err) {
 				return
 			}
