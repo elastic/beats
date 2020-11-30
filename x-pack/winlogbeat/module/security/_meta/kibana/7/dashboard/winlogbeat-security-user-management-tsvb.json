@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Uses Simple Metric Visualizations",
+        "description": "User management activity with TSVB metrics.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -15,13 +15,15 @@
         },
         "optionsJSON": {
           "hidePanelTitles": false,
-          "useMargins": true
+          "useMargins": false
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 19,
+              "h": 7,
               "i": "1",
               "w": 17,
               "x": 0,
@@ -29,315 +31,268 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "title": "",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
             "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
+              "title": "Created Users [Winlogbeat Security]"
             },
-            "gridData": {
-              "h": 19,
-              "i": "2",
-              "w": 18,
-              "x": 17,
-              "y": 0
-            },
-            "panelIndex": "2",
-            "panelRefName": "panel_1",
-            "title": "User Management Actions [Winlogbeat Security]",
-            "version": "7.3.0"
-          },
-          {
-            "embeddableConfig": {},
             "gridData": {
               "h": 16,
               "i": "3",
               "w": 9,
               "x": 0,
-              "y": 44
+              "y": 55
             },
             "panelIndex": "3",
-            "panelRefName": "panel_2",
+            "panelRefName": "panel_1",
             "title": "Created Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 19,
-              "i": "4",
-              "w": 13,
-              "x": 35,
-              "y": 0
+            "embeddableConfig": {
+              "title": "Enabled Users [Winlogbeat Security]"
             },
-            "panelIndex": "4",
-            "panelRefName": "panel_3",
-            "title": "Event Codes [Winlogbeat Security]",
-            "version": "7.3.0"
-          },
-          {
-            "embeddableConfig": {},
             "gridData": {
               "h": 16,
               "i": "5",
               "w": 9,
               "x": 9,
-              "y": 44
+              "y": 55
             },
             "panelIndex": "5",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_2",
             "title": "Enabled Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Disabled Users [Winlogbeat Security]"
+            },
             "gridData": {
               "h": 16,
               "i": "6",
               "w": 9,
               "x": 0,
-              "y": 66
+              "y": 80
             },
             "panelIndex": "6",
-            "panelRefName": "panel_5",
+            "panelRefName": "panel_3",
             "title": "Disabled Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Deleted Users [Winlogbeat Security]"
+            },
             "gridData": {
               "h": 16,
               "i": "7",
               "w": 9,
               "x": 18,
-              "y": 44
+              "y": 55
             },
             "panelIndex": "7",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_4",
             "title": "Deleted Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
             "embeddableConfig": {
-              "vis": {
-                "defaultColors": {
-                  "0 - 4": "rgb(247,252,245)",
-                  "12 - 16": "rgb(35,139,69)",
-                  "4 - 8": "rgb(199,233,192)",
-                  "8 - 12": "rgb(116,196,118)"
-                },
-                "legendOpen": false
-              }
+              "title": "Passwords Changes [Winlogbeat Security]"
             },
-            "gridData": {
-              "h": 20,
-              "i": "8",
-              "w": 48,
-              "x": 0,
-              "y": 19
-            },
-            "panelIndex": "8",
-            "panelRefName": "panel_7",
-            "title": "Actions performed over Users [Winlogbeat Security]",
-            "version": "7.3.0"
-          },
-          {
-            "embeddableConfig": {},
             "gridData": {
               "h": 16,
               "i": "9",
               "w": 9,
               "x": 18,
-              "y": 66
+              "y": 80
             },
             "panelIndex": "9",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_5",
             "title": "Passwords Changes [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 5,
+              "h": 9,
               "i": "10",
               "w": 9,
               "x": 0,
-              "y": 39
+              "y": 46
             },
             "panelIndex": "10",
-            "panelRefName": "panel_9",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_6",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 5,
+              "h": 9,
               "i": "11",
               "w": 9,
               "x": 9,
-              "y": 39
+              "y": 46
             },
             "panelIndex": "11",
-            "panelRefName": "panel_10",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_7",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 5,
+              "h": 9,
               "i": "12",
               "w": 9,
               "x": 18,
-              "y": 39
+              "y": 46
             },
             "panelIndex": "12",
-            "panelRefName": "panel_11",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_8",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "13",
               "w": 9,
               "x": 0,
-              "y": 60
+              "y": 71
             },
             "panelIndex": "13",
-            "panelRefName": "panel_12",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_9",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "14",
               "w": 9,
               "x": 18,
-              "y": 60
+              "y": 71
             },
             "panelIndex": "14",
-            "panelRefName": "panel_13",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_10",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Unlocked Users [Winlogbeat Security]"
+            },
             "gridData": {
               "h": 16,
               "i": "15",
               "w": 9,
               "x": 9,
-              "y": 66
+              "y": 80
             },
             "panelIndex": "15",
-            "panelRefName": "panel_14",
+            "panelRefName": "panel_11",
             "title": "Unlocked Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Users Changes [Winlogbeat Security]"
+            },
             "gridData": {
               "h": 16,
               "i": "16",
               "w": 9,
               "x": 18,
-              "y": 88
+              "y": 105
             },
             "panelIndex": "16",
-            "panelRefName": "panel_15",
+            "panelRefName": "panel_12",
             "title": "Users Changes [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "17",
               "w": 9,
               "x": 0,
-              "y": 82
+              "y": 96
             },
             "panelIndex": "17",
-            "panelRefName": "panel_16",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_13",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "18",
               "w": 9,
               "x": 9,
-              "y": 60
+              "y": 71
             },
             "panelIndex": "18",
-            "panelRefName": "panel_17",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_14",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "19",
               "w": 9,
               "x": 18,
-              "y": 82
+              "y": 96
             },
             "panelIndex": "19",
-            "panelRefName": "panel_18",
-            "title": "",
-            "version": "7.3.0"
+            "panelRefName": "panel_15",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Locked-out Users [Winlogbeat Security]"
+            },
             "gridData": {
               "h": 16,
               "i": "20",
               "w": 9,
               "x": 0,
-              "y": 88
+              "y": 105
             },
             "panelIndex": "20",
-            "panelRefName": "panel_19",
+            "panelRefName": "panel_16",
             "title": "Locked-out Users [Winlogbeat Security]",
-            "version": "7.3.0"
+            "version": "7.7.0"
           },
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 27,
-              "i": "21",
-              "w": 20,
-              "x": 27,
-              "y": 39
-            },
-            "panelIndex": "21",
-            "panelRefName": "panel_20",
-            "title": "User Management Actions Distributions over Time [Winlogbeat Security]",
-            "version": "7.3.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 38,
+              "h": 48,
               "i": "22",
               "w": 21,
               "x": 27,
-              "y": 66
+              "y": 73
             },
             "panelIndex": "22",
-            "panelRefName": "panel_21",
-            "version": "7.3.1"
+            "panelRefName": "panel_17",
+            "version": "7.7.0"
           },
           {
             "embeddableConfig": {},
@@ -346,25 +301,26 @@
               "i": "23",
               "w": 48,
               "x": 0,
-              "y": 104
+              "y": 121
             },
             "panelIndex": "23",
-            "panelRefName": "panel_22",
-            "version": "7.3.1"
+            "panelRefName": "panel_18",
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": ""
+            },
             "gridData": {
-              "h": 6,
+              "h": 9,
               "i": "24",
               "w": 9,
               "x": 9,
-              "y": 82
+              "y": 96
             },
             "panelIndex": "24",
-            "panelRefName": "panel_23",
-            "title": "",
-            "version": "7.3.1"
+            "panelRefName": "panel_19",
+            "version": "7.7.0"
           },
           {
             "embeddableConfig": {},
@@ -373,11 +329,137 @@
               "i": "25",
               "w": 9,
               "x": 9,
-              "y": 88
+              "y": 105
             },
             "panelIndex": "25",
+            "panelRefName": "panel_20",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": ""
+            },
+            "gridData": {
+              "h": 7,
+              "i": "20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+              "w": 31,
+              "x": 17,
+              "y": 0
+            },
+            "panelIndex": "20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+            "panelRefName": "panel_21",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "colors": {
+                "added-user-account": "#0A437C",
+                "deleted-user-account": "#82B5D8",
+                "enabled-user-account": "#0A50A1",
+                "modified-user-account": "#052B51",
+                "renamed-user-account": "#1F78C1",
+                "reset-password": "#5195CE"
+              },
+              "vis": {
+                "colors": {
+                  "added-user-account": "#0A437C",
+                  "deleted-user-account": "#82B5D8",
+                  "disabled-user-account": "#BADFF4",
+                  "enabled-user-account": "#0A50A1",
+                  "modified-user-account": "#052B51",
+                  "renamed-user-account": "#1F78C1",
+                  "reset-password": "#5195CE"
+                }
+              }
+            },
+            "gridData": {
+              "h": 19,
+              "i": "8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+              "w": 18,
+              "x": 0,
+              "y": 7
+            },
+            "panelIndex": "8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+            "panelRefName": "panel_22",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
+              "i": "18cc78ac-3f77-4f54-b351-cb94873cae3f",
+              "w": 14,
+              "x": 18,
+              "y": 7
+            },
+            "panelIndex": "18cc78ac-3f77-4f54-b351-cb94873cae3f",
+            "panelRefName": "panel_23",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
+              "i": "75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
+              "w": 16,
+              "x": 32,
+              "y": 7
+            },
+            "panelIndex": "75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
             "panelRefName": "panel_24",
-            "version": "7.3.1"
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Actions performed over Users [Winlogbeat Security]",
+              "vis": null
+            },
+            "gridData": {
+              "h": 20,
+              "i": "f443b5b0-ada7-426f-ae2f-46573f94f24f",
+              "w": 48,
+              "x": 0,
+              "y": 26
+            },
+            "panelIndex": "f443b5b0-ada7-426f-ae2f-46573f94f24f",
+            "panelRefName": "panel_25",
+            "title": "Actions performed over Users [Winlogbeat Security]",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "colors": {
+                "added-user-account": "#0A437C",
+                "deleted-user-account": "#82B5D8",
+                "disabled-user-account": "#BADFF4",
+                "enabled-user-account": "#0A50A1",
+                "modified-user-account": "#2F575E",
+                "renamed-user-account": "#1F78C1",
+                "reset-password": "#5195CE"
+              },
+              "vis": {
+                "colors": {
+                  "added-user-account": "#0A437C",
+                  "deleted-user-account": "#82B5D8",
+                  "disabled-user-account": "#BADFF4",
+                  "enabled-user-account": "#0A50A1",
+                  "modified-user-account": "#2F575E",
+                  "renamed-user-account": "#1F78C1",
+                  "reset-password": "#5195CE",
+                  "unlocked-user-account": "#0A437C"
+                }
+              }
+            },
+            "gridData": {
+              "h": 27,
+              "i": "820c0311-d378-49dc-a614-e0fed2254603",
+              "w": 21,
+              "x": 27,
+              "y": 46
+            },
+            "panelIndex": "820c0311-d378-49dc-a614-e0fed2254603",
+            "panelRefName": "panel_26",
+            "version": "7.7.0"
           }
         ],
         "timeRestore": false,
@@ -395,129 +477,139 @@
           "type": "visualization"
         },
         {
-          "id": "833e0110-b9ec-11e9-b6a2-c9b4015c4baf",
+          "id": "5e7f0ed0-bcd2-11e9-b6a2-c9b4015c4baf",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "5e7f0ed0-bcd2-11e9-b6a2-c9b4015c4baf",
+          "id": "0620c3d0-bcd4-11e9-b6a2-c9b4015c4baf",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "b2cecf10-bcd3-11e9-b6a2-c9b4015c4baf",
+          "id": "8f20c950-bcd4-11e9-b6a2-c9b4015c4baf",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "0620c3d0-bcd4-11e9-b6a2-c9b4015c4baf",
+          "id": "ee0319a0-bcd4-11e9-b6a2-c9b4015c4baf",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "8f20c950-bcd4-11e9-b6a2-c9b4015c4baf",
+          "id": "da5ffe40-bcd9-11e9-b6a2-c9b4015c4baf",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "ee0319a0-bcd4-11e9-b6a2-c9b4015c4baf",
+          "id": "102efd20-bcdd-11e9-b6a2-c9b4015c4baf",
           "name": "panel_6",
           "type": "visualization"
         },
         {
-          "id": "dce77e60-bcd7-11e9-b6a2-c9b4015c4baf",
+          "id": "855957d0-bcdd-11e9-b6a2-c9b4015c4baf",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "da5ffe40-bcd9-11e9-b6a2-c9b4015c4baf",
+          "id": "c359b020-bcdd-11e9-b6a2-c9b4015c4baf",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "102efd20-bcdd-11e9-b6a2-c9b4015c4baf",
+          "id": "0cb2d940-bcde-11e9-b6a2-c9b4015c4baf",
           "name": "panel_9",
           "type": "visualization"
         },
         {
-          "id": "855957d0-bcdd-11e9-b6a2-c9b4015c4baf",
+          "id": "568a8130-bcde-11e9-b6a2-c9b4015c4baf",
           "name": "panel_10",
           "type": "visualization"
         },
         {
-          "id": "c359b020-bcdd-11e9-b6a2-c9b4015c4baf",
+          "id": "da2110c0-bcea-11e9-b6a2-c9b4015c4baf",
           "name": "panel_11",
           "type": "visualization"
         },
         {
-          "id": "0cb2d940-bcde-11e9-b6a2-c9b4015c4baf",
+          "id": "abf96c10-bcea-11e9-b6a2-c9b4015c4baf",
           "name": "panel_12",
           "type": "visualization"
         },
         {
-          "id": "568a8130-bcde-11e9-b6a2-c9b4015c4baf",
+          "id": "84502430-bce8-11e9-b6a2-c9b4015c4baf",
           "name": "panel_13",
           "type": "visualization"
         },
         {
-          "id": "da2110c0-bcea-11e9-b6a2-c9b4015c4baf",
+          "id": "ab6f8d80-bce8-11e9-b6a2-c9b4015c4baf",
           "name": "panel_14",
           "type": "visualization"
         },
         {
-          "id": "abf96c10-bcea-11e9-b6a2-c9b4015c4baf",
+          "id": "5d92b100-bce8-11e9-b6a2-c9b4015c4baf",
           "name": "panel_15",
           "type": "visualization"
         },
         {
-          "id": "84502430-bce8-11e9-b6a2-c9b4015c4baf",
+          "id": "4ac8f5f0-bcfe-11e9-b6a2-c9b4015c4baf",
           "name": "panel_16",
           "type": "visualization"
         },
         {
-          "id": "ab6f8d80-bce8-11e9-b6a2-c9b4015c4baf",
-          "name": "panel_17",
-          "type": "visualization"
-        },
-        {
-          "id": "5d92b100-bce8-11e9-b6a2-c9b4015c4baf",
-          "name": "panel_18",
-          "type": "visualization"
-        },
-        {
-          "id": "4ac8f5f0-bcfe-11e9-b6a2-c9b4015c4baf",
-          "name": "panel_19",
-          "type": "visualization"
-        },
-        {
-          "id": "8f723a10-bd97-11e9-b9c5-fddc96658612",
-          "name": "panel_20",
-          "type": "visualization"
-        },
-        {
           "id": "7e178c80-fee1-11e9-8405-516218e3d268",
-          "name": "panel_21",
+          "name": "panel_17",
           "type": "search"
         },
         {
           "id": "324686c0-fefb-11e9-8405-516218e3d268",
-          "name": "panel_22",
+          "name": "panel_18",
           "type": "search"
         },
         {
           "id": "5e19ff80-231c-11ea-8405-516218e3d268",
-          "name": "panel_23",
+          "name": "panel_19",
           "type": "visualization"
         },
         {
           "id": "fa876300-231a-11ea-8405-516218e3d268",
+          "name": "panel_20",
+          "type": "visualization"
+        },
+        {
+          "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+          "name": "panel_21",
+          "type": "visualization"
+        },
+        {
+          "id": "26877510-9b72-11ea-87e4-49f31ec44891",
+          "name": "panel_22",
+          "type": "visualization"
+        },
+        {
+          "id": "5c9ee410-9b74-11ea-87e4-49f31ec44891",
+          "name": "panel_23",
+          "type": "visualization"
+        },
+        {
+          "id": "117f5a30-9b71-11ea-87e4-49f31ec44891",
           "name": "panel_24",
+          "type": "visualization"
+        },
+        {
+          "id": "aa31c9d0-9b75-11ea-87e4-49f31ec44891",
+          "name": "panel_25",
+          "type": "visualization"
+        },
+        {
+          "id": "caf4d2b0-9b76-11ea-87e4-49f31ec44891",
+          "name": "panel_26",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzcwLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzg2LDFd"
     },
     {
       "attributes": {
@@ -538,7 +630,7 @@
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "# **User Management Events**\n\n#### This dashboard shows information about User Management Events collected by winlogbeat\n#\n#\n#\nEvent | Description\n-- | --\n4720 | A user account was created\n4722 | A user account was enabled\n4723 | An attempt was made to change an account's password\n4724 | An attempt was made to reset an account's password\n4725 | An user account was disabled\n4726 | An user account was deleted\n4738 | An user account was changed\n4740 | An user account was locked out\n4767 | An account was unlocked\n4781 | The name of an account was changed",
+            "markdown": "# **User Management Events**\n\n#### This dashboard shows information about User Management Events collected by winlogbeat\n",
             "openLinksInNewTab": false
           },
           "title": "User  Management Events - Description [Winlogbeat Security]",
@@ -547,236 +639,12 @@
       },
       "id": "2dc6b820-b9e8-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzcxLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "4720",
-                    "4722",
-                    "4723",
-                    "4724",
-                    "4725",
-                    "4726",
-                    "4738",
-                    "4740",
-                    "4765",
-                    "4766",
-                    "4767",
-                    "4780",
-                    "4781",
-                    "4794",
-                    "5376",
-                    "5377"
-                  ],
-                  "type": "phrases",
-                  "value": "4720, 4722, 4723, 4724, 4725, 4726, 4738, 4740, 4765, 4766, 4767, 4780, 4781, 4794, 5376, 5377"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "4720"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4722"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4723"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4724"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4725"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4726"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4738"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4740"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4765"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4766"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4767"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4780"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4781"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4794"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5376"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5377"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "User Management Events - Event Actions - Donut [Winlogbeat Security]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.action",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "dimensions": {
-              "buckets": [
-                {
-                  "accessor": 0,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                }
-              ],
-              "metric": {
-                "accessor": 1,
-                "aggType": "count",
-                "format": {
-                  "id": "number"
-                },
-                "params": {}
-              }
-            },
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "User Management Events - Event Actions - Donut [Winlogbeat Security]",
-          "type": "pie"
-        }
-      },
-      "id": "833e0110-b9ec-11e9-b6a2-c9b4015c4baf",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzcyLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzg3LDFd"
     },
     {
       "attributes": {
@@ -960,7 +828,7 @@
       },
       "id": "5e7f0ed0-bcd2-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -975,272 +843,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzczLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "4720",
-                    "4722",
-                    "4723",
-                    "4724",
-                    "4725",
-                    "4726",
-                    "4738",
-                    "4740",
-                    "4765",
-                    "4766",
-                    "4767",
-                    "4780",
-                    "4781",
-                    "4794",
-                    "5376",
-                    "5377"
-                  ],
-                  "type": "phrases",
-                  "value": "4720, 4722, 4723, 4724, 4725, 4726, 4738, 4740, 4765, 4766, 4767, 4780, 4781, 4794, 5376, 5377"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "4720"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4722"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4723"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4724"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4725"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4726"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4738"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4740"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4765"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4766"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4767"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4780"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4781"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4794"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5376"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5377"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "User Management Events - Event Actions - Table [Winlogbeat Security]",
-        "uiStateJSON": {
-          "vis": {
-            "params": {
-              "sort": {
-                "columnIndex": null,
-                "direction": null
-              }
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Event Short Description",
-                "field": "event.action",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Event Code",
-                "field": "event.code",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "dimensions": {
-              "buckets": [
-                {
-                  "accessor": 0,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                },
-                {
-                  "accessor": 1,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                }
-              ],
-              "metrics": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "params": {}
-                }
-              ]
-            },
-            "perPage": 10,
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showTotal": false,
-            "sort": {
-              "columnIndex": null,
-              "direction": null
-            },
-            "totalFunc": "sum"
-          },
-          "title": "User Management Events - Event Actions - Table [Winlogbeat Security]",
-          "type": "table"
-        }
-      },
-      "id": "b2cecf10-bcd3-11e9-b6a2-c9b4015c4baf",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc0LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzg4LDFd"
     },
     {
       "attributes": {
@@ -1424,7 +1028,7 @@
       },
       "id": "0620c3d0-bcd4-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -1439,8 +1043,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc1LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzg5LDFd"
     },
     {
       "attributes": {
@@ -1624,7 +1228,7 @@
       },
       "id": "8f20c950-bcd4-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -1639,8 +1243,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc2LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzkwLDFd"
     },
     {
       "attributes": {
@@ -1824,7 +1428,7 @@
       },
       "id": "ee0319a0-bcd4-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -1839,292 +1443,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc3LDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "4720",
-                    "4722",
-                    "4723",
-                    "4724",
-                    "4725",
-                    "4726",
-                    "4738",
-                    "4740",
-                    "4765",
-                    "4766",
-                    "4767",
-                    "4780",
-                    "4781",
-                    "4794",
-                    "5376",
-                    "5377"
-                  ],
-                  "type": "phrases",
-                  "value": "4720, 4722, 4723, 4724, 4725, 4726, 4738, 4740, 4765, 4766, 4767, 4780, 4781, 4794, 5376, 5377"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "4720"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4722"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4723"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4724"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4725"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4726"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4738"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4740"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4765"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4766"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4767"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4780"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4781"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4794"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5376"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "5377"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "User Management Events - Affected Users vs Actions - Heatmap [Winlogbeat Security]",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 14": "rgb(247,251,255)",
-              "14 - 28": "rgb(198,219,239)",
-              "28 - 42": "rgb(107,174,214)",
-              "42 - 55": "rgb(33,113,181)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Target User",
-                "field": "winlog.event_data.TargetUserName",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 15
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Operation",
-                "field": "event.action",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "colorSchema": "Blues",
-            "colorsNumber": 4,
-            "colorsRange": [],
-            "dimensions": {
-              "series": [
-                {
-                  "accessor": 1,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                }
-              ],
-              "x": {
-                "accessor": 0,
-                "aggType": "terms",
-                "format": {
-                  "id": "terms",
-                  "params": {
-                    "id": "string",
-                    "missingBucketLabel": "Missing",
-                    "otherBucketLabel": "Other"
-                  }
-                },
-                "params": {}
-              },
-              "y": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "params": {}
-                }
-              ]
-            },
-            "enableHover": false,
-            "invertColors": false,
-            "legendPosition": "right",
-            "percentageMode": false,
-            "setColorRange": false,
-            "times": [],
-            "type": "heatmap",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "color": "black",
-                  "overwriteColor": false,
-                  "rotate": 0,
-                  "show": true
-                },
-                "scale": {
-                  "defaultYExtents": false,
-                  "type": "linear"
-                },
-                "show": false,
-                "type": "value"
-              }
-            ]
-          },
-          "title": "User Management Events - Affected Users vs Actions - Heatmap [Winlogbeat Security]",
-          "type": "heatmap"
-        }
-      },
-      "id": "dce77e60-bcd7-11e9-b6a2-c9b4015c4baf",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc4LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzkxLDFd"
     },
     {
       "attributes": {
@@ -2318,7 +1638,7 @@
       },
       "id": "da5ffe40-bcd9-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2333,8 +1653,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzc5LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzkyLDFd"
     },
     {
       "attributes": {
@@ -2437,7 +1757,7 @@
       },
       "id": "102efd20-bcdd-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2452,8 +1772,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzgwLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzkzLDFd"
     },
     {
       "attributes": {
@@ -2557,7 +1877,7 @@
       },
       "id": "855957d0-bcdd-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2572,8 +1892,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzgxLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk0LDFd"
     },
     {
       "attributes": {
@@ -2676,7 +1996,7 @@
       },
       "id": "c359b020-bcdd-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2691,8 +2011,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzgyLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk1LDFd"
     },
     {
       "attributes": {
@@ -2796,7 +2116,7 @@
       },
       "id": "0cb2d940-bcde-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2811,8 +2131,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzgzLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk2LDFd"
     },
     {
       "attributes": {
@@ -2925,7 +2245,7 @@
       },
       "id": "568a8130-bcde-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -2940,8 +2260,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg0LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk3LDFd"
     },
     {
       "attributes": {
@@ -3125,7 +2445,7 @@
       },
       "id": "da2110c0-bcea-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3140,8 +2460,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg1LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk4LDFd"
     },
     {
       "attributes": {
@@ -3325,7 +2645,7 @@
       },
       "id": "abf96c10-bcea-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3340,8 +2660,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg2LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "Wzk5LDFd"
     },
     {
       "attributes": {
@@ -3448,7 +2768,7 @@
       },
       "id": "84502430-bce8-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3463,8 +2783,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg3LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwMCwxXQ=="
     },
     {
       "attributes": {
@@ -3571,7 +2891,7 @@
       },
       "id": "ab6f8d80-bce8-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3586,8 +2906,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg4LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwMSwxXQ=="
     },
     {
       "attributes": {
@@ -3694,7 +3014,7 @@
       },
       "id": "5d92b100-bce8-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3709,8 +3029,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzg5LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwMiwxXQ=="
     },
     {
       "attributes": {
@@ -3894,7 +3214,7 @@
       },
       "id": "4ac8f5f0-bcfe-11e9-b6a2-c9b4015c4baf",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -3909,12 +3229,104 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzkwLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwMywxXQ=="
     },
     {
       "attributes": {
+        "columns": [
+          "user.name",
+          "source.domain",
+          "source.ip",
+          "winlog.logon.id",
+          "winlog.logon.type"
+        ],
         "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4624"
+                  ],
+                  "type": "phrases",
+                  "value": "4624"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4624"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Logon Details [Winlogbeat Security]",
+        "version": 1
+      },
+      "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2020-06-04T16:26:27.206Z",
+      "version": "WzE0MywxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "event.action",
+          "winlog.event_data.TargetUserName",
+          "user.domain",
+          "user.name",
+          "winlog.event_data.SubjectDomainName",
+          "winlog.logon.id",
+          "related.user"
+        ],
+        "description": "",
+        "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [
@@ -4008,374 +3420,6 @@
                 }
               }
             ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Event Distribution in time [Winlogbeat Security]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "now-45d",
-                  "to": "now"
-                },
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "event.action",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "dimensions": {
-              "series": [
-                {
-                  "accessor": 1,
-                  "aggType": "filters",
-                  "format": {},
-                  "params": {}
-                }
-              ],
-              "x": {
-                "accessor": 0,
-                "aggType": "date_histogram",
-                "format": {
-                  "id": "date",
-                  "params": {
-                    "pattern": "YYYY-MM-DD HH:mm"
-                  }
-                },
-                "params": {
-                  "bounds": {
-                    "max": "2019-11-04T14:10:39.628Z",
-                    "min": "2019-09-20T13:10:39.628Z"
-                  },
-                  "date": true,
-                  "format": "YYYY-MM-DD HH:mm",
-                  "interval": "PT12H"
-                }
-              },
-              "y": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "params": {}
-                }
-              ]
-            },
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "bottom",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": "true",
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Event Distribution in time [Winlogbeat Security]",
-          "type": "histogram"
-        }
-      },
-      "id": "8f723a10-bd97-11e9-b9c5-fddc96658612",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzkxLDFd"
-    },
-    {
-      "attributes": {
-        "columns": [
-          "user.name",
-          "source.domain",
-          "source.ip",
-          "winlog.logon.id",
-          "winlog.logon.type"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "4624"
-                  ],
-                  "type": "phrases",
-                  "value": "4624"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "4624"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "Logon Details [Winlogbeat Security]",
-        "version": 1
-      },
-      "id": "7e178c80-fee1-11e9-8405-516218e3d268",
-      "migrationVersion": {
-        "search": "7.4.0"
-      },
-      "references": [
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "winlogbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzkyLDFd"
-    },
-    {
-      "attributes": {
-        "columns": [
-          "event.action",
-          "winlog.event_data.TargetUserName",
-          "user.domain",
-          "winlog.event_data.SubjectUserName",
-          "winlog.event_data.SubjectDomainName",
-          "winlog.logon.id",
-          "related.user"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "4720",
-                    "4722",
-                    "4723",
-                    "4724",
-                    "4725",
-                    "4726",
-                    "4738",
-                    "4740",
-                    "4767",
-                    "4781"
-                  ],
-                  "type": "phrases",
-                  "value": "4720, 4722, 4723, 4724, 4725, 4726, 4738, 4740, 4767, 4781"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "4720"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4722"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4723"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4724"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4725"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4726"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4738"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4740"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4767"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "4781"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
             "highlightAll": true,
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
@@ -4411,8 +3455,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "WzkzLDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwNSwxXQ=="
     },
     {
       "attributes": {
@@ -4519,7 +3563,7 @@
       },
       "id": "5e19ff80-231c-11ea-8405-516218e3d268",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -4534,8 +3578,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzk0LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwNiwxXQ=="
     },
     {
       "attributes": {
@@ -4719,7 +3763,7 @@
       },
       "id": "fa876300-231a-11ea-8405-516218e3d268",
       "migrationVersion": {
-        "visualization": "7.4.2"
+        "visualization": "7.7.0"
       },
       "references": [
         {
@@ -4734,9 +3778,552 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-02-04T20:39:02.784Z",
-      "version": "Wzk1LDFd"
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwNywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Dashboard links  - Simple [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 12,
+            "markdown": "[Winlogbeat General ECS Dashboard](#/dashboard/Winlogbeat-Dashboard-ecs) | [User Logon Information](#/dashboard/035846a0-a249-11e9-a422-d144027429da?) | [Logon failed and Account Lockout](#/dashboard/f49f3170-9ffc-11ea-87e4-49f31ec44891)  | [User Management Events](#/dashboard/8223bed0-b9e9-11e9-b6a2-c9b4015c4baf) | [Group Management Events](#/dashboard/01c54730-fee6-11e9-8405-516218e3d268)",
+            "openLinksInNewTab": false
+          },
+          "title": "Dashboard links  - Simple [Winlogbeat Security]",
+          "type": "markdown"
+        }
+      },
+      "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:29.252Z",
+      "version": "WzE3NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "User Management Actions [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 15
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": false,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "User Management Actions [Winlogbeat Security]",
+          "type": "pie"
+        }
+      },
+      "id": "26877510-9b72-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "324686c0-fefb-11e9-8405-516218e3d268",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzEwOSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "User Event Actions - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "event.action",
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 25
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "event.code",
+                "field": "event.code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "User Event Actions - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "5c9ee410-9b74-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "324686c0-fefb-11e9-8405-516218e3d268",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzExMCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Target Users [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "winlog.event_data.TargetUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear",
+            "showLabel": false
+          },
+          "title": "Target Users [Winlogbeat Security]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "117f5a30-9b71-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "324686c0-fefb-11e9-8405-516218e3d268",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzExMSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "User Management Events - Affected Users vs Actions - Heatmap [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Target User",
+                "field": "winlog.event_data.TargetUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "colorSchema": "Blues",
+            "colorsNumber": 4,
+            "colorsRange": [],
+            "enableHover": false,
+            "invertColors": false,
+            "legendPosition": "right",
+            "percentageMode": false,
+            "setColorRange": false,
+            "times": [],
+            "type": "heatmap",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "color": "black",
+                  "overwriteColor": false,
+                  "rotate": 0,
+                  "show": true
+                },
+                "scale": {
+                  "defaultYExtents": false,
+                  "type": "linear"
+                },
+                "show": false,
+                "type": "value"
+              }
+            ]
+          },
+          "title": "User Management Events - Affected Users vs Actions - Heatmap [Winlogbeat Security]",
+          "type": "heatmap"
+        }
+      },
+      "id": "aa31c9d0-9b75-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "324686c0-fefb-11e9-8405-516218e3d268",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzExMiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Event Distribution in time [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-7d",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 15
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {
+              "show": false
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Event Distribution in time [Winlogbeat Security]",
+          "type": "histogram"
+        }
+      },
+      "id": "caf4d2b0-9b76-11ea-87e4-49f31ec44891",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "324686c0-fefb-11e9-8405-516218e3d268",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-06-04T16:26:25.228Z",
+      "version": "WzExMywxXQ=="
     }
   ],
-  "version": "7.5.2"
+  "version": "7.7.0"
 }
