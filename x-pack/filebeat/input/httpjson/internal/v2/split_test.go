@@ -19,8 +19,8 @@ func TestSplit(t *testing.T) {
 	cases := []struct {
 		name             string
 		config           *splitConfig
-		ctx              transformContext
-		resp             *transformable
+		ctx              *transformContext
+		resp             transformable
 		expectedMessages []common.MapStr
 		expectedErr      error
 	}{
@@ -37,8 +37,8 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"this": "is kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -104,8 +104,8 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"this": "is not kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -160,8 +160,8 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"this": "is not kept",
 					"alerts": []interface{}{
 						map[string]interface{}{
@@ -206,8 +206,8 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
@@ -246,7 +246,7 @@ func TestSplit(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "A nested array with an empty nested array in an object published and returns error",
+			name: "A nested array with an empty nested array in an object publishes without the key",
 			config: &splitConfig{
 				Target: "body.response",
 				Type:   "array",
@@ -256,13 +256,12 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"response": []interface{}{
 						map[string]interface{}{
 							"Event": map[string]interface{}{
-								"timestamp":  "1606324417",
-								"Attributes": []interface{}{},
+								"timestamp": "1606324417",
 							},
 						},
 					},
@@ -271,12 +270,10 @@ func TestSplit(t *testing.T) {
 			expectedMessages: []common.MapStr{
 				{
 					"Event": common.MapStr{
-						"timestamp":  "1606324417",
-						"Attributes": common.MapStr{},
+						"timestamp": "1606324417",
 					},
 				},
 			},
-			expectedErr: errEmptyField,
 		},
 		{
 			name: "First level split skips publish if no events and keep_parent: false",
@@ -289,13 +286,55 @@ func TestSplit(t *testing.T) {
 				},
 			},
 			ctx: emptyTransformContext(),
-			resp: &transformable{
-				body: common.MapStr{
+			resp: transformable{
+				"body": common.MapStr{
 					"response": []interface{}{},
 				},
 			},
-			expectedMessages: []common.MapStr{},
-			expectedErr:      errEmptyTopField,
+			expectedMessages: []common.MapStr{
+				{"response": []interface{}{}},
+			},
+			expectedErr: errEmptyField,
+		},
+		{
+			name: "Changes must be local to parent when nested splits",
+			config: &splitConfig{
+				Target: "body.items",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:     "body.splitHere.splitMore",
+					Type:       "array",
+					KeepParent: true,
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"@timestamp":    "1234567890",
+					"nextPageToken": "tok",
+					"items": []interface{}{
+						common.MapStr{"foo": "bar"},
+						common.MapStr{
+							"baz": "buzz",
+							"splitHere": common.MapStr{
+								"splitMore": []interface{}{
+									common.MapStr{
+										"deepest1": "data",
+									},
+									common.MapStr{
+										"deepest2": "data",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{"foo": "bar"},
+				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest1": "data"}}},
+				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest2": "data"}}},
+			},
 		},
 	}
 

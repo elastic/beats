@@ -101,8 +101,8 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 		return 0, nil
 	}
 
-	tr := emptyTransformable()
-	tr.header = resp.Header
+	tr := transformable{}
+	tr.setHeader(resp.Header)
 
 	remaining := r.remaining.Execute(emptyTransformContext(), tr, nil, r.log)
 	if remaining == "" {
@@ -132,7 +132,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 		return 0, fmt.Errorf("failed to parse rate-limit reset value: %w", err)
 	}
 
-	if timeNow().Sub(time.Unix(epoch, 0)) > 0 {
+	if timeNow().Unix() > epoch {
 		return 0, nil
 	}
 

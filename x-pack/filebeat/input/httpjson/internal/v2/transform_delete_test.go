@@ -129,40 +129,40 @@ func TestNewDelete(t *testing.T) {
 func TestDeleteFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx transformContext, transformable *transformable, key string) error
+		tfunc       func(ctx transformContext, transformable transformable, key string) error
 		paramCtx    transformContext
-		paramTr     *transformable
+		paramTr     transformable
 		paramKey    string
-		expectedTr  *transformable
+		expectedTr  transformable
 		expectedErr error
 	}{
 		{
 			name:        "deleteBody",
 			tfunc:       deleteBody,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{body: common.MapStr{"a_key": "a_value"}},
+			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
 			paramKey:    "a_key",
-			expectedTr:  &transformable{body: common.MapStr{}},
+			expectedTr:  transformable{"body": common.MapStr{}},
 			expectedErr: nil,
 		},
 		{
 			name:     "deleteHeader",
 			tfunc:    deleteHeader,
 			paramCtx: transformContext{},
-			paramTr: &transformable{header: http.Header{
+			paramTr: transformable{"header": http.Header{
 				"A_key": []string{"a_value"},
 			}},
 			paramKey:    "a_key",
-			expectedTr:  &transformable{header: http.Header{}},
+			expectedTr:  transformable{"header": http.Header{}},
 			expectedErr: nil,
 		},
 		{
 			name:        "deleteURLParams",
 			tfunc:       deleteURLParams,
 			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
+			paramTr:     transformable{"url": newURL("http://foo.example.com?a_key=a_value")},
 			paramKey:    "a_key",
-			expectedTr:  &transformable{url: newURL("http://foo.example.com")},
+			expectedTr:  transformable{"url": newURL("http://foo.example.com")},
 			expectedErr: nil,
 		},
 	}

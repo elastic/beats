@@ -129,44 +129,44 @@ func TestNewAppend(t *testing.T) {
 func TestAppendFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx transformContext, transformable *transformable, key, val string) error
-		paramCtx    transformContext
-		paramTr     *transformable
+		tfunc       func(ctx *transformContext, transformable transformable, key, val string) error
+		paramCtx    *transformContext
+		paramTr     transformable
 		paramKey    string
 		paramVal    string
-		expectedTr  *transformable
+		expectedTr  transformable
 		expectedErr error
 	}{
 		{
 			name:        "appendBody",
 			tfunc:       appendBody,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{body: common.MapStr{"a_key": "a_value"}},
+			paramCtx:    &transformContext{},
+			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
 			paramKey:    "a_key",
 			paramVal:    "another_value",
-			expectedTr:  &transformable{body: common.MapStr{"a_key": []interface{}{"a_value", "another_value"}}},
+			expectedTr:  transformable{"body": common.MapStr{"a_key": []interface{}{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
 			name:     "appendHeader",
 			tfunc:    appendHeader,
-			paramCtx: transformContext{},
-			paramTr: &transformable{header: http.Header{
+			paramCtx: &transformContext{},
+			paramTr: transformable{"header": http.Header{
 				"A_key": []string{"a_value"},
 			}},
 			paramKey:    "a_key",
 			paramVal:    "another_value",
-			expectedTr:  &transformable{header: http.Header{"A_key": []string{"a_value", "another_value"}}},
+			expectedTr:  transformable{"header": http.Header{"A_key": []string{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
 			name:        "appendURLParams",
 			tfunc:       appendURLParams,
-			paramCtx:    transformContext{},
-			paramTr:     &transformable{url: newURL("http://foo.example.com?a_key=a_value")},
+			paramCtx:    &transformContext{},
+			paramTr:     transformable{"url": newURL("http://foo.example.com?a_key=a_value")},
 			paramKey:    "a_key",
 			paramVal:    "another_value",
-			expectedTr:  &transformable{url: newURL("http://foo.example.com?a_key=a_value&a_key=another_value")},
+			expectedTr:  transformable{"url": newURL("http://foo.example.com?a_key=a_value&a_key=another_value")},
 			expectedErr: nil,
 		},
 	}

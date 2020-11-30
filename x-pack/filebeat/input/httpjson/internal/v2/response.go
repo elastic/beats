@@ -28,6 +28,27 @@ type response struct {
 	body   interface{}
 }
 
+func (resp *response) clone() *response {
+	clone := &response{
+		page:   resp.page,
+		header: resp.header.Clone(),
+		url:    resp.url,
+	}
+
+	switch t := resp.body.(type) {
+	case []interface{}:
+		c := make([]interface{}, len(t))
+		copy(c, t)
+		clone.body = c
+	case common.MapStr:
+		clone.body = t.Clone()
+	case map[string]interface{}:
+		clone.body = common.MapStr(t).Clone()
+	}
+
+	return clone
+}
+
 type responseProcessor struct {
 	log        *logp.Logger
 	transforms []basicTransform
@@ -53,7 +74,7 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx transformContext, resp *http.Response) (<-chan maybeMsg, error) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) (<-chan maybeMsg, error) {
 	ch := make(chan maybeMsg)
 
 	go func() {
@@ -77,7 +98,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				return
 			}
 
-			*trCtx.lastResponse = *page
+			trCtx.updateLastResponse(*page)
 
 			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
 
@@ -91,7 +112,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 				}
 
 				if rp.split == nil {
-					ch <- maybeMsg{msg: tr.body}
+					ch <- maybeMsg{msg: tr.body()}
 					rp.log.Debug("no split found: continuing")
 					continue
 				}
@@ -113,14 +134,14 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx trans
 	return ch, nil
 }
 
-func (resp *response) asTransformables(log *logp.Logger) []*transformable {
-	var ts []*transformable
+func (resp *response) asTransformables(log *logp.Logger) []transformable {
+	var ts []transformable
 
 	convertAndAppend := func(m map[string]interface{}) {
-		tr := emptyTransformable()
-		tr.header = resp.header.Clone()
-		tr.url = resp.url
-		tr.body = common.MapStr(m).Clone()
+		tr := transformable{}
+		tr.setHeader(resp.header.Clone())
+		tr.setURL(resp.url)
+		tr.setBody(common.MapStr(m).Clone())
 		ts = append(ts, tr)
 	}
 

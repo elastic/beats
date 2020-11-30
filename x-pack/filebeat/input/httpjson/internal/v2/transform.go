@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/pkg/errors"
 
@@ -22,60 +23,133 @@ type transformsConfig []*common.Config
 type transforms []transform
 
 type transformContext struct {
+	lock         sync.RWMutex
 	cursor       *cursor
 	lastEvent    *common.MapStr
 	lastResponse *response
 }
 
-func emptyTransformContext() transformContext {
-	return transformContext{
+func emptyTransformContext() *transformContext {
+	return &transformContext{
 		cursor:       &cursor{},
 		lastEvent:    &common.MapStr{},
 		lastResponse: &response{},
 	}
 }
 
-type transformable struct {
-	body   common.MapStr
-	header http.Header
-	url    url.URL
+func (ctx *transformContext) cursorMap() common.MapStr {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	return ctx.cursor.clone()
 }
 
-func (t *transformable) clone() *transformable {
-	if t == nil {
-		return emptyTransformable()
-	}
-	return &transformable{
-		body: func() common.MapStr {
-			if t.body == nil {
-				return common.MapStr{}
-			}
-			return t.body.Clone()
-		}(),
-		header: func() http.Header {
-			if t.header == nil {
-				return http.Header{}
-			}
-			return t.header.Clone()
-		}(),
-		url: t.url,
-	}
+func (ctx *transformContext) lastEventClone() *common.MapStr {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	clone := ctx.lastEvent.Clone()
+	return &clone
 }
 
-func (t *transformable) templateValues() common.MapStr {
-	return common.MapStr{
-		"header":     t.header.Clone(),
-		"body":       t.body.Clone(),
-		"url.value":  t.url.String(),
-		"url.params": t.url.Query(),
-	}
+func (ctx *transformContext) lastResponseClone() *response {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	return ctx.lastResponse.clone()
 }
 
-func emptyTransformable() *transformable {
-	return &transformable{
-		body:   common.MapStr{},
-		header: http.Header{},
+func (ctx *transformContext) updateCursor() {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+
+	// we do not want to pass the cursor data to itself
+	newCtx := emptyTransformContext()
+	newCtx.lastEvent = ctx.lastEvent
+	newCtx.lastResponse = ctx.lastResponse
+
+	ctx.cursor.update(newCtx)
+}
+
+func (ctx *transformContext) updateLastEvent(e common.MapStr) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	*ctx.lastEvent = e
+}
+
+func (ctx *transformContext) updateLastResponse(r response) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	*ctx.lastResponse = r
+}
+
+type transformable common.MapStr
+
+func (tr transformable) access() common.MapStr {
+	return common.MapStr(tr)
+}
+
+func (tr transformable) Put(k string, v interface{}) {
+	_, _ = tr.access().Put(k, v)
+}
+
+func (tr transformable) GetValue(k string) (interface{}, error) {
+	return tr.access().GetValue(k)
+}
+
+func (tr transformable) Clone() transformable {
+	return transformable(tr.access().Clone())
+}
+
+func (tr transformable) setHeader(v http.Header) {
+	tr.Put("header", v)
+}
+
+func (tr transformable) header() http.Header {
+	val, err := tr.GetValue("header")
+	if err != nil {
+		return http.Header{}
 	}
+
+	header, ok := val.(http.Header)
+	if !ok {
+		return http.Header{}
+	}
+
+	return header
+}
+
+func (tr transformable) setBody(v common.MapStr) {
+	tr.Put("body", v)
+}
+
+func (tr transformable) body() common.MapStr {
+	val, err := tr.GetValue("body")
+	if err != nil {
+		return common.MapStr{}
+	}
+
+	body, ok := val.(common.MapStr)
+	if !ok {
+		return common.MapStr{}
+	}
+
+	return body
+}
+
+func (tr transformable) setURL(v url.URL) {
+	tr.Put("url", v)
+}
+
+func (tr transformable) url() url.URL {
+	val, err := tr.GetValue("url")
+	if err != nil {
+		return url.URL{}
+	}
+
+	u, ok := val.(url.URL)
+	if !ok {
+		return url.URL{}
+	}
+
+	return u
 }
 
 type transform interface {
@@ -84,7 +158,7 @@ type transform interface {
 
 type basicTransform interface {
 	transform
-	run(transformContext, *transformable) (*transformable, error)
+	run(*transformContext, transformable) (transformable, error)
 }
 
 type maybeMsg struct {

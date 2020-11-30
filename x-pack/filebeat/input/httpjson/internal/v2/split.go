@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	errEmptyField    = errors.New("the requested field is empty")
-	errEmptyTopField = errors.New("the requested top split field is empty")
+	errEmptyField       = errors.New("the requested field is empty")
+	errExpectedSplitArr = errors.New("split was expecting field to be an array")
+	errExpectedSplitObj = errors.New("split was expecting field to be an object")
 )
 
 type split struct {
@@ -22,7 +23,7 @@ type split struct {
 	targetInfo targetInfo
 	kind       string
 	transforms []basicTransform
-	split      *split
+	child      *split
 	keepParent bool
 	keyField   string
 }
@@ -70,127 +71,115 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		keepParent: c.KeepParent,
 		keyField:   c.KeyField,
 		transforms: ts,
-		split:      s,
+		child:      s,
 	}, nil
 }
 
-func (s *split) run(ctx transformContext, resp *transformable, ch chan<- maybeMsg) error {
-	return s.runChild(ctx, resp, ch, false)
+func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMsg) error {
+	root := resp.body()
+	return s.split(ctx, root, ch)
 }
 
-func (s *split) runChild(ctx transformContext, resp *transformable, ch chan<- maybeMsg, isChild bool) error {
-	respCpy := resp.clone()
-
-	v, err := respCpy.body.GetValue(s.targetInfo.Name)
+func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybeMsg) error {
+	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != common.ErrKeyNotFound {
 		return err
 	}
 
+	if v == nil {
+		ch <- maybeMsg{msg: root}
+		return errEmptyField
+	}
+
 	switch s.kind {
 	case "", splitTypeArr:
-		if v == nil {
-			s.log.Debug("array field is nil, sending main body")
-			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
-		}
-
-		arr, ok := v.([]interface{})
+		varr, ok := v.([]interface{})
 		if !ok {
-			return fmt.Errorf("field %s needs to be an array to be able to split on it but it is %T", s.targetInfo.Name, v)
+			return errExpectedSplitArr
 		}
 
-		if len(arr) == 0 {
-			s.log.Debug("array field is empty, sending main body")
-			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
+		if len(varr) == 0 {
+			ch <- maybeMsg{msg: root}
+			return errEmptyField
 		}
 
-		for _, a := range arr {
-			if err := s.sendEvent(ctx, respCpy, "", a, ch, isChild); err != nil {
-				return err
+		for _, e := range varr {
+			if err := s.sendMessage(ctx, root, "", e, ch); err != nil {
+				s.log.Debug(err)
 			}
 		}
 
 		return nil
 	case splitTypeMap:
-		if v == nil {
-			s.log.Debug("object field is nil, sending main body")
-			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
-		}
-
-		ms, ok := toMapStr(v)
+		vmap, ok := toMapStr(v)
 		if !ok {
-			return fmt.Errorf("field %s needs to be a map to be able to split on it but it is %T", s.targetInfo.Name, v)
+			return errExpectedSplitObj
 		}
 
-		if len(ms) == 0 {
-			s.log.Debug("object field is empty, sending main body")
-			return s.sendEvent(ctx, respCpy, "", nil, ch, isChild)
+		if len(vmap) == 0 {
+			ch <- maybeMsg{msg: root}
+			return errEmptyField
 		}
 
-		for k, v := range ms {
-			if err := s.sendEvent(ctx, respCpy, k, v, ch, isChild); err != nil {
-				return err
+		for k, e := range vmap {
+			if err := s.sendMessage(ctx, root, k, e, ch); err != nil {
+				s.log.Debug(err)
 			}
 		}
 
 		return nil
 	}
 
-	return errors.New("invalid split type")
+	return errors.New("unknown split type")
 }
 
-func toMapStr(v interface{}) (common.MapStr, bool) {
-	var m common.MapStr
-	if v == nil {
-		return m, true
-	}
-	switch ts := v.(type) {
-	case common.MapStr:
-		m = ts
-	case map[string]interface{}:
-		m = common.MapStr(ts)
-	default:
-		return nil, false
-	}
-	return m, true
-}
-
-func (s *split) sendEvent(ctx transformContext, resp *transformable, key string, val interface{}, ch chan<- maybeMsg, isChild bool) error {
-	if val == nil && !isChild && !s.keepParent {
-		return errEmptyTopField
-	}
-
-	m, ok := toMapStr(val)
+func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key string, v interface{}, ch chan<- maybeMsg) error {
+	obj, ok := toMapStr(v)
 	if !ok {
-		return errors.New("split can only be applied on object lists")
+		return errExpectedSplitObj
 	}
+
+	clone := root.Clone()
 
 	if s.keyField != "" && key != "" {
-		_, _ = m.Put(s.keyField, key)
+		_, _ = obj.Put(s.keyField, key)
 	}
 
 	if s.keepParent {
-		_, _ = resp.body.Put(s.targetInfo.Name, m)
+		_, _ = clone.Put(s.targetInfo.Name, obj)
 	} else {
-		resp.body = m
+		clone = obj
 	}
+
+	tr := transformable{}
+	tr.setBody(clone)
 
 	var err error
 	for _, t := range s.transforms {
-		resp, err = t.run(ctx, resp)
+		tr, err = t.run(ctx, tr)
 		if err != nil {
 			return err
 		}
 	}
 
-	if s.split != nil {
-		return s.split.runChild(ctx, resp, ch, true)
+	if s.child != nil {
+		return s.child.split(ctx, clone, ch)
 	}
 
-	ch <- maybeMsg{msg: resp.body.Clone()}
-
-	if val == nil {
-		return errEmptyField
-	}
+	ch <- maybeMsg{msg: clone}
 
 	return nil
+}
+
+func toMapStr(v interface{}) (common.MapStr, bool) {
+	if v == nil {
+		return common.MapStr{}, false
+	}
+	switch t := v.(type) {
+	case common.MapStr:
+		return t, true
+	case map[string]interface{}:
+		return common.MapStr(t), true
+	}
+	return common.MapStr{}, false
 }

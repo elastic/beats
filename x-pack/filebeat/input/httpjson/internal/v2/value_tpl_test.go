@@ -19,8 +19,8 @@ func TestValueTpl(t *testing.T) {
 	cases := []struct {
 		name        string
 		value       string
-		paramCtx    transformContext
-		paramTr     *transformable
+		paramCtx    *transformContext
+		paramTr     transformable
 		paramDefVal string
 		expected    string
 		setup       func()
@@ -29,21 +29,21 @@ func TestValueTpl(t *testing.T) {
 		{
 			name:  "can render values from ctx",
 			value: "{{.last_response.body.param}}",
-			paramCtx: transformContext{
+			paramCtx: &transformContext{
 				lastEvent:    &common.MapStr{},
 				lastResponse: newTestResponse(common.MapStr{"param": 25}, nil, ""),
 			},
-			paramTr:     emptyTransformable(),
+			paramTr:     transformable{},
 			paramDefVal: "",
 			expected:    "25",
 		},
 		{
 			name:  "can render default value if execute fails",
 			value: "{{.last_response.body.does_not_exist}}",
-			paramCtx: transformContext{
+			paramCtx: &transformContext{
 				lastEvent: &common.MapStr{},
 			},
-			paramTr:     emptyTransformable(),
+			paramTr:     transformable{},
 			paramDefVal: "25",
 			expected:    "25",
 		},
@@ -51,7 +51,7 @@ func TestValueTpl(t *testing.T) {
 			name:        "can render default value if template is empty",
 			value:       "",
 			paramCtx:    emptyTransformContext(),
-			paramTr:     emptyTransformable(),
+			paramTr:     transformable{},
 			paramDefVal: "25",
 			expected:    "25",
 		},
@@ -65,7 +65,7 @@ func TestValueTpl(t *testing.T) {
 			name:     "func parseDuration",
 			value:    `{{ parseDuration "-1h" }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "-1h0m0s",
 		},
 		{
@@ -74,7 +74,7 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ now }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
@@ -83,28 +83,28 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ now (parseDuration "-1h") }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 12:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseDate",
 			value:    `{{ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 12:25:32.1234567 +0000 UTC",
 		},
 		{
 			name:     "func parseDate defaults to RFC3339",
 			value:    `{{ parseDate "2020-11-05T12:25:32Z" }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 12:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseDate with custom layout",
 			value:    `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006") }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 12:25:32 +0000 UTC",
 		},
 		{
@@ -113,7 +113,7 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ formatDate (now) "UnixDate" "America/New_York" }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "Thu Nov  5 08:25:32 EST 2020",
 		},
 		{
@@ -122,7 +122,7 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ formatDate (now) "UnixDate" }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "Thu Nov  5 13:25:32 UTC 2020",
 		},
 		{
@@ -131,34 +131,34 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ formatDate (now) "UnixDate" "wrong/tz"}}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "Thu Nov  5 13:25:32 UTC 2020",
 		},
 		{
 			name:     "func parseTimestamp",
 			value:    `{{ (parseTimestamp 1604582732) }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseTimestampMilli",
 			value:    `{{ (parseTimestampMilli 1604582732000) }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
 			name:     "func parseTimestampNano",
 			value:    `{{ (parseTimestampNano 1604582732000000000) }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
 			name:  "func getRFC5988Link",
 			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
-			paramCtx: transformContext{
+			paramCtx: &transformContext{
 				lastEvent: &common.MapStr{},
 				lastResponse: newTestResponse(
 					nil,
@@ -169,13 +169,13 @@ func TestValueTpl(t *testing.T) {
 					"",
 				),
 			},
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
 		},
 		{
 			name:  "func getRFC5988Link does not match",
 			value: `{{ getRFC5988Link "previous" .last_response.header.Link }}`,
-			paramCtx: transformContext{
+			paramCtx: &transformContext{
 				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
@@ -184,7 +184,7 @@ func TestValueTpl(t *testing.T) {
 					"",
 				),
 			},
-			paramTr:     emptyTransformable(),
+			paramTr:     transformable{},
 			paramDefVal: "https://example.com/default",
 			expected:    "https://example.com/default",
 		},
@@ -192,7 +192,7 @@ func TestValueTpl(t *testing.T) {
 			name:        "func getRFC5988Link empty header",
 			value:       `{{ getRFC5988Link "previous" .last_response.header.Empty }}`,
 			paramCtx:    emptyTransformContext(),
-			paramTr:     emptyTransformable(),
+			paramTr:     transformable{},
 			paramDefVal: "https://example.com/default",
 			expected:    "https://example.com/default",
 		},
@@ -202,7 +202,7 @@ func TestValueTpl(t *testing.T) {
 			teardown: func() { timeNow = time.Now },
 			value:    `{{ (parseDuration "-1h") | now | formatDate }}`,
 			paramCtx: emptyTransformContext(),
-			paramTr:  emptyTransformable(),
+			paramTr:  transformable{},
 			expected: "2020-11-05T12:25:32Z",
 		},
 	}

@@ -30,7 +30,7 @@ type set struct {
 	value        *valueTpl
 	defaultValue *valueTpl
 
-	runFunc func(ctx transformContext, transformable *transformable, key, val string) error
+	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
 }
 
 func (set) transformName() string { return setName }
@@ -112,12 +112,12 @@ func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 	}, nil
 }
 
-func (set *set) run(ctx transformContext, transformable *transformable) (*transformable, error) {
-	value := set.value.Execute(ctx, transformable, set.defaultValue, set.log)
-	if err := set.runFunc(ctx, transformable, set.targetInfo.Name, value); err != nil {
-		return nil, err
+func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
+	value := set.value.Execute(ctx, tr, set.defaultValue, set.log)
+	if err := set.runFunc(ctx, tr, set.targetInfo.Name, value); err != nil {
+		return transformable{}, err
 	}
-	return transformable, nil
+	return tr, nil
 }
 
 func setToCommonMap(m common.MapStr, key, val string) error {
@@ -130,29 +130,31 @@ func setToCommonMap(m common.MapStr, key, val string) error {
 	return nil
 }
 
-func setBody(ctx transformContext, transformable *transformable, key, value string) error {
-	return setToCommonMap(transformable.body, key, value)
+func setBody(ctx *transformContext, transformable transformable, key, value string) error {
+	return setToCommonMap(transformable.body(), key, value)
 }
 
-func setHeader(ctx transformContext, transformable *transformable, key, value string) error {
+func setHeader(ctx *transformContext, transformable transformable, key, value string) error {
 	if value == "" {
 		return nil
 	}
-	transformable.header.Add(key, value)
+	transformable.header().Add(key, value)
 	return nil
 }
 
-func setURLParams(ctx transformContext, transformable *transformable, key, value string) error {
+func setURLParams(ctx *transformContext, transformable transformable, key, value string) error {
 	if value == "" {
 		return nil
 	}
-	q := transformable.url.Query()
+	url := transformable.url()
+	q := url.Query()
 	q.Set(key, value)
-	transformable.url.RawQuery = q.Encode()
+	url.RawQuery = q.Encode()
+	transformable.setURL(url)
 	return nil
 }
 
-func setURLValue(ctx transformContext, transformable *transformable, _, value string) error {
+func setURLValue(ctx *transformContext, transformable transformable, _, value string) error {
 	// if the template processing did not find any value
 	// we fail without parsing
 	if value == "<no value>" || value == "" {
@@ -162,6 +164,6 @@ func setURLValue(ctx transformContext, transformable *transformable, _, value st
 	if err != nil {
 		return errNewURLValueNotSet
 	}
-	transformable.url = *url
+	transformable.setURL(*url)
 	return nil
 }

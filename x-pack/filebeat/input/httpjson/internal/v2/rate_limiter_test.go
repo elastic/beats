@@ -10,12 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Test getRateLimit function with a remaining quota, expect to receive 0, nil.
-func TestGetRateLimitCase1(t *testing.T) {
+func TestGetRateLimitReturns0IfRemainingQuota(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "118")
@@ -38,8 +39,7 @@ func TestGetRateLimitCase1(t *testing.T) {
 	assert.EqualValues(t, 0, epoch)
 }
 
-// Test getRateLimit function with a past time, expect to receive 0, nil.
-func TestGetRateLimitCase2(t *testing.T) {
+func TestGetRateLimitReturns0IfEpochInPast(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "10")
 	header.Add("X-Rate-Limit-Remaining", "0")
@@ -62,8 +62,7 @@ func TestGetRateLimitCase2(t *testing.T) {
 	assert.EqualValues(t, 0, epoch)
 }
 
-// Test getRateLimit function with a time yet to come, expect to receive <reset-value>, nil.
-func TestGetRateLimitCase3(t *testing.T) {
+func TestGetRateLimitReturnsResetValue(t *testing.T) {
 	epoch := int64(1604582732 + 100)
 	timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })

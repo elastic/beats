@@ -22,7 +22,7 @@ type deleteConfig struct {
 type delete struct {
 	targetInfo targetInfo
 
-	runFunc func(ctx transformContext, transformable *transformable, key string) error
+	runFunc func(ctx transformContext, transformable transformable, key string) error
 }
 
 func (delete) transformName() string { return deleteName }
@@ -99,11 +99,11 @@ func newDelete(cfg *common.Config) (delete, error) {
 	}, nil
 }
 
-func (delete *delete) run(ctx transformContext, transformable *transformable) (*transformable, error) {
-	if err := delete.runFunc(ctx, transformable, delete.targetInfo.Name); err != nil {
-		return nil, err
+func (delete *delete) run(ctx transformContext, tr transformable) (transformable, error) {
+	if err := delete.runFunc(ctx, tr, delete.targetInfo.Name); err != nil {
+		return transformable{}, err
 	}
-	return transformable, nil
+	return tr, nil
 }
 
 func deleteFromCommonMap(m common.MapStr, key string) error {
@@ -113,18 +113,20 @@ func deleteFromCommonMap(m common.MapStr, key string) error {
 	return nil
 }
 
-func deleteBody(ctx transformContext, transformable *transformable, key string) error {
-	return deleteFromCommonMap(transformable.body, key)
+func deleteBody(ctx transformContext, transformable transformable, key string) error {
+	return deleteFromCommonMap(transformable.body(), key)
 }
 
-func deleteHeader(ctx transformContext, transformable *transformable, key string) error {
-	transformable.header.Del(key)
+func deleteHeader(ctx transformContext, transformable transformable, key string) error {
+	transformable.header().Del(key)
 	return nil
 }
 
-func deleteURLParams(ctx transformContext, transformable *transformable, key string) error {
-	q := transformable.url.Query()
+func deleteURLParams(ctx transformContext, transformable transformable, key string) error {
+	url := transformable.url()
+	q := url.Query()
 	q.Del(key)
-	transformable.url.RawQuery = q.Encode()
+	url.RawQuery = q.Encode()
+	transformable.setURL(url)
 	return nil
 }

@@ -44,14 +44,14 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
 	fallback := func(err error) string {
 		if err != nil {
 			log.Debugf("template execution failed: %v", err)
 		}
 		if defaultVal != nil {
 			log.Debugf("template execution: falling back to default value")
-			return defaultVal.Execute(emptyTransformContext(), emptyTransformable(), nil, log)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, nil, log)
 		}
 		return ""
 	}
@@ -64,10 +64,10 @@ func (t *valueTpl) Execute(trCtx transformContext, tr *transformable, defaultVal
 	}()
 
 	buf := new(bytes.Buffer)
-	data := tr.templateValues()
-	_, _ = data.Put("cursor", trCtx.cursor.clone())
-	_, _ = data.Put("last_event", trCtx.lastEvent.Clone())
-	_, _ = data.Put("last_response", trCtx.lastResponse.templateValues())
+	data := tr.Clone()
+	data.Put("cursor", trCtx.cursorMap())
+	data.Put("last_event", trCtx.lastEventClone())
+	data.Put("last_response", trCtx.lastResponseClone().templateValues())
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		return fallback(err)

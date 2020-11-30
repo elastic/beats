@@ -31,7 +31,7 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
-func (c *httpClient) do(stdCtx context.Context, trCtx transformContext, req *http.Request) (*http.Response, error) {
+func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
 		return c.client.Do(req)
 	})
@@ -46,25 +46,27 @@ func (c *httpClient) do(stdCtx context.Context, trCtx transformContext, req *htt
 	return resp, nil
 }
 
-func (rf *requestFactory) newRequest(ctx transformContext) (*transformable, error) {
-	req := emptyTransformable()
-	req.url = rf.url
+func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, error) {
+	req := transformable{}
+	req.setURL(rf.url)
 
-	if rf.body != nil {
-		req.body.DeepUpdate(*rf.body)
+	if rf.body != nil && len(*rf.body) > 0 {
+		req.setBody(rf.body.Clone())
 	}
 
-	req.header.Set("Accept", "application/json")
-	req.header.Set("User-Agent", userAgent)
+	header := http.Header{}
+	header.Set("Accept", "application/json")
+	header.Set("User-Agent", userAgent)
 	if rf.method == "POST" {
-		req.header.Set("Content-Type", "application/json")
+		header.Set("Content-Type", "application/json")
 	}
+	req.setHeader(header)
 
 	var err error
 	for _, t := range rf.transforms {
 		req, err = t.run(ctx, req)
 		if err != nil {
-			return nil, err
+			return transformable{}, err
 		}
 	}
 
@@ -100,17 +102,17 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 	return rf
 }
 
-func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transformContext) (*http.Request, error) {
+func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transformContext) (*http.Request, error) {
 	trReq, err := rf.newRequest(trCtx)
 	if err != nil {
 		return nil, err
 	}
 
 	var body []byte
-	if len(trReq.body) > 0 {
+	if len(trReq.body()) > 0 {
 		switch rf.method {
 		case "POST":
-			body, err = json.Marshal(trReq.body)
+			body, err = json.Marshal(trReq.body())
 			if err != nil {
 				return nil, err
 			}
@@ -119,14 +121,15 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx transform
 		}
 	}
 
-	req, err := http.NewRequest(rf.method, trReq.url.String(), bytes.NewBuffer(body))
+	url := trReq.url()
+	req, err := http.NewRequest(rf.method, url.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
 	req = req.WithContext(stdCtx)
 
-	req.Header = trReq.header.Clone()
+	req.Header = trReq.header().Clone()
 
 	if rf.user != "" || rf.password != "" {
 		req.SetBasicAuth(rf.user, rf.password)
@@ -155,7 +158,7 @@ func newRequester(
 	}
 }
 
-func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, publisher inputcursor.Publisher) error {
+func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	req, err := r.requestFactory.newHTTPRequest(stdCtx, trCtx)
 	if err != nil {
 		return fmt.Errorf("failed to create http request: %w", err)
@@ -185,16 +188,18 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx transformContext, pu
 			continue
 		}
 
-		if err := publisher.Publish(event, trCtx.cursor.clone()); err != nil {
+		if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
 			r.log.Errorf("error publishing event: %v", err)
 			continue
 		}
 
-		*trCtx.lastEvent = maybeMsg.msg
+		trCtx.updateLastEvent(maybeMsg.msg)
 		n += 1
 	}
-	trCtx.cursor.update(trCtx)
+
+	trCtx.updateCursor()
 
 	r.log.Infof("request finished: %d events published", n)
+
 	return nil
 }

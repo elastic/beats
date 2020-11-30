@@ -27,7 +27,7 @@ type appendt struct {
 	value        *valueTpl
 	defaultValue *valueTpl
 
-	runFunc func(ctx transformContext, transformable *transformable, key, val string) error
+	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
 }
 
 func (appendt) transformName() string { return appendName }
@@ -107,12 +107,12 @@ func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 	}, nil
 }
 
-func (append *appendt) run(ctx transformContext, transformable *transformable) (*transformable, error) {
-	value := append.value.Execute(ctx, transformable, append.defaultValue, append.log)
-	if err := append.runFunc(ctx, transformable, append.targetInfo.Name, value); err != nil {
-		return nil, err
+func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
+	value := append.value.Execute(ctx, tr, append.defaultValue, append.log)
+	if err := append.runFunc(ctx, tr, append.targetInfo.Name, value); err != nil {
+		return transformable{}, err
 	}
-	return transformable, nil
+	return tr, nil
 }
 
 func appendToCommonMap(m common.MapStr, key, val string) error {
@@ -138,24 +138,26 @@ func appendToCommonMap(m common.MapStr, key, val string) error {
 	return nil
 }
 
-func appendBody(ctx transformContext, transformable *transformable, key, value string) error {
-	return appendToCommonMap(transformable.body, key, value)
+func appendBody(ctx *transformContext, transformable transformable, key, value string) error {
+	return appendToCommonMap(transformable.body(), key, value)
 }
 
-func appendHeader(ctx transformContext, transformable *transformable, key, value string) error {
+func appendHeader(ctx *transformContext, transformable transformable, key, value string) error {
 	if value == "" {
 		return nil
 	}
-	transformable.header.Add(key, value)
+	transformable.header().Add(key, value)
 	return nil
 }
 
-func appendURLParams(ctx transformContext, transformable *transformable, key, value string) error {
+func appendURLParams(ctx *transformContext, transformable transformable, key, value string) error {
 	if value == "" {
 		return nil
 	}
-	q := transformable.url.Query()
+	url := transformable.url()
+	q := url.Query()
 	q.Add(key, value)
-	transformable.url.RawQuery = q.Encode()
+	url.RawQuery = q.Encode()
+	transformable.setURL(url)
 	return nil
 }

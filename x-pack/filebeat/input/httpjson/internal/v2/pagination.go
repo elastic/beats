@@ -68,7 +68,7 @@ type pageIterator struct {
 	pagination *pagination
 
 	stdCtx context.Context
-	trCtx  transformContext
+	trCtx  *transformContext
 
 	resp *http.Response
 
@@ -78,7 +78,7 @@ type pageIterator struct {
 	n int
 }
 
-func (p *pagination) newPageIterator(stdCtx context.Context, trCtx transformContext, resp *http.Response) *pageIterator {
+func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response) *pageIterator {
 	return &pageIterator{
 		pagination: p,
 		stdCtx:     stdCtx,

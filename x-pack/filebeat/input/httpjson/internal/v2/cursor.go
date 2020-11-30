@@ -40,7 +40,7 @@ func (c *cursor) load(cursor *inputcursor.Cursor) {
 	c.log.Debugf("cursor loaded: %v", c.state)
 }
 
-func (c *cursor) update(trCtx transformContext) {
+func (c *cursor) update(trCtx *transformContext) {
 	if c.cfg == nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (c *cursor) update(trCtx transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
-		v := cfg.Value.Execute(trCtx, emptyTransformable(), cfg.Default, c.log)
+		v := cfg.Value.Execute(trCtx, transformable{}, cfg.Default, c.log)
 		_, _ = c.state.Put(k, v)
 		c.log.Debugf("cursor.%s stored with %s", k, v)
 	}

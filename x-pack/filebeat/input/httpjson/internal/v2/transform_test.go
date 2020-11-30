@@ -22,24 +22,26 @@ func TestEmptyTransformContext(t *testing.T) {
 }
 
 func TestEmptyTransformable(t *testing.T) {
-	tr := emptyTransformable()
-	assert.Equal(t, common.MapStr{}, tr.body)
-	assert.Equal(t, http.Header{}, tr.header)
+	tr := transformable{}
+	assert.Equal(t, common.MapStr{}, tr.body())
+	assert.Equal(t, http.Header{}, tr.header())
 }
 
 func TestTransformableNilClone(t *testing.T) {
-	var tr *transformable
-	cl := tr.clone()
-	assert.Equal(t, common.MapStr{}, cl.body)
-	assert.Equal(t, http.Header{}, cl.header)
+	var tr transformable
+	cl := tr.Clone()
+	assert.Equal(t, common.MapStr{}, cl.body())
+	assert.Equal(t, http.Header{}, cl.header())
 }
 
 func TestTransformableClone(t *testing.T) {
-	tr := emptyTransformable()
-	_, _ = tr.body.Put("key", "value")
-	cl := tr.clone()
-	assert.Equal(t, common.MapStr{"key": "value"}, cl.body)
-	assert.Equal(t, http.Header{}, cl.header)
+	tr := transformable{}
+	body := tr.body()
+	_, _ = body.Put("key", "value")
+	tr.setBody(body)
+	cl := tr.Clone()
+	assert.Equal(t, common.MapStr{"key": "value"}, cl.body())
+	assert.Equal(t, http.Header{}, cl.header())
 }
 
 func TestNewTransformsFromConfig(t *testing.T) {
