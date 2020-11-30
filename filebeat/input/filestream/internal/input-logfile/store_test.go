@@ -261,6 +261,9 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 
 		})
 
+		var newState state
+		s.persistentStore.Get("test::key1::updated", &newState)
+
 		want := map[string]state{
 			"test::key1": state{
 				Updated: s.Get("test::key1").internalState.Updated,
@@ -273,7 +276,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
 			"test::key1::updated": state{
-				Updated: s.Get("test::key1::updated").internalState.Updated,
+				Updated: newState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
 			},
