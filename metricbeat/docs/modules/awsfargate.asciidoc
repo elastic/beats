@@ -1,0 +1,86 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-awsfargate]]
+[role="xpack"]
+== AWS Fargate module
+
+beta[]
+
+Amazon ECS on Fargate provides a method to retrieve various metadata, network
+metrics, and Docker stats about tasks and containers. This is referred to as the
+https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html[task metadata endpoint]
+and this endpoint is available per container.
+
+The environment variable is injected by default into the containers of Amazon
+ECS tasks on Fargate that use platform version 1.4.0 or later and Amazon ECS
+tasks on Amazon EC2 that are running at least version 1.39.0 of the Amazon ECS
+container agent.
+
+The awsfargate module is a Metricbeat module which collects AWS fargate metrics
+from task metadata endpoint.
+
+[float]
+== Introduction to AWS ECS and Fargate
+Amazon Elastic Container Service (Amazon ECS) is a highly scalable, fast,
+container management service that makes it easy to run, stop, and manage
+containers. ECS has two launch types that can define how compute resources will
+be managed: ECS EC2 and ECS Fargate.
+
+* *ECS EC2*
+
+ECS EC2 launches containers that run on EC2 instances. Users have to manage EC2
+instances. Pricing depends on the number of EC2 instances running.
+
+* *ECS Fargate*
+
+ECS Fargate removes the responsibility of provisioning, configuring, and
+managing the EC2 instances by allowing AWS to manage the EC2 instances. Users
+only need to specify containers and tasks. Pricing based on the number of tasks.
+
+[float]
+== Task Metadata Endpoint
+https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-metadata-endpoint-v4-fargate.html[Task metadata endpoint]
+returns https://docs.docker.com/engine/api/v1.30/#operation/ContainerStats[Docker stats]
+in JSON format for all the containers associated with the task.
+This endpoint is only available from within the task definition itself, which
+means Metricbeat needs to be run as a sidecar container within the task
+definition. Since the metadata endpoint is only accessible from within the
+Fargate Task, there is no authentication in place.
+
+[float]
+== Metricsets
+Currently, we have `task_stats` metricset in `awsfargate` module.
+
+[float]
+=== `task_stats`
+This metricset collects runtime CPU metrics, disk I/O metrics, memory metrics,
+network metrics and container metadata from both endpoint
+`${ECS_CONTAINER_METADATA_URI_V4}/task/stats` and `${ECS_CONTAINER_METADATA_URI_V4}/task`.
+
+
+[float]
+=== Example configuration
+
+The AWS Fargate module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: awsfargate
+  period: 10s
+  metricsets:
+    - task_stats
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-awsfargate-task_stats,task_stats>>
+
+include::awsfargate/task_stats.asciidoc[]
+
