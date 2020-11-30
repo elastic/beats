@@ -22,7 +22,7 @@ type deleteConfig struct {
 type delete struct {
 	targetInfo targetInfo
 
-	runFunc func(ctx transformContext, transformable transformable, key string) error
+	runFunc func(ctx *transformContext, transformable transformable, key string) error
 }
 
 func (delete) transformName() string { return deleteName }
@@ -99,7 +99,7 @@ func newDelete(cfg *common.Config) (delete, error) {
 	}, nil
 }
 
-func (delete *delete) run(ctx transformContext, tr transformable) (transformable, error) {
+func (delete *delete) run(ctx *transformContext, tr transformable) (transformable, error) {
 	if err := delete.runFunc(ctx, tr, delete.targetInfo.Name); err != nil {
 		return transformable{}, err
 	}
@@ -113,16 +113,16 @@ func deleteFromCommonMap(m common.MapStr, key string) error {
 	return nil
 }
 
-func deleteBody(ctx transformContext, transformable transformable, key string) error {
+func deleteBody(ctx *transformContext, transformable transformable, key string) error {
 	return deleteFromCommonMap(transformable.body(), key)
 }
 
-func deleteHeader(ctx transformContext, transformable transformable, key string) error {
+func deleteHeader(ctx *transformContext, transformable transformable, key string) error {
 	transformable.header().Del(key)
 	return nil
 }
 
-func deleteURLParams(ctx transformContext, transformable transformable, key string) error {
+func deleteURLParams(ctx *transformContext, transformable transformable, key string) error {
 	url := transformable.url()
 	q := url.Query()
 	q.Del(key)

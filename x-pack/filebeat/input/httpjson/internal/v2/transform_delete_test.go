@@ -129,8 +129,8 @@ func TestNewDelete(t *testing.T) {
 func TestDeleteFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx transformContext, transformable transformable, key string) error
-		paramCtx    transformContext
+		tfunc       func(ctx *transformContext, transformable transformable, key string) error
+		paramCtx    *transformContext
 		paramTr     transformable
 		paramKey    string
 		expectedTr  transformable
@@ -139,7 +139,7 @@ func TestDeleteFunctions(t *testing.T) {
 		{
 			name:        "deleteBody",
 			tfunc:       deleteBody,
-			paramCtx:    transformContext{},
+			paramCtx:    &transformContext{},
 			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
 			paramKey:    "a_key",
 			expectedTr:  transformable{"body": common.MapStr{}},
@@ -148,7 +148,7 @@ func TestDeleteFunctions(t *testing.T) {
 		{
 			name:     "deleteHeader",
 			tfunc:    deleteHeader,
-			paramCtx: transformContext{},
+			paramCtx: &transformContext{},
 			paramTr: transformable{"header": http.Header{
 				"A_key": []string{"a_value"},
 			}},
@@ -159,7 +159,7 @@ func TestDeleteFunctions(t *testing.T) {
 		{
 			name:        "deleteURLParams",
 			tfunc:       deleteURLParams,
-			paramCtx:    transformContext{},
+			paramCtx:    &transformContext{},
 			paramTr:     transformable{"url": newURL("http://foo.example.com?a_key=a_value")},
 			paramKey:    "a_key",
 			expectedTr:  transformable{"url": newURL("http://foo.example.com")},
