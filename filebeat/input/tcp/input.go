@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -75,13 +75,13 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
+	splitFunc := streaming.SplitFunc([]byte(config.LineDelimiter))
 	if splitFunc == nil {
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
 	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
+	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
 
 	server, err := tcp.New(&config.Config, factory)
 	if err != nil {
