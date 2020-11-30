@@ -32,9 +32,11 @@ import (
 )
 
 var (
-	excludedFilePath = filepath.Join("testdata", "excluded_file")
-	includedFilePath = filepath.Join("testdata", "included_file")
-	directoryPath    = filepath.Join("testdata", "unharvestable_dir")
+	excludedFilePath            = filepath.Join("testdata", "excluded_file")
+	includedFilePath            = filepath.Join("testdata", "included_file")
+	unharvestableDir            = filepath.Join("testdata", "unharvestable_dir")
+	includedDir                 = filepath.Join("testdata", "included_dir", "recursively")
+	includedRecursivelyFilePath = filepath.Join("testdata", "included_dir", "recursively", "included_file")
 )
 
 func TestFileScanner(t *testing.T) {
@@ -42,6 +44,7 @@ func TestFileScanner(t *testing.T) {
 		paths         []string
 		excludedFiles []match.Matcher
 		symlinks      bool
+		recursiveGlob bool
 		expectedFiles []string
 	}{
 		"select all files": {
@@ -61,8 +64,16 @@ func TestFileScanner(t *testing.T) {
 			},
 		},
 		"skip directories": {
-			paths:         []string{directoryPath},
+			paths:         []string{unharvestableDir},
 			expectedFiles: []string{},
+		},
+		"select recursively provided file": {
+			paths:         []string{"**/included_file"},
+			recursiveGlob: true,
+			expectedFiles: []string{
+				mustAbsPath(includedFilePath),
+				mustAbsPath(includedRecursivelyFilePath),
+			},
 		},
 	}
 
@@ -76,7 +87,7 @@ func TestFileScanner(t *testing.T) {
 			cfg := fileScannerConfig{
 				ExcludedFiles: test.excludedFiles,
 				Symlinks:      test.symlinks,
-				RecursiveGlob: false,
+				RecursiveGlob: test.recursiveGlob,
 			}
 			fs, err := newFileScanner(test.paths, cfg)
 			if err != nil {
@@ -93,12 +104,14 @@ func TestFileScanner(t *testing.T) {
 }
 
 func setupFilesForScannerTest(t *testing.T) {
-	err := os.MkdirAll(directoryPath, 0750)
-	if err != nil {
-		t.Fatal(t)
+	for _, dir := range []string{unharvestableDir, includedDir} {
+		err := os.MkdirAll(dir, 0750)
+		if err != nil {
+			t.Fatal(t)
+		}
 	}
 
-	for _, path := range []string{excludedFilePath, includedFilePath} {
+	for _, path := range []string{excludedFilePath, includedFilePath, includedRecursivelyFilePath} {
 		f, err := os.Create(path)
 		if err != nil {
 			t.Fatalf("file %s, error %v", path, err)
