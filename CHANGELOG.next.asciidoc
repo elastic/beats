@@ -731,6 +731,7 @@ from being added to events by default. {pull}18159[18159]
 - Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
 - Improve panw ECS url fields mapping. {pull}22481[22481]
 - Improve Nats filebeat dashboard. {pull}22726[22726]
+- Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 
 *Heartbeat*
 
