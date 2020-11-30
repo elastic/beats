@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2020-11-03T09:06:42.000Z",
+        "azure.platformlogs.ActivityId": "30ed877c-a36b-491a-bd4d-ddd847fe55b8",
+        "azure.platformlogs.Caller": "Portal",
+        "azure.platformlogs.Environment": "PROD",
+        "azure.platformlogs.EventTimeString": "11/3/2020 9:06:42 AM +00:00",
+        "azure.platformlogs.ScaleUnit": "PROD-AM3-AZ501",
+        "azure.platformlogs.category": "OperationalLogs",
+        "azure.platformlogs.event_category": "Administrative",
+        "azure.platformlogs.properties.Namespace": "obstesteventhubs",
+        "azure.platformlogs.properties.SubscriptionId": "7657426d-c4c3-44ac-88a2-3b2cd59e6dba",
+        "azure.platformlogs.properties.TrackingId": "30ed877c-a36b-491a-bd4d-ddd847fe55b8_M2CH3_M2CH3_G3S2",
+        "azure.platformlogs.properties.Via": "sb://obstesteventhubs.servicebus.windows.net/insights-logs-operationallogs/consumergroups?api-version=2017-04&$skip=0&$top=100",
+        "azure.platformlogs.status": "Succeeded",
+        "azure.resource.group": "OBS-TEST",
+        "azure.resource.id": "/SUBSCRIPTIONS/7657426D-C4C3-44AC-88A2-3B2CD59E6DBA/RESOURCEGROUPS/OBS-TEST/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/OBSTESTEVENTHUBS",
+        "azure.resource.name": "OBSTESTEVENTHUBS",
+        "azure.resource.provider": "MICROSOFT.EVENTHUB/NAMESPACES",
+        "azure.subscription_id": "7657426D-C4C3-44AC-88A2-3B2CD59E6DBA",
+        "cloud.provider": "azure",
+        "cloud.region": "West Europe",
+        "event.action": "Retreive ConsumerGroup",
+        "event.dataset": "azure.platformlogs",
+        "event.kind": "event",
+        "event.module": "azure",
+        "event.outcome": "succeeded",
+        "fileset.name": "platformlogs",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]
