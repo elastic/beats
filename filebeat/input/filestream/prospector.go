@@ -166,12 +166,17 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 					err := s.FindCursorMeta(src, meta)
 					if err != nil {
 						log.Errorf("Error while getting cursor meta data of entry %s: %v", src.Name(), err)
+
+						meta.IdentifierName = p.identifier.Name()
 					}
 					s.UpdateMetadata(src, fileMeta{Source: src.newPath, IdentifierName: meta.IdentifierName})
 
 					if p.stateChangeCloser.Renamed {
 						log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
-						hg.Stop(src)
+
+						fe.Op = loginp.OpDelete
+						srcToClose := p.identifier.GetSource(fe)
+						hg.Stop(srcToClose)
 					}
 				}
 
