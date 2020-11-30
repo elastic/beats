@@ -406,11 +406,11 @@ func (r *resource) copyWithNewKey(key string) *resource {
 	return &resource{
 		key:                    key,
 		stored:                 r.stored,
-		internalInSync:         r.internalInSync,
+		internalInSync:         true,
 		activeCursorOperations: r.activeCursorOperations,
 		internalState:          r.internalState,
 		cursor:                 r.cursor,
-		pendingCursor:          r.pendingCursor,
+		pendingCursor:          nil,
 		cursorMeta:             r.cursorMeta,
 	}
 }

@@ -201,7 +201,7 @@ func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
 	inputPrefix := pluginName
 	configuredUserID := false
 	if userID != "" {
-		inputPrefix = inputPrefix + "-" + userID
+		inputPrefix = inputPrefix + "::" + userID
 		configuredUserID = true
 	}
 	return &sourceIdentifier{
