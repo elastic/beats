@@ -403,12 +403,19 @@ func (r *resource) inSyncStateSnapshot() state {
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
+	internalState := r.internalState
+
+	// This is required to prevent the cleaner from removing the
+	// entry from the registry immediately.
+	// It still might be removed if the output is blocked for a long
+	// time. If removed the whole file is resent to the output when found/updated.
+	internalState.Updated = time.Now()
 	return &resource{
 		key:                    key,
 		stored:                 r.stored,
 		internalInSync:         true,
+		internalState:          internalState,
 		activeCursorOperations: r.activeCursorOperations,
-		internalState:          r.internalState,
 		cursor:                 r.cursor,
 		pendingCursor:          nil,
 		cursorMeta:             r.cursorMeta,
