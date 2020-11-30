@@ -447,6 +447,47 @@ processors:
      value: "{{panw.panos.ruleset}}"
      ignore_empty_value: true
 
+# Set url and file values
+ - rename:
+     if: 'ctx?.panw?.panos?.sub_type != "url"'
+     field: url.original
+     target_field: file.name
+     ignore_missing: true
+
+ - grok:
+     field: url.original
+     patterns:
+       - '(%{ANY:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
+     ignore_missing: true
+     pattern_definitions:
+       USERNAME: '[^\:]*'
+       PASSWORD: '[^@]*'
+       DOMAIN: '[^\/\?#\:]*'
+       PATH: '[^\?#]*'
+       QUERY: '[^#]*'
+       ANY: '.*'
+     if: 'ctx?.url?.original != null && ctx?.url?.original != "-/" && ctx?.url?.original != ""'
+
+ - grok:
+     field: url.path
+     patterns:
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:url.extension}))?'
+     ignore_missing: true
+     pattern_definitions:
+       FILENAME: '[^\.]+'
+       ANY: '.*'
+     if: 'ctx?.url?.path != null && ctx?.url?.path != ""'
+
+ - grok:
+     field: file.name
+     patterns:
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:file.extension}))?'
+     ignore_missing: true
+     pattern_definitions:
+       FILENAME: '[^\.]+'
+       ANY: '.*'
+     if: 'ctx?.file?.name != null && ctx?.file?.name != ""'
+
  - append:
      field: related.user
      value: "{{client.user.name}}"
@@ -468,6 +509,12 @@ processors:
      if: "ctx?.destination?.user?.name != null"
 
  - append:
+     field: related.user
+     value: "{{url.username}}"
+     if: "ctx?.url?.username != null && ctx?.url?.username != ''"
+     allow_duplicates: false
+
+ - append:
      field: related.hash
      value: "{{panw.panos.file.hash}}"
      if: "ctx?.panw?.panos?.file?.hash != null"
@@ -476,6 +523,12 @@ processors:
      field: related.hosts
      value: "{{observer.hostname}}"
      if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
+     allow_duplicates: false
+
+ - append:
+     field: related.hosts
+     value: "{{url.domain}}"
+     if: "ctx?.url?.domain != null && ctx.url?.domain != ''"
      allow_duplicates: false
 
 # Remove temporary fields.
