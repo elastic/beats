@@ -240,10 +240,6 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 
 // handle message
 func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
-	if !json.Valid([]byte(*m.Body)) {
-		return nil, fmt.Errorf("sqs message body %s json.Valid failed, skipping this message", *m.MessageId)
-	}
-
 	var msg sqsMessage
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
