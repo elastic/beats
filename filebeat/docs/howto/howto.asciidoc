@@ -5,7 +5,7 @@
 --
 Learn how to perform common {beatname_uc} configuration tasks.
 
-* <<override-{beatname_lc}-config-settings>
+* <<override-{beatname_lc}-config-settings>>
 * <<{beatname_lc}-template>>
 * <<change-index-name>>
 * <<load-kibana-dashboards>>
