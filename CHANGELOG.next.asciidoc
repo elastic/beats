@@ -423,6 +423,7 @@ from being added to events by default. {pull}18159[18159]
 - Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
+- Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 
 *Heartbeat*
 
