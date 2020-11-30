@@ -23,6 +23,16 @@ be managed: ECS EC2 and ECS Fargate.
 ECS EC2 launches containers that run on EC2 instances. Users have to manage EC2
 instances. Pricing depends on the number of EC2 instances running.
 
+One can monitor these containers by deploying Metricbeat on the corresponding EC2 instances with the
+Metricbeat Docker module enabled.
+
+In order to achieve this one will need:
+
+. to ensure access to these EC2 instances using ssh keys
+coupled with EC2 instances (attach ssh keys on cluster creation using `Key pair` option)
+. to enable shh access for the instances with the
+proper https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html[inbound rules].
+
 * *ECS Fargate*
 
 ECS Fargate removes the responsibility of provisioning, configuring, and
@@ -48,17 +58,3 @@ Currently, we have `task_stats` metricset in `awsfargate` module.
 This metricset collects runtime CPU metrics, disk I/O metrics, memory metrics,
 network metrics and container metadata from both endpoint
 `${ECS_CONTAINER_METADATA_URI_V4}/task/stats` and `${ECS_CONTAINER_METADATA_URI_V4}/task`.
-
-
-[float]
-== How to monitor containers running on ECS EC2
-As it was already mentioned running containers on ECS EC2 launches containers that run on EC2 instances.
-One can monitor these containers by deploying Metricbeat on the corresponding EC2 instances with the
-Metricbeat Docker module enabled.
-
-In order to achieve this one will need:
-
-. to ensure access to these EC2 instances using ssh keys
-coupled with EC2 instances (attach ssh keys on cluster creation using `Key pair` option)
-. to enable shh access for the instances with the
-proper https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html[inbound rules].
