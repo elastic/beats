@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package streaming
 
 import (
 	"bufio"
@@ -38,14 +38,14 @@ type ConnectionHandler func(context.Context, net.Conn) error
 type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
 
 // SplitHandlerFactory allows creation of a handler that has splitting capabilities.
-func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
+func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
 	return func(config ListenerConfig) ConnectionHandler {
 		return ConnectionHandler(func(ctx context.Context, conn net.Conn) error {
 			metadata := metadataCallback(conn)
 			maxMessageSize := uint64(config.MaxMessageSize)
 
 			var log *logp.Logger
-			if family == FamilyUnix {
+			if family == inputsource.FamilyUnix {
 				// unix sockets have an empty `RemoteAddr` value, so no need to capture it
 				log = logger.With("handler", "split_client")
 			} else {

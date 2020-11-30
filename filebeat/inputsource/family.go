@@ -15,17 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package inputsource
 
-import (
-	"time"
+import "strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+// Family represents the type of connection we're handling
+type Family string
+
+const (
+	// FamilyUnix represents a unix socket listener
+	FamilyUnix Family = "unix"
+	// FamilyTCP represents a tcp socket listener
+	FamilyTCP Family = "tcp"
+	// FamilyUDP represents a udp socket listener
+	FamilyUDP Family = "udp"
 )
 
-// ListenerConfig exposes the shared listener configuration.
-type ListenerConfig struct {
-	Timeout        time.Duration
-	MaxMessageSize cfgtype.ByteSize
-	MaxConnections int
+func (f Family) String() string {
+	return strings.ToUpper(string(f))
 }
