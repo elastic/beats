@@ -23,6 +23,9 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i)(/test)')
   }
+  environment {
+    A = credentials('vault-secret-id')
+  }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
     booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
@@ -35,6 +38,21 @@ pipeline {
   stages {
     stage('test'){
       steps {
+        withCredentials([
+          string(credentialsId: 'vault-addr', variable: 'VAULT_ADDR')
+        ]) {
+          echo "addr-OK"
+        }
+        withCredentials([
+          string(credentialsId: 'vault-role-id', variable: 'VAULT_ROLE_ID')
+        ]) {
+          echo "role-ok"
+        }
+        withCredentials([
+          string(credentialsId: 'vault-secret-id', variable: 'VAULT_SECRET_ID')
+        ]) {
+          echo "secret-ok"
+        }
         getVaultSecret(secret: 'secret/jenkins-ci/fossa/api-token')
       }
     }
