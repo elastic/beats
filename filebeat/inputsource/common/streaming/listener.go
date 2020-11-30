@@ -15,34 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package streaming
 
 import (
 	"bufio"
 	"bytes"
 	"context"
 	"net"
-	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
-
-// Family represents the type of connection we're handling
-type Family string
-
-const (
-	// FamilyUnix represents a unix socket listener
-	FamilyUnix Family = "unix"
-	// FamilyTCP represents a tcp socket listener
-	FamilyTCP Family = "tcp"
-)
-
-func (f Family) String() string {
-	return strings.ToUpper(string(f))
-}
 
 // ListenerFactory returns a net.Listener
 type ListenerFactory func() (net.Listener, error)
@@ -51,7 +37,7 @@ type ListenerFactory func() (net.Listener, error)
 type Listener struct {
 	Listener        net.Listener
 	config          *ListenerConfig
-	family          Family
+	family          inputsource.Family
 	wg              sync.WaitGroup
 	log             *logp.Logger
 	ctx             context.Context
@@ -62,7 +48,7 @@ type Listener struct {
 }
 
 // NewListener creates a new Listener
-func NewListener(family Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
+func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
 	return &Listener{
 		config:          config,
 		family:          family,
@@ -149,7 +135,7 @@ func (l *Listener) run() {
 			l.registerHandler()
 			defer l.unregisterHandler()
 
-			if l.family == FamilyUnix {
+			if l.family == inputsource.FamilyUnix {
 				// unix sockets have an empty `RemoteAddr` value, so no need to capture it
 				l.log.Debugw("New client", "total", l.clientsCount.Load())
 			} else {
@@ -163,7 +149,7 @@ func (l *Listener) run() {
 			}
 
 			defer func() {
-				if l.family == FamilyUnix {
+				if l.family == inputsource.FamilyUnix {
 					// unix sockets have an empty `RemoteAddr` value, so no need to capture it
 					l.log.Debugw("client disconnected", "total", l.clientsCount.Load())
 				} else {
@@ -192,6 +178,10 @@ func (l *Listener) unregisterHandler() {
 
 // SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
 func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
+	if len(lineDelimiter) == 0 {
+		return nil
+	}
+
 	ld := []byte(lineDelimiter)
 	if bytes.Equal(ld, []byte("\n")) {
 		// This will work for most usecases and will also strip \r if present.
