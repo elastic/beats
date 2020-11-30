@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-11-30T16:19:52.816Z",
+        "@timestamp": "2014-03-25T21:08:19.000Z",
         "aws.cloudtrail.event_category": "Management",
         "aws.cloudtrail.event_type": "AwsApiCall",
         "aws.cloudtrail.event_version": "1.07",
@@ -18,7 +18,7 @@
         "event.id": "REDACTED",
         "event.kind": "event",
         "event.module": "aws",
-        "event.original": "{\"awsRegion\":\"us-east-1\",\"eventCategory\":\"Management\",\"eventID\":\"REDACTED\",\"eventName\":\"DescribeConfigurationRecorders\",\"eventSource\":\"config.amazonaws.com\",\"eventTime\":\"REDACTED\",\"eventType\":\"AwsApiCall\",\"eventVersion\":\"1.07\",\"managementEvent\":true,\"readOnly\":true,\"recipientAccountId\":\"REDACTED\",\"requestID\":\"REDACTED\",\"requestParameters\":null,\"responseElements\":null,\"sourceIPAddress\":\"REDACTED\",\"userAgent\":\"REDACTED\",\"userIdentity\":{\"accessKeyId\":\"REDACTED\",\"accountId\":\"REDACTED\",\"arn\":\"arn:aws:iam::REDACTED:user/REDACTED\",\"principalId\":\"REDACTED\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"REDACTED\",\"mfaAuthenticated\":\"true\"},\"sessionIssuer\":{},\"webIdFederationData\":{}},\"type\":\"IAMUser\",\"userName\":\"REDACTED\"}}",
+        "event.original": "{\"awsRegion\":\"us-east-1\",\"eventCategory\":\"Management\",\"eventID\":\"REDACTED\",\"eventName\":\"DescribeConfigurationRecorders\",\"eventSource\":\"config.amazonaws.com\",\"eventTime\":\"2014-03-25T21:08:19Z\",\"eventType\":\"AwsApiCall\",\"eventVersion\":\"1.07\",\"managementEvent\":true,\"readOnly\":true,\"recipientAccountId\":\"REDACTED\",\"requestID\":\"REDACTED\",\"requestParameters\":null,\"responseElements\":null,\"sourceIPAddress\":\"REDACTED\",\"userAgent\":\"REDACTED\",\"userIdentity\":{\"accessKeyId\":\"REDACTED\",\"accountId\":\"REDACTED\",\"arn\":\"arn:aws:iam::REDACTED:user/REDACTED\",\"principalId\":\"REDACTED\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"REDACTED\",\"mfaAuthenticated\":\"true\"},\"sessionIssuer\":{},\"webIdFederationData\":{}},\"type\":\"IAMUser\",\"userName\":\"REDACTED\"}}",
         "event.outcome": "success",
         "event.provider": "config.amazonaws.com",
         "event.type": "info",
