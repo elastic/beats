@@ -17604,6 +17604,52 @@ Elasticsearch module
 
 
 
+
+*`cluster_state.nodes_hash`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.nodes_hash
+
+--
+
+*`cluster_state.version`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.version
+
+--
+
+*`cluster_state.master_node`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.master_node
+
+--
+
+*`cluster_state.state_uuid`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.state_uuid
+
+--
+
+*`cluster_state.status`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.state.status
+
+--
+
 *`timestamp`*::
 +
 --
@@ -18449,11 +18495,6 @@ alias to: elasticsearch.index.summary.total.indexing.index.count
 
 --
 
-[float]
-=== elasticsearch
-
-
-
 
 *`elasticsearch.cluster.name`*::
 +
@@ -18792,6 +18833,42 @@ Cluster stats
 
 
 
+
+*`elasticsearch.cluster.stats.state.nodes_hash`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.master_node`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.version`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.state_uuid`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.state.status`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.cluster.stats.status`*::
 +
 --
@@ -18812,6 +18889,15 @@ Nodes statistics.
 *`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.stats.count
+
+--
+
+*`elasticsearch.cluster.stats.nodes.stats.count`*::
++
+--
 Total number of nodes in cluster.
 
 
@@ -18822,6 +18908,15 @@ type: long
 *`elasticsearch.cluster.stats.nodes.master`*::
 +
 --
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.stats.master
+
+--
+
+*`elasticsearch.cluster.stats.nodes.stats.master`*::
++
+--
 Number of master-eligible nodes in cluster.
 
 
@@ -18830,6 +18925,15 @@ type: long
 --
 
 *`elasticsearch.cluster.stats.nodes.data`*::
++
+--
+type: long
+
+alias to: elasticsearch.cluster.stats.nodes.stats.data
+
+--
+
+*`elasticsearch.cluster.stats.nodes.stats.data`*::
 +
 --
 Number of data nodes in cluster.

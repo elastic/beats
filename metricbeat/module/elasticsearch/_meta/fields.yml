@@ -6,6 +6,24 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: cluster_state
+      type: group
+      fields:
+        - name: nodes_hash
+          type: alias
+          path: elasticsearch.cluster.stats.state.nodes_hash
+        - name: version
+          type: alias
+          path: elasticsearch.cluster.stats.state.version
+        - name: master_node
+          type: alias
+          path: elasticsearch.cluster.stats.state.master_node
+        - name: state_uuid
+          type: alias
+          path: elasticsearch.cluster.stats.state.state_uuid
+        - name: status
+          type: alias
+          path: elasticsearch.cluster.stats.state.status
     - name: timestamp
       type: alias
       path: "@timestamp"
@@ -408,7 +426,6 @@
                       path: elasticsearch.index.summary.total.indexing.index.count
     - name: elasticsearch
       type: group
-      description: >
       fields:
         - name: cluster.name
           type: keyword

@@ -1,0 +1,287 @@
+{
+    "_nodes": {
+        "total": 1,
+        "successful": 1,
+        "failed": 0
+    },
+    "cluster_name": "docker-cluster",
+    "cluster_uuid": "izHz76JkQDG-4sL2G5EQug",
+    "timestamp": 1604418525510,
+    "status": "yellow",
+    "indices": {
+        "count": 8,
+        "shards": {
+            "total": 8,
+            "primaries": 8,
+            "replication": 0,
+            "index": {
+                "shards": {
+                    "min": 1,
+                    "max": 1,
+                    "avg": 1
+                },
+                "primaries": {
+                    "min": 1,
+                    "max": 1,
+                    "avg": 1
+                },
+                "replication": {
+                    "min": 0,
+                    "max": 0,
+                    "avg": 0
+                }
+            }
+        },
+        "docs": {
+            "count": 223,
+            "deleted": 862
+        },
+        "store": {
+            "size_in_bytes": 11701629,
+            "reserved_in_bytes": 0
+        },
+        "fielddata": {
+            "memory_size_in_bytes": 0,
+            "evictions": 0
+        },
+        "query_cache": {
+            "memory_size_in_bytes": 0,
+            "total_count": 0,
+            "hit_count": 0,
+            "miss_count": 0,
+            "cache_size": 0,
+            "cache_count": 0,
+            "evictions": 0
+        },
+        "completion": {
+            "size_in_bytes": 0
+        },
+        "segments": {
+            "count": 19,
+            "memory_in_bytes": 110372,
+            "terms_memory_in_bytes": 80960,
+            "stored_fields_memory_in_bytes": 9304,
+            "term_vectors_memory_in_bytes": 0,
+            "norms_memory_in_bytes": 2880,
+            "points_memory_in_bytes": 0,
+            "doc_values_memory_in_bytes": 17228,
+            "index_writer_memory_in_bytes": 0,
+            "version_map_memory_in_bytes": 0,
+            "fixed_bit_set_memory_in_bytes": 776,
+            "max_unsafe_auto_id_timestamp": -1,
+            "file_sizes": {}
+        },
+        "mappings": {
+            "field_types": [
+                {
+                    "name": "alias",
+                    "count": 59,
+                    "index_count": 1
+                },
+                {
+                    "name": "binary",
+                    "count": 9,
+                    "index_count": 1
+                },
+                {
+                    "name": "boolean",
+                    "count": 128,
+                    "index_count": 4
+                },
+                {
+                    "name": "byte",
+                    "count": 1,
+                    "index_count": 1
+                },
+                {
+                    "name": "date",
+                    "count": 113,
+                    "index_count": 7
+                },
+                {
+                    "name": "double",
+                    "count": 35,
+                    "index_count": 1
+                },
+                {
+                    "name": "flattened",
+                    "count": 9,
+                    "index_count": 1
+                },
+                {
+                    "name": "float",
+                    "count": 80,
+                    "index_count": 2
+                },
+                {
+                    "name": "geo_point",
+                    "count": 7,
+                    "index_count": 1
+                },
+                {
+                    "name": "integer",
+                    "count": 29,
+                    "index_count": 2
+                },
+                {
+                    "name": "ip",
+                    "count": 19,
+                    "index_count": 1
+                },
+                {
+                    "name": "keyword",
+                    "count": 1184,
+                    "index_count": 7
+                },
+                {
+                    "name": "long",
+                    "count": 1902,
+                    "index_count": 5
+                },
+                {
+                    "name": "nested",
+                    "count": 13,
+                    "index_count": 3
+                },
+                {
+                    "name": "object",
+                    "count": 1978,
+                    "index_count": 8
+                },
+                {
+                    "name": "scaled_float",
+                    "count": 105,
+                    "index_count": 1
+                },
+                {
+                    "name": "text",
+                    "count": 184,
+                    "index_count": 6
+                }
+            ]
+        },
+        "analysis": {
+            "char_filter_types": [],
+            "tokenizer_types": [],
+            "filter_types": [],
+            "analyzer_types": [],
+            "built_in_char_filters": [],
+            "built_in_tokenizers": [],
+            "built_in_filters": [],
+            "built_in_analyzers": []
+        }
+    },
+    "nodes": {
+        "count": {
+            "total": 1,
+            "coordinating_only": 0,
+            "data": 1,
+            "data_cold": 0,
+            "data_content": 0,
+            "data_hot": 0,
+            "data_warm": 0,
+            "ingest": 1,
+            "master": 1,
+            "ml": 1,
+            "remote_cluster_client": 1,
+            "transform": 1,
+            "voting_only": 0
+        },
+        "versions": [
+            "8.0.0"
+        ],
+        "os": {
+            "available_processors": 12,
+            "allocated_processors": 12,
+            "names": [
+                {
+                    "name": "Linux",
+                    "count": 1
+                }
+            ],
+            "pretty_names": [
+                {
+                    "pretty_name": "CentOS Linux 8 (Core)",
+                    "count": 1
+                }
+            ],
+            "mem": {
+                "total_in_bytes": 33300463616,
+                "free_in_bytes": 7118233600,
+                "used_in_bytes": 26182230016,
+                "free_percent": 21,
+                "used_percent": 79
+            }
+        },
+        "process": {
+            "cpu": {
+                "percent": 0
+            },
+            "open_file_descriptors": {
+                "min": 367,
+                "max": 367,
+                "avg": 367
+            }
+        },
+        "jvm": {
+            "max_uptime_in_millis": 17857098,
+            "versions": [
+                {
+                    "version": "15",
+                    "vm_name": "OpenJDK 64-Bit Server VM",
+                    "vm_version": "15+36",
+                    "vm_vendor": "AdoptOpenJDK",
+                    "bundled_jdk": true,
+                    "using_bundled_jdk": true,
+                    "count": 1
+                }
+            ],
+            "mem": {
+                "heap_used_in_bytes": 615251232,
+                "heap_max_in_bytes": 1073741824
+            },
+            "threads": 85
+        },
+        "fs": {
+            "total_in_bytes": 958613114880,
+            "free_in_bytes": 231480127488,
+            "available_in_bytes": 182713794560
+        },
+        "plugins": [],
+        "network_types": {
+            "transport_types": {
+                "netty4": 1
+            },
+            "http_types": {
+                "netty4": 1
+            }
+        },
+        "discovery_types": {
+            "zen": 1
+        },
+        "packaging_types": [
+            {
+                "flavor": "default",
+                "type": "docker",
+                "count": 1
+            }
+        ],
+        "ingest": {
+            "number_of_pipelines": 1,
+            "processor_stats": {
+                "gsub": {
+                    "count": 0,
+                    "failed": 0,
+                    "current": 0,
+                    "time_in_millis": 0
+                },
+                "script": {
+                    "count": 0,
+                    "failed": 0,
+                    "current": 0,
+                    "time_in_millis": 0
+                }
+            }
+        }
+    }
+}
