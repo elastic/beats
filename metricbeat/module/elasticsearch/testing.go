@@ -20,11 +20,12 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper"
 
 	"github.com/stretchr/testify/require"
 
