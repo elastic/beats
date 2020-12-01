@@ -19,9 +19,9 @@
 package status
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -106,7 +106,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func  adjustFleetEvent(event mb.Event) mb.Event {
+func adjustFleetEvent(event mb.Event) mb.Event {
 	var adjusted mb.Event
 	adjusted.MetricSetFields = event.MetricSetFields.Clone()
 

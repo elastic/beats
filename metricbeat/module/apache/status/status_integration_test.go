@@ -20,11 +20,11 @@
 package status
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
