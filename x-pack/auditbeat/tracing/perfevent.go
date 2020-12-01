@@ -358,7 +358,7 @@ func makeMetadata(eventID int, record *perf.SampleRecord) Metadata {
 func (c *PerfChannel) channelLoop() {
 	defer c.wg.Done()
 	ctx := doneWrapperContext(c.done)
-	merger := newRecordMerger(c.events[:c.cpus.count], c, c.pollTimeout)
+	merger := newRecordMerger(c.events[:c.cpus.NumCPU()], c, c.pollTimeout)
 	for {
 		// Read the available event from all the monitored ring-buffers that
 		// has the smallest timestamp.
