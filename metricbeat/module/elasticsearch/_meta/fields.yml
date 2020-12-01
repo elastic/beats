@@ -6,6 +6,24 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: cluster_state
+      type: group
+      fields:
+        - name: nodes_hash
+          type: alias
+          path: elasticsearch.cluster.stats.state.nodes_hash
+        - name: version
+          type: alias
+          path: elasticsearch.cluster.stats.state.version
+        - name: master_node
+          type: alias
+          path: elasticsearch.cluster.stats.state.master_node
+        - name: state_uuid
+          type: alias
+          path: elasticsearch.cluster.stats.state.state_uuid
+        - name: status
+          type: alias
+          path: elasticsearch.cluster.stats.state.status
     - name: timestamp
       type: alias
       path: "@timestamp"
@@ -21,6 +39,121 @@
         - name: name
           type: alias
           path: elasticsearch.node.name
+    - name: index_stats
+      type: group
+      fields:
+        - name: index
+          path: elasticsearch.index.name
+          type: alias
+        - name: primaries
+          type: group
+          fields:
+            - name: store.size_in_bytes
+              type: alias
+              path: elasticsearch.index.primaries.store.size_in_bytes
+            - name: docs.count
+              type: alias
+              path: elasticsearch.index.primaries.docs.count
+            - name: segments.count
+              type: alias
+              path: elasticsearch.index.primaries.segments.count
+            - name: refresh.total_time_in_millis
+              type: alias
+              path: elasticsearch.index.primaries.refresh.total_time_in_millis
+            - name: merges.total_size_in_bytes
+              type: alias
+              path: elasticsearch.index.primaries.merges.total_size_in_bytes
+            - name: indexing
+              type: group
+              fields:
+                - name: index_total
+                  type: alias
+                  path: elasticsearch.index.primaries.indexing.index_total
+                - name: index_time_in_millis
+                  type: alias
+                  path: elasticsearch.index.primaries.indexing.index_time_in_millis
+                - name: throttle_time_in_millis
+                  type: alias
+                  path: elasticsearch.index.primaries.indexing.throttle_time_in_millis
+        - name: total
+          type: group
+          fields:
+            - name: query_cache.memory_size_in_bytes
+              type: alias
+              path: elasticsearch.index.total.query_cache.memory_size_in_bytes
+            - name: fielddata.memory_size_in_bytes
+              type: alias
+              path: elasticsearch.index.total.fielddata.memory_size_in_bytes
+            - name: request_cache.memory_size_in_bytes
+              type: alias
+              path: elasticsearch.index.total.request_cache.memory_size_in_bytes
+            - name: merges.total_size_in_bytes
+              type: alias
+              path: elasticsearch.index.total.merges.total_size_in_bytes
+            - name: refresh.total_time_in_millis
+              type: alias
+              path: elasticsearch.index.total.refresh.total_time_in_millis
+            - name: store.size_in_bytes
+              type: alias
+              path: elasticsearch.index.total.store.size_in_bytes
+            - name: indexing
+              type: group
+              fields:
+                - name: index_total
+                  type: alias
+                  path: elasticsearch.index.total.indexing.index_total
+                - name: index_time_in_millis
+                  type: alias
+                  path: elasticsearch.index.total.indexing.index_time_in_millis
+                - name: throttle_time_in_millis
+                  type: alias
+                  path: elasticsearch.index.total.indexing.throttle_time_in_millis
+            - name: search
+              type: group
+              fields:
+                - name: query_total
+                  type: alias
+                  path: elasticsearch.index.total.search.query_total
+                - name: query_time_in_millis
+                  type: alias
+                  path: elasticsearch.index.total.search.query_time_in_millis
+            - name: segments
+              type: group
+              fields:
+                - name: query_total
+                  type: alias
+                  path: elasticsearch.index.total.segments.memory_in_bytes
+                - name: terms_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.terms_memory_in_bytes
+                - name: points_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.points_memory_in_bytes
+                - name: count
+                  type: alias
+                  path: elasticsearch.index.total.segments.count
+                - name: doc_values_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.doc_values_memory_in_bytes
+                - name: norms_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.norms_memory_in_bytes
+                - name: stored_fields_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.stored_fields_memory_in_bytes
+                - name: fixed_bit_set_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.fixed_bit_set_memory_in_bytes
+                - name: term_vectors_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.term_vectors_memory_in_bytes
+                - name: version_map_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.version_map_memory_in_bytes
+                - name: index_writer_memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+
     - name: ccr_auto_follow_stats
       type: group
       fields:
@@ -408,7 +541,6 @@
                       path: elasticsearch.index.summary.total.indexing.index.count
     - name: elasticsearch
       type: group
-      description: >
       fields:
         - name: cluster.name
           type: keyword

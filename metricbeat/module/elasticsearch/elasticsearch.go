@@ -327,7 +327,7 @@ func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool
 }
 
 // GetStackUsage returns stack usage information.
-func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+func GetStackUsage(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage", "")
 	if err != nil {
 		return nil, err
