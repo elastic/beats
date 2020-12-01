@@ -60,8 +60,8 @@ relative path is set, it is considered relative to the config path. See the <<di
 section for details.
 
 *`setup.template.overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
-is false. Do not enable this option is you start more than one instance of {beatname_uc} at the same time. It
-can overload your {es} by sending too many template update reqests.
+is false. Do not enable this option if you start more than one instance of {beatname_uc} at the same time. It
+can overload {es} by sending too many template update requests.
 
 *`setup.template.settings`*:: A dictionary of settings to place into the `settings.index` dictionary of the
 Elasticsearch template. For more details about the available Elasticsearch mapping options, please
