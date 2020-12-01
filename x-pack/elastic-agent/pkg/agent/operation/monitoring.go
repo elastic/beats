@@ -327,12 +327,13 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 		})
 	}
 
+	fixedAgentName := strings.ReplaceAll(agentName, "-", "_")
 	// setup cpu, memory and fd monitors for agents
 	modules = append(modules, map[string]interface{}{
 		"module":     "system",
 		"period":     "10s",
 		"metricsets": []string{"process"},
-		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", agentName),
+		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
 		"processes":  []string{install.BinaryName},
 		"processors": []map[string]interface{}{
 			{
@@ -340,7 +341,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"target": "data_stream",
 					"fields": map[string]interface{}{
 						"type":      "metrics",
-						"dataset":   fmt.Sprintf("elastic_agent.%s", agentName),
+						"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
 						"namespace": "default",
 					},
 				},
@@ -349,7 +350,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 				"add_fields": map[string]interface{}{
 					"target": "event",
 					"fields": map[string]interface{}{
-						"dataset": fmt.Sprintf("elastic_agent.%s", agentName),
+						"dataset": fmt.Sprintf("elastic_agent.%s", fixedAgentName),
 					},
 				},
 			},
@@ -374,7 +375,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					},
 				},
 			},
-			{
+			// {
 				// maps to keyword incorrectly, TODO: fix later, not that important field for our use-case
 				"drop_fields": map[string]interface{}{
 					"fields":         []string{"system.process.cpu.start_time"},
