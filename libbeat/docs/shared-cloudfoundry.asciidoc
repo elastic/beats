@@ -50,7 +50,7 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloud
 curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloudfoundry/{beatname_lc}/manifest.yml
 ------------------------------------------------
 
-You need to modify the `{beatname_lc}.yml` file to set the `api_address`,
+You need to modify the +{beatname_lc}.yml+ file to set the `api_address`,
 `client_id` and `client_secret`.
 
 
