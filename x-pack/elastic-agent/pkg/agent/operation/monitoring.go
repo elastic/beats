@@ -375,7 +375,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					},
 				},
 			},
-			// {
+			{
 				// maps to keyword incorrectly, TODO: fix later, not that important field for our use-case
 				"drop_fields": map[string]interface{}{
 					"fields":         []string{"system.process.cpu.start_time"},
