@@ -192,7 +192,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 					"time_in_queue.ms": int64(858),
 					"insert_order":     int64(45),
 				}, Timestamp: time.Time{},
-				Took:         0,
+				Took: 0,
 			},
 		}},
 	}
