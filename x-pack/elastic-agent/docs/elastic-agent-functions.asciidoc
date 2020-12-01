@@ -206,7 +206,7 @@ stringContains("hello world", "hello") == true
 stringContains(${var1}, "hello") != true
 ----
 
-[[subtract-function]]
+[[substract-function]]
 === `subtract`
 
 `substract(Number, Number) Number`

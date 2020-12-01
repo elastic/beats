@@ -3,7 +3,7 @@
 
 A condition is a boolean expression that you can specify in your agent policy
 to control whether a configuration is applied to the running {agent}. You can
-set a condition on inputs, streams, or even processors. 
+set a condition on inputs, streams, or even processors.
 
 In this example, the input is applied if the host platform is Linux:
 
@@ -51,7 +51,7 @@ inputs:
 
 The conditions supported by {agent} are based on {ref}/eql-syntax.html[EQL]'s
 boolean syntax, but add support for variables from providers and functions to
-manipulate the values. 
+manipulate the values.
 
 **Supported operators:**
 
@@ -65,7 +65,7 @@ manipulate the values.
 * Array functions <<arrayContains-function,`arrayContains`>>
 * Dict functions <<hasKey-function,`hasKey`>> (not in EQL)
 * Length functions <<length-function,`length`>>
-* Math functions <<add-function,`add`>>, <<subtract-function,`subtract`>>,
+* Math functions <<add-function,`add`>>, <<substract-function,`substract`>>,
 <<multiply-function,`multiply`>>, <<divide-function,`divide`>>, <<modulo-function,`modulo`>>
 * String functions <<concat-function,`concat`>>, <<endsWith-function,`endsWith`>>,
 <<indexOf-function,`indexOf`>>, <<match-function,`match`>>, <<number-function,`number`>>,
