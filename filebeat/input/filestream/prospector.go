@@ -63,6 +63,7 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 		})
 	}
 
+	files := p.filewatcher.GetFiles()
 	identifierName := p.identifier.Name()
 	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
@@ -70,16 +71,18 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 		if err != nil {
 			return "", nil
 		}
+
+		fi, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
 		if fm.IdentifierName != identifierName {
-			fi, err := os.Stat(fm.Source)
-			if err != nil {
-				return "", fm
-			}
 			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
-		return "", nil
+		return "", fm
 	})
 
 	return nil
