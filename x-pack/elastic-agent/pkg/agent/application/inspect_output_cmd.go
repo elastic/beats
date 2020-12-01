@@ -66,7 +66,7 @@ func (c *InspectOutputCmd) inspectOutputs(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		return listOutputsFromConfig(l, agentInfo, rawConfig)
 	}
 
@@ -119,7 +119,7 @@ func (c *InspectOutputCmd) inspectOutput(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		return printOutputFromConfig(l, agentInfo, c.output, c.program, rawConfig)
 	}
 
