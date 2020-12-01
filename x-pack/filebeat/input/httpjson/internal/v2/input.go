@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	inputName = "httpjsonv2"
+	inputName = "httpjson"
 )
 
 var (
@@ -42,9 +42,9 @@ type retryLogger struct {
 	log *logp.Logger
 }
 
-func newRetryLogger() *retryLogger {
+func newRetryLogger(log *logp.Logger) *retryLogger {
 	return &retryLogger{
-		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+		log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1)),
 	}
 }
 
@@ -136,7 +136,7 @@ func run(
 		return nil
 	})
 
-	log.Infof("Context done: %v", err)
+	log.Infof("Input stopped because context was cancelled with: %v", err)
 
 	return nil
 }
@@ -157,7 +157,7 @@ func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSC
 			Timeout:       timeout,
 			CheckRedirect: checkRedirect(config.Request, log),
 		},
-		Logger:       newRetryLogger(),
+		Logger:       newRetryLogger(log),
 		RetryWaitMin: config.Request.Retry.getWaitMin(),
 		RetryWaitMax: config.Request.Retry.getWaitMax(),
 		RetryMax:     config.Request.Retry.getMaxAttempts(),

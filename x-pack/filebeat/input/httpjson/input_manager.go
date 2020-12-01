@@ -43,7 +43,7 @@ func (m inputManager) Init(grp unison.Group, mode inputv2.Mode) error {
 // Create creates a cursor input manager if the config has a date cursor set up,
 // otherwise it creates a stateless input manager.
 func (m inputManager) Create(cfg *common.Config) (inputv2.Input, error) {
-	if b, _ := cfg.Bool("is_v2", -1); b {
+	if v, _ := cfg.String("config_version", -1); v == "2" {
 		return m.v2inputManager.Create(cfg)
 	}
 	cfgwarn.Deprecate("7.12", "you are using a deprecated version of httpjson config")
