@@ -20,11 +20,12 @@
 package index_recovery
 
 import (
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
