@@ -50,7 +50,7 @@ func NewCrashChecker(ctx context.Context, ch chan error, log *logger.Logger) (*C
 		checkPeriod: defaultCheckPeriod,
 	}
 
-	if err := c.Init(ctx); err != nil {
+	if err := c.Init(ctx, log); err != nil {
 		return nil, err
 	}
 

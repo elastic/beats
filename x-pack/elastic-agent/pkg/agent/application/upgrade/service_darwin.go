@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
@@ -34,7 +36,7 @@ const (
 )
 
 // Init initializes os dependent properties.
-func (ch *CrashChecker) Init(ctx context.Context) error {
+func (ch *CrashChecker) Init(ctx context.Context, _ *logger.Logger) error {
 	ch.sc = &darwinPidProvider{}
 
 	return nil
@@ -48,11 +50,13 @@ func (p *darwinPidProvider) Close() {}
 
 func (p *darwinPidProvider) PID(ctx context.Context) (int, error) {
 	piders := []func(context.Context) (int, error){
-		// list of services differs when using sudo and not
-		// agent should be included in sudo one but in case it's not
-		// we're falling back to regular
-		p.piderFromCmd(ctx, "sudo", "launchctl", "list", install.ServiceName),
 		p.piderFromCmd(ctx, "launchctl", "list", install.ServiceName),
+	}
+
+	// if release is specifically built to be upgradeable (using DEV flag)
+	// we dont require to run as a service and will need sudo fallback
+	if release.Upgradeable() {
+		piders = append(piders, p.piderFromCmd(ctx, "sudo", "launchctl", "list", install.ServiceName))
 	}
 
 	var pidErrors error

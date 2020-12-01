@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 const (
@@ -26,7 +27,7 @@ const (
 )
 
 // Init initializes os dependent properties.
-func (ch *CrashChecker) Init(ctx context.Context) error {
+func (ch *CrashChecker) Init(ctx context.Context, _ *logger.Logger) error {
 	mgr, err := mgr.Connect()
 	if err != nil {
 		return errors.New("failed to initiate service manager", err)
