@@ -67,20 +67,20 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
 
 	for _, pipeline := range pipelines {
-		var clusterUUIDs []string
+		clusterUUIDs := make(map[string]struct{}, 0)
 		for _, vertex := range pipeline.Graph.Graph.Vertices {
 			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
 			if clusterUUID != "" {
-				clusterUUIDs = append(clusterUUIDs, clusterUUID)
+				clusterUUIDs[clusterUUID] = struct{}{}
 			}
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one
 		if len(clusterUUIDs) == 0 {
-			clusterUUIDs = []string{""}
+			clusterUUIDs[""] = struct{}{}
 		}
 
-		for _, clusterUUID := range clusterUUIDs {
+		for clusterUUID, _ := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
 				clusterToPipelinesMap[clusterUUID] = []logstash.PipelineState{}
