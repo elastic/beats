@@ -19,9 +19,11 @@ package ml_job
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
