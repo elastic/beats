@@ -94,5 +94,5 @@ class Test(BaseTest):
         assert os.path.isdir(migrated_registry_dir)
         assert os.path.isdir(migrated_registry_dir + "/filebeat")
         assert os.path.isfile(migrated_registry_dir + "/filebeat/log.json")
-        assert os.path.isfile(migrated_registry_dir + "/filebeat/1.json")
+        assert os.path.isfile(migrated_registry_dir + "/filebeat/2.json")
         assert os.path.isfile(migrated_registry_dir + "/filebeat/active.dat")

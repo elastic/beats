@@ -379,6 +379,8 @@ func TestConfigurableStartStop(t *testing.T) {
 }
 
 func TestConfigurableService(t *testing.T) {
+	t.Skipf("flaky see https://github.com/elastic/beats/issues/20836")
+
 	p := getProgram("serviceable", "1.0")
 
 	operator := getTestOperator(t, downloadPath, installPath, p)
@@ -388,7 +390,7 @@ func TestConfigurableService(t *testing.T) {
 	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
 
 	// emulating a service, so we need to start the binary here in the test
-	spec := p.Spec()
+	spec := p.ProcessSpec()
 	cmd := exec.Command(spec.BinaryPath, fmt.Sprintf("%d", p.ServicePort()))
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	cmd.Dir = filepath.Dir(spec.BinaryPath)
@@ -443,7 +445,7 @@ func TestConfigurableService(t *testing.T) {
 
 func isAvailable(name, version string) error {
 	p := getProgram(name, version)
-	spec := p.Spec()
+	spec := p.ProcessSpec()
 	path := spec.BinaryPath
 	if runtime.GOOS == "windows" {
 		path += ".exe"

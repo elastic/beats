@@ -4,6 +4,19 @@
     Cluster stats
   release: ga
   fields:
+    - name: state
+      type: group
+      fields:
+        - name: nodes_hash
+          type: keyword
+        - name: master_node
+          type: keyword
+        - name: version
+          type: keyword
+        - name: state_uuid
+          type: keyword
+        - name: status
+          type: keyword
     - name: status
       type: keyword
       description: >
@@ -14,14 +27,23 @@
         Nodes statistics.
       fields:
       - name: count
+        type: alias
+        path: elasticsearch.cluster.stats.nodes.stats.count
+      - name: stats.count
         type: long
         description: >
           Total number of nodes in cluster.
       - name: master
+        type: alias
+        path: elasticsearch.cluster.stats.nodes.stats.master
+      - name: stats.master
         type: long
         description: >
           Number of master-eligible nodes in cluster.
       - name: data
+        type: long
+        path: elasticsearch.cluster.stats.nodes.stats.data
+      - name: stats.data
         type: long
         description: >
           Number of data nodes in cluster.

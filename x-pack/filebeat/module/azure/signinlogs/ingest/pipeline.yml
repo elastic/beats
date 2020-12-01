@@ -259,12 +259,14 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null || ctx.azure.signinlogs.properties.status.error_code > 0"
+    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null && ctx.azure.signinlogs.properties.status.error_code > 0"
 - grok:
     field: azure.signinlogs.properties.user_principal_name
     patterns:
       - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+      - '%{GREEDYDATA:user.name}'
     ignore_missing: true
+    ignore_failure: true
 - convert:
     field: azure.signinlogs.properties.user_display_name
     target_field: user.full_name
@@ -278,6 +280,7 @@ processors:
 - geoip:
     field: source.ip
     target_field: source.geo
+    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip

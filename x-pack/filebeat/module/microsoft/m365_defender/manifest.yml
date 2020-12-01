@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 5m
+  - name: tags
+    default: [m365-defender, forwarded]
+  - name: url
+    default: "https://api.security.microsoft.com/api/incidents"
+  - name: oauth2
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/defender.yml
+
+

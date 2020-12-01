@@ -116,18 +116,11 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 		return nil, err
 	}
 
-	var t string
-	if runtime.GOOS == "windows" {
-		t = fs.TypeName
-	} else {
-		t = fs.SysTypeName
-	}
-
 	filesystem := FSStat{
 		FileSystemUsage: stat,
 		DevName:         fs.DevName,
 		Mount:           fs.DirName,
-		SysTypeName:     t,
+		SysTypeName:     fs.SysTypeName,
 	}
 
 	return &filesystem, nil
@@ -145,20 +138,23 @@ func AddFileSystemUsedPercentage(f *FSStat) {
 
 // GetFilesystemEvent turns a stat struct into a MapStr
 func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
-	return common.MapStr{
+	evt := common.MapStr{
 		"type":        fsStat.SysTypeName,
 		"device_name": fsStat.DevName,
 		"mount_point": fsStat.Mount,
 		"total":       fsStat.Total,
-		"free":        fsStat.Free,
 		"available":   fsStat.Avail,
-		"files":       fsStat.Files,
-		"free_files":  fsStat.FreeFiles,
+		"free":        fsStat.Free,
 		"used": common.MapStr{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
 		},
 	}
+	if runtime.GOOS != "windows" {
+		evt.Put("files", fsStat.Files)
+		evt.Put("free_files", fsStat.FreeFiles)
+	}
+	return evt
 }
 
 // Predicate is a function predicate for use with filesystems. It returns true

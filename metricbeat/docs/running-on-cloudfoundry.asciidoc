@@ -66,16 +66,8 @@ To check the status, run:
 $ cf apps
 
 name         requested state   instances   memory   disk   urls
-metricbeat   started           1/1         256M     1G
+metricbeat   started           1/1         512M     1G
 ------------------------------------------------
 
 Metrics should start flowing to Elasticsearch. The events are annotated with
 metadata added by the <<add-cloudfoundry-metadata>> processor.
-
-
-[WARNING]
-=======================================
-*Set shard_id to scale:* By default {beatname_uc} will generate a random `shard_id` when it starts. In the case that
-{beatname_uc} needs to be scaled passed 1 instance, be sure to set a static `shard_id`. Not setting a static `shard_id`
-will result in duplicate events being pushed to Elasticsearch.
-=======================================

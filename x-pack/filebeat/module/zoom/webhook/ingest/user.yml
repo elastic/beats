@@ -1,0 +1,61 @@
+description: Pipeline for parsing Zoom user webhooks
+processors:
+- append:
+    field: event.type
+    value: iam
+    if: "!['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: authentication
+    if: "['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action != 'user.created'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'user.deleted'
+- append:
+    field: event.type
+    value: change
+    if: "['user.updated', 'user.settings_updated', 'user.deactivated', 'user.activated', 'user.disassociated', 'user.presence_status_updated', 'user.personal_notes_updated'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: ctx?.event?.action == 'user.signed_in'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.event?.action == 'user.signed_out'
+- rename:
+    field: zoom.object
+    target_field: zoom.user
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: "['user.updated', 'user.settings_updated'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- date:
+    field: zoom.user.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "['user.signed_in', 'user.signed_out', 'user.personal_notes_updated', 'user.presence_status_updated'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- append:
+    field: related.user
+    value: "{{zoom.user.id}}"
+    if: "ctx?.zoom?.user?.id != null"
+- remove:
+    field:
+    - zoom.time_stamp
+    - zoom.user.date_time
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

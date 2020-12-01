@@ -55,6 +55,7 @@
         "source.as.organization.name": "Consorci de Serveis Universitaris de Catalunya",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "158.109.0.1",
