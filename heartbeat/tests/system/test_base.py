@@ -32,6 +32,30 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
         heartbeat_proc.check_kill_and_wait()
 
+    def test_disabled(self):
+        """
+        Basic test against a disabled monitor
+        """
+
+        config = {
+            "monitors": [
+                {
+                    "type": "http",
+                    "enabled": "false",
+                    "urls": ["http://localhost:9200"],
+                }
+            ]
+        }
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            **config
+        )
+
+        heartbeat_proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+        heartbeat_proc.check_kill_and_wait()
+
     def test_fields_under_root(self):
         """
         Basic test with fields and tags in monitor
