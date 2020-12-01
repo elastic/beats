@@ -73,6 +73,10 @@ func TestNewCPUSetFromExpression(t *testing.T) {
 			fail:    true,
 		},
 		{
+			content: "3-4-5",
+			fail:    true,
+		},
+		{
 			content: "0-4,5,6-6,,,,15",
 			result: CPUSet{
 				mask: []bool{

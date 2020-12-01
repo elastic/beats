@@ -99,8 +99,8 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 			if num+1 > max {
 				max = num + 1
 			}
-			ranges = append(ranges, r)
 		}
+		ranges = append(ranges, r)
 	}
 	if max == 0 {
 		return CPUSet{}, nil
@@ -110,7 +110,7 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 		from, to := -1, -1
 		switch len(r) {
 		case 0:
-			// Ignore empty range.
+			continue // Ignore empty range.
 		case 1:
 			from = r[0]
 			to = r[0]
