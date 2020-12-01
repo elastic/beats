@@ -208,6 +208,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
+- Fix exit on monitors with `enabled: false` {pull}22829[22829]
 
 *Journalbeat*
 
