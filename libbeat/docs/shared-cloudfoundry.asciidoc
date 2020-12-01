@@ -109,20 +109,20 @@ endif::[]
 * Number of {beatname_uc} instances. When {beatname_uc} is deployed as a Cloud
   Foundry application, it can be scaled up and down as any other application,
   with `cf scale` or by specifying the number of instances in the manifest.
-* Output configuration. In some cases, you can fine-tune the output
-  configuration to improve the events throughput. Some outputs support multiple
-  workers. The number of workers can be changed to take better advantage of the
-  available resources.
+* <<configuring-output,Output configuration>>. In some cases, you can fine-tune
+  the output configuration to improve the events throughput. Some outputs
+  support multiple workers. The number of workers can be changed to take better
+  advantage of the available resources.
 
 Some basic recommendations to adjust these settings when {beatname_uc} is not
 able to collect all events:
 
 * If {beatname_uc} is hitting its CPU limits, you will need to increase the
-  number of instances.
+  number of {beatname_uc} instances deployed with the same `shard_id`.
 * If {beatname_uc} has some spare CPU, there may be some backpressure from the
   output. Try to increase the number of workers in the output. If this doesn't
-  help, the bottle-neck may be in the network or in Elasticsearch. When other
-  outputs than Elasticsearch are used, similar recommendations apply.
-* If {beatname_uc} is hitting memory limits, increase the memory limit. After
-  adjusting memory limits, if {beatname_uc} is still unable to collect all
-  events, check the other recommendations.
+  help, the bottleneck may be in the network or in the service receiving the
+  events sent by {beatname_uc}.
+* If you need to modify the memory limit of {beatname_uc}, remember that CPU
+  shares assigned to Cloud Foundry applications depend on the configured memory
+  limit. You may need to check the other recommendations after that.
