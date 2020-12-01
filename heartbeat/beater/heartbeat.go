@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 
 	"github.com/pkg/errors"
@@ -127,8 +129,13 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
+			if err == stdfields.ErrPluginDisabled {
+				continue // don't stop loading monitors just because they're disabled
+			}
+
 			return errors.Wrap(err, "could not create monitor")
 		}
+
 		created.Start()
 	}
 	return nil
