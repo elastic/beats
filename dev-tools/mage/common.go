@@ -782,7 +782,7 @@ func binaryExtension(goos string) string {
 	return ""
 }
 
-var parseVersionRegex = regexp.MustCompile(`(?m)^[^\d]*(?P<major>\d)+\.(?P<minor>\d)+(?:\.(?P<patch>\d)+.*)?$`)
+var parseVersionRegex = regexp.MustCompile(`(?m)^[^\d]*(?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<patch>\d+).*)?$`)
 
 // ParseVersion extracts the major, minor, and optional patch number from a
 // version string.
