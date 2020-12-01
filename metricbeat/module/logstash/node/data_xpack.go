@@ -85,7 +85,7 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 			clusterUUIDs.Add("")
 		}
 
-		for _, clusterUUID := range clusterUUIDs {
+		for clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
 				clusterToPipelinesMap[clusterUUID] = []logstash.PipelineState{}

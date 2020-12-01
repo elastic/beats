@@ -232,7 +232,7 @@ func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID st
 			clusterUUIDs.Add("")
 		}
 
-		for _, clusterUUID := range clusterUUIDs {
+		for clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
 				clusterToPipelinesMap[clusterUUID] = []PipelineStats{}
