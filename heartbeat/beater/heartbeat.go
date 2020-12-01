@@ -21,14 +21,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-
-	"github.com/elastic/beats/v7/heartbeat/hbregistry"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
