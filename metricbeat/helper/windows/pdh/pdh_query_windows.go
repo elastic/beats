@@ -192,12 +192,24 @@ func (q *Query) GetFormattedCounterArrayValues() (map[string][]CounterValue, err
 	rtn := make(map[string][]CounterValue, len(q.Counters))
 	for path, counter := range q.Counters {
 		counterValue := CounterValue{Instance: counter.instanceName, Err: CounterValueError{CStatus: 0}}
-		value, err := PdhGetFormattedCounterArray(counter.handle)
-		_ = path
-		_= value
-		_= err
-		_= counterValue
-		//rtn[path] = append(rtn[path], q.PdhGetFormattedCounterArray(counter))
+		values, err := PdhGetFormattedCounterArray(counter.handle, PdhFmtDouble|PdhFmtNoCap100)
+		if err != nil {
+			counterValue.Err.Error = err
+			continue
+		}
+		for i := 0; i < len(values); i++ {
+			var val interface{}
+
+			switch counter.format {
+			case PdhFmtDouble:
+				val = *(*float64)(unsafe.Pointer(&values[i].Value.LongValue))
+			case PdhFmtLarge:
+				val = *(*int64)(unsafe.Pointer(&values[i].Value.LongValue))
+			}
+			counterValue.Measurement = val
+			counterValue.Instance = values[i].Name
+			rtn[path] = append(rtn[path], counterValue)
+		}
 	}
 	return rtn, nil
 }

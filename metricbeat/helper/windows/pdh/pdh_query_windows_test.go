@@ -20,6 +20,7 @@ package pdh
 import (
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -59,6 +60,24 @@ func TestExpandWildCardPathWithEmptyString(t *testing.T) {
 	list, err := q.ExpandWildCardPath("")
 	assert.Nil(t, list)
 	assert.EqualValues(t, err.Error(), "no query path given")
+}
+
+// TestExpandWildCardPathWithEmptyString will check for a valid path string.
+func TestGetFormattedCounterArrayValues(t *testing.T) {
+	var q Query
+	err := q.Open()
+	assert.NoError(t, err)
+	defer q.Close()
+	err = q.AddCounter(`\Processor(*)\% Processor Time`, "", "", true)
+	err = q.CollectData()
+	err = q.CollectData()
+	time.Sleep(15)
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := q.GetFormattedCounterArrayValues()
+	assert.NoError(t, err)
+	assert.True(t, len(list)>0)
 }
 
 // TestSuccessfulQuery retrieves a per counter successfully.

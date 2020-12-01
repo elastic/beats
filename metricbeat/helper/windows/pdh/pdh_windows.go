@@ -20,6 +20,8 @@
 package pdh
 
 import (
+	"bytes"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"strconv"
 	"syscall"
 	"unicode/utf16"
@@ -42,18 +44,20 @@ import (
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 //sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
 //sys _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) [failretval!=0] = pdh.PdhEnumObjectItemsW
-//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufsize *uint32, bufcnt *uint32, item *PdhFmtCounterValueItem) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 
-type PdhQueryHandle uintptr
-
-var InvalidQueryHandle = ^PdhQueryHandle(0)
-
-type PdhCounterHandle uintptr
-
-var InvalidCounterHandle = ^PdhCounterHandle(0)
+var (
+	InvalidQueryHandle = ^PdhQueryHandle(0)
+	InvalidCounterHandle = ^PdhCounterHandle(0)
+	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(PdhCounterValueItem{}))
+	)
 
 // PerformanceDetailWizard is the counter detail level
 const PerformanceDetailWizard = 400
+
+type PdhQueryHandle uintptr
+
+type PdhCounterHandle uintptr
 
 // PdhCounterInfo struct contains the performance counter details
 type PdhCounterInfo struct {
@@ -101,17 +105,28 @@ type PdhCounterValueLong struct {
 	Pad_cgo_1 [4]byte
 }
 
-// PdhFmtCounterValue for counter arrays
-type PdhFmtCounterValue struct {
-	CStatus uint32
-	padding uint32
-	Value   uint64
-}
-
 // PdhCounterValueArray.
 type PdhCounterValueArray struct {
 	buf   []byte
 	Items []PdhFmtCounterValueItem
+}
+
+// PdhCounterValueArray.
+type PdhFmtCounterValueItem struct {
+	Name		*uint16
+	FmtValue	PdhCounterValue
+}
+
+// PdhCounterValueArray.
+type PdhCounterValueItem struct {
+	SzName   uintptr
+	FmtValue PdhCounterValue
+}
+
+// CounterValueItem.
+type CounterValueItem struct {
+	Name  string
+	Value PdhCounterValue
 }
 
 // PdhOpenQuery creates a new query.
@@ -330,30 +345,44 @@ func (e PdhErrno) Error() string {
 	return string(utf16.Decode(b[:n]))
 }
 
-// PdhGetFormattedCounterValueLong computes a displayable long value for the specified counter.
-func PdhGetFormattedCounterArray(counter PdhCounterHandle) (*PdhCounterValueArray, error) {
-	array := new(PdhCounterValueArray)
-	var size, count uint32
-	var p *PdhFmtCounterValueItem
-	if len(array.buf) > 0 {
-		size = uint32(len(array.buf))
-		p = (*PdhFmtCounterValueItem)(unsafe.Pointer(&array.buf[0]))
-	}
-	err := _PdhGetFormattedCounterArray(counter, PdhFmtLong|PdhFmtNoCap100, &size, &count, p)
-	if err!= nil {
-		if err!= PDH_MORE_DATA {
-			return nil, err
+func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) ([]CounterValueItem, error) {
+	var bufferSize uint32
+	var bufferCount uint32
+
+	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
+		// From MSDN: You should call this function twice, the first time to get the required
+		// buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
 		}
-		array.buf = make([]byte, size)
-		p = (*PdhFmtCounterValueItem)(unsafe.Pointer(&array.buf[0]))
-		err = _PdhGetFormattedCounterArray(counter, PdhFmtLong|PdhFmtNoCap100, &size, &count, p)
-		if err != nil {
-			return nil, err
+
+		// Buffer holds PdhCounterValueItems at the beginning and then null-terminated
+		// strings at the end.
+		buffer := make([]byte, bufferSize)
+		if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &buffer[0]); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
 		}
+
+		values := make([]CounterValueItem, bufferCount)
+		nameBuffer := new(bytes.Buffer)
+		for i := 0; i < len(values); i++ {
+			pdhValueItem := (*PdhCounterValueItem)(unsafe.Pointer(&buffer[i*sizeofPdhCounterValueItem]))
+
+			// The strings are appended to the end of the buffer.
+			nameOffset := pdhValueItem.SzName - (uintptr)(unsafe.Pointer(&buffer[0]))
+			nameBuffer.Reset()
+			if err := common.UTF16ToUTF8Bytes(buffer[nameOffset:], nameBuffer); err != nil {
+				return nil, err
+			}
+
+			values[i].Name = nameBuffer.String()
+			values[i].Value = pdhValueItem.FmtValue
+		}
+
+		return values, nil
 	}
 
-	array.Items = (*[1 << 20]PdhFmtCounterValueItem)(unsafe.Pointer(p))[:count]
-	return array, nil
+	return nil, nil
 }
 
 

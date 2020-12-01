@@ -72,15 +72,8 @@ var pdhErrors = map[PdhErrno]struct{}{
 {{- end }}
 }
 
-type PdhFmtCounterValueItem struct {
-	Name     *uint16
-	FmtValue PDH_FMT_COUNTERVALUE
-}
-
-type PdhFmtCounterValue struct {
-	CStatus uint32
-	padding uint32
-	Value   uint64 // largest value of the union possible
+// PdhCounterValue is the structure that receives the counter value.
+type PdhCounterValue C.PDH_FMT_COUNTERVALUE
 
 type PdhCounterFormat uint32
 

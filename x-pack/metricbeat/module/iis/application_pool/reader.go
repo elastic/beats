@@ -94,37 +94,13 @@ func (r *AppPoolReader) InitCounters() error {
 		r.log.Info("no running application pools found")
 		return nil
 	}
-	var newQueries []string
 	r.workerProcesses = make(map[string]string)
 	for key, value := range appPoolCounters {
-		childQueries, err := r.query.GetCounterPaths(value)
-		if err != nil {
-			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
-				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("application pool"), "query", value)
-			} else {
-				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
-			}
-			continue
+		if err := r.query.AddCounter(value, "*", "float", true); err != nil {
+			return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 		}
-		newQueries = append(newQueries, childQueries...)
-		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
-		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
-			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
-			r.log.Debugw("No counter paths returned but PdhExpandWildCardPathW returned no errors", "initial query", value,
-				logp.Namespace("perfmon"), "expanded query", childQueries)
-			continue
-		}
-		for _, v := range childQueries {
-			if err := r.query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
-				return errors.Wrapf(err, `failed to add counter (query="%v")`, v)
-			}
-			r.workerProcesses[v] = key
-		}
-	}
-	err = r.query.RemoveUnusedCounters(newQueries)
-	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
+	r.workerProcesses[value] = key
+
 	}
 	return nil
 }
@@ -143,7 +119,7 @@ func (r *AppPoolReader) Read() ([]mb.Event, error) {
 	}
 
 	// Get the values.
-	values, err := r.query.GetFormattedCounterValues()
+	values, err := r.query.GetFormattedCounterArrayValues()
 	if err != nil {
 		r.query.Close()
 		return nil, errors.Wrap(err, "failed formatting counter values")

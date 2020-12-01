@@ -7,6 +7,7 @@
 package application_pool
 
 import (
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,20 +17,20 @@ import (
 
 // TestNewReaderValid should successfully instantiate the reader.
 func TestNewReaderValid(t *testing.T) {
-	var config Config
-	reader, err := newReader(config)
+	var config iis.Config
+	reader, err := NewReader(config)
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
 	assert.NotNil(t, reader.query.Handle)
 	assert.NotNil(t, reader.query.Counters)
-	defer reader.close()
+	defer reader.Close()
 }
 
 // TestInitCounters should successfully instantiate the reader counters.
 func TestInitCounters(t *testing.T) {
-	var config Config
-	reader, err := newReader(config)
+	var config iis.Config
+	reader, err := NewReader(config)
 	assert.NotNil(t, reader)
 	assert.NoError(t, err)
 	// if iis is not enabled, the reader.ApplicationPools is empty
@@ -37,7 +38,7 @@ func TestInitCounters(t *testing.T) {
 		assert.NotZero(t, len(reader.query.Counters))
 		assert.NotZero(t, len(reader.workerProcesses))
 	}
-	defer reader.close()
+	defer reader.Close()
 }
 
 func TestGetProcessIds(t *testing.T) {

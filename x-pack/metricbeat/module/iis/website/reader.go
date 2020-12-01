@@ -67,7 +67,6 @@ func NewReader(config iis.Config) (*WebsiteReader, error) {
 
 // initAppPools will check for any new instances and add them to the counter list
 func (r *WebsiteReader) InitCounters() error {
-	var newQueries []string
 	for _, value := range websiteCounters {
 
 		if err := r.query.AddCounter(value, "*", "float", true); err != nil {
@@ -75,10 +74,6 @@ func (r *WebsiteReader) InitCounters() error {
 		}
 	}
 
-	err := r.query.RemoveUnusedCounters(newQueries)
-	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
-	}
 	return nil
 }
 
