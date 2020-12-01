@@ -20,10 +20,12 @@ package index
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/helper"
+	"strconv"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
-	"strconv"
+
+	"github.com/elastic/beats/v7/metricbeat/helper"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
