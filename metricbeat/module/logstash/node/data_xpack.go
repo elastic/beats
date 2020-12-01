@@ -66,6 +66,11 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClust
 	var clusterToPipelinesMap map[string][]logstash.PipelineState
 	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
 
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
+
 	for _, pipeline := range pipelines {
 		clusterUUIDs := common.StringSet{}
 		for _, vertex := range pipeline.Graph.Graph.Vertices {

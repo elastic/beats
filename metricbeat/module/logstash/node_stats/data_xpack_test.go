@@ -105,23 +105,6 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 						},
 					},
 				},
-				"es_1": {
-					{
-						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
-							{
-								"id":           "vertex_1",
-								"cluster_uuid": "es_1",
-							},
-							{
-								"id": "vertex_2",
-							},
-							{
-								"id": "vertex_3",
-							},
-						},
-					},
-				},
 			},
 		},
 		"two_pipelines": {
@@ -189,23 +172,6 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 						},
 					},
 				},
-				"es_1": {
-					{
-						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
-							{
-								"id":           "vertex_1_1",
-								"cluster_uuid": "es_1",
-							},
-							{
-								"id": "vertex_1_2",
-							},
-							{
-								"id": "vertex_1_3",
-							},
-						},
-					},
-				},
 			},
 		},
 		"no_override_cluster_id": {
@@ -241,7 +207,6 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 					},
 				},
 			},
-			overrideClusterUUID: "",
 			expectedMap: map[string][]PipelineStats{
 				"es_1": {
 					{

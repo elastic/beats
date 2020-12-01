@@ -123,27 +123,6 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 						},
 					},
 				},
-				"es_1": {
-					{
-						ID: "test_pipeline",
-						Graph: &logstash.GraphContainer{
-							Graph: &logstash.Graph{
-								Vertices: []map[string]interface{}{
-									{
-										"id":           "vertex_1",
-										"cluster_uuid": "es_1",
-									},
-									{
-										"id": "vertex_2",
-									},
-									{
-										"id": "vertex_3",
-									},
-								},
-							},
-						},
-					},
-				},
 			},
 		},
 		"two_pipelines": {
@@ -221,27 +200,6 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 									},
 									{
 										"id": "vertex_2_3",
-									},
-								},
-							},
-						},
-					},
-				},
-				"es_1": {
-					{
-						ID: "test_pipeline_1",
-						Graph: &logstash.GraphContainer{
-							Graph: &logstash.Graph{
-								Vertices: []map[string]interface{}{
-									{
-										"id":           "vertex_1_1",
-										"cluster_uuid": "es_1",
-									},
-									{
-										"id": "vertex_1_2",
-									},
-									{
-										"id": "vertex_1_3",
 									},
 								},
 							},

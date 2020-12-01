@@ -213,6 +213,11 @@ func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID st
 	var clusterToPipelinesMap map[string][]PipelineStats
 	clusterToPipelinesMap = make(map[string][]PipelineStats)
 
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
+
 	for _, pipeline := range pipelines {
 		clusterUUIDs := common.StringSet{}
 		for _, vertex := range pipeline.Vertices {
