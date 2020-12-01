@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -79,6 +80,8 @@ type Source interface {
 
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
+
+const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
@@ -167,7 +170,11 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, errNoInputRunner
 	}
 
-	sourceIdentifier := newSourceIdentifier(cim.Type, settings.ID)
+	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating source identifier for input: %v", err)
+	}
+
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
@@ -197,17 +204,20 @@ type sourceIdentifier struct {
 	configuredUserID bool
 }
 
-func newSourceIdentifier(pluginName, userID string) *sourceIdentifier {
-	inputPrefix := pluginName
-	configuredUserID := false
-	if userID != "" {
-		inputPrefix = inputPrefix + "::" + userID
-		configuredUserID = true
+func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
+	if userID == globalInputID {
+		return nil, fmt.Errorf("invalid user ID: .global")
+	}
+
+	configuredUserID := true
+	if userID == "" {
+		configuredUserID = false
+		userID = globalInputID
 	}
 	return &sourceIdentifier{
-		prefix:           inputPrefix + "::",
+		prefix:           pluginName + "::" + userID + "::",
 		configuredUserID: configuredUserID,
-	}
+	}, nil
 }
 
 func (i *sourceIdentifier) ID(s Source) string {
