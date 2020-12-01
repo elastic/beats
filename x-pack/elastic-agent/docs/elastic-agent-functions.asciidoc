@@ -209,12 +209,12 @@ stringContains(${var1}, "hello") != true
 [[subtract-function]]
 === `subtract`
 
-`subtract(Number, Number) Number`
+`substract(Number, Number) Number`
 
 Usage:
 
 [source,eql]
 ----
 substract(5, 1) == 4
-subtract(${foo}, 2) != 2
+substract(${foo}, 2) != 2
 ----
