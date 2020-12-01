@@ -857,6 +857,7 @@ same journal. {pull}18467[18467]
 - Add unit file states to system/service {pull}22557[22557]
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - `kibana` module: `stats` metricset no-longer collects usage-related data. {pull}22732[22732]
+- Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 
 *Packetbeat*
 
