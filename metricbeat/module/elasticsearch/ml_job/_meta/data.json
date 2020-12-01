@@ -1,50 +1,37 @@
 {
-    "@timestamp": "2020-09-09T12:02:47.753Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "service": {
-        "type": "elasticsearch",
-        "name": "elasticsearch",
-        "address": "localhost:9200"
-    },
-    "event": {
-        "dataset": "elasticsearch.ml.job",
-        "module": "elasticsearch",
-        "duration": 6753437
-    },
-    "metricset": {
-        "name": "ml_job",
-        "period": 10000
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
+        "cluster": {
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
+        },
         "ml": {
             "job": {
-                "state": "closed",
                 "data_counts": {
-                    "record": {
-                        "processed": {
+                    "bucket": {
+                        "count": 2,
+                        "empty": {
                             "count": 0
                         },
-                        "earliest": {},
-                        "latest": {},
-                        "input": {
+                        "sparse": {
                             "count": 0
                         }
                     },
                     "field": {
                         "processed": {
-                            "count": 0
+                            "count": 28
                         }
                     },
                     "input": {
-                        "bytes": 0,
+                        "bytes": 1254,
                         "field": {
-                            "count": 0
+                            "count": 28
                         }
                     },
+                    "invalid_date": {
+                        "count": 0
+                    },
+                    "last_data_time": 1525848008257,
                     "missing_field": {
                         "count": 0
                     },
@@ -53,64 +40,66 @@
                             "count": 0
                         }
                     },
-                    "bucket": {
-                        "sparse": {
-                            "count": 0
+                    "record": {
+                        "earliest": {
+                            "ms": 1525847665298
                         },
-                        "count": 0,
-                        "empty": {
-                            "count": 0
+                        "input": {
+                            "count": 14
+                        },
+                        "latest": {
+                            "ms": 1525847795423
+                        },
+                        "processed": {
+                            "count": 14
                         }
-                    },
-                    "invalid_date": {
-                        "count": 0
                     }
                 },
+                "id": "55",
                 "model_size": {
-                    "model": {
-                        "bytes": 0
-                    },
-                    "total": {
-                        "field": {
-                            "partition": {
-                                "count": 0
-                            },
-                            "by": {
-                                "count": 0
-                            },
-                            "over": {
-                                "count": 0
-                            }
-                        }
-                    },
                     "bucket_allocation_failures": {
                         "count": 0
                     },
                     "log_time": {
-                        "ms": 1599652967759
+                        "ms": 1525848008000
                     },
-                    "timestamp": {},
-                    "result_type": "model_size_stats"
+                    "model": {
+                        "bytes": 49176
+                    },
+                    "result_type": "model_size_stats",
+                    "timestamp": {
+                        "ms": 1525847700000
+                    },
+                    "total": {
+                        "field": {
+                            "by": {
+                                "count": 3
+                            },
+                            "over": {
+                                "count": 0
+                            },
+                            "partition": {
+                                "count": 2
+                            }
+                        }
+                    }
                 },
-                "id": "mario"
+                "state": "closed"
             }
-        },
-        "cluster": {
-            "name": "docker-cluster",
-            "id": "giRKn5pZQ0afY0YrRiXdxQ"
         }
     },
-    "ecs": {
-        "version": "1.5.0"
+    "event": {
+        "dataset": "elasticsearch.ml.job",
+        "duration": 115000,
+        "module": "elasticsearch"
     },
-    "host": {
-        "name": "mcastro"
+    "metricset": {
+        "name": "ml_job",
+        "period": 10000
     },
-    "agent": {
-        "version": "8.0.0",
-        "ephemeral_id": "0860b6a7-2d1d-4062-a4da-756d0d42b282",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro",
-        "type": "metricbeat"
+    "service": {
+        "address": "127.0.0.1:43359",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }
