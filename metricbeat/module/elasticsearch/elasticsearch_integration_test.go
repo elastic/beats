@@ -129,7 +129,7 @@ func TestXPackEnabled(t *testing.T) {
 		"ccr":            []string{}, // no longer indexed into .monitoring-es-*
 		"cluster_stats":  []string{}, // no longer indexed into .monitoring-es-*
 		"enrich":         []string{}, // no longer indexed into .monitoring-es-*
-		"index_recovery": []string{"index_recovery"},
+		"index_recovery": []string{}, // no longer indexed into .monitoring-es-*
 		"index_summary":  []string{}, // no longer indexed into .monitoring-es-*
 		"ml_job":         []string{"job_stats"},
 		"node_stats":     []string{}, // no longer indexed into .monitoring-es-*
@@ -261,6 +261,9 @@ func getXPackConfig(host string) map[string]interface{} {
 		"metricsets":    xpackMetricSets,
 		"hosts":         []string{host},
 		"xpack.enabled": true,
+		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
+		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
+		"index_recovery.active_only": false,
 	}
 }
 

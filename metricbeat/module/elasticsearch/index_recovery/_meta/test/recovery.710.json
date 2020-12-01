@@ -1,0 +1,296 @@
+{
+    ".kibana-event-log-8.0.0-000001": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605819056123,
+                "stop_time_in_millis": 1605819058696,
+                "total_time_in_millis": 2573,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 1600,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 951
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    },
+    "metricbeat-8.0.0-2020.11.19-000001": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605821233207,
+                "stop_time_in_millis": 1605821233384,
+                "total_time_in_millis": 176,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 48,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 116
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    },
+    ".apm-custom-link": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605819052622,
+                "stop_time_in_millis": 1605819052858,
+                "total_time_in_millis": 235,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 129,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 96
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    },
+    ".kibana_task_manager_1": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605819048103,
+                "stop_time_in_millis": 1605819048832,
+                "total_time_in_millis": 729,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 282,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 336
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    },
+    ".apm-agent-configuration": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605819052947,
+                "stop_time_in_millis": 1605819053072,
+                "total_time_in_millis": 125,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 70,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 40
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    },
+    ".kibana_1": {
+        "shards": [
+            {
+                "id": 0,
+                "type": "EMPTY_STORE",
+                "stage": "DONE",
+                "primary": true,
+                "start_time_in_millis": 1605819048514,
+                "stop_time_in_millis": 1605819048834,
+                "total_time_in_millis": 319,
+                "source": {},
+                "target": {
+                    "id": "Fkj12lAFQOex0DwK0HMwHw",
+                    "host": "127.0.0.1",
+                    "transport_address": "127.0.0.1:9300",
+                    "ip": "127.0.0.1",
+                    "name": "082618b4bb36"
+                },
+                "index": {
+                    "size": {
+                        "total_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "recovered_in_bytes": 0,
+                        "percent": "0.0%"
+                    },
+                    "files": {
+                        "total": 0,
+                        "reused": 0,
+                        "recovered": 0,
+                        "percent": "0.0%"
+                    },
+                    "total_time_in_millis": 59,
+                    "source_throttle_time_in_millis": 0,
+                    "target_throttle_time_in_millis": 0
+                },
+                "translog": {
+                    "recovered": 0,
+                    "total": 0,
+                    "percent": "100.0%",
+                    "total_on_start": 0,
+                    "total_time_in_millis": 234
+                },
+                "verify_index": {
+                    "check_index_time_in_millis": 0,
+                    "total_time_in_millis": 0
+                }
+            }
+        ]
+    }
+}
