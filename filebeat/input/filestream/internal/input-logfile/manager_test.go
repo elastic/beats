@@ -45,8 +45,8 @@ func TestSourceIdentifier_ID(t *testing.T) {
 				&testSource{"another_unique_name"},
 			},
 			expectedSourceIDs: []string{
-				testPluginName + "::unique_name",
-				testPluginName + "::another_unique_name",
+				testPluginName + "::.global::unique_name",
+				testPluginName + "::.global::another_unique_name",
 			},
 		},
 	}
@@ -55,11 +55,16 @@ func TestSourceIdentifier_ID(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			if err != nil {
+				t.Fatalf("cannot create identifier: %v", err)
+			}
 
 			for i, src := range test.sources {
-				srcID := srcIdentifier.ID(src)
-				assert.Equal(t, test.expectedSourceIDs[i], srcID)
+				t.Run(name+"_with_src: "+src.Name(), func(t *testing.T) {
+					srcID := srcIdentifier.ID(src)
+					assert.Equal(t, test.expectedSourceIDs[i], srcID)
+				})
 			}
 		})
 	}
@@ -72,9 +77,9 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 	}{
 		"plugin with no user configured ID": {
 			matchingIDs: []string{
-				testPluginName + "::my_id",
-				testPluginName + "::path::my_id",
-				testPluginName + "::" + testPluginName + "::my_id",
+				testPluginName + "::.global::my_id",
+				testPluginName + "::.global::path::my_id",
+				testPluginName + "::.global::" + testPluginName + "::my_id",
 			},
 		},
 		"plugin with user configured ID": {
@@ -91,10 +96,15 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			if err != nil {
+				t.Fatalf("cannot create identifier: %v", err)
+			}
 
 			for _, id := range test.matchingIDs {
-				assert.True(t, srcIdentifier.MatchesInput(id))
+				t.Run(name+"_with_id: "+id, func(t *testing.T) {
+					assert.True(t, srcIdentifier.MatchesInput(id))
+				})
 			}
 		})
 	}
@@ -125,11 +135,32 @@ func TestSourceIdentifier_NotMachesInput(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			srcIdentifier := newSourceIdentifier(testPluginName, test.userID)
+			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			if err != nil {
+				t.Fatalf("cannot create identifier: %v", err)
+			}
 
 			for _, id := range test.notMatchingIDs {
-				assert.False(t, srcIdentifier.MatchesInput(id))
+				t.Run(name+"_with_id: "+id, func(t *testing.T) {
+					assert.False(t, srcIdentifier.MatchesInput(id))
+				})
 			}
 		})
 	}
+}
+
+func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
+	noIDIdentifier, err := newSourceIdentifier(testPluginName, "")
+	if err != nil {
+		t.Fatalf("cannot create identifier: %v", err)
+	}
+	withIDIdentifier, err := newSourceIdentifier(testPluginName, "id")
+	if err != nil {
+		t.Fatalf("cannot create identifier: %v", err)
+	}
+
+	src := &testSource{"test"}
+	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
+	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
+	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
 }

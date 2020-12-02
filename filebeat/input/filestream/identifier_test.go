@@ -18,6 +18,8 @@
 package filestream
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,18 +27,36 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 type testFileIdentifierConfig struct {
 	Identifier *common.ConfigNamespace `config:"identifier"`
 }
 
-func TestNewFileIdentifier(t *testing.T) {
+func TestFileIdentifier(t *testing.T) {
 	t.Run("default file identifier", func(t *testing.T) {
 		identifier, err := newFileIdentifier(nil)
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
+		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		if err != nil {
+			t.Fatalf("cannot create temporary file for test: %v", err)
+		}
+		defer os.Remove(tmpFile.Name())
+
+		fi, err := tmpFile.Stat()
+		if err != nil {
+			t.Fatalf("cannot stat temporary file for test: %v", err)
+		}
+
+		src := identifier.GetSource(loginp.FSEvent{
+			NewPath: tmpFile.Name(),
+			Info:    fi,
+		})
+
+		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
 	})
 
 	t.Run("path identifier", func(t *testing.T) {

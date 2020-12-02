@@ -37,11 +37,13 @@ import (
 func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	testCases := map[string]struct {
 		entries             map[string]loginp.Value
+		filesOnDisk         map[string]os.FileInfo
 		cleanRemoved        bool
 		expectedCleanedKeys []string
 	}{
 		"prospector init with clean_removed enabled with no entries": {
 			entries:             nil,
+			filesOnDisk:         nil,
 			cleanRemoved:        true,
 			expectedCleanedKeys: []string{},
 		},
@@ -54,6 +56,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 					},
 				},
 			},
+			filesOnDisk:         nil,
 			cleanRemoved:        false,
 			expectedCleanedKeys: []string{},
 		},
@@ -66,15 +69,22 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 					},
 				},
 			},
+			filesOnDisk:         nil,
 			cleanRemoved:        true,
 			expectedCleanedKeys: []string{"key1"},
 		},
 	}
 
 	for name, testCase := range testCases {
+		testCase := testCase
+
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
-			p := fileProspector{identifier: mustPathIdentifier(false), cleanRemoved: testCase.cleanRemoved}
+			p := fileProspector{
+				identifier:   mustPathIdentifier(false),
+				cleanRemoved: testCase.cleanRemoved,
+				filewatcher:  &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
+			}
 			p.Init(testStore)
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
@@ -90,13 +100,19 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 	defer f.Close()
 	tmpFileName := f.Name()
+	fi, err := f.Stat()
+	if err != nil {
+		t.Fatalf("cannot stat test file: %v", err)
+	}
 
 	testCases := map[string]struct {
 		entries             map[string]loginp.Value
+		filesOnDisk         map[string]os.FileInfo
 		expectedUpdatedKeys map[string]string
 	}{
 		"prospector init does not update keys if there are no entries": {
 			entries:             nil,
+			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
 		},
 		"prospector init does not update keys of not existing files": {
@@ -108,6 +124,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 					},
 				},
 			},
+			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
 		},
 		"prospector init updates keys of existing files": {
@@ -119,14 +136,22 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 					},
 				},
 			},
+			filesOnDisk: map[string]os.FileInfo{
+				tmpFileName: fi,
+			},
 			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
 		},
 	}
 
 	for name, testCase := range testCases {
+		testCase := testCase
+
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
-			p := fileProspector{identifier: mustPathIdentifier(false)}
+			p := fileProspector{
+				identifier:  mustPathIdentifier(false),
+				filewatcher: &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
+			}
 			p.Init(testStore)
 
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
@@ -352,8 +377,9 @@ func (t *testHarvesterGroup) StopGroup() error {
 }
 
 type mockFileWatcher struct {
-	nextIdx int
-	events  []loginp.FSEvent
+	nextIdx     int
+	events      []loginp.FSEvent
+	filesOnDisk map[string]os.FileInfo
 }
 
 func (m *mockFileWatcher) Event() loginp.FSEvent {
@@ -367,7 +393,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 
 func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
 
-func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return nil }
+func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return m.filesOnDisk }
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}
