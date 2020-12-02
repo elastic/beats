@@ -35,7 +35,7 @@ pipeline {
   }
   options {
     timeout(time: 3, unit: 'HOURS')
-    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
     disableResume()
@@ -216,7 +216,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  node(args.label) {
+  withNode(args.label) {
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -231,7 +231,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    node(args.label) {
+    withNode(args.label) {
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -292,7 +292,7 @@ def runCommand(Map args = [:]) {
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
-  node(args.label) {
+  withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -303,6 +303,16 @@ def runCommand(Map args = [:]) {
         }
       }
     }
+  }
+}
+
+/**
+* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+*/
+def withNode(String label, Closure body) {
+  sleep randomNumber(min: 10, max: 200)
+  node(label) {
+    body()
   }
 }
 
