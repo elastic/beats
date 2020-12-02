@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -184,6 +185,8 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 }
 
 func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
+
+func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return nil }
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}
