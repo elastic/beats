@@ -39,7 +39,7 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test\\W+.*$)')
+    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test(?:\\W+.*)?$)')
   }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
