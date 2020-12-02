@@ -5,6 +5,8 @@
 package v2
 
 import (
+	"go.uber.org/multierr"
+
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -42,7 +44,10 @@ func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
 	registerRequestTransforms()
 	registerResponseTransforms()
 	registerPaginationTransforms()
-	return m.stateless.Init(grp, mode) // multierr.Append()
+	return multierr.Append(
+		m.stateless.Init(grp, mode),
+		m.cursor.Init(grp, mode),
+	)
 }
 
 // Create creates a cursor input manager if the config has a date cursor set up,

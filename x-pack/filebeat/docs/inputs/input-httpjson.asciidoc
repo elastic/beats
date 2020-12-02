@@ -13,7 +13,17 @@ beta[]
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-This input supports basic auth, oauth2, retrieval at a configurable interval, pagination, retries and rate limiting.
+This input supports:
+
+* Auth
+** Basic
+** OAuth2
+* Retrieval at a configurable interval
+* Pagination
+* Retries
+* Rate limiting
+* Request transformations
+* Response transformations
 
 Example configurations:
 
@@ -80,35 +90,38 @@ filebeat.inputs:
   request.url: http://localhost
 ----
 
+[[input-state]]
 ==== Input state
 
-The `httpjson` input will keep a runtime state between requests, that can be accessed by some configuration options and transfroms.
+The `httpjson` input keeps a runtime state between requests. This state can be accessed by some configuration options and transforms.
 
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
 - `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
 - `last_response.header`: A map containing the headers from the last successful response.
-- `last_response.body`: A map containing the parsed JSON body from the last successful response. (before any transform)
+- `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
-- `url.value`: The full URL with params and fragments. Will make reference to the request URL for configs under `request.*` and for the last successful request under `response.*`.
-- `url.params`: A map containing the URL params. Will make reference to the request URL for configs under `request.*` and for the last successful request under `response.*`.
-- `header`: A map containing the headers. Will make reference to the request headers for configs under `request.*` and for the last successful response ones under `response.*`.
-- `body`: A map containing the body. Will make reference to the request body for configs under `request.*` and for the last successful response one under `response.*`.
-- `cursor`: A map containing any data the user configured to be stored between restarts.
+- `url.value`: The full URL with params and fragments.
+- `url.params`: A map containing the URL params.
+- `header`: A map containing the headers. References request headers when used in <<request-transforms>> or <<request-rate-limit>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `body`: A map containing the body. References request body when used in <<request-transforms>> configuration section, and to the last response body when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
-All of the mentioned objects are only stored at runtime, except `cursor` which values are persisted between restarts.
+All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
 
+[[transforms]]
 ==== Transforms
 
-A transform is an action that let the user modify the input state. Depending on where the transform is defined, it will have access for reading or writing different elements of the state.
-This access limitations will be specified in the corresponding configuration sections.
+A transform is an action that lets the user modify the <<input-state,input state>>. Depending on where the transform is defined, it will have access for reading or writing different elements of the <<input-state,state>>.
+
+The access limitations are described in the corresponding configuration sections.
 
 [float]
 ==== `append`
 
-Append will append a value to a list. If the field does not exist the first entry will be a scalar value, and subsequent additions will convert it to a list.
+Appends a value to a list. If the field does not exist, the first entry will be a scalar value, and subsequent additions will convert the value to a list.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -119,13 +132,13 @@ Append will append a value to a list. If the field does not exist the first entr
 ----
 
 - `target` defines the destination field where the value is stored.
-- `value` defines the value that will be stored and it is a value template.
+- `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 
 [float]
 ==== `delete`
 
-Delete will delete the target field.
+Deletes the target field.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -133,14 +146,12 @@ Delete will delete the target field.
     target: body.foo.bar
 ----
 
-- `target` defines the destination field to delete.
-
-NOTE: If `target` is a list, it will delete the list completely, and not a single element.
+- `target` defines the destination field to delete. If `target` is a list and not a single element, the complete list will be deleted.
 
 [float]
 ==== `set`
 
-Set will set a value.
+Sets a value.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -151,14 +162,15 @@ Set will set a value.
 ----
 
 - `target` defines the destination field where the value is stored.
-- `value` defines the value that will be stored and it is a value template.
+- `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 
+[[value-templates]]
 ==== Value templates
 
-Some configuration options and transforms can use value templates. Value templates are Go templates with access to the input state and to some built in functions.
+Some configuration options and transforms can use value templates. Value templates are Go templates with access to the input state and to some built-in functions.
 
-The state elements and what operations can be performed are defined by the option or transform using them and will be specified in them.
+To see which <<input-state,state elements>> and operations are available, see the documentation for the option or <<transforms,transform>> where you want to use a value template.
 
 A value template looks like:
 
@@ -170,19 +182,19 @@ A value template looks like:
     default: "a default value"
 ----
 
-What is between `{{` `}}` will be evaluated. For more information on Go templates please refer to https://golang.org/pkg/text/template[the Go docs].
+The content inside the curly braces `{{` `}}` is evaluated. For more information on Go templates please refer to https://golang.org/pkg/text/template[the Go docs].
 
-Some built in helper functions are provided to work with the input state inside value templates:
+Some built-in helper functions are provided to work with the input state inside value templates:
 
 - `parseDuration`: parses duration strings and returns `time.Duration`. Example: `{{parseDuration "1h"}}`.
 - `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `{{now (parseDuration "-1h")}}` returns the time at 1 hour before now.
 - `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732}}` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732000}}` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732000000000}}` returns `2020-11-05 13:25:32 +0000 UTC`.
-- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Go lang predefined layouts or a custom one. Example: `{{ parseDate "2020-11-05T12:25:32Z" }}`, `{{ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" }}`, `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC }}`.
-- `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Go lang predefined layouts or a custom one. It will default to UTC timezone when formatting but optionally a different timezone can be specified. If the timezone is incorrect will default to UTC. Example: `{{ formatDate (now) "UnixDate" }}`, `{{ formatDate (now) "UnixDate" "America/New_York" }}`.
-- `getRFC5988Link`: it extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when we are parsing header values for pagination, for example. Example: `{{ getRFC5988Link "next" .last_response.header.Link }}`
-- `toInt`: converts a string to an integer, returns 0 if it fails.
+- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `{{ parseDate "2020-11-05T12:25:32Z" }}`, `{{ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" }}`, `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC }}`.
+- `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `{{ formatDate (now) "UnixDate" }}`, `{{ formatDate (now) "UnixDate" "America/New_York" }}`.
+- `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `{{ getRFC5988Link "next" .last_response.header.Link }}`.
+- `toInt`: converts a string to an integer. Returns 0 if the conversion fails.
 - `add`: adds a list of integers and returns their sum.
 
 In addition to the provided functions, any of the native functions for `time.Time` and `http.Header` types can be used on the corresponding objects. Examples: `{{(now).Day}}`, `{{.last_response.header.Get "key"}}`
@@ -197,7 +209,7 @@ The `httpjson` input supports the following configuration options plus the
 
 Defines the configuration version. Current supported versions are: `1` and `2`. Default: `1`.
 
-NOTE: This defaulting to `1` is just to avoid breaking current configurations. V1 configuration is deprecated and will be unsupported in next releases. Any new configuration should use `config_version: 2`.
+NOTE: This setting defaults to `1` to avoid breaking current configurations. V1 configuration is deprecated and will be unsupported in future releases. Any new configuration should use `config_version: 2`.
 
 [float]
 ==== `interval`
@@ -207,8 +219,7 @@ Duration between repeated requests. It may make additional pagination requests i
 [float]
 ==== `auth.basic.enabled`
 
-The `enabled` setting can be used to disable the basic auth configuration by
-setting it to `false`. Default: `true`.
+When set to `false`, disables the basic auth configuration. Default: `true`.
 
 NOTE: Basic auth settings are disabled if either `enabled` is set to `false` or
 the `auth.basic` section is missing.
@@ -216,18 +227,17 @@ the `auth.basic` section is missing.
 [float]
 ==== `auth.basic.user`
 
-The `user` setting sets the user to authenticate with.
+The user to authenticate with.
 
 [float]
 ==== `auth.basic.password`
 
-The `password` setting sets the password to use.
+The password to use.
 
 [float]
 ==== `auth.oauth2.enabled`
 
-The `enabled` setting can be used to disable the oauth2 configuration by
-setting it to `false`. The default value is `true`.
+When set to `false`, disables the oauth2 configuration. Default: `true`.
 
 NOTE: OAuth2 settings are disabled if either `enabled` is set to `false` or
 the `auth.oauth2` section is missing.
@@ -235,41 +245,39 @@ the `auth.oauth2` section is missing.
 [float]
 ==== `auth.oauth2.provider`
 
-The `provider` setting can be used to configure supported oauth2 providers.
+Used to configure supported oauth2 providers.
 Each supported provider will require specific settings. It is not set by default.
 Supported providers are: `azure`, `google`.
 
 [float]
 ==== `auth.oauth2.client.id`
 
-The `client.id` setting is used as part of the authentication flow. It is always required
+The client ID used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
 
 [float]
 ==== `auth.oauth2.client.secret`
 
-The `client.secret` setting is used as part of the authentication flow. It is always required
+The client secret used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
 
 [float]
 ==== `auth.oauth2.scopes`
 
-The `scopes` setting defines a list of scopes that will be requested during the oauth2 flow.
+A list of scopes that will be requested during the oauth2 flow.
 It is optional for all providers.
 
 [float]
 ==== `auth.oauth2.token_url`
 
-The `token_url` setting specifies the endpoint that will be used to generate the
-tokens during the oauth2 flow. It is required if no provider is specified.
+The endpoint that will be used to generate the tokens during the oauth2 flow. It is required if no provider is specified.
 
 NOTE: For `azure` provider either `token_url` or `azure.tenant_id` is required.
 
 [float]
 ==== `auth.oauth2.endpoint_params`
 
-The `endpoint_params` setting specifies a set of values that will be sent on each
-request to the `token_url`. Each param key can have multiple values.
+Set of values that will be sent on each request to the `token_url`. Each param key can have multiple values.
 Can be set for all providers except `google`.
 
 ["source","yaml",subs="attributes"]
@@ -288,7 +296,7 @@ Can be set for all providers except `google`.
 [float]
 ==== `auth.oauth2.azure.tenant_id`
 
-The `azure.tenant_id` is used for authentication when using `azure` provider.
+Used for authentication when using `azure` provider.
 Since it is used in the process to generate the `token_url`, it can't be used in
 combination with it. It is not required.
 
@@ -298,13 +306,13 @@ https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-ser
 [float]
 ==== `auth.oauth2.azure.resource`
 
-The `azure.resource` is used to identify the accessed WebAPI resource when using `azure` provider.
+The accessed WebAPI resource when using `azure` provider.
 It is not required.
 
 [float]
 ==== `auth.oauth2.google.credentials_file`
 
-The `google.credentials_file` setting specifies the credentials file for Google.
+The credentials file for Google.
 
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
@@ -313,7 +321,7 @@ how to provide Google credentials, please refer to https://cloud.google.com/docs
 [float]
 ==== `auth.oauth2.google.credentials_json`
 
-The `google.credentials_json` setting allows to write your credentials information as raw JSON.
+Your credentials information as raw JSON.
 
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
@@ -322,7 +330,7 @@ how to provide Google credentials, please refer to https://cloud.google.com/docs
 [float]
 ==== `auth.oauth2.google.jwt_file`
 
-The `google.jwt_file` setting specifies the JWT Account Key file for Google.
+The JWT Account Key file for Google.
 
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
@@ -373,48 +381,50 @@ information.
 [float]
 ==== `request.retry.max_attempts`
 
-This specifies the maximum number of retries for the HTTP client. Default: `5`.
+The maximum number of retries for the HTTP client. Default: `5`.
 
 [float]
 ==== `request.retry.wait_min`
 
-This specifies the minimum time to wait before a retry is attempted. Default: `1s`.
+The minimum time to wait before a retry is attempted. Default: `1s`.
 
 [float]
 ==== `request.retry.wait_max`
 
-This specifies the maximum time to wait before a retry is attempted. Default: `60s`.
+The maximum time to wait before a retry is attempted. Default: `60s`.
 
 [float]
 ==== `request.redirect.forward_headers`
 
-This specifies if headers are forwarded in case of a redirect. Default: `false`.
+When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
 
 [float]
 ==== `request.redirect.headers_ban_list`
 
-When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list, will be forwarded. Default: `[]`.
+When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list will be forwarded. Default: `[]`.
 
 [float]
 ==== `request.redirect.max_redirects`
 
-Sets the maximum number of redirects to follow for a request. Default: `10`.
+The maximum number of redirects to follow for a request. Default: `10`.
 
+[[request-rate-limit]]
 [float]
 ==== `request.rate_limit.limit`
 
-This specifies the value of the response that specifies the total limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the total limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
 [float]
 ==== `request.rate_limit.remaining`
 
-This specifies the value of the response that specifies the remaining quota of the rate limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the remaining quota of the rate limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
 [float]
 ==== `request.rate_limit.reset`
 
-This specifies the value of the response that specifies the epoch time when the rate limit will reset. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+The value of the response that specifies the epoch time when the rate limit will reset. It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
+[[request-transforms]]
 [float]
 ==== `request.transforms`
 
@@ -439,6 +449,7 @@ filebeat.inputs:
         value: '{{now (parseDuration "-1h")}}'
 ----
 
+[[response-transforms]]
 [float]
 ==== `response.transforms`
 
@@ -474,6 +485,7 @@ filebeat.inputs:
         value: 5m
 ----
 
+[[response-split]]
 [float]
 ==== `response.split`
 
@@ -510,17 +522,18 @@ If set to true, the fields from the parent document (at the same level as `targe
 [float]
 ==== `response.split[].key_field`
 
-It can only be used with `type: map`. When not empty, will define the a new field where the original key value will be stored.
+Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
 ==== `response.split[].split`
 
-Nested split operation. Split operations can be nested at will, an event won't be created until the deepest split operation is applied.
+Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
 
+[[response-pagination]]
 [float]
 ==== `response.pagination`
 
-List of transforms to apply to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual `response.transforms` and `response.split` will be executed normally.
+List of transforms that will be applied to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual `response.transforms` and `response.split` will be executed normally.
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
@@ -530,8 +543,9 @@ Can write state to: [`body.*`, `header.*`, `url.*`].
 
 Examples using split:
 
-- We have a response with two nested arrays and we want a document for each of the elements of the inner array:
+- We have a response with two nested arrays, and we want a document for each of the elements of the inner array:
 
++
 ["source","json",subs="attributes"]
 ----
 {
@@ -563,8 +577,10 @@ Examples using split:
 }
 ----
 
-Our config will look like
++
+The config will look like:
 
++
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
@@ -583,8 +599,10 @@ filebeat.inputs:
       keep_parent: true
 ----
 
++
 This will output:
 
++
 ["source","json",subs="attributes"]
 ----
 [
@@ -627,8 +645,9 @@ This will output:
 ]
 ----
 
-- We have a response with two an array with objects, and we want a document for each of the object keys while keeping the keys values:
+- We have a response with an array with two objects, and we want a document for each of the object keys while keeping the keys values:
 
++
 ["source","json",subs="attributes"]
 ----
 {
@@ -654,8 +673,10 @@ This will output:
 }
 ----
 
-Our config will look like
++
+The config will look like:
 
++
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
@@ -675,8 +696,10 @@ filebeat.inputs:
       key_field: id
 ----
 
++
 This will output:
 
++
 ["source","json",subs="attributes"]
 ----
 [
@@ -697,8 +720,9 @@ This will output:
 ]
 ----
 
-- We have a response with two an array with objects, and we want a document for each of the object keys while applying a transform to each:
+- We have a response with an array with two objects, and we want a document for each of the object keys while applying a transform to each:
 
++
 ["source","json",subs="attributes"]
 ----
 {
@@ -724,8 +748,10 @@ This will output:
 }
 ----
 
-Our config will look like
++
+The config will look like:
 
++
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
@@ -745,8 +771,10 @@ filebeat.inputs:
       type: map
 ----
 
++
 This will output:
 
++
 ["source","json",subs="attributes"]
 ----
 [
@@ -761,10 +789,11 @@ This will output:
 ]
 ----
 
+[[cursor]]
 [float]
 ==== `cursor`
 
-Cursor is a list of key value objects where an arbitrary values are defined. The values are interpreted as value templates and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
+Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
 Can read state from: [`.last_response.*`, `.last_event.*`].
 
@@ -840,6 +869,7 @@ Deprecated, use `response.pagination`.
 ==== `rate_limit.*`
 
 Deprecated, use `request.rate_limit.*`.
+
 [float]
 ==== `retry.*`
 
@@ -862,47 +892,15 @@ Deprecated, use `auth.oauth2.*`.
 
 ==== Request life cycle
 
+image:images/input-httpjson-lifecycle.png[Request lifecycle]
 
-....
-+-------+                  +-------------------+ +---------------------+              +---------------------------+   +---------------+ +---------+
-| Input |                  | RequestTransforms | | ResponsePagination  |              | ResponseTransforms/Split  |   | RemoteServer  | | Output  |
-+-------+                  +-------------------+ +---------------------+              +---------------------------+   +---------------+ +---------+
-    |                                |                      |                                    |                            |              |
-    | 1. At interval,                |                      |                                    |                            |              |
-    | create a new request.          |                      |                                    |                            |              |
-    |------------------------------->|                      |                                    |                            |              |
-    |   ---------------------------\ |                      |                                    |                            |              |
-    |   | 2. Transform the request |-|                      |                                    |                            |              |
-    |   | before executing it.     | |                      |                                    |                            |              |
-    |   |--------------------------| |                      |                                    |                            |              |
-    |                                | 3. Execute request.  |                                    |                            |              |
-    |                                |--------------------------------------------------------------------------------------->|              |
-    |                                |                      |                                    |                            |              |
-    |                                |                      |                                    |  4. Return response.       |              |
-    |                                |                      |                                    |<---------------------------|              |
-    |                                |                      |         -------------------------\ |                            |              |
-    |                                |                      |         | 5. Transform response  |-|                            |              |
-    |                                |                      |         | into a list of events. | |                            |              |
-    |                                |                      |         |------------------------| |                            |              |
-    |                                |                      |                                    | 6. Publish every           |              |
-    |                                |                      |                                    | event to output.           |              |
-    |                                |                      |                                    |------------------------------------------>|
-    |                                |                      | -----------------------------\     |                            |              |
-    |                                |                      |-| 7. If there are more pages |     |                            |              |
-    |                                |                      | | transform the request.     |     |                            |              |
-    |                                |                      | |----------------------------|     |                            |              |
-    |                                |                      |                                    |                            |              |
-    |                                |                      | Execute request and go back to 4.  |                            |              |
-    |                                |                      |---------------------------------------------------------------->|              |
-....
-
-. At every defined interval a new request will be created.
-. The request will be transformed using the configured `request.transforms`.
-. The resulting transformed request will be executed.
-. The server will respond (here is where any retry or rate limit policy will take place when configured).
-. The response will be transformed using the configured `response.transforms` and `response.split`.
-. Each resulting event will be published to the output.
-. If a `response.pagination` is configured and there are more pages, a new request will be created using it, otherwise the process ends until the next interval.
+. At every defined interval a new request is created.
+. The request is transformed using the configured `request.transforms`.
+. The resulting transformed request is executed.
+. The server responds (here is where any retry or rate limit policy takes place when configured).
+. The response is transformed using the configured `response.transforms` and `response.split`.
+. Each resulting event is published to the output.
+. If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
