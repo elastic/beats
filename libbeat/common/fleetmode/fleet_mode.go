@@ -38,8 +38,8 @@ func Enabled() bool {
 		return false
 	}
 
-	CfgObject, _ := cfgFlag.Value.(*common.SettingsFlag)
-	cliCfg := CfgObject.Config()
+	cfgObject, _ := cfgFlag.Value.(*common.SettingsFlag)
+	cliCfg := cfgObject.Config()
 
 	err := cliCfg.Unpack(&managementSettings)
 	if err != nil {
