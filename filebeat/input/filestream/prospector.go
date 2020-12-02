@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"os"
 	"time"
 
 	"github.com/urso/sderr"
@@ -46,6 +45,8 @@ type fileProspector struct {
 }
 
 func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+	files := p.filewatcher.GetFiles()
+
 	if p.cleanRemoved {
 		cleaner.CleanIf(func(v loginp.Value) bool {
 			var fm fileMeta
@@ -55,15 +56,11 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 				return true
 			}
 
-			_, err = os.Stat(fm.Source)
-			if err != nil {
-				return true
-			}
-			return false
+			_, ok := files[fm.Source]
+			return !ok
 		})
 	}
 
-	files := p.filewatcher.GetFiles()
 	identifierName := p.identifier.Name()
 	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta

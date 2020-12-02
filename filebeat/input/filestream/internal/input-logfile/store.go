@@ -183,10 +183,6 @@ func (s *sourceStore) Remove(src Source) error {
 
 // CleanIf sets the TTL of a resource if the predicate return true.
 func (s *sourceStore) CleanIf(pred func(v Value) bool) {
-	if !s.identifier.configuredUserID {
-		return
-	}
-
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
