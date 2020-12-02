@@ -9,7 +9,7 @@
 
 # For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
-
+retryer.maxbackoff: 60s
 # ============================== Filebeat inputs ===============================
 
 filebeat.inputs:

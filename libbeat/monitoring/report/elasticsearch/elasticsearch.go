@@ -182,7 +182,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,
 			Processors:    processing,
-		})
+		}, nil)
 	if err != nil {
 		return nil, err
 	}

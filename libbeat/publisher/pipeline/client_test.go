@@ -41,6 +41,7 @@ func TestClient(t *testing.T) {
 			},
 			outputs.Group{},
 			settings,
+			nil,
 		)
 		if err != nil {
 			panic(err)
@@ -127,6 +128,7 @@ func TestClientWaitClose(t *testing.T) {
 			func(queue.ACKListener) (queue.Queue, error) { return qu, nil },
 			outputs.Group{},
 			settings,
+			nil,
 		)
 		if err != nil {
 			panic(err)
