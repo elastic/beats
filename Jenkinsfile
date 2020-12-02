@@ -302,7 +302,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags
+  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
   if(isUnix()) {
     if (isArm() && is64arm()) {
@@ -324,7 +324,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     def goArch = is32() ? '386' : 'amd64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-    goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
+    userProfile="${env.WORKSPACE}"
+    goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
     path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
@@ -340,6 +341,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
+    "GOX_FLAGS=${gox_flags}",
     "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
     "MODULE=${module}",
@@ -348,22 +350,14 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "RACE_DETECTOR=true",
     "TEST_COVERAGE=true",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
-    "GOX_FLAGS=${gox_flags}"
+    "OLD_USERPROFILE=${env.USERPROFILE}",
+    "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
-      installTools()
-      if(isUnix()) {
-        // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
-        // See https://github.com/elastic/beats/issues/17787.
-        sh(label: 'check git config', script: '''
-          if [ -z "$(git config --get user.email)" ]; then
-            git config --global user.email "beatsmachine@users.noreply.github.com"
-            git config --global user.name "beatsmachine"
-          fi''')
-      }
+      installTools(args)
       // Skip to upload the generated files by default.
       def upload = false
       try {
@@ -412,11 +406,19 @@ def fixPermissions(location) {
 * This method installs the required dependencies that are for some reason not available in the
 * CI Workers.
 */
-def installTools() {
+def installTools(args) {
+  def stepHeader = "${args.id?.trim() ? args.id : env.STAGE_NAME}"
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+    // See https://github.com/elastic/beats/issues/17787.
+    sh(label: 'check git config', script: '''
+      if [ -z "$(git config --get user.email)" ]; then
+        git config --global user.email "beatsmachine@users.noreply.github.com"
+        git config --global user.name "beatsmachine"
+      fi''')
   } else {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
