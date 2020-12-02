@@ -29,7 +29,12 @@ const (
 	// PresentCPUsPath is the path to the system file listing the CPUs that are identified as present.
 	PresentCPUsPath = "/sys/devices/system/cpu/present"
 
-	// See `Documentation/admin-guide/cputopology.rst` in the Linux kernel docs for more information.
+	// See `Documentation/admin-guide/cputopology.rst` in the Linux kernel docs for more information
+	// on the above files.
+
+	// IsolatedCPUsPath is only present when CPU isolation is active, for example using the `isolcpus`
+	// kernel argument.
+	IsolatedCPUsPath = "/sys/devices/system/cpu/isolated"
 )
 
 // CPUSet represents a group of CPUs.

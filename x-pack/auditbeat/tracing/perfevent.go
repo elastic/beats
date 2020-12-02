@@ -110,6 +110,12 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 	channel.attr.SetSamplePeriod(1)
 	channel.attr.SetWakeupEvents(1)
 
+	// Load the list of online CPUs from /sys/devices/system/cpu/online.
+	// This is necessary in order to to install each kprobe on all online CPUs.
+	//
+	// Note:
+	// There's currently no mechanism to adapt to CPUs being added or removed
+	// at runtime (CPU hotplug).
 	channel.cpus, err = NewCPUSetFromFile(OnlineCPUsPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error listing online CPUs")
