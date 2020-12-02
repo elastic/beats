@@ -82,7 +82,7 @@ type SynthError struct {
 }
 
 func (se *SynthError) String() string {
-	return fmt.Sprintf("%s: %s\n%s", se.Name, se.Message, se.Stack)
+	return fmt.Sprintf("%s: %s\n", se.Name, se.Message)
 }
 
 func (se *SynthError) toMap() common.MapStr {
