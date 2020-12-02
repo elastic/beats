@@ -10,7 +10,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -55,7 +54,7 @@ type PerfChannel struct {
 
 	running uintptr
 	wg      sync.WaitGroup
-	numCPUs int
+	cpus    CPUSet
 
 	// Settings
 	attr        perf.Attr
@@ -98,7 +97,6 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 		done:        make(chan struct{}, 0),
 		streams:     make(map[uint64]stream),
 		pid:         perf.AllThreads,
-		numCPUs:     runtime.NumCPU(),
 		attr: perf.Attr{
 			Type: perf.TracepointEvent,
 			SampleFormat: perf.SampleFormat{
@@ -112,6 +110,19 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 	channel.attr.SetSamplePeriod(1)
 	channel.attr.SetWakeupEvents(1)
 
+	// Load the list of online CPUs from /sys/devices/system/cpu/online.
+	// This is necessary in order to to install each kprobe on all online CPUs.
+	//
+	// Note:
+	// There's currently no mechanism to adapt to CPUs being added or removed
+	// at runtime (CPU hotplug).
+	channel.cpus, err = NewCPUSetFromFile(OnlineCPUsPath)
+	if err != nil {
+		return nil, errors.Wrap(err, "error listing online CPUs")
+	}
+	if channel.cpus.NumCPU() < 1 {
+		return nil, errors.New("couldn't list online CPUs")
+	}
 	// Set configuration
 	for _, fun := range cfg {
 		if err = fun(channel); err != nil {
@@ -210,14 +221,15 @@ func WithPollTimeout(timeout time.Duration) PerfChannelConf {
 func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 	c.attr.Config = uint64(format.ID)
 	doGroup := len(c.events) > 0
-	for idx := 0; idx < c.numCPUs; idx++ {
+	cpuList := c.cpus.AsList()
+	for idx, cpu := range cpuList {
 		var group *perf.Event
 		var flags int
 		if doGroup {
 			group = c.events[idx]
 			flags = unix.PERF_FLAG_FD_NO_GROUP | unix.PERF_FLAG_FD_OUTPUT
 		}
-		ev, err := perf.OpenWithFlags(&c.attr, c.pid, idx, group, flags)
+		ev, err := perf.OpenWithFlags(&c.attr, c.pid, cpu, group, flags)
 		if err != nil {
 			return err
 		}
@@ -352,7 +364,7 @@ func makeMetadata(eventID int, record *perf.SampleRecord) Metadata {
 func (c *PerfChannel) channelLoop() {
 	defer c.wg.Done()
 	ctx := doneWrapperContext(c.done)
-	merger := newRecordMerger(c.events[:c.numCPUs], c, c.pollTimeout)
+	merger := newRecordMerger(c.events[:c.cpus.NumCPU()], c, c.pollTimeout)
 	for {
 		// Read the available event from all the monitored ring-buffers that
 		// has the smallest timestamp.
