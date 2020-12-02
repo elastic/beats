@@ -153,5 +153,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		r.Event(event)
 	}
+
 	return errs.Err()
 }
