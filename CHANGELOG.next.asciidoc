@@ -216,6 +216,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
+  as gauges (rather than counters). {pull}22877[22877]
 
 *Auditbeat*
 
