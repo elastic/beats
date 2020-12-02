@@ -64,18 +64,12 @@ func TestFetchFleetMode(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check number of fields.
-	if len(event.MetricSetFields) < 10 {
+	if len(event.MetricSetFields) < 11 {
 		t.Fatal("Too few top-level elements in the event")
 	}
 
 	_, err := event.MetricSetFields.GetValue("hostname")
 	assert.Equal(t, common.ErrKeyNotFound, err, "apache.hostname shouldn't be present in the fleet mode")
-
-	_, err = event.MetricSetFields.GetValue("uptime")
-	assert.Equal(t, common.ErrKeyNotFound, err, "apache.uptime shouldn't be present in the fleet mode")
-
-	_, err = event.RootFields.GetValue("host.uptime")
-	assert.NoError(t, err, "host.uptime should be present in the fleet mode")
 }
 
 func getConfig(host string) map[string]interface{} {

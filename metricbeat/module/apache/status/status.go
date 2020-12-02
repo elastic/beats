@@ -21,7 +21,6 @@ package status
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -112,16 +111,5 @@ func adjustFleetEvent(event mb.Event) mb.Event {
 
 	// Remove apache.hostname
 	adjusted.MetricSetFields.Delete("hostname")
-
-	// Replace "apache.uptime" with "uptime"
-	uptime, err := adjusted.MetricSetFields.GetValue("uptime.uptime")
-	if err == nil {
-		if adjusted.RootFields == nil {
-			adjusted.RootFields = common.MapStr{}
-		}
-
-		adjusted.RootFields.Put("host.uptime", uptime)
-		adjusted.MetricSetFields.Delete("uptime")
-	}
 	return adjusted
 }
