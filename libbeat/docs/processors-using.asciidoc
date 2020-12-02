@@ -462,7 +462,7 @@ For example, to configure the condition `NOT status = OK`:
 
 [source,yaml]
 ------
-not
+not:
   equals:
     status: OK
 ------
