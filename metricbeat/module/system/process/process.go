@@ -162,17 +162,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 
 		// Duplicate system.process.memory.rss.pct with process.memory.pct
-		// For Windows, duplicate system.process.memory.wss.pct with process.memory.pct
 		if k, ok := proc["memory"]; ok {
 			mem := k.(common.MapStr)
-			if runtime.GOOS == "windows" {
-				if v, ok := mem["wss"].(common.MapStr)["pct"]; ok {
-					rootFields.Put("process.memory.pct", v)
-				}
-			} else {
-				if v, ok := mem["rss"].(common.MapStr)["pct"]; ok {
-					rootFields.Put("process.memory.pct", v)
-				}
+			if v, ok := mem["rss"].(common.MapStr)["pct"]; ok {
+				rootFields.Put("process.memory.pct", v)
 			}
 		}
 
