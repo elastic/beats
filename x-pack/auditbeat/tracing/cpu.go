@@ -9,7 +9,6 @@ package tracing
 import (
 	"bytes"
 	"io/ioutil"
-	"math"
 	"strconv"
 	"strings"
 
@@ -95,11 +94,11 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 		parts := strings.Split(expr, "-")
 		r := make([]int, 0, len(parts))
 		for _, numStr := range parts {
-			num64, err := strconv.ParseInt(numStr, 10, 32)
-			if err != nil || num64 < 0 || num64 > math.MaxInt16 {
+			num16, err := strconv.ParseInt(numStr, 10, 16)
+			if err != nil || num16 < 0 {
 				return CPUSet{}, errors.Errorf("failed to parse integer '%s' from range '%s' at '%s'", numStr, expr, contents)
 			}
-			num := int(num64)
+			num := int(num16)
 			r = append(r, num)
 			if num+1 > max {
 				max = num + 1
