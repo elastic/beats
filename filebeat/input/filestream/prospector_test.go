@@ -164,22 +164,29 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	minuteAgo := time.Now().Add(-1 * time.Minute)
 
 	testCases := map[string]struct {
-		events          []loginp.FSEvent
-		ignoreOlder     time.Duration
-		expectedSources []string
+		events         []loginp.FSEvent
+		ignoreOlder    time.Duration
+		expectedEvents []harvesterEvent
 	}{
 		"two new files": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file"},
 			},
-			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
+			expectedEvents: []harvesterEvent{
+				harvesterStart("path::/path/to/file"),
+				harvesterStart("path::/path/to/other/file"),
+				harvesterGroupStop{},
+			},
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
 			},
-			expectedSources: []string{"path::/path/to/file"},
+			expectedEvents: []harvesterEvent{
+				harvesterStart("path::/path/to/file"),
+				harvesterGroupStop{},
+			},
 		},
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
@@ -194,8 +201,10 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
 				},
 			},
-			ignoreOlder:     10 * time.Second,
-			expectedSources: []string{},
+			ignoreOlder: 10 * time.Second,
+			expectedEvents: []harvesterEvent{
+				harvesterGroupStop{},
+			},
 		},
 		"newer files with ignore older": {
 			events: []loginp.FSEvent{
@@ -210,8 +219,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo},
 				},
 			},
-			ignoreOlder:     5 * time.Minute,
-			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
+			ignoreOlder: 5 * time.Minute,
+			expectedEvents: []harvesterEvent{
+				harvesterStart("path::/path/to/file"),
+				harvesterStart("path::/path/to/other/file"),
+				harvesterGroupStop{},
+			},
 		},
 	}
 
@@ -225,11 +238,11 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				ignoreOlder: test.ignoreOlder,
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
-			hg := getTestHarvesterGroup()
+			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
 
-			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
+			assert.ElementsMatch(t, test.expectedEvents, hg.events)
 		})
 	}
 }
@@ -267,7 +280,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
 
-			p.Run(ctx, testStore, getTestHarvesterGroup())
+			p.Run(ctx, testStore, newTestHarvesterGroup())
 
 			has := testStore.has("path::/path/to/file")
 
@@ -283,11 +296,10 @@ func TestProspectorDeletedFile(t *testing.T) {
 
 func TestProspectorRenamedFile(t *testing.T) {
 	testCases := map[string]struct {
-		events                   []loginp.FSEvent
-		trackRename              bool
-		closeRenamed             bool
-		expectedEncounteredNames []string
-		expectedStoppedNames     []string
+		events         []loginp.FSEvent
+		trackRename    bool
+		closeRenamed   bool
+		expectedEvents []harvesterEvent
 	}{
 		"one renamed file without rename tracker": {
 			events: []loginp.FSEvent{
@@ -297,8 +309,11 @@ func TestProspectorRenamedFile(t *testing.T) {
 					NewPath: "/new/path/to/file",
 				},
 			},
-			expectedEncounteredNames: []string{"path::/new/path/to/file"},
-			expectedStoppedNames:     []string{"path::/old/path/to/file"},
+			expectedEvents: []harvesterEvent{
+				harvesterStop("path::/old/path/to/file"),
+				harvesterStart("path::/new/path/to/file"),
+				harvesterGroupStop{},
+			},
 		},
 		"one renamed file with rename tracker": {
 			events: []loginp.FSEvent{
@@ -309,6 +324,9 @@ func TestProspectorRenamedFile(t *testing.T) {
 				},
 			},
 			trackRename: true,
+			expectedEvents: []harvesterEvent{
+				harvesterGroupStop{},
+			},
 		},
 		"one renamed file with rename tracker with close renamed": {
 			events: []loginp.FSEvent{
@@ -318,9 +336,12 @@ func TestProspectorRenamedFile(t *testing.T) {
 					NewPath: "/new/path/to/file",
 				},
 			},
-			trackRename:          true,
-			closeRenamed:         true,
-			expectedStoppedNames: []string{"path::/old/path/to/file"},
+			trackRename:  true,
+			closeRenamed: true,
+			expectedEvents: []harvesterEvent{
+				harvesterStop("path::/old/path/to/file"),
+				harvesterGroupStop{},
+			},
 		},
 	}
 
@@ -338,7 +359,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/old/path/to/file")
 
-			hg := getTestHarvesterGroup()
+			hg := newTestHarvesterGroup()
 			p.Run(ctx, testStore, hg)
 
 			has := testStore.has("path::/old/path/to/file")
@@ -348,31 +369,44 @@ func TestProspectorRenamedFile(t *testing.T) {
 				assert.False(t, has)
 			}
 
-			assert.ElementsMatch(t, test.expectedEncounteredNames, hg.encounteredNames)
-			assert.ElementsMatch(t, test.expectedStoppedNames, hg.stoppedNames)
+			assert.Equal(t, test.expectedEvents, hg.events)
 
 		})
 	}
 }
 
+type harvesterEvent interface{ String() string }
+
+type harvesterStart string
+
+func (h harvesterStart) String() string { return string(h) }
+
+type harvesterStop string
+
+func (h harvesterStop) String() string { return string(h) }
+
+type harvesterGroupStop struct{}
+
+func (h harvesterGroupStop) String() string { return "stop" }
+
 type testHarvesterGroup struct {
-	encounteredNames []string
-	stoppedNames     []string
+	events []harvesterEvent
 }
 
-func getTestHarvesterGroup() *testHarvesterGroup {
-	return &testHarvesterGroup{make([]string, 0), make([]string, 0)}
+func newTestHarvesterGroup() *testHarvesterGroup {
+	return &testHarvesterGroup{make([]harvesterEvent, 0)}
 }
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
-	t.encounteredNames = append(t.encounteredNames, s.Name())
+	t.events = append(t.events, harvesterStart(s.Name()))
 }
 
-func (t *testHarvesterGroup) Stop(_ loginp.Source) {
-	return
+func (t *testHarvesterGroup) Stop(s loginp.Source) {
+	t.events = append(t.events, harvesterStop(s.Name()))
 }
 
 func (t *testHarvesterGroup) StopGroup() error {
+	t.events = append(t.events, harvesterGroupStop{})
 	return nil
 }
 
