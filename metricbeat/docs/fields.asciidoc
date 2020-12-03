@@ -27849,7 +27849,7 @@ Kibana module
 [float]
 === kibana
 
-
+TODO
 
 
 *`kibana.stats.usage.name`*::
@@ -27857,7 +27857,7 @@ Kibana module
 --
 type: alias
 
-alias to: kibana.stats.usage
+alias to: kibana.stats.usage.index
 
 --
 
@@ -27867,6 +27867,16 @@ alias to: kibana.stats.usage
 Kibana stats and run-time metrics.
 
 
+
+
+*`kibana.stats.usage.index`*::
++
+--
+TODO
+
+type: keyword
+
+--
 
 *`kibana.stats.uuid`*::
 +
