@@ -27868,13 +27868,6 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana.stats.usage.index`*::
-+
---
-type: keyword
-
---
-
 
 *`kibana.stats.usage.index`*::
 +

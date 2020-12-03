@@ -60,6 +60,5 @@ func getXPackConfig(host string) map[string]interface{} {
 		"module":        kibana.ModuleName,
 		"metricsets":    xpackMetricSets,
 		"hosts":         []string{host},
-		"xpack.enabled": true,
 	}
 }
