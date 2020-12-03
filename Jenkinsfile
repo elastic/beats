@@ -450,7 +450,7 @@ def archiveTestOutput(Map args = [:]) {
             returnStatus: true,
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, id: args.id)
+        junit(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       if (args.upload) {
         tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
       }
