@@ -20,12 +20,6 @@
 package kibana_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 )
@@ -34,31 +28,10 @@ var xpackMetricSets = []string{
 	"stats",
 }
 
-func TestXPackEnabled(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 300, "kibana")
-
-	metricSetToTypeMap := map[string]string{
-		"stats": "kibana_stats",
-	}
-
-	config := getXPackConfig(service.Host())
-
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	for _, metricSet := range metricSets {
-		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		require.Empty(t, errs)
-		require.NotEmpty(t, events)
-
-		event := events[0]
-		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-		require.Regexp(t, `^.monitoring-kibana-\d-mb`, event.Index)
-	}
-}
-
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        kibana.ModuleName,
-		"metricsets":    xpackMetricSets,
-		"hosts":         []string{host},
+		"module":     kibana.ModuleName,
+		"metricsets": xpackMetricSets,
+		"hosts":      []string{host},
 	}
 }

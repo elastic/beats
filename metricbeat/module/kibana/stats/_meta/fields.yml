@@ -7,9 +7,8 @@
     - name: usage
       type: group
       fields:
-        - name: index
-          type: keyword
-          description: TODO
+      - name: index
+        type: keyword
     - name: uuid
       type: alias
       path: service.id

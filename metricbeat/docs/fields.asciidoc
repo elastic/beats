@@ -27872,8 +27872,6 @@ Kibana stats and run-time metrics.
 *`kibana.stats.usage.index`*::
 +
 --
-TODO
-
 type: keyword
 
 --
