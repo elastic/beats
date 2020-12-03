@@ -139,35 +139,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 
 		// Duplicate system.process.cmdline with ECS name process.command_line
-		if v, ok := proc["cmdline"]; ok {
-			rootFields.Put("process.command_line", v)
-		}
+		rootFields = getAndCopy(proc, "cmdline", rootFields, "process.command_line")
 
 		// Duplicate system.process.state with process.state
-		if v, ok := proc["state"]; ok {
-			rootFields.Put("process.state", v)
-		}
+		rootFields = getAndCopy(proc, "state", rootFields, "process.state")
 
 		// Duplicate system.process.cpu.start_time with process.cpu.start_time
-		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
-		if k, ok := proc["cpu"]; ok {
-			cpu := k.(common.MapStr)
-			if v, ok := cpu["start_time"]; ok {
-				rootFields.Put("process.cpu.start_time", v)
-			}
+		rootFields = getAndCopy(proc, "cpu.start_time", rootFields, "process.cpu.start_time")
 
-			if v, ok := cpu["total"].(common.MapStr)["norm"].(common.MapStr)["pct"]; ok {
-				rootFields.Put("process.cpu.pct", v)
-			}
-		}
+		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
+		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.norm.pct")
 
 		// Duplicate system.process.memory.rss.pct with process.memory.pct
-		if k, ok := proc["memory"]; ok {
-			mem := k.(common.MapStr)
-			if v, ok := mem["rss"].(common.MapStr)["pct"]; ok {
-				rootFields.Put("process.memory.pct", v)
-			}
-		}
+		rootFields = getAndCopy(proc, "memory.rss.pct", rootFields, "process.memory.pct")
 
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
 			rootFields.Put("process.working_directory", cwd)
@@ -205,4 +189,14 @@ func getAndRemove(from common.MapStr, field string) interface{} {
 		return v
 	}
 	return nil
+}
+
+func getAndCopy(from common.MapStr, field string, to common.MapStr, toField string) common.MapStr {
+	v, err := from.GetValue(field)
+	if err != nil {
+		return to
+	}
+
+	_, err = to.Put(toField, v)
+	return to
 }
