@@ -1,0 +1,63 @@
+[[rate_limit]]
+=== Rate limit the flow of events
+
+++++
+<titleabbrev>rate_limit</titleabbrev>
+++++
+
+The `rate_limit` processor limits the rate of event flow based on
+the specified configuration.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+- rate_limit:
+   limit: "10000/m"
+-----------------------------------------------------
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+- rate_limit:
+   fields:
+   - "cloudfoundry.org.name"
+   limit: "400/s"
+-----------------------------------------------------
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+- if.equals.cloudfoundry.org.name: "acme"
+  then:
+  - rate_limit:
+      limit: "500/s"
+-----------------------------------------------------
+
+The following settings are supported:
+
+`limit`:: The rate limit. Supported time units for the rate are `s` (per second), `m` (per minute), and `h` (per hour).
+`fields`:: (Optional) List of fields. The rate limit will be applied to each distinct value derived by combining the values of these fields.
+`algorithm`:: (Optional) The rate limiting algorithm to use. Supported algorithms are `token_bucket`, `leaky_bucket_queue`, and `sliding_window`. Default is `token_bucket`.
+
+Some rate limiting algorithms support additional settings.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+- rate_limit:
+   limit: "10000/m"
+   algorithm:
+     token_bucket: ~
+-----------------------------------------------------
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+- rate_limit:
+   limit: "10000/m"
+   algorithm:
+     token_bucket:
+       burst_multiplier: 1.0
+-----------------------------------------------------
+
+`algorithm.token_bucket.burst_multiplier`:: How much burstability of events should the token bucket allow for. Optional. Default = 1.0 which means no burstability. TODO: explain better.
