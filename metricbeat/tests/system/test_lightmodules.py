@@ -23,7 +23,8 @@ class Test(metricbeat.BaseTest):
                 "name": "test",
                 "metricsets": ["json"],
                 "namespace": "test",
-                "hosts": [f"{server.server_name}:{server.server_port}"],
+                # Hard-coding 'localhost' because hostname in server.server_name doesn't always work.
+                "hosts": [f"localhost:{server.server_port}"],
             }])
 
             proc = self.start_beat()
