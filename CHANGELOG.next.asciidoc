@@ -616,7 +616,6 @@ same journal. {pull}18467[18467]
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 
-
 *Packetbeat*
 
 `host` metadata fields when processing network data from network tap or mirror
