@@ -14,26 +14,39 @@ IF ERRORLEVEL 1 (
 )
 mkdir %WORKSPACE%\bin
 
-REM If 32 bits then install the GVM accordingly
-IF NOT EXIST "%PROGRAMFILES(X86)%" (
-    curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
-)
-
-where /q gvm
-IF ERRORLEVEL 1 (
-    IF EXIST "%PROGRAMFILES(X86)%" (
-        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-amd64.exe
-    ) ELSE (
-        curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-windows-386.exe
-    )
+IF EXIST "%PROGRAMFILES(X86)%" (
+    REM Force the gvm installation.
+    SET GVM_BIN=gvm.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-amd64.exe
     IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
         exit /b 1
     )
-    dir "%WORKSPACE%\bin" /b
+) ELSE (
+    REM Windows 7 workers got a broken gvm installation.
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-386.exe
+    IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
+        exit /b 1
+    )
 )
-FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
+
+SET GVM_BIN=gvm.exe
+WHERE /q %GVM_BIN%
+%GVM_BIN% version
+
+REM Install the given go version
+%GVM_BIN% --debug install %GO_VERSION%
+
+REM Configure the given go version
+FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
 go env
+IF ERRORLEVEL 1 (
+    REM go is not configured correctly.
+    exit /b 1
+)
+
 go get github.com/magefile/mage
 where mage
 mage -version
@@ -41,6 +54,9 @@ IF ERRORLEVEL 1 (
     exit /b 1
 )
 
+REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
+SET PREVIOUS_USERPROFILE=%USERPROFILE%
+SET USERPROFILE=%OLD_USERPROFILE%
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8
     choco install python -y -r --no-progress --version 3.8.5
@@ -61,3 +77,6 @@ IF ERRORLEVEL 1 (
 )
 gcc --version
 where gcc
+
+REM Reset the USERPROFILE
+SET USERPROFILE=%PREVIOUS_USERPROFILE%

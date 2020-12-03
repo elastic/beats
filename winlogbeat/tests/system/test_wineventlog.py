@@ -1,5 +1,6 @@
 import codecs
 import os
+import platform
 import sys
 import time
 import unittest
@@ -250,6 +251,8 @@ class Test(WriteReadTest):
         self.assertEqual(evts[0]["log.level"], "error")
         self.assertEqual(evts[1]["log.level"], "warning")
 
+    @unittest.skipIf(platform.platform().startswith("Windows-7"),
+                     "Flaky test: https://github.com/elastic/beats/issues/22753")
     def test_query_ignore_older(self):
         """
         wineventlog - Query by time (ignore_older than 2s)
