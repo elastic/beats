@@ -42687,7 +42687,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes. Not available on Windows.
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
 
 
 type: long
@@ -42699,31 +42699,7 @@ format: bytes
 *`system.process.memory.rss.pct`*::
 +
 --
-The percentage of memory the process occupied in main memory (RAM). Not available on Windows.
-
-
-type: scaled_float
-
-format: percent
-
---
-
-*`system.process.memory.wss.bytes`*::
-+
---
-The Working Set Size. The amount of memory the process occupied in main memory (RAM). Windows only.
-
-
-type: long
-
-format: bytes
-
---
-
-*`system.process.memory.wss.pct`*::
-+
---
-The percentage of memory the process occupied in main memory (RAM). Windows only.
+The percentage of memory the process occupied in main memory (RAM).
 
 
 type: scaled_float
@@ -42735,7 +42711,7 @@ format: percent
 *`system.process.memory.share`*::
 +
 --
-The shared memory the process uses. Not available on Windows.
+The shared memory the process uses.
 
 
 type: long
