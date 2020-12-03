@@ -241,6 +241,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	var msg sqsMessage
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
+		c.logger.Debug("sqs message body = ", *m.Body)
 		if jsonError, ok := err.(*json.SyntaxError); ok {
 			return nil, fmt.Errorf("json unmarshal sqs message body failed at offset %d with syntax error: %w", jsonError.Offset, err)
 		} else {
