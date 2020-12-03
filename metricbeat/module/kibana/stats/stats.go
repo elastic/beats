@@ -39,9 +39,10 @@ func init() {
 }
 
 const (
-	statsPath             = "api/stats"
-	settingsPath          = "api/settings"
-	usageCollectionPeriod = 24 * time.Hour
+	statsPath              = "api/stats"
+	settingsPath           = "api/settings"
+	usageCollectionPeriod  = 24 * time.Hour
+	usageCollectionBackoff = 1 * time.Hour
 )
 
 var (
@@ -59,6 +60,7 @@ type MetricSet struct {
 	statsHTTP            *helper.HTTP
 	settingsHTTP         *helper.HTTP
 	usageLastCollectedOn time.Time
+	usageNextCollectOn   time.Time
 	isUsageExcludable    bool
 }
 
@@ -152,6 +154,10 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 
 		content, err = m.statsHTTP.FetchContent()
 		if err != nil {
+			if shouldCollectUsage {
+				// When errored in collecting the usage stats it may be counterproductive to try again on the next poll, try to collect the stats again after usageCollectionBackoff
+				m.usageNextCollectOn = now.Add(usageCollectionBackoff)
+			}
 			return err
 		}
 
@@ -186,5 +192,5 @@ func (m *MetricSet) calculateIntervalMs() int64 {
 }
 
 func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod
+	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
 }

@@ -49,6 +49,7 @@ type pgsqlPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcp *common.TCPTuple,
@@ -140,6 +141,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
@@ -150,13 +152,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results protos.Reporter, config *pgsqlConfig) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
 	pgsql.log = logp.NewLogger("pgsql")
@@ -170,6 +172,7 @@ func (pgsql *pgsqlPlugin) init(results protos.Reporter, config *pgsqlConfig) err
 	pgsql.transactions.StartJanitor(pgsql.transactionTimeout)
 	pgsql.handlePgsql = handlePgsql
 	pgsql.results = results
+	pgsql.watcher = watcher
 
 	return nil
 }
@@ -379,7 +382,7 @@ var handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCP
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = pgsql.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
 		pgsql.receivedPgsqlRequest(m)

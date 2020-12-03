@@ -5,7 +5,7 @@
 var security = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
 
     // Logon Types
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-audit-logon-events
@@ -19,13 +19,6 @@ var security = (function () {
         "9": "NewCredentials",
         "10": "RemoteInteractive",
         "11": "CachedInteractive",
-    };
-
-    // ECS Allowed Event Outcome
-    // https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-outcome.html
-    var eventOutcomes = {
-        "Audit Success": "success",
-        "Audit Failure": "failure",
     };
 
     // User Account Control Attributes Table
@@ -1361,18 +1354,6 @@ var security = (function () {
         }
     };
 
-    var addEventOutcome = function(evt) {
-        var auditResult = evt.Get("winlog.keywords");
-        if (!auditResult) {
-            return;
-        }
-        var  eventOutcome = eventOutcomes[auditResult];
-        if (eventOutcome === undefined) {
-            return;
-        }
-        evt.Put("event.outcome", eventOutcome);
-    };
-
     var addLogonType = function(evt) {
         var code = evt.Get("winlog.event_data.LogonType");
         if (!code) {
@@ -1498,11 +1479,12 @@ var security = (function () {
             fields: [
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
-                {from: "winlog.event_data.ClientAddress", to: "source.ip"},
+                {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
             ignore_missing: true,
+            fail_on_error: false,
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.AccountName");
@@ -1688,7 +1670,7 @@ var security = (function () {
             if (!cl) {
                 return;
             }
-            evt.Put("process.args", winlogbeat.splitCommandLine(cl));
+            evt.Put("process.args", windows.splitCommandLine(cl));
             evt.Put("process.command_line", cl);
         })
         .Build();
@@ -1699,7 +1681,6 @@ var security = (function () {
         .Add(copyTargetUserLogonId)
         .Add(addLogonType)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     // Handles both 4624
@@ -1709,7 +1690,6 @@ var security = (function () {
         .Add(addLogonType)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
             if (user) {
@@ -1727,7 +1707,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
             if (user) {
@@ -1748,7 +1727,6 @@ var security = (function () {
         .Add(addFailureSubStatus)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     var event4672 = new processor.Chain()
@@ -1762,7 +1740,6 @@ var security = (function () {
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     var event4688 = new processor.Chain()
@@ -1770,7 +1747,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameNewProcessFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             var res = /^-$/.test(user);
@@ -1785,7 +1761,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     var event4697 = new processor.Chain()
@@ -1794,7 +1769,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addServiceFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "change");
         })
@@ -1806,7 +1780,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             evt.AppendTo('related.user', user);
@@ -1818,7 +1791,6 @@ var security = (function () {
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var userNew = evt.Get("winlog.event_data.NewTargetUserName");
             evt.AppendTo('related.user', userNew);
@@ -1834,7 +1806,6 @@ var security = (function () {
         .Add(copyTargetUserToGroup)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "group");
             var member = evt.Get("winlog.event_data.MemberName");
@@ -1851,7 +1822,6 @@ var security = (function () {
         .Add(copySubjectUserLogonIdFromUserData)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "change");
         })
@@ -1863,7 +1833,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addAuditInfo)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "change");
         })
@@ -1872,7 +1841,6 @@ var security = (function () {
     var auditLogMgmt = new processor.Chain()
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     var computerMgmtEvts = new processor.Chain()
@@ -1882,7 +1850,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var privs = evt.Get("winlog.event_data.PrivilegeList");
             if (!privs) {
@@ -1896,14 +1863,12 @@ var security = (function () {
     var sessionEvts = new processor.Chain()
         .Add(addSessionData)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
      var event4964 = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copyTargetUserLogonId)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "group");
         })
@@ -1916,7 +1881,6 @@ var security = (function () {
         .Add(addTicketEncryptionType)
         .Add(addTicketStatus)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var ip = evt.Get("source.ip");
             if (/::ffff:/.test(ip)) {
@@ -1929,14 +1893,12 @@ var security = (function () {
         .Add(copyTargetUser)
         .Add(addFailureStatus)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Build();
 
     var  scheduledTask = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "admin");
         })
@@ -1947,7 +1909,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(addEventOutcome)
         .Add(function(evt) {
             var privs = evt.Get("winlog.event_data.PrivilegeList");
             if (!privs) {

@@ -12,6 +12,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -58,6 +59,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -105,6 +107,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -151,6 +154,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -198,6 +202,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -244,6 +249,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "0",
         "group.name": "wheel",
@@ -336,6 +342,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Software Signing",
         "fileset.name": "log",
         "group.id": "20",
         "group.name": "staff",
@@ -381,6 +388,7 @@
         "event.type": [
             "start"
         ],
+        "file.x509.issuer.common_name": "Developer ID Application: Google, Inc. (EQHXZ8M8AV)",
         "fileset.name": "log",
         "group.id": "20",
         "group.name": "staff",

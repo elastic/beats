@@ -1,6 +1,6 @@
-{{ if eq .input "google-pubsub" }}
+{{ if eq .input "gcp-pubsub" }}
 
-type: google-pubsub
+type: gcp-pubsub
 project_id: {{ .project_id }}
 topic: {{ .topic }}
 subscription.name: {{ .subscription_name }}
@@ -34,4 +34,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.6.0

@@ -1,0 +1,619 @@
+- name: zoom
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing Zoom API Webhooks.
+  fields:
+    - name: master_account_id
+      type: keyword
+      description: >
+        Master Account related to a specific Sub Account
+    - name: sub_account_id
+      type: keyword
+      description: >
+        Related Sub Account
+    - name: operator_id
+      type: keyword
+      description: >
+        UserID that triggered the event
+    - name: operator
+      type: keyword
+      description: >
+        Username/Email related to the user that triggered the event
+    - name: account_id
+      type: keyword
+      description: >
+        Related accountID to the event
+    - name: timestamp
+      type: date
+      description: >
+        Timestamp related to the event
+    - name: creation_type
+      type: keyword
+      description: >
+        Creation type
+    - name: account.owner_id
+      type: keyword
+      description: >
+        UserID of the user whose sub account was created/disassociated
+    - name: account.email
+      type: keyword
+      description: >
+        Email related to the user the action was performed on
+    - name: account.owner_email
+      type: keyword
+      description: >
+        Email of the user whose sub account was created/disassociated
+    - name: account.account_name
+      type: keyword
+      description: >
+        When an account name is updated, this is the new value set
+    - name: account.account_alias
+      type: keyword
+      description: >
+        When an account alias is updated, this is the new value set
+    - name: account.account_support_name
+      type: keyword
+      description: >
+        When an account support_name is updated, this is the new value set
+    - name: account.account_support_email
+      type: keyword
+      description: >
+        When an account support_email is updated, this is the new value set
+    - name: chat_channel.name
+      type: keyword
+      description: >
+        The name of the channel that has been added/modified/deleted
+    - name: chat_channel.id
+      type: keyword
+      description: >
+        The ID of the channel that has been added/modified/deleted
+    - name: chat_channel.type
+      type: keyword
+      description: >
+        Type of channel related to the event. Can be 1(Invite-Only), 2(Private) or 3(Public)
+    - name: chat_message.id
+      type: keyword
+      description: >
+        Unique ID of the related chat message
+    - name: chat_message.type
+      type: keyword
+      description: >
+        Type of message, can be either "to_contact" or "to_channel"
+    - name: chat_message.session_id
+      type: keyword
+      description: >
+        SessionID for the channel related to the message
+    - name: chat_message.contact_email
+      type: keyword
+      description: >
+        Email address related to the user sending the message
+    - name: chat_message.contact_id
+      type: keyword
+      description: >
+        UserID belonging to the user receiving a message
+    - name: chat_message.channel_id
+      type: keyword
+      description: >
+        ChannelID related to the message
+    - name: chat_message.channel_name
+      type: keyword
+      description: >
+        Channel name related to the message
+    - name: chat_message.message
+      type: keyword
+      description: >
+        A string containing the full message that was sent
+    - name: meeting.id
+      type: keyword
+      description: >
+        Unique ID of the related meeting
+    - name: meeting.uuid
+      type: keyword
+      description: >
+        The UUID of the related meeting
+    - name: meeting.host_id
+      type: keyword
+      description: >
+        The UserID of the configured meeting host
+    - name: meeting.topic
+      type: keyword
+      description: >
+        Topic of the related meeting
+    - name: meeting.type
+      type: keyword
+      description: >
+        Type of meeting created
+    - name: meeting.start_time
+      type: date
+      description: >
+        Date and time the meeting started
+    - name: meeting.timezone
+      type: keyword
+      description: >
+        Which timezone is used for the meeting timestamps
+    - name: meeting.duration
+      type: long
+      description: >
+        The duration of a meeting in minutes
+    - name: meeting.issues
+      type: keyword
+      description: >
+        When a user reports an issue with the meeting, for example: "Unstable audio quality"
+    - name: meeting.password
+      type: keyword
+      description: >
+        Password related to the meeting
+    - name: phone.id
+      type: keyword
+      description: >
+        Unique ID for the phone or conversation
+    - name: phone.user_id
+      type: keyword
+      description: >
+        UserID for the phone owner related to a Call Log being completed
+    - name: phone.download_url
+      type: keyword
+      description: >
+        Download URL for the voicemail
+    - name: phone.ringing_start_time
+      type: date
+      description: >
+        The timestamp when a ringtone was established to the callee
+    - name: phone.connected_start_time
+      type: date
+      description: >
+        The date and time when a ringtone was established to the callee
+    - name: phone.answer_start_time
+      type: date
+      description: >
+        The date and time when the call was answered
+    - name: phone.call_end_time
+      type: date
+      description: >
+        The date and time when the call ended
+    - name: phone.call_id
+      type: keyword
+      description: >
+        Unique ID of the related call
+    - name: phone.duration
+      type: long
+      description: >
+        Duration of a voicemail in minutes
+    - name: phone.caller.id
+      type: keyword
+      description: >
+        UserID of the caller related to the voicemail/call
+    - name: phone.caller.user_id
+      type: keyword
+      description: >
+        UserID of the person which initiated the call
+    - name: phone.caller.number_type
+      type: keyword
+      description: >
+        The type of number, can be 1(Internal) or 2(External)
+    - name: phone.caller.name
+      type: keyword
+      description: >
+        The name of the related callee
+    - name: phone.caller.phone_number
+      type: keyword
+      description: >
+        Phone Number of the caller related to the call
+    - name: phone.caller.extension_type
+      type: keyword
+      description: >
+        Extension type of the caller number, can be user, callQueue, autoReceptionist or shareLineGroup
+    - name: phone.caller.extension_number
+      type: keyword
+      description: >
+        Extension number of the caller
+    - name: phone.caller.timezone
+      type: keyword
+      description: >
+        Timezone of the caller
+    - name: phone.caller.device_type
+      type: keyword
+      description: >
+        Device type used by the caller
+    - name: phone.callee.id
+      type: keyword
+      description: >
+        UserID of the callee related to the voicemail/call
+    - name: phone.callee.user_id
+      type: keyword
+      description: >
+        UserID of the related callee of a voicemail/call
+    - name: phone.callee.name
+      type: keyword
+      description: >
+        The name of the related callee
+    - name: phone.callee.number_type
+      type: keyword
+      description: >
+        The type of number, can be 1(Internal) or 2(External)
+    - name: phone.callee.phone_number
+      type: keyword
+      description: >
+        Phone Number of the callee related to the call
+    - name: phone.callee.extension_type
+      type: keyword
+      description: >
+        Extension type of the callee number, can be user, callQueue, autoReceptionist or shareLineGroup
+    - name: phone.callee.extension_number
+      type: keyword
+      description: >
+        Extension number of the callee related to the call
+    - name: phone.callee.timezone
+      type: keyword
+      description: >
+        Timezone of the callee related to the call
+    - name: phone.callee.device_type
+      type: keyword
+      description: >
+        Device type used by the callee related to the call
+    - name: phone.date_time
+      type: date
+      description: >
+        Date and time of the related phone event
+    - name: recording.id
+      type: keyword
+      description: >
+        Unique ID of the related recording
+    - name: recording.uuid
+      type: keyword
+      description: >
+        UUID of the related recording
+    - name: recording.host_id
+      type: keyword
+      description: >
+        UserID of the host of the meeting that was recorded
+    - name: recording.topic
+      type: keyword
+      description: >
+        Topic of the meeting related to the recording
+    - name: recording.type
+      type: keyword
+      description: >
+        Type of recording, can be multiple type of values, please check Zoom documentation
+    - name: recording.start_time
+      type: date
+      description: >
+        The date and time when the recording started
+    - name: recording.timezone
+      type: keyword
+      description: >
+        The timezone used for the recording date
+    - name: recording.duration
+      type: long
+      description: >
+        Duration of the recording in minutes
+    - name: recording.share_url
+      type: keyword
+      description: >
+        The URL to access the recording
+    - name: recording.total_size
+      type: long
+      description: >
+        Total size of the recording in bytes
+    - name: recording.recording_count
+      type: long
+      description: >
+        Number of recording files related to the recording
+    - name: recording.recording_file.recording_start
+      type: date
+      description: >
+        The date and time the recording started
+    - name: recording.recording_file.recording_end
+      type: date
+      description: >
+        The date and time the recording finished
+    - name: recording.host_email
+      type: keyword
+      description: >
+        Email address of the host related to the meeting that was recorded
+    - name: user.id
+      type: keyword
+      description: >
+        UserID related to the user event
+    - name: user.first_name
+      type: keyword
+      description: >
+        User first name related to the user event
+    - name: user.last_name
+      type: keyword
+      description: >
+        User last name related to the user event
+    - name: user.email
+      type: keyword
+      description: >
+        User email related to the user event
+    - name: user.type
+      type: keyword
+      description: >
+        User type related to the user event
+    - name: user.phone_number
+      type: keyword
+      description: >
+        User phone number related to the user event
+    - name: user.phone_country
+      type: keyword
+      description: >
+        User country code related to the user event
+    - name: user.company
+      type: keyword
+      description: >
+        User company related to the user event
+    - name: user.pmi
+      type: keyword
+      description: >
+        User personal meeting ID related to the user event
+    - name: user.use_pmi
+      type: boolean
+      description: >
+        If a user has PMI enabled
+    - name: user.pic_url
+      type: keyword
+      description: >
+        Full URL to the profile picture used by the user
+    - name: user.vanity_name
+      type: keyword
+      description: >
+        Name of the personal meeting room related to the user event
+    - name: user.timezone
+      type: keyword
+      description: >
+        Timezone configured for the user
+    - name: user.language
+      type: keyword
+      description: >
+        Language configured for the user
+    - name: user.host_key
+      type: keyword
+      description: >
+        Host key set for the user
+    - name: user.role
+      type: keyword
+      description: >
+        The configured role for the user
+    - name: user.dept
+      type: keyword
+      description: >
+        The configured departement for the user
+    - name: user.presence_status
+      type: keyword
+      description: >
+        Current presence status of user
+    - name: user.personal_notes
+      type: keyword
+      description: >
+        Personal notes for the User
+    - name: user.client_type
+      type: keyword
+      description: >
+        Type of client used by the user. Can be browser, mac, win, iphone or android
+    - name: user.version
+      type: keyword
+      description: >
+        Version of the client used by the user
+    - name: webinar.id
+      type: keyword
+      description: >
+        Unique ID for the related webinar
+    - name: webinar.join_url
+      type: keyword
+      description: >
+        The URL configured to join the webinar
+    - name: webinar.uuid
+      type: keyword
+      description: >
+        UUID for the related webinar
+    - name: webinar.host_id
+      type: keyword
+      description: >
+        UserID for the configured host of the webinar
+    - name: webinar.topic
+      type: keyword
+      description: >
+        Meeting topic of the related webinar
+    - name: webinar.type
+      type: keyword
+      description: >
+        Type of webinar created. Can be either 5(Webinar), 6(Recurring webinar without fixed time) or 9(Recurring webinar with fixed time)
+    - name: webinar.start_time
+      type: date
+      description: >
+        The date and time when the webinar started
+    - name: webinar.timezone
+      type: keyword
+      description: >
+        Timezone used for the dates related to the webinar
+    - name: webinar.duration
+      type: long
+      description: >
+        Duration of the webinar in minutes
+    - name: webinar.agenda
+      type: keyword
+      description: >
+        The configured agenda of the webinar
+    - name: webinar.password
+      type: keyword
+      description: >
+        Password configured to access the webinar
+    - name: webinar.issues
+      type: keyword
+      description: >
+        Any reported issues about a webinar is reported in this field
+    - name: zoomroom.id
+      type: keyword
+      description: >
+        Unique ID of the Zoom room
+    - name: zoomroom.room_name
+      type: keyword
+      description: >
+        The configured name of the Zoom room
+    - name: zoomroom.calendar_name
+      type: keyword
+      description: >
+        Calendar name of the Zoom room
+    - name: zoomroom.calendar_id
+      type: keyword
+      description: >
+        Unique ID of the calendar used by the Zoom room
+    - name: zoomroom.event_id
+      type: keyword
+      description: >
+        Unique ID of the calendar event associated with the Zoom Room
+    - name: zoomroom.change_key
+      type: keyword
+      description: >
+        Key used by Microsoft products integration that represents a specific version of a calendar
+    - name: zoomroom.resource_email
+      type: keyword
+      description: >
+        Email address associated with the calendar in use by the Zoom room
+    - name: zoomroom.email
+      type: keyword
+      description: >
+        Email address associated with the Zoom room itself
+    - name: zoomroom.issue
+      type: keyword
+      description: >
+        Any reported alerts or issues related to the Zoom room or its equipment
+    - name: zoomroom.alert_type
+      type: keyword
+      description: >
+        An integer value representing the type of alert. The list of alert types can be found in the Zoom documentation
+    - name: zoomroom.component
+      type: keyword
+      description: >
+        An integer value representing the type of equipment or component, The list of component types can be found in the Zoom documentation
+    - name: zoomroom.alert_kind
+      type: keyword
+      description: >
+        An integer value showing if the Zoom room alert has been either 1(Triggered) or 2(Cleared)
+    - name: registrant.id
+      type: keyword
+      description: >
+        Unique ID of the user registering to a meeting or webinar
+    - name: registrant.status
+      type: keyword
+      description: >
+        Status of the specific user registration
+    - name: registrant.email
+      type: keyword
+      description: >
+        Email of the user registering to a meeting or webinar
+    - name: registrant.first_name
+      type: keyword
+      description: >
+        First name of the user registering to a meeting or webinar
+    - name: registrant.last_name
+      type: keyword
+      description: >
+        Last name of the user registering to a meeting or webinar
+    - name: registrant.address
+      type: keyword
+      description: >
+        Address of the user registering to a meeting or webinar
+    - name: registrant.city
+      type: keyword
+      description: >
+        City of the user registering to a meeting or webinar
+    - name: registrant.country
+      type: keyword
+      description: >
+        Country of the user registering to a meeting or webinar
+    - name: registrant.zip
+      type: keyword
+      description: >
+        Zip code of the user registering to a meeting or webinar
+    - name: registrant.state
+      type: keyword
+      description: >
+        State of the user registering to a meeting or webinar
+    - name: registrant.phone
+      type: keyword
+      description: >
+        Phone number of the user registering to a meeting or webinar
+    - name: registrant.industry
+      type: keyword
+      description: >
+        Related industry of the user registering to a meeting or webinar
+    - name: registrant.org
+      type: keyword
+      description: >
+        Organization related to the user registering to a meeting or webinar
+    - name: registrant.job_title
+      type: keyword
+      description: >
+        Job title of the user registering to a meeting or webinar
+    - name: registrant.purchasing_time_frame
+      type: keyword
+      description: >
+        Choosen purchase timeframe of the user registering to a meeting or webinar
+    - name: registrant.role_in_purchase_process
+      type: keyword
+      description: >
+        Choosen role in a purchase process related to the user registering to a meeting or webinar
+    - name: registrant.no_of_employees
+      type: keyword
+      description: >
+        Number of employees choosen by the user registering to a meeting or webinar
+    - name: registrant.comments
+      type: keyword
+      description: >
+        Comments left by the user registering to a meeting or webinar
+    - name: registrant.join_url
+      type: keyword
+      description: >
+        The URL that the registrant can use to join the webinar
+    - name: participant.id
+      type: keyword
+      description: >
+        Unique ID of the participant related to a meeting
+    - name: participant.user_id
+      type: keyword
+      description: >
+        UserID of the participant related to a meeting
+    - name: participant.user_name
+      type: keyword
+      description: >
+        Username of the participant related to a meeting
+    - name: participant.join_time
+      type: date
+      description: >
+        The date and time a participant joined a meeting
+    - name: participant.leave_time
+      type: date
+      description: >
+        The date and time a participant left a meeting
+    - name: participant.sharing_details.link_source
+      type: keyword
+      description: >
+        Method of sharing with dropbox integration
+    - name: participant.sharing_details.content
+      type: keyword
+      description: >
+        Type of content that was shared
+    - name: participant.sharing_details.file_link
+      type: keyword
+      description: >
+        The file link that was shared
+    - name: participant.sharing_details.date_time
+      type: keyword
+      description: >
+        Timestamp the sharing started
+    - name: participant.sharing_details.source
+      type: keyword
+      description: >
+        The file source that was share
+    - name: old_values
+      type: flattened
+      description: >
+        Includes the old values when updating a object like user, meeting, account or webinar
+    - name: settings
+      type: flattened
+      description: >
+        The current active settings related to a object like user, meeting, account or webinar

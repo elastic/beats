@@ -81,7 +81,7 @@ func NewFields() *Fields {
 				Kind:     "event",
 			},
 			Type:     []string{"connection", "protocol"},
-			Category: []string{"network_traffic", "network"},
+			Category: []string{"network"},
 		},
 	}
 }
@@ -147,13 +147,58 @@ func (f *Fields) SetDestination(endpoint *common.Endpoint) {
 func (f *Fields) AddIP(ip ...string) {
 	if f.Related == nil {
 		f.Related = &ecsRelated{
-			ipSet: make(map[string]struct{}),
+			ipSet:   make(map[string]struct{}),
+			userSet: make(map[string]struct{}),
+			hostSet: make(map[string]struct{}),
 		}
 	}
 	for _, ipAddress := range ip {
+		if ipAddress == "" {
+			continue
+		}
 		if _, ok := f.Related.ipSet[ipAddress]; !ok {
 			f.Related.ipSet[ipAddress] = struct{}{}
 			f.Related.IP = append(f.Related.IP, ipAddress)
+		}
+	}
+}
+
+// AddUser adds the given user names to the related ECS User field
+func (f *Fields) AddUser(u ...string) {
+	if f.Related == nil {
+		f.Related = &ecsRelated{
+			ipSet:   make(map[string]struct{}),
+			userSet: make(map[string]struct{}),
+			hostSet: make(map[string]struct{}),
+		}
+	}
+	for _, user := range u {
+		if user == "" {
+			continue
+		}
+		if _, ok := f.Related.userSet[user]; !ok {
+			f.Related.userSet[user] = struct{}{}
+			f.Related.User = append(f.Related.User, user)
+		}
+	}
+}
+
+// AddHost adds the given hosts to the related ECS Hosts field
+func (f *Fields) AddHost(h ...string) {
+	if f.Related == nil {
+		f.Related = &ecsRelated{
+			ipSet:   make(map[string]struct{}),
+			userSet: make(map[string]struct{}),
+			hostSet: make(map[string]struct{}),
+		}
+	}
+	for _, host := range h {
+		if host == "" {
+			continue
+		}
+		if _, ok := f.Related.hostSet[host]; !ok {
+			f.Related.hostSet[host] = struct{}{}
+			f.Related.Hosts = append(f.Related.Hosts, host)
 		}
 	}
 }

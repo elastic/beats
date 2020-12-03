@@ -12,17 +12,18 @@ This file is generated! See scripts/docs_collector.py
 == Check Point module
 beta[]
 
-This is a module for Check Point firewall logs. It supports logs from the Log Exporter in the Syslog format.
+This is a module for Check Point firewall logs. It supports logs from the Log
+Exporter in the Syslog RFC 5424 format. If you need to ingest Check Point logs
+in CEF format then please use the <<filebeat-module-cef, `CEF module`>> (more
+fields are provided in the syslog output).
 
-To configure a Log Exporter, please refer to the documentation by https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323[Check Point].
+To configure a Log Exporter, please refer to the documentation by
+https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323[Check
+Point].
 
-Example below:
+Example Log Exporter config:
 
 `cp_log_export add name testdestination target-server 192.168.1.1 target-port 9001 protocol udp format syslog`
-
-The module that supports Check Point firewall logs sent in the CEF format requires the <<filebeat-module-cef, `CEF module`>>
-
-The Check Point and ECS fields that are the same between both modules will be mapped to the same names for compability between modules, though not all fields are included in CEF. Please reference the supported fields in the CEF documentation.
 
 include::../include/gs-link.asciidoc[]
 
@@ -30,7 +31,8 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-This module has been tested against Check Point Log Exporter on R80.X but should also work with R77.30.
+This module has been tested against Check Point Log Exporter on R80.X but should
+also work with R77.30.
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -67,6 +69,18 @@ The UDP port to listen for syslog traffic. Defaults to 9001.
 A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[checkpoint-firewall, forwarded]`.
+
+*`var.ssl`*::
+
+The SSL/TLS configuration for the filebeat instance. This can be used to enforce mutual TLS.
+```yaml
+ssl:
+  enabled: true
+  certificate_authorities: ["my-ca.pem"]
+  certificate: "filebeat-cert.pem"
+  key: "filebeat-key.pem"
+  client_authentication: "required"
+```
 
 [float]
 ==== Check Point devices

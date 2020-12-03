@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
+const ackPath = "/api/fleet/agents/%s/acks"
 
 // AckEvent is an event sent in an ACK request.
 type AckEvent struct {
@@ -45,12 +45,10 @@ func (e *AckRequest) Validate() error {
 // AckResponse is the response send back from the server.
 // 200
 // {
-// 	 "action": "acks",
-// 	 "success": true
+// 	 "action": "acks"
 // }
 type AckResponse struct {
-	Action  string `json:"action"`
-	Success bool   `json:"success"`
+	Action string `json:"action"`
 }
 
 // Validate validates the response send from the server.
