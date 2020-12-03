@@ -17,14 +17,22 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
-// Guess how to get a struct sock* from an ip_local_out() call.
+// Guess how to get a struct sock* and an sk_buff* from an ip_local_out() call.
 // This function has three forms depending on kernel version:
 // - ip_local_out(struct sk_buff *skb) // 2.x//<3.13
 // - ip_local_out_sk(struct sock *sk, struct sk_buff *skb) // 3.13..4.3
 // - ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb) // 4.4+
 //
-// what it does is set a probe on tcp_sendmsg (guaranteed to have a *sock)
-// and in ip_local_out, which will be called by tcp_sendmsg.
+// To make things more complicated, in some 5.x+ kernels, ip_local_out is never
+// triggered although it exists, but __ip_local_out always works, so
+// this guess expects the template variable IP_LOCAL_OUT to be set to the
+// first of these functions that is available for tracing:
+// [ "ip_local_out_sk", "__ip_local_out", "ip_local_out" ]
+//
+// ----
+//
+// What it guess does is set a probe on tcp_sendmsg (guaranteed to have a *sock)
+// and in .IP_LOCAL_OUT, which will be called by tcp_sendmsg.
 // It dumps the first param (which can be a struct net* or a struct sk_buff)
 // and gets the second param. Either the second param is the sock, or is it
 // found at some point in the dumped first param.
@@ -98,8 +106,8 @@ func (g *guessIPLocalOut) Probes() ([]helper.ProbeDef, error) {
 			Probe: tracing.Probe{
 				Name:    "ip_local_out_sock_guess",
 				Address: "{{.IP_LOCAL_OUT}}",
-				Fetchargs: "arg={{if eq .IP_LOCAL_OUT \"ip_local_out\"}}{{.P2}}{{else}}{{.P1}}{{end}} dump=" +
-					helper.MakeMemoryDump("{{if eq .IP_LOCAL_OUT \"ip_local_out\"}}{{.P1}}{{else}}{{.P2}}{{end}}", 0, skbuffDumpSize),
+				Fetchargs: "arg={{if ne .IP_LOCAL_OUT \"ip_local_out_sk\"}}{{.P2}}{{else}}{{.P1}}{{end}} dump=" +
+					helper.MakeMemoryDump("{{if ne .IP_LOCAL_OUT \"ip_local_out_sk\"}}{{.P1}}{{else}}{{.P2}}{{end}}", 0, skbuffDumpSize),
 			},
 			Decoder: helper.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
 		},
@@ -149,7 +157,8 @@ func (g *guessIPLocalOut) Extract(ev interface{}) (common.MapStr, bool) {
 			// No tcp_sendmsg received?
 			return nil, false
 		}
-		isIpLocalOut := g.ctx.Vars["IP_LOCAL_OUT"] == "ip_local_out"
+		// Special handling for ip_local_out_sk
+		isIpLocalOut := g.ctx.Vars["IP_LOCAL_OUT"] != "ip_local_out_sk"
 		if v.Arg == g.sock {
 			if isIpLocalOut {
 				return common.MapStr{
