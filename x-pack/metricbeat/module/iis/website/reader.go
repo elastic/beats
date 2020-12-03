@@ -7,9 +7,9 @@
 package website
 
 import (
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
-
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 
 	"github.com/pkg/errors"
 
@@ -92,17 +92,93 @@ func (r *WebsiteReader) Read() ([]mb.Event, error) {
 		r.query.Close()
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
-	var events []mb.Event
-	//eventGroup := r.mapEvents(values)
+	events := r.mapEvents(values)
 	r.executed = true
-	results := make([]mb.Event, 0, len(events))
-	//for _, val := range eventGroup {
-	//	results = append(results, val)
-	//}
-	return results, nil
+	return events, nil
 }
 
 // close will close the PDH query for now.
 func (r *WebsiteReader) Close() error {
 	return r.query.Close()
+}
+
+// HasExecuted will chck if collect has been executed.
+func (r *WebsiteReader) HasExecuted() bool {
+	return r.executed
+}
+
+type InstanceCollection struct {
+	Values []InstanceValue
+	Name   string
+}
+
+type InstanceValue struct {
+	Query  string
+	Values []pdh.CounterValue
+}
+
+func hasCollection(instance string, collection []InstanceCollection) bool {
+	for _, val := range collection {
+		if val.Name == instance {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *WebsiteReader) mapEvents(values map[string][]pdh.CounterValue) []mb.Event {
+	var events []mb.Event
+	var collection []InstanceCollection
+	for key, valueGroup := range values {
+		for i, val := range valueGroup {
+			if val.Instance == "_Total" {
+				continue
+			}
+			if ok := hasCollection(val.Instance, collection); ok {
+				collection[i].Values = append(collection[i].Values, InstanceValue{Query: key, Values: []pdh.CounterValue{val}})
+			} else {
+				webCol := InstanceCollection{
+					Values: []InstanceValue{{Query: key, Values: []pdh.CounterValue{
+						val,
+					}}},
+					Name: val.Instance,
+				}
+				collection = append(collection, webCol)
+			}
+		}
+	}
+
+	for _, counter := range collection {
+		event := mb.Event{
+			MetricSetFields: common.MapStr{
+				"name": counter.Name,
+			},
+			RootFields: common.MapStr{},
+		}
+		for _, values := range counter.Values {
+			for _, val := range values.Values {
+				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+				if val.Err.Error != nil {
+					if !r.executed {
+						continue
+					}
+					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
+					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
+					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
+					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+						r.log.Debugw("Counter value retrieval returned",
+							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("application_pool"), "query", values.Query)
+						continue
+					}
+				}
+				event.MetricSetFields.Put(websiteCounters[values.Query], val.Measurement)
+			}
+
+		}
+
+		events = append(events, event)
+	}
+
+	return events
 }

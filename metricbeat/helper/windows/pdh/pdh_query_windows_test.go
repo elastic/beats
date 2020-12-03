@@ -77,7 +77,7 @@ func TestGetFormattedCounterArrayValues(t *testing.T) {
 	}
 	list, err := q.GetFormattedCounterArrayValues()
 	assert.NoError(t, err)
-	assert.True(t, len(list)>0)
+	assert.True(t, len(list) > 0)
 }
 
 // TestSuccessfulQuery retrieves a per counter successfully.

@@ -21,11 +21,12 @@ package pdh
 
 import (
 	"bytes"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"strconv"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"golang.org/x/sys/windows"
 )
@@ -47,10 +48,10 @@ import (
 //sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 
 var (
-	InvalidQueryHandle = ^PdhQueryHandle(0)
-	InvalidCounterHandle = ^PdhCounterHandle(0)
+	InvalidQueryHandle        = ^PdhQueryHandle(0)
+	InvalidCounterHandle      = ^PdhCounterHandle(0)
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(PdhCounterValueItem{}))
-	)
+)
 
 // PerformanceDetailWizard is the counter detail level
 const PerformanceDetailWizard = 400
@@ -113,8 +114,8 @@ type PdhCounterValueArray struct {
 
 // PdhCounterValueArray.
 type PdhFmtCounterValueItem struct {
-	Name		*uint16
-	FmtValue	PdhCounterValue
+	Name     *uint16
+	FmtValue PdhCounterValue
 }
 
 // PdhCounterValueArray.
@@ -384,7 +385,3 @@ func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterForm
 
 	return nil, nil
 }
-
-
-
-

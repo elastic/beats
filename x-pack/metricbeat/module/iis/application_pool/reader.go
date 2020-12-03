@@ -7,8 +7,9 @@
 package application_pool
 
 import (
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 	"strings"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
@@ -29,7 +30,7 @@ type AppPoolReader struct {
 	query            pdh.Query    // PDH Query
 	executed         bool         // Indicates if the query has been executed.
 	log              *logp.Logger //
-	config           iis.Config       // Metricset configuration
+	config           iis.Config   // Metricset configuration
 }
 
 // ApplicationPool struct contains the list of applications and their worker processes
@@ -99,7 +100,7 @@ func (r *AppPoolReader) InitCounters() error {
 		if err := r.query.AddCounter(value, "*", "float", true); err != nil {
 			return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
 		}
-	r.workerProcesses[value] = key
+		r.workerProcesses[value] = key
 
 	}
 	return nil
@@ -173,6 +174,11 @@ func (r *AppPoolReader) mapEvents(values map[string][]pdh.CounterValue) map[stri
 		}
 	}
 	return events
+}
+
+// HasExecuted will chck if collect has been executed.
+func (r *AppPoolReader) HasExecuted() bool {
+	return r.executed
 }
 
 // close will close the PDH query for now.
