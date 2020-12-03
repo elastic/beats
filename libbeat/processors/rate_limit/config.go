@@ -19,11 +19,12 @@ package rate_limit
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
 )
 
 // Config for rate limit processor.
 type Config struct {
-	Limit     Limit                  `config:"limit" validate:"required"`
+	Limit     algorithm.Limit        `config:"limit" validate:"required"`
 	Fields    []string               `config:"fields"`
 	Algorithm common.ConfigNamespace `config:"algorithm"`
 }

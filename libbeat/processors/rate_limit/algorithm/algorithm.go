@@ -21,13 +21,12 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit"
 )
 
 var registry = map[string]Algorithm{}
 
 type Config struct {
-	Limit  rate_limit.Limit
+	Limit  Limit
 	Config common.Config
 }
 
