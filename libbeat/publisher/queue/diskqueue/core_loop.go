@@ -129,14 +129,16 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 	// The writer loop response contains the number of bytes written to
 	// each segment that appeared in the request. Entries always appear in
 	// the same sequence as (the beginning of) segments.writing.
-	for index, bytesWritten := range response.bytesWritten {
+	for index, segmentEntry := range response.segments {
 		// Update the segment with its new size.
-		dq.segments.writing[index].endOffset += segmentOffset(bytesWritten)
+		dq.segments.writing[index].endOffset +=
+			segmentOffset(segmentEntry.bytesWritten)
+		dq.segments.writing[index].framesWritten += segmentEntry.framesWritten
 	}
 
 	// If there is more than one segment in the response, then all but the
 	// last have been closed and are ready to move to the reading list.
-	closedCount := len(response.bytesWritten) - 1
+	closedCount := len(response.segments) - 1
 	if closedCount > 0 {
 		// Remove the prefix of the writing array and append to to reading.
 		closedSegments := dq.segments.writing[:closedCount]

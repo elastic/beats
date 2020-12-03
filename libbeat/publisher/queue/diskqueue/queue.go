@@ -150,7 +150,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
-	initialSegments, err := scanExistingSegments(settings.directoryPath())
+	initialSegments, err :=
+		scanExistingSegments(logger, settings.directoryPath())
 	if err != nil {
 		return nil, err
 	}

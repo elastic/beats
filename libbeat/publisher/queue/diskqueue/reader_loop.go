@@ -102,8 +102,9 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
-	_, err = handle.Seek(
-		segmentHeaderSize+int64(request.startOffset), os.SEEK_SET)
+	// getReader positions us at the start of the data region, so we use
+	// a relative seek to advance to the request position.
+	_, err = handle.Seek(int64(request.startOffset), os.SEEK_CUR)
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}

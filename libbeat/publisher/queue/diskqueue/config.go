@@ -190,7 +190,8 @@ func (settings Settings) segmentPath(segmentID segmentID) string {
 }
 
 func (settings Settings) maxSegmentOffset() segmentOffset {
-	return segmentOffset(settings.MaxSegmentSize - segmentHeaderSize)
+	return segmentOffset(
+		int(settings.MaxSegmentSize) - segmentHeaderSize)
 }
 
 // Given a retry interval, nextRetryInterval returns the next higher level

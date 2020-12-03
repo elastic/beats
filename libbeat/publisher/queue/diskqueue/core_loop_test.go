@@ -122,7 +122,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	}
 
 	settings := DefaultSettings()
-	settings.MaxSegmentSize = 1000 + segmentHeaderSize
+	settings.MaxSegmentSize = uint64(1000 + segmentHeaderSize)
 	settings.MaxBufferSize = 10000
 	for description, test := range testCases {
 		dq := &diskQueue{
@@ -235,7 +235,9 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to one segment (no segments should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		bytesWritten: []int64{100},
+		segments: []writerLoopResponseSegment{
+			{bytesWritten: 100},
+		},
 	})
 	if len(dq.segments.writing) != 4 || len(dq.segments.reading) != 0 {
 		t.Fatalf("expected 4 writing and 0 reading segments, got %v writing "+
@@ -248,7 +250,10 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to two segments (the first one should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		bytesWritten: []int64{100, 100},
+		segments: []writerLoopResponseSegment{
+			{bytesWritten: 100},
+			{bytesWritten: 100},
+		},
 	})
 	if len(dq.segments.writing) != 3 || len(dq.segments.reading) != 1 {
 		t.Fatalf("expected 3 writing and 1 reading segments, got %v writing "+
@@ -265,7 +270,11 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to three segments (the first two should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		bytesWritten: []int64{100, 100, 500},
+		segments: []writerLoopResponseSegment{
+			{bytesWritten: 100},
+			{bytesWritten: 100},
+			{bytesWritten: 500},
+		},
 	})
 	if len(dq.segments.writing) != 1 || len(dq.segments.reading) != 3 {
 		t.Fatalf("expected 1 writing and 3 reading segments, got %v writing "+
@@ -964,11 +973,12 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 }
 
 func segmentWithSize(size int) *queueSegment {
-	if size < segmentHeaderSize {
+	headerSize := segmentHeaderSize
+	if size < headerSize {
 		// Can't have a segment smaller than the segment header
 		return nil
 	}
-	return &queueSegment{endOffset: segmentOffset(size - segmentHeaderSize)}
+	return &queueSegment{endOffset: segmentOffset(size - headerSize)}
 }
 
 func equalReaderLoopRequests(

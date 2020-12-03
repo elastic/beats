@@ -20,11 +20,15 @@ package diskqueue
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // diskQueueSegments encapsulates segment-related queue metadata.
@@ -91,6 +95,12 @@ type queueSegment struct {
 	// A segment id is globally unique within its originating queue.
 	id segmentID
 
+	// If this segment was created during a previous session, the header
+	// field will be populated during the initial scan on queue startup.
+	// This is only used to support old schema versions, and is empty for
+	// segments created in the current session.
+	header *segmentHeader
+
 	// The byte offset of the end of the segment's data region. This is
 	// updated when the segment is written to, and should always correspond
 	// to the end of a complete data frame. The total size of a segment file
@@ -103,6 +113,12 @@ type queueSegment struct {
 	// which can only happen after reading has begun on the segment.)
 	firstFrameID frameID
 
+	// The number of frames written to this segment during this session. This
+	// is zero for any segment that was created in a previous session.
+	// After a segment is done being written, this value is written to the
+	// frameCount field in the segment file header.
+	framesWritten uint32
+
 	// The number of frames read from this segment during this session. This
 	// does not necessarily equal the number of frames in the segment, even
 	// after reading is complete, since the segment may have been partially
@@ -113,11 +129,24 @@ type queueSegment struct {
 }
 
 type segmentHeader struct {
+	// The schema version for this segment file. Current schema version is 1.
 	version uint32
+
+	// If the segment file has been completely written, this field contains
+	// the number of data frames, which is used to track the number of
+	// pending events left in the queue from previous sessions.
+	// If the segment file has not been completely written, this field is zero.
+	// Only present in schema version >= 1.
+	frameCount uint32
 }
 
-// Segment headers are currently just a 32-bit version.
-const segmentHeaderSize = 4
+const currentSegmentVersion = 1
+
+// Segment headers are currently a 4-byte version plus a 4-byte frame count.
+// In contexts where the segment may have been created by an earlier version,
+// instead use (segmentHeader).sizeOnDisk() which accounts for the schema
+// version of the target header.
+const segmentHeaderSize = 8
 
 // Sort order: we store loaded segments in ascending order by their id.
 type bySegmentID []*queueSegment
@@ -126,32 +155,88 @@ func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 
+func (header segmentHeader) sizeOnDisk() int {
+	if header.version < 1 {
+		// Schema 0 had nothing except the 4-byte version.
+		return 4
+	}
+	// Current schema has a 4-byte version and 4-byte frame count.
+	return 8
+}
+
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
-func scanExistingSegments(path string) ([]*queueSegment, error) {
-	files, err := ioutil.ReadDir(path)
+func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
+	files, err := ioutil.ReadDir(pathStr)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", path, err)
+		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", pathStr, err)
 	}
 
 	segments := []*queueSegment{}
 	for _, file := range files {
-		if file.Size() <= segmentHeaderSize {
+		/*if file.Size() <= segmentHeaderSize {
 			// Ignore segments that don't have at least some data beyond the
 			// header (this will always be true of segments we write unless there
 			// is an error).
 			continue
-		}
+		}*/
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
 			// don't match the "[uint64].seg" pattern.
 			if id, err := strconv.ParseUint(components[0], 10, 64); err == nil {
-				segments = append(segments,
-					&queueSegment{
-						id:        segmentID(id),
-						endOffset: segmentOffset(file.Size() - segmentHeaderSize),
+				fullPath := path.Join(pathStr, file.Name())
+				header, err := readSegmentHeaderWithFrameCount(fullPath)
+				if header == nil {
+					logger.Errorf("couldn't load segment file '%v': %v", fullPath, err)
+					continue
+				}
+				// If we get an error but still got a valid header back, then we
+				// were able to read at least some frames, so we keep this segment
+				// but issue a warning.
+				if err != nil {
+					logger.Warnf(
+						"error loading segment file '%v', data may be incomplete: %v",
+						fullPath, err)
+				}
+				segments = append(segments, &queueSegment{
+					id:        segmentID(id),
+					header:    header,
+					endOffset: segmentOffset(file.Size() - int64(header.sizeOnDisk())),
+				})
+
+				//newSegment, err := prescanSegment(logger, segmentID(id), fullPath)
+
+				// If a segment is returned with an error, this means we were able to
+				// read at least some data but the end of the file may be incomplete
+				// or corrupted. In this case we add it to our list and read as much of
+				// it as we can.
+				/*if newSegment == nil {
+					logger.Errorf("couldn't load segment file '%v': %v", fullPath, err)
+				} else {
+					if err != nil {
+						logger.Warnf(
+							"error loading segment file '%v', data may be incomplete: %v",
+							fullPath, err)
+					}
+					segments = append(segments, newSegment)
+				}*/
+				/*frameCount, err := readFrameCount(path.Join(pathStr, file.Name()))
+				if frameCount == 0 {
+					logger.Errorf("")
+				} else {
+					if err != nil {
+						// If there is an error but frameCount is still positive, it means
+						// we
+						logger.Warnf(
+							"Error")
+					}
+					segments = append(segments, &queueSegment{
+						id:            segmentID(id),
+						endOffset:     segmentOffset(file.Size() - segmentHeaderSize),
+						framesWritten: frameCount,
 					})
+				}*/
 			}
 		}
 	}
@@ -160,10 +245,66 @@ func scanExistingSegments(path string) ([]*queueSegment, error) {
 }
 
 func (segment *queueSegment) sizeOnDisk() uint64 {
-	return uint64(segment.endOffset) + segmentHeaderSize
+	var headerSize int
+	if segment.header != nil {
+		headerSize = segment.header.sizeOnDisk()
+	} else {
+		headerSize = segmentHeaderSize
+	}
+	return uint64(segment.endOffset) + uint64(headerSize)
 }
 
-// Should only be called from the reader loop.
+// A helper function that returns the number of frames in an existing
+// segment file, used during startup to count how many events are
+// pending in the queue from a previous session.
+// It first tries to read the frame count from the segment header
+// (which requires segment schema version >= 1 and a successful prior
+// shutdown). If this fails, it falls back to a manual scan through
+// the file checking only the frame lengths.
+func readFrameCount(path string) (uint32, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"Couldn't open segment file '%s': %w", path, err)
+	}
+	defer file.Close()
+	// Wrap the handle to retry non-fatal errors and always return the full
+	// requested data length if possible.
+	reader := autoRetryReader{file}
+	header, err := readSegmentHeader(reader)
+	if err != nil {
+		return 0, err
+	}
+	if header.frameCount > 0 {
+		return header.frameCount, nil
+	}
+	frameCount := uint32(0)
+	for {
+		var frameLength uint32
+		err := binary.Read(reader, binary.LittleEndian, &frameLength)
+		if err != nil {
+			if err == io.EOF {
+				// End of file at a frame boundary means we successfully scanned all
+				// frames.
+				return frameCount, nil
+			}
+			// All other errors are reported, but we still include the current
+			// frameCount since we want to recover as many frames as we can.
+			return frameCount, err
+		}
+		_, err = file.Seek(int64(frameLength), os.SEEK_CUR)
+		if err != nil {
+			// An error in seeking probably means an invalid length, which
+			// indicates a truncated frame or data corruption, so return
+			// without including it in our count.
+			return frameCount, err
+		}
+		frameCount++
+	}
+}
+
+// Should only be called from the reader loop. If successful, returns an open
+// file handle positioned at the beginning of the segment's data region.
 func (segment *queueSegment) getReader(
 	queueSettings Settings,
 ) (*os.File, error) {
@@ -173,8 +314,8 @@ func (segment *queueSegment) getReader(
 		return nil, fmt.Errorf(
 			"Couldn't open segment %d: %w", segment.id, err)
 	}
-	// Right now there is only one valid header (indicating schema version
-	// zero) so we don't need the value itself.
+	// We don't need the header contents here, we just want to advance past the
+	// header region, so discard the return value.
 	_, err = readSegmentHeader(file)
 	if err != nil {
 		file.Close()
@@ -193,8 +334,7 @@ func (segment *queueSegment) getWriter(
 	if err != nil {
 		return nil, err
 	}
-	header := &segmentHeader{version: 0}
-	err = writeSegmentHeader(file, header)
+	err = writeSegmentHeader(file, 0)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't write segment header: %w", err)
 	}
@@ -222,20 +362,98 @@ func (segment *queueSegment) getWriterWithRetry(
 	return file, err
 }
 
-func readSegmentHeader(in *os.File) (*segmentHeader, error) {
+// readSegmentHeaderWithFrameCount reads the header from the beginning
+// of the file at the given path. If the header's frameCount is 0
+// (whether because it is from an old version or because the segment
+// file was not closed cleanly), it attempts to calculate it manually
+// by scanning the file, and returns a struct with the "correct"
+// frame count.
+func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"couldn't open segment file '%s': %w", path, err)
+	}
+	defer file.Close()
+	// Wrap the handle to retry non-fatal errors and always return the full
+	// requested data length if possible, then read the raw header.
+	reader := autoRetryReader{file}
+	header, err := readSegmentHeader(reader)
+	if err != nil {
+		return nil, err
+	}
+	// If the header has a positive frame count then there is
+	// no more work to do, so return immediately.
+	if header.frameCount > 0 {
+		return header, nil
+	}
+	// If we made it here, we loaded a valid header but the frame count is
+	// zero, so we need to check it with a manual scan.
+	for {
+		var frameLength uint32
+		err = binary.Read(reader, binary.LittleEndian, &frameLength)
+		if err != nil {
+			// EOF at a frame boundary means we successfully scanned all frames.
+			if err == io.EOF && header.frameCount > 0 {
+				return header, nil
+			}
+			// All other errors mean we are done scanning, exit the loop.
+			break
+		}
+		// Try to advance to the next frame.
+		_, err = file.Seek(int64(frameLength), os.SEEK_CUR)
+		if err != nil {
+			// An error in seeking probably means an invalid length, which
+			// indicates a truncated frame or data corruption, so end the
+			// loop without including it in our count.
+			break
+		}
+		header.frameCount++
+	}
+	// If we ended up here instead of returning directly, then
+	// we encountered an error. We still return a valid header as
+	// long as we successfully scanned at least one frame first.
+	if header.frameCount > 0 {
+		return header, err
+	}
+	return nil, err
+}
+
+// readSegmentHeader decodes a raw header from the given reader and
+// returns it as a struct.
+func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
 	header := &segmentHeader{}
 	err := binary.Read(in, binary.LittleEndian, &header.version)
 	if err != nil {
 		return nil, err
 	}
-	if header.version != 0 {
+	if header.version > currentSegmentVersion {
 		return nil, fmt.Errorf("Unrecognized schema version %d", header.version)
+	}
+	if header.version >= 1 {
+		err = binary.Read(in, binary.LittleEndian, &header.frameCount)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return header, nil
 }
 
-func writeSegmentHeader(out *os.File, header *segmentHeader) error {
-	err := binary.Write(out, binary.LittleEndian, header.version)
+// writeSegmentHeader seeks to the beginning of the given file handle and
+// writes a segment header with the current schema version, containing the
+// given frameCount.
+func writeSegmentHeader(out *os.File, frameCount uint32) error {
+	_, err := out.Seek(0, os.SEEK_SET)
+	if err != nil {
+		return err
+	}
+
+	version := uint32(currentSegmentVersion)
+	err = binary.Write(out, binary.LittleEndian, version)
+	if err != nil {
+		return err
+	}
+	err = binary.Write(out, binary.LittleEndian, frameCount)
 	return err
 }
 
