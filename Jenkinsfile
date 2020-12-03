@@ -2,13 +2,6 @@
 
 @Library('apm@current') _
 
-import groovy.transform.Field
-
-/**
- This is required to store the stashed id with the test results to be digested with runbld
-*/
-@Field def stashedTestReports = [:]
-
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
   environment {
@@ -144,11 +137,6 @@ pipeline {
 COMMIT=${env.GIT_BASE_COMMIT}
 VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
-    }
-    always {
-      deleteDir()
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-      runbld(stashedTestReports: stashedTestReports, project: env.REPO)
     }
     cleanup {
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
@@ -460,7 +448,7 @@ def archiveTestOutput(Map args = [:]) {
             returnStatus: true,
             script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
-      junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults, stashedTestReports: stashedTestReports, id: args.id)
+        junit(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       if (args.upload) {
         tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
       }
