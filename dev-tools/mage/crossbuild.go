@@ -264,6 +264,7 @@ func (b GolangCrossBuilder) Build() error {
 	args = append(args,
 		"--rm",
 		"--env", "GOFLAGS=-mod=readonly",
+		"--env", "GODEBUG=x509ignoreCN=0",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),

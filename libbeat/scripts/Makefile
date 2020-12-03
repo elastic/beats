@@ -231,6 +231,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
 	  -e BEATS_INSIDE_INTEGRATION_TEST_ENV=${BEATS_INSIDE_INTEGRATION_TEST_ENV} \
 	  -e GOFLAGS=${INSTALL_FLAG} \
+	  -e GODEBUG=x509ignoreCN=0 \
 	  beat make integration-tests
 
 # Runs the system tests
@@ -250,6 +251,7 @@ system-tests-environment: prepare-tests build-image
 		-e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 		-e PYTHON_EXE=${PYTHON_EXE} \
 		-e GOFLAGS=${INSTALL_FLAG} \
+		-e GODEBUG=x509ignoreCN=0 \
 		beat make system-tests
 
 .PHONY: fast-system-tests
