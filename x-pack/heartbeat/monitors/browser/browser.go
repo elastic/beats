@@ -7,6 +7,7 @@ package browser
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/user"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -20,7 +21,16 @@ func init() {
 	monitors.RegisterActive("synthetic/browser", create)
 }
 
+var NotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
+
 func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {
+	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
+	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
+	// we can remove this check.
+	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
+		return nil, 0, NotSyntheticsCapableError
+	}
+
 	curUser, err := user.Current()
 	if err != nil {
 		return nil, 0, fmt.Errorf("could not determine current user for script monitor %w: ", err)

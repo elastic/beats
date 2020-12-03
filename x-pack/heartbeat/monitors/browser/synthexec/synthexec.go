@@ -38,25 +38,19 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		return nil, err
 	}
 
-	// Override the synthetics package if desired
-	if os.Getenv("HEARTBEAT_SYNTHETICS_TGZ") != "" {
-		err = runSimpleCommand(exec.Command("npm", "install", os.Getenv("HEARTBEAT_SYNTHETICS_TGZ")), dir)
+	if os.Getenv("ELASTIC_SYNTHETICS_OFFLINE") != "true" {
+		// Ensure all deps installed
+		err = runSimpleCommand(exec.Command("npm", "install"), dir)
 		if err != nil {
 			return nil, err
 		}
-	}
 
-	// Ensure all deps installed
-	err = runSimpleCommand(exec.Command("npm", "install"), dir)
-	if err != nil {
-		return nil, err
-	}
-
-	// Update playwright, needs to run separately to ensure post-install hook is run that downloads
-	// chrome. See https://github.com/microsoft/playwright/issues/3712
-	err = runSimpleCommand(exec.Command("npm", "install", "playwright"), dir)
-	if err != nil {
-		return nil, err
+		// Update playwright, needs to run separately to ensure post-install hook is run that downloads
+		// chrome. See https://github.com/microsoft/playwright/issues/3712
+		err = runSimpleCommand(exec.Command("npm", "install", "playwright-chromium"), dir)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cmdFactory, err := suiteCommandFactory(dir, suiteFile, "--dry-run")
