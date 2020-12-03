@@ -20,12 +20,13 @@
 package stats
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 
 	"github.com/stretchr/testify/require"
 
