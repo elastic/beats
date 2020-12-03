@@ -62,7 +62,7 @@ func TestFileScanner(t *testing.T) {
 		"skip excluded files": {
 			paths: []string{excludedFilePath, includedFilePath},
 			excludedFiles: []match.Matcher{
-				match.MustCompile(filepath.Join(".*", excludedFileName)),
+				match.MustCompile(excludedFileName),
 			},
 			expectedFiles: []string{includedFilePath},
 		},
