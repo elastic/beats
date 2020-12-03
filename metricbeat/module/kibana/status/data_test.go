@@ -20,7 +20,10 @@
 package status
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -38,4 +41,30 @@ func TestEventMapping(t *testing.T) {
 	require.NoError(t, err, f)
 	require.True(t, len(reporter.GetEvents()) >= 1, f)
 	require.Equal(t, 0, len(reporter.GetErrors()), f)
+}
+
+
+func TestData2(t *testing.T) {
+	mux := http.NewServeMux()
+
+	mux.Handle("/api/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		content, _ := ioutil.ReadFile("./_meta/testdata/7.0.0.json")
+		w.Write(content)
+	}))
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     kibana.ModuleName,
+		"metricsets": []string{"status"},
+		"hosts":      []string{host},
+	}
 }
