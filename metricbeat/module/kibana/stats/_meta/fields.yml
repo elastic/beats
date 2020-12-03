@@ -4,6 +4,8 @@
     Kibana stats and run-time metrics.
   release: ga
   fields:
+    - name: usage.index
+      type: keyword
     - name: usage
       type: group
       fields:
