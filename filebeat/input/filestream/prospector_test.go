@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -27,8 +28,6 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -45,13 +44,13 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
 				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file"},
 			},
-			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
 				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file"},
 			},
-			expectedSources: []string{"filestream::path::/path/to/file"},
+			expectedSources: []string{"path::/path/to/file"},
 		},
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
@@ -83,7 +82,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				},
 			},
 			ignoreOlder:     5 * time.Minute,
-			expectedSources: []string{"filestream::path::/path/to/file", "filestream::path::/path/to/other/file"},
+			expectedSources: []string{"path::/path/to/file", "path::/path/to/other/file"},
 		},
 	}
 
@@ -99,7 +98,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := getTestHarvesterGroup()
 
-			p.Run(ctx, testStateStore(), hg)
+			p.Run(ctx, newMockMetadataUpdater(), hg)
 
 			assert.ElementsMatch(t, hg.encounteredNames, test.expectedSources)
 		})
@@ -136,15 +135,12 @@ func TestProspectorDeletedFile(t *testing.T) {
 			}
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
-			testStore := testStateStore()
-			testStore.Set("filestream::path::/path/to/file", nil)
+			testStore := newMockMetadataUpdater()
+			testStore.set("path::/path/to/file")
 
 			p.Run(ctx, testStore, getTestHarvesterGroup())
 
-			has, err := testStore.Has("filestream::path::/path/to/file")
-			if err != nil {
-				t.Fatal(err)
-			}
+			has := testStore.has("path::/path/to/file")
 
 			if test.cleanRemoved {
 				assert.False(t, has)
@@ -162,8 +158,15 @@ type testHarvesterGroup struct {
 
 func getTestHarvesterGroup() *testHarvesterGroup { return &testHarvesterGroup{make([]string, 0)} }
 
-func (t *testHarvesterGroup) Run(_ input.Context, s loginp.Source) error {
+func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 	t.encounteredNames = append(t.encounteredNames, s.Name())
+}
+
+func (t *testHarvesterGroup) Stop(_ loginp.Source) {
+	return
+}
+
+func (t *testHarvesterGroup) StopGroup() error {
 	return nil
 }
 
@@ -180,11 +183,40 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	m.nextIdx++
 	return evt
 }
+
 func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
 
-func testStateStore() *statestore.Store {
-	s, _ := statestore.NewRegistry(storetest.NewMemoryStoreBackend()).Get(pluginName)
-	return s
+func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return nil }
+
+type mockMetadataUpdater struct {
+	table map[string]interface{}
+}
+
+func newMockMetadataUpdater() *mockMetadataUpdater {
+	return &mockMetadataUpdater{
+		table: make(map[string]interface{}),
+	}
+}
+
+func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
+
+func (mu *mockMetadataUpdater) has(id string) bool {
+	_, ok := mu.table[id]
+	return ok
+}
+
+func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
+	return nil
+}
+
+func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
+	mu.table[s.Name()] = v
+	return nil
+}
+
+func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
+	delete(mu.table, s.Name())
+	return nil
 }
 
 func mustPathIdentifier() fileIdentifier {
