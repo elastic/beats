@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
+- system/socket: Fixed startup error with some 5.x kernels. {issue}18755[18755] {pull}22787[22787]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 
 *Filebeat*
@@ -200,6 +201,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
 - Fix missing variable when loading aws pipelines. {pull}22645[22645]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
+- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 
 *Heartbeat*
 
