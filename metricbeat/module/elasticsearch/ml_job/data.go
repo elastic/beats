@@ -55,7 +55,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	var errs multierror.Errors
 	for _, job := range jobsData.Jobs {
-
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}

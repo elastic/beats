@@ -19,8 +19,9 @@ package shard
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"strconv"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
