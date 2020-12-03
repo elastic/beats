@@ -32,7 +32,7 @@ type Config struct {
 
 type Algorithm interface {
 	ID() string
-	Configure(Config)
+	Configure(Config) error
 	IsAllowed(string) bool
 }
 
