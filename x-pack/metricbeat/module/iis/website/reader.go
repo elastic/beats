@@ -17,8 +17,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-const ecsProcessId = "process.pid"
-
 // Reader will contain the config options
 type WebsiteReader struct {
 	query    pdh.Query    // PDH Query
@@ -28,22 +26,22 @@ type WebsiteReader struct {
 }
 
 var websiteCounters = map[string]string{
-	"network.total_bytes_received":      "\\Web Service(*)\\Total Bytes Received",
-	"network.total_bytes_sent":          "\\Web Service(*)\\Total Bytes Sent",
-	"network.bytes_sent_per_sec":        "\\Web Service(*)\\Bytes Sent/sec",
-	"network.bytes_received_per_sec":    "\\Web Service(*)\\Bytes Received/sec",
-	"network.current_connections":       "\\Web Service(*)\\Current Connections",
-	"network.maximum_connections":       "\\Web Service(*)\\Maximum Connections",
-	"network.total_connection_attempts": "\\Web Service(*)\\Total Connection Attempts (all instances)",
-	"network.total_get_requests":        "\\Web Service(*)\\Total Get Requests",
-	"network.get_requests_per_sec":      "\\Web Service(*)\\Get Requests/sec",
-	"network.total_post_requests":       "\\Web Service(*)\\Total Post Requests",
-	"network.post_requests_per_sec":     "\\Web Service(*)\\Post Requests/sec",
-	"network.total_delete_requests":     "\\Web Service(*)\\Total Delete Requests",
-	"network.delete_requests_per_sec":   "\\Web Service(*)\\Delete Requests/sec",
-	"network.service_uptime":            "\\Web Service(*)\\Service Uptime",
-	"network.total_put_requests":        "\\Web Service(*)\\Total PUT Requests",
-	"network.put_requests_per_sec":      "\\Web Service(*)\\PUT Requests/sec",
+	"\\Web Service(*)\\Total Bytes Received":                      "network.total_bytes_received",
+	"\\Web Service(*)\\Total Bytes Sent":                          "network.total_bytes_sent",
+	"\\Web Service(*)\\Bytes Sent/sec":                            "network.bytes_sent_per_sec",
+	"\\Web Service(*)\\Bytes Received/sec":                        "network.bytes_received_per_sec",
+	"\\Web Service(*)\\Current Connections":                       "network.current_connections",
+	"\\Web Service(*)\\Maximum Connections":                       "network.maximum_connections",
+	"\\Web Service(*)\\Total Connection Attempts (all instances)": "network.total_connection_attempts",
+	"\\Web Service(*)\\Total Get Requests":                        "network.total_get_requests",
+	"\\Web Service(*)\\Get Requests/sec":                          "network.get_requests_per_sec",
+	"\\Web Service(*)\\Total Post Requests":                       "network.total_post_requests",
+	"\\Web Service(*)\\Post Requests/sec":                         "network.post_requests_per_sec",
+	"\\Web Service(*)\\Total Delete Requests":                     "network.total_delete_requests",
+	"\\Web Service(*)\\Delete Requests/sec":                       "network.delete_requests_per_sec",
+	"\\Web Service(*)\\Service Uptime":                            "network.service_uptime",
+	"\\Web Service(*)\\Total PUT Requests":                        "network.total_put_requests",
+	"\\Web Service(*)\\PUT Requests/sec":                          "network.put_requests_per_sec",
 }
 
 // newReader creates a new instance of Reader.
@@ -67,10 +65,10 @@ func NewReader(config iis.Config) (*WebsiteReader, error) {
 
 // initAppPools will check for any new instances and add them to the counter list
 func (r *WebsiteReader) InitCounters() error {
-	for _, value := range websiteCounters {
+	for key := range websiteCounters {
 
-		if err := r.query.AddCounter(value, "*", "float", true); err != nil {
-			return errors.Wrapf(err, `failed to add counter (query="%v")`, value)
+		if err := r.query.AddCounter(key, "*", "float", true); err != nil {
+			return errors.Wrapf(err, `failed to add counter (query="%v")`, key)
 		}
 	}
 
@@ -117,25 +115,26 @@ type InstanceValue struct {
 	Values []pdh.CounterValue
 }
 
-func hasCollection(instance string, collection []InstanceCollection) bool {
-	for _, val := range collection {
+func hasCollection(instance string, collection []InstanceCollection) (bool, int) {
+	for i, val := range collection {
 		if val.Name == instance {
-			return true
+			return true, i
 		}
 	}
-	return false
+	return false, 0
 }
 
+// mapEvents func maps counters results to events, grouping by website name
 func (r *WebsiteReader) mapEvents(values map[string][]pdh.CounterValue) []mb.Event {
 	var events []mb.Event
 	var collection []InstanceCollection
 	for key, valueGroup := range values {
-		for i, val := range valueGroup {
+		for _, val := range valueGroup {
 			if val.Instance == "_Total" {
 				continue
 			}
-			if ok := hasCollection(val.Instance, collection); ok {
-				collection[i].Values = append(collection[i].Values, InstanceValue{Query: key, Values: []pdh.CounterValue{val}})
+			if ok, index := hasCollection(val.Instance, collection); ok {
+				collection[index].Values = append(collection[index].Values, InstanceValue{Query: key, Values: []pdh.CounterValue{val}})
 			} else {
 				webCol := InstanceCollection{
 					Values: []InstanceValue{{Query: key, Values: []pdh.CounterValue{
@@ -147,7 +146,6 @@ func (r *WebsiteReader) mapEvents(values map[string][]pdh.CounterValue) []mb.Eve
 			}
 		}
 	}
-
 	for _, counter := range collection {
 		event := mb.Event{
 			MetricSetFields: common.MapStr{
@@ -174,11 +172,8 @@ func (r *WebsiteReader) mapEvents(values map[string][]pdh.CounterValue) []mb.Eve
 				}
 				event.MetricSetFields.Put(websiteCounters[values.Query], val.Measurement)
 			}
-
 		}
-
 		events = append(events, event)
 	}
-
 	return events
 }
