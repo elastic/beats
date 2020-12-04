@@ -14,6 +14,8 @@ Parameters:
     Type: String
   ServiceName:
     Type: String
+  LogGroupName:
+    Type: String
 Resources:
   Cluster:
     Type: AWS::ECS::Cluster
@@ -25,7 +27,7 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: metricbeat-fargate-log-group
+      LogGroupName: !Ref LogGroupName
   ExecutionRole:
     Type: AWS::IAM::Role
     Properties:

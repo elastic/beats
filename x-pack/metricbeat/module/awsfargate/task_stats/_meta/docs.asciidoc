@@ -42,10 +42,6 @@ aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_ID --se
 ==== AWS CloudFormation Template Example
 Here is an example of AWS CloudFormation template to create a new cluster,
 create a task definition that runs Metricbeat container and start the service.
-Please copy this section into a `cloud_formation.yml` file locally and replace
-`<your-cluster-name>`, `<your-log-group-name>`, and `<your-service-name>` with
-your own preferred names. Also you can find `<ELASTIC_CLOUD_ID secret ARN>` and
-`<ELASTIC_CLOUD_AUTH secret ARN>` values from AWS secret manager.
 
 [source,yaml]
 ----
@@ -65,6 +61,8 @@ Parameters:
     Type: String
   ServiceName:
     Type: String
+  LogGroupName:
+    Type: String
 Resources:
   Cluster:
     Type: AWS::ECS::Cluster
@@ -76,7 +74,7 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: metricbeat-fargate-log-group
+      LogGroupName: !Ref LogGroupName
   ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -153,15 +151,15 @@ Resources:
 ==== Create CloudFormation Stack
 Here is the AWS CLI to create a stack using the CloudFormation config file above:
 ----
-aws --region us-east-2 cloudformation create-stack --stack-name test-metricbeat-deployment --template-body file://./module/awsfargate/cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<your-subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<your-cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<your-cloud-id-arn> ParameterKey=ClusterName,ParameterValue=metricbeat-fargate ParameterKey=RoleName,ParameterValue=ecsFargateTaskExecutionRole ParameterKey=TaskName,ParameterValue=task-metricbeat ParameterKey=ServiceName,ParameterValue=metricbeat-service
+aws --region us-east-2 cloudformation create-stack --stack-name test-metricbeat-deployment --template-body file://./module/awsfargate/cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<your-subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<your-cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<your-cloud-id-arn> ParameterKey=ClusterName,ParameterValue=metricbeat-fargate ParameterKey=RoleName,ParameterValue=ecsFargateTaskExecutionRole ParameterKey=TaskName,ParameterValue=task-metricbeat ParameterKey=ServiceName,ParameterValue=metricbeat-service ParameterKey=LogGroupName,ParameterValue=metricbeat-fargate-log-group
 ----
 
 Make sure to replace `<your-subnet-id>` with your own subnet in this command. Please go
 to Services -> VPC -> Subnets to find subnet ID to use. You can also add several
 more containers under the TaskDefinition section. Also remember to plugin
 `<your-cloud-auth-arn>` and `<your-cloud-id-arn>`. You can always change the `ClusterName`,
-`RoleName`, `TaskName`, and `ServiceName` by giving a new name when running the
-`create-stack` AWS CLI command.
+`RoleName`, `TaskName`, `ServiceName`, and `LogGroupName` by giving a new name
+when running the `aws cloudformation create-stack` AWS CLI command.
 
 [float]
 ==== Delete CloudFormation Stack
