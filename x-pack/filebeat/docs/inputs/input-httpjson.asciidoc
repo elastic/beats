@@ -13,20 +13,28 @@ beta[]
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-For example, this input is used to retrieve MISP threat indicators in the
-Filebeat <<filebeat-module-misp,MISP>> module.
+This input supports:
 
-This input supports retrieval at a configurable interval and pagination.
+* Auth
+** Basic
+** OAuth2
+* Retrieval at a configurable interval
+* Pagination
+* Retries
+* Rate limiting
+* Request transformations
+* Response transformations
 
 Example configurations:
 
 ["source","yaml",subs="attributes"]
 ----
-{beatname_lc}.inputs:
+filebeat.inputs:
 # Fetch your public IP every minute.
 - type: httpjson
-  url: https://api.ipify.org/?format=json
+  config_version: 2
   interval: 1m
+  request.url: https://api.ipify.org/?format=json
   processors:
     - decode_json_fields
         fields: [message]
@@ -35,42 +43,161 @@ Example configurations:
 
 ["source","yaml",subs="attributes"]
 ----
-{beatname_lc}.inputs:
+filebeat.inputs:
 - type: httpjson
-  url: http://localhost:9200/_search?scroll=5m
-  http_method: POST
-  json_objects_array: hits.hits
-  pagination:
-    extra_body_content:
-      scroll: 5m
-    id_field: _scroll_id
-    req_field: scroll_id
-    url: http://localhost:9200/_search/scroll
+  config_version: 2
+  request.url: http://localhost:9200/_search?scroll=5m
+  request.method: POST
+  response.split:
+    target: body.hits.hits
+  response.pagination:
+    - set:
+        target: url.value
+        value: http://localhost:9200/_search/scroll
+    - set:
+        target: .url.params.scroll_id
+        value: '{{.last_request.body._scroll_id}}'
+    - set:
+        target: .body.scroll
+        value: 5m
 ----
 
-Additionally, it supports authentication via HTTP Headers, API key or oauth2.
+Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
 
 Example configurations with authentication:
 
 ["source","yaml",subs="attributes"]
 ----
-{beatname_lc}.inputs:
+filebeat.inputs:
 - type: httpjson
-  http_headers:
-    Authorization: 'Basic aGVsbG86d29ybGQ='
-  url: http://localhost
+  config_version: 2
+  request.url: http://localhost
+  request.transforms:
+    - set:
+        target: header.Authorization
+        value: 'Basic aGVsbG86d29ybGQ='
 ----
 
 ["source","yaml",subs="attributes"]
 ----
-{beatname_lc}.inputs:
+filebeat.inputs:
 - type: httpjson
-  oauth2:
+  config_version: 2
+  auth.oauth2:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
     token_url: http://localhost/oauth2/token
-  url: http://localhost
+  request.url: http://localhost
 ----
+
+[[input-state]]
+==== Input state
+
+The `httpjson` input keeps a runtime state between requests. This state can be accessed by some configuration options and transforms.
+
+The state has the following elements:
+
+- `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
+- `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.header`: A map containing the headers from the last successful response.
+- `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
+- `last_response.page`: A number indicating the page number of the last response.
+- `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
+- `url.value`: The full URL with params and fragments.
+- `url.params`: A map containing the URL params.
+- `header`: A map containing the headers. References request headers when used in <<request-transforms>> or <<request-rate-limit>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `body`: A map containing the body. References request body when used in <<request-transforms>> configuration section, and to the last response body when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
+
+All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+[[transforms]]
+==== Transforms
+
+A transform is an action that lets the user modify the <<input-state,input state>>. Depending on where the transform is defined, it will have access for reading or writing different elements of the <<input-state,state>>.
+
+The access limitations are described in the corresponding configuration sections.
+
+[float]
+==== `append`
+
+Appends a value to a list. If the field does not exist, the first entry will be a scalar value, and subsequent additions will convert the value to a list.
+
+["source","yaml",subs="attributes"]
+----
+- append:
+    target: body.foo.bar
+    value: '{{.cursor.baz}}'
+    default: "a default value"
+----
+
+- `target` defines the destination field where the value is stored.
+- `value` defines the value that will be stored and it is a <<value-templates,value template>>.
+- `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+
+[float]
+==== `delete`
+
+Deletes the target field.
+
+["source","yaml",subs="attributes"]
+----
+- delete:
+    target: body.foo.bar
+----
+
+- `target` defines the destination field to delete. If `target` is a list and not a single element, the complete list will be deleted.
+
+[float]
+==== `set`
+
+Sets a value.
+
+["source","yaml",subs="attributes"]
+----
+- set:
+    target: body.foo.bar
+    value: '{{.cursor.baz}}'
+    default: "a default value"
+----
+
+- `target` defines the destination field where the value is stored.
+- `value` defines the value that will be stored and it is a <<value-templates,value template>>.
+- `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+
+[[value-templates]]
+==== Value templates
+
+Some configuration options and transforms can use value templates. Value templates are Go templates with access to the input state and to some built-in functions.
+
+To see which <<input-state,state elements>> and operations are available, see the documentation for the option or <<transforms,transform>> where you want to use a value template.
+
+A value template looks like:
+
+["source","yaml",subs="attributes"]
+----
+- set:
+    target: body.foo.bar
+    value: '{{.cursor.baz}} more data'
+    default: "a default value"
+----
+
+The content inside the curly braces `{{` `}}` is evaluated. For more information on Go templates please refer to https://golang.org/pkg/text/template[the Go docs].
+
+Some built-in helper functions are provided to work with the input state inside value templates:
+
+- `parseDuration`: parses duration strings and returns `time.Duration`. Example: `{{parseDuration "1h"}}`.
+- `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `{{now (parseDuration "-1h")}}` returns the time at 1 hour before now.
+- `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732}}` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732000}}` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `{{parseTimestamp 1604582732000000000}}` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `{{ parseDate "2020-11-05T12:25:32Z" }}`, `{{ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" }}`, `{{ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC }}`.
+- `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `{{ formatDate (now) "UnixDate" }}`, `{{ formatDate (now) "UnixDate" "America/New_York" }}`.
+- `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `{{ getRFC5988Link "next" .last_response.header.Link }}`.
+- `toInt`: converts a string to an integer. Returns 0 if the conversion fails.
+- `add`: adds a list of integers and returns their sum.
+
+In addition to the provided functions, any of the native functions for `time.Time` and `http.Header` types can be used on the corresponding objects. Examples: `{{(now).Day}}`, `{{.last_response.header.Get "key"}}`
 
 ==== Configuration options
 
@@ -78,335 +205,86 @@ The `httpjson` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-==== `api_key`
+==== `config_version`
 
-API key to access the HTTP API. When set, this adds an `Authorization` header to
-the HTTP request with this as the value.
+Defines the configuration version. Current supported versions are: `1` and `2`. Default: `1`.
 
-[float]
-==== `http_client_timeout`
-
-Duration before declaring that the HTTP client connection has timed out.
-Defaults to `60s`. Valid time units are `ns`, `us`, `ms`, `s` (default), `m`,
-`h`.
-
-[float]
-==== `http_headers`
-
-Additional HTTP headers to set in the requests. The default value is `null`
-(no additional headers).
-
-["source","yaml",subs="attributes"]
-----
-- type: httpjson
-  http_headers:
-    Authorization: 'Basic aGVsbG86d29ybGQ='
-----
-
-[float]
-==== `http_method`
-
-HTTP method to use when making requests. `GET` or `POST` are the options.
-Defaults to `GET`.
-
-[float]
-==== `http_request_body`
-
-An optional HTTP POST body. The configuration value must be an object, and it
-will be encoded to JSON. This is only valid when `http_method` is `POST`.
-Defaults to `null` (no HTTP body).
-
-["source","yaml",subs="attributes"]
-----
-- type: httpjson
-  http_method: POST
-  http_request_body:
-    query:
-      bool:
-        filter:
-          term:
-            type: authentication
-----
+NOTE: This setting defaults to `1` to avoid breaking current configurations. V1 configuration is deprecated and will be unsupported in future releases. Any new configuration should use `config_version: 2`.
 
 [float]
 ==== `interval`
 
-Duration between repeated requests. By default, the interval is `0` which means
-it performs a single request then stops. It may make additional pagination
-requests in response to the initial request if pagination is enabled.
+Duration between repeated requests. It may make additional pagination requests in response to the initial request if pagination is enabled. Default: `60s`.
 
 [float]
-==== `json_objects_array`
+==== `auth.basic.enabled`
 
-If the response body contains a JSON object containing an array then this option
-specifies the key containing that array. Each object in that array will generate
-an event. This example response contains an array called `events` that we want
-to index.
+When set to `false`, disables the basic auth configuration. Default: `true`.
 
-["source","json",subs="attributes"]
-----
-{
-  "time": "2020-06-02 23:22:32 UTC",
-  "events": [
-    {
-      "timestamp": "2020-05-02 11:10:03 UTC",
-      "event": {
-        "category": "authorization"
-      },
-      "user": {
-        "name": "fflintstone"
-      }
-    },
-    {
-      "timestamp": "2020-05-05 13:03:11 UTC",
-      "event": {
-        "category": "authorization"
-      },
-      "user": {
-        "name": "brubble"
-      }
-    }
-  ]
-}
-----
-
-The config needs to specify `events` as the `json_objects_array` value.
-
-["source","yaml",subs="attributes"]
-----
-- type: httpjson
-  json_objects_array: events
-----
+NOTE: Basic auth settings are disabled if either `enabled` is set to `false` or
+the `auth.basic` section is missing.
 
 [float]
-==== `split_events_by`
+==== `auth.basic.user`
 
-If the response body contains a JSON object containing an array then this option
-specifies the key containing that array. Each object in that array will generate
-an event, but will maintain the common fields of the document as well.
-
-["source","json",subs="attributes"]
-----
-{
-  "time": "2020-06-02 23:22:32 UTC",
-  "user": "Bob",
-  "events": [
-    {
-      "timestamp": "2020-05-02 11:10:03 UTC",
-      "event": {
-        "category": "authorization"
-      }
-    },
-    {
-      "timestamp": "2020-05-05 13:03:11 UTC",
-      "event": {
-        "category": "authorization"
-      }
-    }
-  ]
-}
-----
-
-The config needs to specify `events` as the `split_events_by` value.
-
-["source","yaml",subs="attributes"]
-----
-- type: httpjson
-  split_events_by: events
-----
-
-And will output the following events:
-
-["source","json",subs="attributes"]
-----
-[
-  {
-    "time": "2020-06-02 23:22:32 UTC",
-    "user": "Bob",
-    "events": {
-      "timestamp": "2020-05-02 11:10:03 UTC",
-      "event": {
-        "category": "authorization"
-      }
-    }
-  },
-  {
-    "time": "2020-06-02 23:22:32 UTC",
-    "user": "Bob",
-    "events": {
-      "timestamp": "2020-05-05 13:03:11 UTC",
-      "event": {
-        "category": "authorization"
-      }
-    }
-  }
-]
-----
-
-It can be used in combination with `json_objects_array`, which will look for the field inside each element.
+The user to authenticate with.
 
 [float]
-==== `no_http_body`
+==== `auth.basic.password`
 
-Force HTTP requests to be sent with an empty HTTP body. Defaults to `false`.
-This option cannot be used with `http_request_body`,
-`pagination.extra_body_content`, or `pagination.req_field`.
+The password to use.
 
 [float]
-==== `pagination.enabled`
+==== `auth.oauth2.enabled`
 
-The `enabled` setting can be used to disable the pagination configuration by
-setting it to `false`. The default value is `true`.
-
-NOTE: Pagination settings are disabled if either `enabled` is set to `false` or
-the `pagination` section is missing.
-
-[float]
-==== `pagination.extra_body_content`
-
-An object containing additional fields that should be included in the pagination
-request body. Defaults to `null`.
-
-["source","yaml",subs="attributes"]
-----
-- type: httpjson
-  pagination.extra_body_content:
-    max_items: 500
-----
-
-[float]
-==== `pagination.header.field_name`
-
-The name of the HTTP header in the response that is used for pagination control.
-The header value will be extracted from the response and used to make the next
-pagination response. `pagination.header.regex_pattern` can be used to select
-a subset of the value.
-
-[float]
-==== `pagination.header.regex_pattern`
-
-The regular expression pattern to use for retrieving the pagination information
-from the HTTP header field specified above. The first match becomes as the
-value.
-
-[float]
-==== `pagination.id_field`
-
-The name of a field in the JSON response body to use as the pagination ID.
-The value will be included in the next pagination request under the key
-specified by the `pagination.req_field` value.
-
-[float]
-==== `pagination.req_field`
-
-The name of the field to include in the pagination JSON request body containing
-the pagination ID defined by the `pagination.id_field` field.
-
-[float]
-==== `pagination.url`
-
-This specifies the URL for sending pagination requests. Defaults to the `url`
-value. This is only needed when the pagination requests need to be routed to
-a different URL.
-
-[float]
-==== `rate_limit.limit`
-
-This specifies the field in the HTTP header of the response that specifies the
-total limit.
-
-[float]
-==== `rate_limit.remaining`
-
-This specifies the field in the HTTP header of the response that specifies the
-remaining quota of the rate limit.
-
-[float]
-==== `rate_limit.reset`
-
-This specifies the field in the HTTP Header of the response that specifies the
-epoch time when the rate limit will reset.
-
-[float]
-==== `retry.max_attempts`
-
-This specifies the maximum number of retries for the retryable HTTP client. Default: 5.
-
-[float]
-==== `retry.wait_min`
-
-This specifies the minimum time to wait before a retry is attempted. Default: 1s.
-
-[float]
-==== `retry.wait_max`
-
-This specifies the maximum time to wait before a retry is attempted. Default: 60s.
-
-[float]
-==== `ssl`
-
-This specifies SSL/TLS configuration. If the ssl section is missing, the host's
-CAs are used for HTTPS connections. See <<configuration-ssl>> for more
-information.
-
-[float]
-==== `url`
-
-The URL of the HTTP API. Required.
-
-[float]
-==== `oauth2.enabled`
-
-The `enabled` setting can be used to disable the oauth2 configuration by
-setting it to `false`. The default value is `true`.
+When set to `false`, disables the oauth2 configuration. Default: `true`.
 
 NOTE: OAuth2 settings are disabled if either `enabled` is set to `false` or
-the `oauth2` section is missing.
+the `auth.oauth2` section is missing.
 
 [float]
-==== `oauth2.provider`
+==== `auth.oauth2.provider`
 
-The `provider` setting can be used to configure supported oauth2 providers.
+Used to configure supported oauth2 providers.
 Each supported provider will require specific settings. It is not set by default.
 Supported providers are: `azure`, `google`.
 
 [float]
-==== `oauth2.client.id`
+==== `auth.oauth2.client.id`
 
-The `client.id` setting is used as part of the authentication flow. It is always required
+The client ID used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
 
 [float]
-==== `oauth2.client.secret`
+==== `auth.oauth2.client.secret`
 
-The `client.secret` setting is used as part of the authentication flow. It is always required
+The client secret used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
 
 [float]
-==== `oauth2.scopes`
+==== `auth.oauth2.scopes`
 
-The `scopes` setting defines a list of scopes that will be requested during the oauth2 flow.
+A list of scopes that will be requested during the oauth2 flow.
 It is optional for all providers.
 
 [float]
-==== `oauth2.token_url`
+==== `auth.oauth2.token_url`
 
-The `token_url` setting specifies the endpoint that will be used to generate the
-tokens during the oauth2 flow. It is required if no provider is specified.
+The endpoint that will be used to generate the tokens during the oauth2 flow. It is required if no provider is specified.
 
 NOTE: For `azure` provider either `token_url` or `azure.tenant_id` is required.
 
 [float]
-==== `oauth2.endpoint_params`
+==== `auth.oauth2.endpoint_params`
 
-The `endpoint_params` setting specifies a set of values that will be sent on each
-request to the `token_url`. Each param key can have multiple values.
+Set of values that will be sent on each request to the `token_url`. Each param key can have multiple values.
 Can be set for all providers except `google`.
 
 ["source","yaml",subs="attributes"]
 ----
 - type: httpjson
-  oauth2:
+  config_version: 2
+  auth.oauth2:
     endpoint_params:
       Param1:
         - ValueA
@@ -416,9 +294,9 @@ Can be set for all providers except `google`.
 ----
 
 [float]
-==== `oauth2.azure.tenant_id`
+==== `auth.oauth2.azure.tenant_id`
 
-The `azure.tenant_id` is used for authentication when using `azure` provider.
+Used for authentication when using `azure` provider.
 Since it is used in the process to generate the `token_url`, it can't be used in
 combination with it. It is not required.
 
@@ -426,37 +304,603 @@ For information about where to find it, you can refer to
 https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
 
 [float]
-==== `oauth2.azure.resource`
+==== `auth.oauth2.azure.resource`
 
-The `azure.resource` is used to identify the accessed WebAPI resource when using `azure` provider.
+The accessed WebAPI resource when using `azure` provider.
 It is not required.
 
 [float]
-==== `oauth2.google.credentials_file`
+==== `auth.oauth2.google.credentials_file`
 
-The `google.credentials_file` setting specifies the credentials file for Google.
-
-NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
-default credentials from the environment will be attempted via ADC. For more information about
-how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
-
-[float]
-==== `oauth2.google.credentials_json`
-
-The `google.credentials_json` setting allows to write your credentials information as raw JSON.
+The credentials file for Google.
 
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
-==== `oauth2.google.jwt_file`
+==== `auth.oauth2.google.credentials_json`
 
-The `google.jwt_file` setting specifies the JWT Account Key file for Google.
+Your credentials information as raw JSON.
 
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.jwt_file`
+
+The JWT Account Key file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `request.url`
+
+The URL of the HTTP API. Required.
+
+[float]
+==== `request.method`
+
+HTTP method to use when making requests. `GET` or `POST` are the options. Default: `GET`.
+
+[float]
+==== `request.body`
+
+An optional HTTP POST body. The configuration value must be an object, and it
+will be encoded to JSON. This is only valid when `request.method` is `POST`.
+Defaults to `null` (no HTTP body).
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  config_version: 2
+  request.method: POST
+  request.body:
+    query:
+      bool:
+        filter:
+          term:
+            type: authentication
+----
+
+[float]
+==== `request.timeout`
+
+Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
+
+[float]
+==== `request.ssl`
+
+This specifies SSL/TLS configuration. If the ssl section is missing, the host's
+CAs are used for HTTPS connections. See <<configuration-ssl>> for more
+information.
+
+[float]
+==== `request.retry.max_attempts`
+
+The maximum number of retries for the HTTP client. Default: `5`.
+
+[float]
+==== `request.retry.wait_min`
+
+The minimum time to wait before a retry is attempted. Default: `1s`.
+
+[float]
+==== `request.retry.wait_max`
+
+The maximum time to wait before a retry is attempted. Default: `60s`.
+
+[float]
+==== `request.redirect.forward_headers`
+
+When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+
+[float]
+==== `request.redirect.headers_ban_list`
+
+When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list will be forwarded. Default: `[]`.
+
+[float]
+==== `request.redirect.max_redirects`
+
+The maximum number of redirects to follow for a request. Default: `10`.
+
+[[request-rate-limit]]
+[float]
+==== `request.rate_limit.limit`
+
+The value of the response that specifies the total limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+
+[float]
+==== `request.rate_limit.remaining`
+
+The value of the response that specifies the remaining quota of the rate limit. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+
+[float]
+==== `request.rate_limit.reset`
+
+The value of the response that specifies the epoch time when the rate limit will reset. It is defined with a Go template value. Can read state from: [`.last_response.header`]
+
+[[request-transforms]]
+[float]
+==== `request.transforms`
+
+List of transforms to apply to the request before each execution.
+
+Available transforms for request: [`append`, `delete`, `set`].
+
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+
+Can write state to: [`header.*`, `url.params.*`, `body.*`].
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  request.url: http://localhost:9200/_search?scroll=5m
+  request.method: POST
+  request.transforms:
+    - set:
+        target: body.from
+        value: '{{now (parseDuration "-1h")}}'
+----
+
+[[response-transforms]]
+[float]
+==== `response.transforms`
+
+List of transforms to apply to the response once it is received.
+
+Available transforms for response: [`append`, `delete`, `set`].
+
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`].
+
+Can write state to: [`body.*`].
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  request.url: http://localhost:9200/_search?scroll=5m
+  request.method: POST
+  response.transforms:
+    - delete:
+        target: body.very_confidential
+  response.split:
+    target: .body.hits.hits
+  response.pagination:
+    - set:
+        target: url.value
+        value: http://localhost:9200/_search/scroll
+    - set:
+        target: .url.params.scroll_id
+        value: '{{.last_request.body._scroll_id}}'
+    - set:
+        target: .body.scroll
+        value: 5m
+----
+
+[[response-split]]
+[float]
+==== `response.split`
+
+Split operation to apply to the response once it is received. A split can convert a map or an array into multiple events.
+
+[float]
+==== `response.split[].target`
+
+Defines the target field upon the split operation will be performed.
+
+[float]
+==== `response.split[].type`
+
+Defines the field type of the target. Allowed values: `array`, `map`. Default: `array`.
+
+[float]
+==== `response.split[].transforms`
+
+A set of transforms can be defined. This list will be applied after `response.transforms` and after the object has been modified based on `response.split[].keep_parent` and `response.split[].key_field`.
+
+Available transforms for response: [`append`, `delete`, `set`].
+
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`].
+
+Can write state to: [`body.*`].
+
+NOTE: in this context, `body.*` will be the result of all the previous transformations.
+
+[float]
+==== `response.split[].keep_parent`
+
+If set to true, the fields from the parent document (at the same level as `target`) will be kept. Otherwise a new document will be created using `target` as the root. Default: `false`.
+
+[float]
+==== `response.split[].key_field`
+
+Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
+
+[float]
+==== `response.split[].split`
+
+Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
+
+[[response-pagination]]
+[float]
+==== `response.pagination`
+
+List of transforms that will be applied to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual `response.transforms` and `response.split` will be executed normally.
+
+Available transforms for pagination: [`append`, `delete`, `set`].
+
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+
+Can write state to: [`body.*`, `header.*`, `url.*`].
+
+Examples using split:
+
+- We have a response with two nested arrays, and we want a document for each of the elements of the inner array:
+
++
+["source","json",subs="attributes"]
+----
+{
+  "this": "is kept",
+  "alerts": [
+    {
+      "this_is": "also kept",
+      "entities": [
+        {
+          "something": "something"
+        },
+        {
+          "else": "else"
+        }
+      ]
+    },
+    {
+      "this_is": "also kept 2",
+      "entities": [
+        {
+          "something": "something 2"
+        },
+        {
+          "else": "else 2"
+        }
+      ]
+    }
+  ]
+}
+----
+
++
+The config will look like:
+
++
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://example.com
+  response.split:
+    target: body.alerts
+    type: array
+    keep_parent: true
+    split:
+      # paths in nested splits need to represent the state of body, not only their current level of nesting
+      target: body.alerts.entities
+      type: array
+      keep_parent: true
+----
+
++
+This will output:
+
++
+["source","json",subs="attributes"]
+----
+[
+  {
+    "this": "is kept",
+    "alerts": {
+      "this_is": "also kept",
+      "entities": {
+        "something": "something"
+      }
+    }
+  },
+  {
+    "this": "is kept",
+    "alerts": {
+      "this_is": "also kept",
+      "entities": {
+        "else": "else"
+      }
+    }
+  },
+  {
+    "this": "is kept",
+    "alerts": {
+      "this_is": "also kept 2",
+      "entities": {
+        "something": "something 2"
+      }
+    }
+  },
+  {
+    "this": "is kept",
+    "alerts": {
+      "this_is": "also kept 2",
+      "entities": {
+        "else": "else 2"
+      }
+    }
+  }
+]
+----
+
+- We have a response with an array with two objects, and we want a document for each of the object keys while keeping the keys values:
+
++
+["source","json",subs="attributes"]
+----
+{
+  "this": "is not kept",
+  "alerts": [
+    {
+      "this_is": "kept",
+      "entities": {
+        "id1": {
+          "something": "something"
+        }
+      }
+    },
+    {
+      "this_is": "kept 2",
+      "entities": {
+        "id2": {
+          "something": "something 2"
+        }
+      }
+    }
+  ]
+}
+----
+
++
+The config will look like:
+
++
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://example.com
+  response.split:
+    target: body.alerts
+    type: array
+    keep_parent: false
+    split:
+      # this time alerts will not exist because previous keep_parent is false
+      target: body.entities
+      type: map
+      keep_parent: true
+      key_field: id
+----
+
++
+This will output:
+
++
+["source","json",subs="attributes"]
+----
+[
+  {
+    "this_is": "kept",
+    "entities": {
+      "id": "id1",
+      "something": "something"
+    }
+  },
+  {
+    "this_is": "kept 2",
+    "entities": {
+      "id": "id2",
+      "something": "something 2"
+    }
+  }
+]
+----
+
+- We have a response with an array with two objects, and we want a document for each of the object keys while applying a transform to each:
+
++
+["source","json",subs="attributes"]
+----
+{
+  "this": "is not kept",
+  "alerts": [
+    {
+      "this_is": "also not kept",
+      "entities": {
+        "id1": {
+          "something": "something"
+        }
+      }
+    },
+    {
+      "this_is": "also not kept",
+      "entities": {
+        "id2": {
+          "something": "something 2"
+        }
+      }
+    }
+  ]
+}
+----
+
++
+The config will look like:
+
++
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://example.com
+  response.split:
+    target: body.alerts
+    type: array
+    split:
+      transforms:
+        - set:
+            target: body.new
+            value: will be added to each
+      target: body.entities
+      type: map
+----
+
++
+This will output:
+
++
+["source","json",subs="attributes"]
+----
+[
+  {
+    "something": "something",
+    "new": "will be added for each"
+  },
+  {
+    "something": "something 2",
+    "new": "will be added for each"
+  }
+]
+----
+
+[[cursor]]
+[float]
+==== `cursor`
+
+Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
+
+Can read state from: [`.last_response.*`, `.last_event.*`].
+
+NOTE: Default templates do not have access to any state, only to functions.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://api.ipify.org/?format=json
+  response.transforms:
+    - set:
+        target: body.last_requested_at
+        value: '{{.cursor.last_requested_at}}'
+        default: "{{now}}"
+  cursor:
+    last_requested_at:
+      value: '{{now}}'
+  processors:
+    - decode_json_fields
+        fields: [message]
+        target: json
+----
+
+[float]
+==== `api_key`
+
+Deprecated, use `request.transforms`.
+
+[float]
+==== `http_client_timeout`
+
+Deprecated, use `request.timeout`.
+
+[float]
+==== `http_headers`
+
+Deprecated, use `request.transforms`.
+
+[float]
+==== `http_method`
+
+Deprecated, use `request.method`.
+
+[float]
+==== `http_request_body`
+
+Deprecated, use `request.body`.
+
+[float]
+==== `json_objects_array`
+
+Deprecated, use `request.split`.
+
+[float]
+==== `split_events_by`
+
+Deprecated, use `request.split`.
+
+[float]
+==== `no_http_body`
+
+Deprecated.
+
+[float]
+==== `pagination.*`
+
+Deprecated, use `response.pagination`.
+
+[float]
+==== `rate_limit.*`
+
+Deprecated, use `request.rate_limit.*`.
+
+[float]
+==== `retry.*`
+
+Deprecated, use `request.retry.*`.
+
+[float]
+==== `ssl`
+
+Deprecated, use `request.ssl`.
+
+[float]
+==== `url`
+
+Deprecated, use `request.url`.
+
+[float]
+==== `oauth2.*`
+
+Deprecated, use `auth.oauth2.*`.
+
+==== Request life cycle
+
+image:images/input-httpjson-lifecycle.png[Request lifecycle]
+
+. At every defined interval a new request is created.
+. The request is transformed using the configured `request.transforms`.
+. The resulting transformed request is executed.
+. The server responds (here is where any retry or rate limit policy takes place when configured).
+. The response is transformed using the configured `response.transforms` and `response.split`.
+. Each resulting event is published to the output.
+. If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
