@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
+- Update to ECS 1.7.0. {pull}22571[22571]
 
 *Auditbeat*
 
@@ -98,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
+- Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 
 *Heartbeat*
 
