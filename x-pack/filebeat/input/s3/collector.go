@@ -238,10 +238,15 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 
 // handle message
 func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
-	msg := sqsMessage{}
+	var msg sqsMessage
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
-		return nil, fmt.Errorf("json unmarshal sqs message body failed: %w", err)
+		c.logger.Debug("sqs message body = ", *m.Body)
+		if jsonError, ok := err.(*json.SyntaxError); ok {
+			return nil, fmt.Errorf("json unmarshal sqs message body failed at offset %d with syntax error: %w", jsonError.Offset, err)
+		} else {
+			return nil, fmt.Errorf("json unmarshal sqs message body failed: %w", err)
+		}
 	}
 
 	var s3Infos []s3Info
