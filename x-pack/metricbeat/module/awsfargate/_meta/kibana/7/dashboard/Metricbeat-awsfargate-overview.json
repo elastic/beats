@@ -1,1134 +1,1027 @@
 {
-  "objects": [
-    {
-      "attributes": {
-        "description": "Overview of AWS Fargate Metrics",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "ECS Task Filter"
-            },
-            "gridData": {
-              "h": 7,
-              "i": "2429ae11-ccb3-4016-b18d-c88140e29f67",
-              "w": 9,
-              "x": 0,
-              "y": 0
-            },
-            "panelIndex": "2429ae11-ccb3-4016-b18d-c88140e29f67",
-            "panelRefName": "panel_0",
-            "title": "ECS Task Filter",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "Tasks and Containers"
-            },
-            "gridData": {
-              "h": 14,
-              "i": "672ac8a3-b7ac-4584-8a8c-f6656a4d0554",
-              "w": 8,
-              "x": 9,
-              "y": 0
-            },
-            "panelIndex": "672ac8a3-b7ac-4584-8a8c-f6656a4d0554",
-            "panelRefName": "panel_1",
-            "title": "Tasks and Containers",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "Containers"
-            },
-            "gridData": {
-              "h": 14,
-              "i": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
-              "w": 31,
-              "x": 17,
-              "y": 0
-            },
-            "panelIndex": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
-            "panelRefName": "panel_2",
-            "title": "Containers",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "Container Number"
-            },
-            "gridData": {
-              "h": 7,
-              "i": "fe533491-74ff-42ab-a7ad-9134104b2b71",
-              "w": 9,
-              "x": 0,
-              "y": 7
-            },
-            "panelIndex": "fe533491-74ff-42ab-a7ad-9134104b2b71",
-            "panelRefName": "panel_3",
-            "title": "Container Number",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "Container Memory Usage Pct"
-            },
-            "gridData": {
-              "h": 14,
-              "i": "196727c3-4cd2-4a56-bfdd-af9c3802a338",
-              "w": 24,
-              "x": 24,
-              "y": 14
-            },
-            "panelIndex": "196727c3-4cd2-4a56-bfdd-af9c3802a338",
-            "panelRefName": "panel_4",
-            "title": "Container Memory Usage Pct",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "CPU Usage"
-            },
-            "gridData": {
-              "h": 14,
-              "i": "d5a23126-171b-4f2c-8e18-b02d934165b6",
-              "w": 24,
-              "x": 0,
-              "y": 14
-            },
-            "panelIndex": "d5a23126-171b-4f2c-8e18-b02d934165b6",
-            "panelRefName": "panel_5",
-            "title": "CPU Usage",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "DiskIO Write"
-            },
-            "gridData": {
-              "h": 15,
-              "i": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
-              "w": 24,
-              "x": 24,
-              "y": 28
-            },
-            "panelIndex": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
-            "panelRefName": "panel_6",
-            "title": "DiskIO Write",
-            "version": "7.10.0"
-          },
-          {
-            "embeddableConfig": {
-              "hidePanelTitles": false,
-              "title": "DiskIO Read"
-            },
-            "gridData": {
-              "h": 15,
-              "i": "d7a6623a-14cf-411c-ab73-ded3734a359b",
-              "w": 24,
-              "x": 0,
-              "y": 28
-            },
-            "panelIndex": "d7a6623a-14cf-411c-ab73-ded3734a359b",
-            "panelRefName": "panel_7",
-            "title": "DiskIO Read",
-            "version": "7.10.0"
-          }
-        ],
-        "timeRestore": false,
-        "title": "[Metricbeat AWSFargate] Fargate Overview",
-        "version": 1
-      },
-      "id": "20dc7c50-2e89-11eb-991c-c5fd3b7f5a63",
-      "migrationVersion": {
-        "dashboard": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
+    "objects": [
         {
-          "id": "38eee240-2e90-11eb-a417-f961313c14f6",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "32f23030-2ea0-11eb-a417-f961313c14f6",
-          "name": "panel_1",
-          "type": "lens"
-        },
-        {
-          "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
-          "name": "panel_2",
-          "type": "lens"
-        },
-        {
-          "id": "7647f380-2e8f-11eb-a417-f961313c14f6",
-          "name": "panel_3",
-          "type": "lens"
-        },
-        {
-          "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
-          "name": "panel_4",
-          "type": "lens"
-        },
-        {
-          "id": "fc35a560-2e8e-11eb-a417-f961313c14f6",
-          "name": "panel_5",
-          "type": "lens"
-        },
-        {
-          "id": "c3952840-2e91-11eb-a417-f961313c14f6",
-          "name": "panel_6",
-          "type": "lens"
-        },
-        {
-          "id": "a7970500-2e91-11eb-a417-f961313c14f6",
-          "name": "panel_7",
-          "type": "lens"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2020-11-24T23:02:31.275Z",
-      "version": "WzIwMzcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "ECS Task Filter [Metricbeat AWSFargate]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "container.labels.com_amazonaws_ecs_task-definition-family",
-                "id": "1606248025028",
-                "indexPatternRefName": "control_0_index_pattern",
-                "label": "ECS Tasks",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
+            "attributes": {
+                "description": "Overview of AWS Fargate Metrics",
+                "hits": 0,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
                 },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": false,
-            "useTimeFilter": false
-          },
-          "title": "ECS Task Filter [Metricbeat AWSFargate]",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "38eee240-2e90-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "visualization": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-11-24T21:53:53.111Z",
-      "version": "WzE3ODcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "4bd3e6f0-a950-4dae-906a-00969a34c3a6": {
-                  "columnOrder": [
-                    "a5fcfa8d-3d50-4416-8ed4-e088b79fb0c1",
-                    "b1c37db3-b573-4b9f-a15a-cd075af34507",
-                    "42c53b4b-2287-4363-b673-8706739eb65b"
-                  ],
-                  "columns": {
-                    "42c53b4b-2287-4363-b673-8706739eb65b": {
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "Unique count of container.name",
-                      "operationType": "cardinality",
-                      "scale": "ratio",
-                      "sourceField": "container.name"
-                    },
-                    "a5fcfa8d-3d50-4416-8ed4-e088b79fb0c1": {
-                      "customLabel": true,
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Tasks",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "42c53b4b-2287-4363-b673-8706739eb65b",
-                          "type": "column"
+                "optionsJSON": {
+                    "hidePanelTitles": false,
+                    "useMargins": true
+                },
+                "panelsJSON": [
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "ECS Task Filter"
                         },
-                        "orderDirection": "desc",
-                        "size": 20
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.labels.com_amazonaws_ecs_task-definition-family"
-                    },
-                    "b1c37db3-b573-4b9f-a15a-cd075af34507": {
-                      "customLabel": true,
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Containers",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "42c53b4b-2287-4363-b673-8706739eb65b",
-                          "type": "column"
+                        "gridData": {
+                            "h": 7,
+                            "i": "2429ae11-ccb3-4016-b18d-c88140e29f67",
+                            "w": 9,
+                            "x": 0,
+                            "y": 0
                         },
-                        "orderDirection": "desc",
-                        "size": 20
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
+                        "panelIndex": "2429ae11-ccb3-4016-b18d-c88140e29f67",
+                        "panelRefName": "panel_0",
+                        "title": "ECS Task Filter",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "Containers"
+                        },
+                        "gridData": {
+                            "h": 14,
+                            "i": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
+                            "w": 39,
+                            "x": 9,
+                            "y": 0
+                        },
+                        "panelIndex": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
+                        "panelRefName": "panel_1",
+                        "title": "Containers",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "Container Number"
+                        },
+                        "gridData": {
+                            "h": 7,
+                            "i": "fe533491-74ff-42ab-a7ad-9134104b2b71",
+                            "w": 9,
+                            "x": 0,
+                            "y": 7
+                        },
+                        "panelIndex": "fe533491-74ff-42ab-a7ad-9134104b2b71",
+                        "panelRefName": "panel_2",
+                        "title": "Container Number",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "CPU Usage"
+                        },
+                        "gridData": {
+                            "h": 14,
+                            "i": "d5a23126-171b-4f2c-8e18-b02d934165b6",
+                            "w": 24,
+                            "x": 0,
+                            "y": 14
+                        },
+                        "panelIndex": "d5a23126-171b-4f2c-8e18-b02d934165b6",
+                        "panelRefName": "panel_3",
+                        "title": "CPU Usage",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "Container Memory Usage Pct"
+                        },
+                        "gridData": {
+                            "h": 14,
+                            "i": "196727c3-4cd2-4a56-bfdd-af9c3802a338",
+                            "w": 24,
+                            "x": 24,
+                            "y": 14
+                        },
+                        "panelIndex": "196727c3-4cd2-4a56-bfdd-af9c3802a338",
+                        "panelRefName": "panel_4",
+                        "title": "Container Memory Usage Pct",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "DiskIO Read"
+                        },
+                        "gridData": {
+                            "h": 15,
+                            "i": "d7a6623a-14cf-411c-ab73-ded3734a359b",
+                            "w": 24,
+                            "x": 0,
+                            "y": 28
+                        },
+                        "panelIndex": "d7a6623a-14cf-411c-ab73-ded3734a359b",
+                        "panelRefName": "panel_5",
+                        "title": "DiskIO Read",
+                        "version": "7.10.0"
+                    },
+                    {
+                        "embeddableConfig": {
+                            "hidePanelTitles": false,
+                            "title": "DiskIO Write"
+                        },
+                        "gridData": {
+                            "h": 15,
+                            "i": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+                            "w": 24,
+                            "x": 24,
+                            "y": 28
+                        },
+                        "panelIndex": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+                        "panelRefName": "panel_6",
+                        "title": "DiskIO Write",
+                        "version": "7.10.0"
                     }
-                  }
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "layers": [
-              {
-                "categoryDisplay": "hide",
-                "groups": [
-                  "a5fcfa8d-3d50-4416-8ed4-e088b79fb0c1",
-                  "b1c37db3-b573-4b9f-a15a-cd075af34507"
                 ],
-                "layerId": "4bd3e6f0-a950-4dae-906a-00969a34c3a6",
-                "legendDisplay": "hide",
-                "metric": "42c53b4b-2287-4363-b673-8706739eb65b",
-                "nestedLegend": false,
-                "numberDisplay": "percent",
-                "percentDecimals": 2
-              }
+                "timeRestore": false,
+                "title": "[Metricbeat AWSFargate] Fargate Overview",
+                "version": 1
+            },
+            "id": "20dc7c50-2e89-11eb-991c-c5fd3b7f5a63",
+            "migrationVersion": {
+                "dashboard": "7.9.3"
+            },
+            "namespaces": [
+                "default"
             ],
-            "shape": "donut"
-          }
-        },
-        "title": "Tasks and Containers [Metricbeat AWSFargate]",
-        "visualizationType": "lnsPie"
-      },
-      "id": "32f23030-2ea0-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-4bd3e6f0-a950-4dae-906a-00969a34c3a6",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T21:58:34.930Z",
-      "version": "WzE5MDcsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
-                  "columnOrder": [
-                    "eb452b61-bf12-46c0-afae-c0f1c776156c",
-                    "5b846eff-5ca7-45b0-b4c2-0346e9986302",
-                    "2a534ac1-f90c-42e0-865e-6a30964106ff",
-                    "2dcfeb76-547a-4016-9a8c-6eda084ec442",
-                    "6196e159-3c1d-4b0c-97ce-5f27415796dd"
-                  ],
-                  "columns": {
-                    "2a534ac1-f90c-42e0-865e-6a30964106ff": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "DiskIO",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "percent",
-                          "params": {
-                            "decimals": 2
-                          }
-                        }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.diskio.total"
-                    },
-                    "2dcfeb76-547a-4016-9a8c-6eda084ec442": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "Memory Usage",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "percent",
-                          "params": {
-                            "decimals": 2
-                          }
-                        }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.memory.usage.pct"
-                    },
-                    "5b846eff-5ca7-45b0-b4c2-0346e9986302": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "CPU Usage",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "percent",
-                          "params": {
-                            "decimals": 2
-                          }
-                        }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.cpu.total.norm.pct",
-                      "suggestedPriority": 0
-                    },
-                    "6196e159-3c1d-4b0c-97ce-5f27415796dd": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "Mem RSS",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "bytes",
-                          "params": {
-                            "decimals": 2
-                          }
-                        }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.memory.rss.total"
-                    },
-                    "eb452b61-bf12-46c0-afae-c0f1c776156c": {
-                      "customLabel": true,
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Container Name",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "5b846eff-5ca7-45b0-b4c2-0346e9986302",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "size": 20
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
-                    }
-                  }
+            "references": [
+                {
+                    "id": "38eee240-2e90-11eb-a417-f961313c14f6",
+                    "name": "panel_0",
+                    "type": "visualization"
+                },
+                {
+                    "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
+                    "name": "panel_1",
+                    "type": "lens"
+                },
+                {
+                    "id": "7647f380-2e8f-11eb-a417-f961313c14f6",
+                    "name": "panel_2",
+                    "type": "lens"
+                },
+                {
+                    "id": "fc35a560-2e8e-11eb-a417-f961313c14f6",
+                    "name": "panel_3",
+                    "type": "lens"
+                },
+                {
+                    "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
+                    "name": "panel_4",
+                    "type": "lens"
+                },
+                {
+                    "id": "a7970500-2e91-11eb-a417-f961313c14f6",
+                    "name": "panel_5",
+                    "type": "lens"
+                },
+                {
+                    "id": "c3952840-2e91-11eb-a417-f961313c14f6",
+                    "name": "panel_6",
+                    "type": "lens"
                 }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "layers": [
-              {
-                "columns": [
-                  "eb452b61-bf12-46c0-afae-c0f1c776156c",
-                  "5b846eff-5ca7-45b0-b4c2-0346e9986302",
-                  "2a534ac1-f90c-42e0-865e-6a30964106ff",
-                  "2dcfeb76-547a-4016-9a8c-6eda084ec442",
-                  "6196e159-3c1d-4b0c-97ce-5f27415796dd"
-                ],
-                "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a"
-              }
-            ]
-          }
-        },
-        "title": "Container Table [Metricbeat AWSFargate]",
-        "visualizationType": "lnsDatatable"
-      },
-      "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T19:52:15.007Z",
-      "version": "WzExNjIsMV0="
-    },
-    {
-      "attributes": {
-        "description": null,
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "d63a04e0-4544-46aa-9dca-0c246d753134": {
-                  "columnOrder": [
-                    "75ac880e-2155-4ebe-934c-e317f2aaff69"
-                  ],
-                  "columns": {
-                    "75ac880e-2155-4ebe-934c-e317f2aaff69": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "",
-                      "operationType": "cardinality",
-                      "params": {},
-                      "scale": "ratio",
-                      "sourceField": "container.name"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "accessor": "75ac880e-2155-4ebe-934c-e317f2aaff69",
-            "layerId": "d63a04e0-4544-46aa-9dca-0c246d753134"
-          }
-        },
-        "title": "Container Number [Metricbeat AWSFargate]",
-        "visualizationType": "lnsMetric"
-      },
-      "id": "7647f380-2e8f-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-d63a04e0-4544-46aa-9dca-0c246d753134",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T20:05:37.814Z",
-      "version": "WzEzNDEsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
-                  "columnOrder": [
-                    "55121be2-80f6-407c-9352-3e13705ac860",
-                    "eb452b61-bf12-46c0-afae-c0f1c776156c",
-                    "5b846eff-5ca7-45b0-b4c2-0346e9986302"
-                  ],
-                  "columns": {
-                    "55121be2-80f6-407c-9352-3e13705ac860": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "10s"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "5b846eff-5ca7-45b0-b4c2-0346e9986302": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "Container Memory Usage Pct",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "percent",
-                          "params": {
-                            "decimals": 2
-                          }
-                        }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.memory.usage.pct",
-                      "suggestedPriority": 0
-                    },
-                    "eb452b61-bf12-46c0-afae-c0f1c776156c": {
-                      "customLabel": true,
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Container Name",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "5b846eff-5ca7-45b0-b4c2-0346e9986302",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "size": 20
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "5b846eff-5ca7-45b0-b4c2-0346e9986302"
-                ],
-                "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "eb452b61-bf12-46c0-afae-c0f1c776156c",
-                "xAccessor": "55121be2-80f6-407c-9352-3e13705ac860"
-              }
             ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            }
-          }
-        },
-        "title": "Container Memory Usage Pct [Metricbeat AWSFargate]",
-        "visualizationType": "lnsXY"
-      },
-      "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
+            "type": "dashboard",
+            "updated_at": "2020-12-04T01:38:22.722Z",
+            "version": "WzEyMzUzLDFd"
         },
         {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T19:47:04.615Z",
-      "version": "WzEwNjMsMV0="
-    },
-    {
-      "attributes": {
-        "description": null,
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "d63a04e0-4544-46aa-9dca-0c246d753134": {
-                  "columnOrder": [
-                    "a3e6dd1b-05b8-48f5-8c88-602d55b849f9",
-                    "f1eea561-6ad3-4212-9bc2-c70bd76281d6",
-                    "566daa9c-ca4d-4a86-a4e3-6336463a0be7"
-                  ],
-                  "columns": {
-                    "566daa9c-ca4d-4a86-a4e3-6336463a0be7": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "CPU Usage",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "percent",
-                          "params": {
-                            "decimals": 2
-                          }
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
                         }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.cpu.user.norm.pct",
-                      "suggestedPriority": 0
-                    },
-                    "a3e6dd1b-05b8-48f5-8c88-602d55b849f9": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "10s"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "f1eea561-6ad3-4212-9bc2-c70bd76281d6": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of container.name",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "566daa9c-ca4d-4a86-a4e3-6336463a0be7",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "size": 20
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
                     }
-                  }
+                },
+                "title": "ECS Task Filter [Metricbeat AWSFargate]",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "controls": [
+                            {
+                                "fieldName": "container.labels.com_amazonaws_ecs_task-definition-family",
+                                "id": "1606248025028",
+                                "indexPatternRefName": "control_0_index_pattern",
+                                "label": "ECS Tasks",
+                                "options": {
+                                    "dynamicOptions": true,
+                                    "multiselect": true,
+                                    "order": "desc",
+                                    "size": 5,
+                                    "type": "terms"
+                                },
+                                "parent": "",
+                                "type": "list"
+                            }
+                        ],
+                        "pinFilters": false,
+                        "updateFiltersOnChange": false,
+                        "useTimeFilter": false
+                    },
+                    "title": "ECS Task Filter [Metricbeat AWSFargate]",
+                    "type": "input_control_vis"
                 }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
             },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
+            "id": "38eee240-2e90-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "visualization": "7.10.0"
             },
-            "layers": [
-              {
-                "accessors": [
-                  "566daa9c-ca4d-4a86-a4e3-6336463a0be7"
-                ],
-                "layerId": "d63a04e0-4544-46aa-9dca-0c246d753134",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "f1eea561-6ad3-4212-9bc2-c70bd76281d6",
-                "xAccessor": "a3e6dd1b-05b8-48f5-8c88-602d55b849f9"
-              }
+            "namespaces": [
+                "default"
             ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            }
-          }
-        },
-        "title": "CPU Usage [Metricbeat AWSFargate]",
-        "visualizationType": "lnsXY"
-      },
-      "id": "fc35a560-2e8e-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "control_0_index_pattern",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "visualization",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDAsMV0="
         },
         {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-d63a04e0-4544-46aa-9dca-0c246d753134",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T21:50:17.807Z",
-      "version": "WzE3NDIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "c8d70f88-6554-41ca-ac1e-a3cf8b992972": {
-                  "columnOrder": [
-                    "989ce63a-7fcd-4c83-980b-d595a1dd2469",
-                    "0505d890-632e-4434-a68f-f019e7893eaf",
-                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
-                  ],
-                  "columns": {
-                    "0505d890-632e-4434-a68f-f019e7893eaf": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of container.name",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "size": 3
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
-                    },
-                    "989ce63a-7fcd-4c83-980b-d595a1dd2469": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "DiskIO Write",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "bytes",
-                          "params": {
-                            "decimals": 2
-                          }
+            "attributes": {
+                "description": "",
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
+                                    "columnOrder": [
+                                        "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                        "040803fd-23f9-4f4f-95da-e8be99becbc1",
+                                        "b1e08425-6a1e-4db6-bb47-a65167b7e14f",
+                                        "09de0d9e-c174-46cf-bdc8-50158475b4a7",
+                                        "e0782143-0636-43b4-8fac-b857ea5282b2",
+                                        "7626706b-6efa-4fe7-b45c-6e9afa07f982",
+                                        "441ceb32-53e7-4408-9638-6dfd38202144"
+                                    ],
+                                    "columns": {
+                                        "040803fd-23f9-4f4f-95da-e8be99becbc1": {
+                                            "customLabel": true,
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Task Name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "type": "alphabetical"
+                                                },
+                                                "orderDirection": "asc",
+                                                "size": 20
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.labels.com_amazonaws_ecs_task-definition-family"
+                                        },
+                                        "09de0d9e-c174-46cf-bdc8-50158475b4a7": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "CPU",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "percent",
+                                                    "params": {
+                                                        "decimals": 3
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.cpu.total.norm.pct"
+                                        },
+                                        "441ceb32-53e7-4408-9638-6dfd38202144": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "Memory",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "percent",
+                                                    "params": {
+                                                        "decimals": 3
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.memory.usage.pct"
+                                        },
+                                        "7626706b-6efa-4fe7-b45c-6e9afa07f982": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "Memory Usage",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "bytes",
+                                                    "params": {
+                                                        "decimals": 2
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.memory.usage.total"
+                                        },
+                                        "b1e08425-6a1e-4db6-bb47-a65167b7e14f": {
+                                            "customLabel": true,
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "ECS Cluster ARN",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "type": "alphabetical"
+                                                },
+                                                "orderDirection": "asc",
+                                                "size": 20
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.labels.com_amazonaws_ecs_cluster"
+                                        },
+                                        "e0782143-0636-43b4-8fac-b857ea5282b2": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "DiskIO",
+                                            "operationType": "avg",
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.diskio.total"
+                                        },
+                                        "eb452b61-bf12-46c0-afae-c0f1c776156c": {
+                                            "customLabel": true,
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Container Name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "type": "alphabetical"
+                                                },
+                                                "orderDirection": "asc",
+                                                "size": 20
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.name"
+                                        }
+                                    }
+                                }
+                            }
                         }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.diskio.write.bytes",
-                      "suggestedPriority": 0
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "layers": [
+                            {
+                                "columns": [
+                                    "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                    "040803fd-23f9-4f4f-95da-e8be99becbc1",
+                                    "b1e08425-6a1e-4db6-bb47-a65167b7e14f",
+                                    "09de0d9e-c174-46cf-bdc8-50158475b4a7",
+                                    "e0782143-0636-43b4-8fac-b857ea5282b2",
+                                    "7626706b-6efa-4fe7-b45c-6e9afa07f982",
+                                    "441ceb32-53e7-4408-9638-6dfd38202144"
+                                ],
+                                "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a"
+                            }
+                        ]
                     }
-                  }
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
+                },
+                "title": "Container Table [Metricbeat AWSFargate]",
+                "visualizationType": "lnsDatatable"
             },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
+            "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
             },
-            "layers": [
-              {
-                "accessors": [
-                  "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
-                ],
-                "layerId": "c8d70f88-6554-41ca-ac1e-a3cf8b992972",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "0505d890-632e-4434-a68f-f019e7893eaf",
-                "xAccessor": "989ce63a-7fcd-4c83-980b-d595a1dd2469"
-              }
+            "namespaces": [
+                "default"
             ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            }
-          }
-        },
-        "title": "DiskIO Write [Metricbeat AWSFargate]",
-        "visualizationType": "lnsXY"
-      },
-      "id": "c3952840-2e91-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-04T01:38:02.495Z",
+            "version": "WzEyMzMyLDFd"
         },
         {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-c8d70f88-6554-41ca-ac1e-a3cf8b992972",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T20:15:25.655Z",
-      "version": "WzE2MzIsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "c8d70f88-6554-41ca-ac1e-a3cf8b992972": {
-                  "columnOrder": [
-                    "989ce63a-7fcd-4c83-980b-d595a1dd2469",
-                    "0505d890-632e-4434-a68f-f019e7893eaf",
-                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
-                  ],
-                  "columns": {
-                    "0505d890-632e-4434-a68f-f019e7893eaf": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of container.name",
-                      "operationType": "terms",
-                      "params": {
-                        "orderBy": {
-                          "columnId": "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "size": 3
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "container.name"
-                    },
-                    "989ce63a-7fcd-4c83-980b-d595a1dd2469": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "DiskIO Read",
-                      "operationType": "avg",
-                      "params": {
-                        "format": {
-                          "id": "bytes",
-                          "params": {
-                            "decimals": 2
-                          }
+            "attributes": {
+                "description": null,
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "d63a04e0-4544-46aa-9dca-0c246d753134": {
+                                    "columnOrder": [
+                                        "75ac880e-2155-4ebe-934c-e317f2aaff69"
+                                    ],
+                                    "columns": {
+                                        "75ac880e-2155-4ebe-934c-e317f2aaff69": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "",
+                                            "operationType": "cardinality",
+                                            "params": {},
+                                            "scale": "ratio",
+                                            "sourceField": "container.name"
+                                        }
+                                    }
+                                }
+                            }
                         }
-                      },
-                      "scale": "ratio",
-                      "sourceField": "awsfargate.task_stats.diskio.read.bytes",
-                      "suggestedPriority": 0
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "accessor": "75ac880e-2155-4ebe-934c-e317f2aaff69",
+                        "layerId": "d63a04e0-4544-46aa-9dca-0c246d753134"
                     }
-                  }
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
+                },
+                "title": "Container Number [Metricbeat AWSFargate]",
+                "visualizationType": "lnsMetric"
             },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
+            "id": "7647f380-2e8f-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
             },
-            "layers": [
-              {
-                "accessors": [
-                  "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
-                ],
-                "layerId": "c8d70f88-6554-41ca-ac1e-a3cf8b992972",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "0505d890-632e-4434-a68f-f019e7893eaf",
-                "xAccessor": "989ce63a-7fcd-4c83-980b-d595a1dd2469"
-              }
+            "namespaces": [
+                "default"
             ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-d63a04e0-4544-46aa-9dca-0c246d753134",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDMsMV0="
+        },
+        {
+            "attributes": {
+                "description": null,
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "d63a04e0-4544-46aa-9dca-0c246d753134": {
+                                    "columnOrder": [
+                                        "a3e6dd1b-05b8-48f5-8c88-602d55b849f9",
+                                        "f1eea561-6ad3-4212-9bc2-c70bd76281d6",
+                                        "566daa9c-ca4d-4a86-a4e3-6336463a0be7"
+                                    ],
+                                    "columns": {
+                                        "566daa9c-ca4d-4a86-a4e3-6336463a0be7": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "CPU Usage",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "percent",
+                                                    "params": {
+                                                        "decimals": 2
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.cpu.user.norm.pct",
+                                            "suggestedPriority": 0
+                                        },
+                                        "a3e6dd1b-05b8-48f5-8c88-602d55b849f9": {
+                                            "dataType": "date",
+                                            "isBucketed": true,
+                                            "label": "@timestamp",
+                                            "operationType": "date_histogram",
+                                            "params": {
+                                                "interval": "10s"
+                                            },
+                                            "scale": "interval",
+                                            "sourceField": "@timestamp"
+                                        },
+                                        "f1eea561-6ad3-4212-9bc2-c70bd76281d6": {
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Top values of container.name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "columnId": "566daa9c-ca4d-4a86-a4e3-6336463a0be7",
+                                                    "type": "column"
+                                                },
+                                                "orderDirection": "desc",
+                                                "size": 20
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "axisTitlesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "fittingFunction": "None",
+                        "gridlinesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "layers": [
+                            {
+                                "accessors": [
+                                    "566daa9c-ca4d-4a86-a4e3-6336463a0be7"
+                                ],
+                                "layerId": "d63a04e0-4544-46aa-9dca-0c246d753134",
+                                "position": "top",
+                                "seriesType": "line",
+                                "showGridlines": false,
+                                "splitAccessor": "f1eea561-6ad3-4212-9bc2-c70bd76281d6",
+                                "xAccessor": "a3e6dd1b-05b8-48f5-8c88-602d55b849f9"
+                            }
+                        ],
+                        "legend": {
+                            "isVisible": true,
+                            "position": "right"
+                        },
+                        "preferredSeriesType": "line",
+                        "tickLabelsVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        }
+                    }
+                },
+                "title": "CPU Usage [Metricbeat AWSFargate]",
+                "visualizationType": "lnsXY"
             },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            }
-          }
+            "id": "fc35a560-2e8e-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
+            },
+            "namespaces": [
+                "default"
+            ],
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-d63a04e0-4544-46aa-9dca-0c246d753134",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDUsMV0="
         },
-        "title": "DiskIO Read [Metricbeat AWSFargate]",
-        "visualizationType": "lnsXY"
-      },
-      "id": "a7970500-2e91-11eb-a417-f961313c14f6",
-      "migrationVersion": {
-        "lens": "7.10.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
         {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
+            "attributes": {
+                "description": "",
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
+                                    "columnOrder": [
+                                        "55121be2-80f6-407c-9352-3e13705ac860",
+                                        "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                        "5b846eff-5ca7-45b0-b4c2-0346e9986302"
+                                    ],
+                                    "columns": {
+                                        "55121be2-80f6-407c-9352-3e13705ac860": {
+                                            "dataType": "date",
+                                            "isBucketed": true,
+                                            "label": "@timestamp",
+                                            "operationType": "date_histogram",
+                                            "params": {
+                                                "interval": "10s"
+                                            },
+                                            "scale": "interval",
+                                            "sourceField": "@timestamp"
+                                        },
+                                        "5b846eff-5ca7-45b0-b4c2-0346e9986302": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "Container Memory Usage Pct",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "percent",
+                                                    "params": {
+                                                        "decimals": 2
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.memory.usage.pct",
+                                            "suggestedPriority": 0
+                                        },
+                                        "eb452b61-bf12-46c0-afae-c0f1c776156c": {
+                                            "customLabel": true,
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Container Name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "columnId": "5b846eff-5ca7-45b0-b4c2-0346e9986302",
+                                                    "type": "column"
+                                                },
+                                                "orderDirection": "desc",
+                                                "size": 20
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "axisTitlesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "fittingFunction": "None",
+                        "gridlinesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "layers": [
+                            {
+                                "accessors": [
+                                    "5b846eff-5ca7-45b0-b4c2-0346e9986302"
+                                ],
+                                "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+                                "position": "top",
+                                "seriesType": "line",
+                                "showGridlines": false,
+                                "splitAccessor": "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                "xAccessor": "55121be2-80f6-407c-9352-3e13705ac860"
+                            }
+                        ],
+                        "legend": {
+                            "isVisible": true,
+                            "position": "right"
+                        },
+                        "preferredSeriesType": "line",
+                        "tickLabelsVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        }
+                    }
+                },
+                "title": "Container Memory Usage Pct [Metricbeat AWSFargate]",
+                "visualizationType": "lnsXY"
+            },
+            "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
+            },
+            "namespaces": [
+                "default"
+            ],
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDQsMV0="
         },
         {
-          "id": "5606f070-13f6-11eb-991c-c5fd3b7f5a63",
-          "name": "indexpattern-datasource-layer-c8d70f88-6554-41ca-ac1e-a3cf8b992972",
-          "type": "index-pattern"
+            "attributes": {
+                "description": "",
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "c8d70f88-6554-41ca-ac1e-a3cf8b992972": {
+                                    "columnOrder": [
+                                        "989ce63a-7fcd-4c83-980b-d595a1dd2469",
+                                        "0505d890-632e-4434-a68f-f019e7893eaf",
+                                        "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
+                                    ],
+                                    "columns": {
+                                        "0505d890-632e-4434-a68f-f019e7893eaf": {
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Top values of container.name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "columnId": "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b",
+                                                    "type": "column"
+                                                },
+                                                "orderDirection": "desc",
+                                                "size": 3
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.name"
+                                        },
+                                        "989ce63a-7fcd-4c83-980b-d595a1dd2469": {
+                                            "dataType": "date",
+                                            "isBucketed": true,
+                                            "label": "@timestamp",
+                                            "operationType": "date_histogram",
+                                            "params": {
+                                                "interval": "auto"
+                                            },
+                                            "scale": "interval",
+                                            "sourceField": "@timestamp"
+                                        },
+                                        "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "DiskIO Read",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "bytes",
+                                                    "params": {
+                                                        "decimals": 2
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.diskio.read.bytes",
+                                            "suggestedPriority": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "axisTitlesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "fittingFunction": "None",
+                        "gridlinesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "layers": [
+                            {
+                                "accessors": [
+                                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
+                                ],
+                                "layerId": "c8d70f88-6554-41ca-ac1e-a3cf8b992972",
+                                "position": "top",
+                                "seriesType": "line",
+                                "showGridlines": false,
+                                "splitAccessor": "0505d890-632e-4434-a68f-f019e7893eaf",
+                                "xAccessor": "989ce63a-7fcd-4c83-980b-d595a1dd2469"
+                            }
+                        ],
+                        "legend": {
+                            "isVisible": true,
+                            "position": "right"
+                        },
+                        "preferredSeriesType": "line",
+                        "tickLabelsVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        }
+                    }
+                },
+                "title": "DiskIO Read [Metricbeat AWSFargate]",
+                "visualizationType": "lnsXY"
+            },
+            "id": "a7970500-2e91-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
+            },
+            "namespaces": [
+                "default"
+            ],
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-c8d70f88-6554-41ca-ac1e-a3cf8b992972",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDcsMV0="
+        },
+        {
+            "attributes": {
+                "description": "",
+                "state": {
+                    "datasourceStates": {
+                        "indexpattern": {
+                            "layers": {
+                                "c8d70f88-6554-41ca-ac1e-a3cf8b992972": {
+                                    "columnOrder": [
+                                        "989ce63a-7fcd-4c83-980b-d595a1dd2469",
+                                        "0505d890-632e-4434-a68f-f019e7893eaf",
+                                        "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
+                                    ],
+                                    "columns": {
+                                        "0505d890-632e-4434-a68f-f019e7893eaf": {
+                                            "dataType": "string",
+                                            "isBucketed": true,
+                                            "label": "Top values of container.name",
+                                            "operationType": "terms",
+                                            "params": {
+                                                "orderBy": {
+                                                    "columnId": "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b",
+                                                    "type": "column"
+                                                },
+                                                "orderDirection": "desc",
+                                                "size": 3
+                                            },
+                                            "scale": "ordinal",
+                                            "sourceField": "container.name"
+                                        },
+                                        "989ce63a-7fcd-4c83-980b-d595a1dd2469": {
+                                            "dataType": "date",
+                                            "isBucketed": true,
+                                            "label": "@timestamp",
+                                            "operationType": "date_histogram",
+                                            "params": {
+                                                "interval": "auto"
+                                            },
+                                            "scale": "interval",
+                                            "sourceField": "@timestamp"
+                                        },
+                                        "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b": {
+                                            "customLabel": true,
+                                            "dataType": "number",
+                                            "isBucketed": false,
+                                            "label": "DiskIO Write",
+                                            "operationType": "avg",
+                                            "params": {
+                                                "format": {
+                                                    "id": "bytes",
+                                                    "params": {
+                                                        "decimals": 2
+                                                    }
+                                                }
+                                            },
+                                            "scale": "ratio",
+                                            "sourceField": "awsfargate.task_stats.diskio.write.bytes",
+                                            "suggestedPriority": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "filters": [],
+                    "query": {
+                        "language": "kuery",
+                        "query": ""
+                    },
+                    "visualization": {
+                        "axisTitlesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "fittingFunction": "None",
+                        "gridlinesVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        },
+                        "layers": [
+                            {
+                                "accessors": [
+                                    "ab00dce2-6c01-4a0d-8d7c-71330afbaa3b"
+                                ],
+                                "layerId": "c8d70f88-6554-41ca-ac1e-a3cf8b992972",
+                                "position": "top",
+                                "seriesType": "line",
+                                "showGridlines": false,
+                                "splitAccessor": "0505d890-632e-4434-a68f-f019e7893eaf",
+                                "xAccessor": "989ce63a-7fcd-4c83-980b-d595a1dd2469"
+                            }
+                        ],
+                        "legend": {
+                            "isVisible": true,
+                            "position": "right"
+                        },
+                        "preferredSeriesType": "line",
+                        "tickLabelsVisibilitySettings": {
+                            "x": true,
+                            "yLeft": true,
+                            "yRight": true
+                        }
+                    }
+                },
+                "title": "DiskIO Write [Metricbeat AWSFargate]",
+                "visualizationType": "lnsXY"
+            },
+            "id": "c3952840-2e91-11eb-a417-f961313c14f6",
+            "migrationVersion": {
+                "lens": "7.10.0"
+            },
+            "namespaces": [
+                "default"
+            ],
+            "references": [
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-current-indexpattern",
+                    "type": "index-pattern"
+                },
+                {
+                    "id": "metricbeat-*",
+                    "name": "indexpattern-datasource-layer-c8d70f88-6554-41ca-ac1e-a3cf8b992972",
+                    "type": "index-pattern"
+                }
+            ],
+            "type": "lens",
+            "updated_at": "2020-12-03T17:36:56.326Z",
+            "version": "WzI0MDYsMV0="
         }
-      ],
-      "type": "lens",
-      "updated_at": "2020-11-24T20:14:28.176Z",
-      "version": "WzE1OTgsMV0="
-    }
-  ],
-  "version": "7.10.0"
+    ],
+    "version": "7.10.0"
 }
