@@ -7,8 +7,10 @@ package browser
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
+	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -21,6 +23,8 @@ func init() {
 	monitors.RegisterActive("synthetic/browser", create)
 }
 
+var experimentalWarning = sync.Once{}
+
 var NotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
 
 func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err error) {
@@ -30,6 +34,10 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
 		return nil, 0, NotSyntheticsCapableError
 	}
+
+	experimentalWarning.Do(func() {
+		logp.Info("Synthetic monitor detected! Please note synthetic monitors are an experimental unsupported feature!")
+	})
 
 	curUser, err := user.Current()
 	if err != nil {
