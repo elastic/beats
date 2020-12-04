@@ -42,7 +42,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
@@ -127,11 +126,11 @@ func TestXPackEnabled(t *testing.T) {
 	setupTest(t, host, version)
 
 	metricSetToTypesMap := map[string][]string{
-		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
-		"cluster_stats":  []string{"cluster_stats"},
-		"enrich":         []string{"enrich_coordinator_stats"},
-		"index_recovery": []string{"index_recovery"},
-		"index_summary":  []string{"indices_stats"},
+		"ccr":            []string{}, // no longer indexed into .monitoring-es-*
+		"cluster_stats":  []string{}, // no longer indexed into .monitoring-es-*
+		"enrich":         []string{}, // no longer indexed into .monitoring-es-*
+		"index_recovery": []string{}, // no longer indexed into .monitoring-es-*
+		"index_summary":  []string{}, // no longer indexed into .monitoring-es-*
 		"ml_job":         []string{"job_stats"},
 		"node_stats":     []string{}, // no longer indexed into .monitoring-es-*
 	}
@@ -152,11 +151,6 @@ func TestXPackEnabled(t *testing.T) {
 				numIndices, err := countIndices(host)
 				require.NoError(t, err)
 				require.Len(t, events, numIndices)
-
-				for _, event := range events {
-					require.Equal(t, "index_stats", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
 
 				return
 			}
@@ -226,21 +220,23 @@ func TestGetAllIndices(t *testing.T) {
 		// Check that we have events for both indices we created
 		var idxVisibleExists, idxHiddenExists bool
 		for _, event := range events {
-			v, err := event.RootFields.GetValue("index_stats")
-			require.NoError(t, err)
 
-			idx, ok := v.(index.Index)
-			if !ok {
-				t.FailNow()
-			}
+			name, ok := event.MetricSetFields["name"]
+			require.True(t, ok)
 
-			switch idx.Index {
+			hidden, ok := event.MetricSetFields["hidden"]
+			require.True(t, ok)
+
+			isHidden, ok := hidden.(bool)
+			require.True(t, ok)
+
+			switch name {
 			case indexVisible:
 				idxVisibleExists = true
-				require.False(t, idx.Hidden)
+				require.False(t, isHidden)
 			case indexHidden:
 				idxHiddenExists = true
-				require.True(t, idx.Hidden)
+				require.True(t, isHidden)
 			}
 		}
 
@@ -265,6 +261,9 @@ func getXPackConfig(host string) map[string]interface{} {
 		"metricsets":    xpackMetricSets,
 		"hosts":         []string{host},
 		"xpack.enabled": true,
+		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
+		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
+		"index_recovery.active_only": false,
 	}
 }
 

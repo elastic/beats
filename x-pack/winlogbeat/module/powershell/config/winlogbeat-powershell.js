@@ -5,7 +5,7 @@
 var powershell = (function () {
     var path = require("path");
     var processor = require("processor");
-    var winlogbeat = require("winlogbeat");
+    var windows = require("windows");
 
     var normalizeCommonFieldNames = new processor.Convert({
         fields: [
@@ -183,7 +183,7 @@ var powershell = (function () {
         if (!commandLine) {
             return;
         }
-        evt.Put(target, winlogbeat.splitCommandLine(commandLine));
+        evt.Put(target, windows.splitCommandLine(commandLine));
     };
 
     var addProcessArgs = function (evt) {

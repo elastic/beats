@@ -37,7 +37,7 @@ const allXML = `
     <Level>4</Level>
     <Task>9</Task>
     <Opcode>0</Opcode>
-    <Keywords>0x4000000000000004</Keywords>
+    <Keywords>0x8020000000000000</Keywords>
     <TimeCreated SystemTime="2016-01-28T20:33:27.990735300Z"/>
     <EventRecordID>100</EventRecordID>
     <Correlation ActivityID="{A066CCF1-8AB3-459B-B62F-F79F957A5036}" RelatedActivityID="{85FC0930-9C49-42DA-804B-A7368104BD1B}" />
@@ -94,7 +94,7 @@ func TestXML(t *testing.T) {
 				EventIdentifier: EventIdentifier{ID: 91},
 				LevelRaw:        4,
 				TaskRaw:         9,
-				KeywordsRaw:     0x4000000000000004,
+				KeywordsRaw:     0x8020000000000000,
 				TimeCreated:     TimeCreated{allXMLTimeCreated},
 				RecordID:        100,
 				Correlation:     Correlation{"{A066CCF1-8AB3-459B-B62F-F79F957A5036}", "{85FC0930-9C49-42DA-804B-A7368104BD1B}"},

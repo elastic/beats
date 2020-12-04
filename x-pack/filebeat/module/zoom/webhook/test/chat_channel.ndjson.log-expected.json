@@ -1,0 +1,67 @@
+[
+    {
+        "event.action": "chat_channel.created",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8dfgdfguQrdfgdf",
+            "z8dfgdfguQrdfgdf",
+            "sdfdsfdsKIrrCYw"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "vbbvnvAdsfe",
+        "zoom.chat_channel.id": "6dfgdfgdg444447b0egga",
+        "zoom.chat_channel.name": "Delivering Happiness",
+        "zoom.chat_channel.type": 1,
+        "zoom.operator": "somememai@gmtsffjdfhail.com",
+        "zoom.operator_id": "z8dfgdfguQrdfgdf"
+    },
+    {
+        "event.action": "chat_channel.member_invited",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "user"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 963,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "z8dfgdfguQrdfgdf",
+            "s0hhFOCYw"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "vbbvnvAdsfe",
+        "zoom.chat_channel.id": "6dfgdfgdg444447b0egga",
+        "zoom.chat_channel.name": "Delivering Happiness",
+        "zoom.chat_channel.type": 1,
+        "zoom.operator": "somememai@gmtsffjdfhail.com",
+        "zoom.operator_id": "z8dfgdfguQrdfgdf"
+    }
+]

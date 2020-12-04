@@ -5,6 +5,7 @@ set -eo pipefail
 # Environment variables used
 # FLEET_ENROLLMENT_TOKEN - existing enrollment token to be used for enroll
 # FLEET_ENROLL - if set to 1 enroll will be performed
+# FLEET_ENROLL_INSECURE - if set to 1, agent will enroll with fleet using --insecure flag
 # FLEET_SETUP - if  set to 1 fleet setup will be performed
 # FLEET_TOKEN_NAME - token name for a token to be created
 # KIBANA_HOST - actual kibana host [http://localhost:5601]
@@ -12,8 +13,8 @@ set -eo pipefail
 # KIBANA_USERNAME - username for accessing kibana API [elastic]
 
 function setup(){
-  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
-  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/setup \
+  curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
+ curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/fleet/agents/setup \
     -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true' \
     -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
@@ -26,7 +27,7 @@ function enroll(){
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]]; then
       apikey="${FLEET_ENROLLMENT_TOKEN}"
     else
-      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
@@ -39,7 +40,7 @@ function enroll(){
       local apikeyId=$(echo $enrollResp | jq -r '.list[0].id')
       echo $apikeyId
 
-      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys/$apikeyId \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/fleet/enrollment-api-keys/$apikeyId \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
@@ -53,7 +54,11 @@ function enroll(){
     fi
     echo $apikey
 
-    ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
+    if [[ -n "${FLEET_ENROLL_INSECURE}" ]] && [[ ${FLEET_ENROLL_INSECURE} == 1 ]]; then
+      insecure_flag="--insecure"
+    fi
+
+    ./{{ .BeatName }} enroll ${insecure_flag} ${KIBANA_HOST:-http://localhost:5601} $apikey -f
 }
 
 if [[ -n "${FLEET_SETUP}" ]] && [[ ${FLEET_SETUP} == 1 ]]; then setup; fi

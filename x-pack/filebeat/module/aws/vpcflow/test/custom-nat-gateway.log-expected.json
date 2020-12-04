@@ -1,6 +1,5 @@
 [
     {
-        "aws.vpcflow.instance_id": "-",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.pkt_dstaddr": "203.0.113.5",
         "aws.vpcflow.pkt_srcaddr": "10.0.1.5",

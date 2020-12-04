@@ -29,6 +29,7 @@ type GeoConfig struct {
 	Name           string `config:"name"`
 	Location       string `config:"location"`
 	ContinentName  string `config:"continent_name"`
+	CountryName    string `config:"country_name"`
 	CountryISOCode string `config:"country_iso_code"`
 	RegionName     string `config:"region_name"`
 	RegionISOCode  string `config:"region_iso_code"`
@@ -59,6 +60,7 @@ func GeoConfigToMap(config GeoConfig) (common.MapStr, error) {
 		"name":             config.Name,
 		"location":         config.Location,
 		"continent_name":   config.ContinentName,
+		"country_name":     config.CountryName,
 		"country_iso_code": config.CountryISOCode,
 		"region_name":      config.RegionName,
 		"region_iso_code":  config.RegionISOCode,

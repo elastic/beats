@@ -1,0 +1,58 @@
+++++
+<div class="tabs" data-tab-group="os">
+  <div role="tablist" aria-label="Uninstall">
+    <button role="tab"
+            aria-selected="true"
+            aria-controls="mac-tab-uninstall"
+            id="mac-uninstall">
+      MacOS
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="linux-tab-uninstall"
+            id="linux-uninstall"
+            tabindex="-1">
+      Linux
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="win-tab-uninstall"
+            id="win-uninstall"
+            tabindex="-1">
+      Windows
+    </button>
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="mac-tab-uninstall"
+       aria-labelledby="mac-uninstall">
+++++
+
+include::uninstall.asciidoc[tag=mac]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-uninstall"
+       aria-labelledby="linux-uninstall"
+       hidden="">
+++++
+
+include::uninstall.asciidoc[tag=linux]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="win-tab-uninstall"
+       aria-labelledby="win-uninstall"
+       hidden="">
+++++
+
+include::uninstall.asciidoc[tag=win]
+
+++++
+  </div>
+</div>
+++++

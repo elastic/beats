@@ -634,7 +634,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 
 func createAndStartServer(t *testing.T, handler Handler, extraConfigs ...func(*Server)) *Server {
 	t.Helper()
-	srv, err := New(newErrorLogger(t), ":0", handler)
+	srv, err := New(newErrorLogger(t), "localhost:0", handler)
 	require.NoError(t, err)
 	for _, extra := range extraConfigs {
 		extra(srv)

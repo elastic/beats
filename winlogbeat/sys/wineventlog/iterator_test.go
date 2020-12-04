@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
@@ -38,9 +39,7 @@ func TestEventIterator(t *testing.T) {
 
 	const eventCount = 1500
 	for i := 0; i < eventCount; i++ {
-		if err := writer.Info(1, "Test message "+strconv.Itoa(i+1)); err != nil {
-			t.Fatal(err)
-		}
+		safeWriteEvent(t, writer, eventlog.Info, 1, []string{"Test message " + strconv.Itoa(i+1)})
 	}
 
 	// Validate the assumption that 1024 is the max number of handles supported

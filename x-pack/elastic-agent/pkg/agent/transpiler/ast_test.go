@@ -112,13 +112,13 @@ func TestAST(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "range",
-							value: &List{
+							value: NewList(
 								[]Node{
 									&IntVal{value: 20},
 									&IntVal{value: 30},
 									&IntVal{value: 40},
 								},
-							},
+							),
 						},
 						&Key{name: "timeout", value: &IntVal{value: 12}},
 					},
@@ -135,13 +135,13 @@ func TestAST(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "range",
-							value: &List{
+							value: NewList(
 								[]Node{
 									&UIntVal{value: uint64(20)},
 									&UIntVal{value: uint64(30)},
 									&UIntVal{value: uint64(40)},
 								},
-							},
+							),
 						},
 						&Key{name: "timeout", value: &IntVal{value: 12}},
 					},
@@ -159,23 +159,23 @@ func TestAST(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "range32",
-							value: &List{
+							value: NewList(
 								[]Node{
 									&FloatVal{value: 20.0},
 									&FloatVal{value: 30.0},
 									&FloatVal{value: 40.0},
 								},
-							},
+							),
 						},
 						&Key{
 							name: "range64",
-							value: &List{
+							value: NewList(
 								[]Node{
 									&FloatVal{value: 20.0},
 									&FloatVal{value: 30.0},
 									&FloatVal{value: 40.0},
 								},
-							},
+							),
 						},
 						&Key{name: "ratio", value: &FloatVal{value: 0.5}},
 					},
@@ -195,7 +195,7 @@ func TestAST(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{name: "ignore_older", value: &StrVal{value: "20s"}},
 									&Key{name: "paths", value: &List{value: []Node{
@@ -203,8 +203,8 @@ func TestAST(t *testing.T) {
 										&StrVal{value: "/var/log/log2"},
 									}}},
 									&Key{name: "type", value: &StrVal{value: "log/docker"}},
-								},
-							}},
+								}),
+						},
 					},
 				},
 			},
@@ -225,11 +225,11 @@ func TestAST(t *testing.T) {
 				},
 			},
 			ast: &AST{
-				root: &Dict{
-					value: []Node{
+				root: NewDict(
+					[]Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{name: "ignore_older", value: &StrVal{value: "20s"}},
 									&Key{name: "paths", value: &List{value: []Node{
@@ -237,42 +237,37 @@ func TestAST(t *testing.T) {
 										&StrVal{value: "/var/log/log2"},
 									}}},
 									&Key{name: "type", value: &StrVal{value: "log/docker"}},
-								},
-							}},
+								}),
+						},
 						&Key{
 							name: "outputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{
 										name: "elasticsearch",
-										value: &Dict{
+										value: NewDict(
 											[]Node{
 												&Key{
 													name: "ssl",
-													value: &Dict{
+													value: NewDict(
 														[]Node{
 															&Key{name: "certificates_authorities",
-																value: &List{
+																value: NewList(
 																	[]Node{
 																		&StrVal{value: "abc1"},
 																		&StrVal{value: "abc2"},
 																	},
-																},
+																),
 															},
-														},
-													},
+														}),
 												},
-											},
-										},
+											}),
 									},
-								},
-							},
+								}),
 						},
-					},
-				},
+					}),
 			},
 		},
-
 		"Keys with multiple levels of deeps with compact keys": {
 			hashmap: map[string]interface{}{
 				"inputs": map[string]interface{}{
@@ -305,7 +300,7 @@ func TestAST(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{name: "ignore_older", value: &StrVal{value: "20s"}},
 									&Key{name: "paths", value: &List{value: []Node{
@@ -313,36 +308,33 @@ func TestAST(t *testing.T) {
 										&StrVal{value: "/var/log/log2"},
 									}}},
 									&Key{name: "type", value: &StrVal{value: "log/docker"}},
-								},
-							}},
+								}),
+						},
 						&Key{
 							name: "outputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{
 										name: "elasticsearch",
-										value: &Dict{
+										value: NewDict(
 											[]Node{
 												&Key{
 													name: "ssl",
-													value: &Dict{
+													value: NewDict(
 														[]Node{
 															&Key{name: "certificates_authorities",
-																value: &List{
+																value: NewList(
 																	[]Node{
 																		&StrVal{value: "abc1"},
 																		&StrVal{value: "abc2"},
 																	},
-																},
+																),
 															},
-														},
-													},
+														}),
 												},
-											},
-										},
+											}),
 									},
-								},
-							},
+								}),
 						},
 					},
 				},
@@ -404,11 +396,11 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{name: "type", value: &StrVal{value: "log/docker"}},
-								},
-							}},
+								}),
+						},
 					},
 				},
 			},
@@ -431,17 +423,18 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "ssl", value: &Dict{
+									&Key{name: "ssl", value: NewDict(
 										[]Node{
 											&Key{name: "ca", value: &List{
 												value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 											}},
 											&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-										}}},
-								},
-							}},
+										}),
+									},
+								}),
+						},
 					},
 				},
 			},
@@ -471,11 +464,11 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
 									&Key{name: "1", value: &StrVal{value: "log/docker"}},
-								},
-							}},
+								}),
+						},
 					},
 				},
 			},
@@ -495,21 +488,20 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "x", value: &Dict{
+									&Key{name: "x", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-								},
-							},
+												})},
+										}),
+									},
+								}),
 						},
 					},
 				},
@@ -536,32 +528,31 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "x", value: &Dict{
+									&Key{name: "x", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-									&Key{name: "y", value: &Dict{
+												})},
+										}),
+									},
+									&Key{name: "y", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-								},
-							},
+												})},
+										}),
+									},
+								}),
 						},
 					},
 				},
@@ -588,21 +579,20 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "x", value: &Dict{
+									&Key{name: "x", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-								},
-							},
+												})},
+										}),
+									},
+								}),
 						},
 					},
 				},
@@ -623,21 +613,20 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "x", value: &Dict{
+									&Key{name: "x", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-								},
-							},
+												})},
+										}),
+									},
+								}),
 						},
 					},
 				},
@@ -662,21 +651,20 @@ func TestSelector(t *testing.T) {
 					value: []Node{
 						&Key{
 							name: "inputs",
-							value: &Dict{
+							value: NewDict(
 								[]Node{
-									&Key{name: "x", value: &Dict{
+									&Key{name: "x", value: NewDict(
 										[]Node{
-											&Key{name: "ssl", value: &Dict{
+											&Key{name: "ssl", value: NewDict(
 												[]Node{
 													&Key{name: "ca", value: &List{
 														value: []Node{&StrVal{value: "ca1"}, &StrVal{value: "ca2"}},
 													}},
 													&Key{name: "certificate", value: &StrVal{value: "/etc/ssl/my.crt"}},
-												}}},
-										},
-									}},
-								},
-							},
+												})},
+										}),
+									},
+								}),
 						},
 					},
 				},
@@ -699,6 +687,529 @@ func TestSelector(t *testing.T) {
 				t.Logf(
 					`received: %+v
 					 expected: %+v`, v, test.expected)
+			}
+		})
+	}
+}
+
+func TestAST_Apply(t *testing.T) {
+	testcases := map[string]struct {
+		input    map[string]interface{}
+		expected *AST
+		vars     *Vars
+		matchErr bool
+	}{
+		"2 vars missing with default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing|'other'}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewDict(
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/value1"},
+												&StrVal{value: "/var/log/other"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": "value1",
+				},
+			}),
+		},
+		"2 vars missing no default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing}"},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": "value1",
+				},
+			}),
+			matchErr: true,
+		},
+		"vars not string": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewDict(
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/1"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": 1,
+				},
+			}),
+		},
+		"vars replace with object": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "logfile",
+					"paths": []string{"/var/log/syslog"},
+					"processors": []map[string]interface{}{
+						{
+							"add_fields": map[string]interface{}{
+								"labels": "${host.labels}",
+							},
+						},
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewDict(
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/syslog"},
+											},
+										},
+									},
+									&Key{
+										name: "processors",
+										value: &List{
+											value: []Node{
+												NewDict(
+													[]Node{
+														&Key{
+															name: "add_fields",
+															value: NewDict(
+																[]Node{
+																	&Key{
+																		name: "labels",
+																		value: &List{
+																			value: []Node{
+																				&StrVal{value: "label1"},
+																				&StrVal{value: "label2"},
+																			},
+																		},
+																	},
+																},
+															),
+														},
+													},
+												),
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "logfile"}},
+								}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition false str removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "false",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition false removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": false,
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition true string keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "true",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition true keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": true,
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition eval keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "arrayContains(${host.labels}, 'label2')",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition eval removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "arrayContains(${host.labels}, 'missing')",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition eval removes dict from dict": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/other"},
+						"nested": map[string]interface{}{
+							"removed":   "whole dict removed",
+							"condition": "arrayContains(${host.labels}, 'missing')",
+						},
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+	}
+
+	for name, test := range testcases {
+		t.Run(name, func(t *testing.T) {
+			v, err := NewAST(test.input)
+			require.NoError(t, err)
+			err = v.Apply(test.vars)
+			if test.matchErr {
+				require.Equal(t, ErrNoMatch, err)
+			} else {
+				require.NoError(t, err)
+				if !assert.True(t, reflect.DeepEqual(test.expected, v)) {
+					t.Logf(
+						`received: %+v
+					 expected: %+v`, v, test.expected)
+				}
 			}
 		})
 	}
@@ -1102,4 +1613,12 @@ func TestHash(t *testing.T) {
 			assert.Equal(t, test.match, test.c1.HashStr() == test.c2.HashStr())
 		})
 	}
+}
+
+func mustMakeVars(mapping map[string]interface{}) *Vars {
+	v, err := NewVars(mapping)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }

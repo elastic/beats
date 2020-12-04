@@ -41,15 +41,25 @@ var Name = "metricbeat"
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-func init() {
+// MetricbeatSettings contains the default settings for metricbeat
+func MetricbeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	settings := instance.Settings{
+	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+}
+
+// Initialize initializes the entrypoint commands for metricbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	return rootCmd
+}
+
+func init() {
+	RootCmd = Initialize(MetricbeatSettings())
 }
