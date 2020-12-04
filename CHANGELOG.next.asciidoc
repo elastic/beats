@@ -30,22 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
-- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
-`forwarded` from the list. {issue}13920[13920]
-* Cisco {pull}18753[18753]
-* CrowdStrike {pull}19132[19132]
-* Fortinet {pull}19133[19133]
-* iptables {pull}18756[18756]
-* Checkpoint {pull}18754[18754]
-* Netflow {pull}19087[19087]
-* Zeek {pull}19113[19113] (`forwarded` tag is not included by default)
-* Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
-* CoreDNS {pull}19134[19134] (`forwarded` tag is not included by default)
-* Envoy Proxy {pull}19134[19134] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
-- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
-- With the default configuration the cef and panw modules will no longer send the `host`
-`forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
 - Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 - Adds `split_events_by` option to httpjson input. {pull}19246[19246]
 - Adds `date_cursor` option to httpjson input. {pull}19483[19483]
@@ -392,8 +377,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new Checkpoint Syslog filebeat module. {pull}17682[17682]
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
 - Added new Fortigate Syslog filebeat module. {pull}17890[17890]
-- Added an input option `publisher_pipeline.disable_host` to disable `host.name`
-from being added to events by default. {pull}18159[18159]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Added http_endpoint input{pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
@@ -438,9 +421,6 @@ from being added to events by default. {pull}18159[18159]
 *Heartbeat*
 
 *Journalbeat*
-
-- Added an `id` config option to inputs to allow running multiple inputs on the
-same journal. {pull}18467[18467]
 
 *Metricbeat*
 
@@ -490,10 +470,6 @@ same journal. {pull}18467[18467]
 - Added cache and connection_errors metrics to status metricset of MySQL module {issue}16955[16955] {pull}19844[19844]
 
 *Packetbeat*
-
-`host` metadata fields when processing network data from network tap or mirror
-port. {pull}19209[19209]
-
 
 *Functionbeat*
 
