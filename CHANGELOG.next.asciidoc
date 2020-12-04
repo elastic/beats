@@ -215,6 +215,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed documentation for commands in beats dev guide {pull}22194[22194]
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
+- Fix FileVersion contained in Windows exe files. {pull}22581[22581]
+- Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+- Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
+
 
 *Auditbeat*
 
@@ -232,6 +236,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
 - system/socket: Fixed a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
 - file_integrity: stop monitoring excluded paths {issue}21278[21278] {pull}21282[21282]
+- auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
+- system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
+- system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 
 *Filebeat*
 
@@ -332,15 +339,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
+- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Fixed missing `tls` fields when connecting to https via proxy. {issue}15797[15797] {pull}22190[22190]
 
 *Heartbeat*
 
 - The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
+- Fix exit on monitors with `enabled: false` {pull}22829[22829]
 
 *Journalbeat*
 
@@ -435,6 +446,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change Session ID type from int to string {pull}22359[22359]
 - Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
 - Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
+- Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
+- Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
+- Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 
 *Packetbeat*
 
@@ -531,6 +545,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
+- Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
 
 *Auditbeat*
 
@@ -716,13 +731,17 @@ from being added to events by default. {pull}18159[18159]
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Rename googlecloud module to gcp module. {pull}22214[22214]
 - Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
 - Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
 - Copy tag names from MISP data into events. {pull}21664[21664]
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Added TLS JA3 fingerprint, certificate not_before/not_after, certificate SHA1 hash, and certificate subject fields to Zeek SSL dataset. {pull}21696[21696]
+- Add platform logs in the azure filebeat module. {pull}22371[22371]
 - Added `event.ingested` field to data from the Netflow module. {pull}22412[22412]
 - Improve panw ECS url fields mapping. {pull}22481[22481]
+- Improve Nats filebeat dashboard. {pull}22726[22726]
+- Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 
 *Heartbeat*
 
@@ -842,8 +861,12 @@ same journal. {pull}18467[18467]
 - Map cloud data filed `cloud.account.id` to azure subscription.  {pull}21483[21483] {issue}21381[21381]
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
 - Duplicate system.process.cmdline field with process.command_line ECS field name. {pull}22325[22325]
+- Add awsfargate module task_stats metricset to monitor AWS ECS Fargate. {pull}22034[22034]
 - Add connection and route metricsets for nats metricbeat module to collect metrics per connection/route. {pull}22445[22445]
 - Add unit file states to system/service {pull}22557[22557]
+- Add io.ops in fields exported by system.diskio. {pull}22066[22066]
+- `kibana` module: `stats` metricset no-longer collects usage-related data. {pull}22732[22732]
+- Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 
 *Packetbeat*
 
@@ -855,14 +878,10 @@ same journal. {pull}18467[18467]
 - Add initial SIP protocol support {pull}21221[21221]
 - Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
 - Change build process for x-pack distribution {pull}21979[21979]
-
-*Packetbeat*
-
-`host` metadata fields when processing network data from network tap or mirror
-port. {pull}19209[19209]
-
+- Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
 
 *Functionbeat*
+
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 
@@ -878,6 +897,7 @@ port. {pull}19209[19209]
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 
 *Elastic Log Driver*
+
 - Add support for `docker logs` command {pull}19531[19531]
 
 ==== Deprecated

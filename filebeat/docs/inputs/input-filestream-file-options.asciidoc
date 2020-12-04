@@ -358,6 +358,8 @@ instead and let {beatname_uc} pick up the file again.
 Different `file_identity` methods can be configured to suit the
 environment where you are collecting log messages.
 
+WARNING: Changing `file_identity` methods between runs may result in
+duplicated events in the output.
 
 *`native`*:: The default behaviour of {beatname_uc} is to differentiate
 between files using their inodes and device ids.
