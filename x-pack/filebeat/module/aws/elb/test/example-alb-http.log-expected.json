@@ -39,7 +39,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
+        "trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -90,7 +90,7 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "tracing.trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
+        "trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -139,7 +139,7 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "tracing.trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
+        "trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -182,7 +182,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "-"
     },
     {
@@ -262,7 +262,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -303,7 +303,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -335,7 +335,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "-",
+        "trace.id": "-",
         "user_agent.original": "-"
     },
     {
@@ -366,7 +366,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "-",
+        "trace.id": "-",
         "user_agent.original": "-"
     },
     {
@@ -421,7 +421,7 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "tracing.trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
+        "trace.id": "Root=1-58337327-72bd00b0343d75b906739c42",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -478,7 +478,7 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "tracing.trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
+        "trace.id": "Root=1-58337281-1d84f3d73c47ec4e58577259",
         "user_agent.original": "curl/7.46.0"
     },
     {
@@ -527,7 +527,7 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "-"
     },
     {
@@ -581,7 +581,7 @@
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
-        "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
+        "trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "-"
     }
 ]
