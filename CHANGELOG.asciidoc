@@ -24,7 +24,6 @@ https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
 
 - Fix missing variable when loading aws pipelines. {pull}22645[22645]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
-- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 
 *Heartbeat*
 
