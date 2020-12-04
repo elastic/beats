@@ -7,36 +7,6 @@
 === Beats version 7.10.1
 https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Journalbeat*
-
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -58,91 +28,23 @@ https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
 
 *Heartbeat*
 
-
-*Heartbeat*
-
 - The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
 - Fix exit on monitors with `enabled: false` {pull}22829[22829]
-
-*Journalbeat*
-
 
 *Metricbeat*
 
 - Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
-
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
 
 *Functionbeat*
 
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
-
-
-
-
 
 [[release-notes-7.10.0]]
 === Beats version 7.10.0
