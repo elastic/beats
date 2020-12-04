@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -81,7 +82,7 @@ var (
 
 func TestParseDHCPRequest(t *testing.T) {
 	logp.TestingSetup()
-	p, err := newPlugin(true, nil, nil)
+	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +166,7 @@ func TestParseDHCPRequest(t *testing.T) {
 }
 
 func TestParseDHCPACK(t *testing.T) {
-	p, err := newPlugin(true, nil, nil)
+	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

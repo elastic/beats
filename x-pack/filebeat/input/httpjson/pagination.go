@@ -72,7 +72,7 @@ func (p *pagination) nextRequestInfo(ri *requestInfo, response response, lastObj
 
 // getNextLinkFromHeader retrieves the next URL for pagination from the HTTP Header of the response
 func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Regexp) (string, error) {
-	links, ok := header[fieldName]
+	links, ok := header[http.CanonicalHeaderKey(fieldName)]
 	if !ok {
 		return "", fmt.Errorf("field %s does not exist in the HTTP Header", fieldName)
 	}

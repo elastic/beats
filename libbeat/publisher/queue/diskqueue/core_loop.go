@@ -93,10 +93,10 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 	// than an entire segment all by itself (as long as it isn't, it is
 	// guaranteed to eventually enter the queue assuming no disk errors).
 	frameSize := request.frame.sizeOnDisk()
-	if dq.settings.MaxSegmentSize < frameSize {
+	if dq.settings.maxSegmentOffset() < segmentOffset(frameSize) {
 		dq.logger.Warnf(
-			"Rejecting event with size %v because the maximum segment size is %v",
-			frameSize, dq.settings.MaxSegmentSize)
+			"Rejecting event with size %v because the segment buffer limit is %v",
+			frameSize, dq.settings.maxSegmentOffset())
 		request.responseChan <- false
 		return
 	}
@@ -169,8 +169,16 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 		// A segment in the writing list can't be finished writing,
 		// so we don't check the endOffset.
 		segment = dq.segments.writing[0]
+		if response.err != nil {
+			// Errors reading a writing segment are awkward since we can't discard
+			// them until the writer loop is done with them. Instead we just seek
+			// to the end of the current data region. If we're lucky this lets us
+			// skip the intervening errors; if not, the segment will be cleaned up
+			// after the writer loop is done with it.
+			dq.segments.nextReadOffset = segment.endOffset
+		}
 	}
-	segment.framesRead = uint64(dq.segments.nextReadFrameID - segment.firstFrameID)
+	segment.framesRead += response.frameCount
 
 	// If there was an error, report it.
 	if response.err != nil {
@@ -318,13 +326,19 @@ func (dq *diskQueue) maybeWritePending() {
 		// Nothing to do right now
 		return
 	}
+
 	// Remove everything from pendingFrames and forward it to the writer loop.
 	frames := dq.pendingFrames
 	dq.pendingFrames = nil
+	dq.writerLoop.requestChan <- writerLoopRequest{frames: frames}
 
-	dq.writerLoop.requestChan <- writerLoopRequest{
-		frames: frames,
+	// Compute the size of the request so we know how full the queue is going
+	// to be.
+	totalSize := uint64(0)
+	for _, sf := range frames {
+		totalSize += sf.frame.sizeOnDisk()
 	}
+	dq.writeRequestSize = totalSize
 	dq.writing = true
 }
 
@@ -346,6 +360,16 @@ func (dq *diskQueue) maybeReadPending() {
 		// A read request is already pending
 		return
 	}
+	// Check if the next reading segment has already been completely read. (This
+	// can happen if it was being written and read simultaneously.) In this case
+	// we should move it to the acking list and proceed to the next segment.
+	if len(dq.segments.reading) > 0 &&
+		dq.segments.nextReadOffset >= dq.segments.reading[0].endOffset {
+		dq.segments.acking = append(dq.segments.acking, dq.segments.reading[0])
+		dq.segments.reading = dq.segments.reading[1:]
+		dq.segments.nextReadOffset = 0
+	}
+	// Get the next available segment from the reading or writing lists.
 	segment := dq.segments.readingSegment()
 	if segment == nil ||
 		dq.segments.nextReadOffset >= segmentOffset(segment.endOffset) {
@@ -353,7 +377,12 @@ func (dq *diskQueue) maybeReadPending() {
 		return
 	}
 	if dq.segments.nextReadOffset == 0 {
-		// If we're reading the beginning of this segment, assign its firstFrameID.
+		// If we're reading the beginning of this segment, assign its firstFrameID
+		// so we can recognize its acked frames later.
+		// The first segment we read might not have its initial nextReadOffset
+		// set to 0 if the segment was already partially read on a previous run.
+		// However that can only happen when nextReadFrameID == 0, so we don't
+		// need to do anything in that case.
 		segment.firstFrameID = dq.segments.nextReadFrameID
 	}
 	request := readerLoopRequest{
@@ -448,8 +477,12 @@ func (dq *diskQueue) canAcceptFrameOfSize(frameSize uint64) bool {
 	// left in the queue after accounting for the existing segments and the
 	// pending writes that were already accepted.
 	pendingBytes := uint64(0)
-	for _, request := range dq.pendingFrames {
-		pendingBytes += request.frame.sizeOnDisk()
+	for _, sf := range dq.pendingFrames {
+		pendingBytes += sf.frame.sizeOnDisk()
+	}
+	// If a writing request is outstanding, include it in the size total.
+	if dq.writing {
+		pendingBytes += dq.writeRequestSize
 	}
 	currentSize := pendingBytes + dq.segments.sizeOnDisk()
 

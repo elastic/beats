@@ -55,6 +55,11 @@ type diskQueue struct {
 	// otherwise.
 	writing bool
 
+	// If writing is true, then writeRequestSize equals the number of bytes it
+	// contained. Used to calculate how much free capacity the queue has left
+	// after all scheduled writes have been completed (see canAcceptFrameOfSize).
+	writeRequestSize uint64
+
 	// reading is true if the reader loop is processing a request, false
 	// otherwise.
 	reading bool
@@ -94,7 +99,7 @@ func init() {
 // queueFactory matches the queue.Factory interface, and is used to add the
 // disk queue to the registry.
 func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {

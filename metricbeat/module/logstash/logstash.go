@@ -57,13 +57,13 @@ type MetricSet struct {
 	XPack bool
 }
 
-type graph struct {
+type Graph struct {
 	Vertices []map[string]interface{} `json:"vertices"`
 	Edges    []map[string]interface{} `json:"edges"`
 }
 
-type graphContainer struct {
-	Graph   *graph `json:"graph,omitempty"`
+type GraphContainer struct {
+	Graph   *Graph `json:"graph,omitempty"`
 	Type    string `json:"type"`
 	Version string `json:"version"`
 	Hash    string `json:"hash"`
@@ -74,8 +74,8 @@ type PipelineState struct {
 	ID             string          `json:"id"`
 	Hash           string          `json:"hash"`
 	EphemeralID    string          `json:"ephemeral_id"`
-	Graph          *graphContainer `json:"graph,omitempty"`
-	Representation *graphContainer `json:"representation"`
+	Graph          *GraphContainer `json:"graph,omitempty"`
+	Representation *GraphContainer `json:"representation"`
 	BatchSize      int             `json:"batch_size"`
 	Workers        int             `json:"workers"`
 }

@@ -62,12 +62,8 @@ func newManaged(
 	log *logger.Logger,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
-	}
-
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
@@ -154,7 +150,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -238,6 +234,15 @@ func newManaged(
 		&handlerUpgrade{
 			upgrader: managedApplication.upgrader,
 			log:      log,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionSettings{},
+		&handlerSettings{
+			log:       log,
+			reexec:    reexec,
+			agentInfo: agentInfo,
 		},
 	)
 

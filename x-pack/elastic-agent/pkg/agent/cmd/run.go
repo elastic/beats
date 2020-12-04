@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -16,14 +17,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/service"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	agentName = "elastic-agent"
 )
 
 func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -70,10 +78,22 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
+	if err := getOverwrites(rawConfig); err != nil {
+		return errors.New(err, "could not read overwrites")
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
+	if err != nil {
+		return errors.New(err,
+			"could not load agent info",
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
@@ -87,7 +107,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
 	}
 
-	execPath, err := os.Executable()
+	execPath, err := reexecPath()
 	if err != nil {
 		return err
 	}
@@ -101,7 +121,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, control)
+	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo)
 	if err != nil {
 		return err
 	}
@@ -145,4 +165,65 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	rex.ShutdownComplete()
 	return err
+}
+
+func reexecPath() (string, error) {
+	// set executable path to symlink instead of binary
+	// in case of updated symlinks we should spin up new agent
+	potentialReexec := filepath.Join(paths.Top(), agentName)
+
+	// in case it does not exists fallback to executable
+	if _, err := os.Stat(potentialReexec); os.IsNotExist(err) {
+		return os.Executable()
+	}
+
+	return potentialReexec, nil
+}
+
+func getOverwrites(rawConfig *config.Config) error {
+	path := info.AgentConfigFile()
+
+	store := storage.NewDiskStore(path)
+	reader, err := store.Load()
+	if err != nil && errors.Is(err, os.ErrNotExist) {
+		// no fleet file ignore
+		return nil
+	} else if err != nil {
+		return errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	err = rawConfig.Merge(config)
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	return nil
+}
+
+func defaultLogLevel(cfg *configuration.Configuration) string {
+	if application.IsStandalone(cfg.Fleet) {
+		// for standalone always take the one from config and don't override
+		return ""
+	}
+
+	defaultLogLevel := logger.DefaultLoggingConfig().Level.String()
+	if configuredLevel := cfg.Settings.LoggingConfig.Level.String(); configuredLevel != "" && configuredLevel != defaultLogLevel {
+		// predefined log level
+		return configuredLevel
+	}
+
+	return defaultLogLevel
 }

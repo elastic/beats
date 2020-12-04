@@ -10,8 +10,13 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "libbeat"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        make: |
+          make -C libbeat check;
+          make -C libbeat update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

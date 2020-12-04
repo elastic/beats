@@ -461,7 +461,7 @@ func newEventError(env *events.Envelope) *EventError {
 	}
 }
 
-func envelopeToEvent(env *events.Envelope) Event {
+func EnvelopeToEvent(env *events.Envelope) Event {
 	switch *env.EventType {
 	case events.Envelope_HttpStartStop:
 		return newEventHttpAccess(env)
@@ -490,21 +490,45 @@ func envelopMap(evt Event) common.MapStr {
 }
 
 func baseMap(evt Event) common.MapStr {
-	return common.MapStr{
-		"cloudfoundry": common.MapStr{
-			"type":     evt.String(),
-			"envelope": envelopMap(evt),
-			"tags":     dedotedTags(evt.Tags()),
-		},
+	tags, meta := tagsToMeta(evt.Tags())
+	cf := common.MapStr{
+		"type":     evt.String(),
+		"envelope": envelopMap(evt),
 	}
-}
-
-func dedotedTags(tags map[string]string) common.MapStr {
-	result := common.MapStr{}
-	for name, value := range tags {
-		result[common.DeDot(name)] = value
+	if len(tags) > 0 {
+		cf["tags"] = tags
+	}
+	result := common.MapStr{
+		"cloudfoundry": cf,
+	}
+	if len(meta) > 0 {
+		result.DeepUpdate(meta)
 	}
 	return result
+}
+
+func tagsToMeta(eventTags map[string]string) (tags common.MapStr, meta common.MapStr) {
+	tags = common.MapStr{}
+	meta = common.MapStr{}
+	for name, value := range eventTags {
+		switch name {
+		case "app_id":
+			meta.Put("cloudfoundry.app.id", value)
+		case "app_name":
+			meta.Put("cloudfoundry.app.name", value)
+		case "space_id":
+			meta.Put("cloudfoundry.space.id", value)
+		case "space_name":
+			meta.Put("cloudfoundry.space.name", value)
+		case "organization_id":
+			meta.Put("cloudfoundry.org.id", value)
+		case "organization_name":
+			meta.Put("cloudfoundry.org.name", value)
+		default:
+			tags[common.DeDot(name)] = value
+		}
+	}
+	return tags, meta
 }
 
 func baseMapWithApp(evt EventWithAppID) common.MapStr {

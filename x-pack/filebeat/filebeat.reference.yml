@@ -142,6 +142,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   cloudwatch:
     enabled: false
 
@@ -175,6 +181,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   ec2:
     enabled: false
@@ -210,6 +222,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   elb:
     enabled: false
 
@@ -243,6 +261,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   s3access:
     enabled: false
@@ -278,6 +302,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   vpcflow:
     enabled: false
 
@@ -312,6 +342,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
@@ -328,6 +364,16 @@ filebeat.modules:
       storage_account: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
+
+  platformlogs:
+    enabled: false
+  #  var:
+  #    eventhub: ""
+  #    consumer_group: "$Default"
+  #    connection_string: ""
+  #    storage_account: ""
+  #    storage_account_key: ""
+
 
   auditlogs:
     enabled: false
@@ -522,6 +568,21 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+  umbrella:
+    enabled: true
+
+    #var.input: s3
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    # Access ID to authenticate with the S3 input
+    #var.access_key_id: 123456
+    # Access key to authenticate with the S3 input
+    #var.secret_access_key: PASSWORD
+    # The duration that the received messages are hidden from ReceiveMessage request
+    #var.visibility_timeout: 300s
+    # Maximum duration before AWS API request will be interrupted
+    #var.api_timeout: 120s
 
 #--------------------------- Citrix NetScaler Module ---------------------------
 - module: citrix
@@ -762,8 +823,8 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#----------------------------- Google Cloud Module -----------------------------
-- module: googlecloud
+#--------------------- Google Cloud Platform (GCP) Module ---------------------
+- module: gcp
   vpcflow:
     enabled: true
 
@@ -772,11 +833,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
     # configured to use this topic as a sink for VPC flow logs.
-    var.topic: googlecloud-vpc-flowlogs
+    var.topic: gcp-vpc-flowlogs
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -790,11 +851,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-firewall
+    var.topic: gcp-vpc-firewall
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-firewall-sub
+    var.subscription_name: filebeat-gcp-firewall-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -808,11 +869,68 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-audit
+    var.topic: gcp-vpc-audit
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-audit
+    var.subscription_name: filebeat-gcp-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+#----------------------------- Googlecloud Module -----------------------------
+# googlecloud module is deprecated, please use gcp instead
+- module: gcp
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: gcp-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  firewall:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-firewall
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-firewall-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-audit
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -1350,6 +1468,18 @@ filebeat.modules:
     # API token to access the logs API.
     #var.url: https://yourOktaDomain/api/v1/logs
     #var.api_key: 'yourApiTokenHere'
+
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  database_audit:
+    enabled: true
+
+    # Set which input to use between syslog or file (default).
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths: /home/user/oracleauditlogs/*.aud
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -2337,7 +2467,7 @@ filebeat.inputs:
 
 #---------------------------- Google Cloud Pub/Sub Input -----------------------
 # Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: google-pubsub
+- type: gcp-pubsub
   enabled: false
 
   # Google Cloud project ID. Required.
@@ -2374,8 +2504,8 @@ filebeat.inputs:
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-s3-input
 
-  # Queue urls (required) to receive queue messages from
-  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+  # Queue url (required) to receive queue messages from
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"
 
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
@@ -2489,6 +2619,41 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
+  
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+    
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
@@ -3504,6 +3669,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of filebeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
@@ -3643,7 +3810,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 

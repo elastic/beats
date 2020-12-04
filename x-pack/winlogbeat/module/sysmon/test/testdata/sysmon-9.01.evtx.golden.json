@@ -27,7 +27,7 @@
           "id": 4724
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 1,
       "user": {
@@ -72,14 +72,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -110,7 +107,7 @@
         "C:\\Windows\\Sysmon.exe"
       ],
       "command_line": "C:\\Windows\\Sysmon.exe",
-      "entity_id": "{42f11c3b-ce01-5c8f-0000-0010c73e2a00}",
+      "entity_id": "{42F11C3B-CE01-5C8F-0000-0010C73E2A00}",
       "executable": "C:\\Windows\\Sysmon.exe",
       "hash": {
         "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
@@ -121,10 +118,16 @@
           "C:\\Windows\\system32\\services.exe"
         ],
         "command_line": "C:\\Windows\\system32\\services.exe",
-        "entity_id": "{42f11c3b-6e1a-5c8c-0000-0010f14d0000}",
+        "entity_id": "{42F11C3B-6E1A-5C8C-0000-0010F14D0000}",
         "executable": "C:\\Windows\\System32\\services.exe",
         "name": "services.exe",
         "pid": 488
+      },
+      "pe": {
+        "company": "Sysinternals - www.sysinternals.com",
+        "description": "System activity monitor",
+        "file_version": "9.01",
+        "product": "Sysinternals Sysmon"
       },
       "pid": 4860,
       "working_directory": "C:\\Windows\\system32\\"
@@ -146,7 +149,7 @@
         "Description": "System activity monitor",
         "FileVersion": "9.01",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Sysinternals Sysmon",
         "TerminalSessionId": "0"
@@ -158,14 +161,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 3,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -197,7 +197,7 @@
         "-Embedding"
       ],
       "command_line": "C:\\Windows\\system32\\wbem\\unsecapp.exe -Embedding",
-      "entity_id": "{42f11c3b-ce01-5c8f-0000-00102c412a00}",
+      "entity_id": "{42F11C3B-CE01-5C8F-0000-00102C412A00}",
       "executable": "C:\\Windows\\System32\\wbem\\unsecapp.exe",
       "hash": {
         "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
@@ -210,10 +210,16 @@
           "DcomLaunch"
         ],
         "command_line": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch",
-        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "entity_id": "{42F11C3B-6E1B-5C8C-0000-00102F610000}",
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
+      },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "Sink to receive asynchronous callbacks for WMI client application",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
       },
       "pid": 5028,
       "working_directory": "C:\\Windows\\system32\\"
@@ -235,7 +241,7 @@
         "Description": "Sink to receive asynchronous callbacks for WMI client application",
         "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
@@ -247,14 +253,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 4,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -281,7 +284,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010e61e2a00}",
+      "entity_id": "{42F11C3B-CDF4-5C8F-0000-0010E61E2A00}",
       "executable": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Sysmon.exe",
       "name": "Sysmon.exe",
       "pid": 4616
@@ -297,14 +300,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 5,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -331,7 +331,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010071e2a00}",
+      "entity_id": "{42F11C3B-CDF4-5C8F-0000-0010071E2A00}",
       "executable": "C:\\Users\\vagrant\\Downloads\\Sysmon.exe",
       "name": "Sysmon.exe",
       "pid": 4648
@@ -347,14 +347,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 6,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -386,7 +383,7 @@
         "-Embedding"
       ],
       "command_line": "C:\\Windows\\system32\\wbem\\wmiprvse.exe -Embedding",
-      "entity_id": "{42f11c3b-ce03-5c8f-0000-0010e9462a00}",
+      "entity_id": "{42F11C3B-CE03-5C8F-0000-0010E9462A00}",
       "executable": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
       "hash": {
         "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
@@ -399,10 +396,16 @@
           "DcomLaunch"
         ],
         "command_line": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch",
-        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "entity_id": "{42F11C3B-6E1B-5C8C-0000-00102F610000}",
         "executable": "C:\\Windows\\System32\\svchost.exe",
         "name": "svchost.exe",
         "pid": 560
+      },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "WMI Provider Host",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
       },
       "pid": 4508,
       "working_directory": "C:\\Windows\\system32\\"
@@ -424,7 +427,7 @@
         "Description": "WMI Provider Host",
         "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
         "IntegrityLevel": "System",
-        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonGuid": "{42F11C3B-6E1A-5C8C-0000-0020E7030000}",
         "LogonId": "0x3e7",
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
@@ -436,14 +439,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 7,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -482,7 +482,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -513,14 +513,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 8,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -559,7 +556,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -591,14 +588,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 9,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -637,7 +631,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -669,14 +663,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -715,7 +706,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -747,14 +738,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -793,7 +781,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -828,14 +816,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 12,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -875,7 +860,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -909,14 +894,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 13,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -955,7 +937,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -987,14 +969,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 14,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1033,7 +1012,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1064,14 +1043,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 15,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1110,7 +1086,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1144,14 +1120,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 16,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1190,7 +1163,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1224,14 +1197,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 17,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1270,7 +1240,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1301,14 +1271,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 18,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1347,7 +1314,7 @@
       "type": "ipv6"
     },
     "process": {
-      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "entity_id": "{42F11C3B-0BAD-5C8C-0000-0010DFBC0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
@@ -1378,14 +1345,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 19,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1424,7 +1388,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1459,14 +1423,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 20,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1505,7 +1466,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1540,14 +1501,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 21,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1586,7 +1544,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1621,14 +1579,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 22,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1667,7 +1622,7 @@
       "type": "ipv4"
     },
     "process": {
-      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "entity_id": "{42F11C3B-6E19-5C8C-0000-0010EB030000}",
       "executable": "System",
       "name": "System",
       "pid": 4
@@ -1702,14 +1657,11 @@
           "id": 4492
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 23,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1736,7 +1688,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccc6-5c8f-0000-001005082900}",
+      "entity_id": "{42F11C3B-CCC6-5C8F-0000-001005082900}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 4832
@@ -1752,14 +1704,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 24,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1786,7 +1735,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-cccc-5c8f-0000-0010e8272900}",
+      "entity_id": "{42F11C3B-CCCC-5C8F-0000-0010E8272900}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 3208
@@ -1802,14 +1751,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 25,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1841,7 +1787,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -1861,14 +1807,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 26,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1900,7 +1843,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -1920,14 +1863,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 27,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1959,7 +1899,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -1979,14 +1919,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 28,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2018,7 +1955,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2038,14 +1975,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 29,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2072,7 +2006,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccab-5c8f-0000-001064eb2700}",
+      "entity_id": "{42F11C3B-CCAB-5C8F-0000-001064EB2700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 2680
@@ -2088,14 +2022,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 30,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -2127,7 +2058,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2147,14 +2078,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 31,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2186,7 +2114,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "entity_id": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
       "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "name": "chrome.exe",
       "pid": 1600
@@ -2206,14 +2134,11 @@
           "id": 4516
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 32,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }

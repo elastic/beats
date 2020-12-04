@@ -7,6 +7,8 @@ package dir
 import (
 	"context"
 	"os"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 // Checker performs basic check that the install directory exists.
@@ -18,7 +20,7 @@ func NewChecker() *Checker {
 }
 
 // Check checks that the install directory exists.
-func (*Checker) Check(_ context.Context, _, _, installDir string) error {
+func (*Checker) Check(_ context.Context, _ program.Spec, _, installDir string) error {
 	_, err := os.Stat(installDir)
 	return err
 }

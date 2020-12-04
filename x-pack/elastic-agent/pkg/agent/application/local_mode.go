@@ -63,6 +63,7 @@ func newLocal(
 	rawConfig *config.Config,
 	reexec reexecManager,
 	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (*Local, error) {
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
@@ -74,10 +75,6 @@ func newLocal(
 		if err != nil {
 			return nil, err
 		}
-	}
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
 	}
 
 	logR := logreporter.NewReporter(log)
@@ -100,7 +97,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, cfg.Settings, localApplication.srv, reporter, monitor))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}

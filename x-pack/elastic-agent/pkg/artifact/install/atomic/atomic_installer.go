@@ -9,10 +9,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 type embeddedInstaller interface {
-	Install(ctx context.Context, programName, version, installDir string) error
+	Install(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 // Installer installs into temporary destination and moves to correct one after
@@ -29,9 +32,9 @@ func NewInstaller(i embeddedInstaller) (*Installer, error) {
 }
 
 // Install performs installation of program in a specific version.
-func (i *Installer) Install(ctx context.Context, programName, version, installDir string) error {
+func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
 	// tar installer uses Dir of installDir to determine location of unpack
-	tempDir, err := ioutil.TempDir(os.TempDir(), "elastic-agent-install")
+	tempDir, err := ioutil.TempDir(paths.TempDir(), "elastic-agent-install")
 	if err != nil {
 		return err
 	}
@@ -46,7 +49,7 @@ func (i *Installer) Install(ctx context.Context, programName, version, installDi
 		os.RemoveAll(tempInstallDir)
 	}
 
-	if err := i.installer.Install(ctx, programName, version, tempInstallDir); err != nil {
+	if err := i.installer.Install(ctx, spec, version, tempInstallDir); err != nil {
 		// cleanup unfinished install
 		os.RemoveAll(tempInstallDir)
 		return err

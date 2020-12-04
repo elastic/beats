@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
@@ -26,10 +27,17 @@ import (
 )
 
 const (
-	agentName         = "elastic-agent"
-	hashLen           = 6
-	agentCommitFile   = ".elastic-agent.active.commit"
-	agentArtifactName = "beats/" + agentName
+	agentName       = "elastic-agent"
+	hashLen         = 6
+	agentCommitFile = ".elastic-agent.active.commit"
+)
+
+var (
+	agentSpec = program.Spec{
+		Name:     "Elastic Agent",
+		Cmd:      agentName,
+		Artifact: "beats/" + agentName,
+	}
 )
 
 // Upgrader performs an upgrade
@@ -183,9 +191,6 @@ func (u *Upgrader) Ack(ctx context.Context) error {
 }
 
 func (u *Upgrader) sourceURI(version, retrievedURI string) (string, error) {
-	if strings.HasSuffix(version, "-SNAPSHOT") && retrievedURI == "" {
-		return "", errors.New("snapshot upgrade requires source uri", errors.TypeConfig)
-	}
 	if retrievedURI != "" {
 		return retrievedURI, nil
 	}

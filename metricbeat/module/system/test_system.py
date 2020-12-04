@@ -36,10 +36,10 @@ SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "ir
                                                "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
-                        "write.bytes", "read.time", "write.time", "io.time"]
+                        "write.bytes", "read.time", "write.time"]
 
 SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
-                              "write.bytes", "read.time", "write.time", "io.time",
+                              "write.bytes", "read.time", "write.time", "io.time", "io.ops",
                               "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
                               "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
 
@@ -458,7 +458,7 @@ class Test(metricbeat.BaseTest):
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
-        self.assertTrue(found_cmdline, "cmdline not found in any process events")
+            self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -544,6 +544,7 @@ class Test(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
+        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["user.name"])
