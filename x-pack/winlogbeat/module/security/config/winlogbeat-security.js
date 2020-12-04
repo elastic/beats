@@ -1519,11 +1519,13 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            if (/.@*/.test(user)) {
-                user = user.split('@')[0];
-                evt.Put('user.name', user);
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.name', user);
+                }
+                evt.AppendTo('related.user', user);
             }
-            evt.AppendTo('related.user', user);
         })
         .Build();
 
