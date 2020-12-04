@@ -30,10 +30,12 @@ import (
 )
 
 type managedInput struct {
-	manager      *InputManager
-	prospector   Prospector
-	harvester    Harvester
-	cleanTimeout time.Duration
+	userID           string
+	manager          *InputManager
+	sourceIdentifier *sourceIdentifier
+	prospector       Prospector
+	harvester        Harvester
+	cleanTimeout     time.Duration
 }
 
 // Name is required to implement the v2.Input interface
@@ -49,33 +51,29 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+	groupStore := inp.manager.getRetainedStore()
+	defer groupStore.Release()
+
 	// Setup cancellation using a custom cancel context. All workers will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	store := inp.manager.store
-	store.Retain()
-	defer store.Release()
-
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      make(map[string]context.CancelFunc),
-		manager:      inp.manager,
+		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
-		store:        store,
+		store:        groupStore,
 		tg:           unison.TaskGroup{},
 	}
 
-	stateStore, err := inp.manager.StateStore.Access()
-	if err != nil {
-		return err
-	}
-	defer stateStore.Close()
+	prospectorStore := inp.manager.getRetainedStore()
+	defer prospectorStore.Release()
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
 
-	inp.prospector.Run(ctx, stateStore, hg)
+	inp.prospector.Run(ctx, sourceStore, hg)
 
 	return nil
 }

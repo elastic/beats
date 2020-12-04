@@ -37,7 +37,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-f5>>
 * <<exported-fields-fortinet>>
-* <<exported-fields-googlecloud>>
+* <<exported-fields-gcp>>
 * <<exported-fields-gsuite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -3052,6 +3052,153 @@ ip Address
 
 
 type: keyword
+
+--
+
+[float]
+=== platformlogs
+
+Fields for Azure platform logs.
+
+
+
+*`azure.platformlogs.operation_name`*::
++
+--
+Operation name
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.result_type`*::
++
+--
+Result type
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.result_signature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.category`*::
++
+--
+Category
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.event_category`*::
++
+--
+Event Category
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.status`*::
++
+--
+Status
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.ccpNamespace`*::
++
+--
+ccpNamespace
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Cloud`*::
++
+--
+Cloud
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Environment`*::
++
+--
+Environment
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.EventTimeString`*::
++
+--
+EventTimeString
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.Caller`*::
++
+--
+Caller
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.ScaleUnit`*::
++
+--
+ScaleUnit
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.ActivityId`*::
++
+--
+ActivityId
+
+
+type: keyword
+
+--
+
+*`azure.platformlogs.properties.*`*::
++
+--
+Properties
+
+
+type: object
 
 --
 
@@ -68452,8 +68599,8 @@ type: integer
 
 --
 
-[[exported-fields-googlecloud]]
-== Google Cloud fields
+[[exported-fields-gcp]]
+== Google Cloud Platform (GCP) fields
 
 Module for handling logs from Google Cloud.
 

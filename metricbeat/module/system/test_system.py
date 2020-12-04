@@ -39,7 +39,7 @@ SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time"]
 
 SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
-                              "write.bytes", "read.time", "write.time", "io.time",
+                              "write.bytes", "read.time", "write.time", "io.time", "io.ops",
                               "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
                               "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
 

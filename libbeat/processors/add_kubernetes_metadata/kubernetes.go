@@ -220,13 +220,17 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
 		// be populated before trying to generate metadata for Pods.
-		if err := nodeWatcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
-			return
+		if nodeWatcher != nil {
+			if err := nodeWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+				return
+			}
 		}
-		if err := namespaceWatcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
-			return
+		if namespaceWatcher != nil {
+			if err := namespaceWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				return
+			}
 		}
 		if err := watcher.Start(); err != nil {
 			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
