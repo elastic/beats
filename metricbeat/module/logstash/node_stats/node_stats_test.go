@@ -58,7 +58,7 @@ func TestGetServiceURI(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			newURI, err := getServiceURI(nodeStatsPath, test.xpackEnabled, test.graphAPIsAvailable)
+			newURI, err := getServiceURI(nodeStatsPath, test.graphAPIsAvailable)
 			if test.errExpected {
 				require.Equal(t, "", newURI)
 			} else {
@@ -77,7 +77,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 
 		numCalls := 2 + (r % 10) // between 2 and 11
 		for i := uint(0); i < numCalls; i++ {
-			uri, err = getServiceURI(uri, true, func() error { return nil })
+			uri, err = getServiceURI(uri, func() error { return nil })
 			if err != nil {
 				return false
 			}

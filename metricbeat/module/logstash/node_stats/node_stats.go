@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) updateServiceURI() error {
-	u, err := getServiceURI(m.GetURI(), m.XPack, m.CheckPipelineGraphAPIsAvailable)
+	u, err := getServiceURI(m.GetURI(), m.CheckPipelineGraphAPIsAvailable)
 	if err != nil {
 		return err
 	}
@@ -95,12 +95,7 @@ func (m *MetricSet) updateServiceURI() error {
 
 }
 
-func getServiceURI(currURI string, xpackEnabled bool, graphAPIsAvailable func() error) (string, error) {
-	if !xpackEnabled {
-		// No need to request pipeline vertices from service API
-		return currURI, nil
-	}
-
+func getServiceURI(currURI string, graphAPIsAvailable func() error) (string, error) {
 	if err := graphAPIsAvailable(); err != nil {
 		return "", err
 	}
