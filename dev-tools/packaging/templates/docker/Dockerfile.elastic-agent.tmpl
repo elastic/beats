@@ -66,6 +66,17 @@ LABEL \
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
 
+# Add an init process, check the checksum to make sure it's a match
+RUN set -e ; \
+  TINI_VERSION='v0.19.0' ; \
+  TINI_BIN='tini-amd64' ; \
+  curl --retry 8 -S -L -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BIN}" ; \
+  curl --retry 8 -S -L -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BIN}.sha256sum" ; \
+  sha256sum -c "${TINI_BIN}.sha256sum" ; \
+  rm "${TINI_BIN}.sha256sum" ; \
+  mv "${TINI_BIN}" /bin/tini ; \
+  chmod +x /bin/tini
+
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
 
@@ -90,4 +101,5 @@ EXPOSE {{ $port }}
 {{- end }}
 
 WORKDIR {{ $beatHome }}
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
+CMD ["-environment", "container"]
