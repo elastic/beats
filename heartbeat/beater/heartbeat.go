@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -54,7 +55,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
-
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
 	if locationName == "" {
@@ -137,8 +137,13 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
+			if err == stdfields.ErrPluginDisabled {
+				continue // don't stop loading monitors just because they're disabled
+			}
+
 			return errors.Wrap(err, "could not create monitor")
 		}
+
 		created.Start()
 	}
 	return nil

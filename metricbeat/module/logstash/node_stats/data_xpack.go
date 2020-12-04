@@ -219,20 +219,20 @@ func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID st
 	}
 
 	for _, pipeline := range pipelines {
-		var clusterUUIDs []string
+		clusterUUIDs := common.StringSet{}
 		for _, vertex := range pipeline.Vertices {
 			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
 			if clusterUUID != "" {
-				clusterUUIDs = append(clusterUUIDs, clusterUUID)
+				clusterUUIDs.Add(clusterUUID)
 			}
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one
 		if len(clusterUUIDs) == 0 {
-			clusterUUIDs = []string{""}
+			clusterUUIDs.Add("")
 		}
 
-		for _, clusterUUID := range clusterUUIDs {
+		for clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
 				clusterToPipelinesMap[clusterUUID] = []PipelineStats{}

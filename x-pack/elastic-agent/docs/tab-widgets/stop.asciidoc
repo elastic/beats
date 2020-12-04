@@ -8,7 +8,7 @@ Use `systemctl` to stop the agent:
 
 [source,shell]
 ----
-systemctl stop elastic-agent
+sudo systemctl stop elastic-agent
 ----
 
 Otherwise, use:
@@ -33,34 +33,28 @@ include::stop.asciidoc[tag=stop-command]
 // end::rpm[]
 
 // tag::mac[]
-// tag::kill-process[]
-Get the process ID (PID) of the `elastic-agent` process:
 
 [source,shell]
 ----
-ps | grep elastic-agent
+sudo launchctl unload /Library/LaunchDaemons/co.elastic.elastic-agent.plist
 ----
 
-Then kill the process, replacing the PID in this example with the PID from
-the grep command:
+NOTE: {agent} will restart automatically if the system is rebooted.
 
-[source,shell]
-----
-kill -9 90682
-----
-
-NOTE: {agent} will NOT restart automatically if the system is rebooted.
-
-// end::kill-process[]
 // end::mac[]
 
 // tag::linux[]
-include::stop.asciidoc[tag=kill-process]
+[source,shell]
+----
+sudo service elastic-agent stop
+----
+
+NOTE: {agent} will restart automatically if the system is rebooted.
+
 // end::linux[]
 
 // tag::win[]
 
-If you installed {agent} as a service, stop the service. 
 [source,shell]
 ----
 Stop-Service elastic-agent

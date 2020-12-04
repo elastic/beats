@@ -4,8 +4,10 @@
 
 beta[]
 
+== Uninstall on macOS, Linux, and Windows
+
 To uninstall {agent}, run the `uninstall` command from the directory where
-{agent} is running. Not sure where the agent is running? See
+{agent} is running. Not sure where the agent is running? See 
 <<installation-layout>>.
 
 --
@@ -17,7 +19,18 @@ Follow the prompts to confirm that you want to uninstall {agent}. The command
 stops and uninstalls any managed programs, such as {beats} and
 {elastic-endpoint}, before it stops and uninstalls {agent}.
 
-If you run into problems, see <<ingest-management-troubleshooting>>.
+If you run into problems, see <<fleet-troubleshooting>>.
+
+== Uninstall on DEB or RPM
+
+The `uninstall` command is not supported for DEB or RPM installations. To
+uninstall {agent} on DEB or RPM:
+
+. If the agent is managed by {fleet}, <<unenroll-elastic-agent,unenroll the agent>>.
+. On your host, <<stop-elastic-agent,stop the agent>>.
+. Manually remove the agent files from your system.
+
+//TODO: Confirm this procedure.
 
 // Add Javascript and CSS for tabbed panels
 include::tab-widgets/code.asciidoc[]
