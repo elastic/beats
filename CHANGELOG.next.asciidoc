@@ -107,7 +107,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - Fix metrics hints builder to avoid wrong container metadata usage when port is not exposed {pull}18979[18979]
 - Server-side TLS config now validates certificate and key are both specified {pull}19584[19584]
-- Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 
 *Auditbeat*
 
@@ -117,10 +116,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
-- system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
-- system/socket: Fixed startup error with some 5.x kernels. {issue}18755[18755] {pull}22787[22787]
-- system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 
 *Filebeat*
 
@@ -156,10 +151,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing `default_field: false` to aws filesets fields.yml. {pull}19568[19568]
 - Fix bug with empty filter values in system/service {pull}19812[19812]
 - Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
-- Fix auditd module syscall table for ppc64 and ppc64le. {pull}20052[20052]
-- Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
 - Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
-- Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
 - Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
 - Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
 - Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
@@ -168,25 +160,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
-- Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
-- Fix long registry migration times. {pull}20717[20717] {issue}20705[20705]
-- Fix event types and categories in auditd module to comply with ECS {pull}20652[20652]
-- Update documentation in the azure module filebeat. {pull}20815[20815]
-- Remove wrongly mapped `tls.client.server_name` from `fortinet/firewall` fileset. {pull}20983[20983]
-- Fix an error updating file size being logged when EOF is reached. {pull}21048[21048]
-- Fix error when processing AWS Cloudtrail Digest logs. {pull}21086[21086] {issue}20943[20943]
-- Provide backwards compatibility for the `set` processor when Elasticsearch is less than 7.9.0. {pull}20908[20908]
-- Handle multiple upstreams in ingress-controller. {pull}21215[21215]
-- Provide backwards compatibility for the `append` processor when Elasticsearch is less than 7.10.0. {pull}21159[21159]
-- Fix checkpoint module when logs contain time field. {pull}20567[20567]
-- Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
-- Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
-- Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
-- Fix missing variable when loading aws pipelines. {pull}22645[22645]
-- Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
-- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 
 *Heartbeat*
 
@@ -196,8 +171,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
-- Fix exit on monitors with `enabled: false` {pull}22829[22829]
 
 *Journalbeat*
 
@@ -248,33 +221,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
-- Updates vm_compute metricset with more info on guest metrics. {pull}20448[20448]
-- Add fallback for PdhExpandWildCardPathW failing in perfmon metricset. {issue}20139[20139] {pull}20630[20630]
-- Fix resource tags in aws cloudwatch metricset {issue}20326[20326]  {pull}20385[20385]
 - Add support for azure light metricset app_stats. {pull}20639[20639]
-- Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
-- Fill cloud.account.name with accountID if account alias doesn't exist. {pull}20736[20736]
-- Fix ec2 disk and network metrics to use Sum statistic method. {pull}20680[20680]
-- The Kibana collector applies backoff when errored at getting usage stats {pull}20772[20772]
-- Update fields.yml in the azure module, missing metrics field. {pull}20918[20918]
-- The `elasticsearch/index` metricset only requests wildcard expansion for hidden indices if the monitored Elasticsearch cluster supports it. {pull}20938[20938]
-- Disable Kafka metricsets based on Jolokia by default. They require a different configuration. {pull}20989[20989]
-- Fix panic index out of range error when getting AWS account name. {pull}21101[21101] {issue}21095[21095]
-- Handle missing counters in the application_pool metricset. {pull}21071[21071]
-- Fix timestamp handling in remote_write. {pull}21166[21166]
 - Fix remote_write flaky test. {pull}21173[21173]
-- Visualization title fixes in aws, azure and googlecloud compute dashboards. {pull}21098[21098]
-- Fix retrieving resources by ID for the azure module. {pull}21711[21711] {issue}21707[21707]
-- Use timestamp from CloudWatch API when creating events. {pull}21498[21498]
-- Report the correct windows events for system/filesystem {pull}21758[21758]
-- Fix regular expression in windows/permfon. {pull}22146[22146] {issue}21125[21125]
-- Fix azure storage event format. {pull}21845[21845]
-- Fix panic in kubernetes autodiscover related to keystores {issue}21843[21843] {pull}21880[21880]
-- [Kubernetes] Remove redundant dockersock volume mount {pull}22009[22009]
-- Revert change to report `process.memory.rss` as `process.memory.wss` on Windows. {pull}22055[22055]
 - Remove io.time from windows {pull}22237[22237]
-- Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
-- Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 
 *Packetbeat*
 
@@ -313,30 +262,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
-- Add minimum cache TTL for successful DNS responses. {pull}18986[18986]
-- Add support for DNS over TLS for the `dns` processor. {pull}19321[19321]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
-- Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
-- Add container ECS fields in kubernetes metadata. {pull}20984[20984]
-- Add ingress controller dashboards. {pull}21052[21052]
-- Added experimental `citrix` module. {pull}20820[20820]
-- Added experimental `cyberark` module. {pull}20820[20820]
-- Added experimental `proofpoint` module. {pull}20820[20820]
-- Added experimental `snort` module. {pull}20820[20820]
-- Added experimental `symantec` module. {pull}20820[20820]
-- Added experimental dataset `barracuda/spamfirewall`. {pull}20820[20820]
-- Added experimental dataset `cisco/meraki`. {pull}20820[20820]
-- Added experimental dataset `f5/bigipafm`. {pull}20820[20820]
-- Added experimental dataset `fortinet/fortimail`. {pull}20820[20820]
-- Added experimental dataset `fortinet/fortimanager`. {pull}20820[20820]
-- Added experimental dataset `juniper/netscreen`. {pull}20820[20820]
-- Added experimental dataset `sophos/utm`. {pull}20820[20820]
-- Add Cloud Foundry tags in related events. {pull}21177[21177]
-- Cloud Foundry metadata is cached to disk. {pull}20775[20775]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
-- Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
 
 *Auditbeat*
 
@@ -413,7 +342,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental dataset sonicwall/firewall for Sonicwall Firewalls logs {pull}19713[19713]
 - Add experimental dataset squid/log for Squid Proxy Server logs {pull}19713[19713]
 - Add experimental dataset zscaler/zia for Zscaler Internet Access logs {pull}19713[19713]
-- Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 
 *Heartbeat*
 
@@ -473,10 +401,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Add monitoring info about triggered functions. {pull}14876[14876]
-- Add Google Cloud Platform support. {pull}13598[13598]
-- Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
-- Add support for parallelization factor for kinesis. {pull}20727[20727]
 
 *Winlogbeat*
 
@@ -510,6 +434,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
 
 
 
