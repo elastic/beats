@@ -17,7 +17,7 @@
 
 // +build linux freebsd,cgo
 
-package instance
+package metrics
 
 import (
 	"fmt"

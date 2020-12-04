@@ -14,9 +14,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 )
 
 const (
@@ -328,13 +328,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 	}
 
 	fixedAgentName := strings.ReplaceAll(agentName, "-", "_")
-	// setup cpu, memory and fd monitors for agents
 	modules = append(modules, map[string]interface{}{
-		"module":     "system",
+		"module":     "http",
+		"metricsets": []string{"json"},
+		"namespace":  "agent",
 		"period":     "10s",
-		"metricsets": []string{"process"},
+		"path":       "/stats",
+		"hosts":      []string{beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS())},
 		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
-		"processes":  []string{install.BinaryName},
 		"processors": []map[string]interface{}{
 			{
 				"add_fields": map[string]interface{}{
@@ -365,20 +366,17 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 				},
 			},
 			{
-				"drop_event": map[string]interface{}{
-					"when": map[string]interface{}{
-						"not": map[string]interface{}{
-							"equals": map[string]interface{}{
-								"process.name": install.BinaryName,
-							},
+				"rename": map[string]interface{}{
+					"fields": []map[string]interface{}{
+						{
+							"from": "http.agent.beat",
+							"to":   "elastic-agent",
+						},
+						{
+							"from": "http.agent.system",
+							"to":   "elastic-agent.system",
 						},
 					},
-				},
-			},
-			{
-				// maps to keyword incorrectly, TODO: fix later, not that important field for our use-case
-				"drop_fields": map[string]interface{}{
-					"fields":         []string{"system.process.cpu.start_time"},
 					"ignore_missing": true,
 				},
 			},
