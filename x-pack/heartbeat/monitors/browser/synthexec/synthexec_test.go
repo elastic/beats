@@ -5,7 +5,14 @@
 package synthexec
 
 import (
+	"context"
+	"fmt"
+	"os/exec"
+	"path"
+	"path/filepath"
+	"runtime"
 	"testing"
+	"time"
 
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/require"
@@ -83,6 +90,67 @@ func TestJsonToSynthEvent(t *testing.T) {
 			if diff := deep.Equal(gotRes, tt.synthEvent); diff != nil {
 				t.Error(diff)
 			}
+		})
+	}
+}
+
+func TestRunCmd(t *testing.T) {
+	cmd := exec.Command("go", "run", "./main.go")
+	_, filename, _, _ := runtime.Caller(0)
+	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+
+	stdinStr := "MY_STDIN"
+
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil)
+	require.NoError(t, err)
+
+	var synthEvents []*SynthEvent
+	timeout := time.NewTimer(time.Minute)
+Loop:
+	for {
+		select {
+		case se := <-mpx.SynthEvents():
+			if se == nil {
+				break Loop
+			}
+			synthEvents = append(synthEvents, se)
+		case <-timeout.C:
+			require.Fail(t, "timeout expired for testing runCmd!")
+		}
+	}
+
+	eventsWithType := func(typ string) (matched []*SynthEvent) {
+		for _, se := range synthEvents {
+			if se.Type == typ {
+				matched = append(matched, se)
+			}
+		}
+		return
+	}
+
+	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
+		stdoutEvents := eventsWithType("stdout")
+		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
+	})
+	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
+		stdoutEvents := eventsWithType("stderr")
+		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
+		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
+	})
+	t.Run("should have one event per line in sampleinput", func(t *testing.T) {
+		// 27 lines are in sample.ndjson + 2 from stderr + 1 from stdout
+		expected := 27 + 2 + 1
+		require.Len(t, synthEvents, expected)
+	})
+
+	expectedEventTypes := []string{
+		"journey/start",
+		"step/end",
+		"journey/end",
+	}
+	for _, typ := range expectedEventTypes {
+		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {
+			require.GreaterOrEqual(t, len(eventsWithType(typ)), 1)
 		})
 	}
 }
