@@ -17,7 +17,7 @@
         "command_line": "/sbin/init splash",
         "cpu": {
             "pct": 0,
-            "start_time": "2020-12-03T21:01:50.000Z"
+            "start_time": "2020-12-04T22:17:35.000Z"
         },
         "memory": {
             "pct": 0.0004
@@ -35,22 +35,22 @@
         "process": {
             "cmdline": "/sbin/init splash",
             "cpu": {
-                "start_time": "2020-12-03T21:01:50.000Z",
+                "start_time": "2020-12-04T22:17:35.000Z",
                 "total": {
                     "norm": {
                         "pct": 0
                     },
                     "pct": 0,
-                    "value": 4220
+                    "value": 1290
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 12042240,
+                    "bytes": 12173312,
                     "pct": 0.0004
                 },
-                "share": 8523776,
-                "size": 172105728
+                "share": 8679424,
+                "size": 172113920
             },
             "state": "sleeping"
         }
