@@ -151,6 +151,10 @@ func TestEmitEvent_Node(t *testing.T) {
 							Type:    v1.NodeInternalIP,
 							Address: "1.2.3.4",
 						},
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
 					},
 				},
 			},
@@ -161,16 +165,18 @@ func TestEmitEvent_Node(t *testing.T) {
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
-						"name": "metricbeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
 						"node": common.MapStr{
-							"name": "metricbeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},
@@ -204,7 +210,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				},
 				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
-					Addresses: []v1.NodeAddress{},
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
 					Conditions: []v1.NodeCondition{
 						{
 							Type:   v1.NodeReady,
@@ -220,16 +226,18 @@ func TestEmitEvent_Node(t *testing.T) {
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
-						"name": "metricbeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
 						"node": common.MapStr{
-							"name": "metricbeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},

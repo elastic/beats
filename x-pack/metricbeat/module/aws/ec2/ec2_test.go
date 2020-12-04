@@ -11,8 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -20,7 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 // MockEC2Client struct is used for unit tests.
@@ -32,22 +32,23 @@ var (
 	regionName = "us-west-1"
 	instanceID = "i-123"
 	namespace  = "AWS/EC2"
+	statistic  = "Average"
 
 	id1         = "cpu1"
 	metricName1 = "CPUUtilization"
-	label1      = instanceID + labelSeparator + metricName1
+	label1      = newLabel(instanceID, metricName1, statistic).JSON()
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = instanceID + labelSeparator + metricName2
+	label2      = newLabel(instanceID, metricName2, statistic).JSON()
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = instanceID + labelSeparator + metricName3
+	label3      = newLabel(instanceID, metricName3, statistic).JSON()
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = instanceID + labelSeparator + metricName4
+	label4      = newLabel(instanceID, metricName4, statistic).JSON()
 )
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
@@ -81,6 +82,10 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 		{
 			Key:   awssdk.String("helm.sh/chart"),
 			Value: awssdk.String("foo-chart"),
+		},
+		{
+			Key:   awssdk.String("Name"),
+			Value: awssdk.String("test-instance"),
 		},
 	}
 
@@ -144,9 +149,14 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu":  common.MapStr{"pct": 0.0025},
+				"id":   "i-123",
+				"name": "test-instance",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -171,6 +181,7 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
@@ -211,7 +222,9 @@ func TestCreateCloudWatchEventsDedotTags(t *testing.T) {
 
 	metricSet := MetricSet{
 		&aws.MetricSet{},
+		logp.NewLogger("test"),
 	}
+
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
@@ -227,9 +240,14 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
-				"instance":          common.MapStr{"id": "i-123"},
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu":  common.MapStr{"pct": 0.0025},
+				"id":   "i-123",
+				"name": "test-instance",
 			},
 		},
 		MetricSetFields: common.MapStr{
@@ -254,6 +272,7 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 			"tags": common.MapStr{
 				"app_kubernetes_io/name": "foo",
 				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
 			},
 		},
 	}
@@ -300,6 +319,7 @@ func TestCreateCloudWatchEventsWithTagsFilter(t *testing.T) {
 				Value: "foo",
 			}},
 		},
+		logp.NewLogger("test"),
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 
@@ -354,6 +374,7 @@ func TestCreateCloudWatchEventsWithNotMatchingTagsFilter(t *testing.T) {
 				Value: "not_foo",
 			}},
 		},
+		logp.NewLogger("test"),
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
@@ -375,8 +396,8 @@ func TestConstructMetricQueries(t *testing.T) {
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
 	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 5*time.Minute)
-	assert.Equal(t, 1, len(metricDataQuery))
-	assert.Equal(t, "i-123|CPUUtilization", *metricDataQuery[0].Label)
+	assert.Equal(t, 2, len(metricDataQuery))
+	assert.Equal(t, "{\"InstanceID\":\"i-123\",\"MetricName\":\"CPUUtilization\",\"Statistic\":\"Average\"}", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
 	assert.Equal(t, metricName1, *metricDataQuery[0].MetricStat.Metric.MetricName)
 	assert.Equal(t, namespace, *metricDataQuery[0].MetricStat.Metric.Namespace)
@@ -454,4 +475,81 @@ func TestCalculateRate(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, c.rateMetricValueDetailed, output)
 	}
+}
+
+func TestCreateCloudWatchEventsWithInstanceName(t *testing.T) {
+	expectedEvent := mb.Event{
+		RootFields: common.MapStr{
+			"cloud": common.MapStr{
+				"region":            regionName,
+				"provider":          "aws",
+				"instance":          common.MapStr{"id": "i-123", "name": "test-instance"},
+				"machine":           common.MapStr{"type": "t2.medium"},
+				"availability_zone": "us-west-1a",
+			},
+			"host": common.MapStr{
+				"cpu": common.MapStr{"pct": 0.25},
+				"id":  "i-123",
+			},
+		},
+		MetricSetFields: common.MapStr{
+			"tags": common.MapStr{
+				"app_kubernetes_io/name": "foo",
+				"helm_sh/chart":          "foo-chart",
+				"Name":                   "test-instance",
+			},
+		},
+	}
+	svcEC2Mock := &MockEC2Client{}
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(instanceIDs))
+	instanceID := instanceIDs[0]
+	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
+
+	getMetricDataOutput := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
+		},
+	}
+
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+		logp.NewLogger("test"),
+	}
+
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(events))
+
+	assert.Equal(t, expectedEvent.MetricSetFields["tags"], events[instanceID].ModuleFields["tags"])
+
+	hostID, err := events[instanceID].RootFields.GetValue("host.id")
+	assert.NoError(t, err)
+	assert.Equal(t, "i-123", hostID)
+
+	instanceName, err := events[instanceID].RootFields.GetValue("cloud.instance.name")
+	assert.NoError(t, err)
+	assert.Equal(t, "test-instance", instanceName)
+}
+
+func TestNewLabel(t *testing.T) {
+	instanceID := "i-123"
+	metricName := "CPUUtilization"
+	statistic := "Average"
+	label := newLabel(instanceID, metricName, statistic).JSON()
+	assert.Equal(t, "{\"InstanceID\":\"i-123\",\"MetricName\":\"CPUUtilization\",\"Statistic\":\"Average\"}", label)
+}
+
+func TestConvertLabel(t *testing.T) {
+	labelStr := "{\"InstanceID\":\"i-123\",\"MetricName\":\"CPUUtilization\",\"Statistic\":\"Average\"}"
+	label, err := newLabelFromJSON(labelStr)
+	assert.NoError(t, err)
+	assert.Equal(t, "i-123", label.InstanceID)
+	assert.Equal(t, "CPUUtilization", label.MetricName)
+	assert.Equal(t, "Average", label.Statistic)
 }

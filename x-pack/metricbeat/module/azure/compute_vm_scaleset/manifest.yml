@@ -1,0 +1,72 @@
+default: false
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.Compute/virtualMachineScaleSets"
+    add_cloud_metadata: true
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.Compute/virtualMachineScaleSets"
+      metrics:
+      - name: ["CPU Credits Remaining", "CPU Credits Consumed", "OS Per Disk Read Bytes/sec", "OS Per Disk Write Bytes/sec", "OS Per Disk Read Operations/Sec", "OS Per Disk Write Operations/Sec", "OS Per Disk QD"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        timegrain: "PT5M"
+        ignore_unsupported: true
+      - name: ["Per Disk Read Bytes/sec", "Per Disk Write Bytes/sec", "Per Disk Read Operations/Sec", "Per Disk Write Operations/Sec", "Per Disk QD"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+          - name: "SlotId"
+            value: "*"
+      - name: ["Network In", "Percentage CPU", "Network Out", "Disk Read Bytes", "Disk Write Bytes", "Disk Read Operations/Sec", "Disk Write Operations/Sec", "Data Disk Read Bytes/sec", "Data Disk Write Bytes/sec", "Network Out Total",
+      "Network In Total", "VM Uncached IOPS Consumed Percentange", "VM Uncached Bandwidth Consumed Percentange", "VM Cached IOPS Consumed Percentange", "VM Cached Bandwidth Consumed Percentange", "Premium OS Disk Cache Read Miss",
+      "Premium OS Disk Cache Read Hit", "Premium Data Disk Cache Read Miss", "Data Disk Read Operations/Sec", "Data Disk Write Operations/Sec", "Data Disk Queue Depth", "Data Disk Bandwidth Consumed Percentage",
+      "Premium Data Disk Cache Read Hit", "Outbound Flows Maximum Creation Rate", "Inbound Flows Maximum Creation Rate", "Outbound Flows", "Inbound Flows", "OS Disk IOPS Consumed Percentage", "OS Disk Bandwidth Consumed Percentage",
+      "OS Disk Queue Depth", "OS Disk Write Operations/Sec", "OS Disk Read Operations/Sec", "OS Disk Write Bytes/sec", "OS Disk Read Bytes/sec", "Data Disk IOPS Consumed Percentage"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+          - name: "VMName"
+            value: "*"
+      - name: ["Memory\\Commit Limit", "Memory\\Committed Bytes", "Memory\\% Committed Bytes In Use", "Memory\\Available Bytes"]
+        namespace: "Azure.VM.Windows.GuestMetrics"
+        timegrain: "PT5M"
+        dimensions:
+          - name: "VirtualMachine"
+            value: "*"
+        ignore_unsupported: true
+    - resource_id: ""
+      timegrain: "PT5M"
+      metrics:
+      - name: ["CPU Credits Remaining", "CPU Credits Consumed", "OS Per Disk Read Bytes/sec", "OS Per Disk Write Bytes/sec", "OS Per Disk Read Operations/Sec", "OS Per Disk Write Operations/Sec", "OS Per Disk QD"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+      - name: ["Per Disk Read Bytes/sec", "Per Disk Write Bytes/sec", "Per Disk Read Operations/Sec", "Per Disk Write Operations/Sec", "Per Disk QD"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+          - name: "SlotId"
+            value: "*"
+      - name: ["Network In", "Percentage CPU", "Network Out", "Disk Read Bytes", "Disk Write Bytes", "Disk Read Operations/Sec", "Disk Write Operations/Sec", "Data Disk Read Bytes/sec", "Data Disk Write Bytes/sec", "Network Out Total",
+                 "Network In Total", "VM Uncached IOPS Consumed Percentange", "VM Uncached Bandwidth Consumed Percentange", "VM Cached IOPS Consumed Percentange", "VM Cached Bandwidth Consumed Percentange", "Premium OS Disk Cache Read Miss",
+                 "Premium OS Disk Cache Read Hit", "Premium Data Disk Cache Read Miss", "Data Disk Read Operations/Sec", "Data Disk Write Operations/Sec", "Data Disk Queue Depth", "Data Disk Bandwidth Consumed Percentage",
+                 "Premium Data Disk Cache Read Hit", "Outbound Flows Maximum Creation Rate", "Inbound Flows Maximum Creation Rate", "Outbound Flows", "Inbound Flows", "OS Disk IOPS Consumed Percentage", "OS Disk Bandwidth Consumed Percentage",
+                 "OS Disk Queue Depth", "OS Disk Write Operations/Sec", "OS Disk Read Operations/Sec", "OS Disk Write Bytes/sec", "OS Disk Read Bytes/sec", "Data Disk IOPS Consumed Percentage"]
+        namespace: "Microsoft.Compute/virtualMachineScaleSets"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+          - name: "VMName"
+            value: "*"
+      - name: ["Memory\\Commit Limit", "Memory\\Committed Bytes", "Memory\\% Committed Bytes In Use", "Memory\\Available Bytes"]
+        namespace: "Azure.VM.Windows.GuestMetrics"
+        timegrain: "PT5M"
+        dimensions:
+          - name: "VirtualMachine"
+            value: "*"
+        ignore_unsupported: true

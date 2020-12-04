@@ -213,7 +213,6 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
 			return &fleetapi.CheckinResponse{
 				Actions: []fleetapi.Action{&fleetapi.ActionUnenroll{ActionID: "", ActionType: "UNENROLL", IsDetected: true}},
-				Success: true,
 			}, nil
 		}
 
@@ -253,4 +252,8 @@ func (f *fleetGateway) stop() {
 	defer f.scheduler.Stop()
 	close(f.done)
 	f.wg.Wait()
+}
+
+func (f *fleetGateway) SetClient(client clienter) {
+	f.client = client
 }

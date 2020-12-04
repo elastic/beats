@@ -15,6 +15,12 @@ metricbeat:
         target: "event"
         fields:
           dataset: docker.status
+    - add_fields:
+        target: "elastic_agent"
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
   - module: docker
     metricsets: [info]
     index: metrics-generic-default
@@ -30,6 +36,12 @@ metricbeat:
         target: "event"
         fields:
           dataset: generic
+    - add_fields:
+        target: "elastic_agent"
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
@@ -48,7 +60,12 @@ metricbeat:
           target: "event"
           fields:
             dataset: generic
-
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]

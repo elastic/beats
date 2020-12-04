@@ -1,0 +1,396 @@
+{
+    "security": {
+        "available": true,
+        "enabled": false
+    },
+    "monitoring": {
+        "available": true,
+        "enabled": true,
+        "collection_enabled": false,
+        "enabled_exporters": {
+            "local": 1
+        }
+    },
+    "watcher": {
+        "available": false,
+        "enabled": true,
+        "execution": {
+            "actions": {
+                "_all": {
+                    "total": 0,
+                    "total_time_in_ms": 0
+                }
+            }
+        },
+        "watch": {
+            "input": {
+                "_all": {
+                    "total": 0,
+                    "active": 0
+                }
+            },
+            "trigger": {
+                "_all": {
+                    "total": 0,
+                    "active": 0
+                }
+            }
+        },
+        "count": {
+            "total": 0,
+            "active": 0
+        }
+    },
+    "graph": {
+        "available": false,
+        "enabled": true
+    },
+    "ml": {
+        "available": false,
+        "enabled": true,
+        "jobs": {
+            "_all": {
+                "count": 0,
+                "detectors": {
+                    "total": 0,
+                    "min": 0,
+                    "avg": 0,
+                    "max": 0
+                },
+                "created_by": {},
+                "model_size": {
+                    "total": 0,
+                    "min": 0,
+                    "avg": 0,
+                    "max": 0
+                },
+                "forecasts": {
+                    "total": 0,
+                    "forecasted_jobs": 0
+                }
+            }
+        },
+        "datafeeds": {
+            "_all": {
+                "count": 0
+            }
+        },
+        "data_frame_analytics_jobs": {
+            "_all": {
+                "count": 0
+            }
+        },
+        "inference": {
+            "ingest_processors": {
+                "_all": {
+                    "num_docs_processed": {
+                        "max": 0,
+                        "sum": 0,
+                        "min": 0
+                    },
+                    "pipelines": {
+                        "count": 0
+                    },
+                    "num_failures": {
+                        "max": 0,
+                        "sum": 0,
+                        "min": 0
+                    },
+                    "time_ms": {
+                        "max": 0,
+                        "sum": 0,
+                        "min": 0
+                    }
+                }
+            },
+            "trained_models": {
+                "_all": {
+                    "count": 0
+                }
+            }
+        },
+        "node_count": 1
+    },
+    "logstash": {
+        "available": false,
+        "enabled": true
+    },
+    "eql": {
+        "available": true,
+        "enabled": true,
+        "features": {
+            "joins": {
+                "join_queries_three": 0,
+                "join_queries_two": 0,
+                "join_until": 0,
+                "join_queries_five_or_more": 0,
+                "join_queries_four": 0
+            },
+            "sequence": 0,
+            "keys": {
+                "join_keys_two": 0,
+                "join_keys_one": 0,
+                "join_keys_three": 0,
+                "join_keys_five_or_more": 0,
+                "join_keys_four": 0
+            },
+            "join": 0,
+            "sequences": {
+                "sequence_queries_three": 0,
+                "sequence_queries_four": 0,
+                "sequence_queries_two": 0,
+                "sequence_until": 0,
+                "sequence_queries_five_or_more": 0,
+                "sequence_maxspan": 0
+            },
+            "event": 0,
+            "pipes": {
+                "pipe_tail": 0,
+                "pipe_head": 0
+            }
+        },
+        "queries": {
+            "all": {
+                "total": 0,
+                "failed": 0
+            },
+            "_all": {
+                "total": 0,
+                "failed": 0
+            }
+        }
+    },
+    "sql": {
+        "available": true,
+        "enabled": true,
+        "features": {
+            "having": 0,
+            "subselect": 0,
+            "limit": 0,
+            "orderby": 0,
+            "where": 0,
+            "join": 0,
+            "groupby": 0,
+            "command": 0,
+            "local": 0
+        },
+        "queries": {
+            "cli": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "rest": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "canvas": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "odbc": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "jdbc": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "odbc32": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "odbc64": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "_all": {
+                "total": 0,
+                "paging": 0,
+                "failed": 0
+            },
+            "translate": {
+                "count": 0
+            }
+        }
+    },
+    "rollup": {
+        "available": true,
+        "enabled": true
+    },
+    "ilm": {
+        "policy_count": 8,
+        "policy_stats": [
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    },
+                    "delete": {
+                        "min_age": 7776000000,
+                        "actions": [
+                            "delete"
+                        ]
+                    }
+                },
+                "indices_managed": 1
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            },
+            {
+                "phases": {
+                    "delete": {
+                        "min_age": 604800000,
+                        "actions": [
+                            "delete"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    },
+                    "delete": {
+                        "min_age": 7776000000,
+                        "actions": [
+                            "delete"
+                        ]
+                    }
+                },
+                "indices_managed": 1
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            },
+            {
+                "phases": {
+                    "hot": {
+                        "min_age": 0,
+                        "actions": [
+                            "rollover"
+                        ]
+                    },
+                    "delete": {
+                        "min_age": 7776000000,
+                        "actions": [
+                            "delete"
+                        ]
+                    }
+                },
+                "indices_managed": 0
+            }
+        ]
+    },
+    "slm": {
+        "available": true,
+        "enabled": true
+    },
+    "ccr": {
+        "available": false,
+        "enabled": true,
+        "follower_indices_count": 0,
+        "auto_follow_patterns_count": 0
+    },
+    "transform": {
+        "available": true,
+        "enabled": true
+    },
+    "vectors": {
+        "available": true,
+        "enabled": true,
+        "dense_vector_fields_count": 0,
+        "dense_vector_dims_avg_count": 0
+    },
+    "voting_only": {
+        "available": true,
+        "enabled": true
+    },
+    "frozen_indices": {
+        "available": true,
+        "enabled": true,
+        "indices_count": 0
+    },
+    "spatial": {
+        "available": true,
+        "enabled": true
+    },
+    "analytics": {
+        "available": true,
+        "enabled": true,
+        "stats": {
+            "boxplot_usage": 0,
+            "cumulative_cardinality_usage": 0,
+            "string_stats_usage": 2,
+            "top_metrics_usage": 0,
+            "t_test_usage": 0,
+            "moving_percentiles_usage": 0,
+            "normalize_usage": 0,
+            "rate_usage": 0
+        }
+    },
+    "data_streams": {
+        "available": true,
+        "enabled": true,
+        "data_streams": 0,
+        "indices_count": 0
+    },
+    "searchable_snapshots": {
+        "available": false,
+        "enabled": true,
+        "indices_count": 0
+    }
+}

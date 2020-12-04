@@ -29,7 +29,7 @@ type config struct {
 func defaultConfig() config {
 	return config{
 		ForwarderConfig: harvester.ForwarderConfig{
-			Type: "awscloudwatch",
+			Type: "aws-cloudwatch",
 		},
 		StartPosition: "beginning",
 		ScanFrequency: 10 * time.Second,

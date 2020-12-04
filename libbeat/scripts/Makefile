@@ -25,7 +25,7 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
-INSTALL_CMD?=get
+INSTALL_CMD?=install
 export INSTALL_FLAG
 export INSTALL_CMD
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
@@ -41,7 +41,7 @@ export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go' 2>/dev/null)
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2>/dev/null)
 GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
-GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
+GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs grep -l '\+build.*stresstest' | xargs -n1 dirname | uniq)
 SHELL=bash
 ES_HOST?=elasticsearch
 ES_PORT?=9200

@@ -232,6 +232,19 @@ Set `max_retries` to a value less than 0 to retry until all events are published
 The default is 3.
 endif::[]
 
+===== `backoff.init`
+
+The number of seconds to wait before trying to republish to Kafka
+after a network error. After waiting `backoff.init` seconds, {beatname_uc}
+tries to republish. If the attempt fails, the backoff timer is increased
+exponentially up to `backoff.max`. After a successful publish, the backoff
+timer is reset. The default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to republish to
+Kafka after a network error. The default is 60s.
+
 ===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Kafka request. The default is 2048.
@@ -261,6 +274,12 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
+[IMPORTANT]
+.Known issue with Azure Event Hub for Kafka
+====
+When targeting Azure Event Hub for Kafka, set `compression` to `none` as the provided codecs are not supported.
+====
+
 ===== `compression_level`
 
 Sets the compression level used by gzip. Setting this value to 0 disables compression.
@@ -288,3 +307,11 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 `-keyalg RSA` argument to ensure it uses a cipher supported by
 https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
 See <<configuration-ssl>> for more information.
+
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.

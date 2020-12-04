@@ -8,11 +8,6 @@ import (
 	"os/user"
 )
 
-// Specifier returns a process specification.
-type Specifier interface {
-	Spec() ProcessSpec
-}
-
 // ProcessSpec specifies a way of running a process
 type ProcessSpec struct {
 	// Binary path.

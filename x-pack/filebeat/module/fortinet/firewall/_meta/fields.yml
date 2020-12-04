@@ -3,6 +3,7 @@
   description: >
     Fields from fortinet FortiOS
   fields:
+
     - name: file.hash.crc32
       type: keyword
       description: >

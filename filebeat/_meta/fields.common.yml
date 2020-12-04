@@ -4,13 +4,6 @@
     Contains log file lines.
   fields:
 
-    - name: log.file.path
-      type: keyword
-      required: false
-      description: >
-        The file from which the line was read. This field contains the absolute path to the file.
-        For example: `/var/log/system.log`.
-
     - name: log.source.address
       type: keyword
       required: false
