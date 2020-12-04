@@ -16,9 +16,7 @@
         ],
         "command_line": "/sbin/init splash",
         "cpu": {
-            "norm": {
-                "pct": 0
-            },
+            "pct": 0,
             "start_time": "2020-12-03T21:01:50.000Z"
         },
         "memory": {

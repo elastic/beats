@@ -148,7 +148,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		rootFields = getAndCopy(proc, "cpu.start_time", rootFields, "process.cpu.start_time")
 
 		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
-		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.norm.pct")
+		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.pct")
 
 		// Duplicate system.process.memory.rss.pct with process.memory.pct
 		rootFields = getAndCopy(proc, "memory.rss.pct", rootFields, "process.memory.pct")
