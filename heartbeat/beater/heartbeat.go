@@ -185,7 +185,7 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 		return nil
 	}
 	for _, suite := range bt.config.SyntheticSuites {
-		logp.Warn("Listing suite", suite.Path)
+		logp.Info("Listing suite %s", suite.Path)
 		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
 		if err != nil {
 			return err
