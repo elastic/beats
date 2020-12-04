@@ -74,6 +74,9 @@ values might change during the lifetime of the file. If this happens
 of the file. To solve this problem you can configure `file_identity` option. Possible
 values besides the default `inode_deviceid` are `path` and `inode_marker`.
 
+WARNING: Changing `file_identity` methods between runs may result in
+duplicated events in the output.
+
 Selecting `path` instructs {beatname_uc} to identify files based on their
 paths. This is a quick way to avoid rereading files if inode and device ids
 might change. However, keep in mind if the files are rotated (renamed), they

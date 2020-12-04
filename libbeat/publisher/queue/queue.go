@@ -27,7 +27,7 @@ import (
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *common.Config) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
