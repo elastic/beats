@@ -9542,13 +9542,7 @@ example: tls
 
 --
 
-[float]
-=== tracing
-
-Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
-
-
-*`tracing.span.id`*::
+*`span.id`*::
 +
 --
 Unique identifier of the span within the scope of its trace.
@@ -9560,7 +9554,7 @@ example: 3ff9a8981b7ccd5a
 
 --
 
-*`tracing.trace.id`*::
+*`trace.id`*::
 +
 --
 Unique identifier of the trace.
@@ -9572,7 +9566,7 @@ example: 4bf92f3577b34da6a3ce929d0e0e4736
 
 --
 
-*`tracing.transaction.id`*::
+*`transaction.id`*::
 +
 --
 Unique identifier of the transaction within the scope of its trace.
@@ -9605,9 +9599,10 @@ example: www.elastic.co
 *`url.extension`*::
 +
 --
-The field contains the file extension from the original request url.
+The field contains the file extension from the original request url, excluding the leading dot.
 The file extension is only set if it exists, as not every url has a file extension.
 The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
