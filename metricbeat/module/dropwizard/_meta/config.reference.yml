@@ -2,6 +2,6 @@
   metricsets: ["collector"]
   period: 10s
   hosts: ["localhost:8080"]
-  metrics_path: /metrics/metrics
+  metrics_path: /test/metrics
   namespace: example
   enabled: true
