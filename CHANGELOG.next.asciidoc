@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
+- Update to ECS 1.7.0. {pull}22571[22571]
 
 *Auditbeat*
 
@@ -98,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
+- Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 
 *Heartbeat*
 
@@ -320,7 +322,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
-- Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
@@ -336,6 +337,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checkpoint module when logs contain time field. {pull}20567[20567]
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
+- Add json body check for sqs message. {pull}21727[21727]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
@@ -351,8 +353,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
-- Fix exit on monitors with `enabled: false` {pull}22829[22829]
 
 *Journalbeat*
 
@@ -450,6 +450,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
 - Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
+- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
+- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
+- Add required option for `metrics` in app_insights. {pull}20406[20406]
+- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
+- Add support for azure light metricset app_stats. {pull}20639[20639]
+- Fix remote_write flaky test. {pull}21173[21173]
+- Remove io.time from windows {pull}22237[22237]
 
 *Packetbeat*
 
@@ -515,25 +522,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
 - Add minimum cache TTL for successful DNS responses. {pull}18986[18986]
 - Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
-- Add leader election for Kubernetes autodiscover. {pull}20281[20281]
 - Add capability of enriching process metadata with contianer id also for non-privileged containers in `add_process_metadata` processor. {pull}19767[19767]
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
-- Add container ECS fields in kubernetes metadata. {pull}20984[20984]
-- Add ingress controller dashboards. {pull}21052[21052]
-- Added experimental `citrix` module. {pull}20820[20820]
-- Added experimental `cyberark` module. {pull}20820[20820]
-- Added experimental `proofpoint` module. {pull}20820[20820]
-- Added experimental `snort` module. {pull}20820[20820]
-- Added experimental `symantec` module. {pull}20820[20820]
-- Added experimental dataset `barracuda/spamfirewall`. {pull}20820[20820]
-- Added experimental dataset `cisco/meraki`. {pull}20820[20820]
-- Added experimental dataset `f5/bigipafm`. {pull}20820[20820]
-- Added experimental dataset `fortinet/fortimail`. {pull}20820[20820]
-- Added experimental dataset `fortinet/fortimanager`. {pull}20820[20820]
-- Added experimental dataset `juniper/netscreen`. {pull}20820[20820]
-- Added experimental dataset `sophos/utm`. {pull}20820[20820]
-- Add Cloud Foundry tags in related events. {pull}21177[21177]
-- Cloud Foundry metadata is cached to disk. {pull}20775[20775]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
 - Add istiod metricset. {pull}21519[21519]
 - Release `add_cloudfoundry_metadata` as GA. {pull}21525[21525]
@@ -920,6 +910,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
 
 
 
