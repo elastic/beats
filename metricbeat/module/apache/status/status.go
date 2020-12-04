@@ -21,6 +21,7 @@ package status
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -63,6 +64,8 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
+
+	isFleetMode bool
 }
 
 // New creates new instance of MetricSet.
@@ -74,6 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
+		fleetmode.Enabled(),
 	}, nil
 }
 
@@ -87,10 +91,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	data, _ := eventMapping(scanner, m.Host())
-
-	if reported := reporter.Event(mb.Event{MetricSetFields: data}); !reported {
-		m.Logger().Error("error reporting event")
+	event := mb.Event{
+		MetricSetFields: data,
 	}
 
+	if m.isFleetMode {
+		event = adjustFleetEvent(event)
+	}
+
+	if reported := reporter.Event(event); !reported {
+		m.Logger().Error("error reporting event")
+	}
 	return nil
+}
+
+func adjustFleetEvent(event mb.Event) mb.Event {
+	var adjusted mb.Event
+	adjusted.MetricSetFields = event.MetricSetFields.Clone()
+
+	// Remove apache.hostname
+	adjusted.MetricSetFields.Delete("hostname")
+	return adjusted
 }

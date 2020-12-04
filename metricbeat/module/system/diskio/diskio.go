@@ -107,6 +107,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 
+		// Add linux-only ops in progress
+		if runtime.GOOS == "linux" {
+			event.Put("io.ops", counters.IopsInProgress)
+		}
+
 		// accumulate values from all interfaces
 		diskReadBytes += counters.ReadBytes
 		diskWriteBytes += counters.WriteBytes
