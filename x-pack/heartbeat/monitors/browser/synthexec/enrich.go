@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// journeyEnricher olds state across received SynthEvents retaining fields
+// journeyEnricher holds state across received SynthEvents retaining fields
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
 	journeyComplete bool
