@@ -552,6 +552,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
+- Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 
 *Packetbeat*
 
