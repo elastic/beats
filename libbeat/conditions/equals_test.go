@@ -60,49 +60,44 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 	})
 }
 
-func benchmarkEquals(b *testing.B, equalsFactory func(fields map[string]interface{}) (c Condition, err error), fields map[string]interface{}) {
-	e, err := equalsFactory(fields)
-	assert.NoError(b, err)
+func BenchmarkEquals(b *testing.B) {
+	cases := map[string]map[string]interface{}{
+		"1 condition": {
+			"type": "process",
+		},
+		"3 conditions": {
+			"type":     "process",
+			"proc.pid": 305,
+			"final":    false,
+		},
+		"5 conditions": {
+			"type":             "process",
+			"proc.pid":         305,
+			"final":            false,
+			"tags":             "error path",
+			"non-existing-key": "",
+		},
+		"7 conditions": {
+			"type":                "process",
+			"proc.pid":            305,
+			"final":               false,
+			"tags":                "error path",
+			"non-existing-key":    "",
+			"proc.cmdline":        "/usr/libexec/secd",
+			"proc.cpu.start_time": 10,
+		},
+	}
 
-	runtime.GC()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		e.Check(secdTestEvent)
+	for name, config := range cases {
+		b.Run(name, func(b *testing.B) {
+			e, err := NewEqualsCondition(config)
+			assert.NoError(b, err)
+
+			runtime.GC()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				e.Check(secdTestEvent)
+			}
+		})
 	}
 }
-
-func equalsFactory(fields map[string]interface{}) (c Condition, err error) {
-	return NewEqualsCondition(fields)
-}
-
-var (
-	condition1 = map[string]interface{}{
-		"type": "process",
-	}
-	conditions3 = map[string]interface{}{
-		"type":     "process",
-		"proc.pid": 305,
-		"final":    false,
-	}
-	conditions5 = map[string]interface{}{
-		"type":             "process",
-		"proc.pid":         305,
-		"final":            false,
-		"tags":             "error path",
-		"non-existing-key": "",
-	}
-	conditions7 = map[string]interface{}{
-		"type":                "process",
-		"proc.pid":            305,
-		"final":               false,
-		"tags":                "error path",
-		"non-existing-key":    "",
-		"proc.cmdline":        "/usr/libexec/secd",
-		"proc.cpu.start_time": 10,
-	}
-)
-
-func BenchmarkEqualsWith1Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, condition1) }
-func BenchmarkEqualsWith3Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions3) }
-func BenchmarkEqualsWith5Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions5) }
-func BenchmarkEqualsWith7Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions7) }
