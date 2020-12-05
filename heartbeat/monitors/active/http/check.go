@@ -70,9 +70,12 @@ type respValidator func(*http.Response) error
 type bodyValidator func(*http.Response, string) error
 
 var (
-	errBodyMismatch         = errors.New("all positive and negative pattern mismatch")
-	errBodyPostiveMismatch  = errors.New("negative pattern match, but positive pattern mismatch")
-	errBodyNegativeMismatch = errors.New("positive pattern match, but negative pattern mismatch")
+	errBodyMismatch          = errors.New("no pattern matches under check.body")
+	errBodyPositiveMismatch  = errors.New("only positive pattern mismatch")
+	errBodyNegativeMismatch  = errors.New("only negative pattern mismatch")
+	errBodyNoValidCheckType  = errors.New("no valid check type under check.body, only 'positive' or 'negative' is expected")
+	errBodyNoValidCheckParam = errors.New("no valid check parameters under check.body")
+	errBodyIllegalBody = errors.New("unsupported content under check.body")
 )
 
 func makeValidateResponse(config *responseParameters) (multiValidator, error) {
@@ -90,8 +93,13 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if config.RecvBody != nil {
-		pm, nm := parseBody(config.RecvBody)
-		bodyValidators = append(bodyValidators, checkBody(pm, nm))
+		pm, nm, err := parseBody(config.RecvBody)
+		if err != nil {
+			bodyValidators = append(bodyValidators, func(response *http.Response, body string) error {
+				return err
+			})
+		}
+		bodyValidators = append(bodyValidators,  checkBody(pm, nm))
 	}
 
 	if len(config.RecvJSON) > 0 {
@@ -135,21 +143,25 @@ func checkHeaders(headers map[string]string) respValidator {
 	}
 }
 
-func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher) {
+func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err error) {
 	// run through this code block if there is no positive or negative keyword in response body
 	// in this case, there's only plain body
 	if p, ok := b.([]interface{}); ok {
 		for _, pp := range p {
 			if pat, ok := pp.(string); ok {
-				return append(positiveMatch, match.MustCompile(pat)), negativeMatch
+				positiveMatch = append(positiveMatch, match.MustCompile(pat))
 			}
 		}
+		return positiveMatch, negativeMatch, nil
 	}
 
 	// run through this part if there exists positive/negative keyword in response body
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
 	if m, ok := b.(map[string]interface{}); ok {
 		for checkType, v := range m {
+			if checkType != "positive" && checkType != "negative" {
+				return positiveMatch, negativeMatch, errBodyNoValidCheckType
+			}
 			if params, ok := v.([]interface{}); ok {
 				for _, param := range params {
 					if pat, ok := param.(string); ok {
@@ -157,15 +169,14 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher) {
 							positiveMatch = append(positiveMatch, match.MustCompile(pat))
 						} else if checkType == "negative" {
 							negativeMatch = append(negativeMatch, match.MustCompile(pat))
-						} else {
-							return positiveMatch, negativeMatch
 						}
 					}
 				}
 			}
 		}
+		return positiveMatch, negativeMatch, nil
 	}
-	return positiveMatch, negativeMatch
+	return positiveMatch, negativeMatch, errBodyIllegalBody
 }
 
 /* checkBody accepts 2 parameters:
@@ -189,7 +200,7 @@ func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 			if positiveMatchFlag {
 				return nil
 			}
-			return errBodyPostiveMismatch
+			return errBodyPositiveMismatch
 		}
 
 		// force positiveMatchFlag to true if positiveMatch is empty
@@ -213,7 +224,7 @@ func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 		if positiveMatchFlag {
 			return errBodyNegativeMismatch
 		}
-		return errBodyPostiveMismatch
+		return errBodyPositiveMismatch
 	}
 }
 
