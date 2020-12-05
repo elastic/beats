@@ -119,10 +119,10 @@ func (c Equals) String() string {
 	return fmt.Sprintf("equals: %v", map[string]equalsValue(c))
 }
 
-// Equals is a Condition for testing string equality.
+// Equals2 is a Condition for testing string equality.
 type Equals2 map[string]equalsValueType
 
-// equalValue checks its defined value equals the given value
+// equalsValueType checks its defined value equals the given value
 type equalsValueType interface {
 	Check(interface{}) bool
 }
@@ -150,7 +150,7 @@ func (e equalsStringValue) Check(value interface{}) bool {
 type equalsBoolValue bool
 
 func (e equalsBoolValue) Check(value interface{}) bool {
-	if bValue, err := ExtractBool(value); err != nil {
+	if bValue, err := ExtractBool(value); err == nil {
 		return bValue == bool(e)
 	}
 	logp.L().Named(logName).Warnf("expected bool but got type %T in equals condition.", value)
@@ -207,7 +207,7 @@ func (c Equals2) String() string {
 	return fmt.Sprintf("equals: %v", map[string]equalsValueType(c))
 }
 
-// Equals2 is a Condition for testing string equality.
+// Equals3 is a Condition for testing string equality.
 type Equals3 map[string]equalsValueFunc
 
 type equalsValueFunc func(interface{}) bool
