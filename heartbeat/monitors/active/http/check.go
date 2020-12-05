@@ -143,6 +143,11 @@ func checkHeaders(headers map[string]string) respValidator {
 }
 
 func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err error) {
+	// run through this code block if there is only string
+	if pat, ok := b.(string); ok {
+		return append(positiveMatch, match.MustCompile(pat)), negativeMatch, nil
+	}
+
 	// run through this code block if there is no positive or negative keyword in response body
 	// in this case, there's only plain body
 	if p, ok := b.([]interface{}); ok {
