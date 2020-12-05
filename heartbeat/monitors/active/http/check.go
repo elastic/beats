@@ -70,7 +70,6 @@ type respValidator func(*http.Response) error
 type bodyValidator func(*http.Response, string) error
 
 var (
-	errBodyMismatch          = errors.New("no pattern matches under check.body")
 	errBodyPositiveMismatch  = errors.New("only positive pattern mismatch")
 	errBodyNegativeMismatch  = errors.New("only negative pattern mismatch")
 	errBodyNoValidCheckType  = errors.New("no valid check type under check.body, only 'positive' or 'negative' is expected")
@@ -179,52 +178,40 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 	return positiveMatch, negativeMatch, errBodyIllegalBody
 }
 
-/* checkBody accepts 2 parameters:
-1. positive check regex
-2. negative check regex
+/* checkBody accepts 2 check types:
+1. positive
+2. negative
+So, there are 4 kinds of scenarios:
+1. none of check types
+2. only positive
+3. only negative
+4. positive and negative both here
 */
 func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 	// in case there's both valid positive and negative regex pattern
 	return func(r *http.Response, body string) error {
-		positiveMatchFlag := false
-		negativeMatchFlag := true
+		if len(positiveMatch) == 0 && len(negativeMatch) == 0 {
+			return errBodyNoValidCheckParam
+		}
 		// positive match loop
 		for _, pattern := range positiveMatch {
-			if pattern.MatchString(body) {
-				positiveMatchFlag = true
-				break
-			}
-		}
-		// return the result of positive check immediately if there is no negative match
-		if len(negativeMatch) == 0 {
-			if positiveMatchFlag {
+			// return immediately if there is no negative match
+			if pattern.MatchString(body) && len(negativeMatch) == 0 {
 				return nil
 			}
-			return errBodyPositiveMismatch
 		}
-
-		// force positiveMatchFlag to true if positiveMatch is empty
-		// to tolerate the case there is only negativeMatch
-		if len(positiveMatch) == 0 {
-			positiveMatchFlag = true
+		// return immediately if there is no negative match
+		if len(negativeMatch) == 0 {
+			return errBodyPositiveMismatch
 		}
 
 		// negative match loop
 		for _, pattern := range negativeMatch {
 			if pattern.MatchString(body) {
-				negativeMatchFlag = false
-				break
+				return errBodyNegativeMismatch
 			}
 		}
-
-		// in case positiveMatch and negativeMatch are both not empty
-		if positiveMatchFlag && negativeMatchFlag {
-			return nil
-		}
-		if positiveMatchFlag {
-			return errBodyNegativeMismatch
-		}
-		return errBodyPositiveMismatch
+		return nil
 	}
 }
 
