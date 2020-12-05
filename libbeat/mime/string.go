@@ -17,26 +17,8 @@
 
 package mime
 
-type config struct {
-	From string `config:"from"`
-	To   string `config:"to"`
-}
-
-const (
-	defaultFrom = "http.request.body.content"
-	defaultTo   = "http.request.mime_type"
-)
-
-func (c config) FromOrDefault() string {
-	if c.From == "" {
-		return defaultFrom
-	}
-	return c.From
-}
-
-func (c config) ToOrDefault() string {
-	if c.To == "" {
-		return defaultTo
-	}
-	return c.To
+// Detect tries to detect a mime-type based off
+// of a byte string passed into the function
+func Detect(data string) string {
+	return DetectBytes([]byte(data))
 }

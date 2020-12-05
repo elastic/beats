@@ -22,9 +22,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestMimeType(t *testing.T) {
@@ -76,52 +73,9 @@ func TestMimeType(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			evt := beat.Event{
-				Fields: common.MapStr{
-					"http.request.body.content": test.body,
-				},
-			}
-			p, err := New(common.MustNewConfigFrom(map[string]interface{}{}))
-			require.NoError(t, err)
-			observed, err := p.Run(&evt)
-			require.NoError(t, err)
-			enriched, err := observed.Fields.GetValue("http.request.mime_type")
-			require.NoError(t, err)
-			require.Equal(t, test.expectedType, enriched)
+			require.Equal(t, test.expectedType, Detect(test.body))
 		})
 	}
-}
-
-func TestMimeTypeFromTo(t *testing.T) {
-	evt := beat.Event{
-		Fields: common.MapStr{
-			"foo.bar.baz": "hello world!",
-		},
-	}
-	p, err := New(common.MustNewConfigFrom(map[string]interface{}{
-		"from": "foo.bar.baz",
-		"to":   "bar.baz.zoiks",
-	}))
-	require.NoError(t, err)
-	observed, err := p.Run(&evt)
-	require.NoError(t, err)
-	enriched, err := observed.Fields.GetValue("bar.baz.zoiks")
-	require.NoError(t, err)
-	require.Equal(t, "text/plain; charset=utf-8", enriched)
-}
-
-func TestMimeTypeTestNoMatch(t *testing.T) {
-	evt := beat.Event{
-		Fields: common.MapStr{
-			"http.request.body.content": string([]byte{0, 0}),
-		},
-	}
-	p, err := New(common.MustNewConfigFrom(map[string]interface{}{}))
-	require.NoError(t, err)
-	observed, err := p.Run(&evt)
-	require.NoError(t, err)
-	hasKey, _ := observed.Fields.HasKey("http.request.mime_type")
-	require.False(t, hasKey)
 }
 
 func convertToData(t *testing.T, sample string) string {
