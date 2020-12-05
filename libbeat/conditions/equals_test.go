@@ -18,6 +18,7 @@
 package conditions
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,23 +60,38 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 	})
 }
 
+func benchmarkEquals(b *testing.B, equalsFactory func(fields map[string]interface{}) (c Condition, err error), fields map[string]interface{}) {
+	e, err := equalsFactory(fields)
+	assert.NoError(b, err)
+
+	runtime.GC()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		e.Check(secdTestEvent)
+	}
+}
+
+func equalsFactory(fields map[string]interface{}) (c Condition, err error) {
+	return NewEqualsCondition(fields)
+}
+
 var (
-	config = map[string]interface{}{
+	condition1 = map[string]interface{}{
 		"type": "process",
 	}
-	config1 = map[string]interface{}{
+	conditions3 = map[string]interface{}{
 		"type":     "process",
 		"proc.pid": 305,
 		"final":    false,
 	}
-	config2 = map[string]interface{}{
+	conditions5 = map[string]interface{}{
 		"type":             "process",
 		"proc.pid":         305,
 		"final":            false,
 		"tags":             "error path",
 		"non-existing-key": "",
 	}
-	config3 = map[string]interface{}{
+	conditions7 = map[string]interface{}{
 		"type":                "process",
 		"proc.pid":            305,
 		"final":               false,
@@ -86,40 +102,7 @@ var (
 	}
 )
 
-type factory func(fields map[string]interface{}) (c Condition, err error)
-
-func benchmarkEquals(b *testing.B, f factory, fields map[string]interface{}) {
-	e, err := f(fields)
-	assert.NoError(b, err)
-	for i := 0; i < b.N; i++ {
-		e.Check(secdTestEvent)
-	}
-}
-
-func equalFactory(fields map[string]interface{}) (c Condition, err error) {
-	return NewEqualsCondition(fields)
-}
-
-func equal2Factory(fields map[string]interface{}) (c Condition, err error) {
-	return NewEqualsCondition2(fields)
-}
-
-func equal3Factory(fields map[string]interface{}) (c Condition, err error) {
-	return NewEqualsCondition3(fields)
-}
-
-func BenchmarkEqualsWith1Conditions(b *testing.B)  { benchmarkEquals(b, equalFactory, config) }
-func BenchmarkEquals2With1Conditions(b *testing.B) { benchmarkEquals(b, equal2Factory, config) }
-func BenchmarkEquals3With1Conditions(b *testing.B) { benchmarkEquals(b, equal3Factory, config) }
-
-func BenchmarkEqualsWith3Conditions(b *testing.B)  { benchmarkEquals(b, equalFactory, config1) }
-func BenchmarkEquals2With3Conditions(b *testing.B) { benchmarkEquals(b, equal2Factory, config1) }
-func BenchmarkEquals3With3Conditions(b *testing.B) { benchmarkEquals(b, equal3Factory, config1) }
-
-func BenchmarkEqualsWith5Conditions(b *testing.B)  { benchmarkEquals(b, equalFactory, config2) }
-func BenchmarkEquals2With5Conditions(b *testing.B) { benchmarkEquals(b, equal2Factory, config2) }
-func BenchmarkEquals3With5Conditions(b *testing.B) { benchmarkEquals(b, equal3Factory, config2) }
-
-func BenchmarkEqualsWith7Conditions(b *testing.B)  { benchmarkEquals(b, equalFactory, config3) }
-func BenchmarkEquals2With7Conditions(b *testing.B) { benchmarkEquals(b, equal2Factory, config3) }
-func BenchmarkEquals3With7Conditions(b *testing.B) { benchmarkEquals(b, equal3Factory, config3) }
+func BenchmarkEqualsWith1Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, condition1) }
+func BenchmarkEqualsWith3Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions3) }
+func BenchmarkEqualsWith5Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions5) }
+func BenchmarkEqualsWith7Conditions(b *testing.B) { benchmarkEquals(b, equalsFactory, conditions7) }
