@@ -74,7 +74,7 @@ var (
 	errBodyNegativeMismatch  = errors.New("only negative pattern mismatch")
 	errBodyNoValidCheckType  = errors.New("no valid check type under check.body, only 'positive' or 'negative' is expected")
 	errBodyNoValidCheckParam = errors.New("no valid check parameters under check.body")
-	errBodyIllegalBody = errors.New("unsupported content under check.body")
+	errBodyIllegalBody       = errors.New("unsupported content under check.body")
 )
 
 func makeValidateResponse(config *responseParameters) (multiValidator, error) {
@@ -98,7 +98,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 				return err
 			})
 		}
-		bodyValidators = append(bodyValidators,  checkBody(pm, nm))
+		bodyValidators = append(bodyValidators, checkBody(pm, nm))
 	}
 
 	if len(config.RecvJSON) > 0 {
