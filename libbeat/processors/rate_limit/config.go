@@ -31,25 +31,20 @@ type Config struct {
 	Algorithm common.ConfigNamespace `config:"algorithm"`
 }
 
-func defaultConfig() (*Config, error) {
-	cfg, err := common.NewConfigFrom(map[string]interface{}{
-		"algorithm": map[string]interface{}{
+func (c *Config) SetDefaults() error {
+	if c.Algorithm.Name() == "" {
+		cfg, err := common.NewConfigFrom(map[string]interface{}{
 			"token_bucket": map[string]interface{}{
 				"burst_multiplier": 1.0,
 			},
-		},
-	})
+		})
 
-	if err != nil {
-		return nil, errors.Wrap(err, "could not parse default configuration")
+		if err != nil {
+			return errors.Wrap(err, "could not parse default configuration")
+		}
+
+		c.Algorithm.Unpack(cfg)
 	}
 
-	var config Config
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "could not unpack default configuration")
-	}
-
-	config.Fields = make([]string, 0)
-
-	return &config, nil
+	return nil
 }

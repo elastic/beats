@@ -40,7 +40,7 @@ type tokenBucket struct {
 
 func newTokenBucket(config Config) (Algorithm, error) {
 	var cfg struct {
-		BurstMultipler float64 `config:"burst_multiplier"`
+		BurstMultiplier float64 `config:"burst_multiplier"`
 	}
 
 	if err := config.Config.Unpack(&cfg); err != nil {
@@ -49,7 +49,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 
 	return &tokenBucket{
 		config.Limit,
-		config.Limit.value * cfg.BurstMultipler,
+		config.Limit.value * cfg.BurstMultiplier,
 		make(map[string]bucket, 0),
 	}, nil
 }
@@ -59,6 +59,7 @@ func (t *tokenBucket) IsAllowed(key string) bool {
 
 	b := t.getBucket(key)
 	allowed := b.withdraw()
+	t.buckets[key] = b
 
 	return allowed
 }
@@ -78,7 +79,7 @@ func (t *tokenBucket) getBucket(key string) bucket {
 }
 
 func (b *bucket) withdraw() bool {
-	if b.tokens == 0 {
+	if b.tokens < 1 {
 		return false
 	}
 	b.tokens--
