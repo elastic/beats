@@ -5,89 +5,39 @@
         "event.timezone": "-02:00",
         "fileset.name": "vulnerabilities",
         "input.type": "log",
-        "log.offset": 0,
+        "log.offset": 1635,
         "service.type": "snyk",
-        "snyk.project.id": "projectid",
-        "snyk.project.name": "gituser/gitproject",
-        "snyk.project.package_manager": "npm",
-        "snyk.project.source": "github",
-        "snyk.project.target_file": "package.json",
-        "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
-        "snyk.vulnerabilities.credit": [
-            "Snyk Security Research Team"
-        ],
-        "snyk.vulnerabilities.cvss3": "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
-        "snyk.vulnerabilities.disclosure_time": "2016-11-27T22:00:00.000Z",
-        "snyk.vulnerabilities.exploit_maturity": "no-known-exploit",
-        "snyk.vulnerabilities.id": "npm:ejs:20161128",
-        "snyk.vulnerabilities.identifiers.alternative": [
-            "SNYK-JS-EJS-10218"
-        ],
-        "snyk.vulnerabilities.identifiers.cwe": [
-            "CWE-94"
-        ],
-        "snyk.vulnerabilities.introduced_date": "2020-04-07",
-        "snyk.vulnerabilities.is_fixed": false,
-        "snyk.vulnerabilities.is_ignored": false,
-        "snyk.vulnerabilities.is_patchable": false,
-        "snyk.vulnerabilities.is_patched": false,
-        "snyk.vulnerabilities.is_pinnable": false,
-        "snyk.vulnerabilities.is_upgradable": false,
-        "snyk.vulnerabilities.language": "js",
-        "snyk.vulnerabilities.package": "ejs",
-        "snyk.vulnerabilities.package_manager": "npm",
-        "snyk.vulnerabilities.patches": [
+        "snyk.projects": [
             {
-                "comments": [],
-                "id": "patch:npm:ejs:20161128:0",
-                "modification_time": "2019-12-03T11:40:45.851976Z",
-                "urls": [
-                    "https://snyk-patches.s3.amazonaws.com/npm/ejs/20161128/ejs_20161128_0_0_3d447c5a335844b25faec04b1132dbc721f9c8f6.patch"
-                ],
-                "version": "<2.5.3 >=2.2.4"
+                "id": "projectid",
+                "name": "username/reponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "someotheruser/someotherreponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "folder1/package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "projectname",
+                "packageManager": "npm",
+                "source": "cli",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
             }
         ],
-        "snyk.vulnerabilities.priority_score": 4.05,
-        "snyk.vulnerabilities.publication_time": "2016-11-28T18:44:12.000Z",
-        "snyk.vulnerabilities.reachability": "No Info",
-        "snyk.vulnerabilities.semver.vulnerable": [
-            "<2.5.3"
+        "snyk.related.projects": [
+            "username/reponame",
+            "someotheruser/someotherreponame",
+            "projectname"
         ],
-        "snyk.vulnerabilities.title": "Arbitrary Code Execution",
-        "snyk.vulnerabilities.type": "vuln",
-        "snyk.vulnerabilities.unique_severities_list": [
-            "high"
-        ],
-        "snyk.vulnerabilities.url": "https://snyk.io/vuln/npm:ejs:20161128",
-        "snyk.vulnerabilities.version": "0.8.8",
-        "tags": [
-            "snyk-vulnerabilities",
-            "forwarded"
-        ],
-        "vulnerability.category": "Github",
-        "vulnerability.classification": "CVSS",
-        "vulnerability.enumeration": "CVE",
-        "vulnerability.id": [],
-        "vulnerability.reference": "https://snyk.io/org/orgid123/project/projectid/#issue-npm:ejs:20161128",
-        "vulnerability.scanner.vendor": "Snyk",
-        "vulnerability.score.base": "8.1",
-        "vulnerability.score.version": "3.0",
-        "vulnerability.severity": "high"
-    },
-    {
-        "event.dataset": "snyk.vulnerabilities",
-        "event.module": "snyk",
-        "event.timezone": "-02:00",
-        "fileset.name": "vulnerabilities",
-        "input.type": "log",
-        "log.offset": 1286,
-        "service.type": "snyk",
-        "snyk.project.id": "projectid",
-        "snyk.project.name": "gituser/gitproject",
-        "snyk.project.package_manager": "npm",
-        "snyk.project.source": "github",
-        "snyk.project.target_file": "foldername/package.json",
-        "snyk.project.url": "https://snyk.io/org/orgid231/project/projectid321",
         "snyk.vulnerabilities.credit": [
             "Snyk Security Research Team"
         ],
@@ -115,7 +65,7 @@
             {
                 "comments": [],
                 "id": "patch:npm:ejs:20161128:0",
-                "modification_time": "2019-12-03T11:40:45.851976Z",
+                "modificationTime": "2019-12-03T11:40:45.851976Z",
                 "urls": [
                     "https://snyk-patches.s3.amazonaws.com/npm/ejs/20161128/ejs_20161128_0_0_3d447c5a335844b25faec04b1132dbc721f9c8f6.patch"
                 ],
@@ -133,7 +83,6 @@
         "snyk.vulnerabilities.unique_severities_list": [
             "high"
         ],
-        "snyk.vulnerabilities.url": "https://snyk.io/vuln/npm:ejs:20161128",
         "snyk.vulnerabilities.version": "0.8.8",
         "tags": [
             "snyk-vulnerabilities",
@@ -145,7 +94,7 @@
         "vulnerability.id": [
             "CVE-2017-1000228"
         ],
-        "vulnerability.reference": "https://snyk.io/org/orgid231/project/projectid/#issue-npm:ejs:20161128",
+        "vulnerability.reference": "https://snyk.io/vuln/npm:ejs:20161128",
         "vulnerability.scanner.vendor": "Snyk",
         "vulnerability.score.base": "8.1",
         "vulnerability.score.version": "3.0",
@@ -157,14 +106,39 @@
         "event.timezone": "-02:00",
         "fileset.name": "vulnerabilities",
         "input.type": "log",
-        "log.offset": 2600,
+        "log.offset": 3287,
         "service.type": "snyk",
-        "snyk.project.id": "projectid",
-        "snyk.project.name": "gituser/gitproject",
-        "snyk.project.package_manager": "gomodules",
-        "snyk.project.source": "cli",
-        "snyk.project.target_file": "folder/go.mod",
-        "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
+        "snyk.projects": [
+            {
+                "id": "projectid",
+                "name": "username/reponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "someotheruser/someotherreponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "folder1/package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "projectname",
+                "packageManager": "npm",
+                "source": "cli",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            }
+        ],
+        "snyk.related.projects": [
+            "username/reponame",
+            "someotheruser/someotherreponame",
+            "projectname"
+        ],
         "snyk.vulnerabilities.credit": [
             "josselin-c"
         ],
@@ -206,7 +180,6 @@
         "snyk.vulnerabilities.unique_severities_list": [
             "high"
         ],
-        "snyk.vulnerabilities.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
         "snyk.vulnerabilities.version": "#000000000000",
         "tags": [
             "snyk-vulnerabilities",
@@ -216,7 +189,7 @@
         "vulnerability.classification": "CVSS",
         "vulnerability.enumeration": "CVE",
         "vulnerability.id": [],
-        "vulnerability.reference": "https://snyk.io/org/orgid123/project/projectid/#issue-SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
+        "vulnerability.reference": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMSATORIGOUUID-72488",
         "vulnerability.scanner.vendor": "Snyk",
         "vulnerability.score.base": "8.1",
         "vulnerability.score.version": "3.0",
@@ -228,14 +201,39 @@
         "event.timezone": "-02:00",
         "fileset.name": "vulnerabilities",
         "input.type": "log",
-        "log.offset": 3958,
+        "log.offset": 4990,
         "service.type": "snyk",
-        "snyk.project.id": "projectid",
-        "snyk.project.name": "gituser/project",
-        "snyk.project.package_manager": "gomodules",
-        "snyk.project.source": "cli",
-        "snyk.project.target_file": "foldername/go.mod",
-        "snyk.project.url": "https://snyk.io/org/orgid123/project/projectid123",
+        "snyk.projects": [
+            {
+                "id": "projectid",
+                "name": "username/reponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "someotheruser/someotherreponame",
+                "packageManager": "npm",
+                "source": "github",
+                "targetFile": "folder1/package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            },
+            {
+                "id": "projectid",
+                "name": "projectname",
+                "packageManager": "npm",
+                "source": "cli",
+                "targetFile": "package.json",
+                "url": "https://snyk.io/org/orgname/project/projectid"
+            }
+        ],
+        "snyk.related.projects": [
+            "username/reponame",
+            "someotheruser/someotherreponame",
+            "projectname"
+        ],
         "snyk.vulnerabilities.credit": [
             "Unknown"
         ],
@@ -551,7 +549,6 @@
         "snyk.vulnerabilities.unique_severities_list": [
             "medium"
         ],
-        "snyk.vulnerabilities.url": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
         "snyk.vulnerabilities.version": "2.1.0",
         "tags": [
             "snyk-vulnerabilities",
@@ -563,7 +560,7 @@
         "vulnerability.id": [
             "CVE-2019-11254"
         ],
-        "vulnerability.reference": "https://snyk.io/org/orgid123/project/projectid/#issue-SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
+        "vulnerability.reference": "https://snyk.io/vuln/SNYK-GOLANG-GITHUBCOMGOYAMLYAML-564236",
         "vulnerability.scanner.vendor": "Snyk",
         "vulnerability.score.base": "6.5",
         "vulnerability.score.version": "3.0",

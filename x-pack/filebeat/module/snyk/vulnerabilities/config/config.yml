@@ -1,18 +1,58 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-http_method: GET
+config_version: "2"
 interval: {{ .interval }}
-json_objects_array: results
-url: {{ .url }}
 
-http_headers:
-  Authorization: token {{ .api_token }}
-date_cursor.field: lastUpdateTime
-date_cursor.url_field: '$filter'
-date_cursor.value_template: 'lastUpdateTime gt {{.}}'
-date_cursor.initial_interval: 55m
-date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
+request.url: {{ .url }}
+request.method: POST
+request.ssl: {{ .ssl | tojson }}
+request.transforms:
+- set:
+    target: header.Authorization
+    value: token {{ .api_token }}
+- set: {{ .from_params | tojson }}
+- set: {{ .to_params | tojson }}
+request.timeout: 120s
+request.body:
+  filters:
+    orgs:
+    {{ range .orgs }}
+    - {{ . }}
+    {{ end }}
+    severity:
+    {{ range .included_severity }}
+    - {{ . }}
+    {{ end }}
+    exploitMaturity:
+    {{ range .exploit_maturity }}
+    - {{ . }}
+    {{ end }}
+    types:
+    {{ range .types }}
+    - {{ . }}
+    {{ end }}
+    languages:
+    {{ range .languages }}
+    - {{ . }}
+    {{ end }}
+    identifier: {{ .identifier | tojson}}
+    ignored: {{ .ignored }}
+    patched: {{ .patched }}
+    fixable: {{ .fixable }}
+    isFixed: {{ .is_fixed }}
+    isUpgradable: {{ .is_upgradeable }}
+    isPatchable: {{ .is_patchable }}
+    isPinnable: {{ .is_pinnable }}
+    priorityScore:
+      min: {{ .min_priority_score }}
+      max: {{ .max_priority_score }}
+
+response.pagination:
+- set: {{ .link_pagination | tojson }}
+
+response.split:
+  target: body.results
 
 {{ else if eq .input "file" }}
 
@@ -29,9 +69,20 @@ tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
+  - add_locale: ~
   - decode_json_fields:
       fields: [message]
       target: json
+  - fingerprint:
+      fields: ["json.issue.id"]
+      target_field: "@metadata._id"
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
   - add_fields:
       target: ''
       fields:

@@ -126130,6 +126130,26 @@ Module for parsing Snyk project vulnerabilities.
 
 
 
+*`snyk.projects`*::
++
+--
+Array with all related projects objects.
+
+
+type: flattened
+
+--
+
+*`snyk.related.projects`*::
++
+--
+Array of all the related project ID's.
+
+
+type: keyword
+
+--
+
 [float]
 === audit
 
@@ -126307,7 +126327,7 @@ type: flattened
 *`snyk.vulnerabilities.priority_score`*::
 +
 --
-The CVS priority score
+The CVS priority score.
 
 
 type: long
@@ -126321,6 +126341,26 @@ The vulnerability publication time.
 
 
 type: date
+
+--
+
+*`snyk.vulnerabilities.jira_issue_url`*::
++
+--
+Link to the related Jira issue.
+
+
+type: keyword
+
+--
+
+*`snyk.vulnerabilities.original_severity`*::
++
+--
+The original severity of the vulnerability.
+
+
+type: long
 
 --
 
@@ -126358,16 +126398,6 @@ type: keyword
 +
 --
 A list of related unique severities.
-
-
-type: keyword
-
---
-
-*`snyk.vulnerabilities.url`*::
-+
---
-Link to the original vulnerability reference.
 
 
 type: keyword
@@ -126438,73 +126468,6 @@ type: keyword
 +
 --
 CWE vulnerability identifiers.
-
-
-type: keyword
-
---
-
-[float]
-=== project
-
-Module for parsing Snyk project vulnerabilities.
-
-
-
-*`snyk.project.id`*::
-+
---
-The issue ID.
-
-
-type: keyword
-
---
-
-*`snyk.project.name`*::
-+
---
-The name of the Github Project.
-
-
-type: keyword
-
---
-
-*`snyk.project.package_manager`*::
-+
---
-Package Manager related to the vulnerability.
-
-
-type: keyword
-
---
-
-*`snyk.project.source`*::
-+
---
-Which service the vulnerable project was found on.
-
-
-type: keyword
-
---
-
-*`snyk.project.target_file`*::
-+
---
-The module file scanned to find currently used versions.
-
-
-type: keyword
-
---
-
-*`snyk.project.url`*::
-+
---
-URL to the related project on Snyk.
 
 
 type: keyword

@@ -5,6 +5,32 @@ var:
     default: [snyk-audit, forwarded]
   - name: input
     default: httpjson
+  - name: interval
+    default: 1h
+  - name: from_params
+    default:
+      target: url.params.from
+      value: '{{ formatDate (now (parseDuration "-24h")) "2006-01-02" }}'
+  - name: to_params
+    default:
+      target: url.params.to
+      value: '{{ formatDate (now) "2006-01-02" }}'
+  - name: link_pagination
+    default:
+      target: url.value
+      value: '{{ getRFC5988Link "next" .last_response.header.Link }}'
+  - name: api_token
+  - name: audit_type
+  - name: audit_id
+  - name: user_id
+    default: ""
+  - name: project_id
+    default: ""
+  - name: email_address
+    default: ""
+  - name: event
+    default: ""
+  - name: ssl
 
 ingest_pipeline:
   - ingest/pipeline.yml

@@ -59,11 +59,19 @@
     - name: priority_score
       type: long
       description: >
-        The CVS priority score
+        The CVS priority score.
     - name: publication_time
       type: date
       description: >
         The vulnerability publication time.
+    - name: jira_issue_url
+      type: keyword
+      description: >
+        Link to the related Jira issue.
+    - name: original_severity
+      type: long
+      description: >
+        The original severity of the vulnerability.
     - name: reachability
       type: keyword
       description: >
@@ -80,10 +88,6 @@
       type: keyword
       description: >
         A list of related unique severities.
-    - name: url
-      type: keyword
-      description: >
-        Link to the original vulnerability reference.
     - name: version
       type: keyword
       description: >
@@ -112,34 +116,3 @@
       type: keyword
       description: >
         CWE vulnerability identifiers.
-
-- name: projects
-  type: group
-  release: beta
-  description: >
-    Module for parsing Snyk project vulnerabilities.
-  fields:
-    - name: id
-      type: keyword
-      description: >
-        The issue ID.
-    - name: name
-      type: keyword
-      description: >
-        The name of the Github Project.
-    - name: package_manager
-      type: keyword
-      description: >
-        Package Manager related to the vulnerability.
-    - name: source
-      type: keyword
-      description: >
-        Which service the vulnerable project was found on.
-    - name: target_file
-      type: keyword
-      description: >
-        The module file scanned to find currently used versions.
-    - name: url
-      type: keyword
-      description: >
-        URL to the related project on Snyk.

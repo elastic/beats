@@ -5,6 +5,74 @@ var:
     default: [snyk-vulnerabilities, forwarded]
   - name: input
     default: httpjson
+  - name: interval
+    default: 24h
+  - name: url
+    default: https://snyk.io/api/v1/reporting/issues/?page=1&perPage=10&sortBy=issueTitle&order=asc&groupBy=issue
+  - name: from_params
+    default:
+      target: url.params.from
+      value: '{{ formatDate (now (parseDuration "-24h")) "2006-01-02" }}'
+  - name: to_params
+    default:
+      target: url.params.to
+      value: '{{ formatDate (now) "2006-01-02" }}'
+  - name: link_pagination
+    default:
+      target: url.value
+      value: '{{ getRFC5988Link "next" .last_response.header.Link }}'
+  - name: interval
+    default: 10s
+  - name: api_token
+  - name: ssl
+  - name: orgs
+  - name: included_severity
+    default:
+      - high
+      - medium
+      - low
+  - name: exploit_maturity
+    default:
+      - mature
+      - proof-of-concept
+      - no-known-exploit
+      - no-data
+  - name: types
+    default:
+      - vuln
+      - license
+  - name: languages
+    default:
+      - javascript
+      - ruby
+      - java
+      - scala
+      - python
+      - golang
+      - php
+      - dotnet
+      - swift
+      - docker
+  - name: identifier
+    default: ""
+  - name: ignored
+    default: false
+  - name: patched
+    default: false
+  - name: fixable
+    default: false
+  - name: is_fixed
+    default: false
+  - name: is_upgradeable
+    default: false
+  - name: is_patchable
+    default: false
+  - name: is_pinnable
+    default: false
+  - name: min_priority_score
+    default: 0
+  - name: max_priority_score
+    default: 1000
 
 ingest_pipeline:
   - ingest/pipeline.yml
