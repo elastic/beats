@@ -87,10 +87,10 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	if p.algorithm.IsAllowed(key) {
-		p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
 		return event, nil
 	}
 
+	p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
 	return nil, nil
 }
 
