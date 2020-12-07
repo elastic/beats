@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	Register("token_bucket", newTokenBucket)
+	register("token_bucket", newTokenBucket)
 }
 
 type bucket struct {

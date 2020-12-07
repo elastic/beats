@@ -25,21 +25,33 @@ import (
 
 var registry = make(map[string]constructor, 0)
 
+// Config for rate limit algorithm.
 type Config struct {
-	Limit  Rate
+	// Limit is the rate limit to be enforced by the algorithm.
+	Limit Rate
+
+	// Config is any algorithm-specific additional configuration.
 	Config common.Config
 }
 
+// Algorithm is the interface that all rate limiting algorithms must
+// conform to.
 type Algorithm interface {
+	// IsAllowed accepts a key and returns whether that key is allowed
+	// (true) or not (false). If a key is allowed, it means it is NOT
+	// rate limited. If a key is not allowed, it means it is being rate
+	// limited.
 	IsAllowed(string) bool
 }
 
 type constructor func(Config) (Algorithm, error)
 
-func Register(id string, ctor constructor) {
+func register(id string, ctor constructor) {
 	registry[id] = ctor
 }
 
+// Factory returns the requested rate limiting algorithm, if one is found. If not found,
+// an error is returned.
 func Factory(id string) (constructor, error) {
 	if ctor, found := registry[id]; found {
 		return ctor, nil
