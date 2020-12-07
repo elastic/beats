@@ -287,6 +287,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 		return nil, false
 	}
 	var modules []interface{}
+	fixedAgentName := strings.ReplaceAll(agentName, "-", "_")
+
 	for name, endpoints := range hosts {
 		modules = append(modules, map[string]interface{}{
 			"module":     "beat",
@@ -324,10 +326,63 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					},
 				},
 			},
+		}, map[string]interface{}{
+			"module":     "http",
+			"metricsets": []string{"json"},
+			"namespace":  "agent",
+			"period":     "10s",
+			"path":       "/stats",
+			"hosts":      []string{beats.AgentMonitoringEndpoint(o.config.DownloadConfig.OS())},
+			"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "metrics",
+							"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+							"namespace": "default",
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
+							"process":  name,
+						},
+					},
+				},
+				{
+					"rename": map[string]interface{}{
+						"fields": []map[string]interface{}{
+							{
+								"from": "http.agent.beat",
+								"to":   "elastic-agent",
+							},
+							{
+								"from": "http.agent.system",
+								"to":   "elastic-agent.system",
+							},
+						},
+						"ignore_missing": true,
+					},
+				},
+			},
 		})
 	}
 
-	fixedAgentName := strings.ReplaceAll(agentName, "-", "_")
 	modules = append(modules, map[string]interface{}{
 		"module":     "http",
 		"metricsets": []string{"json"},
@@ -362,6 +417,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 						"id":       o.agentInfo.AgentID(),
 						"version":  o.agentInfo.Version(),
 						"snapshot": o.agentInfo.Snapshot(),
+						"process":  "elastic-agent",
 					},
 				},
 			},
