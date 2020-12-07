@@ -29,15 +29,15 @@ import (
 const (
 	// size for mime detection, office file
 	// detection requires ~8kb to detect properly
-	headerSize = 8192
+	maxHeaderSize = 8192
 )
 
 // DetectBytes tries to detect a mime-type based off
 // of a chunk of bytes passed into the function
 func DetectBytes(data []byte) string {
 	header := data
-	if len(data) > headerSize {
-		header = data[:headerSize]
+	if len(data) > maxHeaderSize {
+		header = data[:maxHeaderSize]
 	}
 	kind, err := filetype.Match(header)
 	if err == nil && kind != filetype.Unknown {
@@ -52,6 +52,11 @@ func DetectBytes(data []byte) string {
 			return detected
 		}
 	}
+	// The fallback for http.DetectContentType is "application/octet-stream"
+	// meaning that if we see it, we were unable to determine the type and
+	// we just know we're dealing with a chunk of some sort of bytes. Rather
+	// than reporting the fallback, we'll just say we were unable to detect
+	// the type.
 	if netType == "application/octet-stream" {
 		return ""
 	}
