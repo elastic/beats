@@ -332,7 +332,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			"namespace":  "agent",
 			"period":     "10s",
 			"path":       "/stats",
-			"hosts":      []string{beats.AgentMonitoringEndpoint(o.config.DownloadConfig.OS())},
+			"hosts":      endpoints,
 			"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
 			"processors": []map[string]interface{}{
 				{
@@ -368,12 +368,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"rename": map[string]interface{}{
 						"fields": []map[string]interface{}{
 							{
-								"from": "http.agent.beat",
-								"to":   "elastic-agent",
-							},
-							{
-								"from": "http.agent.system",
-								"to":   "elastic-agent.system",
+								"from": "http.agent",
+								"to":   "metrics",
 							},
 						},
 						"ignore_missing": true,
@@ -425,12 +421,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 				"rename": map[string]interface{}{
 					"fields": []map[string]interface{}{
 						{
-							"from": "http.agent.beat",
-							"to":   "elastic-agent",
-						},
-						{
-							"from": "http.agent.system",
-							"to":   "elastic-agent.system",
+							"from": "http.agent",
+							"to":   "metrics",
 						},
 					},
 					"ignore_missing": true,
