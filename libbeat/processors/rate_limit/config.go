@@ -18,6 +18,8 @@
 package rate_limit
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
 )
@@ -29,8 +31,21 @@ type Config struct {
 	Algorithm common.ConfigNamespace `config:"algorithm"`
 }
 
-func defaultConfig() Config {
-	return Config{
-		// TODO: set default algorithm
+func defaultConfig() (*Config, error) {
+	cfg, err := common.NewConfigFrom(map[string]interface{}{
+		"algorithm": map[string]interface{}{
+			"token_bucket": "~",
+		},
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse default configuration")
 	}
+
+	var config Config
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, errors.Wrap(err, "could not unpack default configuration")
+	}
+
+	return &config, nil
 }

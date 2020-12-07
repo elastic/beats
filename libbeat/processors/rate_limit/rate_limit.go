@@ -43,7 +43,11 @@ type rateLimit struct {
 
 // New constructs a new rate limit processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	config := defaultConfig()
+	config, err := defaultConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create default configuration")
+	}
+
 	if err := cfg.Unpack(&config); err != nil {
 		// TODO: make custom error: errConfigUnpack?
 		return nil, errors.Wrap(err, "could not unpack processor configuration")
@@ -61,7 +65,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	// TODO: flesh out fields
 	p := &rateLimit{
-		config:    config,
+		config:    *config,
 		algorithm: algo,
 	}
 
