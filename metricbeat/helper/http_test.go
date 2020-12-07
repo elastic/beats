@@ -33,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 func TestGetAuthHeaderFromToken(t *testing.T) {
@@ -196,17 +197,39 @@ func TestOverUnixSocket(t *testing.T) {
 		return
 	}
 
-	t.Run("at root", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "testsocket")
+	cases := map[string]struct {
+		hostDataBuilder func(sockFile string) (mb.HostData, error)
+	}{
+		"at root": {
+			hostDataBuilder: func(sockFile string) (mb.HostData, error) {
+				return mb.HostData{
+					Transport:    dialer.NewUnixDialerBuilder(sockFile),
+					URI:          "http://unix/",
+					SanitizedURI: "http://unix",
+				}, nil
+			},
+		},
+		"at specific path": {
+			hostDataBuilder: func(sockFile string) (mb.HostData, error) {
+				uri := "http://unix/ok"
+				return mb.HostData{
+					Transport:    dialer.NewUnixDialerBuilder(sockFile),
+					URI:          uri,
+					SanitizedURI: uri,
+				}, nil
+			},
+		},
+		"with parser builder": {
+			hostDataBuilder: func(sockFile string) (mb.HostData, error) {
+				parser := parse.URLHostParserBuilder{}.Build()
+				return parser(&dummyModule{}, "http+unix://"+sockFile)
+			},
+		},
+	}
+
+	serveOnUnixSocket := func(t *testing.T, path string) net.Listener {
+		l, err := net.Listen("unix", path)
 		require.NoError(t, err)
-		defer os.RemoveAll(tmpDir)
-
-		sockFile := tmpDir + "/test.sock"
-
-		l, err := net.Listen("unix", sockFile)
-		require.NoError(t, err)
-
-		defer l.Close()
 
 		mux := http.NewServeMux()
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -215,61 +238,35 @@ func TestOverUnixSocket(t *testing.T) {
 
 		go http.Serve(l, mux)
 
-		cfg := defaultConfig()
-		hostData := mb.HostData{
-			Transport:    dialer.NewUnixDialerBuilder(sockFile),
-			URI:          "http://unix/",
-			SanitizedURI: "http://unix",
-		}
+		return l
+	}
 
-		h, err := NewHTTPFromConfig(cfg, hostData)
-		require.NoError(t, err)
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			tmpDir, err := ioutil.TempDir("", "testsocket")
+			require.NoError(t, err)
+			defer os.RemoveAll(tmpDir)
 
-		r, err := h.FetchResponse()
-		require.NoError(t, err)
-		defer r.Body.Close()
-		content, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
-		assert.Equal(t, []byte("ehlo!"), content)
-	})
+			sockFile := tmpDir + "/test.sock"
+			l := serveOnUnixSocket(t, sockFile)
+			defer l.Close()
 
-	t.Run("at specific path", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "testsocket")
-		require.NoError(t, err)
-		defer os.RemoveAll(tmpDir)
+			cfg := defaultConfig()
 
-		sockFile := tmpDir + "/test.sock"
-		uri := "http://unix/ok"
+			hostData, err := c.hostDataBuilder(sockFile)
+			require.NoError(t, err)
 
-		l, err := net.Listen("unix", sockFile)
-		require.NoError(t, err)
+			h, err := NewHTTPFromConfig(cfg, hostData)
+			require.NoError(t, err)
 
-		defer l.Close()
-
-		mux := http.NewServeMux()
-		mux.HandleFunc("/ok", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "ehlo!")
+			r, err := h.FetchResponse()
+			require.NoError(t, err)
+			defer r.Body.Close()
+			content, err := ioutil.ReadAll(r.Body)
+			require.NoError(t, err)
+			assert.Equal(t, []byte("ehlo!"), content)
 		})
-
-		go http.Serve(l, mux)
-
-		cfg := defaultConfig()
-		hostData := mb.HostData{
-			Transport:    dialer.NewUnixDialerBuilder(sockFile),
-			URI:          uri,
-			SanitizedURI: uri,
-		}
-
-		h, err := NewHTTPFromConfig(cfg, hostData)
-		require.NoError(t, err)
-
-		r, err := h.FetchResponse()
-		require.NoError(t, err)
-		defer r.Body.Close()
-		content, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
-		assert.Equal(t, []byte("ehlo!"), content)
-	})
+	}
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {
@@ -290,4 +287,18 @@ func checkTimeout(t *testing.T, h *HTTP) {
 	case <-time.After(1 * time.Second):
 		t.Fatal("timeout should have happened time ago")
 	}
+}
+
+type dummyModule struct{}
+
+func (*dummyModule) Name() string {
+	return "dummy"
+}
+
+func (*dummyModule) Config() mb.ModuleConfig {
+	return mb.ModuleConfig{}
+}
+
+func (*dummyModule) UnpackConfig(interface{}) error {
+	return nil
 }

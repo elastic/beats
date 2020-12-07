@@ -15,197 +15,42 @@
             "splash"
         ],
         "command_line": "/sbin/init splash",
+        "cpu": {
+            "pct": 0,
+            "start_time": "2020-12-04T22:17:35.000Z"
+        },
+        "memory": {
+            "pct": 0.0004
+        },
         "name": "systemd",
         "pgid": 1,
         "pid": 1,
-        "ppid": 0
+        "ppid": 0,
+        "state": "sleeping"
     },
     "service": {
         "type": "system"
     },
     "system": {
         "process": {
-            "cgroup": {
-                "blkio": {
-                    "id": "init.scope",
-                    "path": "/init.scope",
-                    "total": {
-                        "bytes": 573440,
-                        "ios": 140
-                    }
-                },
-                "cpu": {
-                    "cfs": {
-                        "period": {
-                            "us": 100000
-                        },
-                        "quota": {
-                            "us": 0
-                        },
-                        "shares": 1024
-                    },
-                    "id": "init.scope",
-                    "path": "/init.scope",
-                    "rt": {
-                        "period": {
-                            "us": 0
-                        },
-                        "runtime": {
-                            "us": 0
-                        }
-                    },
-                    "stats": {
-                        "periods": 0,
-                        "throttled": {
-                            "ns": 0,
-                            "periods": 0
-                        }
-                    }
-                },
-                "cpuacct": {
-                    "id": "init.scope",
-                    "path": "/init.scope",
-                    "percpu": {
-                        "1": 571119313,
-                        "10": 282248474,
-                        "11": 363773369,
-                        "12": 855691122,
-                        "2": 735154670,
-                        "3": 458174215,
-                        "4": 281192882,
-                        "5": 563599363,
-                        "6": 415888016,
-                        "7": 396270851,
-                        "8": 550242795,
-                        "9": 419970811
-                    },
-                    "stats": {
-                        "system": {
-                            "ns": 1700000000
-                        },
-                        "user": {
-                            "ns": 1920000000
-                        }
-                    },
-                    "total": {
-                        "ns": 5893325881
-                    }
-                },
-                "id": "init.scope",
-                "memory": {
-                    "id": "init.scope",
-                    "kmem": {
-                        "failures": 0,
-                        "limit": {
-                            "bytes": 9223372036854771712
-                        },
-                        "usage": {
-                            "bytes": 16871424,
-                            "max": {
-                                "bytes": 17829888
-                            }
-                        }
-                    },
-                    "kmem_tcp": {
-                        "failures": 0,
-                        "limit": {
-                            "bytes": 9223372036854771712
-                        },
-                        "usage": {
-                            "bytes": 0,
-                            "max": {
-                                "bytes": 0
-                            }
-                        }
-                    },
-                    "mem": {
-                        "failures": 0,
-                        "limit": {
-                            "bytes": 9223372036854771712
-                        },
-                        "usage": {
-                            "bytes": 21827584,
-                            "max": {
-                                "bytes": 30121984
-                            }
-                        }
-                    },
-                    "memsw": {
-                        "failures": 0,
-                        "limit": {
-                            "bytes": 0
-                        },
-                        "usage": {
-                            "bytes": 0,
-                            "max": {
-                                "bytes": 0
-                            }
-                        }
-                    },
-                    "path": "/init.scope",
-                    "stats": {
-                        "active_anon": {
-                            "bytes": 4055040
-                        },
-                        "active_file": {
-                            "bytes": 405504
-                        },
-                        "cache": {
-                            "bytes": 643072
-                        },
-                        "hierarchical_memory_limit": {
-                            "bytes": 9223372036854771712
-                        },
-                        "hierarchical_memsw_limit": {
-                            "bytes": 0
-                        },
-                        "inactive_anon": {
-                            "bytes": 270336
-                        },
-                        "inactive_file": {
-                            "bytes": 0
-                        },
-                        "major_page_faults": 0,
-                        "mapped_file": {
-                            "bytes": 0
-                        },
-                        "page_faults": 117447,
-                        "pages_in": 52008,
-                        "pages_out": 50851,
-                        "rss": {
-                            "bytes": 4009984
-                        },
-                        "rss_huge": {
-                            "bytes": 0
-                        },
-                        "swap": {
-                            "bytes": 0
-                        },
-                        "unevictable": {
-                            "bytes": 0
-                        }
-                    }
-                },
-                "path": "/init.scope"
-            },
             "cmdline": "/sbin/init splash",
             "cpu": {
-                "start_time": "2020-11-03T17:55:56.000Z",
+                "start_time": "2020-12-04T22:17:35.000Z",
                 "total": {
                     "norm": {
                         "pct": 0
                     },
                     "pct": 0,
-                    "value": 5580
+                    "value": 1290
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 13414400,
+                    "bytes": 12173312,
                     "pct": 0.0004
                 },
-                "share": 8531968,
-                "size": 173076480
+                "share": 8679424,
+                "size": 172113920
             },
             "state": "sleeping"
         }

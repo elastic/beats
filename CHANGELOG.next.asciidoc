@@ -337,6 +337,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checkpoint module when logs contain time field. {pull}20567[20567]
 - Add field limit check for AWS Cloudtrail flattened fields. {pull}21388[21388] {issue}21382[21382]
 - Fix syslog RFC 5424 parsing in the CheckPoint module. {pull}21854[21854]
+- Add json body check for sqs message. {pull}21727[21727]
 - Fix incorrect connection state mapping in zeek connection pipeline. {pull}22151[22151] {issue}22149[22149]
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
@@ -448,6 +449,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
 - Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
 - Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
+- Fix rate metrics in Kafka broker metricset by using last minute rate instead of mean rate. {pull}22733[22733]
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 - Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
@@ -854,6 +856,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - `kibana` module: `stats` metricset no-longer collects usage-related data. {pull}22732[22732]
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
+- Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 
 *Packetbeat*
 
