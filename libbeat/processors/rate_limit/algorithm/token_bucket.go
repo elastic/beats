@@ -79,7 +79,7 @@ func (t *tokenBucket) getBucket(key string) bucket {
 }
 
 func (b *bucket) withdraw() bool {
-	if b.tokens < 1 {
+	if b.tokens == 0 {
 		return false
 	}
 	b.tokens--
