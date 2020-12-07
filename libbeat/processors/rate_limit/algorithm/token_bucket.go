@@ -97,7 +97,7 @@ func (b *bucket) replenish(rate Rate) {
 func (t *tokenBucket) replenishBuckets() {
 	toDelete := make([]string, 0)
 
-	// Replenish all buckets with tokens at the rate limit
+	// Add tokens to all buckets according to the rate limit.
 	for key, b := range t.buckets {
 		b.replenish(t.limit)
 
