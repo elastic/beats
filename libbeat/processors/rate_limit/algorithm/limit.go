@@ -31,13 +31,13 @@ const (
 	unitPerHour   unit = "h"
 )
 
-type Limit struct {
+type Rate struct {
 	value float64
 	unit  unit
 }
 
 // Unpack creates a limit from the given string
-func (l *Limit) Unpack(str string) error {
+func (l *Rate) Unpack(str string) error {
 	parts := strings.Split(str, "/")
 	if len(parts) != 2 {
 		// TODO: make custom error?
@@ -67,6 +67,17 @@ func (l *Limit) Unpack(str string) error {
 	l.unit = u
 
 	return nil
+}
+
+func (l *Rate) valuePerSecond() float64 {
+	switch l.unit {
+	case unitPerSecond:
+		return l.value
+	case unitPerMinute:
+		return l.value / 60
+	case unitPerHour:
+		return l.value / (60 * 60)
+	}
 }
 
 func contains(allowed []unit, candidate string) bool {

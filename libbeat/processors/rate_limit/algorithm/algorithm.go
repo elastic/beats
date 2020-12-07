@@ -26,7 +26,7 @@ import (
 var registry = make(map[string]constructor, 0)
 
 type Config struct {
-	Limit  Limit
+	Limit  Rate
 	Config common.Config
 }
 

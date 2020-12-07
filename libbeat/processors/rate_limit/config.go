@@ -26,7 +26,7 @@ import (
 
 // Config for rate limit processor.
 type Config struct {
-	Limit     algorithm.Limit        `config:"limit" validate:"required"`
+	Limit     algorithm.Rate         `config:"limit" validate:"required"`
 	Fields    []string               `config:"fields"`
 	Algorithm common.ConfigNamespace `config:"algorithm"`
 }
