@@ -36,7 +36,7 @@ type Rate struct {
 	unit  unit
 }
 
-// Unpack creates a limit from the given string
+// Unpack creates a Rate from the given string
 func (l *Rate) Unpack(str string) error {
 	parts := strings.Split(str, "/")
 	if len(parts) != 2 {
