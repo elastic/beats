@@ -34,7 +34,9 @@ type Config struct {
 func defaultConfig() (*Config, error) {
 	cfg, err := common.NewConfigFrom(map[string]interface{}{
 		"algorithm": map[string]interface{}{
-			"token_bucket": "~",
+			"token_bucket": map[string]interface{}{
+				"burst_multiplier": 1.0,
+			},
 		},
 	})
 
@@ -46,6 +48,8 @@ func defaultConfig() (*Config, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unpack default configuration")
 	}
+
+	config.Fields = make([]string, 0)
 
 	return &config, nil
 }

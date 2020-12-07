@@ -2,6 +2,8 @@ package algorithm
 
 import (
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -19,12 +21,20 @@ type tokenBucket struct {
 	buckets map[string]bucket
 }
 
-func newTokenBucket(config Config) Algorithm {
+func newTokenBucket(config Config) (Algorithm, error) {
+	var cfg struct {
+		BurstMultipler float64 `config:"burst_multiplier"`
+	}
+
+	if err := config.Config.Unpack(&cfg); err != nil {
+		return nil, errors.Wrap(err, "could not unpack token_bucket algorithm configuration")
+	}
+
 	return &tokenBucket{
 		config.Limit,
-		config.Limit.value * 1, // TODO: replace 1 with burstability multiplier
+		config.Limit.value * cfg.BurstMultipler,
 		make(map[string]bucket, 0),
-	}
+	}, nil
 }
 
 func (t *tokenBucket) IsAllowed(key string) bool {

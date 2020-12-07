@@ -40,7 +40,6 @@ type Rate struct {
 func (l *Rate) Unpack(str string) error {
 	parts := strings.Split(str, "/")
 	if len(parts) != 2 {
-		// TODO: make custom error?
 		return fmt.Errorf(`rate limit in invalid format: %v. Must be specified as "number/unit"`, str)
 	}
 
@@ -78,6 +77,8 @@ func (l *Rate) valuePerSecond() float64 {
 	case unitPerHour:
 		return l.value / (60 * 60)
 	}
+
+	return 0
 }
 
 func contains(allowed []unit, candidate string) bool {

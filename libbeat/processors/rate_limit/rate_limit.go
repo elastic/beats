@@ -19,11 +19,14 @@ package rate_limit
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -39,6 +42,7 @@ const processorName = "rate_limit"
 type rateLimit struct {
 	config    Config
 	algorithm algorithm.Algorithm
+	logger    *logp.Logger
 }
 
 // New constructs a new rate limit processor.
@@ -49,7 +53,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	if err := cfg.Unpack(&config); err != nil {
-		// TODO: make custom error: errConfigUnpack?
 		return nil, errors.Wrap(err, "could not unpack processor configuration")
 	}
 
@@ -58,15 +61,18 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "could not instantiate rate limiting algorithm")
 	}
 
-	algo := algoCtor(algorithm.Config{
+	algo, err := algoCtor(algorithm.Config{
 		Limit:  config.Limit,
 		Config: *config.Algorithm.Config(),
 	})
+	if err != nil {
+		return nil, errors.Wrap(err, "could not construct rate limit algorithm")
+	}
 
-	// TODO: flesh out fields
 	p := &rateLimit{
 		config:    *config,
 		algorithm: algo,
+		logger:    logp.NewLogger("rate_limit"),
 	}
 
 	return p, nil
@@ -75,9 +81,13 @@ func New(cfg *common.Config) (processors.Processor, error) {
 // Run applies the configured rate limit to the given event. If the event is within the
 // configured rate limit, it is returned as-is. If not, nil is returned.
 func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
-	key := "" // TODO: construct key from event fields + config
+	key, err := p.makeKey(event)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not make key")
+	}
 
 	if p.algorithm.IsAllowed(key) {
+		p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
 		return event, nil
 	}
 
@@ -90,4 +100,28 @@ func (p *rateLimit) String() string {
 		"%v=[limit=[%v],fields=[%v],algorithm=[%v]]",
 		processorName, p.config.Limit, p.config.Fields, p.config.Algorithm.Name(),
 	)
+}
+
+func (p *rateLimit) makeKey(event *beat.Event) (string, error) {
+	var key string
+
+	if len(p.config.Fields) > 0 {
+		sort.Strings(p.config.Fields)
+		values := make([]string, len(p.config.Fields))
+		for _, field := range p.config.Fields {
+			value, err := event.GetValue(field)
+			if err != nil && err == common.ErrKeyNotFound {
+				value = ""
+			}
+			if err != nil {
+				return "", errors.Wrapf(err, "error getting value of field: %v", field)
+			}
+
+			// TODO: check that the value is a scalar?
+			values = append(values, fmt.Sprintf("%v", value))
+		}
+		key = strings.Join(values, "_")
+	}
+
+	return key, nil
 }

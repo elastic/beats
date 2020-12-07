@@ -34,7 +34,7 @@ type Algorithm interface {
 	IsAllowed(string) bool
 }
 
-type constructor func(Config) Algorithm
+type constructor func(Config) (Algorithm, error)
 
 func Register(id string, ctor constructor) {
 	registry[id] = ctor
