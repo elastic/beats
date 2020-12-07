@@ -546,7 +546,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
-      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: User Requested."
+      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"

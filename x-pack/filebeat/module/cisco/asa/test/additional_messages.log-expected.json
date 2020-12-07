@@ -3093,6 +3093,46 @@
         ]
     },
     {
+        "cisco.asa.message_id": "716002",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 9810,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.user.name": "alice",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "710003",
         "destination.address": "195.74.114.34",
@@ -3126,7 +3166,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
-        "log.offset": 9810,
+        "log.offset": 9937,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.hostname": "dev01",
