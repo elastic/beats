@@ -91,7 +91,6 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// TODO: log that event is being dropped
 	return nil, nil
 }
 
