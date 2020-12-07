@@ -133,6 +133,14 @@ processors:
         target_field: _ingest._value.modification_time
         ignore_missing: true
     ignore_failure: true
+- foreach:
+    field: snyk.vulnerabilities.projects
+    processor:
+      append:
+        field: snyk.related.projects
+        value: _ingest._value.name
+        ignore_missing: true
+    ignore_failure: true
 - grok:
     field: snyk.project.url
     patterns:
