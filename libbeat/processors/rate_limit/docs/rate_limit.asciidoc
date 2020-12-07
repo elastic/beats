@@ -5,7 +5,7 @@
 <titleabbrev>rate_limit</titleabbrev>
 ++++
 
-The `rate_limit` processor limits the rate of event flow based on
+The `rate_limit` processor limits the throughput of events based on
 the specified configuration.
 
 [source,yaml]
@@ -37,9 +37,9 @@ The following settings are supported:
 
 `limit`:: The rate limit. Supported time units for the rate are `s` (per second), `m` (per minute), and `h` (per hour).
 `fields`:: (Optional) List of fields. The rate limit will be applied to each distinct value derived by combining the values of these fields.
-`algorithm`:: (Optional) The rate limiting algorithm to use. Supported algorithms are `token_bucket`, `leaky_bucket_queue`, and `sliding_window`. Default is `token_bucket`.
+`algorithm`:: (Optional) The rate limiting algorithm to use. The only supported algorithm at the moment is `token_bucket`.
 
-Some rate limiting algorithms support additional settings.
+Rate limiting algorithms may support additional, algorithm-specific settings.
 
 [source,yaml]
 -----------------------------------------------------
