@@ -174,12 +174,6 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 
 	segments := []*queueSegment{}
 	for _, file := range files {
-		/*if file.Size() <= segmentHeaderSize {
-			// Ignore segments that don't have at least some data beyond the
-			// header (this will always be true of segments we write unless there
-			// is an error).
-			continue
-		}*/
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
@@ -204,39 +198,6 @@ func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment,
 					header:    header,
 					endOffset: segmentOffset(file.Size() - int64(header.sizeOnDisk())),
 				})
-
-				//newSegment, err := prescanSegment(logger, segmentID(id), fullPath)
-
-				// If a segment is returned with an error, this means we were able to
-				// read at least some data but the end of the file may be incomplete
-				// or corrupted. In this case we add it to our list and read as much of
-				// it as we can.
-				/*if newSegment == nil {
-					logger.Errorf("couldn't load segment file '%v': %v", fullPath, err)
-				} else {
-					if err != nil {
-						logger.Warnf(
-							"error loading segment file '%v', data may be incomplete: %v",
-							fullPath, err)
-					}
-					segments = append(segments, newSegment)
-				}*/
-				/*frameCount, err := readFrameCount(path.Join(pathStr, file.Name()))
-				if frameCount == 0 {
-					logger.Errorf("")
-				} else {
-					if err != nil {
-						// If there is an error but frameCount is still positive, it means
-						// we
-						logger.Warnf(
-							"Error")
-					}
-					segments = append(segments, &queueSegment{
-						id:            segmentID(id),
-						endOffset:     segmentOffset(file.Size() - segmentHeaderSize),
-						framesWritten: frameCount,
-					})
-				}*/
 			}
 		}
 	}
@@ -252,6 +213,16 @@ func (segment *queueSegment) sizeOnDisk() uint64 {
 		headerSize = segmentHeaderSize
 	}
 	return uint64(segment.endOffset) + uint64(headerSize)
+}
+
+// Returns the number of frames in the segment, derived either from the
+// segment header if the segment is from a previous session, or from the
+// framesWritten field otherwise.
+func (segment *queueSegment) frameCount() uint32 {
+	if segment.header != nil {
+		return segment.header.frameCount
+	}
+	return segment.framesWritten
 }
 
 // A helper function that returns the number of frames in an existing

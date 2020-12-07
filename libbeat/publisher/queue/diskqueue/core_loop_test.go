@@ -122,7 +122,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	}
 
 	settings := DefaultSettings()
-	settings.MaxSegmentSize = uint64(1000 + segmentHeaderSize)
+	settings.MaxSegmentSize = 1000 + segmentHeaderSize
 	settings.MaxBufferSize = 10000
 	for description, test := range testCases {
 		dq := &diskQueue{
@@ -973,12 +973,11 @@ func makeWriteFrameWithSize(size int) *writeFrame {
 }
 
 func segmentWithSize(size int) *queueSegment {
-	headerSize := segmentHeaderSize
-	if size < headerSize {
+	if size < segmentHeaderSize {
 		// Can't have a segment smaller than the segment header
 		return nil
 	}
-	return &queueSegment{endOffset: segmentOffset(size - headerSize)}
+	return &queueSegment{endOffset: segmentOffset(size - segmentHeaderSize)}
 }
 
 func equalReaderLoopRequests(

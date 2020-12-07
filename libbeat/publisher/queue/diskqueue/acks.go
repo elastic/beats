@@ -25,9 +25,14 @@ import (
 )
 
 // queuePosition represents a logical position within the queue buffer.
+// The frame index is logically redundant with the segment offset, but
+// calculating it requires a linear scan of the file so we store both values.
+// Note that frameIndex is relative to the beginning of the segment,
+// and has no relation to the sequence used by frameID.
 type queuePosition struct {
-	segmentID segmentID
-	offset    segmentOffset
+	segmentID  segmentID
+	offset     segmentOffset
+	frameIndex uint64
 }
 
 type diskQueueACKs struct {
@@ -114,15 +119,16 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			newSegment, ok := dqa.segmentBoundaries[dqa.nextFrameID]
 			if ok {
 				// This is the start of a new segment. Remove this frame from the
-				// segment boundary list and set the position to the start of the
-				// new segment.
+				// segment boundary list and reset the next position.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
 				dqa.nextPosition = queuePosition{
-					segmentID: newSegment,
-					offset:    0,
+					segmentID:  newSegment,
+					offset:     0,
+					frameIndex: 0,
 				}
 			}
 			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
+			dqa.nextPosition.frameIndex++
 			delete(dqa.frameSize, dqa.nextFrameID)
 		}
 		// We advanced the ACK position at least somewhat, so write its
