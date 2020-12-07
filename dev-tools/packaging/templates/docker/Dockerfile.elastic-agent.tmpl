@@ -101,4 +101,3 @@ EXPOSE {{ $port }}
 
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
-CMD ["-environment", "container"]
