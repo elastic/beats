@@ -127,6 +127,8 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: append(inEvents[0:2], inEvents[3]),
 		},
+		// TODO: add test for burst multiplier
+		// TODO: add test with fields
 	}
 
 	for name, test := range cases {
