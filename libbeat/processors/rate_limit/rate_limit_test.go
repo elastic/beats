@@ -70,19 +70,20 @@ func TestRateLimit(t *testing.T) {
 		{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
+				"foo": "bar",
+				"baz": "mosquito",
+			},
+		},
+		{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
 				"baz": "qux",
 			},
 		},
 		{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"dog": "seger",
-			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"cat": "garfield",
+				"foo": "seger",
 			},
 		},
 	}
@@ -125,10 +126,18 @@ func TestRateLimit(t *testing.T) {
 			},
 			delay:     400 * time.Millisecond,
 			inEvents:  inEvents,
-			outEvents: append(inEvents[0:2], inEvents[3]),
+			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3]},
+		},
+		"with_fields": {
+			config: common.MapStr{
+				"limit":  "1/s",
+				"fields": []string{"foo"},
+			},
+			delay:     400 * time.Millisecond,
+			inEvents:  inEvents,
+			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
 		},
 		// TODO: add test for burst multiplier
-		// TODO: add test with fields
 	}
 
 	for name, test := range cases {

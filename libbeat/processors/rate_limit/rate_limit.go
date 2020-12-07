@@ -109,11 +109,11 @@ func (p *rateLimit) makeKey(event *beat.Event) (string, error) {
 		values := make([]string, len(p.config.Fields))
 		for _, field := range p.config.Fields {
 			value, err := event.GetValue(field)
-			if err != nil && err == common.ErrKeyNotFound {
-				value = ""
-			}
-			if err != nil {
+			if err != nil && err != common.ErrKeyNotFound {
 				return "", errors.Wrapf(err, "error getting value of field: %v", field)
+			}
+			if err != common.ErrKeyNotFound {
+				value = ""
 			}
 
 			// TODO: check that the value is a scalar?
