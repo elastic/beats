@@ -53,7 +53,7 @@ processors:
 - rename:
     if: ctx.kibana._audit_temp.trace != null
     field: kibana._audit_temp.trace
-    target_field: tracing.trace
+    target_field: trace
 
 - rename:
     if: ctx.kibana._audit_temp.process?.pid != null

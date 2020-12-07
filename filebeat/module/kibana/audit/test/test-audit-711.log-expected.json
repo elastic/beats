@@ -1,6 +1,6 @@
 [
     {
-        "tracing.trace.id": "e0bd67a1-a1b0-424d-9652-a350f88188eb",
+        "trace.id": "e0bd67a1-a1b0-424d-9652-a350f88188eb",
         "process.pid": 86516,
         "message": "User is updating config [id=8.0.0]",
         "@timestamp": "2020-11-20T12:05:14.528-05:00",
@@ -30,7 +30,7 @@
         "user.name": "elastic"
     },
     {
-        "tracing.trace.id": "ae67a156-3847-4d89-9c97-86769df5bc2e",
+        "trace.id": "ae67a156-3847-4d89-9c97-86769df5bc2e",
         "process.pid": 86516,
         "message": "User is requesting [/foo/s/marketing/api/saved_objects/_find] endpoint",
         "url.path": "/foo/s/marketing/api/saved_objects/_find",
@@ -65,7 +65,7 @@
         "user.name": "elastic"
     },
     {
-        "tracing.trace.id": "cef382d1-7442-4f9a-8bee-0512c2b1da5a",
+        "trace.id": "cef382d1-7442-4f9a-8bee-0512c2b1da5a",
         "process.pid": 86516,
         "message": "User is requesting [/foo/s/marketing/api/saved_objects/_bulk_get] endpoint",
         "url.path": "/foo/s/marketing/api/saved_objects/_bulk_get",
@@ -99,7 +99,7 @@
         "user.name": "elastic"
     },
     {
-        "tracing.trace.id": "cef382d1-7442-4f9a-8bee-0512c2b1da5a",
+        "trace.id": "cef382d1-7442-4f9a-8bee-0512c2b1da5a",
         "process.pid": 86516,
         "message": "User has accessed index-pattern [id=metrics-*]",
         "@timestamp": "2020-11-20T12:05:15.853-05:00",
@@ -129,7 +129,7 @@
         "user.name": "elastic"
     },
     {
-        "tracing.trace.id": "b10ee3ab-8102-4122-b4b5-5727e9b3d6a3",
+        "trace.id": "b10ee3ab-8102-4122-b4b5-5727e9b3d6a3",
         "process.pid": 86516,
         "message": "User is requesting [/foo/s/marketing/api/saved_objects/_find] endpoint",
         "url.path": "/foo/s/marketing/api/saved_objects/_find",
@@ -164,7 +164,7 @@
         "user.name": "elastic"
     },
     {
-        "tracing.trace.id": "4995c6bd-903c-42c2-af28-5cf17cc1cb6b",
+        "trace.id": "4995c6bd-903c-42c2-af28-5cf17cc1cb6b",
         "process.pid": 86516,
         "message": "User is requesting [/foo/s/marketing/api/saved_objects/dashboard] endpoint",
         "url.path": "/foo/s/marketing/api/saved_objects/dashboard",
