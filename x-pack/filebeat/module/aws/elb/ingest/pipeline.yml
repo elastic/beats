@@ -131,7 +131,7 @@ processors:
       value: failure
 
   - set:
-      field: tracing.trace.id
+      field: trace.id
       value: "{{aws.elb.trace_id}}"
       ignore_empty_value: true
 

@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,12 +33,22 @@ import (
 )
 
 var (
-	excludedFilePath = filepath.Join("testdata", "excluded_file")
-	includedFilePath = filepath.Join("testdata", "included_file")
-	directoryPath    = filepath.Join("testdata", "unharvestable_dir")
+	excludedFileName = "excluded_file"
+	includedFileName = "included_file"
+	directoryPath    = "unharvestable_dir"
 )
 
 func TestFileScanner(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "fswatch_test_file_scanner")
+	if err != nil {
+		t.Fatalf("cannot create temporary test dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+	setupFilesForScannerTest(t, tmpDir)
+
+	excludedFilePath := filepath.Join(tmpDir, excludedFileName)
+	includedFilePath := filepath.Join(tmpDir, includedFileName)
+
 	testCases := map[string]struct {
 		paths         []string
 		excludedFiles []match.Matcher
@@ -45,29 +56,21 @@ func TestFileScanner(t *testing.T) {
 		expectedFiles []string
 	}{
 		"select all files": {
-			paths: []string{excludedFilePath, includedFilePath},
-			expectedFiles: []string{
-				mustAbsPath(excludedFilePath),
-				mustAbsPath(includedFilePath),
-			},
+			paths:         []string{excludedFilePath, includedFilePath},
+			expectedFiles: []string{excludedFilePath, includedFilePath},
 		},
 		"skip excluded files": {
 			paths: []string{excludedFilePath, includedFilePath},
 			excludedFiles: []match.Matcher{
-				match.MustCompile("excluded_file"),
+				match.MustCompile(excludedFileName),
 			},
-			expectedFiles: []string{
-				mustAbsPath(includedFilePath),
-			},
+			expectedFiles: []string{includedFilePath},
 		},
 		"skip directories": {
-			paths:         []string{directoryPath},
+			paths:         []string{filepath.Join(tmpDir, directoryPath)},
 			expectedFiles: []string{},
 		},
 	}
-
-	setupFilesForScannerTest(t)
-	defer removeFilesOfScannerTest(t)
 
 	for name, test := range testCases {
 		test := test
@@ -92,25 +95,17 @@ func TestFileScanner(t *testing.T) {
 	}
 }
 
-func setupFilesForScannerTest(t *testing.T) {
-	err := os.MkdirAll(directoryPath, 0750)
+func setupFilesForScannerTest(t *testing.T, tmpDir string) {
+	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 750)
 	if err != nil {
-		t.Fatal(t)
+		t.Fatalf("cannot create non harvestable directory: %v", err)
 	}
-
-	for _, path := range []string{excludedFilePath, includedFilePath} {
-		f, err := os.Create(path)
+	for _, path := range []string{excludedFileName, includedFileName} {
+		f, err := os.Create(filepath.Join(tmpDir, path))
 		if err != nil {
 			t.Fatalf("file %s, error %v", path, err)
 		}
 		f.Close()
-	}
-}
-
-func removeFilesOfScannerTest(t *testing.T) {
-	err := os.RemoveAll("testdata")
-	if err != nil {
-		t.Fatal(err)
 	}
 }
 
@@ -236,14 +231,6 @@ func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
 func (t testFileInfo) Sys() interface{}   { return nil }
-
-func mustAbsPath(path string) string {
-	p, err := filepath.Abs(path)
-	if err != nil {
-		panic(err)
-	}
-	return p
-}
 
 func mustDuration(durStr string) time.Duration {
 	dur, err := time.ParseDuration(durStr)
