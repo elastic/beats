@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-var registry = map[string]Algorithm{}
+var registry = make(map[string]constructor, 0)
 
 type Config struct {
 	Limit  Limit
@@ -31,18 +31,18 @@ type Config struct {
 }
 
 type Algorithm interface {
-	ID() string
-	Configure(Config) error
 	IsAllowed(string) bool
 }
 
-func Register(algorithm Algorithm) {
-	registry[algorithm.ID()] = algorithm
+type constructor func(Config) Algorithm
+
+func Register(id string, ctor constructor) {
+	registry[id] = ctor
 }
 
-func Factory(id string) (Algorithm, error) {
-	if algorithm, found := registry[id]; found {
-		return algorithm, nil
+func Factory(id string) (constructor, error) {
+	if ctor, found := registry[id]; found {
+		return ctor, nil
 	}
 
 	return nil, fmt.Errorf("rate limiting algorithm '%v' not implemented", id)

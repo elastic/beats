@@ -53,12 +53,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "could not unpack processor configuration")
 	}
 
-	algo, err := algorithm.Factory(config.Algorithm.Name())
+	algoCtor, err := algorithm.Factory(config.Algorithm.Name())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not instantiate rate limiting algorithm")
 	}
 
-	algo.Configure(algorithm.Config{
+	algo := algoCtor(algorithm.Config{
 		Limit:  config.Limit,
 		Config: *config.Algorithm.Config(),
 	})

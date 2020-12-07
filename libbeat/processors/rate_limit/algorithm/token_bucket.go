@@ -1,20 +1,15 @@
 package algorithm
 
 func init() {
-	Register(&tokenBucket{})
+	Register("token_bucket", newTokenBucket)
 }
 
 type tokenBucket struct {
 	// TODO: flesh out
 }
 
-func (t *tokenBucket) ID() string {
-	return "token_bucket"
-}
-
-func (t *tokenBucket) Configure(config Config) error {
-	// TODO: flesh out
-	return nil
+func newTokenBucket(config Config) Algorithm {
+	return &tokenBucket{}
 }
 
 func (t *tokenBucket) IsAllowed(key string) bool {
