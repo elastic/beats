@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
+*Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.*
+
 This is a module for ingesting data from the different GSuite audit reports API's.
 
 include::../include/gs-link.asciidoc[]

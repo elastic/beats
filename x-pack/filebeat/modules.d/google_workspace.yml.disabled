@@ -1,5 +1,7 @@
-# Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
-- module: gsuite
+# Module: google_workspace
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-google_workspace.html
+
+- module: google_workspace
   saml:
     enabled: true
     # var.jwt_file: credentials.json
@@ -48,3 +50,4 @@
     # var.http_client_timeout: 60s
     # var.user_key: all
     # var.interval: 2h
+
