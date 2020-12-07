@@ -40,7 +40,7 @@ type Rate struct {
 func (l *Rate) Unpack(str string) error {
 	parts := strings.Split(str, "/")
 	if len(parts) != 2 {
-		return fmt.Errorf(`rate limit in invalid format: %v. Must be specified as "number/unit"`, str)
+		return fmt.Errorf(`rate in invalid format: %v. Must be specified as "number/unit"`, str)
 	}
 
 	valueStr := strings.TrimSpace(parts[0])
@@ -48,7 +48,7 @@ func (l *Rate) Unpack(str string) error {
 
 	v, err := strconv.ParseFloat(valueStr, 8)
 	if err != nil {
-		return fmt.Errorf(`rate limit's limit component is not numeric: %v`, valueStr)
+		return fmt.Errorf(`rate's value component is not numeric: %v`, valueStr)
 	}
 
 	if allowed := []unit{unitPerSecond, unitPerMinute, unitPerHour}; !contains(allowed, unitStr) {
@@ -57,7 +57,7 @@ func (l *Rate) Unpack(str string) error {
 			allowedStrs = append(allowedStrs, "/"+string(a))
 		}
 
-		return fmt.Errorf(`rate limit's unit component must be specified as one of: %v`, strings.Join(allowedStrs, ","))
+		return fmt.Errorf(`rate's unit component must be specified as one of: %v`, strings.Join(allowedStrs, ","))
 	}
 
 	u := unit(unitStr)
