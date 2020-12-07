@@ -5,7 +5,8 @@
   fields:
     - name: kibana
       type: group
-      description: ''
+      description: >
+        Module for parsing Kibana logs.
       fields:
         - name: space_id
           description: "The id of the space associated with this request."

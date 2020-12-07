@@ -11,3 +11,6 @@ processors:
       target: ''
       fields:
         ecs.version: 1.6.0
+  - decode_json_fields:
+      fields: [message]
+      target: kibana._audit_temp

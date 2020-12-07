@@ -17,6 +17,7 @@
         "event.category": "database",
         "event.dataset": "kibana.audit",
         "event.outcome": "unknown",
+        "event.type": "change",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -88,6 +89,7 @@
         "event.category": "web",
         "event.dataset": "kibana.audit",
         "event.outcome": "unknown",
+        "event.type": "change",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1170,
@@ -197,5 +199,35 @@
             "superuser"
         ],
         "user.name": "elastic"
-    }
+    },
+    {
+        "trace.id": "4995c6bd-903c-42c2-af28-5cf17cc1cb6b",
+        "process.pid": 86516,
+        "message": "User is creating dashboard [id=undefined]",
+        "@timestamp": "2020-11-20T12:05:24.150-05:00",
+        "ecs.version": "1.6.0",
+        "related.user": [
+            "elastic"
+        ],
+        "event.ingested": "2020-12-02T18:14:41.959534Z",
+        "event.timezone": "-02:00",
+        "event.created": "2020-12-02T18:14:40.622Z",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.action": "saved_object_create",
+        "event.category": "database",
+        "event.dataset": "kibana.audit",
+        "event.outcome": "unknown",
+        "event.type": "creation",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3486,
+        "service.type": "kibana",
+        "kibana.space_id": "marketing",
+        "kibana.saved_object.type": "dashboard",
+        "user.roles": [
+            "superuser"
+        ],
+        "user.name": "elastic"
+    },
 ]

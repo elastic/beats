@@ -89766,6 +89766,7 @@ kibana Module
 [float]
 === kibana
 
+Module for parsing Kibana logs.
 
 
 

@@ -1,8 +1,5 @@
 description: Pipeline for parsing Kibana audit logs in JSON format
 processors:
-- json:
-    field: message
-    target_field: kibana._audit_temp
 
 - set:
     field: "@timestamp"
@@ -24,6 +21,10 @@ processors:
     if: ctx.kibana._audit_temp.event.outcome != null
     field: event.outcome
     value: "{{kibana._audit_temp.event.outcome}}"
+- set:
+    if: ctx.kibana._audit_temp.event.type != null
+    field: event.type
+    value: "{{kibana._audit_temp.event.type}}"
 
 - rename:
     if: ctx.kibana._audit_temp.url != null
