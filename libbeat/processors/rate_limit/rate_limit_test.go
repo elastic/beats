@@ -137,7 +137,15 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
 		},
-		// TODO: add test for burst multiplier
+		"with_burst": { // FIXME: test is not working as expected
+			config: common.MapStr{
+				"limit":            "2/s",
+				"burst_multiplier": 2,
+			},
+			delay:     400 * time.Millisecond,
+			inEvents:  inEvents,
+			outEvents: inEvents,
+		},
 	}
 
 	for name, test := range cases {
