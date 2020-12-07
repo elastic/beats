@@ -56,7 +56,7 @@ func AgentMonitoringEndpoint(operatingSystem string) string {
 	return agentMbEndpointFileFormat
 }
 
-// AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
+// AgentPrefixedMonitoringEndpoint returns endpoint with exposed metrics for agent.
 func AgentPrefixedMonitoringEndpoint(operatingSystem string) string {
 	return httpPlusPrefix + AgentMonitoringEndpoint(operatingSystem)
 }
