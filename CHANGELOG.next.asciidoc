@@ -43,6 +43,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add fileset to ingest Kibana's ECS audit logs. {pull}22696[22696]
+
 
 *Auditbeat*
 
