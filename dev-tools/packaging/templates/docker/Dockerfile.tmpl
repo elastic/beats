@@ -59,6 +59,7 @@ LABEL \
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
+ENV GODEBUG="madvdontneed=1"
 
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
