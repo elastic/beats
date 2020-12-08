@@ -98,25 +98,25 @@ func (p *rateLimit) String() string {
 }
 
 func (p *rateLimit) makeKey(event *beat.Event) (string, error) {
-	var key string
-
-	if len(p.config.Fields) > 0 {
-		sort.Strings(p.config.Fields)
-		values := make([]string, len(p.config.Fields))
-		for _, field := range p.config.Fields {
-			value, err := event.GetValue(field)
-			if err != nil && err != common.ErrKeyNotFound {
-				return "", errors.Wrapf(err, "error getting value of field: %v", field)
-			}
-			if err != common.ErrKeyNotFound {
-				value = ""
-			}
-
-			// TODO: check that the value is a scalar?
-			values = append(values, fmt.Sprintf("%v", value))
-		}
-		key = strings.Join(values, "_")
+	if len(p.config.Fields) == 0 {
+		return "", nil
 	}
+
+	sort.Strings(p.config.Fields)
+	values := make([]string, len(p.config.Fields))
+	for _, field := range p.config.Fields {
+		value, err := event.GetValue(field)
+		if err != nil && err != common.ErrKeyNotFound {
+			return "", errors.Wrapf(err, "error getting value of field: %v", field)
+		}
+		if err != common.ErrKeyNotFound {
+			value = ""
+		}
+
+		// TODO: check that the value is a scalar?
+		values = append(values, fmt.Sprintf("%v", value))
+	}
+	key := strings.Join(values, "_")
 
 	return key, nil
 }
