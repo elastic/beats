@@ -24,6 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
 
@@ -35,11 +38,23 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
-// Name of this beat
-var Name = "metricbeat"
+const (
+	// Name of the beat
+	Name = "metricbeat"
+
+	// ecsVersion specifies the version of ECS that this beat is implementing.
+	ecsVersion = "1.7.0"
+)
 
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
+
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
 
 // MetricbeatSettings contains the default settings for metricbeat
 func MetricbeatSettings() instance.Settings {
@@ -49,6 +64,7 @@ func MetricbeatSettings() instance.Settings {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 }
 
