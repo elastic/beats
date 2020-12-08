@@ -189,9 +189,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	toolsArgs := []string{"--no-color"}
 	if mg.Verbose() {
-		toolsArgs = append(toolsArgs, "-f", "standard-quiet")
-	} else {
 		toolsArgs = append(toolsArgs, "-f", "standard-verbose")
+	} else {
+		toolsArgs = append(toolsArgs, "-f", "standard-quiet")
 	}
 	if params.JUnitReportFile != "" {
 		CreateDir(params.JUnitReportFile)
