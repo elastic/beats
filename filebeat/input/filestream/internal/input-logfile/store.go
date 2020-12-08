@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -30,6 +31,13 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
+
+// sourceStore is a store which can access resources using the Source
+// from an input.
+type sourceStore struct {
+	identifier *sourceIdentifier
+	store      *store
+}
 
 // store encapsulates the persistent store and the in memory state store, that
 // can be ahead of the the persistent store.
@@ -99,6 +107,7 @@ type resource struct {
 	// we always write the complete state of the key/value pair.
 	cursor        interface{}
 	pendingCursor interface{}
+	cursorMeta    interface{}
 }
 
 type (
@@ -116,6 +125,7 @@ type (
 		TTL     time.Duration
 		Updated time.Time
 		Cursor  interface{}
+		Meta    interface{}
 	}
 
 	stateInternal struct {
@@ -149,6 +159,87 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
+func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+	return &sourceStore{
+		store:      s,
+		identifier: identifier,
+	}
+}
+
+func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+	key := s.identifier.ID(src)
+	return s.store.findCursorMeta(key, v)
+}
+
+func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+	key := s.identifier.ID(src)
+	return s.store.updateMetadata(key, v)
+}
+
+func (s *sourceStore) Remove(src Source) error {
+	key := s.identifier.ID(src)
+	return s.store.remove(key)
+}
+
+// CleanIf sets the TTL of a resource if the predicate return true.
+func (s *sourceStore) CleanIf(pred func(v Value) bool) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			continue
+		}
+
+		remove := pred(res)
+		if remove {
+			s.store.UpdateTTL(res, 0)
+		}
+		res.lock.Unlock()
+	}
+}
+
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			continue
+		}
+
+		newKey, updatedMeta := getNewID(res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
+			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
+				res.lock.Unlock()
+				continue
+			}
+
+			// Pending updates due to events that have not yet been ACKed
+			// are not included in the copy. Collection on
+			// the copy start from the last known ACKed position.
+			// This might lead to duplicates if configurations are adapted
+			// for inputs with the same ID are changed.
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			s.store.writeState(r)
+		}
+
+		res.lock.Unlock()
+	}
+}
+
 func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
@@ -169,6 +260,51 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
+func (s *store) findCursorMeta(key string, to interface{}) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+	return typeconv.Convert(to, resource.cursorMeta)
+}
+
+// updateMetadata updates the cursor metadata in the persistent store.
+func (s *store) updateMetadata(key string, meta interface{}) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+
+	resource.cursorMeta = meta
+
+	s.writeState(resource)
+	return nil
+}
+
+// writeState writes the state to the persistent store.
+// WARNING! it does not lock the store
+func (s *store) writeState(r *resource) {
+	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
+	if err != nil {
+		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
+		r.internalInSync = false
+	} else {
+		r.stored = true
+		r.internalInSync = true
+	}
+}
+
+// Removes marks an entry for removal by setting its TTL to zero.
+func (s *store) remove(key string) error {
+	resource := s.ephemeralStore.Find(key, false)
+	if resource == nil {
+		return fmt.Errorf("resource '%s' not found", key)
+	}
+
+	s.UpdateTTL(resource, 0)
+	return nil
+}
+
 // UpdateTTL updates the time-to-live of a resource. Inactive resources with expired TTL are subject to removal.
 // The TTL value is part of the internal state, and will be written immediately to the persistent store.
 // On update the resource its `cursor` state is used, to keep the cursor state in sync with the current known
@@ -185,18 +321,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		resource.internalState.Updated = time.Now()
 	}
 
-	err := s.persistentStore.Set(resource.key, state{
-		TTL:     resource.internalState.TTL,
-		Updated: resource.internalState.Updated,
-		Cursor:  resource.cursor,
-	})
-	if err != nil {
-		s.log.Errorf("Failed to update resource management fields for '%v'", resource.key)
-		resource.internalInSync = false
-	} else {
-		resource.stored = true
-		resource.internalInSync = true
-	}
+	s.writeState(resource)
 }
 
 // Find returns the resource for a given key. If the key is unknown and create is set to false nil will be returned.
@@ -259,12 +384,37 @@ func (r *resource) UnpackCursor(to interface{}) error {
 	return typeconv.Convert(to, r.pendingCursor)
 }
 
+func (r *resource) UnpackCursorMeta(to interface{}) error {
+	return typeconv.Convert(to, r.cursorMeta)
+}
+
 // syncStateSnapshot returns the current insync state based on already ACKed update operations.
 func (r *resource) inSyncStateSnapshot() state {
 	return state{
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
 		Cursor:  r.cursor,
+		Meta:    r.cursorMeta,
+	}
+}
+
+func (r *resource) copyWithNewKey(key string) *resource {
+	internalState := r.internalState
+
+	// This is required to prevent the cleaner from removing the
+	// entry from the registry immediately.
+	// It still might be removed if the output is blocked for a long
+	// time. If removed the whole file is resent to the output when found/updated.
+	internalState.Updated = time.Now()
+	return &resource{
+		key:                    key,
+		stored:                 r.stored,
+		internalInSync:         true,
+		internalState:          internalState,
+		activeCursorOperations: r.activeCursorOperations,
+		cursor:                 r.cursor,
+		pendingCursor:          nil,
+		cursorMeta:             r.cursorMeta,
 	}
 }
 
@@ -280,6 +430,7 @@ func (r *resource) stateSnapshot() state {
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
 		Cursor:  cursor,
+		Meta:    r.cursorMeta,
 	}
 }
 
@@ -310,7 +461,8 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 				TTL:     st.TTL,
 				Updated: st.Updated,
 			},
-			cursor: st.Cursor,
+			cursor:     st.Cursor,
+			cursorMeta: st.Meta,
 		}
 		states.table[resource.key] = resource
 

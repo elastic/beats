@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -45,6 +46,30 @@ func TestFetch(t *testing.T) {
 	if len(event.MetricSetFields) < 11 {
 		t.Fatal("Too few top-level elements in the event")
 	}
+}
+
+func TestFetchFleetMode(t *testing.T) {
+	service := compose.EnsureUp(t, "apache")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	f.(*MetricSet).isFleetMode = true // silently simulate running in the fleet mode
+
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	event := events[0]
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+
+	// Check number of fields.
+	if len(event.MetricSetFields) < 11 {
+		t.Fatal("Too few top-level elements in the event")
+	}
+
+	_, err := event.MetricSetFields.GetValue("hostname")
+	assert.Equal(t, common.ErrKeyNotFound, err, "apache.hostname shouldn't be present in the fleet mode")
 }
 
 func getConfig(host string) map[string]interface{} {

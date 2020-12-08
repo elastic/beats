@@ -156,11 +156,68 @@ func TestEmitEvent_Node(t *testing.T) {
 							Address: "node1",
 						},
 					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
 				},
 			},
 			Expected: bus.Event{
 				"start":    true,
 				"host":     "192.168.0.1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"node": common.MapStr{
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
+					},
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"node": common.MapStr{
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test node start with just node name",
+			Flag:    "start",
+			Node: &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
+					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"start":    true,
+				"host":     "node1",
 				"id":       uid,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
@@ -221,7 +278,7 @@ func TestEmitEvent_Node(t *testing.T) {
 			},
 			Expected: bus.Event{
 				"stop":     true,
-				"host":     "",
+				"host":     "node1",
 				"id":       uid,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
