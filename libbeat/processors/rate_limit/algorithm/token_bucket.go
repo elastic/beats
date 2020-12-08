@@ -36,13 +36,42 @@ type tokenBucket struct {
 	limit   Rate
 	depth   float64
 	buckets map[string]*bucket
+
+	// GC thresholds and metrics
+	gc struct {
+		thresholds tokenBucketGCConfig
+		metrics    tokenBucketGCConfig
+	}
+}
+
+type tokenBucketGCConfig struct {
+	// NumCalls is the number of calls made to IsAllowed. When more than
+	// the specified number of calls are made, GC is performed.
+	NumCalls int `config:"num_calls"`
+
+	// NumBuckets is the number of buckets being utilized by the token
+	// bucket algorithm. When more than the specified number are utilized,
+	// GC is performed.
+	NumBuckets int `config:"num_buckets"`
+}
+
+type tokenBucketConfig struct {
+	BurstMultiplier float64 `config:"burst_multiplier"`
+
+	// GC governs when completely filled token buckets must be deleted
+	// to free up memory. GC is performed when _any_ of the GC conditions
+	// below are met. After each GC, counters corresponding to _each_ of
+	// the GC conditions below are reset.
+	GC tokenBucketGCConfig `config:"gc"`
 }
 
 func newTokenBucket(config Config) (Algorithm, error) {
-	cfg := struct {
-		BurstMultiplier float64 `config:"burst_multiplier"`
-	}{
+	cfg := tokenBucketConfig{
 		BurstMultiplier: 1.0,
+		GC: tokenBucketGCConfig{
+			NumCalls:   10000,
+			NumBuckets: 1000,
+		},
 	}
 
 	if err := config.Config.Unpack(&cfg); err != nil {
@@ -53,28 +82,42 @@ func newTokenBucket(config Config) (Algorithm, error) {
 		config.Limit,
 		config.Limit.value * cfg.BurstMultiplier,
 		make(map[string]*bucket, 0),
+		struct {
+			thresholds tokenBucketGCConfig
+			metrics    tokenBucketGCConfig
+		}{
+			thresholds: tokenBucketGCConfig{
+				NumCalls:   cfg.GC.NumCalls,
+				NumBuckets: cfg.GC.NumBuckets,
+			},
+		},
 	}, nil
 }
 
 func (t *tokenBucket) IsAllowed(key string) bool {
-	t.replenishBuckets()
+	t.runGC()
 
 	b := t.getBucket(key)
 	allowed := b.withdraw()
 
+	t.gc.metrics.NumCalls++
 	return allowed
 }
 
 func (t *tokenBucket) getBucket(key string) *bucket {
 	b, exists := t.buckets[key]
-	if !exists {
-		b = &bucket{
-			tokens:        t.depth,
-			lastReplenish: time.Now(),
-		}
-		t.buckets[key] = b
+	if exists {
+		b.replenish(t.limit)
+		return b
 	}
 
+	b = &bucket{
+		tokens:        t.depth,
+		lastReplenish: time.Now(),
+	}
+	t.buckets[key] = b
+
+	t.gc.metrics.NumBuckets++
 	return b
 }
 
@@ -94,14 +137,19 @@ func (b *bucket) replenish(rate Rate) {
 	b.lastReplenish = time.Now()
 }
 
-func (t *tokenBucket) replenishBuckets() {
-	toDelete := make([]string, 0)
+func (t *tokenBucket) runGC() {
+	// Don't run GC if thresholds haven't been crossed.
+	if (t.gc.metrics.NumBuckets < t.gc.thresholds.NumBuckets) &&
+		(t.gc.metrics.NumCalls < t.gc.thresholds.NumCalls) {
+		return
+	}
 
-	// Add tokens to all buckets according to the rate limit.
+	// Add tokens to all buckets according to the rate limit
+	// and flag full buckets for deletion.
+	toDelete := make([]string, 0)
 	for key, b := range t.buckets {
 		b.replenish(t.limit)
 
-		// If bucket is full, flag it for deletion
 		if b.tokens >= t.depth {
 			toDelete = append(toDelete, key)
 		}
@@ -111,4 +159,8 @@ func (t *tokenBucket) replenishBuckets() {
 	for _, key := range toDelete {
 		delete(t.buckets, key)
 	}
+
+	// Reset GC metrics
+	t.gc.metrics.NumCalls = 0
+	t.gc.metrics.NumBuckets = len(t.buckets)
 }
