@@ -124,7 +124,7 @@ func TestRateLimit(t *testing.T) {
 			config: common.MapStr{
 				"limit": "2/s",
 			},
-			delay:     400 * time.Millisecond,
+			delay:     200 * time.Millisecond,
 			inEvents:  inEvents,
 			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3]},
 		},
