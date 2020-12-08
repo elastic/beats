@@ -203,6 +203,7 @@
         "host.id": "y8fa3M5zSSGo1M_KJRMUXw",
         "http.request.body.content": "\n{\n    \"query\" : {\n        \"term\" : { \"user\" : \"kimchy\" }\n    }\n}\n",
         "http.request.method": "GET",
+        "http.request.mime_type": "application/json",
         "input.type": "log",
         "log.offset": 2056,
         "message": "{\"@timestamp\":\"2019-01-27T20:15:10,380\", \"node.name\":\"node-0\", \"node.id\":\"y8fa3M5zSSGo1M_KJRMUXw\", \"event.type\":\"rest\", \"event.action\":\"authentication_success\", \"user.name\":\"elastic-admin\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:58955\", \"realm\":\"default_file\", \"url.path\":\"/_search\", \"request.method\":\"GET\", \"request.body\":\"\\n{\\n    \\\"query\\\" : {\\n        \\\"term\\\" : { \\\"user\\\" : \\\"kimchy\\\" }\\n    }\\n}\\n\", \"request.id\":\"WzL_kb6VSvOhAq0twPvHOQ\"}",
