@@ -137,7 +137,7 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
 		},
-		"with_burst": { // FIXME: test is not working as expected
+		"with_burst": {
 			config: common.MapStr{
 				"limit":            "2/s",
 				"burst_multiplier": 2,

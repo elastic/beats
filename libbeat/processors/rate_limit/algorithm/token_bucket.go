@@ -35,7 +35,7 @@ type bucket struct {
 type tokenBucket struct {
 	limit   Rate
 	depth   float64
-	buckets map[string]*bucket
+	buckets map[uint64]*bucket
 
 	// GC thresholds and metrics
 	gc struct {
@@ -81,7 +81,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	return &tokenBucket{
 		config.Limit,
 		config.Limit.value * cfg.BurstMultiplier,
-		make(map[string]*bucket, 0),
+		make(map[uint64]*bucket, 0),
 		struct {
 			thresholds tokenBucketGCConfig
 			metrics    tokenBucketGCConfig
@@ -94,7 +94,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	}, nil
 }
 
-func (t *tokenBucket) IsAllowed(key string) bool {
+func (t *tokenBucket) IsAllowed(key uint64) bool {
 	t.runGC()
 
 	b := t.getBucket(key)
@@ -104,7 +104,7 @@ func (t *tokenBucket) IsAllowed(key string) bool {
 	return allowed
 }
 
-func (t *tokenBucket) getBucket(key string) *bucket {
+func (t *tokenBucket) getBucket(key uint64) *bucket {
 	b, exists := t.buckets[key]
 	if exists {
 		b.replenish(t.limit)
@@ -146,7 +146,7 @@ func (t *tokenBucket) runGC() {
 
 	// Add tokens to all buckets according to the rate limit
 	// and flag full buckets for deletion.
-	toDelete := make([]string, 0)
+	toDelete := make([]uint64, 0)
 	for key, b := range t.buckets {
 		b.replenish(t.limit)
 

@@ -20,8 +20,8 @@ package rate_limit
 import (
 	"fmt"
 	"sort"
-	"strings"
 
+	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -97,9 +97,9 @@ func (p *rateLimit) String() string {
 	)
 }
 
-func (p *rateLimit) makeKey(event *beat.Event) (string, error) {
+func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	if len(p.config.Fields) == 0 {
-		return "", nil
+		return 0, nil
 	}
 
 	sort.Strings(p.config.Fields)
@@ -107,16 +107,14 @@ func (p *rateLimit) makeKey(event *beat.Event) (string, error) {
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
 		if err != nil && err != common.ErrKeyNotFound {
-			return "", errors.Wrapf(err, "error getting value of field: %v", field)
+			return 0, errors.Wrapf(err, "error getting value of field: %v", field)
 		}
 		if err != common.ErrKeyNotFound {
 			value = ""
 		}
 
-		// TODO: check that the value is a scalar?
 		values = append(values, fmt.Sprintf("%v", value))
 	}
-	key := strings.Join(values, "_")
 
-	return key, nil
+	return hashstructure.Hash(values, nil)
 }

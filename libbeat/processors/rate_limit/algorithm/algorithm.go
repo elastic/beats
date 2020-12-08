@@ -43,7 +43,7 @@ type Algorithm interface {
 	// (true) or not (false). If a key is allowed, it means it is NOT
 	// rate limited. If a key is not allowed, it means it is being rate
 	// limited.
-	IsAllowed(string) bool
+	IsAllowed(uint64) bool
 }
 
 type constructor func(Config) (Algorithm, error)
