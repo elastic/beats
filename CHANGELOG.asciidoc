@@ -3,6 +3,48 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.10.1]]
+=== Beats version 7.10.1
+https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+
+*Auditbeat*
+
+- auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
+- system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
+- system/socket: Fixed startup error with some 5.x kernels. {issue}18755[18755] {pull}22787[22787]
+- system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
+
+*Filebeat*
+
+- Fix missing variable when loading aws pipelines. {pull}22645[22645]
+- Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
+
+*Heartbeat*
+
+- The `service_name` monitor option is being replaced with `service.name` which is more correct. We will support the old option till 8.0. {pull}20330[20330]
+- Fix exit on monitors with `enabled: false` {pull}22829[22829]
+
+*Metricbeat*
+
+- Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
+- Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
+
+==== Added
+
+*Filebeat*
+
+- Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
+
+*Functionbeat*
+
+- Add support for parallelization factor for kinesis. {pull}20727[20727]
+
 [[release-notes-7.10.0]]
 === Beats version 7.10.0
 https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
@@ -559,6 +601,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Packetbeat*
 
+- Add an example to packetbeat.yml of using the `forwarded` tag to disable `host` metadata fields when processing network data from network tap or mirror port. {pull}19209[19209]
 - Add ECS fields for x509 certs, event categorization, and related IP info. {pull}19167[19167]
 
 *Functionbeat*
@@ -704,7 +747,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
 - Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 - Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
-- Add an input option `publisher_pipeline.disable_host` to disable `host.name`. {pull}18456[18456]
+- Add an input option `publisher_pipeline.disable_host` to disable `host.name` from being added to events by default. {pull}18159[18159]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 - Add support for v10, v11 and v12 logs on Postgres {issue}13810[13810] {pull}17732[17732]

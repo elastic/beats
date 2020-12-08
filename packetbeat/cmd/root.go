@@ -37,7 +37,7 @@ const (
 	Name = "packetbeat"
 
 	// ecsVersion specifies the version of ECS that Packetbeat is implementing.
-	ecsVersion = "1.6.0"
+	ecsVersion = "1.7.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
@@ -60,10 +60,11 @@ func PacketbeatSettings() instance.Settings {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
 	return instance.Settings{
-		RunFlags:      runFlags,
-		Name:          Name,
-		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		RunFlags:       runFlags,
+		Name:           Name,
+		HasDashboards:  true,
+		Processing:     processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		InputQueueSize: 400,
 	}
 }
 
