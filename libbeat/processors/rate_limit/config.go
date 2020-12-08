@@ -34,9 +34,7 @@ type Config struct {
 func (c *Config) SetDefaults() error {
 	if c.Algorithm.Name() == "" {
 		cfg, err := common.NewConfigFrom(map[string]interface{}{
-			"token_bucket": map[string]interface{}{
-				"burst_multiplier": 1.0,
-			},
+			"token_bucket": map[string]interface{}{},
 		})
 
 		if err != nil {

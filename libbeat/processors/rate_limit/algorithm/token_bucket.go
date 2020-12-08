@@ -39,8 +39,10 @@ type tokenBucket struct {
 }
 
 func newTokenBucket(config Config) (Algorithm, error) {
-	var cfg struct {
+	cfg := struct {
 		BurstMultiplier float64 `config:"burst_multiplier"`
+	}{
+		BurstMultiplier: 1.0,
 	}
 
 	if err := config.Config.Unpack(&cfg); err != nil {
