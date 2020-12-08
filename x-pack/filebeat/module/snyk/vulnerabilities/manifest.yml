@@ -21,8 +21,6 @@ var:
     default:
       target: url.value
       value: '{{ getRFC5988Link "next" .last_response.header.Link }}'
-  - name: interval
-    default: 10s
   - name: api_token
   - name: ssl
   - name: orgs
