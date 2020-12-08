@@ -64,7 +64,6 @@ git commit -m "Add the LICENSE"
 git add .gitignore
 git commit -m "Add git settings"
 git add .
-git reset -- .travis.yml
 git commit -m "Add {beat}"
 ```
 
