@@ -277,7 +277,7 @@ var (
 	}
 
 	localHostInfoGroup = map[string]string{
-		sock.Ingressame:    "destination",
+		sock.IngressName:   "destination",
 		sock.EgressName:    "source",
 		sock.ListeningName: "server",
 	}
