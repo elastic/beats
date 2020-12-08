@@ -194,7 +194,16 @@ tags: [
 
 packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
 
-{%- if processors %}
+{%- if include_mime %}
+processors:
+  - detect_mime_type:
+      field: http.request.body.content
+      target: http.request.mime_type
+  - detect_mime_type:
+      field: http.response.body.content
+      target: http.response.mime_type
+
+{%- elif processors %}
 
 #================================ Filters =====================================
 
