@@ -18,10 +18,10 @@ packetbeat.interfaces.device: any
 packetbeat.interfaces.home_networks:
   # RFC1918
   - "10.0.0.0/8"
-	- "172.16.0.0/12"
-	- "192.168.0.0/16"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
   # IPv6 unique local addr
-	- "fc00::/7"
+  - "fc00::/7"
 
 # =================================== Flows ====================================
 
