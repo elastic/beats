@@ -18,6 +18,7 @@
 package algorithm
 
 import (
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -35,7 +36,7 @@ type bucket struct {
 type tokenBucket struct {
 	limit   Rate
 	depth   float64
-	buckets map[uint64]*bucket
+	buckets sync.Map
 
 	// GC thresholds and metrics
 	gc struct {
@@ -81,7 +82,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	return &tokenBucket{
 		config.Limit,
 		config.Limit.value * cfg.BurstMultiplier,
-		make(map[uint64]*bucket, 0),
+		sync.Map{},
 		struct {
 			thresholds tokenBucketGCConfig
 			metrics    tokenBucketGCConfig
@@ -105,17 +106,16 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 }
 
 func (t *tokenBucket) getBucket(key uint64) *bucket {
-	b, exists := t.buckets[key]
+	v, exists := t.buckets.LoadOrStore(key, &bucket{
+		tokens:        t.depth,
+		lastReplenish: time.Now(),
+	})
+	b := v.(*bucket)
+
 	if exists {
 		b.replenish(t.limit)
 		return b
 	}
-
-	b = &bucket{
-		tokens:        t.depth,
-		lastReplenish: time.Now(),
-	}
-	t.buckets[key] = b
 
 	t.gc.metrics.NumBuckets++
 	return b
@@ -147,20 +147,29 @@ func (t *tokenBucket) runGC() {
 	// Add tokens to all buckets according to the rate limit
 	// and flag full buckets for deletion.
 	toDelete := make([]uint64, 0)
-	for key, b := range t.buckets {
+	numBuckets := 0
+	t.buckets.Range(func(k, v interface{}) bool {
+		key := k.(uint64)
+		b := v.(*bucket)
+
 		b.replenish(t.limit)
 
 		if b.tokens >= t.depth {
 			toDelete = append(toDelete, key)
 		}
-	}
+
+		numBuckets++
+
+		return true
+	})
 
 	// Cleanup full buckets to free up memory
 	for _, key := range toDelete {
-		delete(t.buckets, key)
+		t.buckets.Delete(key)
+		numBuckets--
 	}
 
 	// Reset GC metrics
 	t.gc.metrics.NumCalls = 0
-	t.gc.metrics.NumBuckets = len(t.buckets)
+	t.gc.metrics.NumBuckets = numBuckets
 }
