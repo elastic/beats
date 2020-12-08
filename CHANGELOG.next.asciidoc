@@ -470,6 +470,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve panw ECS url fields mapping. {pull}22481[22481]
 - Improve Nats filebeat dashboard. {pull}22726[22726]
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
+- Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 
 *Heartbeat*
 
@@ -605,7 +606,6 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
