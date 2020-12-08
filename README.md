@@ -1,6 +1,6 @@
-[![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.10/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.10/)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
-[![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
+[![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=7.10)](https://codecov.io/github/elastic/beats?branch=7.10)
 
 # Beats - The Lightweight Shippers of the Elastic Stack
 
