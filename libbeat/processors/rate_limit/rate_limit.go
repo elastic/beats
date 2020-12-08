@@ -112,10 +112,11 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	values := make([]string, len(p.config.Fields))
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
-		if err != nil && err != common.ErrKeyNotFound {
-			return 0, errors.Wrapf(err, "error getting value of field: %v", field)
-		}
-		if err != common.ErrKeyNotFound {
+		if err != nil {
+			if err != common.ErrKeyNotFound {
+				return 0, errors.Wrapf(err, "error getting value of field: %v", field)
+			}
+
 			value = ""
 		}
 
