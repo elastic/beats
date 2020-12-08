@@ -59,12 +59,11 @@ func (t *tokenBucket) IsAllowed(key string) bool {
 
 	b := t.getBucket(key)
 	allowed := b.withdraw()
-	t.buckets[key] = b
 
 	return allowed
 }
 
-func (t *tokenBucket) getBucket(key string) bucket {
+func (t *tokenBucket) getBucket(key string) *bucket {
 	b, exists := t.buckets[key]
 	if !exists {
 		b = bucket{
@@ -74,8 +73,7 @@ func (t *tokenBucket) getBucket(key string) bucket {
 		t.buckets[key] = b
 	}
 
-	return b
-
+	return &b
 }
 
 func (b *bucket) withdraw() bool {
