@@ -37,7 +37,7 @@ const (
 	Name = "packetbeat"
 
 	// ecsVersion specifies the version of ECS that Packetbeat is implementing.
-	ecsVersion = "1.6.0"
+	ecsVersion = "1.7.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
@@ -50,7 +50,8 @@ var withECSVersion = processing.WithFields(common.MapStr{
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-func init() {
+// PacketbeatSettings contains the default settings for packetbeat
+func PacketbeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
@@ -58,12 +59,22 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	settings := instance.Settings{
-		RunFlags:      runFlags,
-		Name:          Name,
-		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+	return instance.Settings{
+		RunFlags:       runFlags,
+		Name:           Name,
+		HasDashboards:  true,
+		Processing:     processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		InputQueueSize: 400,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
-	RootCmd.AddCommand(genDevicesCommand())
+}
+
+// Initialize initializes the entrypoint commands for packetbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	rootCmd := cmd.GenRootCmdWithSettings(beater.New, settings)
+	rootCmd.AddCommand(genDevicesCommand())
+	return rootCmd
+}
+
+func init() {
+	RootCmd = Initialize(PacketbeatSettings())
 }

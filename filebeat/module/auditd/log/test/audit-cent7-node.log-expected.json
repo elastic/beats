@@ -98,7 +98,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 862,
-        "message": "",
         "process.executable": "/usr/lib/systemd/systemd-update-utmp",
         "process.name": "systemd-update-utmp",
         "process.pid": 1667,

@@ -72,7 +72,7 @@ require (
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect
-	github.com/elastic/gosigar v0.10.6-0.20200715000138-f115143bb233
+	github.com/elastic/gosigar v0.12.0
 	github.com/fatih/color v1.5.0
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.7
@@ -97,7 +97,7 @@ require (
 	github.com/gorilla/mux v1.7.2 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/h2non/filetype v1.0.12
+	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect

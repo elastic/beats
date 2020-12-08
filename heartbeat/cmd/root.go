@@ -29,32 +29,50 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 )
 
-// Name of this beat
-var Name = "heartbeat"
+const (
+	// Name of the beat
+	Name = "heartbeat"
+
+	// ecsVersion specifies the version of ECS that this beat is implementing.
+	ecsVersion = "1.7.0"
+)
 
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-func init() {
-	settings := instance.Settings{
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
+
+// HeartbeatSettings contains the default settings for heartbeat
+func HeartbeatSettings() instance.Settings {
+	return instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
+}
+
+// Initialize initializes the entrypoint commands for heartbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	rootCmd := cmd.GenRootCmdWithSettings(beater.New, settings)
 
 	// remove dashboard from export commands
-	for _, cmd := range RootCmd.ExportCmd.Commands() {
+	for _, cmd := range rootCmd.ExportCmd.Commands() {
 		if cmd.Name() == "dashboard" {
-			RootCmd.ExportCmd.RemoveCommand(cmd)
+			rootCmd.ExportCmd.RemoveCommand(cmd)
 		}
 	}
 
 	// only add defined flags to setup command
-	setup := RootCmd.SetupCmd
+	setup := rootCmd.SetupCmd
 	setup.Short = "Setup Elasticsearch index template and pipelines"
 	setup.Long = `This command does initial setup of the environment:
  * Index mapping template in Elasticsearch to ensure fields are mapped.
@@ -66,4 +84,10 @@ func init() {
 	setup.Flags().MarkDeprecated(cmd.ILMPolicyKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
 	setup.Flags().Bool(cmd.TemplateKey, false, "Setup index template")
 	setup.Flags().Bool(cmd.ILMPolicyKey, false, "Setup ILM policy")
+
+	return rootCmd
+}
+
+func init() {
+	RootCmd = Initialize(HeartbeatSettings())
 }
