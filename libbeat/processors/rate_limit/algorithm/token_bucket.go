@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 func init() {
@@ -50,7 +50,7 @@ type tokenBucket struct {
 		}
 	}
 
-	clock clock.Clock
+	clock clockwork.Clock
 }
 
 type tokenBucketGCConfig struct {
@@ -103,7 +103,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 				NumBuckets: cfg.GC.NumBuckets,
 			},
 		},
-		clock: clock.RealClock{},
+		clock: clockwork.NewRealClock(),
 	}, nil
 }
 
@@ -118,7 +118,7 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 }
 
 // SetClock allows test code to inject a fake clock
-func (t *tokenBucket) SetClock(c clock.Clock) {
+func (t *tokenBucket) SetClock(c clockwork.Clock) {
 	t.clock = c
 }
 
@@ -146,7 +146,7 @@ func (b *bucket) withdraw() bool {
 	return true
 }
 
-func (b *bucket) replenish(rate Rate, clock clock.Clock) {
+func (b *bucket) replenish(rate Rate, clock clockwork.Clock) {
 	secsSinceLastReplenish := clock.Now().Sub(b.lastReplenish).Seconds()
 	tokensToReplenish := secsSinceLastReplenish * rate.valuePerSecond()
 

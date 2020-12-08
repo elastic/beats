@@ -20,10 +20,10 @@ package algorithm
 import (
 	"fmt"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 var registry = make(map[string]constructor, 0)
@@ -47,7 +47,7 @@ type Algorithm interface {
 	IsAllowed(uint64) bool
 
 	// SetClock allows test code to inject a fake clock.
-	SetClock(clock.Clock)
+	SetClock(clockwork.Clock)
 }
 
 type constructor func(Config) (Algorithm, error)

@@ -21,11 +21,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 func TestNew(t *testing.T) {
@@ -154,10 +154,9 @@ func TestRateLimit(t *testing.T) {
 			p, err := New(common.MustNewConfigFrom(test.config))
 			require.NoError(t, err)
 
-			fakeClock := clock.FakeClock{}
-			fakeClock.SetNow(time.Now())
+			fakeClock := clockwork.NewFakeClock()
 
-			p.(*rateLimit).setClock(&fakeClock)
+			p.(*rateLimit).setClock(fakeClock)
 
 			out := make([]beat.Event, 0)
 			for _, in := range test.inEvents {
@@ -166,7 +165,7 @@ func TestRateLimit(t *testing.T) {
 				if o != nil {
 					out = append(out, *o)
 				}
-				fakeClock.Sleep(test.delay)
+				fakeClock.Advance(test.delay)
 			}
 
 			require.Equal(t, test.outEvents, out)

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
@@ -29,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
@@ -46,7 +46,7 @@ type rateLimit struct {
 	logger    *logp.Logger
 
 	// For testing
-	c clock.Clock
+	c clockwork.Clock
 }
 
 // New constructs a new rate limit processor.
@@ -75,7 +75,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		logger:    logp.NewLogger("rate_limit"),
 	}
 
-	p.setClock(clock.RealClock{})
+	p.setClock(clockwork.NewRealClock())
 
 	return p, nil
 }
@@ -127,7 +127,7 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 }
 
 // setClock allows test code to inject a fake clock
-func (p *rateLimit) setClock(c clock.Clock) {
+func (p *rateLimit) setClock(c clockwork.Clock) {
 	p.c = c
 	p.algorithm.SetClock(c)
 }
