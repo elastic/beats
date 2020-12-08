@@ -97698,9 +97698,9 @@ alias to: source.ip
 --
 
 [[exported-fields-mysqlenterprise]]
-== Mysql Enterprise fields
+== MySQL Enterprise fields
 
-Mysql Enterprise Audit module
+MySQL Enterprise Audit module
 
 
 

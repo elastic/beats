@@ -1273,7 +1273,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------- Mysql Enterprise Module ---------------------------
+#--------------------------- MySQL Enterprise Module ---------------------------
 - module: mysqlenterprise
   audit:
     enabled: true
@@ -1283,7 +1283,8 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # Should only be used together with file input
-    # var.paths: /home/user/mysqlauditlogs/audit.*.log
+    # var.paths:
+    #  - /home/user/mysqlauditlogs/audit.*.log
 
 #--------------------------------- NATS Module ---------------------------------
 - module: nats

@@ -120,8 +120,11 @@ processors:
     lang: painless
     if: ctx?.process?.args != null
     source: |
-      ctx.process.args_count = ctx.process.args.length - 1;
-      ctx.process.executable = ctx.process.args[0];
+      ctx.process.args_count = ctx.process.args.length;
+      if (ctx.process.args.length > 0) {
+        ctx.process.executable = ctx.process.args[0];
+      }
+
 # Attributes starting with _ is only supported by MySQL 8.0.19 and above.
 - convert:
     field: mysqlenterprise.audit.connection_data.connection_attributes._pid

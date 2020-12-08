@@ -1,7 +1,7 @@
 - key: mysqlenterprise
-  title: Mysql Enterprise
+  title: MySQL Enterprise
   description: >
-    Mysql Enterprise Audit module
+    MySQL Enterprise Audit module
   fields:
     - name: mysqlenterprise
       type: group
