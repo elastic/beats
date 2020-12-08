@@ -36,27 +36,6 @@
               description: >
                     Name of the group.
 
-        - name: effective
-          type: group
-          fields:
-            - name: id
-              type: keyword
-              description: >
-                One or multiple unique identifiers of the user.
-            - name: name
-              type: keyword
-              example: albert
-              description: >
-                Short name or login of the user.
-            - name: group.id
-              type: keyword
-              description: >
-                Unique identifier for the group on the system/platform.
-            - name: group.name
-              type: keyword
-              description: >
-                    Name of the group.
-
         - name: filesystem
           type: group
           fields:
