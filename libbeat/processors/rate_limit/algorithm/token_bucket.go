@@ -22,6 +22,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 func init() {
@@ -43,6 +45,8 @@ type tokenBucket struct {
 		thresholds tokenBucketGCConfig
 		metrics    tokenBucketGCConfig
 	}
+
+	clock clock.Clock
 }
 
 type tokenBucketGCConfig struct {
@@ -92,6 +96,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 				NumBuckets: cfg.GC.NumBuckets,
 			},
 		},
+		clock.RealClock{},
 	}, nil
 }
 
@@ -105,15 +110,20 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 	return allowed
 }
 
+// SetClock allows test code to inject a fake clock
+func (t *tokenBucket) SetClock(c clock.Clock) {
+	t.clock = c
+}
+
 func (t *tokenBucket) getBucket(key uint64) *bucket {
 	v, exists := t.buckets.LoadOrStore(key, &bucket{
 		tokens:        t.depth,
-		lastReplenish: time.Now(),
+		lastReplenish: t.clock.Now(),
 	})
 	b := v.(*bucket)
 
 	if exists {
-		b.replenish(t.limit)
+		b.replenish(t.limit, t.clock)
 		return b
 	}
 
@@ -129,12 +139,12 @@ func (b *bucket) withdraw() bool {
 	return true
 }
 
-func (b *bucket) replenish(rate Rate) {
-	secsSinceLastReplenish := time.Now().Sub(b.lastReplenish).Seconds()
+func (b *bucket) replenish(rate Rate, clock clock.Clock) {
+	secsSinceLastReplenish := clock.Now().Sub(b.lastReplenish).Seconds()
 	tokensToReplenish := secsSinceLastReplenish * rate.valuePerSecond()
 
 	b.tokens += tokensToReplenish
-	b.lastReplenish = time.Now()
+	b.lastReplenish = clock.Now()
 }
 
 func (t *tokenBucket) runGC() {
@@ -152,7 +162,7 @@ func (t *tokenBucket) runGC() {
 		key := k.(uint64)
 		b := v.(*bucket)
 
-		b.replenish(t.limit)
+		b.replenish(t.limit, t.clock)
 
 		if b.tokens >= t.depth {
 			toDelete = append(toDelete, key)

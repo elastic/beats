@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 func TestNew(t *testing.T) {
@@ -153,6 +154,11 @@ func TestRateLimit(t *testing.T) {
 			p, err := New(common.MustNewConfigFrom(test.config))
 			require.NoError(t, err)
 
+			fakeClock := clock.FakeClock{}
+			fakeClock.SetNow(time.Now())
+
+			p.(*rateLimit).setClock(&fakeClock)
+
 			out := make([]beat.Event, 0)
 			for _, in := range test.inEvents {
 				o, err := p.Run(&in)
@@ -160,7 +166,7 @@ func TestRateLimit(t *testing.T) {
 				if o != nil {
 					out = append(out, *o)
 				}
-				time.Sleep(test.delay)
+				fakeClock.Sleep(test.delay)
 			}
 
 			require.Equal(t, test.outEvents, out)

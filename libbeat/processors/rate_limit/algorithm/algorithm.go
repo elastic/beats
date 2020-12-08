@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
 var registry = make(map[string]constructor, 0)
@@ -44,6 +45,9 @@ type Algorithm interface {
 	// rate limited. If a key is not allowed, it means it is being rate
 	// limited.
 	IsAllowed(uint64) bool
+
+	// SetClock allows test code to inject a fake clock.
+	SetClock(clock.Clock)
 }
 
 type constructor func(Config) (Algorithm, error)
