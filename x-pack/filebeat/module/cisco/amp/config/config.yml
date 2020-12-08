@@ -1,22 +1,28 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-http_method: GET
+config_version: "2"
 interval: {{ .interval }}
-json_objects_array: data
-url: {{ .url }}
 
-oauth2: {{ .oauth2 | tojson }}
-oauth2.provider: azure
-oauth2.azure.resource: https://api.security.microsoft.com
-http_headers:
-  User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
-date_cursor.field: lastUpdateTime
-date_cursor.url_field: '$filter'
-date_cursor.value_template: 'lastUpdateTime gt {{.}}'
-date_cursor.initial_interval: 55m
-date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
+auth.basic.user: {{ .client_id }}
+auth.basic.password: {{ .api_key }}
 
+request.url: {{ .url }}
+request.method: GET
+request.timeout: 50s
+request.ssl: {{ .ssl | tojson }}
+request.transforms:
+- set: {{ .start_date | tojson }}
+request.rate_limit.limit: {{ .rate_limit | tojson}}
+request.rate_limit.reset: {{ .rate_reset | tojson}}
+request.rate_limit.remaining: {{ .rate_remaining | tojson}}
+
+response.pagination:
+- set: {{ .link_pagination | tojson }}
+
+response.split:
+  target: body.data
+  keep_parent: true
 
 {{ else if eq .input "file" }}
 
