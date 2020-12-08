@@ -47,22 +47,12 @@ func createEvent(stats *Stats) mb.Event {
 		e.MetricSetFields.Put("task_name", taskName)
 	}
 
-	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, regionName, taskName, clusterName))
+	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
 	return e
 }
 
-func getClusterName(labels map[string]string) string {
-	if v, ok := labels[clusterLabel]; ok {
-		vSplit := strings.Split(v, "cluster/")
-		if len(vSplit) == 2 {
-			return vSplit[1]
-		}
-	}
-	return ""
-}
-
-func generateIdentifier(containerName string, region string, taskName string, clusterName string) string {
-	return containerName + "/" + region + "/" + taskName + "/" + clusterName
+func generateIdentifier(containerName string, containerID string) string {
+	return containerName + "/" + containerID
 }
 
 func getRegionAndClusterName(labels map[string]string) (regionName string, clusterName string) {

@@ -62,7 +62,7 @@
                 },
                 "writes": 0
             },
-            "identifier": "query-metadata/us-west-2/query-metadata/default",
+            "identifier": "query-metadata/1234",
             "memory": {
                 "fail": {
                     "count": 0
@@ -135,7 +135,7 @@
         "region": "us-west-2"
     },
     "container": {
-        "id": "query-metadata-1",
+        "id": "1234",
         "image": {
             "name": "mreferre/eksutils"
         },

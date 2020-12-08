@@ -132,5 +132,5 @@ func TestGetRegionAndClusterName(t *testing.T) {
 }
 
 func TestGenerateIdentifier(t *testing.T) {
-	assert.Equal(t, "container-name/us-east-1/task-name/cluster-name", generateIdentifier("container-name", "us-east-1", "task-name", "cluster-name"))
+	assert.Equal(t, "container-name/123", generateIdentifier("container-name", "123"))
 }
