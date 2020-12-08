@@ -3,15 +3,17 @@
     "@timestamp": "2019-10-08T10:20:34.0535453Z",
     "event": {
       "action": "group-membership-enumerated",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4798,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "info",
-        "user"
+        "user",
+        "info"
       ]
     },
     "host": {
