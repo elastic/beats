@@ -35,7 +35,7 @@ type bucket struct {
 type tokenBucket struct {
 	limit   Rate
 	depth   float64
-	buckets map[string]bucket
+	buckets map[string]*bucket
 }
 
 func newTokenBucket(config Config) (Algorithm, error) {
@@ -50,7 +50,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	return &tokenBucket{
 		config.Limit,
 		config.Limit.value * cfg.BurstMultiplier,
-		make(map[string]bucket, 0),
+		make(map[string]*bucket, 0),
 	}, nil
 }
 
@@ -66,14 +66,14 @@ func (t *tokenBucket) IsAllowed(key string) bool {
 func (t *tokenBucket) getBucket(key string) *bucket {
 	b, exists := t.buckets[key]
 	if !exists {
-		b = bucket{
+		b = &bucket{
 			tokens:        t.depth,
 			lastReplenish: time.Now(),
 		}
 		t.buckets[key] = b
 	}
 
-	return &b
+	return b
 }
 
 func (b *bucket) withdraw() bool {
