@@ -19,7 +19,6 @@ package stats
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -38,10 +37,8 @@ func init() {
 }
 
 const (
-	statsPath              = "api/stats"
-	settingsPath           = "api/settings"
-	usageCollectionPeriod  = 24 * time.Hour
-	usageCollectionBackoff = 1 * time.Hour
+	statsPath    = "api/stats"
+	settingsPath = "api/settings"
 )
 
 var (
@@ -55,11 +52,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP            *helper.HTTP
-	settingsHTTP         *helper.HTTP
-	usageLastCollectedOn time.Time
-	usageNextCollectOn   time.Time
-	isUsageExcludable    bool
+	statsHTTP         *helper.HTTP
+	settingsHTTP      *helper.HTTP
+	isUsageExcludable bool
 }
 
 // New create a new instance of the MetricSet
@@ -157,31 +152,17 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	var content []byte
 	var err error
 
-	// Collect usage stats only once every usageCollectionPeriod
+	// Add exclude_usage=true if the Kibana Version supports it
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
 		defer m.statsHTTP.SetURI(origURI)
 
-		shouldCollectUsage := m.shouldCollectUsage(now)
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
+	}
 
-		content, err = m.statsHTTP.FetchContent()
-		if err != nil {
-			if shouldCollectUsage {
-				// When errored in collecting the usage stats it may be counterproductive to try again on the next poll, try to collect the stats again after usageCollectionBackoff
-				m.usageNextCollectOn = now.Add(usageCollectionBackoff)
-			}
-			return err
-		}
-
-		if shouldCollectUsage {
-			m.usageLastCollectedOn = now
-		}
-	} else {
-		content, err = m.statsHTTP.FetchContent()
-		if err != nil {
-			return err
-		}
+	content, err = m.statsHTTP.FetchContent()
+	if err != nil {
+		return err
 	}
 
 	if m.XPackEnabled {
@@ -218,8 +199,4 @@ func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 
 func (m *MetricSet) calculateIntervalMs() int64 {
 	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
-}
-
-func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod && now.Sub(m.usageNextCollectOn) > 0
 }

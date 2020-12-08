@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: azure-eventhub
+  - name: eventhub
+  - name: consumer_group
+    default: "$Default"
+  - name: connection_string
+  - name: storage_account
+  - name: storage_account_key
+  - name: resource_manager_endpoint
+  - name: tags
+    default: [forwarded]
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ../azure-shared-pipeline.yml
+input: config/{{.input}}.yml
