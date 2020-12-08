@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/clock"
 )
 
@@ -43,7 +44,10 @@ type tokenBucket struct {
 	// GC thresholds and metrics
 	gc struct {
 		thresholds tokenBucketGCConfig
-		metrics    tokenBucketGCConfig
+		metrics    struct {
+			numCalls   atomic.Uint
+			numBuckets atomic.Uint
+		}
 	}
 
 	clock clock.Clock
@@ -52,12 +56,12 @@ type tokenBucket struct {
 type tokenBucketGCConfig struct {
 	// NumCalls is the number of calls made to IsAllowed. When more than
 	// the specified number of calls are made, GC is performed.
-	NumCalls int `config:"num_calls"`
+	NumCalls uint `config:"num_calls"`
 
 	// NumBuckets is the number of buckets being utilized by the token
 	// bucket algorithm. When more than the specified number are utilized,
 	// GC is performed.
-	NumBuckets int `config:"num_buckets"`
+	NumBuckets uint `config:"num_buckets"`
 }
 
 type tokenBucketConfig struct {
@@ -84,19 +88,22 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	}
 
 	return &tokenBucket{
-		config.Limit,
-		config.Limit.value * cfg.BurstMultiplier,
-		sync.Map{},
-		struct {
+		limit:   config.Limit,
+		depth:   config.Limit.value * cfg.BurstMultiplier,
+		buckets: sync.Map{},
+		gc: struct {
 			thresholds tokenBucketGCConfig
-			metrics    tokenBucketGCConfig
+			metrics    struct {
+				numCalls   atomic.Uint
+				numBuckets atomic.Uint
+			}
 		}{
 			thresholds: tokenBucketGCConfig{
 				NumCalls:   cfg.GC.NumCalls,
 				NumBuckets: cfg.GC.NumBuckets,
 			},
 		},
-		clock.RealClock{},
+		clock: clock.RealClock{},
 	}, nil
 }
 
@@ -106,7 +113,7 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 	b := t.getBucket(key)
 	allowed := b.withdraw()
 
-	t.gc.metrics.NumCalls++
+	t.gc.metrics.numCalls.Inc()
 	return allowed
 }
 
@@ -127,7 +134,7 @@ func (t *tokenBucket) getBucket(key uint64) *bucket {
 		return b
 	}
 
-	t.gc.metrics.NumBuckets++
+	t.gc.metrics.numBuckets.Inc()
 	return b
 }
 
@@ -149,15 +156,15 @@ func (b *bucket) replenish(rate Rate, clock clock.Clock) {
 
 func (t *tokenBucket) runGC() {
 	// Don't run GC if thresholds haven't been crossed.
-	if (t.gc.metrics.NumBuckets < t.gc.thresholds.NumBuckets) &&
-		(t.gc.metrics.NumCalls < t.gc.thresholds.NumCalls) {
+	if (t.gc.metrics.numBuckets.Load() < t.gc.thresholds.NumBuckets) &&
+		(t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls) {
 		return
 	}
 
 	// Add tokens to all buckets according to the rate limit
 	// and flag full buckets for deletion.
 	toDelete := make([]uint64, 0)
-	numBuckets := 0
+	var numBuckets uint
 	t.buckets.Range(func(k, v interface{}) bool {
 		key := k.(uint64)
 		b := v.(*bucket)
@@ -180,6 +187,6 @@ func (t *tokenBucket) runGC() {
 	}
 
 	// Reset GC metrics
-	t.gc.metrics.NumCalls = 0
-	t.gc.metrics.NumBuckets = numBuckets
+	t.gc.metrics.numCalls = atomic.MakeUint(0)
+	t.gc.metrics.numBuckets = atomic.MakeUint(numBuckets)
 }
