@@ -9,15 +9,15 @@
         Module for parsing Kibana logs.
       fields:
         - name: space_id
-          description: "The id of the space associated with this request."
+          description: "The id of the space associated with this event."
           example: "default"
           type: keyword
         - name: saved_object.type
-          description: "The type of the saved object associated with this request."
+          description: "The type of the saved object associated with this event."
           example: "dashboard"
           type: keyword
         - name: saved_object.id
-          description: "The id of the saved object associated with this request."
+          description: "The id of the saved object associated with this event."
           example: "6295bdd0-0a0e-11e7-825f-6748cda7d858"
           type: keyword
         - name: add_to_spaces

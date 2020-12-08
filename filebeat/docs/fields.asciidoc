@@ -89773,7 +89773,7 @@ Module for parsing Kibana logs.
 *`kibana.space_id`*::
 +
 --
-The id of the space associated with this request.
+The id of the space associated with this event.
 
 type: keyword
 
@@ -89784,7 +89784,7 @@ example: default
 *`kibana.saved_object.type`*::
 +
 --
-The type of the saved object associated with this request.
+The type of the saved object associated with this event.
 
 type: keyword
 
@@ -89795,7 +89795,7 @@ example: dashboard
 *`kibana.saved_object.id`*::
 +
 --
-The id of the saved object associated with this request.
+The id of the saved object associated with this event.
 
 type: keyword
 
