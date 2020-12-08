@@ -13,6 +13,16 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ call .device .GOOS }}
 
+# The network CIDR blocks that are considered "internal" networks for
+# the purpose of network perimeter boundary classification.
+packetbeat.interfaces.home_networks:
+  # RFC1918
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+  # IPv6 unique local addr
+  - "fc00::/7"
+
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
 # not the fastest option.

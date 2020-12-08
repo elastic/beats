@@ -42,6 +42,10 @@ const (
 	Inbound  = "inbound"
 	Outbound = "outbound"
 	Internal = "internal"
+	External = "external"
+	Egress   = "egress"
+	Ingress  = "ingress"
+	Unknown  = "unknown"
 )
 
 // Fields contains common fields used in Packetbeat events. Protocol
@@ -216,7 +220,7 @@ func makeProcess(p *common.Process) *ecs.Process {
 }
 
 // ComputeValues computes derived values like network.bytes and writes them to f.
-func (f *Fields) ComputeValues(localIPs []net.IP) error {
+func (f *Fields) ComputeValues(localIPs []net.IP, internalIPBlocks []*net.IPNet) error {
 	var flow flowhash.Flow
 
 	// network.bytes
@@ -266,27 +270,12 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	// network.direction
-	if len(localIPs) > 0 && f.Network.Direction == "" {
-		if flow.SourceIP != nil {
-			for _, ip := range localIPs {
-				if flow.SourceIP.Equal(ip) {
-					f.Network.Direction = Outbound
-					break
-				}
-			}
+	if f.Network.Direction == "" {
+		direction := hostBasedDirection(flow.SourceIP, flow.DestinationIP, localIPs)
+		if len(internalIPBlocks) > 0 && direction == Unknown {
+			direction = perimeterBasedDirection(flow.SourceIP, flow.DestinationIP, internalIPBlocks)
 		}
-		if flow.DestinationIP != nil {
-			for _, ip := range localIPs {
-				if flow.DestinationIP.Equal(ip) {
-					if f.Network.Direction == Outbound {
-						f.Network.Direction = Internal
-					} else {
-						f.Network.Direction = Inbound
-					}
-					break
-				}
-			}
-		}
+		f.Network.Direction = direction
 	}
 
 	// process (dest process will take priority)
@@ -321,6 +310,57 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	return nil
+}
+
+func hostBasedDirection(source, destination net.IP, ips []net.IP) string {
+	if destination != nil {
+		if destination.IsLoopback() || destination.IsLinkLocalUnicast() || destination.IsLinkLocalMulticast() {
+			return Ingress
+		}
+		for _, ip := range ips {
+			if destination.Equal(ip) {
+				return Ingress
+			}
+		}
+	}
+	if source != nil {
+		if source.IsLoopback() || source.IsLinkLocalUnicast() || source.IsLinkLocalMulticast() {
+			return Egress
+		}
+		for _, ip := range ips {
+			if source.Equal(ip) {
+				return Egress
+			}
+		}
+	}
+	return Unknown
+}
+
+func perimeterBasedDirection(source, destination net.IP, internalIPBlocks []*net.IPNet) string {
+	sourceInternal := isInternalIP(source, internalIPBlocks)
+	destinationInternal := isInternalIP(destination, internalIPBlocks)
+	if sourceInternal && destinationInternal {
+		return Internal
+	}
+	if sourceInternal {
+		return Outbound
+	}
+	if destinationInternal {
+		return Inbound
+	}
+	return External
+}
+
+func isInternalIP(ip net.IP, internalIPBlocks []*net.IPNet) bool {
+	if ip == nil {
+		return false
+	}
+	for _, block := range internalIPBlocks {
+		if block.Contains(ip) {
+			return true
+		}
+	}
+	return false
 }
 
 // MarshalMapStr marshals the fields into MapStr. It returns an error if there

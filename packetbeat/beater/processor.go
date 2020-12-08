@@ -118,6 +118,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 		p.beat.Publisher,
 		config.IgnoreOutgoing,
 		config.Interfaces.File == "",
+		config.Interfaces.HomeNetworks,
 	)
 	if err != nil {
 		return nil, err

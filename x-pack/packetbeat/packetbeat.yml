@@ -13,6 +13,16 @@
 # "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
+# The network CIDR blocks that are considered "internal" networks for
+# the purpose of network perimeter boundary classification.
+packetbeat.interfaces.home_networks:
+  # RFC1918
+  - "10.0.0.0/8"
+	- "172.16.0.0/12"
+	- "192.168.0.0/16"
+  # IPv6 unique local addr
+	- "fc00::/7"
+
 # =================================== Flows ====================================
 
 # Set `enabled: false` or comment out all options to disable flows reporting.
