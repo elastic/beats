@@ -56,17 +56,13 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "could not set default configuration")
 	}
 
-	algoCtor, err := algorithm.Factory(config.Algorithm.Name())
-	if err != nil {
-		return nil, errors.Wrap(err, "could not instantiate rate limiting algorithm")
-	}
-
-	algo, err := algoCtor(algorithm.Config{
+	algoConfig := algorithm.Config{
 		Limit:  config.Limit,
 		Config: *config.Algorithm.Config(),
-	})
+	}
+	algo, err := algorithm.Factory(config.Algorithm.Name(), algoConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct rate limit algorithm")
+		return nil, errors.Wrap(err, "could not construct rate limiting algorithm")
 	}
 
 	p := &rateLimit{

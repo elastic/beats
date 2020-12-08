@@ -20,6 +20,8 @@ package algorithm
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -52,10 +54,17 @@ func register(id string, ctor constructor) {
 
 // Factory returns the requested rate limiting algorithm, if one is found. If not found,
 // an error is returned.
-func Factory(id string) (constructor, error) {
-	if ctor, found := registry[id]; found {
-		return ctor, nil
+func Factory(id string, config Config) (Algorithm, error) {
+	var ctor constructor
+	var found bool
+	if ctor, found = registry[id]; !found {
+		return nil, fmt.Errorf("rate limiting algorithm '%v' not implemented", id)
 	}
 
-	return nil, fmt.Errorf("rate limiting algorithm '%v' not implemented", id)
+	algorithm, err := ctor(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not construct algorithm")
+	}
+
+	return algorithm, nil
 }
