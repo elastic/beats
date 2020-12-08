@@ -350,6 +350,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 - Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
 - Add tini as init system in docker images {pull}22137[22137]
+- Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
 
 *Auditbeat*
 
@@ -566,6 +567,7 @@ port. {pull}19209[19209]
 - Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
 - Change build process for x-pack distribution {pull}21979[21979]
 - Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
+- Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 
 
 *Functionbeat*
