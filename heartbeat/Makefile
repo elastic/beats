@@ -13,8 +13,7 @@ collect: imports kibana
 # Generate imports for all monitors
 .PHONY: imports
 imports:
-	@mkdir -p include
-	mage imports
+	# No-op for heartbeat, kept for compat with other beats
 
 # Collects all module dashboards
 .PHONY: kibana
