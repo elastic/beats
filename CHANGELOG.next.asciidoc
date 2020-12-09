@@ -738,6 +738,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 - Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
+- Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
+- Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
 
 *Heartbeat*
 
