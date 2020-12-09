@@ -1,0 +1,1211 @@
+[
+    {
+        "@timestamp": "2020-10-01T19:21:33.000Z",
+        "event.action": "mysql-startup",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.os.full": "x86_64-Linux",
+        "input.type": "log",
+        "log.offset": 0,
+        "mysqlenterprise.audit.class": "audit",
+        "mysqlenterprise.audit.connection_id": 0,
+        "mysqlenterprise.audit.id": 0,
+        "process.args": [
+            "/usr/local/mysql/bin/mysqld",
+            "--loose-audit-log-format=JSON",
+            "--log-error=log.err",
+            "--pid-file=mysqld.pid",
+            "--port=3306"
+        ],
+        "process.args_count": 5,
+        "process.command_line": "/usr/local/mysql/bin/mysqld --loose-audit-log-format=JSON --log-error=log.err --pid-file=mysqld.pid --port=3306",
+        "process.executable": "/usr/local/mysql/bin/mysqld",
+        "process.name": "mysqld",
+        "related.user": [
+            "skip-grants user"
+        ],
+        "server.user.name": "skip-grants user",
+        "service.id": 1,
+        "service.type": "mysqlenterprise",
+        "service.version": "8.0.22-commercial",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:25:51.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-connect",
+        "event.category": [
+            "database",
+            "network"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "start"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 462,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "8.0.22",
+        "mysqlenterprise.audit.connection_data.connection_attributes._os": "Linux",
+        "mysqlenterprise.audit.connection_data.connection_attributes._platform": "x86_64",
+        "mysqlenterprise.audit.connection_data.connection_attributes.os_user": "root",
+        "mysqlenterprise.audit.connection_data.connection_type": "socket",
+        "mysqlenterprise.audit.connection_data.status": 0,
+        "mysqlenterprise.audit.connection_id": 13,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "process.pid": 33038,
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:25:51.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 925,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 13,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "select @@version_comment limit 1",
+        "mysqlenterprise.audit.general_data.sql_command": "select",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:25:52.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-disconnect",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "end"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 1271,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_type": "socket",
+        "mysqlenterprise.audit.connection_id": 13,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:27:45.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-connect",
+        "event.category": [
+            "database",
+            "network"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "start"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 1553,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "8.0.22",
+        "mysqlenterprise.audit.connection_data.connection_attributes._os": "Linux",
+        "mysqlenterprise.audit.connection_data.connection_attributes._platform": "x86_64",
+        "mysqlenterprise.audit.connection_data.connection_attributes.os_user": "root",
+        "mysqlenterprise.audit.connection_data.connection_type": "socket",
+        "mysqlenterprise.audit.connection_data.status": 0,
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "process.pid": 33197,
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:27:45.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2016,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "select @@version_comment limit 1",
+        "mysqlenterprise.audit.general_data.sql_command": "select",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:27:50.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2362,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'password'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1064,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:28:04.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2744,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'password'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1064,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:28:27.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3126,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'root'@'hades.home' IDENTIFIED BY 'password'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1064,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:28:54.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3517,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1410,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:29:36.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3874,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "CREATE USER 'audit_test_user'@'localhost' IDENTIFIED BY <secret>",
+        "mysqlenterprise.audit.general_data.sql_command": "create_user",
+        "mysqlenterprise.audit.general_data.status": 1396,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:30:00.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 4260,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "CREATE USER 'audit_test_user2'@'hades.home' IDENTIFIED BY <secret>",
+        "mysqlenterprise.audit.general_data.sql_command": "create_user",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:30:18.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 4645,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO \u2018audit_test_user2\u2019@\u2019hades.home\u2019",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1410,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:30:32.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 5031,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'audit_test_user'@'hades.home'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1410,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:30:49.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 5408,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'audit_test_user'@'hades.home'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 1410,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:01.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database",
+            "iam"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 5785,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "GRANT ALL PRIVILEGES ON *.* TO 'audit_test_user2'@'hades.home'",
+        "mysqlenterprise.audit.general_data.sql_command": "grant",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:25.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-connect",
+        "event.category": [
+            "database",
+            "network"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "start"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 6160,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_name": "libmysql",
+        "mysqlenterprise.audit.connection_data.connection_attributes._client_version": "5.7.30",
+        "mysqlenterprise.audit.connection_data.connection_attributes._os": "Linux",
+        "mysqlenterprise.audit.connection_data.connection_attributes._platform": "x86_64",
+        "mysqlenterprise.audit.connection_data.connection_type": "ssl",
+        "mysqlenterprise.audit.connection_data.status": 0,
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "process.pid": 394499,
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:25.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 6638,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "select @@version_comment limit 1",
+        "mysqlenterprise.audit.general_data.sql_command": "select",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:31.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 7020,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "create database audit_test",
+        "mysqlenterprise.audit.general_data.sql_command": "create_db",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:40.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 7399,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "SELECT DATABASE()",
+        "mysqlenterprise.audit.general_data.sql_command": "select",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:40.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 7766,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Init DB",
+        "mysqlenterprise.audit.general_data.sql_command": "error",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:40.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 8104,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "show databases",
+        "mysqlenterprise.audit.general_data.sql_command": "show_databases",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 2,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:40.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 8476,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "show tables",
+        "mysqlenterprise.audit.general_data.sql_command": "show_tables",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 3,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:47.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 8842,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "CREATE TABLE audit_test_table (firstname VARCHAR(20), lastname VARCHAR(20))",
+        "mysqlenterprise.audit.general_data.sql_command": "create_table",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:57.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-insert",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 9273,
+        "mysqlenterprise.audit.class": "table_access",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "mysqlenterprise.audit.table_access_data.db": "audit_test",
+        "mysqlenterprise.audit.table_access_data.query": "INSERT INTO audit_test_table values ('John', 'Smith')",
+        "mysqlenterprise.audit.table_access_data.sql_command": "insert",
+        "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:31:57.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 9702,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "INSERT INTO audit_test_table values ('John', 'Smith')",
+        "mysqlenterprise.audit.general_data.sql_command": "insert",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:32:05.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-read",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 10105,
+        "mysqlenterprise.audit.class": "table_access",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "mysqlenterprise.audit.table_access_data.db": "audit_test",
+        "mysqlenterprise.audit.table_access_data.query": "select * from audit_test_table",
+        "mysqlenterprise.audit.table_access_data.sql_command": "select",
+        "mysqlenterprise.audit.table_access_data.table": "audit_test_table",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:32:05.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-status",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 10509,
+        "mysqlenterprise.audit.class": "general",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.general_data.command": "Query",
+        "mysqlenterprise.audit.general_data.query": "select * from audit_test_table",
+        "mysqlenterprise.audit.general_data.sql_command": "select",
+        "mysqlenterprise.audit.general_data.status": 0,
+        "mysqlenterprise.audit.id": 1,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:32:10.000Z",
+        "client.domain": "hades.home",
+        "client.ip": "192.168.2.5",
+        "event.action": "mysql-disconnect",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "end"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 10889,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_type": "ssl",
+        "mysqlenterprise.audit.connection_id": 16,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "audit_test_user2",
+        "process.name": "mysqld",
+        "related.ip": [
+            "192.168.2.5"
+        ],
+        "related.user": [
+            "audit_test_user2"
+        ],
+        "server.user.name": "audit_test_user2",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:32:12.000Z",
+        "client.domain": "localhost",
+        "event.action": "mysql-disconnect",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "connection",
+            "end"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 11204,
+        "mysqlenterprise.audit.class": "connection",
+        "mysqlenterprise.audit.connection_data.connection_type": "socket",
+        "mysqlenterprise.audit.connection_id": 15,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.login.user": "root",
+        "process.name": "mysqld",
+        "related.user": [
+            "root"
+        ],
+        "server.user.name": "root",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-01T19:32:16.000Z",
+        "event.action": "mysql-shutdown",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysqlenterprise.audit",
+        "event.kind": "event",
+        "event.module": "mysqlenterprise",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 11486,
+        "mysqlenterprise.audit.class": "audit",
+        "mysqlenterprise.audit.connection_id": 0,
+        "mysqlenterprise.audit.id": 0,
+        "mysqlenterprise.audit.shutdown_data.server_id": 1,
+        "process.name": "mysqld",
+        "service.type": "mysqlenterprise",
+        "tags": [
+            "mysqlenterprise-audit"
+        ]
+    }
+]
