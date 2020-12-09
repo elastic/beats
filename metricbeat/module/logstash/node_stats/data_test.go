@@ -20,12 +20,13 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
 	"github.com/stretchr/testify/require"
 
@@ -63,7 +64,7 @@ func TestData(t *testing.T) {
 
 	mux.Handle("/_node/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/node_stats.700.json")
+			input, _ := ioutil.ReadFile("./_meta/test/node_stats.710.json")
 			w.Write(input)
 		}))
 

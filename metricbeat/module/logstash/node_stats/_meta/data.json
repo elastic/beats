@@ -1,140 +1,130 @@
 {
-    "@timestamp": "2020-10-30T12:41:12.793Z",
-    "@metadata": {
-      "beat": "metricbeat",
-      "type": "_doc",
-      "version": "8.0.0"
-    },
-    "metricset": {
-      "name": "node_stats",
-      "period": 10000
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "logstash.node.stats",
+        "duration": 115000,
+        "module": "logstash"
     },
     "logstash": {
-      "node": {
-        "stats": {
-          "events": {
-            "duration_in_millis": 0,
-            "in": 0,
-            "filtered": 0,
-            "out": 0
-          },
-          "reloads": {
-            "failures": 0,
-            "successes": 0
-          },
-          "queue": {
-            "events_count": 0
-          },
-          "os": {
-            "cpu": {
-              "percent": 0,
-              "load_average": {
-                "1m": 2.814453125
-              }
-            },
-            "cgroup": {
-              "cpuacct": null,
-              "cpu": {
-                "stat": null,
-                "control_group": ""
-              }
-            }
-          },
-          "pipelines": [
-            {
-              "id": "main",
-              "hash": "4dbe1b282a0265b7c90ae9212a3b4bef55168d267004e5124a3486f9151d4188",
-              "ephemeral_id": "5fd09014-09f9-449a-8b19-692c82f5494e",
-              "events": {
-                "filtered": 0,
-                "in": 0,
-                "out": 0,
-                "queue_push_duration_in_millis": 0,
-                "duration_in_millis": 0
-              },
-              "reloads": {
-                "successes": 0,
-                "failures": 0
-              },
-              "queue": {
-                "events_count": 0,
-                "max_queue_size_in_bytes": 0,
-                "queue_size_in_bytes": 0,
-                "type": "memory"
-              },
-              "vertices": null
-            }
-          ],
-          "jvm": {
-            "gc": {
-              "collectors": {
-                "old": {
-                  "collection_count": 1,
-                  "collection_time_in_millis": 198
+        "node": {
+            "stats": {
+                "events": {
+                    "duration_in_millis": 0,
+                    "in": 0,
+                    "filtered": 0,
+                    "out": 0
                 },
-                "young": {
-                  "collection_time_in_millis": 298,
-                  "collection_count": 10
-                }
-              }
-            },
-            "mem": {
-              "heap_max_in_bytes": 1.073741822e+09,
-              "heap_used_in_bytes": 3.18658432e+08,
-              "heap_used_percent": 29
-            },
-            "uptime_in_millis": 57904
-          },
-          "process": {
-            "open_file_descriptors": 93,
-            "max_file_descriptors": 10240,
-            "cpu": {
-              "percent": 0
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection_count": 3,
+                                "collection_time_in_millis": 449
+                            },
+                            "young": {
+                                "collection_count": 7,
+                                "collection_time_in_millis": 231
+                            }
+                        }
+                    },
+                    "mem": {
+                        "heap_max_in_bytes": 1037959168,
+                        "heap_used_in_bytes": 371211952,
+                        "heap_used_percent": 35
+                    },
+                    "uptime_in_millis": 33546
+                },
+                "reloads": {
+                    "failures": 0,
+                    "successes": 0
+                },
+                "queue": {
+                    "events_count": 0
+                },
+                "process": {
+                    "open_file_descriptors": 103,
+                    "max_file_descriptors": 524288,
+                    "cpu": {
+                        "percent": 1
+                    }
+                },
+                "os": {
+                    "cpu": {
+                        "percent": 0,
+                        "load_average": {
+                            "15m": 1.7,
+                            "1m": 2.52,
+                            "5m": 1.8
+                        }
+                    },
+                    "cgroup": {
+                        "cpuacct": {
+                            "control_group": "/user.slice",
+                            "usage_nanos": 24041075965919
+                        },
+                        "cpu": {
+                            "stat": {
+                                "number_of_elapsed_periods": 0,
+                                "number_of_times_throttled": 0,
+                                "time_throttled_nanos": 0
+                            },
+                            "control_group": "/user.slice"
+                        }
+                    }
+                },
+                "pipelines": [
+                    {
+                        "id": "main",
+                        "hash": "6984380a58d40b7ebe6ba7ba8fc3134b95ffadfcef9ff328f0864ae002943792",
+                        "ephemeral_id": "eb977feb-0052-4651-a995-39e545213723",
+                        "events": {
+                            "duration_in_millis": 0,
+                            "filtered": 0,
+                            "in": 0,
+                            "out": 0,
+                            "queue_push_duration_in_millis": 0
+                        },
+                        "reloads": {
+                            "successes": 0,
+                            "failures": 0
+                        },
+                        "queue": {
+                            "events_count": 0,
+                            "max_queue_size_in_bytes": 0,
+                            "queue_size_in_bytes": 0,
+                            "type": "memory"
+                        },
+                        "vertices": null
+                    }
+                ],
+                "logstash": {
+                    "uuid": "2fc9524f-a36b-4611-82e4-5246d3ac4714",
+                    "ephemeral_id": "10311adf-a5ba-4920-ada2-8dadc54618fe",
+                    "name": "anonymous",
+                    "host": "anonymous",
+                    "version": "7.8.1",
+                    "snapshot": false,
+                    "status": "green",
+                    "http_address": "127.0.0.1:9600",
+                    "pipeline": {
+                        "batch_size": 125,
+                        "workers": 12
+                    }
+                },
+                "timestamp": "2020-12-09T16:16:17.796Z"
             }
-          },
-          "logstash": {
-            "uuid": "33f30cf2-d580-48fb-ad7c-2fbaf85db604",
-            "http_address": "127.0.0.1:9600",
-            "pipeline": {
-              "batch_size": 125,
-              "workers": 4
-            },
-            "status": "green",
-            "ephemeral_id": "c2f01c4f-5c09-4b65-a922-15fdf3634df3",
-            "name": "mcastro",
-            "host": "mcastro",
-            "version": "7.9.3",
-            "snapshot": false
-          },
-          "timestamp": "2020-10-30T12:41:13.799Z"
         }
-      }
     },
-    "ecs": {
-      "version": "1.5.0"
-    },
-    "host": {
-      "name": "mcastro"
-    },
-    "agent": {
-      "name": "mcastro",
-      "type": "metricbeat",
-      "version": "8.0.0",
-      "ephemeral_id": "fb36ebe3-f38d-4e5f-b68e-8d6f578ed471",
-      "id": "abfbaa55-b79d-4ae5-b412-fd35b933c6d3"
+    "metricset": {
+        "name": "node_stats",
+        "period": 10000
     },
     "service": {
-      "name": "logstash",
-      "id": "",
-      "hostname": "mcastro",
-      "version": "7.9.3",
-      "address": "localhost:9600",
-      "type": "logstash"
-    },
-    "event": {
-      "module": "logstash",
-      "duration": 1005737788,
-      "dataset": "logstash.node.stats"
+        "address": "127.0.0.1:33437",
+        "hostname": "anonymous",
+        "id": "",
+        "name": "logstash",
+        "type": "logstash",
+        "version": "7.8.1"
     }
-  }
-  
+}

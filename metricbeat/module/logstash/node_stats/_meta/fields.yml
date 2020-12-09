@@ -9,19 +9,13 @@
       fields:
         - name: uptime_in_millis
           type: long
-          description: >
-            TODO
         - name: mem
           type: group
           fields:
             - name: heap_used_in_bytes
               type: long
-              description: >
-                TODO
             - name: heap_max_in_bytes
               type: long
-              description: >
-                TODO
     - name: events
       type: group
       description: >
@@ -41,18 +35,13 @@
             Filtered events counter.
         - name: duration_in_millis
           type: long
-          description: TODO
     - name: logstash
       type: group
       fields:
         - name: uuid
           type: keyword
-          description: >
-            TODO
         - name: version
           type: keyword
-          description: >
-            TODO
     - name: os
       type: group
       fields:
@@ -64,23 +53,15 @@
               fields:
                 - name: 15m
                   type: long
-                  description: >
-                    TODO
                 - name: 1m
                   type: long
-                  description: >
-                    TODO
                 - name: 5m
                   type: long
-                  description: >
-                    TODO
         - name: cgroup
           type: group
           fields:
             - name: cpuact.usage_nanos
               type: long
-              description: >
-                TODO
             - name: cpu
               type: group
               fields:
@@ -108,45 +89,33 @@
       fields:
         - name: id
           type: keyword
-          description: >
-            TODO
         - name: hash
           type: keyword
-          description: >
-            TODO
         - name: queue
           type: group
           fields:
             - name: events_count
               type: long
-              description: TODO
             - name: type
               type: keyword
-              description: TODO
             - name: queue_size_in_bytes
               type: long
-              description: TODO
             - name: max_queue_size_in_bytes
               type: long
-              description: TODO
         - name: events
           type: group
           fields:
             - name: out
               type: long
-              description: TODO
             - name: duration_in_millis
               type: long
-              description: TODO
         - name: vertices
           type: group
           fields:
             - name: duration_in_millis
               type: long
-              description: TODO
             - name: events_in
               type: long
-              description: TODO
             - name: pipeline_ephemeral_id
               type: keyword
               description: pipeline_ephemeral_id
@@ -170,19 +139,15 @@
               fields:
                 - name: 15m
                   type: long
-                  description: TODO
                 - name: 1m
                   type: long
-                  description: TODO
                 - name: 5m
                   type: long
-                  description: TODO
         - name: cgroup
           type: group
           fields:
             - name: cpuacct.usage_nanos
               type: long
-              description: TODO
             - name: cpu
               type: group
               fields:
@@ -191,13 +156,9 @@
                   fields:
                     - name: number_of_elapsed_periods
                       type: long
-                      description: TODO
                     - name: time_throttled_nanos
                       type: long
-                      description: TODO
                     - name: number_of_times_throttled
                       type: long
-                      description: TODO
     - name: queue.events_count
       type: long
-      description: TODO

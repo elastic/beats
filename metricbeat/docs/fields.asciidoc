@@ -33169,6 +33169,34 @@ type: nested
 
 
 
+*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
+
+--
+
+
 *`logstash_stats.os.cpu.load_average.15m`*::
 +
 --
@@ -33206,35 +33234,6 @@ alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
 
 --
 
-
-
-*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.number_of_elapsed_periods
-
---
-
-*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.time_throttled_nanos
-
---
-
-*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.number_of_times_throttled
-
---
-
 *`logstash_stats.process.cpu.percent`*::
 +
 --
@@ -33253,185 +33252,25 @@ alias to: logstash.node.stats.queue.events_count
 
 --
 
-[float]
-=== logstash
 
-TODO
-
-
-
-
-*`logstash.stats.timestamp`*::
+*`logstash_state.pipeline.id`*::
 +
 --
 type: alias
 
-alias to: @timestamp
+alias to: logstash.node.state.pipeline.id
 
 --
 
-
-
-*`logstash.stats.jvm.mem.heap_used.bytes`*::
+*`logstash_state.pipeline.hash`*::
 +
 --
 type: alias
 
-alias to: logstash.node.stats.jvm.mem.heap_used_in_bytes
+alias to: logstash.node.state.pipeline.hash
 
 --
 
-*`logstash.stats.jvm.mem.heap_max.bytes`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
-
---
-
-*`logstash.stats.jvm.uptime.ms`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.jvm.uptime_in_millis
-
---
-
-
-*`logstash.stats.events.in`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.events.in
-
---
-
-*`logstash.stats.events.out`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.events.out
-
---
-
-*`logstash.stats.events.duration.ms`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.events.duration_in_millis
-
---
-
-
-*`logstash.stats.logstash.uuid`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.logstash.uuid
-
---
-
-*`logstash.stats.logstash.version`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.logstash.version
-
---
-
-
-
-
-*`logstash.stats.os.cpu.load_average.15m`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cpu.load_average.15m
-
---
-
-*`logstash.stats.os.cpu.load_average.1m`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cpu.load_average.1m
-
---
-
-*`logstash.stats.os.cpu.load_average.5m`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cpu.load_average.5m
-
---
-
-
-*`logstash.stats.os.cgroup.cpuacct.usage_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
-
---
-
-
-
-*`logstash.stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.number_of_elapsed_periods
-
---
-
-*`logstash.stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.time_throttled_nanos
-
---
-
-*`logstash.stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.stat.number_of_times_throttled
-
---
-
-*`logstash.stats.process.cpu.percent`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.process.cpu.percent
-
---
-
-*`logstash.stats.queue.events_count`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.queue.events_count
-
---
 
 [float]
 === node
@@ -33439,6 +33278,27 @@ alias to: logstash.node.stats.queue.events_count
 node
 
 
+
+
+*`logstash.node.state.pipeline.id`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.hash`*::
++
+--
+TODO
+
+
+type: keyword
+
+--
 
 *`logstash.node.host`*::
 +
@@ -33504,9 +33364,6 @@ node_stats metrics.
 *`logstash.node.stats.jvm.uptime_in_millis`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33515,9 +33372,6 @@ type: long
 *`logstash.node.stats.jvm.mem.heap_used_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33525,9 +33379,6 @@ type: long
 *`logstash.node.stats.jvm.mem.heap_max_in_bytes`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33572,8 +33423,6 @@ type: long
 *`logstash.node.stats.events.duration_in_millis`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33582,9 +33431,6 @@ type: long
 *`logstash.node.stats.logstash.uuid`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
@@ -33592,9 +33438,6 @@ type: keyword
 *`logstash.node.stats.logstash.version`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
@@ -33605,9 +33448,6 @@ type: keyword
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33615,9 +33455,6 @@ type: long
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33625,9 +33462,6 @@ type: long
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33636,9 +33470,6 @@ type: long
 *`logstash.node.stats.os.cgroup.cpuact.usage_nanos`*::
 +
 --
-TODO
-
-
 type: long
 
 --
@@ -33689,9 +33520,6 @@ type: double
 *`logstash.node.stats.pipelines.id`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
@@ -33699,9 +33527,6 @@ type: keyword
 *`logstash.node.stats.pipelines.hash`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
@@ -33710,8 +33535,6 @@ type: keyword
 *`logstash.node.stats.pipelines.queue.events_count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33719,8 +33542,6 @@ type: long
 *`logstash.node.stats.pipelines.queue.type`*::
 +
 --
-TODO
-
 type: keyword
 
 --
@@ -33728,8 +33549,6 @@ type: keyword
 *`logstash.node.stats.pipelines.queue.queue_size_in_bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33737,8 +33556,6 @@ type: long
 *`logstash.node.stats.pipelines.queue.max_queue_size_in_bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33747,8 +33564,6 @@ type: long
 *`logstash.node.stats.pipelines.events.out`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33756,8 +33571,6 @@ type: long
 *`logstash.node.stats.pipelines.events.duration_in_millis`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33766,8 +33579,6 @@ type: long
 *`logstash.node.stats.pipelines.vertices.duration_in_millis`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33775,8 +33586,6 @@ type: long
 *`logstash.node.stats.pipelines.vertices.events_in`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33823,8 +33632,6 @@ type: float
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33832,8 +33639,6 @@ type: long
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33841,8 +33646,6 @@ type: long
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33851,8 +33654,6 @@ type: long
 *`logstash.node.stats.os.cgroup.cpuacct.usage_nanos`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33862,8 +33663,6 @@ type: long
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33871,8 +33670,6 @@ type: long
 *`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33880,8 +33677,6 @@ type: long
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -33889,8 +33684,6 @@ type: long
 *`logstash.node.stats.queue.events_count`*::
 +
 --
-TODO
-
 type: long
 
 --
