@@ -895,6 +895,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new winlogbeat security dashboard {pull}18775[18775]
 - Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
+- Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 
 *Elastic Log Driver*
 

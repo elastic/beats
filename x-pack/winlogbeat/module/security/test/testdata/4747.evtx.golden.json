@@ -3,15 +3,17 @@
     "@timestamp": "2019-12-18T16:35:16.6816525Z",
     "event": {
       "action": "removed-member-from-distribution-group",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4747,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "change",
-        "group"
+        "group",
+        "change"
       ]
     },
     "group": {
