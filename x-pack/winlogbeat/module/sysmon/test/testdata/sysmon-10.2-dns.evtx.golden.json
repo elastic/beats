@@ -48,7 +48,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -69,7 +69,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 66,
       "user": {
@@ -127,7 +127,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -148,7 +148,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 67,
       "user": {
@@ -207,7 +207,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -228,7 +228,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 68,
       "user": {
@@ -291,7 +291,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -312,7 +312,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 69,
       "user": {
@@ -370,7 +370,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -391,7 +391,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 70,
       "user": {
@@ -456,7 +456,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -477,7 +477,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 71,
       "user": {
@@ -531,7 +531,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -552,7 +552,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 72,
       "user": {
@@ -615,7 +615,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -636,7 +636,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 73,
       "user": {
@@ -686,7 +686,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -707,7 +707,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 74,
       "user": {
@@ -773,7 +773,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -794,7 +794,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 75,
       "user": {
@@ -892,7 +892,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -913,7 +913,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 76,
       "user": {
@@ -967,7 +967,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -988,7 +988,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 77,
       "user": {
@@ -1046,7 +1046,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1067,7 +1067,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 78,
       "user": {
@@ -1130,7 +1130,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1151,7 +1151,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 79,
       "user": {
@@ -1201,7 +1201,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1222,7 +1222,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 80,
       "user": {
@@ -1286,7 +1286,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1307,7 +1307,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 81,
       "user": {
@@ -1365,7 +1365,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1386,7 +1386,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 82,
       "user": {
@@ -1444,7 +1444,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1465,7 +1465,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 83,
       "user": {
@@ -1550,7 +1550,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1571,7 +1571,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 84,
       "user": {
@@ -1636,7 +1636,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1657,7 +1657,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 85,
       "user": {
@@ -1767,7 +1767,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1788,7 +1788,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 86,
       "user": {
@@ -1886,7 +1886,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1907,7 +1907,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 87,
       "user": {
@@ -2010,7 +2010,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2031,7 +2031,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 88,
       "user": {
@@ -2099,7 +2099,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2120,7 +2120,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 89,
       "user": {
@@ -2225,7 +2225,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2246,7 +2246,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 90,
       "user": {
@@ -2354,7 +2354,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2375,7 +2375,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 91,
       "user": {
@@ -2429,7 +2429,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2450,7 +2450,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 92,
       "user": {
@@ -2549,7 +2549,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2570,7 +2570,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 93,
       "user": {
@@ -2628,7 +2628,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2649,7 +2649,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 94,
       "user": {
@@ -2748,7 +2748,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2769,7 +2769,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 95,
       "user": {
@@ -2823,7 +2823,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2844,7 +2844,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 96,
       "user": {
@@ -2898,7 +2898,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2919,7 +2919,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 97,
       "user": {
@@ -3012,7 +3012,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3033,7 +3033,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 98,
       "user": {
@@ -3115,7 +3115,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3136,7 +3136,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 99,
       "user": {
@@ -3190,7 +3190,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3211,7 +3211,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 100,
       "user": {
@@ -3300,7 +3300,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3321,7 +3321,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 101,
       "user": {
@@ -3425,7 +3425,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3446,7 +3446,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 102,
       "user": {
@@ -3551,7 +3551,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3572,7 +3572,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 103,
       "user": {
@@ -3626,7 +3626,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3647,7 +3647,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 104,
       "user": {
@@ -3751,7 +3751,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3772,7 +3772,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 105,
       "user": {
@@ -3870,7 +3870,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3891,7 +3891,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 106,
       "user": {
@@ -3945,7 +3945,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3966,7 +3966,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 107,
       "user": {
@@ -4016,7 +4016,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4037,7 +4037,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 108,
       "user": {
@@ -4104,7 +4104,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4125,7 +4125,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 109,
       "user": {
@@ -4219,7 +4219,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4240,7 +4240,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 110,
       "user": {
@@ -4338,7 +4338,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4359,7 +4359,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 111,
       "user": {
@@ -4421,7 +4421,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4442,7 +4442,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 112,
       "user": {
@@ -4547,7 +4547,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4568,7 +4568,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 113,
       "user": {
@@ -4631,7 +4631,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4652,7 +4652,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 114,
       "user": {
@@ -4735,7 +4735,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4756,7 +4756,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 115,
       "user": {
@@ -4814,7 +4814,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4835,7 +4835,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 116,
       "user": {
@@ -4889,7 +4889,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4910,7 +4910,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 117,
       "user": {
@@ -4951,7 +4951,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4972,7 +4972,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 118,
       "user": {
@@ -5013,7 +5013,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5034,7 +5034,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 119,
       "user": {
@@ -5133,7 +5133,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5154,7 +5154,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 120,
       "user": {
@@ -5217,7 +5217,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5238,7 +5238,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 121,
       "user": {
@@ -5292,7 +5292,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5313,7 +5313,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 122,
       "user": {
@@ -5412,7 +5412,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5433,7 +5433,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 123,
       "user": {
@@ -5496,7 +5496,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5517,7 +5517,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 124,
       "user": {
@@ -5616,7 +5616,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5637,7 +5637,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 125,
       "user": {
@@ -5691,7 +5691,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5712,7 +5712,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 126,
       "user": {
@@ -5781,7 +5781,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5802,7 +5802,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 127,
       "user": {
@@ -5871,7 +5871,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5892,7 +5892,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 128,
       "user": {
@@ -5947,7 +5947,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5968,7 +5968,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 129,
       "user": {
@@ -6067,7 +6067,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6088,7 +6088,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 130,
       "user": {
@@ -6193,7 +6193,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6214,7 +6214,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 131,
       "user": {
@@ -6319,7 +6319,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6340,7 +6340,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 132,
       "user": {
@@ -6439,7 +6439,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6460,7 +6460,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 133,
       "user": {
@@ -6523,7 +6523,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6544,7 +6544,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 134,
       "user": {
@@ -6613,7 +6613,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6634,7 +6634,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 135,
       "user": {
@@ -6688,7 +6688,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6709,7 +6709,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 136,
       "user": {
@@ -6808,7 +6808,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6829,7 +6829,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 137,
       "user": {
@@ -6938,7 +6938,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6959,7 +6959,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 138,
       "user": {
@@ -7057,7 +7057,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7078,7 +7078,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 139,
       "user": {
@@ -7136,7 +7136,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7157,7 +7157,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 140,
       "user": {
@@ -7261,7 +7261,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7282,7 +7282,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 141,
       "user": {
@@ -7340,7 +7340,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7361,7 +7361,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 142,
       "user": {
@@ -7465,7 +7465,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7486,7 +7486,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 143,
       "user": {
@@ -7585,7 +7585,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7606,7 +7606,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 144,
       "user": {
@@ -7683,7 +7683,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7704,7 +7704,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 145,
       "user": {
@@ -7809,7 +7809,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7830,7 +7830,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 146,
       "user": {
@@ -7909,7 +7909,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7930,7 +7930,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 147,
       "user": {
@@ -7980,7 +7980,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8001,7 +8001,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 148,
       "user": {
@@ -8100,7 +8100,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8121,7 +8121,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 149,
       "user": {
@@ -8190,7 +8190,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8211,7 +8211,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 150,
       "user": {
@@ -8261,7 +8261,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8282,7 +8282,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 151,
       "user": {
@@ -8381,7 +8381,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8402,7 +8402,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 152,
       "user": {
@@ -8502,7 +8502,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8523,7 +8523,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 153,
       "user": {
@@ -8602,7 +8602,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8623,7 +8623,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 154,
       "user": {
@@ -8722,7 +8722,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8743,7 +8743,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 155,
       "user": {
@@ -8831,7 +8831,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8852,7 +8852,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 156,
       "user": {
@@ -8940,7 +8940,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8961,7 +8961,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 157,
       "user": {
@@ -9070,7 +9070,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9091,7 +9091,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 158,
       "user": {
@@ -9191,7 +9191,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9212,7 +9212,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 159,
       "user": {
@@ -9305,7 +9305,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9326,7 +9326,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 160,
       "user": {
@@ -9425,7 +9425,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9446,7 +9446,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 161,
       "user": {
@@ -9545,7 +9545,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9566,7 +9566,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 162,
       "user": {
@@ -9624,7 +9624,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9645,7 +9645,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 163,
       "user": {
@@ -9742,7 +9742,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9763,7 +9763,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 164,
       "user": {
@@ -9821,7 +9821,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9842,7 +9842,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 165,
       "user": {
@@ -9911,7 +9911,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9932,7 +9932,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 166,
       "user": {
@@ -9991,7 +9991,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10012,7 +10012,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 167,
       "user": {
@@ -10071,7 +10071,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10092,7 +10092,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 168,
       "user": {
@@ -10150,7 +10150,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10171,7 +10171,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 169,
       "user": {
@@ -10230,7 +10230,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -10251,7 +10251,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 170,
       "user": {
@@ -10305,7 +10305,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10326,7 +10326,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 171,
       "user": {
@@ -10389,7 +10389,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10410,7 +10410,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 172,
       "user": {
@@ -10468,7 +10468,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10489,7 +10489,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 173,
       "user": {
@@ -10551,7 +10551,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10572,7 +10572,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 174,
       "user": {
@@ -10630,7 +10630,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10651,7 +10651,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 175,
       "user": {
@@ -10709,7 +10709,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10730,7 +10730,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 176,
       "user": {
@@ -10788,7 +10788,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10809,7 +10809,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 177,
       "user": {
@@ -10914,7 +10914,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10935,7 +10935,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 178,
       "user": {
@@ -11004,7 +11004,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11025,7 +11025,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 179,
       "user": {
@@ -11085,7 +11085,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11106,7 +11106,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 180,
       "user": {
@@ -11206,7 +11206,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11227,7 +11227,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 181,
       "user": {
@@ -11277,7 +11277,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11298,7 +11298,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 182,
       "user": {
@@ -11356,7 +11356,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11377,7 +11377,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 183,
       "user": {
@@ -11481,7 +11481,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11502,7 +11502,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 184,
       "user": {
@@ -11556,7 +11556,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11577,7 +11577,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 186,
       "user": {
@@ -11635,7 +11635,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11656,7 +11656,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 187,
       "user": {
@@ -11758,7 +11758,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11779,7 +11779,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 188,
       "user": {
@@ -11887,7 +11887,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11908,7 +11908,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 189,
       "user": {
@@ -11966,7 +11966,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11987,7 +11987,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 190,
       "user": {
@@ -12091,7 +12091,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12112,7 +12112,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 191,
       "user": {
@@ -12217,7 +12217,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12238,7 +12238,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 192,
       "user": {
@@ -12338,7 +12338,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12359,7 +12359,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 193,
       "user": {
@@ -12454,7 +12454,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12475,7 +12475,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 194,
       "user": {
@@ -12580,7 +12580,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12601,7 +12601,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 195,
       "user": {
@@ -12910,7 +12910,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12931,7 +12931,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 196,
       "user": {
@@ -13050,7 +13050,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13071,7 +13071,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 197,
       "user": {
@@ -13125,7 +13125,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13146,7 +13146,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 198,
       "user": {
@@ -13208,7 +13208,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13229,7 +13229,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 199,
       "user": {
@@ -13270,7 +13270,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13291,7 +13291,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 200,
       "user": {
@@ -13349,7 +13349,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13370,7 +13370,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 201,
       "user": {
@@ -13475,7 +13475,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13496,7 +13496,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 202,
       "user": {
@@ -13601,7 +13601,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13622,7 +13622,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 203,
       "user": {
@@ -13680,7 +13680,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13701,7 +13701,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 204,
       "user": {
@@ -13800,7 +13800,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13821,7 +13821,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 205,
       "user": {
@@ -13920,7 +13920,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13941,7 +13941,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 206,
       "user": {
@@ -14039,7 +14039,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14060,7 +14060,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 207,
       "user": {
@@ -14147,7 +14147,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14168,7 +14168,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 208,
       "user": {
@@ -14226,7 +14226,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14247,7 +14247,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 209,
       "user": {
@@ -14305,7 +14305,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14326,7 +14326,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 210,
       "user": {
@@ -14425,7 +14425,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14446,7 +14446,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 212,
       "user": {
@@ -14516,7 +14516,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14537,7 +14537,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 213,
       "user": {
@@ -14642,7 +14642,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14663,7 +14663,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 214,
       "user": {
@@ -14717,7 +14717,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14738,7 +14738,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 215,
       "user": {
@@ -14796,7 +14796,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -14817,7 +14817,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 216,
       "user": {
@@ -14871,7 +14871,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-00106ACA0000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 844
@@ -14892,7 +14892,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 220,
       "user": {
@@ -14933,7 +14933,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-00106ACA0000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 844
@@ -14954,7 +14954,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 221,
       "user": {
@@ -14994,7 +14994,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E9F7-5D2F-0000-001031039C00}",
+      "entity_id": "{fa4a0de6-e9f7-5d2f-0000-001031039c00}",
       "executable": "C:\\Program Files\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\ruby.exe",
       "name": "ruby.exe",
       "pid": 676
@@ -15015,7 +15015,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 230,
       "user": {
@@ -15055,7 +15055,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-001016F70000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-001016f70000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 636
@@ -15076,7 +15076,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 231,
       "user": {
@@ -15138,7 +15138,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A3-5D2F-0000-00102F440100}",
+      "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 1788
@@ -15159,7 +15159,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 232,
       "user": {
@@ -15213,7 +15213,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A3-5D2F-0000-00102F440100}",
+      "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 1788
@@ -15234,7 +15234,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 233,
       "user": {
@@ -15322,7 +15322,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -15343,7 +15343,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 234,
       "user": {
