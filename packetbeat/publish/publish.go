@@ -39,7 +39,7 @@ type TransactionPublisher struct {
 type transProcessor struct {
 	ignoreOutgoing   bool
 	localIPs         []net.IP // TODO: Periodically update this list.
-	internalIPBlocks []*net.IPNet
+	internalNetworks []string
 	name             string
 }
 
@@ -50,17 +50,8 @@ func NewTransactionPublisher(
 	pipeline beat.Pipeline,
 	ignoreOutgoing bool,
 	canDrop bool,
-	homeNetworks []string,
+	internalNetworks []string,
 ) (*TransactionPublisher, error) {
-	internalIPBlocks := []*net.IPNet{}
-	for _, cidr := range homeNetworks {
-		_, block, err := net.ParseCIDR(cidr)
-		if err != nil {
-			return nil, err
-		}
-		internalIPBlocks = append(internalIPBlocks, block)
-	}
-
 	addrs, err := common.LocalIPAddrs()
 	if err != nil {
 		return nil, err
@@ -78,7 +69,7 @@ func NewTransactionPublisher(
 		canDrop:  canDrop,
 		processor: transProcessor{
 			localIPs:         localIPs,
-			internalIPBlocks: internalIPBlocks,
+			internalNetworks: internalNetworks,
 			name:             name,
 			ignoreOutgoing:   ignoreOutgoing,
 		},
@@ -162,7 +153,7 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
-	fields, err := MarshalPacketbeatFields(event, p.localIPs, p.internalIPBlocks)
+	fields, err := MarshalPacketbeatFields(event, p.localIPs, p.internalNetworks)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +198,7 @@ func validateEvent(event *beat.Event) error {
 
 // MarshalPacketbeatFields marshals data contained in the _packetbeat field
 // into the event and removes the _packetbeat key.
-func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP, internalIPBlocks []*net.IPNet) (*pb.Fields, error) {
+func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP, internalNetworks []string) (*pb.Fields, error) {
 	defer delete(event.Fields, pb.FieldsKey)
 
 	fields, err := pb.GetFields(event.Fields)
@@ -215,7 +206,7 @@ func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP, internalIPBlo
 		return nil, err
 	}
 
-	if err = fields.ComputeValues(localIPs, internalIPBlocks); err != nil {
+	if err = fields.ComputeValues(localIPs, internalNetworks); err != nil {
 		return nil, err
 	}
 

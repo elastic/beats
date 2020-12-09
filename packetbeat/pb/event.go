@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -220,7 +221,7 @@ func makeProcess(p *common.Process) *ecs.Process {
 }
 
 // ComputeValues computes derived values like network.bytes and writes them to f.
-func (f *Fields) ComputeValues(localIPs []net.IP, internalIPBlocks []*net.IPNet) error {
+func (f *Fields) ComputeValues(localIPs []net.IP, internalNetworks []string) error {
 	var flow flowhash.Flow
 
 	// network.bytes
@@ -272,8 +273,12 @@ func (f *Fields) ComputeValues(localIPs []net.IP, internalIPBlocks []*net.IPNet)
 	// network.direction
 	if f.Network.Direction == "" {
 		direction := hostBasedDirection(flow.SourceIP, flow.DestinationIP, localIPs)
-		if len(internalIPBlocks) > 0 && direction == Unknown {
-			direction = perimeterBasedDirection(flow.SourceIP, flow.DestinationIP, internalIPBlocks)
+		if len(internalNetworks) > 0 && direction == Unknown {
+			var err error
+			direction, err = perimeterBasedDirection(flow.SourceIP, flow.DestinationIP, internalNetworks)
+			if err != nil {
+				return err
+			}
 		}
 		f.Network.Direction = direction
 	}
@@ -336,31 +341,25 @@ func hostBasedDirection(source, destination net.IP, ips []net.IP) string {
 	return Unknown
 }
 
-func perimeterBasedDirection(source, destination net.IP, internalIPBlocks []*net.IPNet) string {
-	sourceInternal := isInternalIP(source, internalIPBlocks)
-	destinationInternal := isInternalIP(destination, internalIPBlocks)
+func perimeterBasedDirection(source, destination net.IP, internalNetworks []string) (string, error) {
+	sourceInternal, err := conditions.NetworkContains(source, internalNetworks...)
+	if err != nil {
+		return Unknown, err
+	}
+	destinationInternal, err := conditions.NetworkContains(destination, internalNetworks...)
+	if err != nil {
+		return Unknown, err
+	}
 	if sourceInternal && destinationInternal {
-		return Internal
+		return Internal, nil
 	}
 	if sourceInternal {
-		return Outbound
+		return Outbound, nil
 	}
 	if destinationInternal {
-		return Inbound
+		return Inbound, nil
 	}
-	return External
-}
-
-func isInternalIP(ip net.IP, internalIPBlocks []*net.IPNet) bool {
-	if ip == nil {
-		return false
-	}
-	for _, block := range internalIPBlocks {
-		if block.Contains(ip) {
-			return true
-		}
-	}
-	return false
+	return External, nil
 }
 
 // MarshalMapStr marshals the fields into MapStr. It returns an error if there

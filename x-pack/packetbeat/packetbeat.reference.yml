@@ -14,14 +14,14 @@
 packetbeat.interfaces.device: any
 
 # The network CIDR blocks that are considered "internal" networks for
-# the purpose of network perimeter boundary classification.
-packetbeat.interfaces.home_networks:
-  # RFC1918
-  - "10.0.0.0/8"
-  - "172.16.0.0/12"
-  - "192.168.0.0/16"
-  # IPv6 unique local addr
-  - "fc00::/7"
+# the purpose of network perimeter boundary classification. The valid
+# values for internal_networks are the same as those that can be used
+# with processor network conditions.
+#
+# For a list of available values see:
+# https://www.elastic.co/guide/en/beats/packetbeat/defining-processors.html#condition-network
+packetbeat.interfaces.internal_networks:
+  - private
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's

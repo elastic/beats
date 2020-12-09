@@ -3,13 +3,8 @@
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
-packetbeat.interfaces.home_networks:
-  # RFC1918
-  - "10.0.0.0/8"
-  - "172.16.0.0/12"
-  - "192.168.0.0/16"
-  # IPv6 unique local addr
-  - "fc00::/7"
+packetbeat.interfaces.internal_networks:
+  - private
 
 {% if af_packet %}
 packetbeat.interfaces.type: af_packet

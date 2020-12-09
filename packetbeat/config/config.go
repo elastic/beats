@@ -83,7 +83,7 @@ type InterfacesConfig struct {
 	Snaplen               int      `config:"snaplen"`
 	BufferSizeMb          int      `config:"buffer_size_mb"`
 	EnableAutoPromiscMode bool     `config:"auto_promisc_mode"`
-	HomeNetworks          []string `config:"home_networks"`
+	InternalNetworks      []string `config:"internal_networks"`
 	TopSpeed              bool
 	Dumpfile              string
 	OneAtATime            bool
