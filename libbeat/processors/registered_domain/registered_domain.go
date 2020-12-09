@@ -106,6 +106,16 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, errors.Wrapf(err, "failed to write registered domain to target field [%v]", p.TargetField)
 	}
 
+	if p.TargetETLDField != "" {
+		tld, err := publicsuffix.PublicSuffix(domain)
+		if err != nil && !p.IgnoreFailure {
+			return event, errors.Wrap(err, "failed to determine the effective top-level domain")
+		}
+		if _, err = event.PutValue(p.TargetETLDField, subdomain); err != nil && !p.IgnoreFailure {
+			return event, errors.Wrapf(err, "failed to write effective top-level domain to target field [%v]", p.TargetETLDField)
+		}
+	}
+
 	if p.TargetSubdomainField != "" {
 		subdomain := strings.TrimSuffix(strings.TrimSuffix(domain, rd), ".")
 		if subdomain != "" {
