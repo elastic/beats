@@ -41,12 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Docker container needs to be explicitly run as user root for auditing. {pull}21202[21202]
 - File integrity dataset no longer includes the leading dot in `file.extension` values (e.g. it will report "png" instead of ".png") to comply with ECS. {pull}21644[21644]
 - Use ECS 1.7 ingress/egress network directions instead of inbound/outbound. {pull}22991[22991]
-
-*Filebeat*
-
-
-*Auditbeat*
-
+- Use ingress/egress instead of inbound/outbound for ECS 1.7 in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -101,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
+- Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 
 *Heartbeat*
 
@@ -542,6 +538,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
 - Improve equals check. {pull}22778[22778]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
+- Add tini as init system in docker images {pull}22137[22137]
 
 *Auditbeat*
 
@@ -560,6 +557,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
+- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -737,6 +735,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Nats filebeat dashboard. {pull}22726[22726]
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
+- Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
+- Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
 
 *Heartbeat*
 
@@ -917,7 +917,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
