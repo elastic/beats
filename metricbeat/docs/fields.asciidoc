@@ -18134,6 +18134,43 @@ Elasticsearch module
 
 
 
+*`shard.primary`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.primary
+
+--
+
+*`shard.state`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.state
+
+--
+
+*`shard.index`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.name
+
+--
+
+*`shard.node`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.name
+
+--
+
+
 *`cluster_state.nodes_hash`*::
 +
 --

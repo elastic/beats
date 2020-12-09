@@ -15,6 +15,12 @@
         - name: state
           type: alias
           path: elasticsearch.shard.state
+        - name: index
+          type: alias
+          path: elasticsearch.index.name
+        - name: node
+          type: alias
+          path: elasticsearch.node.name
     - name: cluster_state
       type: group
       fields:

@@ -18,12 +18,13 @@
 package shard
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 
 	"github.com/stretchr/testify/require"
 
