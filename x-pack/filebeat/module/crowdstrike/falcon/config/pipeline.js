@@ -45,13 +45,13 @@ var crowdstrikeFalconProcessor = (function () {
         var remoteAddress = evt.Get("crowdstrike.event.RemoteAddress");
         var remotePort = evt.Get("crowdstrike.event.RemotePort");
         if (evt.Get("crowdstrike.event.ConnectionDirection") === "1") {
-            evt.Put("network.direction", "inbound")
+            evt.Put("network.direction", "ingress")
             evt.Put("source.ip", remoteAddress)
             evt.Put("source.port", remotePort)
             evt.Put("destination.ip", localAddress)
             evt.Put("destination.port", localPort)
         } else {
-            evt.Put("network.direction", "outbound")
+            evt.Put("network.direction", "egress")
             evt.Put("destination.ip", remoteAddress)
             evt.Put("destination.port", remotePort)
             evt.Put("source.ip", localAddress)
