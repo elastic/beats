@@ -3,15 +3,17 @@
     "@timestamp": "2019-09-06T13:35:25.5153959Z",
     "event": {
       "action": "deleted-user-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4726,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "deletion",
-        "user"
+        "user",
+        "deletion"
       ]
     },
     "host": {
@@ -70,15 +72,17 @@
     "@timestamp": "2019-09-06T13:35:29.6900555Z",
     "event": {
       "action": "deleted-user-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4726,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "deletion",
-        "user"
+        "user",
+        "deletion"
       ]
     },
     "host": {
