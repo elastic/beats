@@ -257,11 +257,15 @@
         "auditd.log.sequence": 17,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2794,
@@ -311,11 +315,15 @@
         "auditd.log.sequence": 18,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 3193,
@@ -365,11 +373,15 @@
         "auditd.log.sequence": 19,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 3589,
@@ -419,11 +431,15 @@
         "auditd.log.sequence": 20,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 3990,
@@ -473,11 +489,15 @@
         "auditd.log.sequence": 21,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 4389,
@@ -632,11 +652,15 @@
         "auditd.log.sequence": 27,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5953,
@@ -770,11 +794,15 @@
         "auditd.log.sequence": 32,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7289,
@@ -845,11 +873,15 @@
         "auditd.log.sequence": 34,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7921,
@@ -899,11 +931,15 @@
         "auditd.log.sequence": 35,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 8323,
@@ -1121,11 +1157,15 @@
         "auditd.log.sequence": 44,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 10630,
@@ -1196,11 +1236,15 @@
         "auditd.log.sequence": 46,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 11260,
@@ -1250,11 +1294,15 @@
         "auditd.log.sequence": 47,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 11669,
@@ -1304,11 +1352,15 @@
         "auditd.log.sequence": 48,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 12078,
@@ -1358,11 +1410,15 @@
         "auditd.log.sequence": 49,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 12490,
@@ -1412,11 +1468,15 @@
         "auditd.log.sequence": 50,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 12902,
@@ -1466,11 +1526,15 @@
         "auditd.log.sequence": 51,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 13316,
@@ -1520,11 +1584,15 @@
         "auditd.log.sequence": 52,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 13729,
@@ -1574,11 +1642,15 @@
         "auditd.log.sequence": 53,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 14138,
@@ -1628,11 +1700,15 @@
         "auditd.log.sequence": 54,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 14547,
@@ -1682,11 +1758,15 @@
         "auditd.log.sequence": 55,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 14958,
@@ -1736,11 +1816,15 @@
         "auditd.log.sequence": 56,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 15370,
@@ -1790,11 +1874,15 @@
         "auditd.log.sequence": 57,
         "auditd.log.table": "nat",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 15782,
@@ -1844,11 +1932,15 @@
         "auditd.log.sequence": 58,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 16193,
@@ -1898,11 +1990,15 @@
         "auditd.log.sequence": 59,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 16608,
@@ -1952,11 +2048,15 @@
         "auditd.log.sequence": 60,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 17023,
@@ -2006,11 +2106,15 @@
         "auditd.log.sequence": 61,
         "auditd.log.table": "security",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 17440,
@@ -2060,11 +2164,15 @@
         "auditd.log.sequence": 62,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 17856,
@@ -2114,11 +2222,15 @@
         "auditd.log.sequence": 63,
         "auditd.log.table": "raw",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 18267,
@@ -2168,11 +2280,15 @@
         "auditd.log.sequence": 64,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 18679,
@@ -2222,11 +2338,15 @@
         "auditd.log.sequence": 65,
         "auditd.log.table": "filter",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 19094,
@@ -2276,11 +2396,15 @@
         "auditd.log.sequence": 66,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 19509,
@@ -2330,11 +2454,15 @@
         "auditd.log.sequence": 67,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 19921,
@@ -2384,11 +2512,15 @@
         "auditd.log.sequence": 68,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 20333,
@@ -2438,11 +2570,15 @@
         "auditd.log.sequence": 69,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 20745,
@@ -2492,11 +2628,15 @@
         "auditd.log.sequence": 70,
         "auditd.log.table": "mangle",
         "event.action": "netfilter_cfg",
-        "event.category": "configuration",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 21157,
