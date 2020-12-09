@@ -59,7 +59,7 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/elastic-agent.unit.tmpl'
         mode: 0644
       /etc/init.d/{{.BeatServiceName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/elastic-agent.sh.tmpl'
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/elastic-agent.init.sh.tmpl'
         mode: 0755
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
