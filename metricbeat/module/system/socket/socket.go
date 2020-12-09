@@ -277,14 +277,14 @@ var (
 	}
 
 	localHostInfoGroup = map[string]string{
-		sock.InboundName:   "destination",
-		sock.OutboundName:  "source",
+		sock.IngressName:   "destination",
+		sock.EgressName:    "source",
 		sock.ListeningName: "server",
 	}
 
 	remoteHostInfoGroup = map[string]string{
-		sock.InboundName:  "source",
-		sock.OutboundName: "destination",
+		sock.IngressName: "source",
+		sock.EgressName:  "destination",
 	}
 )
 
