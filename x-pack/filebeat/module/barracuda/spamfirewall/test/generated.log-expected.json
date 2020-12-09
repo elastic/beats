@@ -896,6 +896,7 @@
         "rsa.time.endtime": "2017-02-03T21:16:50.000Z",
         "rsa.time.starttime": "2017-02-03T21:16:50.000Z",
         "server.domain": "lit5929.test",
+        "server.registered_domain": "lit5929.test",
         "service.type": "barracuda",
         "source.ip": [
             "10.198.6.166"
@@ -980,6 +981,8 @@
         "rsa.time.endtime": "2017-03-04T11:21:59.000Z",
         "rsa.time.starttime": "2017-03-04T11:21:59.000Z",
         "server.domain": "uptat3156.www5.test",
+        "server.registered_domain": "www5.test",
+        "server.subdomain": "uptat3156",
         "service.type": "barracuda",
         "source.ip": [
             "10.77.137.72"
@@ -1027,6 +1030,8 @@
         "rsa.time.endtime": "2017-03-18T18:24:33.000Z",
         "rsa.time.starttime": "2017-03-18T18:24:33.000Z",
         "server.domain": "neav6028.internal.domain",
+        "server.registered_domain": "internal.domain",
+        "server.subdomain": "neav6028",
         "service.type": "barracuda",
         "source.ip": [
             "10.128.114.77"
@@ -1884,6 +1889,8 @@
         "rsa.time.endtime": "2018-03-25T09:31:24.000Z",
         "rsa.time.starttime": "2018-03-25T09:31:24.000Z",
         "server.domain": "oremagna3521.mail.home",
+        "server.registered_domain": "mail.home",
+        "server.subdomain": "oremagna3521",
         "service.type": "barracuda",
         "source.ip": [
             "10.29.155.171"
@@ -3288,6 +3295,8 @@
         "rsa.time.endtime": "2019-11-30T00:21:57.000Z",
         "rsa.time.starttime": "2019-11-30T00:21:57.000Z",
         "server.domain": "piciatis2460.api.host",
+        "server.registered_domain": "api.host",
+        "server.subdomain": "piciatis2460",
         "service.type": "barracuda",
         "source.ip": [
             "10.77.182.191"

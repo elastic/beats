@@ -187,6 +187,29 @@ function match(id, src, pattern, on_success) {
     };
 }
 
+function match_copy(id, src, dst, on_success) {
+    dst = FIELDS_PREFIX + dst;
+    if (dst === FIELDS_PREFIX || dst === src) {
+        return function (evt) {
+            if (debug) {
+                console.debug("noop      OK: " + id + " field:" + src);
+                console.debug("       input: <<" + evt.Get(src) + ">>");
+            }
+            if (on_success != null) on_success(evt);
+        }
+    }
+    return function (evt) {
+        var msg = evt.Get(src);
+        evt.Put(dst, msg);
+        if (debug) {
+            console.debug("copy      OK: " + id + " field:" + src);
+            console.debug("      target: '" + dst + "'");
+            console.debug("       input: <<" + msg + ">>");
+        }
+        if (on_success != null) on_success(evt);
+    }
+}
+
 function cleanup_flags(processor) {
     return function(evt) {
         processor(evt);
@@ -910,6 +933,57 @@ function extract_root(value) {
 
 function root(dst, src) {
     return url_wrapper(dst, src, extract_root);
+}
+
+function tagval(id, src, cfg, keys, on_success) {
+    var fail = function(evt) {
+        evt.Put(FLAG_FIELD, "tagval_parsing_error");
+    }
+    if (cfg.kv_separator.length !== 1) {
+        throw("Invalid TAGVALMAP ValueDelimiter (must have 1 character)");
+    }
+    var quotes_len = cfg.open_quote.length > 0 && cfg.close_quote.length > 0?
+        cfg.open_quote.length + cfg.close_quote.length : 0;
+    var kv_regex = new RegExp('^*([^' + cfg.kv_separator + ']*)*' + cfg.kv_separator + '*(.*)*$');
+    return function(evt) {
+        var msg = evt.Get(src);
+        if (msg === undefined) {
+            console.warn("tagval: input field is missing");
+            return fail(evt);
+        }
+        var pairs = msg.split(cfg.pair_separator);
+        var i;
+        var success = false;
+        var prev = "";
+        for (i=0; i<pairs.length; i++) {
+            var m = pairs[i].match(kv_regex);
+            var field;
+            if (m === null || m.length !== 3 || m[1] === undefined || m[2] === undefined) {
+                prev += pairs[i] + cfg.pair_separator;
+                continue;
+            }
+            var key = prev + m[1];
+            prev = "";
+            if ( (field=keys[key]) === undefined && (field=keys[key.trim()])===undefined ) {
+                continue;
+            }
+            var value = m[2].trim();
+            if (quotes_len > 0 &&
+                value.length >= cfg.open_quote.length + cfg.close_quote.length &&
+                value.substr(0, cfg.open_quote.length) === cfg.open_quote &&
+                value.substr(value.length - cfg.close_quote.length) === cfg.close_quote) {
+                value = value.substr(cfg.open_quote.length, value.length - quotes_len);
+            }
+            evt.Put(FIELDS_PREFIX + field, value);
+            success = true;
+        }
+        if (!success) {
+            return fail(evt);
+        }
+        if (on_success != null) {
+            on_success(evt);
+        }
+    }
 }
 
 var ecs_mappings = {
@@ -1975,6 +2049,7 @@ function test() {
     test_url();
     test_calls();
     test_assumptions();
+    test_tvm();
     console = saved;
 }
 
@@ -2341,4 +2416,95 @@ function test_assumptions() {
     if (!isNaN(Number(str))) {
         throw("Number conversion accepts extra chars");
     }
+}
+
+// Tests the TAGVALMAP feature.
+function test_tvm() {
+    var tests = [
+        {
+            config: {
+                pair_separator: ',',
+                kv_separator: '=',
+                open_quote: '[',
+                close_quote: ']'
+            },
+            mappings: {
+                "key a": "url",
+                "key_b": "b",
+                "Operation": "operation",
+            },
+            on_success: processor_chain([
+                                setf("d","b")
+                            ]),
+            message: "key_b=value for=B, key a = [http://example.com/] ,Operation=[COPY],other stuff=null,,ignore",
+            expected: {
+                "nwparser.url": "http://example.com/",
+                "nwparser.b": "value for=B",
+                "nwparser.operation": "COPY",
+                "nwparser.d": "value for=B",
+                "log.flags": null,
+            }
+        },
+        {
+            config: {
+                pair_separator: ',',
+                kv_separator: '=',
+                open_quote: '[',
+                close_quote: ']'
+            },
+            mappings: {
+                "key a": "url",
+                "key_b": "b",
+                "Operation": "operation"
+            },
+            on_success: processor_chain([
+                setf("d","b")
+            ]),
+            message: "nothing to see here",
+            expected: {
+                "nwparser.url": null,
+                "nwparser.d": null,
+                "log.flags": "tagval_parsing_error",
+            }
+        },
+        {
+            config: {
+                pair_separator: ' ',
+                kv_separator: ':',
+                open_quote: '"',
+                close_quote: '"'
+            },
+            mappings: {
+                "ICMP Type": "icmp_type",
+                "ICMP Code": "icmp_code",
+                "Operation": "operation",
+            },
+            on_success: processor_chain([
+                setc("success","true")
+            ]),
+            message: "Operation:drop ICMP Type:5 ICMP Code:1 ",
+            expected: {
+                "nwparser.icmp_code": "1",
+                "nwparser.icmp_type": "5",
+                "nwparser.operation": "drop",
+                "nwparser.success": "true",
+                "log.flags": null,
+            }
+        },
+    ];
+    var assertEqual = function(evt, key, expected) {
+        var value = evt.Get(key);
+        if (value !== expected)
+            throw("failed for " + key + ": expected:'" + expected + "' got:'" + value + "'");
+    };
+    tests.forEach(function (test, idx) {
+        var processor = tagval("test", "message", test.config, test.mappings, test.on_success);
+        var evt = new Event({
+            "message": test.message,
+        });
+        processor(evt);
+        for (var key in test.expected) {
+            assertEqual(evt, key, test.expected[key]);
+        }
+    });
 }
