@@ -46,7 +46,7 @@ func NewErrorChecker(ch chan error, log *logger.Logger) (*ErrorChecker, error) {
 }
 
 // Run runs the checking loop.
-func (ch ErrorChecker) Run(ctx context.Context) {
+func (ch *ErrorChecker) Run(ctx context.Context) {
 	ch.log.Debug("Error checker started")
 	for {
 		select {
@@ -55,7 +55,10 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 		case <-time.After(statusCheckPeriod):
 			err := ch.agentClient.Connect(ctx)
 			if err != nil {
+				ch.failuresCounter++
 				ch.log.Error(err, "Failed communicating to running daemon", errors.TypeNetwork, errors.M("socket", control.Address()))
+				ch.checkFailures()
+
 				continue
 			}
 
@@ -64,10 +67,8 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 			if err != nil {
 				ch.log.Error("failed retrieving agent status", err)
 				ch.failuresCounter++
+				ch.checkFailures()
 
-				if failures := ch.failuresCounter; failures > statusCheckMissesAllowed {
-					ch.notifyChan <- errors.New(fmt.Sprintf("service failed to fetch agent status '%d' times in a row", failures))
-				}
 				// agent is probably not running and this will be detected by pid watcher
 				continue
 			}
@@ -91,5 +92,11 @@ func (ch ErrorChecker) Run(ctx context.Context) {
 				ch.notifyChan <- errors.New(err, "applications in a failed state", errors.TypeApplication)
 			}
 		}
+	}
+}
+
+func (ch *ErrorChecker) checkFailures() {
+	if failures := ch.failuresCounter; failures > statusCheckMissesAllowed {
+		ch.notifyChan <- errors.New(fmt.Sprintf("service failed to fetch agent status '%d' times in a row", failures))
 	}
 }
