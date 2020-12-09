@@ -357,10 +357,10 @@ var sysmon = (function () {
     var addNetworkDirection = function (evt) {
         switch (evt.Get("winlog.event_data.Initiated")) {
             case "true":
-                evt.Put("network.direction", "outbound");
+                evt.Put("network.direction", "egress");
                 break;
             case "false":
-                evt.Put("network.direction", "inbound");
+                evt.Put("network.direction", "ingress");
                 break;
         }
         evt.Delete("winlog.event_data.Initiated");
