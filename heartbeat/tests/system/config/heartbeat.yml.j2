@@ -85,11 +85,6 @@ fields:
   {% endfor -%}
 {% endif %}
 
-processors:
-  - detect_mime_type:
-      field: http.response.body.content
-      target: http.response.mime_type
-
 #================================ Queue =====================================
 
 queue.mem:

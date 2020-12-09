@@ -1520,6 +1520,15 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Set internal security zones. used to determine network.direction
+    # default "trust"
+    #var.internal_zones:
+
+    # Set external security zones. used to determine network.direction
+    # default "untrust"
+    #var.external_zones:
+
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs

@@ -17,7 +17,7 @@
         "name": "socket"
     },
     "network": {
-        "direction": "inbound",
+        "direction": "egress",
         "iana_number": "41",
         "type": "ipv6"
     },
@@ -26,17 +26,17 @@
     },
     "source": {
         "ip": "::1",
-        "port": 33972
+        "port": 33974
     },
     "system": {
         "socket": {
             "local": {
                 "ip": "::1",
-                "port": 45109
+                "port": 33974
             },
             "remote": {
                 "ip": "::1",
-                "port": 33972
+                "port": 45109
             }
         }
     },
