@@ -66,4 +66,5 @@ Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 91.240.17.178, IP = 91.240.17.178,
 Apr 27 02:03:03 dev01: %ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested
 Apr 27 02:03:03 dev01: %ASA-4-722051: Group some-policy User testuser IP 8.8.8.8 IPv4 Address 8.8.4.4 IPv6 address 2001:4860:4860::8888 assigned to session
 Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.
+Apr 27 02:03:03 dev01: %ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.
 Apr 27 02:03:03 dev01: %ASA-3-710003: TCP access denied by ACL from 104.46.88.19/6370 to outside:195.74.114.34/23
