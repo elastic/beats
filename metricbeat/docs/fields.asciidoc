@@ -4604,6 +4604,16 @@ type: double
 
 
 
+*`task_stats.identifier`*::
++
+--
+Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
