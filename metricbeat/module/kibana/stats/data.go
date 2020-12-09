@@ -55,7 +55,7 @@ var (
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
-		"usage":                  c.Ifc("usage.kibana"),
+		"usage":                  c.Ifc("usage.kibana", s.Optional),
 		"transport_address":      c.Str("kibana.transport_address"),
 		"version":                c.Str("kibana.version"),
 		"snapshot":               c.Bool("kibana.snapshot"),

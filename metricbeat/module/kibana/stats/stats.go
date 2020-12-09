@@ -83,7 +83,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	now := time.Now()
 
 	if err = m.fetchStats(r, now); err != nil {
-		return err
+		return errors.Wrap(err, "error trying to get stats data from Kibana")
 	}
 
 	if err = m.fetchSettings(r); err != nil {
