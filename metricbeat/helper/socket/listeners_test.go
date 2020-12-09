@@ -42,22 +42,22 @@ func TestListenerTable(t *testing.T) {
 	// Listener on 192.0.2.1:80
 	l.Put(proto, lAddr, httpPort)
 
-	assert.Equal(t, Inbound, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
-	assert.Equal(t, Outbound, l.Direction(syscall.AF_INET, 0, lAddr, httpPort, rAddr, ephemeralPort))
-	assert.Equal(t, Outbound, l.Direction(syscall.AF_INET, proto, lAddr, ephemeralPort, rAddr, ephemeralPort))
+	assert.Equal(t, Ingress, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Egress, l.Direction(syscall.AF_INET, 0, lAddr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Egress, l.Direction(syscall.AF_INET, proto, lAddr, ephemeralPort, rAddr, ephemeralPort))
 
 	// Listener on 0.0.0.0:80
 	l.Reset()
 	l.Put(proto, net.IPv4zero, httpPort)
 
-	assert.Equal(t, Inbound, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
-	assert.Equal(t, Outbound, l.Direction(syscall.AF_INET6, proto, ipv6Addr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Ingress, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Egress, l.Direction(syscall.AF_INET6, proto, ipv6Addr, httpPort, rAddr, ephemeralPort))
 
 	// Listener on :::80
 	l.Reset()
 	l.Put(proto, net.IPv6zero, httpPort)
 
-	assert.Equal(t, Inbound, l.Direction(syscall.AF_INET6, proto, ipv6Addr, httpPort, rAddr, ephemeralPort))
-	assert.Equal(t, Inbound, l.Direction(syscall.AF_INET6, proto, ipv4InIpv6, httpPort, rAddr, ephemeralPort))
-	assert.Equal(t, Outbound, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Ingress, l.Direction(syscall.AF_INET6, proto, ipv6Addr, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Ingress, l.Direction(syscall.AF_INET6, proto, ipv4InIpv6, httpPort, rAddr, ephemeralPort))
+	assert.Equal(t, Egress, l.Direction(syscall.AF_INET, proto, lAddr, httpPort, rAddr, ephemeralPort))
 }

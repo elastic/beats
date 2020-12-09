@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 - Rename googlecloud module to gcp module. {pull}22246[22246]
+- Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
 
 *Packetbeat*
 
@@ -218,8 +219,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix FileVersion contained in Windows exe files. {pull}22581[22581]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
+  as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
-
 
 *Auditbeat*
 
@@ -342,6 +344,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
 
 *Heartbeat*
 
@@ -540,6 +543,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
 - Improve equals check. {pull}22778[22778]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
+- Improve event normalization performance {pull}22974[22974]
 - Add tini as init system in docker images {pull}22137[22137]
 
 *Auditbeat*
@@ -740,6 +744,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 - Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
+- Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
+- Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
+- Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
 
 *Heartbeat*
 

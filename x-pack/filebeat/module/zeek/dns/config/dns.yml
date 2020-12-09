@@ -19,6 +19,7 @@ processors:
       ignore_failure: true
       field: zeek.dns.query
       target_field: dns.question.registered_domain
+      target_subdomain_field: dns.question.subdomain
   - script:
       lang: javascript
       id: zeek_dns_flags
