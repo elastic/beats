@@ -177,6 +177,94 @@ processors:
     field: event.kind
     value: event
 - set:
+    if: "ctx.auditd.log?.record_type == 'CONFIG_CHANGE'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'CONFIG_CHANGE'"
+    field: event.type
+    value: change
+- set:
+    if: "ctx.auditd.log?.record_type == 'DAEMON_CONFIG'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'DAEMON_CONFIG'"
+    field: event.type
+    value: change
+- set:
+    if: "ctx.auditd.log?.record_type == 'DAEMON_RECONFIG'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'DAEMON_RECONFIG'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'USYS_CONFIG'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'USYS_CONFIG'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'NETFILTER_CFG'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'NETFILTER_CFG'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'FEATURE_CHANGE'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'FEATURE_CHANGE'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_CONFIG_CHANGE'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_CONFIG_CHANGE'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_POLICY_LOAD'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_POLICY_LOAD'"
+    field: event.type
+    value: access
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_STATUS'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'MAC_STATUS'"
+    field: event.type
+    value: change
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_MAC_CONFIG_CHANGE'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_MAC_CONFIG_CHANGE'"
+    field: event.type
+    value: change
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_MAC_POLICY_LOAD'"
+    field: event.category
+    value: configuration
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_MAC_POLICY_LOAD'"
+    field: event.type
+    value: access
+- set:
     if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
     field: event.category
     value: authentication
