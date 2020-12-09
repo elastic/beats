@@ -26,6 +26,13 @@ processors:
     field: event.type
     value: "{{kibana._audit_temp.event.type}}"
 
+- remove:
+    field: 'ecs'
+- rename:
+    if: ctx.kibana._audit_temp.ecs != null
+    field: kibana._audit_temp.ecs
+    target_field: "ecs"
+
 - rename:
     if: ctx.kibana._audit_temp.url != null
     field: kibana._audit_temp.url
