@@ -20,6 +20,7 @@ processors:
   - registered_domain:
       field: dns.question.name
       target_field: dns.question.registered_domain
+      target_subdomain_field: dns.question.sudomain
       ignore_missing: true
       ignore_failure: true
 ----
