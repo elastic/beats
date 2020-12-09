@@ -5,10 +5,18 @@
 package task_stats
 
 import (
+	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+)
+
+var (
+	clusterLabel = "com_amazonaws_ecs_cluster"
+	taskLabel    = "com_amazonaws_ecs_task-definition-family"
 )
 
 func eventsMapping(r mb.ReporterV2, statsList []Stats) {
@@ -18,9 +26,8 @@ func eventsMapping(r mb.ReporterV2, statsList []Stats) {
 }
 
 func createEvent(stats *Stats) mb.Event {
-	return mb.Event{
-		Timestamp:  time.Time(stats.Time),
-		RootFields: createContainerFields(stats),
+	e := mb.Event{
+		Timestamp: time.Time(stats.Time),
 		MetricSetFields: common.MapStr{
 			"cpu":     createCPUFields(stats),
 			"memory":  createMemoryFields(stats),
@@ -28,10 +35,44 @@ func createEvent(stats *Stats) mb.Event {
 			"diskio":  createDiskIOFields(stats),
 		},
 	}
+
+	regionName, clusterName := getRegionAndClusterName(stats.Container.Labels)
+	e.RootFields = createRootFields(stats, regionName)
+	if clusterName != "" {
+		e.MetricSetFields.Put("cluster_name", clusterName)
+	}
+
+	taskName := stats.Container.Labels[taskLabel]
+	if taskName != "" {
+		e.MetricSetFields.Put("task_name", taskName)
+	}
+
+	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
+	return e
 }
 
-func createContainerFields(stats *Stats) common.MapStr {
-	return common.MapStr{
+func generateIdentifier(containerName string, containerID string) string {
+	return containerName + "/" + containerID
+}
+
+func getRegionAndClusterName(labels map[string]string) (regionName string, clusterName string) {
+	if v, ok := labels[clusterLabel]; ok {
+		vSplit := strings.Split(v, "cluster/")
+		if len(vSplit) == 2 {
+			clusterName = vSplit[1]
+		}
+
+		arnParsed, err := arn.Parse(v)
+		if err == nil {
+			regionName = arnParsed.Region
+		}
+		return
+	}
+	return
+}
+
+func createRootFields(stats *Stats, regionName string) common.MapStr {
+	rootFields := common.MapStr{
 		"container": common.MapStr{
 			"id": stats.Container.DockerId,
 			"image": common.MapStr{
@@ -41,6 +82,15 @@ func createContainerFields(stats *Stats) common.MapStr {
 			"labels": stats.Container.Labels,
 		},
 	}
+
+	// add cloud.region
+	if regionName != "" {
+		cloud := common.MapStr{
+			"region": regionName,
+		}
+		rootFields.Put("cloud", cloud)
+	}
+	return rootFields
 }
 
 func createCPUFields(stats *Stats) common.MapStr {
