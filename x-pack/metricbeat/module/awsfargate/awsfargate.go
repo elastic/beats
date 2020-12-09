@@ -38,7 +38,7 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
-// NewMetricSet creates a base metricset for awsfargate metricsets
+// NewMetricSet creates a base metricset for awsfargate metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	var config Config
 	err := base.Module().UnpackConfig(&config)
