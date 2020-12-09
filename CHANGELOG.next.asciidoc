@@ -91,7 +91,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
 - Fix Powershell processing of downgraded engine events. {pull}18966[18966]
 - Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
-- Remove top level `hash` property from sysmon events {pull}20653[20653]
 - Use ECS 1.7 ingress/egress instead of inbound/outbound network.direction in sysmon. {pull}22997[22997]
 
 *Functionbeat*
