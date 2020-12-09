@@ -6,6 +6,15 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: shard
+      type: group
+      fields:
+        - name: primary
+          type: alias
+          path: elasticsearch.shard.primary
+        - name: state
+          type: alias
+          path: elasticsearch.shard.state
     - name: cluster_state
       type: group
       fields:
