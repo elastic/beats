@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Use ECS 1.7 ingress/egress network directions instead of inbound/outbound for system/socket. {pull}22991[22991]
 - Use ingress/egress instead of inbound/outbound for ECS 1.7 in auditd module. {pull}23000[23000]
 
 *Filebeat*
@@ -76,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 - Rename googlecloud module to gcp module. {pull}22246[22246]
+- Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
 
 *Packetbeat*
 
@@ -467,6 +469,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
 - Add SSL option to checkpoint module {pull}19560[19560]
+- Added support for MySQL Enterprise audit logs. {pull}22273[22273]
 - Rename googlecloud module to gcp module. {pull}22214[22214]
 - Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
 - Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
@@ -480,6 +483,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
+- Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
 - Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 
 *Heartbeat*
@@ -568,6 +572,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
+- Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 
 *Packetbeat*
