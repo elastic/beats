@@ -1,5 +1,5 @@
 {
-    "query-metadata-1": {
+    "1234": {
         "blkio_stats": {
             "io_service_bytes_recursive": [
                 {"major": 202, "minor": 26368, "op": "Read", "value": 3452928},
@@ -36,7 +36,7 @@
                 "throttled_time": 0
             }
         },
-        "id": "query-metadata-1",
+        "id": "1234",
         "memory_stats": {
             "limit": 3937787904,
             "max_usage": 15294464,
