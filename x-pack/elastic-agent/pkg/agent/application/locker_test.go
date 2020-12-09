@@ -13,12 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testLockFile = "test.lock"
+
 func TestAppLocker(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "locker")
 	defer os.RemoveAll(tmp)
 
-	locker1 := NewAppLocker(tmp)
-	locker2 := NewAppLocker(tmp)
+	locker1 := NewAppLocker(tmp, testLockFile)
+	locker2 := NewAppLocker(tmp, testLockFile)
 
 	require.NoError(t, locker1.TryLock())
 	assert.Error(t, locker2.TryLock())
