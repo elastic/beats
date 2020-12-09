@@ -37,6 +37,8 @@ type bucket struct {
 }
 
 type tokenBucket struct {
+	mu sync.RWMutex
+
 	limit   Rate
 	depth   float64
 	buckets sync.Map
@@ -161,10 +163,21 @@ func (t *tokenBucket) runGC() {
 		return
 	}
 
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	// Don't run GC if thresholds haven't been crossed.
+	// Check again in case another GC thread has run while this GC thread
+	// was waiting to acquire the lock and the other GC thread reset the
+	// metrics.
+	if (t.gc.metrics.numBuckets.Load() < t.gc.thresholds.NumBuckets) &&
+		(t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls) {
+		return
+	}
+
 	// Add tokens to all buckets according to the rate limit
 	// and flag full buckets for deletion.
 	toDelete := make([]uint64, 0)
-	var numBuckets uint
 	t.buckets.Range(func(k, v interface{}) bool {
 		key := k.(uint64)
 		b := v.(*bucket)
@@ -175,18 +188,15 @@ func (t *tokenBucket) runGC() {
 			toDelete = append(toDelete, key)
 		}
 
-		numBuckets++
-
 		return true
 	})
 
 	// Cleanup full buckets to free up memory
 	for _, key := range toDelete {
 		t.buckets.Delete(key)
-		numBuckets--
 	}
 
 	// Reset GC metrics
 	t.gc.metrics.numCalls = atomic.MakeUint(0)
-	t.gc.metrics.numBuckets = atomic.MakeUint(numBuckets)
+	t.gc.metrics.numBuckets.Sub(uint(len(toDelete)))
 }
