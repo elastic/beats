@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Use ingress/egress instead of inbound/outbound for ECS 1.7 in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -362,6 +363,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
+- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
