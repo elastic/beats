@@ -259,8 +259,8 @@ var security = (function () {
         "5024": [["process"], ["start"], "windows-firewall-service-started"],
         "5025": [["process"], ["end"], "windows-firewall-service-stopped"],
         "5033": [["driver"], ["start"], "windows-firewall-driver-started"],
-        "5034": [["driver"], ["end"], "windows-firewall-service-stopped"],
-        "5037": [["driver"], ["end"], "windows-firewall-service-error"],
+        "5034": [["driver"], ["end"], "windows-firewall-driver-stopped"],
+        "5037": [["driver"], ["end"], "windows-firewall-driver-error"],
     };
 
 
