@@ -3056,6 +3056,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.",
+        "event.reason": "User Requested.",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3103,6 +3104,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.",
+        "event.reason": "Idle timeout.",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
