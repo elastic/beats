@@ -217,6 +217,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 						},
 					},
 				},
+				{
+					"drop_fields": map[string]interface{}{
+						"fields": []string{
+							"ecs.version", //coming from logger, already added by libbeat
+						},
+						"ignore_missing": true,
+					},
+				},
 			},
 		},
 	}
@@ -259,6 +267,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 								"version":  o.agentInfo.Version(),
 								"snapshot": o.agentInfo.Snapshot(),
 							},
+						},
+					},
+					{
+						"drop_fields": map[string]interface{}{
+							"fields": []string{
+								"ecs.version", //coming from logger, already added by libbeat
+							},
+							"ignore_missing": true,
 						},
 					},
 				},
