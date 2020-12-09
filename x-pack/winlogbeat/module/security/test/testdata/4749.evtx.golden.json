@@ -3,15 +3,17 @@
     "@timestamp": "2019-12-19T08:03:42.7234679Z",
     "event": {
       "action": "added-distribution-group-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4749,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "group"
+        "group",
+        "creation"
       ]
     },
     "group": {

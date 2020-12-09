@@ -3,7 +3,10 @@
     "@timestamp": "2020-04-01T14:35:04.7030004Z",
     "event": {
       "action": "scheduled-task-disabled",
-      "category": "iam",
+      "category": [
+        "iam",
+        "configuration"
+      ],
       "code": 4701,
       "kind": "event",
       "module": "security",
