@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.10.0\...v7.10.1[View commits]
 
 *Affecting all Beats*
 
+- Fix denial of service flaw where a remote attacker could cause the {beats} process to crash by presenting a specially malformed TLS public key. For more information, see https://discuss.elastic.co/t/beats-7-10-1-security-update/258160[Beats 7.10.1 Security Update].
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 
 *Auditbeat*
