@@ -371,7 +371,17 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 								"from": "http.agent",
 								"to":   "metrics",
 							},
+							{
+								"from": "metrics.beat",
+								"to":   "metrics.process",
+							},
 						},
+						"ignore_missing": true,
+					},
+				},
+				{
+					"drop_fields": map[string]interface{}{
+						"fields":         []string{"metrics.system"},
 						"ignore_missing": true,
 					},
 				},
@@ -418,11 +428,27 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 				},
 			},
 			{
+				"drop_fields": map[string]interface{}{
+					"fields": []string{
+						"http.agent.system",
+						"http.agent.libbeat",
+						"http.agent.filebeat",
+						"http.agent.registrar",
+						"http.agent.output",
+					},
+					"ignore_missing": true,
+				},
+			},
+			{
 				"rename": map[string]interface{}{
 					"fields": []map[string]interface{}{
 						{
 							"from": "http.agent",
 							"to":   "metrics",
+						},
+						{
+							"from": "metrics.beat",
+							"to":   "metrics.process",
 						},
 					},
 					"ignore_missing": true,
