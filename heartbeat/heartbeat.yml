@@ -130,9 +130,7 @@ processors:
         #name: us-east-1a
         # Lat, Lon "
         #location: "37.926868, -78.024902"
-  - detect_mime_type:
-      field: http.response.body.content
-      target: http.response.mime_type
+
 
 # ================================== Logging ===================================
 
