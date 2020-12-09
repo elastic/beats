@@ -1,6 +1,6 @@
 - name: application_pool
   type: group
-  release: beta
+  release: ga
   description: >
     application_pool
   fields:
@@ -8,3 +8,69 @@
       type: keyword
       description: >
         application pool name
+    - name: process
+      type: group
+      description: >
+        process details
+      fields:
+        - name: pid
+          type: long
+          description: >
+             process id
+        - name: handle_count
+          type: long
+          description: >
+            handle count
+        - name: io_read_operations_per_sec
+          type: float
+          description: >
+            io read operations per sec
+        - name: io_write_operations_per_sec
+          type: float
+          description: >
+            io write operations per sec
+        - name: virtual_bytes
+          type: float
+          description: >
+            virtual bytes
+        - name: cpu_usage_perc
+          type: float
+          description: >
+           cpu usage
+        - name: thread_count
+          type: long
+          description: >
+            thread count
+        - name: working_set
+          type: float
+          description: >
+            working set
+        - name: private_bytes
+          type: float
+          description: >
+            private bytes
+        - name: page_faults_per_sec
+          type: float
+          description: >
+            page faults
+    - name: net_clr
+      type: group
+      description: >
+        net clr
+      fields:
+        - name: finallys_per_sec
+          type: long
+          description: >
+            finallys per sec
+        - name: throw_to_catch_depth_per_sec
+          type: long
+          description: >
+            throw to catch depth per sec
+        - name: total_exceptions_thrown
+          type: long
+          description: >
+            total exceptions thrown
+        - name: filters_per_sec
+          type: long
+          description: >
+            filters per sec

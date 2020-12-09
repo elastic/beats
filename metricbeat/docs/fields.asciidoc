@@ -23951,23 +23951,883 @@ type: keyword
 
 --
 
-*`iis.webserver.*.*`*::
+[float]
+=== process
+
+process details
+
+
+
+*`iis.application_pool.process.pid`*::
 +
 --
+process id
+
+
+type: long
+
+--
+
+*`iis.application_pool.process.handle_count`*::
++
+--
+handle count
+
+
+type: long
+
+--
+
+*`iis.application_pool.process.io_read_operations_per_sec`*::
++
+--
+io read operations per sec
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.io_write_operations_per_sec`*::
++
+--
+io write operations per sec
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.virtual_bytes`*::
++
+--
+virtual bytes
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.cpu_usage_perc`*::
++
+--
+cpu usage
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.thread_count`*::
++
+--
+thread count
+
+
+type: long
+
+--
+
+*`iis.application_pool.process.working_set`*::
++
+--
+working set
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.private_bytes`*::
++
+--
+private bytes
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.page_faults_per_sec`*::
++
+--
+page faults
+
+
+type: float
+
+--
+
+[float]
+=== net_clr
+
+net clr
+
+
+
+*`iis.application_pool.net_clr.finallys_per_sec`*::
++
+--
+finallys per sec
+
+
+type: long
+
+--
+
+*`iis.application_pool.net_clr.throw_to_catch_depth_per_sec`*::
++
+--
+throw to catch depth per sec
+
+
+type: long
+
+--
+
+*`iis.application_pool.net_clr.total_exceptions_thrown`*::
++
+--
+total exceptions thrown
+
+
+type: long
+
+--
+
+*`iis.application_pool.net_clr.filters_per_sec`*::
++
+--
+filters per sec
+
+
+type: long
+
+--
+
+[float]
+=== webserver
+
 webserver
 
 
-type: object
 
---
+[float]
+=== process
 
-*`iis.website.*.*`*::
+process details
+
+
+
+*`iis.webserver.process.cpu_usage_perc`*::
 +
 --
+cpu usage perc
+
+
+type: float
+
+--
+
+*`iis.webserver.process.handle_count`*::
++
+--
+handle count
+
+
+type: float
+
+--
+
+*`iis.webserver.process.virtual_bytes`*::
++
+--
+virtual bytes
+
+
+type: float
+
+--
+
+*`iis.webserver.process.thread_count`*::
++
+--
+thread count
+
+
+type: long
+
+--
+
+*`iis.webserver.process.working_set`*::
++
+--
+working set
+
+
+type: float
+
+--
+
+*`iis.webserver.process.private_bytes`*::
++
+--
+private bytes
+
+
+type: float
+
+--
+
+*`iis.webserver.process.worker_process_count`*::
++
+--
+worker process count
+
+
+type: float
+
+--
+
+*`iis.webserver.process.page_faults_per_sec`*::
++
+--
+page faults
+
+
+type: float
+
+--
+
+*`iis.webserver.process.io_read_operations_per_sec`*::
++
+--
+io read operations per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.process.io_write_operations_per_sec`*::
++
+--
+io write operations per sec
+
+
+type: float
+
+--
+
+[float]
+=== asp_net
+
+net clr
+
+
+
+*`iis.webserver.asp_net.application_restarts`*::
++
+--
+applications restarts
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net.request_wait_time`*::
++
+--
+request wait time
+
+
+type: long
+
+--
+
+[float]
+=== asp_net_application
+
+asp.net application
+
+
+
+*`iis.webserver.asp_net_application.errors_total_per_sec`*::
++
+--
+total errors per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.pipeline_instance_count`*::
++
+--
+pipeline instance count
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_per_sec`*::
++
+--
+requests per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_executing`*::
++
+--
+requests executing
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_in_application_queue`*::
++
+--
+requests in application queue
+
+
+type: float
+
+--
+
+[float]
+=== cache
+
+cache
+
+
+
+*`iis.webserver.cache.current_file_cache_memory_usage`*::
++
+--
+current file cache
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.current_files_cached`*::
++
+--
+current files cached
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.current_uris_cached`*::
++
+--
+current uris cached
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.file_cache_hits`*::
++
+--
+file cache hits
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.file_cache_misses`*::
++
+--
+file cache misses
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.maximum_file_cache_memory_usage`*::
++
+--
+max file cache
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_current_items`*::
++
+--
+output cache current items
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_current_memory_usage`*::
++
+--
+output cache memory usage
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_total_hits`*::
++
+--
+output cache total hits
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_total_misses`*::
++
+--
+output cache total misses
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.total_files_cached`*::
++
+--
+total files cached
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.total_uris_cached`*::
++
+--
+total uris cached
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.uri_cache_hits`*::
++
+--
+uris cached hits
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.uri_cache_misses`*::
++
+--
+uri cache misses
+
+
+type: float
+
+--
+
+[float]
+=== network
+
+network
+
+
+
+*`iis.webserver.network.anonymous_users_per_sec`*::
++
+--
+anonymous users per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.bytes_received_per_sec`*::
++
+--
+bytes received per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.bytes_sent_per_sec`*::
++
+--
+bytes sent per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_anonymous_users`*::
++
+--
+current anonymous users
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_connections`*::
++
+--
+current connections
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_non_anonymous_users`*::
++
+--
+current non anonymous users
+
+
+type: float
+
+--
+
+*`iis.webserver.network.delete_requests_per_sec`*::
++
+--
+delete requests per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.get_requests_per_sec`*::
++
+--
+get requests per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.maximum_connections`*::
++
+--
+maximum connections
+
+
+type: float
+
+--
+
+*`iis.webserver.network.post_requests_per_sec`*::
++
+--
+post requests per sec
+
+
+type: float
+
+--
+
+*`iis.webserver.network.service_uptime`*::
++
+--
+service uptime
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_anonymous_users`*::
++
+--
+total anonymous users
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_bytes_received`*::
++
+--
+total bytes received
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_bytes_sent`*::
++
+--
+total bytes sent
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_connection_attempts`*::
++
+--
+total connection attempts
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_delete_requests`*::
++
+--
+total delete requests
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_get_requests`*::
++
+--
+total get requests
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_non_anonymous_users`*::
++
+--
+total non anonymous users
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_post_requests`*::
++
+--
+total post requests
+
+
+type: float
+
+--
+
+[float]
+=== website
+
 website
 
 
-type: object
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
+
+[float]
+=== network
+
+network
+
+
+
+*`iis.website.network.bytes_received_per_sec`*::
++
+--
+bytes received per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.bytes_sent_per_sec`*::
++
+--
+bytes sent per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.current_connections`*::
++
+--
+current connections
+
+
+type: float
+
+--
+
+*`iis.website.network.delete_requests_per_sec`*::
++
+--
+delete requests per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.get_requests_per_sec`*::
++
+--
+get requests per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.maximum_connections`*::
++
+--
+maximum connections
+
+
+type: float
+
+--
+
+*`iis.website.network.post_requests_per_sec`*::
++
+--
+post requests per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.put_requests_per_sec`*::
++
+--
+put requests per sec
+
+
+type: float
+
+--
+
+*`iis.website.network.service_uptime`*::
++
+--
+service uptime
+
+
+type: float
+
+--
+
+*`iis.website.network.total_bytes_received`*::
++
+--
+total bytes received
+
+
+type: float
+
+--
+
+*`iis.website.network.total_bytes_sent`*::
++
+--
+total bytes sent
+
+
+type: float
+
+--
+
+*`iis.website.network.total_connection_attempts`*::
++
+--
+total connection attempts
+
+
+type: float
+
+--
+
+*`iis.website.network.total_delete_requests`*::
++
+--
+total delete requests
+
+
+type: float
+
+--
+
+*`iis.website.network.total_get_requests`*::
++
+--
+total get requests
+
+
+type: float
+
+--
+
+*`iis.website.network.total_post_requests`*::
++
+--
+total post requests
+
+
+type: float
+
+--
+
+*`iis.website.network.total_put_requests`*::
++
+--
+total put requests
+
+
+type: float
 
 --
 

@@ -1,8 +1,231 @@
-- name: webserver.*.*
-  release: beta
-  type: object
-  object_type: float
-  object_type_mapping_type: "*"
+- name: webserver
+  type: group
+  release: ga
   description: >
     webserver
-
+  fields:
+    - name: process
+      type: group
+      description: >
+        process details
+      fields:
+        - name: cpu_usage_perc
+          type: float
+          description: >
+            cpu usage perc
+        - name: handle_count
+          type: float
+          description: >
+            handle count
+        - name: virtual_bytes
+          type: float
+          description: >
+            virtual bytes
+        - name: thread_count
+          type: long
+          description: >
+            thread count
+        - name: working_set
+          type: float
+          description: >
+            working set
+        - name: private_bytes
+          type: float
+          description: >
+            private bytes
+        - name: worker_process_count
+          type: float
+          description: >
+            worker process count
+        - name: page_faults_per_sec
+          type: float
+          description: >
+            page faults
+        - name: io_read_operations_per_sec
+          type: float
+          description: >
+            io read operations per sec
+        - name: io_write_operations_per_sec
+          type: float
+          description: >
+            io write operations per sec
+    - name: asp_net
+      type: group
+      description: >
+        net clr
+      fields:
+        - name: application_restarts
+          type: float
+          description: >
+            applications restarts
+        - name: request_wait_time
+          type: long
+          description: >
+            request wait time
+    - name: asp_net_application
+      type: group
+      description: >
+       asp.net application
+      fields:
+        - name: errors_total_per_sec
+          type: float
+          description: >
+            total errors per sec
+        - name: pipeline_instance_count
+          type: float
+          description: >
+           pipeline instance count
+        - name: requests_per_sec
+          type: float
+          description: >
+            requests per sec
+        - name: requests_executing
+          type: float
+          description: >
+            requests executing
+        - name: requests_in_application_queue
+          type: float
+          description: >
+            requests in application queue
+    - name: cache
+      type: group
+      description: >
+        cache
+      fields:
+        - name: current_file_cache_memory_usage
+          type: float
+          description: >
+            current file cache
+        - name: current_files_cached
+          type: float
+          description: >
+            current files cached
+        - name: current_uris_cached
+          type: float
+          description: >
+            current uris cached
+        - name: file_cache_hits
+          type: float
+          description: >
+            file cache hits
+        - name: file_cache_misses
+          type: float
+          description: >
+            file cache misses
+        - name: maximum_file_cache_memory_usage
+          type: float
+          description: >
+            max file cache
+        - name: output_cache_current_items
+          type: float
+          description: >
+            output cache current items
+        - name: output_cache_current_memory_usage
+          type: float
+          description: >
+            output cache memory usage
+        - name: output_cache_total_hits
+          type: float
+          description: >
+            output cache total hits
+        - name: output_cache_total_misses
+          type: float
+          description: >
+            output cache total misses
+        - name: total_files_cached
+          type: float
+          description: >
+            total files cached
+        - name: total_uris_cached
+          type: float
+          description: >
+            total uris cached
+        - name: uri_cache_hits
+          type: float
+          description: >
+            uris cached hits
+        - name: uri_cache_misses
+          type: float
+          description: >
+            uri cache misses
+    - name: network
+      type: group
+      description: >
+        network
+      fields:
+        - name: anonymous_users_per_sec
+          type: float
+          description: >
+            anonymous users per sec
+        - name: bytes_received_per_sec
+          type: float
+          description: >
+            bytes received per sec
+        - name: bytes_sent_per_sec
+          type: float
+          description: >
+            bytes sent per sec
+        - name: current_anonymous_users
+          type: float
+          description: >
+            current anonymous users
+        - name: current_connections
+          type: float
+          description: >
+            current connections
+        - name: current_non_anonymous_users
+          type: float
+          description: >
+            current non anonymous users
+        - name: delete_requests_per_sec
+          type: float
+          description: >
+            delete requests per sec
+        - name: get_requests_per_sec
+          type: float
+          description: >
+            get requests per sec
+        - name: maximum_connections
+          type: float
+          description: >
+            maximum connections
+        - name: post_requests_per_sec
+          type: float
+          description: >
+            post requests per sec
+        - name: service_uptime
+          type: float
+          description: >
+            service uptime
+        - name: total_anonymous_users
+          type: float
+          description: >
+            total anonymous users
+        - name: total_bytes_received
+          type: float
+          description: >
+            total bytes received
+        - name: total_bytes_sent
+          type: float
+          description: >
+            total bytes sent
+        - name: total_connection_attempts
+          type: float
+          description: >
+            total connection attempts
+        - name: total_delete_requests
+          type: float
+          description: >
+            total delete requests
+        - name: total_get_requests
+          type: float
+          description: >
+            total get requests
+        - name: total_non_anonymous_users
+          type: float
+          description: >
+            total non anonymous users
+        - name: total_post_requests
+          type: float
+          description: >
+            total post requests
