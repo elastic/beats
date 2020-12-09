@@ -40,6 +40,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
+  * <<filebeat-module-mysqlenterprise>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-netscout>>
@@ -109,6 +110,7 @@ include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
+include::modules/mysqlenterprise.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/netscout.asciidoc[]
