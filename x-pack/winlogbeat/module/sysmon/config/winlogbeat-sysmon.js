@@ -1563,6 +1563,7 @@ var sysmon = (function () {
             ignore_missing: true,
             field: "dns.question.name",
             target_field: "dns.question.registered_domain",
+            target_subdomain_field: "dns.question.subdomain",
         })
         .Add(setRuleName)
         .Add(translateDnsQueryStatus)
