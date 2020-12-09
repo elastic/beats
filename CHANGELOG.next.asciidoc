@@ -738,7 +738,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 - Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
-- Add configuration option to set external and internal networks for panw panos fileset {pull}XXXXX[XXXXX]
+- Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
 
 *Heartbeat*
 
