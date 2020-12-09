@@ -26,6 +26,7 @@
         "dns.question.class": "IN",
         "dns.question.name": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
         "dns.question.registered_domain": "es.io",
+        "dns.question.subdomain": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud",
         "dns.question.top_level_domain": "io",
         "dns.question.type": "A",
         "dns.resolved_ip": [
@@ -99,6 +100,7 @@
         "dns.question.class": "IN",
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
+        "dns.question.subdomain": "_googlecast",
         "dns.question.top_level_domain": "local",
         "dns.question.type": "PTR",
         "dns.type": "query",
@@ -159,6 +161,7 @@
         "dns.id": 0,
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
+        "dns.question.subdomain": "_googlecast",
         "dns.question.top_level_domain": "local",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
