@@ -18,11 +18,12 @@
 package registered_domain
 
 type config struct {
-	Field         string `config:"field"        validate:"required"`
-	TargetField   string `config:"target_field" validate:"required"`
-	IgnoreMissing bool   `config:"ignore_missing"`
-	IgnoreFailure bool   `config:"ignore_failure"`
-	ID            string `config:"id"`
+	Field                string `config:"field"        validate:"required"`
+	TargetField          string `config:"target_field" validate:"required"`
+	TargetSubdomainField string `config:"target_subdomain_field"`
+	IgnoreMissing        bool   `config:"ignore_missing"`
+	IgnoreFailure        bool   `config:"ignore_failure"`
+	ID                   string `config:"id"`
 }
 
 func defaultConfig() config {

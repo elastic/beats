@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Use ingress/egress instead of inbound/outbound for ECS 1.7 in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -91,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
 - Fix Powershell processing of downgraded engine events. {pull}18966[18966]
 - Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
+- Use ECS 1.7 ingress/egress instead of inbound/outbound network.direction in sysmon. {pull}22997[22997]
 
 *Functionbeat*
 
@@ -302,6 +304,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Protect against accessing an undefined variable in Security module. {pull}22937[22937]
 
 *Functionbeat*
 
@@ -361,6 +364,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
+- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -474,6 +478,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Nats filebeat dashboard. {pull}22726[22726]
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
+- Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 
 *Heartbeat*
 
@@ -581,6 +586,7 @@ port. {pull}19209[19209]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
+- Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 
 *Elastic Log Driver*
