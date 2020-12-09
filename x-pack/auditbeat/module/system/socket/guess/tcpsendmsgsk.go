@@ -28,7 +28,7 @@ import (
 //  TCP_SENDMSG_SOCK  : %di
 
 func init() {
-	if err := Registry.AddGuess(&guessTcpSendmsgSock{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessTcpSendmsgSock{} }); err != nil {
 		panic(err)
 	}
 }

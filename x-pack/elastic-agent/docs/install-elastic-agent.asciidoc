@@ -36,17 +36,18 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/download-widget.
 // end::install-elastic-agent[]
 --
 
-. Install {agent} as a managed service, enroll it in {fleet}, and start the
-service:
+. From the agent directory, run the appropriate command to install {agent} as
+a managed service, enroll it in {fleet}, and start the service. Don't have a
+{fleet} enrollment key? Read the
+{ingest-guide}/fleet-quick-start.html[Quick start guide] to learn how to get one
+from {fleet}.
 +
 --
 include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/install-widget.asciidoc[]
-
 --
-
-Don't have a {fleet} enrollment key? Read the
-{ingest-guide}/fleet-quick-start.html[Quick start guide] to
-learn how to generate one.
++
+This step installs the {agent} files into the directory locations described
+in <<installation-layout>>.
 
 Because {agent} is installed as an auto-starting service, it will restart
 automatically if the system is rebooted.

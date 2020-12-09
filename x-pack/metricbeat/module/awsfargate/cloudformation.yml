@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SubnetID:
+    Type: String
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: metricbeat-cloudformation-fargate
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: metricbeat-fargate-log-group
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsFargateTaskExecutionRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: !Sub 'EcsTaskExecutionRole-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - <ELASTIC_CLOUD_ID_ARN>
+                  - <ELASTIC_CLOUD_AUTH_ARN>
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: deployment-task-metricbeat
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: deployment-task-metricbeat-container
+          Image: kaiyansheng/metricbeat-awsfargate:v1
+          Secrets:
+            - Name: ELASTIC_CLOUD_ID
+              ValueFrom: <ELASTIC_CLOUD_ID_ARN>
+            - Name: ELASTIC_CLOUD_AUTH
+              ValueFrom: <ELASTIC_CLOUD_AUTH_ARN>
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: ecs
+          EntryPoint:
+            - sh
+            - -c
+          Command:
+            - ./metricbeat setup && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: deployment-metricbeat-service
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID

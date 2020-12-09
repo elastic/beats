@@ -21,7 +21,7 @@ import (
 	"flag"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -53,34 +53,5 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		initModule()
 	})
 
-	return &Module{BaseModule: base, HostFS: *HostFS, IsAgent: checkMgmtFlags()}, nil
-}
-
-// checkMgmtFlags checks to see if metricbeat is running under Agent
-// The management setting is stored in the main Beat runtime object, but we can't see that from a module
-// So instead we check the CLI flags, since Agent starts metricbeat with "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"
-func checkMgmtFlags() bool {
-	type management struct {
-		Mode    string `config:"management.mode"`
-		Enabled bool   `config:"management.enabled"`
-	}
-	var managementSettings management
-
-	cfgFlag := flag.Lookup("E")
-	if cfgFlag == nil {
-		return false
-	}
-
-	CfgObject, _ := cfgFlag.Value.(*common.SettingsFlag)
-	cliCfg := CfgObject.Config()
-
-	err := cliCfg.Unpack(&managementSettings)
-	if err != nil {
-		return false
-	}
-
-	if managementSettings.Enabled == true && managementSettings.Mode == "x-pack-fleet" {
-		return true
-	}
-	return false
+	return &Module{BaseModule: base, HostFS: *HostFS, IsAgent: fleetmode.Enabled()}, nil
 }
