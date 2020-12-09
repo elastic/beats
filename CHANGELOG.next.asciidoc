@@ -725,6 +725,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Added support for MySQL Enterprise audit logs. {pull}22273[22273]
 - Rename googlecloud module to gcp module. {pull}22214[22214]
 - Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
 - Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
