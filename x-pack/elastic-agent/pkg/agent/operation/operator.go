@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -43,6 +44,7 @@ type Operator struct {
 	bgContext     context.Context
 	pipelineID    string
 	logger        *logger.Logger
+	agentInfo     *info.AgentInfo
 	config        *configuration.SettingsConfig
 	handlers      map[string]handleFunc
 	stateResolver *stateresolver.StateResolver
@@ -66,6 +68,7 @@ type Operator struct {
 func NewOperator(
 	ctx context.Context,
 	logger *logger.Logger,
+	agentInfo *info.AgentInfo,
 	pipelineID string,
 	config *configuration.SettingsConfig,
 	fetcher download.Downloader,
@@ -85,6 +88,7 @@ func NewOperator(
 		config:        config,
 		pipelineID:    pipelineID,
 		logger:        logger,
+		agentInfo:     agentInfo,
 		downloader:    fetcher,
 		verifier:      verifier,
 		installer:     installer,
@@ -252,9 +256,9 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return a, nil
 	}
 
-	specifier, ok := p.(app.Specifier)
+	desc, ok := p.(*app.Descriptor)
 	if !ok {
-		return nil, fmt.Errorf("descriptor is not an app.Specifier")
+		return nil, fmt.Errorf("descriptor is not an app.Descriptor")
 	}
 
 	// TODO: (michal) join args into more compact options version
@@ -268,7 +272,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			p.BinaryName(),
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
-			specifier,
+			desc,
 			o.srv,
 			o.config,
 			o.logger,
@@ -284,7 +288,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),
-			specifier,
+			desc,
 			o.srv,
 			o.config,
 			o.logger,

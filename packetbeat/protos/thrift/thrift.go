@@ -57,6 +57,7 @@ type thriftPlugin struct {
 
 	publishQueue chan *thriftTransaction
 	results      protos.Reporter
+	watcher      procs.ProcessesWatcher
 	idl          *thriftIdl
 }
 
@@ -182,6 +183,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &thriftPlugin{}
@@ -192,7 +194,7 @@ func New(
 		}
 	}
 
-	if err := p.init(testMode, results, &config); err != nil {
+	if err := p.init(testMode, results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
@@ -201,6 +203,7 @@ func New(
 func (thrift *thriftPlugin) init(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	config *thriftConfig,
 ) error {
 	thrift.InitDefaults()
@@ -218,6 +221,7 @@ func (thrift *thriftPlugin) init(
 	if !testMode {
 		thrift.publishQueue = make(chan *thriftTransaction, 1000)
 		thrift.results = results
+		thrift.watcher = watcher
 		go thrift.publishTransactions()
 	}
 
@@ -894,7 +898,7 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 	// all ok, go to next level
 	stream.message.tcpTuple = *tcptuple
 	stream.message.direction = dir
-	stream.message.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	stream.message.cmdlineTuple = thrift.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	if stream.message.frameSize == 0 {
 		stream.message.frameSize = uint32(stream.parseOffset - stream.message.start)
 	}

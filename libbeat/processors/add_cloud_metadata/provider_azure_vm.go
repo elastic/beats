@@ -34,6 +34,9 @@ var azureVMMetadataFetcher = provider{
 		azHeaders := map[string]string{"Metadata": "true"}
 		azSchema := func(m map[string]interface{}) common.MapStr {
 			out, _ := s.Schema{
+				"account": s.Object{
+					"id": c.Str("subscriptionId"),
+				},
 				"instance": s.Object{
 					"id":   c.Str("vmId"),
 					"name": c.Str("name"),
@@ -46,7 +49,7 @@ var azureVMMetadataFetcher = provider{
 			return out
 		}
 
-		fetcher, err := newMetadataFetcher(config, "az", azHeaders, metadataHost, azSchema, azMetadataURI)
+		fetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azSchema, azMetadataURI)
 		return fetcher, err
 	},
 }

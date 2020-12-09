@@ -46,20 +46,24 @@ var (
 // Template holds information for the ES template.
 type Template struct {
 	sync.Mutex
-	name        string
-	pattern     string
-	beatVersion common.Version
-	beatName    string
-	esVersion   common.Version
-	config      TemplateConfig
-	migration   bool
-	order       int
+	name            string
+	pattern         string
+	elasticLicensed bool
+	beatVersion     common.Version
+	beatName        string
+	esVersion       common.Version
+	config          TemplateConfig
+	migration       bool
+	templateType    IndexTemplateType
+	order           int
+	priority        int
 }
 
 // New creates a new template instance
 func New(
 	beatVersion string,
 	beatName string,
+	elasticLicensed bool,
 	esVersion common.Version,
 	config TemplateConfig,
 	migration bool,
@@ -123,14 +127,17 @@ func New(
 	}
 
 	return &Template{
-		pattern:     pattern,
-		name:        name,
-		beatVersion: *bV,
-		esVersion:   esVersion,
-		beatName:    beatName,
-		config:      config,
-		migration:   migration,
-		order:       config.Order,
+		pattern:         pattern,
+		name:            name,
+		elasticLicensed: elasticLicensed,
+		beatVersion:     *bV,
+		esVersion:       esVersion,
+		beatName:        beatName,
+		config:          config,
+		migration:       migration,
+		templateType:    config.Type,
+		order:           config.Order,
+		priority:        config.Priority,
 	}, nil
 }
 
@@ -153,7 +160,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	processor := Processor{EsVersion: t.esVersion, Migration: t.migration}
+	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: t.elasticLicensed, Migration: t.migration}
 	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
@@ -184,21 +191,53 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 
 // LoadMinimal loads the template only with the given configuration
 func (t *Template) LoadMinimal() (common.MapStr, error) {
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	m := common.MapStr{
-		keyPattern: patterns,
-		"order":    t.order,
-		"settings": common.MapStr{
-			"index": t.config.Settings.Index,
-		},
+	m := common.MapStr{}
+	switch t.templateType {
+	case IndexTemplateLegacy:
+		m = t.loadMinimalLegacy()
+	case IndexTemplateComponent:
+		m = t.loadMinimalComponent()
+	case IndexTemplateIndex:
+		m = t.loadMinimalIndex()
+	default:
+		return nil, fmt.Errorf("unknown template type %v", t.templateType)
 	}
+
 	if t.config.Settings.Source != nil {
 		m["mappings"] = buildMappings(
 			t.beatVersion, t.esVersion, t.beatName,
 			nil, nil,
 			common.MapStr(t.config.Settings.Source))
 	}
+
 	return m, nil
+}
+
+func (t *Template) loadMinimalLegacy() common.MapStr {
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	return common.MapStr{
+		keyPattern: patterns,
+		"order":    t.order,
+		"settings": common.MapStr{
+			"index": t.config.Settings.Index,
+		},
+	}
+}
+
+func (t *Template) loadMinimalComponent() common.MapStr {
+	return common.MapStr{
+		"template": common.MapStr{
+			"settings": common.MapStr{
+				"index": t.config.Settings.Index,
+			},
+		},
+	}
+}
+
+func (t *Template) loadMinimalIndex() common.MapStr {
+	m := t.loadMinimalComponent()
+	m["priority"] = t.priority
+	return m
 }
 
 // GetName returns the name of the template
@@ -214,6 +253,19 @@ func (t *Template) GetPattern() string {
 // Generate generates the full template
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	switch t.templateType {
+	case IndexTemplateLegacy:
+		return t.generateLegacy(properties)
+	case IndexTemplateComponent:
+		return t.generateComponent(properties)
+	case IndexTemplateIndex:
+		return t.generateIndex(properties)
+	default:
+	}
+	return nil
+}
+
+func (t *Template) generateLegacy(properties common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	return common.MapStr{
 		keyPattern: patterns,
@@ -230,6 +282,32 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
+}
+
+func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
+	return common.MapStr{
+		"template": common.MapStr{
+			"mappings": buildMappings(
+				t.beatVersion, t.esVersion, t.beatName,
+				properties,
+				append(dynamicTemplates, buildDynTmpl(t.esVersion)),
+				common.MapStr(t.config.Settings.Source)),
+			"settings": common.MapStr{
+				"index": buildIdxSettings(
+					t.esVersion,
+					t.config.Settings.Index,
+				),
+			},
+		},
+	}
+}
+
+func (t *Template) generateIndex(properties common.MapStr) common.MapStr {
+	tmpl := t.generateComponent(properties)
+	tmpl["priority"] = t.priority
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	tmpl[keyPattern] = patterns
+	return tmpl
 }
 
 func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {

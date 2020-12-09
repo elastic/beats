@@ -111,7 +111,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 	}{
 		{"./_meta/test/empty.json", []mb.Event(nil)},
 		{"./_meta/test/task.622.json", []mb.Event{
-			mb.Event{
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -134,7 +134,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 			},
 		}},
 		{"./_meta/test/tasks.622.json", []mb.Event{
-			mb.Event{
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -155,7 +155,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				Timestamp: time.Time{},
 				Took:      0,
 			},
-			mb.Event{
+			{
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
@@ -174,7 +174,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				},
 				Timestamp: time.Time{},
 				Took:      0,
-			}, mb.Event{
+			}, {
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",

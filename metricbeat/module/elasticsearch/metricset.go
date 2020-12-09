@@ -162,7 +162,7 @@ func (m *MetricSet) GetMasterNodeID() (string, error) {
 		return "", err
 	}
 
-	for nodeID, _ := range response.Nodes {
+	for nodeID := range response.Nodes {
 		return nodeID, nil
 	}
 

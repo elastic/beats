@@ -3,8 +3,6 @@ import shutil
 import sys
 import tempfile
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../metricbeat/tests/system'))
-
 if os.name == "nt":
     import win32file
 

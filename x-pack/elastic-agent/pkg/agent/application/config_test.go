@@ -5,8 +5,13 @@
 package application
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,6 +19,44 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
+
+func TestLoadConfig(t *testing.T) {
+	contents := map[string]interface{}{
+		"outputs": map[string]interface{}{
+			"default": map[string]interface{}{
+				"type":     "elasticsearch",
+				"hosts":    []interface{}{"127.0.0.1:9200"},
+				"username": "elastic",
+				"password": "changeme",
+			},
+		},
+		"inputs": []interface{}{
+			map[string]interface{}{
+				"type": "logfile",
+				"streams": []interface{}{
+					map[string]interface{}{
+						"paths": []interface{}{"/var/log/${host.name}"},
+					},
+				},
+			},
+		},
+	}
+
+	tmp, err := ioutil.TempDir("", "config")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmp)
+
+	cfgPath := filepath.Join(tmp, "config.yml")
+	dumpToYAML(t, cfgPath, contents)
+
+	cfg, err := LoadConfigFromFile(cfgPath)
+	require.NoError(t, err)
+
+	cfgData, err := cfg.ToMapStr()
+	require.NoError(t, err)
+
+	assert.Equal(t, contents, cfgData)
+}
 
 func TestConfig(t *testing.T) {
 	testMgmtMode(t)
@@ -27,7 +70,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, false, m.Fleet.Enabled)
-		assert.Equal(t, true, isStandalone(m.Fleet))
+		assert.Equal(t, true, IsStandalone(m.Fleet))
 
 	})
 
@@ -37,7 +80,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, true, m.Fleet.Enabled)
-		assert.Equal(t, false, isStandalone(m.Fleet))
+		assert.Equal(t, false, IsStandalone(m.Fleet))
 	})
 }
 
@@ -73,4 +116,10 @@ func mustWithConfigMode(standalone bool) *config.Config {
 			},
 		},
 	)
+}
+
+func dumpToYAML(t *testing.T, out string, in interface{}) {
+	b, err := yaml.Marshal(in)
+	require.NoError(t, err)
+	ioutil.WriteFile(out, b, 0600)
 }

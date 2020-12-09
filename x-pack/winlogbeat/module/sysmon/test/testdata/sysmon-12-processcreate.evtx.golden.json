@@ -1,0 +1,93 @@
+[
+  {
+    "@timestamp": "2020-10-27T20:00:14.32Z",
+    "event": {
+      "category": [
+        "process"
+      ],
+      "code": 1,
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "start",
+        "process_start"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "args": [
+        "C:\\Windows\\system32\\notepad.exe"
+      ],
+      "command_line": "\"C:\\Windows\\system32\\notepad.exe\" ",
+      "entity_id": "{9F32B55F-7C4E-5F98-5803-000000000500}",
+      "executable": "C:\\Windows\\System32\\notepad.exe",
+      "hash": {
+        "sha1": "b6d237154f2e528f0b503b58b025862d66b02b73"
+      },
+      "name": "notepad.exe",
+      "parent": {
+        "args": [
+          "C:\\Windows\\Explorer.EXE"
+        ],
+        "command_line": "C:\\Windows\\Explorer.EXE",
+        "entity_id": "{9F32B55F-6FDF-5F98-7000-000000000500}",
+        "executable": "C:\\Windows\\explorer.exe",
+        "name": "explorer.exe",
+        "pid": 4212
+      },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "Notepad",
+        "file_version": "10.0.17763.475 (WinBuild.160101.0800)",
+        "original_file_name": "NOTEPAD.EXE",
+        "product": "Microsoft® Windows® Operating System"
+      },
+      "pid": 3616,
+      "working_directory": "C:\\Users\\vagrant\\"
+    },
+    "related": {
+      "hash": "b6d237154f2e528f0b503b58b025862d66b02b73",
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Company": "Microsoft Corporation",
+        "Description": "Notepad",
+        "FileVersion": "10.0.17763.475 (WinBuild.160101.0800)",
+        "IntegrityLevel": "Medium",
+        "LogonGuid": "{9F32B55F-6FDD-5F98-E7C9-020000000000}",
+        "LogonId": "0x2c9e7",
+        "Product": "Microsoft® Windows® Operating System",
+        "RuleName": "-",
+        "TerminalSessionId": "1"
+      },
+      "event_id": 1,
+      "process": {
+        "pid": 7144,
+        "thread": {
+          "id": 6876
+        }
+      },
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 20,
+      "user": {
+        "identifier": "S-1-5-18"
+      },
+      "version": 5
+    }
+  }
+]
