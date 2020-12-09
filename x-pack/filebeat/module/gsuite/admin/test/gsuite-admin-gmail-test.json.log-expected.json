@@ -157,7 +157,8 @@
     {
         "event.action": "CHANGE_EMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -212,7 +213,8 @@
     {
         "event.action": "CHANGE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -263,7 +265,8 @@
     {
         "event.action": "CREATE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -314,7 +317,8 @@
     {
         "event.action": "DELETE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
