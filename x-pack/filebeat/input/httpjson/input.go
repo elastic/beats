@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	v2 "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/internal/v2"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -65,14 +66,15 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
 	sim := stateless.NewInputManager(statelessConfigure)
-	return v2.Plugin{
+	return inputv2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Beta,
 		Deprecated: false,
 		Manager: inputManager{
-			stateless: &sim,
+			v2inputManager: v2.NewInputManager(log, store),
+			stateless:      &sim,
 			cursor: &cursor.InputManager{
 				Logger:     log,
 				StateStore: store,
@@ -117,7 +119,7 @@ func test(url *url.URL) error {
 }
 
 func run(
-	ctx v2.Context,
+	ctx inputv2.Context,
 	config config,
 	tlsConfig *tlscommon.TLSConfig,
 	publisher cursor.Publisher,
