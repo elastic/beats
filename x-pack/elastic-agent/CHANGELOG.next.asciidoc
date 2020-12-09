@@ -27,6 +27,7 @@
 - Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
 - Fix composable input processor promotion to fix duplicates {pull}22344[22344]
 - Fix sysv init files for deb/rpm installation {pull}22543[22543]
+- Fixed parsing of npipe URI {pull}22978[22978]
 
 ==== New features
 
