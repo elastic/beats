@@ -2,10 +2,16 @@
   {
     "@timestamp": "2019-03-18T16:57:37.933Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 16,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -476,7 +482,7 @@
     },
     "network": {
       "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv6"
@@ -550,7 +556,7 @@
     },
     "network": {
       "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv4"
@@ -625,7 +631,7 @@
     },
     "network": {
       "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -700,7 +706,7 @@
     },
     "network": {
       "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -775,7 +781,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -854,7 +860,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -931,7 +937,7 @@
     },
     "network": {
       "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1006,7 +1012,7 @@
     },
     "network": {
       "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1080,7 +1086,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1157,7 +1163,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1234,7 +1240,7 @@
     },
     "network": {
       "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1308,7 +1314,7 @@
     },
     "network": {
       "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1382,7 +1388,7 @@
     },
     "network": {
       "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1460,7 +1466,7 @@
     },
     "network": {
       "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1538,7 +1544,7 @@
     },
     "network": {
       "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1616,7 +1622,7 @@
     },
     "network": {
       "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"

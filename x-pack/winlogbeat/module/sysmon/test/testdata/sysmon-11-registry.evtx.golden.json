@@ -2,10 +2,16 @@
   {
     "@timestamp": "2020-05-05T14:57:40.589Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 13,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -60,10 +66,16 @@
   {
     "@timestamp": "2020-05-05T14:57:44.714Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 13,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -112,10 +124,16 @@
   {
     "@timestamp": "2020-05-05T14:57:44.714Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 13,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -170,10 +188,16 @@
   {
     "@timestamp": "2020-05-05T14:57:46.808Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 13,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -222,10 +246,16 @@
   {
     "@timestamp": "2020-05-05T14:57:46.808Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 13,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant"
