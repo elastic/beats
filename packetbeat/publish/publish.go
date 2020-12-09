@@ -37,9 +37,10 @@ type TransactionPublisher struct {
 }
 
 type transProcessor struct {
-	ignoreOutgoing bool
-	localIPs       []net.IP // TODO: Periodically update this list.
-	name           string
+	ignoreOutgoing   bool
+	localIPs         []net.IP // TODO: Periodically update this list.
+	internalNetworks []string
+	name             string
 }
 
 var debugf = logp.MakeDebug("publish")
@@ -49,6 +50,7 @@ func NewTransactionPublisher(
 	pipeline beat.Pipeline,
 	ignoreOutgoing bool,
 	canDrop bool,
+	internalNetworks []string,
 ) (*TransactionPublisher, error) {
 	addrs, err := common.LocalIPAddrs()
 	if err != nil {
@@ -66,9 +68,10 @@ func NewTransactionPublisher(
 		pipeline: pipeline,
 		canDrop:  canDrop,
 		processor: transProcessor{
-			localIPs:       localIPs,
-			name:           name,
-			ignoreOutgoing: ignoreOutgoing,
+			localIPs:         localIPs,
+			internalNetworks: internalNetworks,
+			name:             name,
+			ignoreOutgoing:   ignoreOutgoing,
 		},
 	}
 	return p, nil
@@ -150,13 +153,13 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
-	fields, err := MarshalPacketbeatFields(event, p.localIPs)
+	fields, err := MarshalPacketbeatFields(event, p.localIPs, p.internalNetworks)
 	if err != nil {
 		return nil, err
 	}
 
 	if fields != nil {
-		if p.ignoreOutgoing && fields.Network.Direction == "outbound" {
+		if p.ignoreOutgoing && fields.Network.Direction == pb.Egress {
 			debugf("Ignore outbound transaction on: %s -> %s",
 				fields.Source.IP, fields.Destination.IP)
 			return nil, nil
@@ -195,7 +198,7 @@ func validateEvent(event *beat.Event) error {
 
 // MarshalPacketbeatFields marshals data contained in the _packetbeat field
 // into the event and removes the _packetbeat key.
-func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP) (*pb.Fields, error) {
+func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP, internalNetworks []string) (*pb.Fields, error) {
 	defer delete(event.Fields, pb.FieldsKey)
 
 	fields, err := pb.GetFields(event.Fields)
@@ -203,7 +206,7 @@ func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP) (*pb.Fields, 
 		return nil, err
 	}
 
-	if err = fields.ComputeValues(localIPs); err != nil {
+	if err = fields.ComputeValues(localIPs, internalNetworks); err != nil {
 		return nil, err
 	}
 
