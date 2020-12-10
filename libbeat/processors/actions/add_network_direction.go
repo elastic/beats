@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 func init() {
@@ -35,6 +36,7 @@ func init() {
 		checks.ConfigChecked(NewAddNetworkDirection,
 			checks.RequireFields("source", "destination", "target", "internal_networks"),
 			checks.AllowedFields("source", "destination", "target", "internal_networks")))
+	jsprocessor.RegisterPlugin("AddNetworkDirection", NewAddNetworkDirection)
 }
 
 const (
