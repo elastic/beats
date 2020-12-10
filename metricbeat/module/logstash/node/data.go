@@ -42,7 +42,7 @@ var (
 	}
 )
 
-func commonFieldsMapping(event mb.Event, fields common.MapStr) error {
+func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
 
@@ -115,7 +115,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 			}
 			event.MetricSetFields.Update(fields)
 
-			if err = commonFieldsMapping(event, fields); err != nil {
+			if err = commonFieldsMapping(&event, fields); err != nil {
 				return err
 			}
 

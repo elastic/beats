@@ -20,13 +20,15 @@
 package node
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 )
 
@@ -39,12 +41,13 @@ func TestEventMapping(t *testing.T) {
 		input, err := ioutil.ReadFile(f)
 		require.NoError(t, err)
 
-		reporter := &mbtest.CapturingReporterV2{}
-		err = commonFieldsMapping(reporter, input)
+		var data map[string]interface{}
+		err = json.Unmarshal(input, &data)
+		require.NoError(t, err)
 
+		event := mb.Event{}
+		err = commonFieldsMapping(&event, data)
 		require.NoError(t, err, f)
-		require.True(t, len(reporter.GetEvents()) >= 1, f)
-		require.Equal(t, 0, len(reporter.GetErrors()), f)
 	}
 }
 
