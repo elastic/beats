@@ -32,24 +32,26 @@ func TestProcessorRun(t *testing.T) {
 		Domain           string
 		RegisteredDomain string
 		Subdomain        string
+		ETLD             string
 	}{
-		{false, "www.google.com", "google.com", "www"},
-		{false, "www.google.co.uk", "google.co.uk", "www"},
-		{false, "www.mail.google.co.uk", "google.co.uk", "www.mail"},
-		{false, "google.com", "google.com", ""},
-		{false, "www.ak.local", "ak.local", "www"},
-		{false, "www.navy.mil", "navy.mil", "www"},
+		{false, "www.google.com", "google.com", "www", "com"},
+		{false, "www.google.co.uk", "google.co.uk", "www", "co.uk"},
+		{false, "www.mail.google.co.uk", "google.co.uk", "www.mail", "co.uk"},
+		{false, "google.com", "google.com", "", "com"},
+		{false, "www.ak.local", "ak.local", "www", "local"},
+		{false, "www.navy.mil", "navy.mil", "www", "mil"},
 
-		{true, "com", "", ""},
-		{true, ".", ".", ""},
-		{true, "", "", ""},
-		{true, "localhost", "", ""},
+		{true, "com", "", "", ""},
+		{true, ".", ".", "", ""},
+		{true, "", "", "", ""},
+		{true, "localhost", "", "", ""},
 	}
 
 	c := defaultConfig()
 	c.Field = "domain"
 	c.TargetField = "registered_domain"
 	c.TargetSubdomainField = "subdomain"
+	c.TargetETLDField = "etld"
 	p, err := newRegisteredDomain(c)
 	if err != nil {
 		t.Fatal(err)
@@ -75,9 +77,20 @@ func TestProcessorRun(t *testing.T) {
 		rd, _ := evt.GetValue("registered_domain")
 		assert.Equal(t, tc.RegisteredDomain, rd)
 
-		if tc.Subdomain != "" {
+		if tc.Subdomain == "" {
+			_, err := evt.GetValue("subdomain")
+			assert.NotNil(t, err)
+		} else {
 			subdomain, _ := evt.GetValue("subdomain")
 			assert.Equal(t, tc.Subdomain, subdomain)
+		}
+
+		if tc.ETLD == "" {
+			_, err := evt.GetValue("etld")
+			assert.NotNil(t, err)
+		} else {
+			etld, _ := evt.GetValue("etld")
+			assert.Equal(t, tc.ETLD, etld)
 		}
 	}
 }
