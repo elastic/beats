@@ -461,6 +461,14 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+      # Set internal security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.internal_zones: [ "Internal" ]
+
+      # Set external security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.external_zones: [ "External" ]
+
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
@@ -475,6 +483,14 @@ filebeat.modules:
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -496,6 +512,14 @@ filebeat.modules:
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
+
   ftd:
     enabled: true
 
@@ -513,6 +537,14 @@ filebeat.modules:
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
   ios:
     enabled: true
@@ -765,6 +797,16 @@ filebeat.modules:
 
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
+
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
 
   clientendpoint:
     enabled: true
