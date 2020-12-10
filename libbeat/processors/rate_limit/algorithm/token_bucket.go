@@ -48,8 +48,7 @@ type tokenBucket struct {
 	gc struct {
 		thresholds tokenBucketGCConfig
 		metrics    struct {
-			numCalls   atomic.Uint
-			numBuckets atomic.Uint
+			numCalls atomic.Uint
 		}
 	}
 
@@ -61,11 +60,6 @@ type tokenBucketGCConfig struct {
 	// NumCalls is the number of calls made to IsAllowed. When more than
 	// the specified number of calls are made, GC is performed.
 	NumCalls uint `config:"num_calls"`
-
-	// NumBuckets is the number of buckets being utilized by the token
-	// bucket algorithm. When more than the specified number are utilized,
-	// GC is performed.
-	NumBuckets uint `config:"num_buckets"`
 }
 
 type tokenBucketConfig struct {
@@ -82,8 +76,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 	cfg := tokenBucketConfig{
 		BurstMultiplier: 1.0,
 		GC: tokenBucketGCConfig{
-			NumCalls:   10000,
-			NumBuckets: 1000,
+			NumCalls: 10000,
 		},
 	}
 
@@ -98,13 +91,11 @@ func newTokenBucket(config Config) (Algorithm, error) {
 		gc: struct {
 			thresholds tokenBucketGCConfig
 			metrics    struct {
-				numCalls   atomic.Uint
-				numBuckets atomic.Uint
+				numCalls atomic.Uint
 			}
 		}{
 			thresholds: tokenBucketGCConfig{
-				NumCalls:   cfg.GC.NumCalls,
-				NumBuckets: cfg.GC.NumBuckets,
+				NumCalls: cfg.GC.NumCalls,
 			},
 		},
 		clock:  clockwork.NewRealClock(),
@@ -139,7 +130,6 @@ func (t *tokenBucket) getBucket(key uint64) *bucket {
 		return b
 	}
 
-	t.gc.metrics.numBuckets.Inc()
 	return b
 }
 
@@ -161,8 +151,7 @@ func (b *bucket) replenish(rate Rate, clock clockwork.Clock) {
 
 func (t *tokenBucket) runGC() {
 	// Don't run GC if thresholds haven't been crossed.
-	if (t.gc.metrics.numBuckets.Load() < t.gc.thresholds.NumBuckets) &&
-		(t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls) {
+	if t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls {
 		return
 	}
 
@@ -173,8 +162,7 @@ func (t *tokenBucket) runGC() {
 	// Check again in case another GC thread has run while this GC thread
 	// was waiting to acquire the lock and the other GC thread reset the
 	// metrics.
-	if (t.gc.metrics.numBuckets.Load() < t.gc.thresholds.NumBuckets) &&
-		(t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls) {
+	if t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls {
 		return
 	}
 
@@ -205,7 +193,6 @@ func (t *tokenBucket) runGC() {
 
 	// Reset GC metrics
 	t.gc.metrics.numCalls = atomic.MakeUint(0)
-	t.gc.metrics.numBuckets.Sub(uint(len(toDelete)))
 
 	gcDuration := time.Now().Sub(gcStartTime)
 	numBucketsDeleted := len(toDelete)
