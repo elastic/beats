@@ -20692,7 +20692,7 @@ type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.invalid_date.count`*::
+*`elasticsearch.ml.job.data.counts.invalid_date_count`*::
 +
 --
 type: long
@@ -20728,16 +20728,15 @@ type: long
 
 --
 
-
-*`elasticsearch.ml.job.data.counts.record.processed.count`*::
+*`elasticsearch.ml.job.data.counts.processed_record_count`*::
 +
 --
 Processed data events.
 
-
 type: long
 
 --
+
 
 *`elasticsearch.ml.job.data.counts.record.earliest.ms`*::
 +

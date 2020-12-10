@@ -49,7 +49,7 @@
           type: long
         - name: out_of_order.timestamp.count
           type: long
-        - name: invalid_date.count
+        - name: invalid_date_count
           type: long
         - name: last_data_time
           type: long
@@ -62,13 +62,12 @@
               type: long
             - name: count
               type: long
+        - name: processed_record_count
+          type: long
+          description: Processed data events.
         - name: record
           type: group
           fields:
-            - name: processed.count
-              type: long
-              description: >
-                Processed data events.
             - name: earliest.ms
               type: long
             - name: latest.ms

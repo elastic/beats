@@ -28,9 +28,7 @@
                             "count": 28
                         }
                     },
-                    "invalid_date": {
-                        "count": 0
-                    },
+                    "invalid_date_count": 0,
                     "last_data_time": 1525848008257,
                     "missing_field": {
                         "count": 0
@@ -40,6 +38,7 @@
                             "count": 0
                         }
                     },
+                    "processed_record_count": 14,
                     "record": {
                         "earliest": {
                             "ms": 1525847665298
@@ -49,9 +48,6 @@
                         },
                         "latest": {
                             "ms": 1525847795423
-                        },
-                        "processed": {
-                            "count": 14
                         }
                     }
                 },
@@ -98,7 +94,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:43359",
+        "address": "127.0.0.1:45215",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

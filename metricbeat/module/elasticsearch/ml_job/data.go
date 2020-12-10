@@ -37,10 +37,8 @@ var (
 		"id":    c.Str("job_id"),
 		"state": c.Str("state"),
 		"data_counts": c.Dict("data_counts", s.Schema{
+			"processed_record_count": c.Int("processed_record_count"),
 			"record": s.Object{
-				"processed": s.Object{
-					"count": c.Int("processed_record_count"),
-				},
 				"earliest": s.Object{
 					"ms": c.Int("earliest_record_timestamp"),
 				},
@@ -79,10 +77,8 @@ var (
 				},
 				"count": c.Int("bucket_count"),
 			},
-			"invalid_date": s.Object{
-				"count": c.Int("invalid_date_count"),
-			},
-			"last_data_time": c.Int("last_data_time"),
+			"invalid_date_count": c.Int("invalid_date_count"),
+			"last_data_time":     c.Int("last_data_time"),
 		}),
 		"model_size": c.Dict("model_size_stats", s.Schema{
 			"result_type": c.Str("result_type"),
