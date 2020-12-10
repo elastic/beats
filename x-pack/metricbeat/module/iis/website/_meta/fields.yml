@@ -16,64 +16,64 @@
         - name: bytes_received_per_sec
           type: float
           description: >
-            bytes received per sec
+            The bytes received per sec size.
         - name: bytes_sent_per_sec
           type: float
           description: >
-            bytes sent per sec
+            The bytes sent per sec size.
         - name: current_connections
           type: float
           description: >
-            current connections
+            The number of current connections.
         - name: delete_requests_per_sec
           type: float
           description: >
-            delete requests per sec
+            The number of DELETE requests per sec.
         - name: get_requests_per_sec
           type: float
           description: >
-            get requests per sec
+            The number of GET requests per sec.
         - name: maximum_connections
           type: float
           description: >
-            maximum connections
+            The number of maximum connections.
         - name: post_requests_per_sec
           type: float
           description: >
-            post requests per sec
+            The number of POST requests per sec.
         - name: put_requests_per_sec
           type: float
           description: >
-            put requests per sec
+            The number of PUT requests per sec.
         - name: service_uptime
           type: float
           description: >
-            service uptime
+            The service uptime.
         - name: total_bytes_received
           type: float
           description: >
-            total bytes received
+            The total number of bytes received.
         - name: total_bytes_sent
           type: float
           description: >
-            total bytes sent
+            The  total number of bytes sent.
         - name: total_connection_attempts
           type: float
           description: >
-            total connection attempts
+            The total number of connection attempts.
         - name: total_delete_requests
           type: float
           description: >
-            total delete requests
+            The total number of DELETE requests.
         - name: total_get_requests
           type: float
           description: >
-            total get requests
+            The total number of GET requests.
         - name: total_post_requests
           type: float
           description: >
-            total post requests
+            The total number of POST requests.
         - name: total_put_requests
           type: float
           description: >
-            total put requests
+            The total number of PUT requests.

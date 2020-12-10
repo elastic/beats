@@ -13,64 +13,60 @@
       description: >
         process details
       fields:
-        - name: pid
-          type: long
-          description: >
-             process id
         - name: handle_count
           type: long
           description: >
-            handle count
+            The number of handles.
         - name: io_read_operations_per_sec
           type: float
           description: >
-            io read operations per sec
+            IO read operations per sec.
         - name: io_write_operations_per_sec
           type: float
           description: >
-            io write operations per sec
+            IO write operations per sec.
         - name: virtual_bytes
           type: float
           description: >
-            virtual bytes
+            Memory virtual bytes.
         - name: cpu_usage_perc
           type: float
           description: >
-           cpu usage
+           The CPU usage percentage.
         - name: thread_count
           type: long
           description: >
-            thread count
+            The number of threats.
         - name: working_set
           type: float
           description: >
-            working set
+            Memory working set.
         - name: private_bytes
           type: float
           description: >
-            private bytes
+            Memory private bytes.
         - name: page_faults_per_sec
           type: float
           description: >
-            page faults
+            Memory page faults.
     - name: net_clr
       type: group
       description: >
         net clr
       fields:
         - name: finallys_per_sec
-          type: long
+          type: float
           description: >
-            finallys per sec
+            The nr of finallys per sec.
         - name: throw_to_catch_depth_per_sec
-          type: long
+          type: float
           description: >
-            throw to catch depth per sec
+            Throw to catch depth count per sec.
         - name: total_exceptions_thrown
           type: long
           description: >
-            total exceptions thrown
+            Total number of exceptions thrown.
         - name: filters_per_sec
-          type: long
+          type: float
           description: >
-            filters per sec
+            Number of filters per sec.
