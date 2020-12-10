@@ -21,6 +21,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-concert/unison"
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 
@@ -38,7 +39,7 @@ type bucket struct {
 }
 
 type tokenBucket struct {
-	mu sync.RWMutex
+	mu unison.Mutex
 
 	limit   Rate
 	depth   float64
@@ -155,16 +156,10 @@ func (t *tokenBucket) runGC() {
 		return
 	}
 
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	// Don't run GC if thresholds haven't been crossed.
-	// Check again in case another GC thread has run while this GC thread
-	// was waiting to acquire the lock and the other GC thread reset the
-	// metrics.
-	if t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls {
+	if !t.mu.TryLock() {
 		return
 	}
+	defer t.mu.Unlock()
 
 	gcStartTime := time.Now()
 
