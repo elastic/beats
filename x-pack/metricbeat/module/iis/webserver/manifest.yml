@@ -45,11 +45,13 @@ input:
       namespace: "asp_net_application"
       counters:
       - name: "Errors Total/Sec"
+        field: "errors_total_per_sec"
       - name: "Pipeline Instance Count"
       - name: "Requests Executing"
       - name: "Requests in Application Queue"
         format: 'large'
       - name: "Requests/Sec"
+        field: "requests_per_sec"
     #cache
     - object: "Web Service Cache"
       namespace: "cache"
