@@ -346,6 +346,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 
 *Heartbeat*
 
@@ -755,6 +756,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 - Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
 - Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
+- Add the ability to override `network.direction` based on interfaces in Fortinet/firewall fileset. {pull}23072[23072]
 
 *Heartbeat*
 
