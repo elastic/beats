@@ -753,6 +753,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
 - Add `network.direction` to auditd/log fileset. {pull}23041[23041]
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
+- Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
+- Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
 - Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
 - Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
 
@@ -880,6 +882,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 - Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
+- Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
 
