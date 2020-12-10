@@ -35,7 +35,7 @@ import (
 
 func init() {
 	processors.RegisterPlugin("rate_limit", New)
-	jsprocessor.RegisterPlugin("Fingerprint", New)
+	jsprocessor.RegisterPlugin("RateLimit", New)
 }
 
 const processorName = "rate_limit"
