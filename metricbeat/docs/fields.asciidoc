@@ -21993,6 +21993,21 @@ type: keyword
 
 --
 
+
+*`elasticsearch.shard.source_node.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.shard.source_node.uuid`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-envoyproxy]]
 == Envoyproxy fields
 

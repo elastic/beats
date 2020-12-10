@@ -9,7 +9,7 @@
             }
         },
         "index": {
-            "name": ".apm-custom-link"
+            "name": ".apm-agent-configuration"
         },
         "node": {
             "name": "hx-oJ1-aT_-5pRG22JMI1Q"
@@ -37,7 +37,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:36553",
+        "address": "127.0.0.1:41773",
         "type": "elasticsearch"
     }
 }
