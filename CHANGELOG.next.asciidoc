@@ -759,6 +759,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
 - Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
 - Add `network.direction` to netflow/log fileset. {pull}23052[23052]
+- Add `network.direction` override by specifying `internal_networks` in gcp module. {pull}23081[23081]
 
 *Heartbeat*
 
