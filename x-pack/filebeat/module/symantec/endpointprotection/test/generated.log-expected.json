@@ -766,9 +766,9 @@
             "bore5546.www.local"
         ],
         "related.ip": [
-            "10.175.83.138",
             "10.207.125.114",
-            "10.7.164.113"
+            "10.7.164.113",
+            "10.175.83.138"
         ],
         "related.user": [
             "remip"
@@ -1203,8 +1203,8 @@
             "atisu6579.test"
         ],
         "related.ip": [
-            "10.209.205.25",
-            "10.185.64.46"
+            "10.185.64.46",
+            "10.209.205.25"
         ],
         "related.user": [
             "iduntu"
@@ -1490,8 +1490,8 @@
             "tuserror810.www5.corp"
         ],
         "related.ip": [
-            "10.87.92.95",
-            "10.247.21.74"
+            "10.247.21.74",
+            "10.87.92.95"
         ],
         "related.user": [
             "Sedutper"
@@ -1828,8 +1828,8 @@
         "rsa.misc.version": "1.3638",
         "rsa.misc.virusname": "isqu",
         "rsa.network.alias_host": [
-            "rsitam2337.mail.localdomain",
-            "assit1598.www5.invalid"
+            "assit1598.www5.invalid",
+            "rsitam2337.mail.localdomain"
         ],
         "rsa.network.domain": "ema7531.api.example",
         "rsa.threat.threat_category": "isqu",
@@ -2755,8 +2755,8 @@
             "iusmo5734.internal.invalid"
         ],
         "related.ip": [
-            "10.40.133.90",
-            "10.171.13.85"
+            "10.171.13.85",
+            "10.40.133.90"
         ],
         "related.user": [
             "bor"
@@ -2982,8 +2982,8 @@
             "upidat1328.internal.localhost"
         ],
         "related.ip": [
-            "10.31.231.57",
-            "10.155.163.6"
+            "10.155.163.6",
+            "10.31.231.57"
         ],
         "related.user": [
             "norumetM"
@@ -3334,8 +3334,8 @@
             "eniamqu1863.api.lan"
         ],
         "related.ip": [
-            "10.29.149.77",
-            "10.56.95.160"
+            "10.56.95.160",
+            "10.29.149.77"
         ],
         "related.user": [
             "rema"
@@ -3409,8 +3409,8 @@
             "tionul7555.www5.lan"
         ],
         "related.ip": [
-            "10.70.185.238",
-            "10.173.98.74"
+            "10.173.98.74",
+            "10.70.185.238"
         ],
         "related.user": [
             "tenby"
@@ -3721,8 +3721,8 @@
             "5"
         ],
         "related.ip": [
-            "10.90.66.238",
-            "10.59.140.108"
+            "10.59.140.108",
+            "10.90.66.238"
         ],
         "related.user": [
             "nulap"

@@ -1020,7 +1020,7 @@ var ecs_mappings = {
     "dns.responsetype": {to:[{field: "dns.answers.type", setter: fld_set}]},
     "dns.resptext": {to:[{field: "dns.answers.name", setter: fld_set}]},
     "dns_querytype": {to:[{field: "dns.question.type", setter: fld_set}]},
-    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0}]},
+    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0},{field: "related.hosts", setter: fld_append}]},
     "domain.dst": {to:[{field: "destination.domain", setter: fld_prio, prio: 1}]},
     "domain.src": {to:[{field: "source.domain", setter: fld_prio, prio: 2}]},
     "domain_id": {to:[{field: "user.domain", setter: fld_set}]},

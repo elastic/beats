@@ -829,8 +829,8 @@
             "apari5002.api.test"
         ],
         "related.ip": [
-            "10.182.213.195",
-            "10.9.200.197"
+            "10.9.200.197",
+            "10.182.213.195"
         ],
         "rsa.crypto.sig_type": "fugiatnu",
         "rsa.internal.messageid": "27813",
@@ -966,8 +966,8 @@
             "cidu921.internal.lan"
         ],
         "related.ip": [
-            "10.222.183.123",
-            "10.165.33.19"
+            "10.165.33.19",
+            "10.222.183.123"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "usan",
@@ -1009,8 +1009,8 @@
             "unturmag6190.api.lan"
         ],
         "related.ip": [
-            "10.52.190.18",
-            "10.238.223.171"
+            "10.238.223.171",
+            "10.52.190.18"
         ],
         "rsa.crypto.sig_type": "Finibus",
         "rsa.internal.messageid": "16539",
@@ -1213,8 +1213,8 @@
             "iqu4858.mail.invalid"
         ],
         "related.ip": [
-            "10.116.175.84",
-            "10.213.100.153"
+            "10.213.100.153",
+            "10.116.175.84"
         ],
         "rsa.crypto.sig_type": "exercit",
         "rsa.internal.messageid": "11634",
@@ -1500,8 +1500,8 @@
             "stiae3403.internal.localhost"
         ],
         "related.ip": [
-            "10.240.144.78",
-            "10.251.159.118"
+            "10.251.159.118",
+            "10.240.144.78"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "ostrudex",
@@ -1647,8 +1647,8 @@
             "urau1660.www.lan"
         ],
         "related.ip": [
-            "10.201.132.114",
-            "10.140.209.249"
+            "10.140.209.249",
+            "10.201.132.114"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "lor",
@@ -1735,8 +1735,8 @@
             "nofde7732.internal.test"
         ],
         "related.ip": [
-            "10.198.44.231",
-            "10.36.122.169"
+            "10.36.122.169",
+            "10.198.44.231"
         ],
         "rsa.crypto.sig_type": "umquam",
         "rsa.internal.messageid": "13228",
@@ -2234,10 +2234,10 @@
             "Loremips5368.www5.corp"
         ],
         "related.ip": [
-            "10.20.167.114",
-            "10.166.40.137",
             "10.65.144.119",
-            "10.49.190.163"
+            "10.20.167.114",
+            "10.49.190.163",
+            "10.166.40.137"
         ],
         "rsa.internal.event_desc": "Offloaded TCP Flow for connection",
         "rsa.internal.messageid": "FTD_events",
@@ -2321,8 +2321,8 @@
             "emulla6625.www5.corp"
         ],
         "related.ip": [
-            "10.237.43.87",
-            "10.82.180.46"
+            "10.82.180.46",
+            "10.237.43.87"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "oloremqu",
@@ -2454,8 +2454,8 @@
             "upta788.invalid"
         ],
         "related.ip": [
-            "10.40.250.209",
-            "10.166.10.187"
+            "10.166.10.187",
+            "10.40.250.209"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "high-temUte",
@@ -2637,8 +2637,8 @@
             "onse3711.api.domain"
         ],
         "related.ip": [
-            "10.95.152.78",
-            "10.4.147.70"
+            "10.4.147.70",
+            "10.95.152.78"
         ],
         "rsa.crypto.sig_type": "cid",
         "rsa.internal.messageid": "9193",
@@ -2790,8 +2790,8 @@
             "essequ121.localdomain"
         ],
         "related.ip": [
-            "10.224.250.83",
-            "10.216.14.36"
+            "10.216.14.36",
+            "10.224.250.83"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "emi",
@@ -3165,8 +3165,8 @@
             "onsecte5119.www.invalid"
         ],
         "related.ip": [
-            "10.198.207.31",
-            "10.5.88.183"
+            "10.5.88.183",
+            "10.198.207.31"
         ],
         "rsa.internal.event_desc": "Failed to locate egress interface",
         "rsa.internal.messageid": "FTD_events",
@@ -3420,8 +3420,8 @@
             "onofdeFi1149.www5.domain"
         ],
         "related.ip": [
-            "10.154.87.98",
-            "10.186.68.87"
+            "10.186.68.87",
+            "10.154.87.98"
         ],
         "rsa.internal.messageid": "NGIPS_events",
         "rsa.internal.msg_id": "uptate",
@@ -3658,8 +3658,8 @@
             "cididu3187.home"
         ],
         "related.ip": [
-            "10.14.46.141",
-            "10.179.27.185"
+            "10.179.27.185",
+            "10.14.46.141"
         ],
         "rsa.internal.messageid": "MALWARE",
         "rsa.misc.checksum": "llumdolo",
@@ -3841,10 +3841,10 @@
             "erunt3957.internal.lan"
         ],
         "related.ip": [
-            "10.125.130.61",
-            "10.32.195.34",
             "10.118.103.185",
-            "10.240.77.10"
+            "10.125.130.61",
+            "10.240.77.10",
+            "10.32.195.34"
         ],
         "rsa.internal.event_desc": "TCP Flow is no longer offloaded for connection",
         "rsa.internal.messageid": "FTD_events",

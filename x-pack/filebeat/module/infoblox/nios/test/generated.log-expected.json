@@ -42,8 +42,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "atio5608.www5.localhost",
-            "com1060.api.example"
+            "com1060.api.example",
+            "atio5608.www5.localhost"
         ],
         "related.ip": [
             "10.202.204.154"
@@ -1236,8 +1236,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "uptatema6843.www.host",
-            "derit4688.mail.localhost"
+            "derit4688.mail.localhost",
+            "uptatema6843.www.host"
         ],
         "related.ip": [
             "10.74.104.215"
@@ -1325,8 +1325,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "ariatu4198.example",
-            "tur90.www.home"
+            "tur90.www.home",
+            "ariatu4198.example"
         ],
         "related.ip": [
             "10.81.202.38"
@@ -2415,8 +2415,8 @@
             "col3570.www.invalid"
         ],
         "related.user": [
-            "rroq",
-            "rcit"
+            "rcit",
+            "rroq"
         ],
         "rsa.email.email_dst": "tsed",
         "rsa.internal.messageid": "sSMTP",

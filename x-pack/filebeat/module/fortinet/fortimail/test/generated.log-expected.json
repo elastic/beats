@@ -596,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.177.36.38",
-            "10.179.124.125"
+            "10.179.124.125",
+            "10.177.36.38"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -1266,8 +1266,8 @@
             "estl5804.internal.local"
         ],
         "related.ip": [
-            "10.179.210.218",
-            "10.73.207.70"
+            "10.73.207.70",
+            "10.179.210.218"
         ],
         "rsa.email.email_dst": "rumSecti",
         "rsa.email.email_src": "taut",
@@ -2683,8 +2683,8 @@
             "taevit4968.mail.local"
         ],
         "related.ip": [
-            "10.62.61.1",
-            "10.144.111.42"
+            "10.144.111.42",
+            "10.62.61.1"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -3236,8 +3236,8 @@
             "uradip7802.mail.example"
         ],
         "related.ip": [
-            "10.93.239.216",
-            "10.44.35.57"
+            "10.44.35.57",
+            "10.93.239.216"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",

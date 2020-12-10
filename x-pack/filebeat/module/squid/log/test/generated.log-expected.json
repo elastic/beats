@@ -18,20 +18,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "example.net"
+            "example.net",
+            "example.org"
         ],
         "related.ip": [
-            "10.234.224.44",
-            "10.251.224.219"
+            "10.251.224.219",
+            "10.234.224.44"
         ],
         "related.user": [
             "tation"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "deny"
+            "deny",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "ciade",
         "rsa.misc.result_code": "liqua",
@@ -154,20 +154,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "example.net"
+            "example.net",
+            "internal.example.com"
         ],
         "related.ip": [
-            "10.15.135.248",
-            "10.142.172.64"
+            "10.142.172.64",
+            "10.15.135.248"
         ],
         "related.user": [
             "tia"
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "iatu",
         "rsa.misc.result_code": "temvel",
@@ -222,8 +222,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.org"
         ],
         "related.ip": [
             "10.81.122.126",
@@ -234,8 +234,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "allow"
+            "allow",
+            "GET"
         ],
         "rsa.misc.content_type": "taev",
         "rsa.misc.result_code": "quiavo",
@@ -291,12 +291,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.net"
+            "api.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.171.175.51",
-            "10.160.95.56"
+            "10.160.95.56",
+            "10.171.175.51"
         ],
         "related.user": [
             "onev"
@@ -364,8 +364,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.12.195.60",
-            "10.175.107.139"
+            "10.175.107.139",
+            "10.12.195.60"
         ],
         "related.user": [
             "mrema"
@@ -436,8 +436,8 @@
             "www.example.org"
         ],
         "related.ip": [
-            "10.198.136.50",
-            "10.207.249.121"
+            "10.207.249.121",
+            "10.198.136.50"
         ],
         "related.user": [
             "tsed"
@@ -501,20 +501,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "example.org"
         ],
         "related.ip": [
-            "10.116.120.216",
-            "10.34.9.93"
+            "10.34.9.93",
+            "10.116.120.216"
         ],
         "related.user": [
             "umdo"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "accept",
-            "PROPFIND"
+            "PROPFIND",
+            "accept"
         ],
         "rsa.misc.content_type": "mol",
         "rsa.misc.result_code": "apariat",
@@ -568,12 +568,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "mail.example.net"
+            "mail.example.net",
+            "example.org"
         ],
         "related.ip": [
-            "10.30.216.41",
-            "10.90.131.186"
+            "10.90.131.186",
+            "10.30.216.41"
         ],
         "related.user": [
             "saute"
@@ -652,8 +652,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "CONNECT"
+            "CONNECT",
+            "accept"
         ],
         "rsa.misc.content_type": "luptat",
         "rsa.misc.result_code": "aborumSe",
@@ -720,8 +720,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "UNLOCK",
-            "allow"
+            "allow",
+            "UNLOCK"
         ],
         "rsa.misc.content_type": "adm",
         "rsa.misc.result_code": "quam",
@@ -789,8 +789,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "OPTIONS",
-            "accept"
+            "accept",
+            "OPTIONS"
         ],
         "rsa.misc.content_type": "emips",
         "rsa.misc.result_code": "onse",
@@ -923,8 +923,8 @@
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "block"
+            "block",
+            "COPY"
         ],
         "rsa.misc.content_type": "uptat",
         "rsa.misc.result_code": "maccusa",
@@ -992,8 +992,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "allow",
-            "NONE"
+            "NONE",
+            "allow"
         ],
         "rsa.misc.content_type": "aaliquaU",
         "rsa.misc.result_code": "mpori",
@@ -1049,20 +1049,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.com"
+            "api.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.164.250.63",
-            "10.249.213.83"
+            "10.249.213.83",
+            "10.164.250.63"
         ],
         "related.user": [
             "itame"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "accept",
-            "PROPFIND"
+            "PROPFIND",
+            "accept"
         ],
         "rsa.misc.content_type": "asun",
         "rsa.misc.result_code": "lit",
@@ -1190,8 +1190,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.13.59.31",
@@ -1263,8 +1263,8 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.49.92.179",
-            "10.89.201.140"
+            "10.89.201.140",
+            "10.49.92.179"
         ],
         "related.user": [
             "isnisiu"
@@ -1274,8 +1274,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "GET"
+            "GET",
+            "accept"
         ],
         "rsa.misc.content_type": "tcons",
         "rsa.misc.result_code": "tsu",
@@ -1331,20 +1331,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "mail.example.net"
+            "mail.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.235.7.92",
-            "10.90.86.89"
+            "10.90.86.89",
+            "10.235.7.92"
         ],
         "related.user": [
             "lapar"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "deny",
-            "PURGE"
+            "PURGE",
+            "deny"
         ],
         "rsa.misc.content_type": "udan",
         "rsa.misc.result_code": "tfu",
@@ -1400,8 +1400,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "www5.example.net"
+            "www5.example.net",
+            "api.example.org"
         ],
         "related.ip": [
             "10.14.211.43",
@@ -1469,8 +1469,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "example.com"
+            "example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.93.123.174",
@@ -1540,12 +1540,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "www5.example.com"
+            "www5.example.com",
+            "www5.example.net"
         ],
         "related.ip": [
-            "10.233.48.103",
-            "10.7.46.36"
+            "10.7.46.36",
+            "10.233.48.103"
         ],
         "related.user": [
             "tlab"
@@ -1613,16 +1613,16 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.93.220.10",
-            "10.27.58.92"
+            "10.27.58.92",
+            "10.93.220.10"
         ],
         "related.user": [
             "qui"
         ],
         "rsa.internal.messageid": "PROPATCH",
         "rsa.misc.action": [
-            "PROPATCH",
-            "accept"
+            "accept",
+            "PROPATCH"
         ],
         "rsa.misc.content_type": "squirati",
         "rsa.misc.result_code": "Nemoenim",
@@ -1747,8 +1747,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "internal.example.com"
+            "internal.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.233.239.112",
@@ -1820,8 +1820,8 @@
             "example.com"
         ],
         "related.ip": [
-            "10.161.203.252",
-            "10.21.169.127"
+            "10.21.169.127",
+            "10.161.203.252"
         ],
         "related.user": [
             "ice"
@@ -1887,12 +1887,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.com"
+            "api.example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.69.139.26",
-            "10.17.215.111"
+            "10.17.215.111",
+            "10.69.139.26"
         ],
         "related.user": [
             "edqui"
@@ -1956,8 +1956,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.10.213.83",
@@ -1968,8 +1968,8 @@
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "accept"
+            "accept",
+            "COPY"
         ],
         "rsa.misc.content_type": "onulam",
         "rsa.misc.result_code": "ugiat",
@@ -2025,12 +2025,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
-            "10.116.230.217",
-            "10.125.131.91"
+            "10.125.131.91",
+            "10.116.230.217"
         ],
         "related.user": [
             "isis"
@@ -2094,16 +2094,16 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.26.96.202",
-            "10.119.90.128"
+            "10.119.90.128",
+            "10.26.96.202"
         ],
         "related.user": [
             "oraincid"
         ],
         "rsa.internal.messageid": "ICP_QUERY",
         "rsa.misc.action": [
-            "ICP_QUERY",
-            "cancel"
+            "cancel",
+            "ICP_QUERY"
         ],
         "rsa.misc.content_type": "ntsunt",
         "rsa.misc.result_code": "amcorp",
@@ -2163,8 +2163,8 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.0.98.205",
-            "10.76.110.144"
+            "10.76.110.144",
+            "10.0.98.205"
         ],
         "related.user": [
             "upt"
@@ -2174,8 +2174,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "HEAD",
-            "deny"
+            "deny",
+            "HEAD"
         ],
         "rsa.misc.content_type": "untutlab",
         "rsa.misc.result_code": "tatem",
@@ -2231,8 +2231,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.org",
-            "www.example.org"
+            "www.example.org",
+            "internal.example.org"
         ],
         "related.ip": [
             "10.224.11.165",
@@ -2303,8 +2303,8 @@
             "internal.example.org"
         ],
         "related.ip": [
-            "10.27.44.4",
-            "10.154.53.249"
+            "10.154.53.249",
+            "10.27.44.4"
         ],
         "related.user": [
             "autodit"
@@ -2372,16 +2372,16 @@
             "example.org"
         ],
         "related.ip": [
-            "10.93.39.140",
-            "10.150.245.88"
+            "10.150.245.88",
+            "10.93.39.140"
         ],
         "related.user": [
             "reetd"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "cancel"
+            "cancel",
+            "COPY"
         ],
         "rsa.misc.content_type": "iusmodte",
         "rsa.misc.result_code": "ntutlabo",
@@ -2441,16 +2441,16 @@
             "mail.example.net"
         ],
         "related.ip": [
-            "10.61.92.2",
-            "10.73.207.70"
+            "10.73.207.70",
+            "10.61.92.2"
         ],
         "related.user": [
             "atu"
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "UNLOCK",
-            "block"
+            "block",
+            "UNLOCK"
         ],
         "rsa.misc.content_type": "commodi",
         "rsa.misc.result_code": "ssecil",
@@ -2576,8 +2576,8 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.173.222.131",
-            "10.211.234.224"
+            "10.211.234.224",
+            "10.173.222.131"
         ],
         "related.user": [
             "Duisa"
@@ -2641,12 +2641,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "www5.example.net"
+            "www5.example.net",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.0.157.225",
-            "10.11.83.126"
+            "10.11.83.126",
+            "10.0.157.225"
         ],
         "related.user": [
             "atu"
@@ -2710,12 +2710,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.com",
-            "www5.example.com"
+            "www5.example.com",
+            "api.example.com"
         ],
         "related.ip": [
-            "10.92.237.93",
-            "10.228.77.21"
+            "10.228.77.21",
+            "10.92.237.93"
         ],
         "related.user": [
             "onse"
@@ -2783,8 +2783,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.102.215.23",
-            "10.20.28.92"
+            "10.20.28.92",
+            "10.102.215.23"
         ],
         "related.user": [
             "ntexpl"
@@ -2793,8 +2793,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "POST"
+            "POST",
+            "allow"
         ],
         "rsa.misc.content_type": "nderiti",
         "rsa.misc.result_code": "litsedq",
@@ -2929,8 +2929,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "DELETE",
-            "allow"
+            "allow",
+            "DELETE"
         ],
         "rsa.misc.content_type": "acom",
         "rsa.misc.result_code": "metco",
@@ -2986,12 +2986,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "example.com"
+            "example.com",
+            "www.example.org"
         ],
         "related.ip": [
-            "10.46.77.76",
-            "10.101.85.169"
+            "10.101.85.169",
+            "10.46.77.76"
         ],
         "related.user": [
             "liquid"
@@ -3001,8 +3001,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "accept"
+            "accept",
+            "GET"
         ],
         "rsa.misc.content_type": "radi",
         "rsa.misc.result_code": "Finibus",
@@ -3062,8 +3062,8 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.231.7.209",
-            "10.24.54.129"
+            "10.24.54.129",
+            "10.231.7.209"
         ],
         "related.user": [
             "eavol"
@@ -3073,8 +3073,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "HEAD"
+            "HEAD",
+            "block"
         ],
         "rsa.misc.content_type": "scipitl",
         "rsa.misc.result_code": "temaccu",
@@ -3132,8 +3132,8 @@
             "www.example.com"
         ],
         "related.ip": [
-            "10.77.129.175",
-            "10.121.163.5"
+            "10.121.163.5",
+            "10.77.129.175"
         ],
         "related.user": [
             "BCS"
@@ -3199,8 +3199,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "www.example.com"
+            "www.example.com",
+            "mail.example.com"
         ],
         "related.ip": [
             "10.51.236.148",
@@ -3211,8 +3211,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "deny"
+            "deny",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "est",
         "rsa.misc.result_code": "agnaaliq",
@@ -3268,8 +3268,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.com"
+            "api.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.244.108.135",
@@ -3341,8 +3341,8 @@
             "www.example.net"
         ],
         "related.ip": [
-            "10.150.198.112",
-            "10.4.69.152"
+            "10.4.69.152",
+            "10.150.198.112"
         ],
         "related.user": [
             "mexer"
@@ -3406,8 +3406,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "www5.example.org"
+            "www5.example.org",
+            "example.org"
         ],
         "related.ip": [
             "10.45.54.107",
@@ -3420,8 +3420,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "POST"
+            "POST",
+            "accept"
         ],
         "rsa.misc.content_type": "mdolors",
         "rsa.misc.result_code": "edictasu",
@@ -3475,12 +3475,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "www5.example.net"
+            "www5.example.net",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.49.242.174",
-            "10.205.28.24"
+            "10.205.28.24",
+            "10.49.242.174"
         ],
         "related.user": [
             "untutlab"
@@ -3544,8 +3544,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.com"
+            "mail.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.183.223.149",
@@ -3612,20 +3612,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "internal.example.org"
+            "internal.example.org",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.88.172.222",
-            "10.81.140.173"
+            "10.81.140.173",
+            "10.88.172.222"
         ],
         "related.user": [
             "etdol"
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "MOVE",
-            "cancel"
+            "cancel",
+            "MOVE"
         ],
         "rsa.misc.content_type": "tura",
         "rsa.misc.result_code": "nturmag",
@@ -3689,8 +3689,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "OPTIONS",
-            "accept"
+            "accept",
+            "OPTIONS"
         ],
         "rsa.misc.content_type": "eacommo",
         "rsa.misc.result_code": "hend",
@@ -3811,8 +3811,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.232.19.43",
@@ -3895,8 +3895,8 @@
         ],
         "rsa.internal.messageid": "ICP_QUERY",
         "rsa.misc.action": [
-            "ICP_QUERY",
-            "cancel"
+            "cancel",
+            "ICP_QUERY"
         ],
         "rsa.misc.content_type": "gelitse",
         "rsa.misc.result_code": "mag",
@@ -3952,20 +3952,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "www5.example.net"
+            "www5.example.net",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.41.156.88",
-            "10.89.73.240"
+            "10.89.73.240",
+            "10.41.156.88"
         ],
         "related.user": [
             "ntorever"
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "MOVE",
-            "deny"
+            "deny",
+            "MOVE"
         ],
         "rsa.misc.content_type": "seos",
         "rsa.misc.result_code": "fugiatqu",
@@ -4021,8 +4021,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "www.example.org"
         ],
         "related.ip": [
             "10.54.44.231",
@@ -4035,8 +4035,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "allow"
+            "allow",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "oreverit",
         "rsa.misc.result_code": "abor",
@@ -4157,8 +4157,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.net"
+            "api.example.net",
+            "api.example.org"
         ],
         "related.ip": [
             "10.76.220.3",
@@ -4172,8 +4172,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "deny"
+            "deny",
+            "GET"
         ],
         "rsa.misc.content_type": "liqua",
         "rsa.misc.result_code": "nderi",
@@ -4229,12 +4229,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "api.example.com"
+            "api.example.com",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.166.160.217",
-            "10.219.245.58"
+            "10.219.245.58",
+            "10.166.160.217"
         ],
         "related.user": [
             "radip"
@@ -4308,8 +4308,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "cancel",
-            "UNLOCK"
+            "UNLOCK",
+            "cancel"
         ],
         "rsa.misc.content_type": "magnam",
         "rsa.misc.result_code": "modoc",
@@ -4365,12 +4365,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "www.example.com"
+            "www.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.54.5.47",
-            "10.202.224.209"
+            "10.202.224.209",
+            "10.54.5.47"
         ],
         "related.user": [
             "aturv"
@@ -4434,20 +4434,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "mail.example.net"
         ],
         "related.ip": [
-            "10.170.234.233",
-            "10.72.99.69"
+            "10.72.99.69",
+            "10.170.234.233"
         ],
         "related.user": [
             "uatu"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "allow",
-            "PROPFIND"
+            "PROPFIND",
+            "allow"
         ],
         "rsa.misc.content_type": "uido",
         "rsa.misc.result_code": "lab",
@@ -4503,12 +4503,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.245.240.47",
-            "10.142.130.227"
+            "10.142.130.227",
+            "10.245.240.47"
         ],
         "related.user": [
             "odic"
@@ -4637,8 +4637,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "mail.example.net"
+            "mail.example.net",
+            "www.example.net"
         ],
         "related.ip": [
             "10.172.139.78",
@@ -4706,12 +4706,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "api.example.net"
+            "api.example.net",
+            "www.example.org"
         ],
         "related.ip": [
-            "10.172.47.7",
-            "10.169.63.169"
+            "10.169.63.169",
+            "10.172.47.7"
         ],
         "related.user": [
             "midestl"
@@ -4720,8 +4720,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "teturad",
         "rsa.misc.result_code": "avolu",
@@ -4775,20 +4775,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
-            "10.32.98.109",
-            "10.62.10.137"
+            "10.62.10.137",
+            "10.32.98.109"
         ],
         "related.user": [
             "deomnisi"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "PURGE",
-            "cancel"
+            "cancel",
+            "PURGE"
         ],
         "rsa.misc.content_type": "laboree",
         "rsa.misc.result_code": "oll",
@@ -4842,8 +4842,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "www5.example.com"
+            "www5.example.com",
+            "api.example.net"
         ],
         "related.ip": [
             "10.176.62.146",
@@ -4910,8 +4910,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "api.example.org"
         ],
         "related.ip": [
             "10.194.198.46",
@@ -4922,8 +4922,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "deny"
+            "deny",
+            "GET"
         ],
         "rsa.misc.content_type": "rured",
         "rsa.misc.result_code": "tuser",
@@ -4979,8 +4979,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www5.example.com"
+            "www5.example.com",
+            "example.com"
         ],
         "related.ip": [
             "10.5.49.20",
@@ -4991,8 +4991,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "OPTIONS",
-            "block"
+            "block",
+            "OPTIONS"
         ],
         "rsa.misc.content_type": "ntutlab",
         "rsa.misc.result_code": "olore",
@@ -5050,8 +5050,8 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.70.244.155",
-            "10.11.73.145"
+            "10.11.73.145",
+            "10.70.244.155"
         ],
         "related.user": [
             "caboNemo"
@@ -5060,8 +5060,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "POST"
+            "POST",
+            "accept"
         ],
         "rsa.misc.content_type": "ons",
         "rsa.misc.result_code": "temaccus",
@@ -5198,8 +5198,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "uis",
         "rsa.misc.result_code": "maveniam",
@@ -5255,20 +5255,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.242.48.203",
-            "10.191.220.1"
+            "10.191.220.1",
+            "10.242.48.203"
         ],
         "related.user": [
             "isi"
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "deny",
-            "DELETE"
+            "DELETE",
+            "deny"
         ],
         "rsa.misc.content_type": "tdolo",
         "rsa.misc.result_code": "ntu",
@@ -5324,20 +5324,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "internal.example.com"
         ],
         "related.ip": [
-            "10.254.10.98",
-            "10.109.88.27"
+            "10.109.88.27",
+            "10.254.10.98"
         ],
         "related.user": [
             "aparia"
         ],
         "rsa.internal.messageid": "PROPATCH",
         "rsa.misc.action": [
-            "accept",
-            "PROPATCH"
+            "PROPATCH",
+            "accept"
         ],
         "rsa.misc.content_type": "epteurs",
         "rsa.misc.result_code": "ccusant",
@@ -5397,16 +5397,16 @@
             "mail.example.org"
         ],
         "related.ip": [
-            "10.175.138.42",
-            "10.5.148.114"
+            "10.5.148.114",
+            "10.175.138.42"
         ],
         "related.user": [
             "onemul"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "LOCK",
-            "deny"
+            "deny",
+            "LOCK"
         ],
         "rsa.misc.content_type": "etur",
         "rsa.misc.result_code": "remeum",
@@ -5474,8 +5474,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "allow",
-            "PROPFIND"
+            "PROPFIND",
+            "allow"
         ],
         "rsa.misc.content_type": "llum",
         "rsa.misc.result_code": "ntut",
@@ -5531,8 +5531,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.73.80.251",
@@ -5600,8 +5600,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "api.example.org"
+            "api.example.org",
+            "www.example.net"
         ],
         "related.ip": [
             "10.153.109.61",
@@ -5612,8 +5612,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "velites",
         "rsa.misc.result_code": "uasiarch",
@@ -5673,8 +5673,8 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.199.103.185",
-            "10.62.168.226"
+            "10.62.168.226",
+            "10.199.103.185"
         ],
         "related.user": [
             "ipsa"
@@ -5683,8 +5683,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "allow"
+            "allow",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "sequamn",
         "rsa.misc.result_code": "eirured",
@@ -5744,16 +5744,16 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.128.84.27",
-            "10.97.33.56"
+            "10.97.33.56",
+            "10.128.84.27"
         ],
         "related.user": [
             "ptate"
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "block"
+            "block",
+            "COPY"
         ],
         "rsa.misc.content_type": "utla",
         "rsa.misc.result_code": "umfu",
@@ -5811,8 +5811,8 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.115.154.104",
-            "10.49.169.175"
+            "10.49.169.175",
+            "10.115.154.104"
         ],
         "related.user": [
             "ore"
@@ -5877,8 +5877,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www.example.org"
         ],
         "related.ip": [
             "10.213.100.153",
@@ -5950,8 +5950,8 @@
             "example.net"
         ],
         "related.ip": [
-            "10.25.53.93",
-            "10.216.143.226"
+            "10.216.143.226",
+            "10.25.53.93"
         ],
         "related.user": [
             "oremeu"
@@ -6017,12 +6017,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "example.com"
+            "example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.246.115.57",
-            "10.139.195.188"
+            "10.139.195.188",
+            "10.246.115.57"
         ],
         "related.user": [
             "mSecti"
@@ -6032,8 +6032,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "HEAD"
+            "HEAD",
+            "allow"
         ],
         "rsa.misc.content_type": "tevel",
         "rsa.misc.result_code": "taevitae",
@@ -6158,8 +6158,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.com",
-            "www5.example.net"
+            "www5.example.net",
+            "api.example.com"
         ],
         "related.ip": [
             "10.245.251.98",
@@ -6298,12 +6298,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "internal.example.com"
+            "internal.example.com",
+            "mail.example.com"
         ],
         "related.ip": [
-            "10.6.88.105",
-            "10.187.86.64"
+            "10.187.86.64",
+            "10.6.88.105"
         ],
         "related.user": [
             "rem"
@@ -6442,16 +6442,16 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.235.160.245",
-            "10.249.101.177"
+            "10.249.101.177",
+            "10.235.160.245"
         ],
         "related.user": [
             "upta"
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "DELETE",
-            "deny"
+            "deny",
+            "DELETE"
         ],
         "rsa.misc.content_type": "uameiu",
         "rsa.misc.result_code": "porinc",
@@ -6511,8 +6511,8 @@
             "mail.example.org"
         ],
         "related.ip": [
-            "10.73.218.58",
-            "10.140.170.171"
+            "10.140.170.171",
+            "10.73.218.58"
         ],
         "related.user": [
             "tinv"
@@ -6576,12 +6576,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "example.com"
+            "example.com",
+            "example.net"
         ],
         "related.ip": [
-            "10.67.148.40",
-            "10.248.156.138"
+            "10.248.156.138",
+            "10.67.148.40"
         ],
         "related.user": [
             "squamest"
@@ -6645,8 +6645,8 @@
             "www.example.org"
         ],
         "related.ip": [
-            "10.83.154.75",
-            "10.37.33.179"
+            "10.37.33.179",
+            "10.83.154.75"
         ],
         "related.user": [
             "eatae"
@@ -6722,8 +6722,8 @@
         ],
         "rsa.internal.messageid": "MKOL",
         "rsa.misc.action": [
-            "deny",
-            "MKOL"
+            "MKOL",
+            "deny"
         ],
         "rsa.misc.content_type": "itse",
         "rsa.misc.result_code": "qui",
@@ -6854,8 +6854,8 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.195.4.70",
-            "10.229.39.190"
+            "10.229.39.190",
+            "10.195.4.70"
         ],
         "related.user": [
             "edictas"
