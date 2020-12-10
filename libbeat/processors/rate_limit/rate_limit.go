@@ -42,9 +42,6 @@ type rateLimit struct {
 	config    Config
 	algorithm algorithm.Algorithm
 	logger    *logp.Logger
-
-	// For testing
-	c clockwork.Clock
 }
 
 // New constructs a new rate limit processor.
@@ -126,6 +123,5 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 
 // setClock allows test code to inject a fake clock
 func (p *rateLimit) setClock(c clockwork.Clock) {
-	p.c = c
 	p.algorithm.SetClock(c)
 }
