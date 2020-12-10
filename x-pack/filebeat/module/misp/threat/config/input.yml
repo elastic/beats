@@ -1,16 +1,35 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-api_key: {{ .api_key }}
-http_client_timeout: {{ .http_client_timeout }}
-http_method: {{ .http_method }}
-http_headers: {{ .http_headers }}
-http_request_body: {{ .http_request_body }}
+config_version: "2"
 interval: {{ .interval }}
-json_objects_array: {{ .json_objects_array }}
-pagination: {{ .pagination }}
-url: {{ .url }}
-ssl: {{ .ssl }}
+
+request.method: POST
+request.ssl: {{ .ssl | tojson }}
+request.url: {{ .url }}
+request.timeout: {{ .http_client_timeout }}
+request.body: {{ .http_request_body | tojson }}
+request.body.returnFormat: json
+request.transforms:
+  - set:
+      target: header.Authorization
+      value: {{.api_key}}
+  - set:
+      target: body.timestamp
+      value: "[[.cursor.timestamp]]"
+
+response.split:
+  target: body.response.Attribute
+
+response.request_body_on_pagination: true
+response.pagination:
+  - set:
+      target: body.page
+      value: "[[add .last_response.page 1]]"
+
+cursor:
+  timestamp:
+    value: "[[.last_event.timestamp]]"
 
 {{ else if eq .input "file" }}
 
