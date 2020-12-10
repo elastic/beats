@@ -765,6 +765,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network.direction` to netflow/log fileset. {pull}23052[23052]
 - Allow cef and checkpoint modules to override network directionality based off of zones {pull}23066[23066]
 - Add the ability to override `network.direction` based on interfaces in Fortinet/firewall fileset. {pull}23072[23072]
+- Add `network.direction` override by specifying `internal_networks` in gcp module. {pull}23081[23081]
 
 *Heartbeat*
 
