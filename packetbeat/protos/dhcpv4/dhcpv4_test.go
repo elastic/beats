@@ -126,6 +126,7 @@ func TestParseDHCPRequest(t *testing.T) {
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
+				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
 				"bytes":        272,
@@ -159,7 +160,7 @@ func TestParseDHCPRequest(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil)
+		publish.MarshalPacketbeatFields(actual, nil, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}
@@ -210,6 +211,7 @@ func TestParseDHCPACK(t *testing.T) {
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
+				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
 				"bytes":        300,
@@ -241,7 +243,7 @@ func TestParseDHCPACK(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil)
+		publish.MarshalPacketbeatFields(actual, nil, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}

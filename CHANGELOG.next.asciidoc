@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
+- Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
 
@@ -116,20 +117,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 - Rename googlecloud module to gcp module. {pull}22246[22246]
+- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
+- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 
 *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
-- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
-- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
-- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
-
-*Packetbeat*
-
 - Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 - Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
+- Update how Packetbeat classifies network directionality to bring it in line with ECS 1.7 {pull}22996[22996]
 
 *Winlogbeat*
 
@@ -222,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
+- Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
 
 *Auditbeat*
 
@@ -344,6 +344,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
+- Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
 
 *Heartbeat*
 
@@ -569,7 +571,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
-
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
@@ -746,6 +747,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
 - Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
 - Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
+- Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
+- Add `event.category` "configuration" to gsuite module events. {pull}23010[23010]
+- Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
+- Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
+- Add `network.direction` to auditd/log fileset. {pull}23041[23041]
+- Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 - Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
 - Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
 
