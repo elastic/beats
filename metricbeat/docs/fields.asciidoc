@@ -28375,11 +28375,6 @@ Kibana module
 
 
 
-[float]
-=== kibana
-
-TODO
-
 
 *`kibana.stats.usage.name`*::
 +

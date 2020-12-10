@@ -8,7 +8,6 @@
   fields:
     - name: kibana
       type: group
-      description: TODO
       fields:
         - name: stats.usage.name
           type: alias
