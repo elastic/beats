@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package rate_limit
+package ratelimit
 
 import (
 	"fmt"
@@ -29,11 +29,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
+	"github.com/elastic/beats/v7/libbeat/processors/ratelimit/algorithm"
 )
 
 func init() {
-	processors.RegisterPlugin("rate_limit", New)
+	processors.RegisterPlugin(processorName, New)
 }
 
 const processorName = "rate_limit"

@@ -15,13 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package rate_limit
+package ratelimit
 
 import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
+	"github.com/elastic/beats/v7/libbeat/processors/ratelimit/algorithm"
 )
 
 // Config for rate limit processor.
