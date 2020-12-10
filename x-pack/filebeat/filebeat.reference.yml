@@ -512,6 +512,14 @@ filebeat.modules:
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
+
   ftd:
     enabled: true
 
@@ -529,6 +537,14 @@ filebeat.modules:
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
   ios:
     enabled: true
@@ -1405,6 +1421,11 @@ filebeat.modules:
     var:
       netflow_host: localhost
       netflow_port: 2055
+      # internal_networks specifies which networks are considered internal or private
+      # you can specify either a CIDR block or any of the special named ranges listed
+      # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+      internal_networks:
+        - private
 
 #-------------------------- Arbor Peakflow SP Module --------------------------
 - module: netscout
