@@ -30,12 +30,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/rate_limit/algorithm"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 func init() {
 	processors.RegisterPlugin("rate_limit", New)
-	jsprocessor.RegisterPlugin("RateLimit", New)
 }
 
 const processorName = "rate_limit"
