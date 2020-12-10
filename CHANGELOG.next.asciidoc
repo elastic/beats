@@ -753,6 +753,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
 - Add `network.direction` to auditd/log fileset. {pull}23041[23041]
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
+- Allow cef and checkpoint modules to override network directionality based off of zones {pull}23066[23066]
 
 *Heartbeat*
 
