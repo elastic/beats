@@ -23947,7 +23947,7 @@ iis module
 [float]
 === application_pool
 
-application_pool
+Application pool process stats.
 
 
 
@@ -23964,7 +23964,7 @@ type: keyword
 [float]
 === process
 
-process details
+Worker process overview.
 
 
 
@@ -24061,14 +24061,14 @@ type: float
 [float]
 === net_clr
 
-net clr
+Common Language Runtime overview.
 
 
 
 *`iis.application_pool.net_clr.finallys_per_sec`*::
 +
 --
-The nr of finallys per sec.
+The number of finallys per sec.
 
 
 type: float
@@ -24108,14 +24108,14 @@ type: float
 [float]
 === webserver
 
-webserver
+Webserver related metrics.
 
 
 
 [float]
 === process
 
-process details
+The process related stats.
 
 
 
@@ -24222,7 +24222,7 @@ type: float
 [float]
 === asp_net
 
-net clr
+Common Language Runtime overview.
 
 
 
@@ -24249,7 +24249,7 @@ type: long
 [float]
 === asp_net_application
 
-asp.net application
+ASP.NET application overview.
 
 
 
@@ -24306,7 +24306,7 @@ type: float
 [float]
 === cache
 
-cache
+The cache overview.
 
 
 
@@ -24453,7 +24453,7 @@ type: float
 [float]
 === network
 
-network
+The network related stats.
 
 
 
@@ -24650,7 +24650,7 @@ type: float
 [float]
 === website
 
-website
+Website related metrics.
 
 
 
@@ -24667,7 +24667,7 @@ type: keyword
 [float]
 === network
 
-network
+The network overview.
 
 
 
