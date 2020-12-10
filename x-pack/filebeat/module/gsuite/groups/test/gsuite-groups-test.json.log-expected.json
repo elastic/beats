@@ -271,7 +271,8 @@
     {
         "event.action": "change_basic_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -427,7 +428,8 @@
     {
         "event.action": "change_identity_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -481,7 +483,8 @@
     {
         "event.action": "add_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -534,7 +537,8 @@
     {
         "event.action": "change_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -588,7 +592,8 @@
     {
         "event.action": "remove_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -641,7 +646,8 @@
     {
         "event.action": "change_new_members_restrictions_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -695,7 +701,8 @@
     {
         "event.action": "change_post_replies_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -749,7 +756,8 @@
     {
         "event.action": "change_spam_moderation_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
@@ -803,7 +811,8 @@
     {
         "event.action": "change_topic_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.groups",
         "event.id": "1",
