@@ -17,89 +17,51 @@
       fields:
         - name: result_type
           type: keyword
-          description: >
-            TODO
         - name: model.bytes
           type: long
-          description: >
-            TODO
         - name: bucket_allocation_failures.count
           type: long
-          description: >
-            TODO
         - name: memory_status
           type: long
-          description: >
-            TODO
         - name: log_time.ms
           type: long
-          description: >
-            TODO
         - name: timestamp.ms
           type: long
-          description: >
-            TODO
         - name: total.field
           type: group
           fields:
             - name: by.count
               type: long
-              description: >
-                TODO
             - name: over.count
               type: long
-              description: >
-                TODO
             - name: partition.count
               type: long
-              description: >
-                TODO
     - name: data.counts
       type: group
       fields:
         - name: field.processed.count
           type: long
-          description: >
-            TODO
         - name: input.bytes
           type: long
-          description: >
-            TODO
         - name: input.field.count
           type: long
-          description: >
-            TODO
         - name: missing_field.count
           type: long
-          description: >
-            TODO
         - name: out_of_order.timestamp.count
           type: long
-          description: >
-            TODO
         - name: invalid_date.count
           type: long
-          description: >
-            TODO
         - name: last_data_time
           type: long
-          description: >
-            TODO
         - name: bucket
           type: group
           fields:
             - name: empty.count
               type: long
-              description: >
-                TODO
             - name: sparse.count
               type: long
-              description: >
-                TODO
             - name: count
               type: long
-              description: >
-                TODO
         - name: record
           type: group
           fields:
@@ -109,16 +71,10 @@
                 Processed data events.
             - name: earliest.ms
               type: long
-              description: >
-                TODO
             - name: latest.ms
               type: long
-              description: >
-                TODO
             - name: input.count
               type: long
-              description: >
-                TODO
     - name: data.invalid_date.count
       type: long
       description: >
