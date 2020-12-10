@@ -483,6 +483,11 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 							"from": "http.agent.beat.handles",
 							"to":   "system.process.fd",
 						},
+						// I should be able to see fd usage. Am I keep too many files open?
+						{
+							"from": "http.agent.beat.cgroup",
+							"to":   "system.process.cgroup",
+						},
 					},
 					"ignore_missing": true,
 				},
