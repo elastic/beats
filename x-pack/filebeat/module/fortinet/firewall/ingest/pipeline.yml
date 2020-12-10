@@ -208,14 +208,16 @@ processors:
     if: >
       ctx?._temp?.external_interfaces != null &&
       ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
       (
         (
-          !ctx._temp.external_interfaces.contains(ctx?.observer?.egress?.interface?.name) &&
-          !ctx._temp.internal_interfaces.contains(ctx?.observer?.egress?.interface?.name)
+          !ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name)
         ) ||
         (
-          !ctx._temp.external_interfaces.contains(ctx?.observer?.ingress?.interface?.name) &&
-          !ctx._temp.internal_interfaces.contains(ctx?.observer?.ingress?.interface?.name)
+          !ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
         )
       )
 - remove:
