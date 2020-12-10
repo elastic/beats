@@ -153,6 +153,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
+- Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
+
 
 *Auditbeat*
 
@@ -493,6 +495,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
 - Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
 - Add `network.direction` to auditd/log fileset. {pull}23041[23041]
+- Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 
 *Heartbeat*
@@ -583,6 +586,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 - Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
+- Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
 
@@ -634,7 +638,6 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
