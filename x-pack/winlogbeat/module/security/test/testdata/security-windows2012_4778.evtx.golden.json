@@ -3,13 +3,17 @@
     "@timestamp": "2020-04-05T16:33:32.3888253Z",
     "event": {
       "action": "session-reconnected",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4778,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"

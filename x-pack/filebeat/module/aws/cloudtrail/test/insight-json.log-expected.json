@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2020-09-09T23:00:00.000Z",
+        "aws.cloudtrail.event_category": "Insight",
         "aws.cloudtrail.event_type": "AwsCloudTrailInsight",
         "aws.cloudtrail.event_version": "1.07",
         "aws.cloudtrail.insight_details.eventName": "AttachUserPolicy",
@@ -45,7 +46,6 @@
         "aws.cloudtrail.insight_details.state": "End",
         "aws.cloudtrail.recipient_account_id": "123456789012",
         "cloud.region": "us-east-1",
-        "event.action": "Insight",
         "event.dataset": "aws.cloudtrail",
         "event.id": "41ed77ca-d659-b45a-8e9a-74e504300007",
         "event.kind": "event",
