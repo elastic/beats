@@ -20,7 +20,6 @@ package ratelimit
 import (
 	"fmt"
 
-	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -45,9 +44,6 @@ type algorithm interface {
 	// rate limited. If a key is not allowed, it means it is being rate
 	// limited.
 	IsAllowed(uint64) bool
-
-	// SetClock allows test code to inject a fake clock.
-	SetClock(clockwork.Clock)
 }
 
 type constructor func(algoConfig) (algorithm, error)

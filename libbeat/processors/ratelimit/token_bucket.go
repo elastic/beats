@@ -116,8 +116,8 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 	return allowed
 }
 
-// SetClock allows test code to inject a fake clock
-func (t *tokenBucket) SetClock(c clockwork.Clock) {
+// setClock allows test code to inject a fake clock
+func (t *tokenBucket) setClock(c clockwork.Clock) {
 	t.clock = c
 }
 

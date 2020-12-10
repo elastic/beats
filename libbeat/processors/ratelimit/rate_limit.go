@@ -121,6 +121,9 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 }
 
 // setClock allows test code to inject a fake clock
+// TODO: remove this method and move tests that use it to algorithm level.
 func (p *rateLimit) setClock(c clockwork.Clock) {
-	p.algorithm.SetClock(c)
+	if a, ok := p.algorithm.(interface{ setClock(clock clockwork.Clock) }); ok {
+		a.setClock(c)
+	}
 }
