@@ -314,12 +314,12 @@ function FirewallProcessor(keep_original_message, debug, internalNetworks) {
     });
 
     if (internalNetworks) {
-        builder = builder.AddNetworkDirection({
+        builder.Add("addNetworkDirection", processor.AddNetworkDirection({
             source: "source.ip",
             destination: "destination.ip",
             target: "network.direction",
             internal_networks: internalNetworks,
-        })
+        }))
     }
 
     return {
