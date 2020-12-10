@@ -546,6 +546,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
 - Improve event normalization performance {pull}22974[22974]
 - Add tini as init system in docker images {pull}22137[22137]
+- Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
 
 *Auditbeat*
 
@@ -759,6 +760,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
 - Add `observer.egress.zone` and `observer.ingress.zone` for cisco/asa and cisco/ftd filesets. {pull}23068[23068]
 - Allow cisco/asa and cisco/ftd filesets to override network directionality based off of zones. {pull}23068[23068]
+- Add `network.direction` to netflow/log fileset. {pull}23052[23052]
+- Allow cef and checkpoint modules to override network directionality based off of zones {pull}23066[23066]
 
 *Heartbeat*
 

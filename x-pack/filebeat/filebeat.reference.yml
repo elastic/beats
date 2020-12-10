@@ -461,6 +461,14 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+      # Set internal security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.internal_zones: [ "Internal" ]
+
+      # Set external security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.external_zones: [ "External" ]
+
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
@@ -475,6 +483,14 @@ filebeat.modules:
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -1386,6 +1402,11 @@ filebeat.modules:
     var:
       netflow_host: localhost
       netflow_port: 2055
+      # internal_networks specifies which networks are considered internal or private
+      # you can specify either a CIDR block or any of the special named ranges listed
+      # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+      internal_networks:
+        - private
 
 #-------------------------- Arbor Peakflow SP Module --------------------------
 - module: netscout
