@@ -159,39 +159,41 @@ func (t *tokenBucket) runGC() {
 	if !t.mu.TryLock() {
 		return
 	}
-	defer t.mu.Unlock()
 
-	gcStartTime := time.Now()
+	go func() {
+		defer t.mu.Unlock()
+		gcStartTime := time.Now()
 
-	// Add tokens to all buckets according to the rate limit
-	// and flag full buckets for deletion.
-	toDelete := make([]uint64, 0)
-	numBucketsBefore := 0
-	t.buckets.Range(func(k, v interface{}) bool {
-		key := k.(uint64)
-		b := v.(*bucket)
+		// Add tokens to all buckets according to the rate limit
+		// and flag full buckets for deletion.
+		toDelete := make([]uint64, 0)
+		numBucketsBefore := 0
+		t.buckets.Range(func(k, v interface{}) bool {
+			key := k.(uint64)
+			b := v.(*bucket)
 
-		b.replenish(t.limit, t.clock)
+			b.replenish(t.limit, t.clock)
 
-		if b.tokens >= t.depth {
-			toDelete = append(toDelete, key)
+			if b.tokens >= t.depth {
+				toDelete = append(toDelete, key)
+			}
+
+			numBucketsBefore++
+			return true
+		})
+
+		// Cleanup full buckets to free up memory
+		for _, key := range toDelete {
+			t.buckets.Delete(key)
 		}
 
-		numBucketsBefore++
-		return true
-	})
+		// Reset GC metrics
+		t.gc.metrics.numCalls = atomic.MakeUint(0)
 
-	// Cleanup full buckets to free up memory
-	for _, key := range toDelete {
-		t.buckets.Delete(key)
-	}
-
-	// Reset GC metrics
-	t.gc.metrics.numCalls = atomic.MakeUint(0)
-
-	gcDuration := time.Now().Sub(gcStartTime)
-	numBucketsDeleted := len(toDelete)
-	numBucketsAfter := numBucketsBefore - numBucketsDeleted
-	t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
-		gcDuration, numBucketsBefore, numBucketsDeleted, numBucketsAfter)
+		gcDuration := time.Now().Sub(gcStartTime)
+		numBucketsDeleted := len(toDelete)
+		numBucketsAfter := numBucketsBefore - numBucketsDeleted
+		t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
+			gcDuration, numBucketsBefore, numBucketsDeleted, numBucketsAfter)
+	}()
 }
