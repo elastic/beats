@@ -9570,6 +9570,12 @@ type: long
 
 --
 
+[[exported-fields-socks5]]
+== SOCKS5 proxy fields
+
+None
+
+
 [float]
 === socks5
 
