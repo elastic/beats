@@ -10,9 +10,10 @@ import (
 
 type noopController struct{}
 
-func (*noopController) Register() status.Reporter  { return &noopReporter{} }
-func (*noopController) Status() status.AgentStatus { return status.Healthy }
-func (*noopController) StatusString() string       { return "online" }
+func (*noopController) Register(_ string) status.Reporter { return &noopReporter{} }
+func (*noopController) Status() status.AgentStatus        { return status.Healthy }
+func (*noopController) UpdateStateID(_ string)            {}
+func (*noopController) StatusString() string              { return "online" }
 
 type noopReporter struct{}
 

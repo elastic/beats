@@ -138,14 +138,12 @@ func newFleetGatewayWithScheduler(
 		done:             done,
 		reporter:         r,
 		acker:            acker,
-		statusReporter:   statusController.Register(),
+		statusReporter:   statusController.Register("gateway"),
 		statusController: statusController,
 	}, nil
 }
 
 func (f *fleetGateway) worker() {
-	lastStatus := status.Healthy
-
 	for {
 		select {
 		case <-f.scheduler.WaitTick():
@@ -157,7 +155,6 @@ func (f *fleetGateway) worker() {
 			resp, err := f.doExecute()
 			if err != nil {
 				f.log.Error(err)
-				lastStatus = status.Failed
 				f.statusReporter.Update(status.Failed)
 				continue
 			}
@@ -169,17 +166,11 @@ func (f *fleetGateway) worker() {
 
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
 				f.log.Errorf("failed to dispatch actions, error: %s", err)
-				lastStatus = status.Degraded
 				f.statusReporter.Update(status.Degraded)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-
-			// prevent reporting same status multiple times
-			if lastStatus != status.Healthy {
-				f.statusReporter.Update(status.Healthy)
-				lastStatus = status.Healthy
-			}
+			f.statusReporter.Update(status.Healthy)
 		case <-f.bgContext.Done():
 			f.stop()
 			return

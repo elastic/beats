@@ -7,21 +7,23 @@ package status
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestReporter(t *testing.T) {
+	l, _ := logger.New("")
 	t.Run("healthy by default", func(t *testing.T) {
-		r := NewController()
+		r := NewController(l)
 		assert.Equal(t, Healthy, r.Status())
 		assert.Equal(t, "online", r.StatusString())
 	})
 
 	t.Run("healthy when all healthy", func(t *testing.T) {
-		r := NewController()
-		r1 := r.Register()
-		r2 := r.Register()
-		r3 := r.Register()
+		r := NewController(l)
+		r1 := r.Register("r1")
+		r2 := r.Register("r2")
+		r3 := r.Register("r3")
 
 		r1.Update(Healthy)
 		r2.Update(Healthy)
@@ -32,10 +34,10 @@ func TestReporter(t *testing.T) {
 	})
 
 	t.Run("degraded when one degraded", func(t *testing.T) {
-		r := NewController()
-		r1 := r.Register()
-		r2 := r.Register()
-		r3 := r.Register()
+		r := NewController(l)
+		r1 := r.Register("r1")
+		r2 := r.Register("r2")
+		r3 := r.Register("r3")
 
 		r1.Update(Healthy)
 		r2.Update(Degraded)
@@ -46,10 +48,10 @@ func TestReporter(t *testing.T) {
 	})
 
 	t.Run("failed when one failed", func(t *testing.T) {
-		r := NewController()
-		r1 := r.Register()
-		r2 := r.Register()
-		r3 := r.Register()
+		r := NewController(l)
+		r1 := r.Register("r1")
+		r2 := r.Register("r2")
+		r3 := r.Register("r3")
 
 		r1.Update(Healthy)
 		r2.Update(Failed)
@@ -60,10 +62,10 @@ func TestReporter(t *testing.T) {
 	})
 
 	t.Run("failed when one failed and one degraded", func(t *testing.T) {
-		r := NewController()
-		r1 := r.Register()
-		r2 := r.Register()
-		r3 := r.Register()
+		r := NewController(l)
+		r1 := r.Register("r1")
+		r2 := r.Register("r2")
+		r3 := r.Register("r3")
 
 		r1.Update(Healthy)
 		r2.Update(Failed)
@@ -74,10 +76,10 @@ func TestReporter(t *testing.T) {
 	})
 
 	t.Run("degraded when degraded and healthy, failed unregistered", func(t *testing.T) {
-		r := NewController()
-		r1 := r.Register()
-		r2 := r.Register()
-		r3 := r.Register()
+		r := NewController(l)
+		r1 := r.Register("r1")
+		r2 := r.Register("r2")
+		r3 := r.Register("r3")
 
 		r1.Update(Healthy)
 		r2.Update(Failed)

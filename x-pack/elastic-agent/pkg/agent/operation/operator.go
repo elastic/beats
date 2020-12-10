@@ -103,7 +103,7 @@ func NewOperator(
 		reporter:         reporter,
 		monitor:          monitor,
 		statusController: statusController,
-		statusReporter:   statusController.Register(),
+		statusReporter:   statusController.Register("operator-" + pipelineID),
 	}
 
 	operator.initHandlerMap()
@@ -140,11 +140,12 @@ func (o *Operator) Close() error {
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
-	_, steps, ack, err := o.stateResolver.Resolve(cfg)
+	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
 		o.statusReporter.Update(status.Failed)
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
+	o.statusController.UpdateStateID(stateID)
 
 	for _, step := range steps {
 		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
@@ -170,8 +171,8 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	}
 
 	// Ack the resolver should state for next call.
-	ack()
 	o.statusReporter.Update(status.Healthy)
+	ack()
 
 	return nil
 }

@@ -65,7 +65,7 @@ func newManaged(
 	reexec reexecManager,
 	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	statusController := status.NewController()
+	statusController := status.NewController(log)
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)

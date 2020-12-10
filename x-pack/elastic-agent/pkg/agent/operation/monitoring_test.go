@@ -133,7 +133,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m, status.NewController())
+	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m, status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}

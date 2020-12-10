@@ -30,7 +30,7 @@ func TestStateResolverAcking(t *testing.T) {
 		require.NoError(t, err)
 
 		// Current state is empty.
-		_, steps, ack, err := r.Resolve(submit)
+		_, _, steps, ack, err := r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(steps))
 
@@ -38,7 +38,7 @@ func TestStateResolverAcking(t *testing.T) {
 		ack()
 
 		// Current sate is not empty lets try to resolve the same configuration.
-		_, steps, ack, err = r.Resolve(submit)
+		_, _, steps, ack, err = r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 0, len(steps))
 	})
@@ -49,12 +49,12 @@ func TestStateResolverAcking(t *testing.T) {
 		require.NoError(t, err)
 
 		// Current state is empty.
-		_, steps1, _, err := r.Resolve(submit)
+		_, _, steps1, _, err := r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(steps1))
 
 		// We didn't ACK the should state, verify that resolve produce the same output.
-		_, steps2, _, err := r.Resolve(submit)
+		_, _, steps2, _, err := r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(steps2))
 
