@@ -858,6 +858,7 @@ processors:
     - checkpoint.uid
     - checkpoint.time
     - syslog5424_ts
+    - _temp_
     ignore_missing: true
 on_failure:
 - set:
