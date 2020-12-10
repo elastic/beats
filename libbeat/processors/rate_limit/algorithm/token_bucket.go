@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -52,7 +53,8 @@ type tokenBucket struct {
 		}
 	}
 
-	clock clockwork.Clock
+	clock  clockwork.Clock
+	logger *logp.Logger
 }
 
 type tokenBucketGCConfig struct {
@@ -105,7 +107,8 @@ func newTokenBucket(config Config) (Algorithm, error) {
 				NumBuckets: cfg.GC.NumBuckets,
 			},
 		},
-		clock: clockwork.NewRealClock(),
+		clock:  clockwork.NewRealClock(),
+		logger: logp.NewLogger("token_bucket"),
 	}, nil
 }
 
@@ -175,9 +178,12 @@ func (t *tokenBucket) runGC() {
 		return
 	}
 
+	gcStartTime := time.Now()
+
 	// Add tokens to all buckets according to the rate limit
 	// and flag full buckets for deletion.
 	toDelete := make([]uint64, 0)
+	numBucketsBefore := 0
 	t.buckets.Range(func(k, v interface{}) bool {
 		key := k.(uint64)
 		b := v.(*bucket)
@@ -188,6 +194,7 @@ func (t *tokenBucket) runGC() {
 			toDelete = append(toDelete, key)
 		}
 
+		numBucketsBefore++
 		return true
 	})
 
@@ -199,4 +206,10 @@ func (t *tokenBucket) runGC() {
 	// Reset GC metrics
 	t.gc.metrics.numCalls = atomic.MakeUint(0)
 	t.gc.metrics.numBuckets.Sub(uint(len(toDelete)))
+
+	gcDuration := time.Now().Sub(gcStartTime)
+	numBucketsDeleted := len(toDelete)
+	numBucketsAfter := numBucketsBefore - numBucketsDeleted
+	t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
+		gcDuration, numBucketsBefore, numBucketsDeleted, numBucketsAfter)
 }
