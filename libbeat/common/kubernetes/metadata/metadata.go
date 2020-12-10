@@ -50,3 +50,24 @@ func WithLabels(kind string) FieldOptions {
 		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 	}
 }
+
+// GetPodMetaGen is a wrapper function that creates a metaGen for pod resource and has embeeded
+// nodeMetaGen and namespaceMetaGen
+func GetPodMetaGen(
+	cfg *common.Config,
+	podWatcher kubernetes.Watcher,
+	nodeWatcher kubernetes.Watcher,
+	namespaceWatcher kubernetes.Watcher,
+	metaConf *AddResourceMetadataConfig) MetaGen {
+
+	var nodeMetaGen, namespaceMetaGen MetaGen
+	if nodeWatcher != nil {
+		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
+	}
+	if namespaceWatcher != nil {
+		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+	}
+	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), nodeMetaGen, namespaceMetaGen)
+
+	return metaGen
+}

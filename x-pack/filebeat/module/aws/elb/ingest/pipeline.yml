@@ -31,7 +31,7 @@ processors:
           %{TIMESTAMP_ISO8601:event.start}
           \"(?:-|%{DATA:_tmp.actions_executed})\"
           \"(?:-|%{DATA:aws.elb.redirect_url})\"
-          \"(?:-|%{DATA:aws.elb.error.reason})\"
+          \"(?:-|%{DATA:aws.elb.error.reason})\"( \"(?:-|%{DATA:_tmp.target_port})\")?( \"(?:-|%{DATA:_tmp.target_status_code})\")?( \"(?:-|%{DATA:aws.elb.classification})\")?( \"(?:-|%{DATA:aws.elb.classification_reason})\")?
 
         # TCP from Network Load Balancers (v2 Load Balancers)
         - >-
@@ -131,7 +131,7 @@ processors:
       value: failure
 
   - set:
-      field: tracing.trace.id
+      field: trace.id
       value: "{{aws.elb.trace_id}}"
       ignore_empty_value: true
 
@@ -139,6 +139,18 @@ processors:
       field: '_tmp.actions_executed'
       target_field: 'aws.elb.action_executed'
       separator: ','
+      ignore_missing: true
+
+  - split:
+      field: '_tmp.target_port'
+      target_field: 'aws.elb.target_port'
+      separator: ' '
+      ignore_missing: true
+
+  - split:
+      field: '_tmp.target_status_code'
+      target_field: 'aws.elb.target_status_code'
+      separator: ' '
       ignore_missing: true
 
   - date:

@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -21,8 +22,16 @@ type Application interface {
 	AgentInfo() *info.AgentInfo
 }
 
+type reexecManager interface {
+	ReExec(argOverrides ...string)
+}
+
+type upgraderControl interface {
+	SetUpgrader(upgrader *upgrade.Upgrader)
+}
+
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string) (Application, error) {
+func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, uc upgraderControl, agentInfo *info.AgentInfo) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
@@ -35,13 +44,16 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, uc, agentInfo)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
 	rawConfig *config.Config,
+	reexec reexecManager,
+	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (Application, error) {
 	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
@@ -52,16 +64,16 @@ func createApplication(
 		return nil, err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig)
+		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, uc, agentInfo)
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, rawConfig)
+	return newManaged(ctx, log, rawConfig, reexec, agentInfo)
 }
 
-// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+// IsStandalone decides based on missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func IsStandalone(cfg *configuration.FleetAgentConfig) bool {
 	return cfg == nil || !cfg.Enabled
 }

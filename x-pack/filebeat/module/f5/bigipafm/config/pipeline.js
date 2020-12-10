@@ -33,8 +33,7 @@ var map_getEventCategoryActivity = {
 
 var dup1 = constant("Deny");
 
-var hdr1 = // "Pattern{Field(hfld1,true), Constant(' '), Field(hfld2,true), Constant(' '), Field(hhostname,true), Constant(' '), Field(hfld3,true), Constant(' '), Field(hfld4,true), Constant(' '), Field(hfld5,true), Constant(' [F5@'), Field(hfld6,true), Constant(' '), Field(payload,false)}"
-match("HEADER#0:0001", "message", "%{hfld1->} %{hfld2->} %{hhostname->} %{hfld3->} %{hfld4->} %{hfld5->} [F5@%{hfld6->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hfld1->} %{hfld2->} %{hhostname->} %{hfld3->} %{hfld4->} %{hfld5->} [F5@%{hfld6->} %{payload}", processor_chain([
 	setc("header_id","0001"),
 	setc("messageid","BIGIP_AFM"),
 ]));

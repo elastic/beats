@@ -22,7 +22,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
-  * <<filebeat-module-googlecloud>>
+  * <<filebeat-module-gcp>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
@@ -40,12 +40,14 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
+  * <<filebeat-module-mysqlenterprise>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-netscout>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-o365>>
   * <<filebeat-module-okta>>
+  * <<filebeat-module-oracle>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
   * <<filebeat-module-postgresql>>
@@ -90,7 +92,7 @@ include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
-include::modules/googlecloud.asciidoc[]
+include::modules/gcp.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
@@ -108,12 +110,14 @@ include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
+include::modules/mysqlenterprise.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/netscout.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/o365.asciidoc[]
 include::modules/okta.asciidoc[]
+include::modules/oracle.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]

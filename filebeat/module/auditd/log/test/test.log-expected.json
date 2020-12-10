@@ -1,11 +1,11 @@
 [
     {
         "@timestamp": "2017-01-31T20:17:14.891Z",
-        "auditd.log.dst_prefixlen": "16",
+        "auditd.log.dst_prefixlen": 16,
         "auditd.log.op": "SPD-delete",
         "auditd.log.sequence": 18877201,
         "auditd.log.ses": "4294967295",
-        "auditd.log.src_prefixlen": "24",
+        "auditd.log.src_prefixlen": 24,
         "destination.address": "192.168.0.0",
         "event.action": "mac_ipsec_event",
         "event.dataset": "auditd.log",
@@ -40,6 +40,7 @@
         "host.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 174,
+        "network.direction": "egress",
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",
         "process.exit_code": 184,
         "process.name": "charon",
@@ -82,15 +83,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:17:21.515Z",
-        "auditd.log.addr": "96.241.146.97",
         "auditd.log.cipher": "chacha20-poly1305@openssh.com",
         "auditd.log.direction": "from-server",
-        "auditd.log.ksize": "512",
+        "auditd.log.ksize": 512,
         "auditd.log.laddr": "10.142.0.2",
-        "auditd.log.lport": "22",
+        "auditd.log.lport": 22,
         "auditd.log.op": "start",
         "auditd.log.pfs": "curve25519-sha256@libssh.org",
-        "auditd.log.rport": "63927",
+        "auditd.log.rport": 63927,
         "auditd.log.sequence": 406,
         "auditd.log.ses": "4294967295",
         "auditd.log.spid": "1299",
@@ -106,6 +106,18 @@
         "process.executable": "/usr/sbin/sshd",
         "process.pid": 1298,
         "service.type": "auditd",
+        "source.address": "96.241.146.97",
+        "source.as.number": 701,
+        "source.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
+        "source.geo.city_name": "Aldie",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 38.9637,
+        "source.geo.location.lon": -77.6099,
+        "source.geo.region_iso_code": "US-VA",
+        "source.geo.region_name": "Virginia",
+        "source.ip": "96.241.146.97",
         "user.audit.id": "4294967295",
         "user.id": "0",
         "user.saved.id": "74"
@@ -167,12 +179,16 @@
         "auditd.log.sw": "gcc-4.8.5-39.el7.x86_64",
         "auditd.log.sw_type": "rpm",
         "event.action": "software_update",
-        "event.category": "package",
+        "event.category": [
+            "package"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1893,
@@ -198,7 +214,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2196,
-        "message": "",
         "process.executable": "/usr/lib/systemd/systemd-update-utmp",
         "process.name": "systemd-update-utmp",
         "process.pid": 678,
@@ -221,7 +236,6 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2438,
-        "message": "",
         "process.executable": "/usr/lib/systemd/systemd-update-utmp",
         "process.name": "systemd-update-utmp",
         "process.pid": 4440,
@@ -232,7 +246,6 @@
     {
         "@timestamp": "2020-02-10T21:59:44.206Z",
         "auditd.log.a0": "top",
-        "auditd.log.argc": "1",
         "auditd.log.sequence": 579393,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -241,6 +254,7 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2688,
+        "process.args_count": 1,
         "service.type": "auditd"
     },
     {
@@ -287,11 +301,15 @@
         "auditd.log.name": "mymodule",
         "auditd.log.sequence": 579397,
         "event.action": "kern_module",
-        "event.category": "driver",
+        "event.category": [
+            "driver"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 3153,
@@ -304,7 +322,6 @@
         "auditd.log.sequence": 145,
         "auditd.log.ses": "3",
         "auditd.log.subj": "system_u:system_r:container_runtime_t:s0",
-        "auditd.log.user": "root",
         "event.action": "virt_control",
         "event.category": "host",
         "event.dataset": "auditd.log",
@@ -319,7 +336,8 @@
         "process.pid": 1431,
         "service.type": "auditd",
         "user.audit.id": "100",
-        "user.id": "0"
+        "user.id": "0",
+        "user.name": "root"
     },
     {
         "@timestamp": "2016-12-16T15:45:43.572Z",

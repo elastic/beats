@@ -19,6 +19,8 @@ processors:
       ignore_failure: true
       field: zeek.dns.query
       target_field: dns.question.registered_domain
+      target_subdomain_field: dns.question.subdomain
+      target_etld_field: dns.question.top_level_domain
   - script:
       lang: javascript
       id: zeek_dns_flags
@@ -203,4 +205,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.7.0

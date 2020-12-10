@@ -15,7 +15,7 @@
     "system": {
         "diskio": {
             "io": {
-                "time": 364
+                "time": 1296
             },
             "iostat": {
                 "await": 0,
@@ -48,11 +48,11 @@
                     }
                 }
             },
-            "name": "loop1",
+            "name": "sda6",
             "read": {
-                "bytes": 5267456,
-                "count": 4124,
-                "time": 557
+                "bytes": 335872,
+                "count": 82,
+                "time": 1296
             },
             "write": {
                 "bytes": 0,

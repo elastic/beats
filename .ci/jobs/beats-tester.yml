@@ -1,8 +1,8 @@
 ---
 - job:
     name: Beats/beats-tester
-    display-name: Beats Tester
-    description: Run the beats-tester
+    display-name: Beats Tester orchestrator
+    description: Orchestrate the beats-tester when packaging finished successfully
     view: Beats
     disabled: false
     project-type: multibranch
@@ -44,7 +44,7 @@
               before: true
           prune: true
           shallow-clone: true
-          depth: 3
+          depth: 10
           do-not-fetch-tags: true
           submodule:
               disable: false

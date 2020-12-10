@@ -64,7 +64,7 @@ rules:
     - cloudfoundry
     - container
     - docker
-    - google-pubsub
+    - gcp-pubsub
     - http_endpoint
     - httpjson
     - kafka
@@ -86,6 +86,8 @@ rules:
     key: enabled
     values:
     - true
+
+- inject_agent_info: {}
 
 - copy:
     from: inputs

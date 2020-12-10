@@ -86,6 +86,9 @@ func TestEventTypeHttpAccess(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 		"http": common.MapStr{
 			"response": common.MapStr{
@@ -160,6 +163,9 @@ func TestEventTypeLog(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 		"message": "log message",
 		"stream":  "stdout",
@@ -207,6 +213,9 @@ func TestEventCounter(t *testing.T) {
 				"job":        "job",
 				"index":      "index",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 	}, evt.ToFields())
 }
@@ -251,6 +260,9 @@ func TestEventValueMetric(t *testing.T) {
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
+			},
+			"tags": common.MapStr{
+				"tag": "value",
 			},
 		},
 	}, evt.ToFields())
@@ -315,6 +327,9 @@ func TestEventContainerMetric(t *testing.T) {
 			"app": common.MapStr{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 	}, evt.ToFields())
 }
@@ -358,9 +373,93 @@ func TestEventError(t *testing.T) {
 				"job":        "job",
 				"index":      "index",
 			},
+			"tags": common.MapStr{
+				"tag": "value",
+			},
 		},
 		"message": "message",
 		"code":    int32(100),
+	}, evt.ToFields())
+}
+
+func TestEventTagsWithMetadata(t *testing.T) {
+	eventType := events.Envelope_LogMessage
+	message := "log message"
+	messageType := events.LogMessage_OUT
+	timestamp := int64(1587469726082)
+	appID := "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+	sourceType := "source_type"
+	sourceInstance := "source_instance"
+	cfEvt := makeEnvelope(&eventType)
+	tags := map[string]string{
+		"app_id":            appID,
+		"app_name":          "some-app",
+		"space_id":          "e1114e92-155c-11eb-ada9-27b81025a657",
+		"space_name":        "some-space",
+		"organization_id":   "baeef1ba-155c-11eb-a1af-8f14964c35d2",
+		"organization_name": "some-org",
+		"custom_tag":        "foo",
+	}
+	cfEvt.Tags = tags
+	cfEvt.LogMessage = &events.LogMessage{
+		Message:        []byte(message),
+		MessageType:    &messageType,
+		Timestamp:      &timestamp,
+		AppId:          &appID,
+		SourceType:     &sourceType,
+		SourceInstance: &sourceInstance,
+	}
+	evt := newEventLog(cfEvt)
+
+	assert.Equal(t, EventTypeLog, evt.EventType())
+	assert.Equal(t, "log", evt.String())
+	assert.Equal(t, "origin", evt.Origin())
+	assert.Equal(t, time.Unix(0, 1587469726082), evt.Timestamp())
+	assert.Equal(t, "deployment", evt.Deployment())
+	assert.Equal(t, "job", evt.Job())
+	assert.Equal(t, "index", evt.Index())
+	assert.Equal(t, "ip", evt.IP())
+	assert.Equal(t, tags, evt.Tags())
+	assert.Equal(t, "f47ac10b-58cc-4372-a567-0e02b2c3d479", evt.AppGuid())
+	assert.Equal(t, "log message", evt.Message())
+	assert.Equal(t, EventLogMessageTypeStdout, evt.MessageType())
+	assert.Equal(t, "source_type", evt.SourceType())
+	assert.Equal(t, "source_instance", evt.SourceID())
+
+	assert.Equal(t, common.MapStr{
+		"cloudfoundry": common.MapStr{
+			"type": "log",
+			"log": common.MapStr{
+				"source": common.MapStr{
+					"instance": evt.SourceID(),
+					"type":     evt.SourceType(),
+				},
+			},
+			"envelope": common.MapStr{
+				"origin":     "origin",
+				"deployment": "deployment",
+				"ip":         "ip",
+				"job":        "job",
+				"index":      "index",
+			},
+			"app": common.MapStr{
+				"id":   "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+				"name": "some-app",
+			},
+			"space": common.MapStr{
+				"id":   "e1114e92-155c-11eb-ada9-27b81025a657",
+				"name": "some-space",
+			},
+			"org": common.MapStr{
+				"id":   "baeef1ba-155c-11eb-a1af-8f14964c35d2",
+				"name": "some-org",
+			},
+			"tags": common.MapStr{
+				"custom_tag": "foo",
+			},
+		},
+		"message": "log message",
+		"stream":  "stdout",
 	}, evt.ToFields())
 }
 

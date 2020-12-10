@@ -32,7 +32,7 @@ type mapResourceMetrics func(client *Client, resources []resources.GenericResour
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
+	azureMonitorService, err := NewService(config)
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			err = errors.Wrap(err, "failed to retrieve resources")
 			return err
 		}
-		if len(resourceList.Values()) == 0 {
+		if len(resourceList) == 0 {
 			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
 			continue
 		}
 		//map resources to the client
-		for _, resource := range resourceList.Values() {
+		for _, resource := range resourceList {
 			if !containsResource(*resource.ID, client.Resources) {
 				client.Resources = append(client.Resources, Resource{
 					Id:           *resource.ID,
@@ -84,7 +84,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 					Subscription: client.Config.SubscriptionId})
 			}
 		}
-		resourceMetrics, err := fn(client, resourceList.Values(), resource)
+		resourceMetrics, err := fn(client, resourceList, resource)
 		if err != nil {
 			return err
 		}

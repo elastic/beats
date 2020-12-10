@@ -22,6 +22,12 @@
     - name: exec_code
       type: keyword
       description: The SIGCHLD code from the service's main process
+    - name: unit_file.state
+      type: keyword
+      description: The state of the unit file
+    - name: unit_file.vendor_preset
+      type: keyword
+      description: The default state of the unit file
     - name: resources
       type: group
       description: system metrics associated with the service

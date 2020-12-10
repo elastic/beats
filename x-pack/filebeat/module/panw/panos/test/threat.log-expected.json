@@ -10,6 +10,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -73,6 +74,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -95,7 +100,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -108,6 +115,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -171,6 +179,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -193,7 +205,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -206,6 +220,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -269,6 +284,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -291,7 +310,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -304,6 +325,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -367,6 +389,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -389,7 +415,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -402,6 +430,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -465,6 +494,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -487,7 +520,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -500,6 +535,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -563,6 +599,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -585,7 +625,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -598,6 +640,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -661,6 +704,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -683,7 +730,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -696,6 +745,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -759,6 +809,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -781,7 +835,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -794,6 +850,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -857,6 +914,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -879,7 +940,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -892,6 +955,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -955,6 +1019,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -977,7 +1045,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -990,6 +1060,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1053,6 +1124,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1075,7 +1150,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1088,6 +1165,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1151,6 +1229,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1173,7 +1255,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1186,6 +1270,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1249,6 +1334,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1271,7 +1360,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1284,6 +1375,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1347,6 +1439,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1369,7 +1465,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1382,6 +1480,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1445,6 +1544,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1467,7 +1570,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1480,6 +1585,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1543,6 +1649,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1565,7 +1675,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1578,6 +1690,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1641,6 +1754,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1663,7 +1780,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1676,6 +1795,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1739,6 +1859,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1761,7 +1885,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1774,6 +1900,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1837,6 +1964,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1859,7 +1990,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -1872,6 +2005,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -1935,6 +2069,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -1957,7 +2095,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -1970,6 +2110,7 @@
         "destination.as.organization.name": "Akamai International B.V.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2033,6 +2174,10 @@
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "b.scorecardresearch.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.137.131",
@@ -2055,7 +2200,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "b.scorecardresearch.com/"
+        "url.domain": "b.scorecardresearch.com",
+        "url.original": "b.scorecardresearch.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -2068,6 +2215,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2131,6 +2279,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2153,7 +2305,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2166,6 +2320,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2229,6 +2384,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2251,7 +2410,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2264,6 +2425,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2327,6 +2489,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2349,7 +2515,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2362,6 +2530,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2425,6 +2594,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2447,7 +2620,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2460,6 +2635,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2523,6 +2699,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2545,7 +2725,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2558,6 +2740,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2621,6 +2804,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2643,7 +2830,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2656,6 +2845,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2719,6 +2909,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2741,7 +2935,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2754,6 +2950,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2817,6 +3014,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2839,7 +3040,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2852,6 +3055,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -2915,6 +3119,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -2937,7 +3145,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2950,6 +3160,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3013,6 +3224,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3035,7 +3250,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3048,6 +3265,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3111,6 +3329,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3133,7 +3355,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3146,6 +3370,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3209,6 +3434,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3231,7 +3460,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3244,6 +3475,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3307,6 +3539,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3329,7 +3565,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3342,6 +3580,7 @@
         "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3405,6 +3644,10 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "consent.cmp.oath.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "152.195.55.192",
@@ -3427,7 +3670,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:53.000-02:00",
@@ -3440,6 +3685,7 @@
         "destination.as.organization.name": "Fastly",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -3503,6 +3749,10 @@
         "panw.panos.threat.resource": "cdn.taboola.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "cdn.taboola.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -3525,7 +3775,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "cdn.taboola.com/"
+        "url.domain": "cdn.taboola.com",
+        "url.original": "cdn.taboola.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:54.000-02:00",
@@ -3539,6 +3791,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6109,
         "destination.geo.location.lon": -122.3303,
         "destination.geo.name": "United States",
@@ -3604,6 +3857,10 @@
         "panw.panos.threat.resource": "rules.quantcount.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "rules.quantcount.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.192.7.152",
@@ -3626,7 +3883,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "rules.quantcount.com/"
+        "url.domain": "rules.quantcount.com",
+        "url.original": "rules.quantcount.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3640,6 +3899,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3705,6 +3965,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3727,7 +3991,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3741,6 +4007,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3806,6 +4073,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3828,7 +4099,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3842,6 +4115,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -3907,6 +4181,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -3929,7 +4207,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3943,6 +4223,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4008,6 +4289,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4030,7 +4315,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4044,6 +4331,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4109,6 +4397,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4131,7 +4423,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4145,6 +4439,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4210,6 +4505,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4232,7 +4531,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4246,6 +4547,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4311,6 +4613,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4333,7 +4639,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4347,6 +4655,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4412,6 +4721,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4434,7 +4747,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4448,6 +4763,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4513,6 +4829,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4535,7 +4855,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4549,6 +4871,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4614,6 +4937,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4636,7 +4963,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4650,6 +4979,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4715,6 +5045,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4737,7 +5071,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4751,6 +5087,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -4816,6 +5153,10 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.4.120.175",
@@ -4838,7 +5179,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:13.000-02:00",
@@ -4852,6 +5195,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.3861,
         "destination.geo.location.lon": -122.0839,
         "destination.geo.name": "United States",
@@ -4917,6 +5261,10 @@
         "panw.panos.threat.resource": "www.googleadservices.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "www.googleadservices.com"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.98",
@@ -4939,7 +5287,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "www.googleadservices.com/"
+        "url.domain": "www.googleadservices.com",
+        "url.original": "www.googleadservices.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -4952,6 +5302,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5015,6 +5366,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5037,7 +5392,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5050,6 +5407,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5113,6 +5471,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5135,7 +5497,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5148,6 +5512,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5211,6 +5576,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5233,7 +5602,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5246,6 +5617,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5309,6 +5681,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5331,7 +5707,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5344,6 +5722,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5407,6 +5786,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5429,7 +5812,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5442,6 +5827,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5505,6 +5891,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5527,7 +5917,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5540,6 +5932,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5603,6 +5996,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5625,7 +6022,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5638,6 +6037,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5701,6 +6101,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5723,7 +6127,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5736,6 +6142,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5799,6 +6206,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5821,7 +6232,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5834,6 +6247,7 @@
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.geo.name": "United States",
@@ -5897,6 +6311,10 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "service.maxymiser.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.72.145.245",
@@ -5919,7 +6337,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -5933,6 +6353,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -5998,6 +6419,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6020,7 +6445,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6034,6 +6461,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6099,6 +6527,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6121,7 +6553,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6135,6 +6569,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6200,6 +6635,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6222,7 +6661,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6236,6 +6677,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6301,6 +6743,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6323,7 +6769,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6337,6 +6785,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6402,6 +6851,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6424,7 +6877,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6438,6 +6893,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6503,6 +6959,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6525,7 +6985,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6539,6 +7001,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6604,6 +7067,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6626,7 +7093,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6640,6 +7109,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6705,6 +7175,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6727,7 +7201,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6741,6 +7217,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6806,6 +7283,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6828,7 +7309,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6842,6 +7325,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -6907,6 +7391,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -6929,7 +7417,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6943,6 +7433,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7008,6 +7499,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7030,7 +7525,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -7044,6 +7541,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7109,6 +7607,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7131,7 +7633,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7145,6 +7649,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7210,6 +7715,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7232,7 +7741,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7246,6 +7757,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7311,6 +7823,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7333,7 +7849,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7347,6 +7865,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7412,6 +7931,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7434,7 +7957,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:29.000-02:00",
@@ -7448,6 +7973,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.name": "United States",
@@ -7513,6 +8039,10 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220",
+            "segment-data.zqtk.net"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.209.101.70",
@@ -7535,6 +8065,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     }
 ]

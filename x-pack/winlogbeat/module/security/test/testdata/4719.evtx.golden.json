@@ -3,7 +3,10 @@
     "@timestamp": "2019-11-07T15:22:57.6553291Z",
     "event": {
       "action": "changed-audit-config",
-      "category": "iam",
+      "category": [
+        "iam",
+        "configuration"
+      ],
       "code": 4719,
       "kind": "event",
       "module": "security",

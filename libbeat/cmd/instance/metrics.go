@@ -21,6 +21,7 @@ package instance
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/gosigar/cgroup"
 )
 
 var (
@@ -35,12 +37,23 @@ var (
 	systemMetrics    *monitoring.Registry
 )
 
+// libbeatMonitoringCgroupsHierarchyOverride is an undocumented environment variable which
+// overrides the cgroups path under /sys/fs/cgroup, which should be set to "/" when running
+// Beats under Docker.
+const libbeatMonitoringCgroupsHierarchyOverride = "LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE"
+
 func init() {
 	systemMetrics = monitoring.Default.NewRegistry("system")
 }
 
 func setupMetrics(name string) error {
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
+
+	//if the beat name is longer than 15 characters, truncate it so we don't fail process checks later on
+	// On *nix, the process name comes from /proc/PID/stat, which uses a comm value of 16 bytes, plus the null byte
+	if (runtime.GOOS == "linux" || runtime.GOOS == "darwin") && len(name) > 15 {
+		name = name[:15]
+	}
 
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
@@ -65,10 +78,15 @@ func setupMetrics(name string) error {
 }
 
 func setupPlatformSpecificMetrics() {
+	switch runtime.GOOS {
+	case "linux":
+		monitoring.NewFunc(beatMetrics, "cgroup", reportBeatCgroups, monitoring.Report)
+	case "windows":
+		setupWindowsHandlesMetrics()
+	}
+
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
-	} else {
-		setupWindowsHandlesMetrics()
 	}
 
 	setupLinuxBSDFDMetrics()
@@ -253,4 +271,87 @@ func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
 	defer V.OnRegistryFinished()
 
 	monitoring.ReportInt(V, "goroutines", int64(runtime.NumGoroutine()))
+}
+
+func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		logp.Err("error getting PID for self process: %v", err)
+		return
+	}
+
+	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		IgnoreRootCgroups:        true,
+		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
+	})
+	if err != nil {
+		if err == cgroup.ErrCgroupsMissing {
+			logp.Warn("cgroup data collection disabled: %v", err)
+		} else {
+			logp.Err("cgroup data collection disabled: %v", err)
+		}
+		return
+	}
+	selfStats, err := cgroups.GetStatsForProcess(pid)
+	if err != nil {
+		logp.Err("error getting group status: %v", err)
+		return
+	}
+	// GetStatsForProcess returns a nil selfStats and no error when there's no stats
+	if selfStats == nil {
+		return
+	}
+
+	if cpu := selfStats.CPU; cpu != nil {
+		monitoring.ReportNamespace(V, "cpu", func() {
+			if cpu.ID != "" {
+				monitoring.ReportString(V, "id", cpu.ID)
+			}
+			monitoring.ReportNamespace(V, "cfs", func() {
+				monitoring.ReportNamespace(V, "period", func() {
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.PeriodMicros))
+				})
+				monitoring.ReportNamespace(V, "quota", func() {
+					monitoring.ReportInt(V, "us", int64(cpu.CFS.QuotaMicros))
+				})
+			})
+			monitoring.ReportNamespace(V, "stats", func() {
+				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods))
+				monitoring.ReportNamespace(V, "throttled", func() {
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.ThrottledPeriods))
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.ThrottledTimeNanos))
+				})
+			})
+		})
+	}
+
+	if cpuacct := selfStats.CPUAccounting; cpuacct != nil {
+		monitoring.ReportNamespace(V, "cpuacct", func() {
+			if cpuacct.ID != "" {
+				monitoring.ReportString(V, "id", cpuacct.ID)
+			}
+			monitoring.ReportNamespace(V, "total", func() {
+				monitoring.ReportInt(V, "ns", int64(cpuacct.TotalNanos))
+			})
+		})
+	}
+
+	if memory := selfStats.Memory; memory != nil {
+		monitoring.ReportNamespace(V, "memory", func() {
+			if memory.ID != "" {
+				monitoring.ReportString(V, "id", memory.ID)
+			}
+			monitoring.ReportNamespace(V, "mem", func() {
+				monitoring.ReportNamespace(V, "limit", func() {
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Limit))
+				})
+				monitoring.ReportNamespace(V, "usage", func() {
+					monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage))
+				})
+			})
+		})
+	}
 }

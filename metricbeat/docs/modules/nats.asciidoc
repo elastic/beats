@@ -7,7 +7,8 @@ This file is generated! See scripts/mage/docs_collector.go
 
 This is the Nats module. The Nats module uses https://nats.io/documentation/managing_the_server/monitoring/[Nats monitoring server APIs] to collect metrics.
 
-The default metricsets are `stats`, `connections`, `routes` and `subscriptions`.
+The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route`
+metricsets can be enabled to collect detailed metrics per connection/route.
 
 [float]
 === Compatibility
@@ -33,21 +34,36 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: nats
-  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  metricsets:
+    - "connections"
+    - "routes"
+    - "stats"
+    - "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
   #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-nats-connection,connection>>
+
 * <<metricbeat-metricset-nats-connections,connections>>
+
+* <<metricbeat-metricset-nats-route,route>>
 
 * <<metricbeat-metricset-nats-routes,routes>>
 
@@ -55,7 +71,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-nats-subscriptions,subscriptions>>
 
+include::nats/connection.asciidoc[]
+
 include::nats/connections.asciidoc[]
+
+include::nats/route.asciidoc[]
 
 include::nats/routes.asciidoc[]
 

@@ -185,6 +185,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.101",
             "192.0.2.10"
@@ -236,6 +239,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.3",
             "192.0.2.57"
@@ -686,6 +692,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "FJSG2NRFW01"
+        ],
         "related.ip": [
             "192.168.132.46",
             "172.24.177.29"
@@ -1959,6 +1968,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.77.12",
             "10.0.13.13"
@@ -2010,6 +2022,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -2061,6 +2076,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -2115,6 +2133,10 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2168,6 +2190,10 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2221,6 +2247,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2275,6 +2304,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -2329,6 +2361,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -2375,6 +2410,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2421,6 +2459,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2472,6 +2513,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.34",
             "192.0.0.12"
@@ -2526,6 +2570,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2580,6 +2627,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2634,6 +2684,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "10.10.10.10"
@@ -2731,6 +2784,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2775,6 +2831,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2819,6 +2878,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2863,6 +2925,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2907,6 +2972,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2951,6 +3019,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2995,6 +3066,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3039,6 +3113,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3089,6 +3166,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "192.0.2.95",
             "10.32.112.125"
@@ -3136,6 +3216,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "10.2.3.5"
         ],
@@ -3233,6 +3316,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "bad.example.com"
+        ],
         "related.ip": [
             "10.1.1.45",
             "192.88.99.129"
