@@ -755,6 +755,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 - Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
 - Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
+- Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
+- Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
 
 *Heartbeat*
 
@@ -913,6 +915,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
+- Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 
 *Elastic Log Driver*
 
