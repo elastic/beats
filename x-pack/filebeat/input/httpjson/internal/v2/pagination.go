@@ -37,9 +37,18 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 
 	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
+
+	body := func() *common.MapStr {
+		if config.Response.RequestBodyOnPagination {
+			return config.Request.Body
+		}
+		return &common.MapStr{}
+	}()
+
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
 		*config.Request.URL.URL,
+		body,
 		append(rts, pts...),
 		config.Auth,
 		log,
@@ -48,12 +57,12 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	return pagination
 }
 
-func newPaginationRequestFactory(method string, url url.URL, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:        url,
 		method:     method,
-		body:       &common.MapStr{},
+		body:       body,
 		transforms: ts,
 		log:        log,
 	}
@@ -143,6 +152,7 @@ func (iter *pageIterator) getPage() (*response, error) {
 		return nil, err
 	}
 	iter.resp.Body.Close()
+	iter.n += 1
 
 	var r response
 	r.header = iter.resp.Header
@@ -154,8 +164,6 @@ func (iter *pageIterator) getPage() (*response, error) {
 			return nil, err
 		}
 	}
-
-	iter.n += 1
 
 	return &r, nil
 }
