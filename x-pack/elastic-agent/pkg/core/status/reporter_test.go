@@ -7,8 +7,9 @@ package status
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func TestReporter(t *testing.T) {

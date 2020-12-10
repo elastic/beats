@@ -7,8 +7,9 @@ package status
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/google/uuid"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // AgentStatus represents a status of agent.
