@@ -164,82 +164,103 @@ var security = (function () {
 
     // event.category, event.type, event.action
     var eventActionTypes = {
-        "1100": ["process","end","logging-service-shutdown"],
-        "1102": ["iam", "admin", "audit-log-cleared"],
-        "1104": ["iam","admin","logging-full"],
-        "1105": ["iam","admin","auditlog-archieved"],
-        "1108": ["iam","admin","logging-processing-error"],
-        "4624": ["authentication","start","logged-in"],
-        "4625": ["authentication","start","logon-failed"],
-        "4634": ["authentication","end","logged-out"],
-        "4647": ["authentication","end","logged-out"],
-        "4648": ["authentication","start","logged-in-explicit"],
-        "4672": ["iam","admin","logged-in-special"],
-        "4673": ["iam","admin","privileged-service-called"],
-        "4674": ["iam","admin","privileged-operation"],
-        "4688": ["process","start","created-process"],
-        "4689": ["process", "end", "exited-process"],
-        "4697": ["iam","admin","service-installed"],
-        "4698": ["iam","creation","scheduled-task-created"],
-        "4699": ["iam","deletion","scheduled-task-deleted"],
-        "4700": ["iam","change","scheduled-task-enabled"],
-        "4701": ["iam","change","scheduled-task-disabled"],
-        "4702": ["iam","change","scheduled-task-updated"],
-        "4719": ["iam","admin","changed-audit-config"],
-        "4720": ["iam","creation","added-user-account"],
-        "4722": ["iam","creation","enabled-user-account"],
-        "4723": ["iam","change","changed-password"],
-        "4724": ["iam","change","reset-password"],
-        "4725": ["iam","deletion","disabled-user-account"],
-        "4726": ["iam","deletion","deleted-user-account"],
-        "4727": ["iam","creation","added-group-account"],
-        "4728": ["iam","change","added-member-to-group"],
-        "4729": ["iam","change","removed-member-from-group"],
-        "4730": ["iam","deletion","deleted-group-account"],
-        "4731": ["iam","creation","added-group-account"],
-        "4732": ["iam","change","added-member-to-group"],
-        "4733": ["iam","change","removed-member-from-group"],
-        "4734": ["iam","deletion","deleted-group-account"],
-        "4735": ["iam","change","modified-group-account"],
-        "4737": ["iam","change","modified-group-account"],
-        "4738": ["iam","change","modified-user-account"],
-        "4740": ["iam","change","locked-out-user-account"],
-        "4741": ["iam","creation","added-computer-account"],
-        "4742": ["iam","change","changed-computer-account"],
-        "4743": ["iam","deletion","deleted-computer-account"],
-        "4744": ["iam","creation","added-distribution-group-account"],
-        "4745": ["iam","change","changed-distribution-group-account"],
-        "4746": ["iam","change","added-member-to-distribution-group"],
-        "4747": ["iam","change","removed-member-from-distribution-group"],
-        "4748": ["iam","deletion","deleted-distribution-group-account"],
-        "4749": ["iam","creation","added-distribution-group-account"],
-        "4750": ["iam","change","changed-distribution-group-account"],
-        "4751": ["iam","change","added-member-to-distribution-group"],
-        "4752": ["iam","change","removed-member-from-distribution-group"],
-        "4753": ["iam","deletion","deleted-distribution-group-account"],
-        "4754": ["iam","creation","added-group-account"],
-        "4755": ["iam","change","modified-group-account"],
-        "4756": ["iam","change","added-member-to-group"],
-        "4757": ["iam","change","removed-member-from-group"],
-        "4758": ["iam","deletion","deleted-group-account"],
-        "4759": ["iam","creation","added-distribution-group-account"],
-        "4760": ["iam","change","changed-distribution-group-account"],
-        "4761": ["iam","change","added-member-to-distribution-group"],
-        "4762": ["iam","change","removed-member-from-distribution-group"],
-        "4763": ["iam","deletion","deleted-distribution-group-account"],
-        "4764": ["iam","change","type-changed-group-account"],
-        "4767": ["iam","change","unlocked-user-account"],
-        "4768": ["authentication","start","kerberos-authentication-ticket-requested"],
-        "4769": ["authentication","start","kerberos-service-ticket-requested"],
-        "4770": ["authentication","start","kerberos-service-ticket-renewed"],
-        "4771": ["authentication","start","kerberos-preauth-failed"],
-        "4776": ["authentication","start","credential-validated"],
-        "4778": ["authentication","start","session-reconnected"],
-        "4779": ["authentication","end","session-disconnected"],
-        "4781": ["iam","change","renamed-user-account","dummy"],
-        "4798": ["iam","info","group-membership-enumerated"],
-        "4799": ["iam","info","user-member-enumerated","dummy"],
-        "4964": ["iam","admin","logged-in-special"],
+        "1100": [["process"], ["end"], "logging-service-shutdown"],
+        "1102": [["iam"], ["admin", "change"], "audit-log-cleared"], // need to recategorize
+        "1104": [["iam"], ["admin"],"logging-full"],
+        "1105": [["iam"], ["admin"],"auditlog-archieved"],
+        "1108": [["iam"], ["admin"],"logging-processing-error"],
+        "4610": [["configuration"], ["access"], "authentication-package-loaded"],
+        "4611": [["configuration"], ["change"], "trusted-logon-process-registered"],
+        "4614": [["configuration"], ["access"], "notification-package-loaded"],
+        "4616": [["configuration"], ["change"], "system-time-changed"],
+        "4622": [["configuration"], ["access"], "security-package-loaded"],
+        "4624": [["authentication"], ["start"], "logged-in"],
+        "4625": [["authentication"], ["start"], "logon-failed"],
+        "4634": [["authentication"], ["end"], "logged-out"],
+        "4647": [["authentication"], ["end"], "logged-out"],
+        "4648": [["authentication"], ["start"], "logged-in-explicit"],
+        "4657": [["configuration"], ["change"], "registry-value-modified"],
+        "4672": [["iam"], ["admin"], "logged-in-special"],
+        "4673": [["iam"], ["admin"], "privileged-service-called"],
+        "4674": [["iam"], ["admin"], "privileged-operation"],
+        "4688": [["process"], ["start"], "created-process"],
+        "4689": [["process"], ["end"], "exited-process"],
+        "4697": [["iam", "configuration"], ["admin", "change"],"service-installed"], // remove iam and admin
+        "4698": [["iam", "configuration"], ["creation", "admin"], "scheduled-task-created"], // remove iam and admin
+        "4699": [["iam", "configuration"], ["deletion", "admin"], "scheduled-task-deleted"], // remove iam and admin
+        "4700": [["iam", "configuration"], ["change", "admin"], "scheduled-task-enabled"], // remove iam and admin
+        "4701": [["iam", "configuration"], ["change", "admin"], "scheduled-task-disabled"], // remove iam and admin
+        "4702": [["iam", "configuration"], ["change", "admin"], "scheduled-task-updated"], // remove iam and admin
+        "4706": [["configuration"], ["creation"], "domain-trust-added"],
+        "4707": [["configuration"], ["deletion"], "domain-trust-removed"],
+        "4713": [["configuration"], ["change"], "kerberos-policy-changed"],
+        "4714": [["configuration"], ["change"], "encrypted-data-recovery-policy-changed"],
+        "4715": [["configuration"], ["change"], "object-audit-policy-changed"],
+        "4716": [["configuration"], ["change"], "trusted-domain-information-changed"],
+        "4719": [["iam", "configuration"], ["admin", "change"], "changed-audit-config"], // remove iam and admin
+        "4720": [["iam"], ["user", "creation"], "added-user-account"],
+        "4722": [["iam"], ["user", "change"], "enabled-user-account"],
+        "4723": [["iam"], ["user", "change"], "changed-password"],
+        "4724": [["iam"], ["user", "change"], "reset-password"],
+        "4725": [["iam"], ["user", "deletion"], "disabled-user-account"],
+        "4726": [["iam"], ["user", "deletion"], "deleted-user-account"],
+        "4727": [["iam"], ["group", "creation"], "added-group-account"],
+        "4728": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4729": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4730": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4731": [["iam"], ["group", "creation"], "added-group-account"],
+        "4732": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4733": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4734": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4735": [["iam"], ["group", "change"], "modified-group-account"],
+        "4737": [["iam"], ["group", "change"], "modified-group-account"],
+        "4738": [["iam"], ["user", "change"], "modified-user-account"],
+        "4739": [["configuration"], ["change"], "domain-policy-changed"],
+        "4740": [["iam"], ["user", "change"], "locked-out-user-account"],
+        "4741": [["iam"], ["creation", "admin"], "added-computer-account"], // remove admin
+        "4742": [["iam"], ["change", "admin"], "changed-computer-account"], // remove admin
+        "4743": [["iam"], ["deletion", "admin"], "deleted-computer-account"], // remove admin
+        "4744": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4745": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4746": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4747": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4748": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4749": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4750": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4751": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4752": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4753": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4754": [["iam"], ["group", "creation"], "added-group-account"],
+        "4755": [["iam"], ["group", "change"], "modified-group-account"],
+        "4756": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4757": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4758": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4759": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4760": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4761": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4762": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4763": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4764": [["iam"], ["group", "change"], "type-changed-group-account"],
+        "4767": [["iam"], ["user", "change"], "unlocked-user-account"],
+        "4768": [["authentication"], ["start"], "kerberos-authentication-ticket-requested"],
+        "4769": [["authentication"], ["start"], "kerberos-service-ticket-requested"],
+        "4770": [["authentication"], ["start"], "kerberos-service-ticket-renewed"],
+        "4771": [["authentication"], ["start"], "kerberos-preauth-failed"],
+        "4776": [["authentication"], ["start"], "credential-validated"],
+        "4778": [["authentication"], ["start"], "session-reconnected"],
+        "4779": [["authentication"], ["end"], "session-disconnected"],
+        "4781": [["iam"], ["user", "change"], "renamed-user-account"],
+        "4798": [["iam"], ["user", "info"], "group-membership-enumerated"], // process enumerates the local groups to which the specified user belongs
+        "4799": [["iam"], ["group", "info"], "user-member-enumerated"], // a process enumerates the members of the specified local group
+        "4912": [["configuration"], ["change"], "per-user-audit-policy-changed"],
+        "4950": [["configuration"], ["change"], "windows-firewall-setting-changed"],
+        "4954": [["configuration"], ["change"], "windows-firewall-group-policy-changed"],
+        "4964": [["iam"], ["admin", "group"], "logged-in-special"],
+        "5024": [["process"], ["start"], "windows-firewall-service-started"],
+        "5025": [["process"], ["end"], "windows-firewall-service-stopped"],
+        "5033": [["driver"], ["start"], "windows-firewall-driver-started"],
+        "5034": [["driver"], ["end"], "windows-firewall-driver-stopped"],
+        "5037": [["driver"], ["end"], "windows-firewall-driver-error"],
     };
 
 
@@ -1348,8 +1369,8 @@ var security = (function () {
         }
         var eventActionDescription = eventActionTypes[code][2];
         if (eventActionDescription) {
-            evt.AppendTo("event.category", eventActionTypes[code][0]);
-            evt.AppendTo("event.type", eventActionTypes[code][1]);
+            evt.Put("event.category", eventActionTypes[code][0]);
+            evt.Put("event.type", eventActionTypes[code][1]);
             evt.Put("event.action", eventActionTypes[code][2]);
         }
     };
@@ -1519,11 +1540,13 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            if (/.@*/.test(user)) {
-                user = user.split('@')[0];
-                evt.Put('user.name', user);
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.name', user);
+                }
+                evt.AppendTo('related.user', user);
             }
-            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1769,9 +1792,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addServiceFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var userMgmtEvts = new processor.Chain()
@@ -1783,7 +1803,6 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             evt.AppendTo('related.user', user);
-            evt.AppendTo("event.type", "user");
         })
         .Build();
 
@@ -1796,7 +1815,6 @@ var security = (function () {
             evt.AppendTo('related.user', userNew);
             var userOld = evt.Get("winlog.event_data.OldTargetUserName");
             evt.AppendTo('related.user', userOld);
-            evt.AppendTo("event.type", "user");
         })
         .Build();
 
@@ -1807,7 +1825,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "group");
             var member = evt.Get("winlog.event_data.MemberName");
             if (!member) {
                 return;
@@ -1822,9 +1839,6 @@ var security = (function () {
         .Add(copySubjectUserLogonIdFromUserData)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var auditChanged = new processor.Chain()
@@ -1833,9 +1847,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addAuditInfo)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var auditLogMgmt = new processor.Chain()
@@ -1856,7 +1867,6 @@ var security = (function () {
                 return;
             }
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
-            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
@@ -1869,9 +1879,6 @@ var security = (function () {
         .Add(copyTargetUser)
         .Add(copyTargetUserLogonId)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "group");
-        })
         .Build();
 
     var kerberosTktEvts = new processor.Chain()
@@ -1899,9 +1906,6 @@ var security = (function () {
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     var sensitivePrivilege = new processor.Chain()

@@ -266,7 +266,7 @@ func NewLeaderElectionManager(
 				Identity: id,
 			},
 		},
-		ReleaseOnCancel: false,
+		ReleaseOnCancel: true,
 		LeaseDuration:   15 * time.Second,
 		RenewDeadline:   10 * time.Second,
 		RetryPeriod:     2 * time.Second,

@@ -4604,6 +4604,16 @@ type: double
 
 
 
+*`task_stats.identifier`*::
++
+--
+Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -41345,6 +41355,57 @@ type: object
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
 
+
+[float]
+=== process
+
+Process metrics.
+
+
+
+*`process.state`*::
++
+--
+The process state. For example: "running".
+
+
+type: keyword
+
+--
+
+*`process.cpu.pct`*::
++
+--
+The percentage of CPU time spent by the process since the last event. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`process.cpu.start_time`*::
++
+--
+The time when the process was started.
+
+
+type: date
+
+--
+
+*`process.memory.pct`*::
++
+--
+The percentage of memory the process occupied in main memory (RAM).
+
+
+type: scaled_float
+
+format: percent
+
+--
 
 [float]
 === system

@@ -3,6 +3,7 @@
   description: >
     Traefik reverse proxy / load balancer metrics
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: traefik
       type: group

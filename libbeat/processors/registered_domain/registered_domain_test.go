@@ -31,22 +31,25 @@ func TestProcessorRun(t *testing.T) {
 		Error            bool
 		Domain           string
 		RegisteredDomain string
+		Subdomain        string
 	}{
-		{false, "www.google.com", "google.com"},
-		{false, "www.google.co.uk", "google.co.uk"},
-		{false, "google.com", "google.com"},
-		{false, "www.ak.local", "ak.local"},
-		{false, "www.navy.mil", "navy.mil"},
+		{false, "www.google.com", "google.com", "www"},
+		{false, "www.google.co.uk", "google.co.uk", "www"},
+		{false, "www.mail.google.co.uk", "google.co.uk", "www.mail"},
+		{false, "google.com", "google.com", ""},
+		{false, "www.ak.local", "ak.local", "www"},
+		{false, "www.navy.mil", "navy.mil", "www"},
 
-		{true, "com", ""},
-		{true, ".", "."},
-		{true, "", ""},
-		{true, "localhost", ""},
+		{true, "com", "", ""},
+		{true, ".", ".", ""},
+		{true, "", "", ""},
+		{true, "localhost", "", ""},
 	}
 
 	c := defaultConfig()
 	c.Field = "domain"
 	c.TargetField = "registered_domain"
+	c.TargetSubdomainField = "subdomain"
 	p, err := newRegisteredDomain(c)
 	if err != nil {
 		t.Fatal(err)
@@ -71,5 +74,10 @@ func TestProcessorRun(t *testing.T) {
 
 		rd, _ := evt.GetValue("registered_domain")
 		assert.Equal(t, tc.RegisteredDomain, rd)
+
+		if tc.Subdomain != "" {
+			subdomain, _ := evt.GetValue("subdomain")
+			assert.Equal(t, tc.Subdomain, subdomain)
+		}
 	}
 }
