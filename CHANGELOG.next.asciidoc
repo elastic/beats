@@ -585,6 +585,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 - Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
+- Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
