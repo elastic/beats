@@ -122,7 +122,7 @@ func run(
 	trCtx.cursor = newCursor(config.Cursor, log)
 	trCtx.cursor.load(cursor)
 
-	err = timed.Periodic(stdCtx, config.Interval, func() error {
+	doFunc := func() error {
 		log.Info("Process another repeated request.")
 
 		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
@@ -134,7 +134,13 @@ func run(
 		}
 
 		return nil
-	})
+	}
+
+	// we trigger the first call immediately,
+	// then we schedule it on the given interval using timed.Periodic
+	if err = doFunc(); err == nil {
+		err = timed.Periodic(stdCtx, config.Interval, doFunc)
+	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)
 
