@@ -102,6 +102,7 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 	monitoring.ReportInt(V, "memory_total", int64(stats.TotalAlloc))
 	if m == monitoring.Full {
 		monitoring.ReportInt(V, "memory_alloc", int64(stats.Alloc))
+		monitoring.ReportInt(V, "memory_sys", int64(stats.Sys))
 		monitoring.ReportInt(V, "gc_next", int64(stats.NextGC))
 	}
 
