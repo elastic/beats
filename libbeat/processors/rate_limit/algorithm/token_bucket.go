@@ -21,9 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/go-concert/unison"
 	"github.com/jonboulle/clockwork"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
