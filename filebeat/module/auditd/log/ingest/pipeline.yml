@@ -306,6 +306,23 @@ processors:
     field: container.runtime
     value: "{{ auditd.log.virt }}"
     ignore_empty_value: true
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'accept' || ctx.auditd.log?.syscall == '43' ||
+      ctx.auditd.log?.syscall == 'recvfrom' || ctx.auditd.log?.syscall == '45' ||
+      ctx.auditd.log?.syscall == 'recvmsg' || ctx.auditd.log?.syscall == '47' ||
+      ctx.auditd.log?.syscall == 'accept4' || ctx.auditd.log?.syscall == '288' )
+    field: network.direction
+    value: ingress
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'connect' || ctx.auditd.log?.syscall == '42' ||
+      ctx.auditd.log?.syscall == 'sendto' || ctx.auditd.log?.syscall == '44' ||
+      ctx.auditd.log?.syscall == 'sendmsg' || ctx.auditd.log?.syscall == '46')
+    field: network.direction
+    value: egress
 - rename:
     ignore_failure: true
     field: auditd.log.arch

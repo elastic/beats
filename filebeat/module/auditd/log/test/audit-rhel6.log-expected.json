@@ -144,6 +144,7 @@
         "host.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 1162,
+        "network.direction": "egress",
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",
         "process.exit_code": 184,
         "process.name": "charon",
