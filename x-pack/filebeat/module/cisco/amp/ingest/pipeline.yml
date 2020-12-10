@@ -1,16 +1,36 @@
 description: Pipeline for parsing checkpoint firewall logs
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
+
 - remove:
     field:
     - message
+    - version
+    - metadata
     ignore_missing: true
+#########################
+## ECS General Mapping ##
+#########################
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: json
     target_field: cisco.amp
     ignore_missing: true
+- remove:
+    field:
+    - "@timestamp"
+    ignore_missing: true
+    if: ctx?.cisco?.amp?.timestamp != null
+- date:
+    field: cisco.amp.timestamp
+    formats:
+      - UNIX
+    ignore_failure: true
+
+#######################
+## ECS Event Mapping ##
+#######################
 - rename:
     field: cisco.amp.id
     target_field: event.id
@@ -19,15 +39,14 @@ processors:
     field: cisco.amp.event_type
     target_field: event.action
     ignore_missing: true
-- date:
-    field: cisco.amp.timestamp
-    formats:
-      - UNIX
-    ignore_failure: true
 - rename:
-    field: cisco.amp.id
-    target_field: event.id
+    field: cisco.amp.severity
+    target_field: event.severity
     ignore_missing: true
+
+######################
+## ECS Host Mapping ##
+######################
 - rename:
     field: cisco.amp.computer.hostname
     target_field: host.name
@@ -37,17 +56,69 @@ processors:
     value: "{{ host.name }}"
     if: ctx?.host?.name != null
 - rename:
-    field: cisco.amp.computer.external_ip
+    field: cisco.amp.computer.user
+    target_field: host.user.name
+    ignore_missing: true
+
+#########################
+## ECS Network Mapping ##
+#########################
+- rename:
+    field: cisco.amp.network_info.nfm.protocol
+    target_field: network.transport
+    ignore_missing: true
+- set:
+    field: network.direction
+    value: outbound
+    if: "ctx?.cisco?.amp?.network_info?.nfm?.direction == 'Outgoing connection from'"
+- set:
+    field: network.direction
+    value: outbound
+    if: "ctx?.cisco?.amp?.network_info?.nfm?.direction != null && ctx?.cisco?.amp?.network_info?.nfm?.direction != 'Outgoing connection from'"
+
+#####################
+## ECS URL Mapping ##
+#####################
+- rename:
+    field: cisco.amp.network_info.dirty_url
+    target_field: url.full
+    ignore_missing: true
+
+########################
+## ECS Source Mapping ##
+########################
+- rename:
+    field: cisco.amp.network_info.local_ip
+    target_field: source.address
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.local_port
+    target_field: source.port
+    ignore_missing: true
+- set:
+    field: source.ip
+    value: "{{ source.address }}"
+    if: ctx?.source?.address != null
+
+#############################
+## ECS Destination Mapping ##
+#############################
+- rename:
+    field: cisco.amp.network_info.remote_ip
     target_field: destination.address
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.remote_port
+    target_field: destination.port
     ignore_missing: true
 - set:
     field: destination.ip
     value: "{{ destination.address }}"
     if: ctx?.destination?.address != null
-- rename:
-    field: cisco.amp.computer.user
-    target_field: host.user.name
-    ignore_missing: true
+
+######################
+## ECS File Mapping ##
+######################
 - rename:
     field: cisco.amp.file.file_name
     target_field: file.name
@@ -68,6 +139,10 @@ processors:
     field: cisco.amp.file.identity.md5
     target_field: file.hash.md5
     ignore_missing: true
+
+#########################
+## ECS Process Mapping ##
+#########################
 - rename:
     field: cisco.amp.file.parent.process_id
     target_field: process.parent.pid
@@ -88,11 +163,71 @@ processors:
     field: cisco.amp.file.parent.identity.md5
     target_field: process.parent.hash.md5
     ignore_missing: true
-# Setting related fields
+
+- rename:
+    field: cisco.amp.network_info.parent.process_id
+    target_field: process.parent.pid
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.file_name
+    target_field: process.parent.name
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.sha256
+    target_field: process.parent.hash.sha256
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.sha1
+    target_field: process.parent.hash.sha1
+    ignore_missing: true
+- rename:
+    field: cisco.amp.network_info.parent.identity.md5
+    target_field: process.parent.hash.md5
+    ignore_missing: true
+
+#########################
+## ECS Related Mapping ##
+#########################
 - append:
     field: related.user
     value: "{{ host.user.name }}"
     if: ctx?.host?.user?.name != null
+- append:
+    field: related.hash
+    value: "{{ process.parent.hash.sha256 }}"
+    if: ctx?.process?.parent?.hash?.sha256 != null
+- append:
+    field: related.hash
+    value: "{{ process.parent.hash.md5 }}"
+    if: ctx?.process?.parent?.hash?.md5 != null
+- append:
+    field: related.hash
+    value: "{{ process.parent.hash.sha1 }}"
+    if: ctx?.process?.parent?.hash?.sha1 != null
+- append:
+    field: related.hash
+    value: "{{ file.hash.sha256 }}"
+    if: ctx?.file?.hash?.sha256 != null
+- append:
+    field: related.hash
+    value: "{{ file.hash.md5 }}"
+    if: ctx?.file?.hash?.md5 != null
+- append:
+    field: related.hash
+    value: "{{ file.hash.sha1 }}"
+    if: ctx?.file?.hash?.sha1 != null
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.sha256 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha256 != null
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.md5 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.md5 != null
+- append:
+    field: related.hash
+    value: "{{ cisco.amp.network_info.parent.identity.sha1 }}"
+    if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha1 != null
 - foreach:
     field: cisco.amp.computer.network_addresses
     processor:
@@ -107,9 +242,21 @@ processors:
         field: cisco.amp.related.mac
         value: "{{ _ingest._value.mac }}"
     if: ctx?.cisco?.amp?.computer?.network_addresses != null
+- foreach:
+    field: cisco.amp.vulnerabilities
+    processor:
+      append:
+        field: cisco.amp.related.cve
+        value: "{{ _ingest._value.cve }}"
+    if: ctx?.cisco?.amp?.vulnerabilities != null
+
+#############
+## Cleanup ##
+#############
 - remove:
     field:
     - cisco.amp.timestamp
+    - cisco.amp.computer.links
     ignore_missing: true
 on_failure:
 - set:

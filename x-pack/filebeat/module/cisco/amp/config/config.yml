@@ -42,6 +42,7 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - decode_json_fields:
       fields: [message]
+      document_id: id
       target: json
   - add_fields:
       target: ''
