@@ -56,7 +56,7 @@ func TestReporter(t *testing.T) {
 		r3.Update(Healthy)
 
 		assert.Equal(t, Failed, r.Status())
-		assert.Equal(t, "failed", r.StatusString())
+		assert.Equal(t, "error", r.StatusString())
 	})
 
 	t.Run("failed when one failed and one degraded", func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestReporter(t *testing.T) {
 		r3.Update(Degraded)
 
 		assert.Equal(t, Failed, r.Status())
-		assert.Equal(t, "failed", r.StatusString())
+		assert.Equal(t, "error", r.StatusString())
 	})
 
 	t.Run("degraded when degraded and healthy, failed unregistered", func(t *testing.T) {

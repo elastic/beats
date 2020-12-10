@@ -29,7 +29,7 @@ var (
 	humanReadableStatuses = map[AgentStatus]string{
 		Healthy:  "online",
 		Degraded: "degraded",
-		Failed:   "failed",
+		Failed:   "error",
 	}
 )
 
