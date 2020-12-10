@@ -348,7 +348,8 @@
     {
         "event.action": "UPDATE_CALENDAR_RESOURCE_FEATURE",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -502,7 +503,8 @@
     {
         "event.action": "CHANGE_CALENDAR_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

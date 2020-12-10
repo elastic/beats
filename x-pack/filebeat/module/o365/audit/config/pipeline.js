@@ -220,33 +220,34 @@ function sharePointFileOperationSchema(debug) {
         ignore_missing: true,
         fail_on_error: false
     }));
-    builder.Add("setEventCategory", new processor.AddFields({
-        target: 'event',
-        fields: {
-            category: 'file',
-        },
-    }));
-    builder.Add("mapEventType", makeMapper({
-        from: 'o365audit.Operation',
-        to: 'event.type',
-        mappings: {
-            'FileAccessed': 'access',
-            'FileDeleted': 'deletion',
-            'FileDownloaded': 'access',
-            'FileModified': 'change',
-            'FileMoved': 'change',
-            'FileRenamed': 'change',
-            'FileRestored': 'change',
-            'FileUploaded': 'creation',
-            'FolderCopied': 'creation',
-            'FolderCreated': 'creation',
-            'FolderDeleted': 'deletion',
-            'FolderModified': 'change',
-            'FolderMoved': 'change',
-            'FolderRenamed': 'change',
-            'FolderRestored': 'change',
-        },
-    }));
+
+    var actionToCategoryType = {
+        ComplianceSettingChanged: ['configuration', 'change'],
+        FileAccessed: ['file', 'access'],
+        FileDeleted: ['file', 'deletion'],
+        FileDownloaded: ['file', 'access'],
+        FileModified: ['file', 'change'],
+        FileMoved:  ['file', 'change'],
+        FileRenamed: ['file', 'change'],
+        FileRestored: ['file', 'change'],
+        FileUploaded: ['file', 'creation'],
+        FolderCopied: ['file', 'creation'],
+        FolderCreated: ['file', 'creation'],
+        FolderDeleted: ['file', 'deletion'],
+        FolderModified: ['file', 'change'],
+        FolderMoved: ['file', 'change'],
+        FolderRenamed: ['file', 'change'],
+        FolderRestored: ['file', 'change'],
+    };
+
+    builder.Add("setEventFields", function(evt) {
+        var action = evt.Get("o365audit.Operation");
+        if (action == null) return;
+        var fields = actionToCategoryType[action];
+        if (fields == null) return;
+        evt.Put("event.category", fields[0]);
+        evt.Put("event.type", fields[1]);
+    });
     return builder.Build();
 }
 
@@ -446,10 +447,25 @@ function yammerSchema(debug) {
         // Network or verified admin changes the information that appears on
         // member profiles for network users network.
         ProcessProfileFields: [ "iam", "user"],
+        // Network or verified admin changes the Yammer network's configuration.
+        // This includes setting the interval for exporting data and enabling chat.
+        NetworkConfigurationUpdated:  [ "configuration", "change" ],
         // Verified admin updates the Yammer network's security configuration.
         // This includes setting password expiration policies and restrictions
         // on IP addresses.
-        NetworkSecurityConfigurationUpdated: [ "iam", "admin"],
+        NetworkSecurityConfigurationUpdated: [ ["iam", "configuration"], ["admin", "change"]],
+        // Verified admin updates the setting for the network data retention
+        // policy to either Hard Delete or Soft Delete. Only verified admins
+        // can perform this operation.
+        SoftDeleteSettingsUpdated: [ "configuration", "change" ],
+        // Network or verified admin changes the information that appears on
+        // member profiles for network users network.
+        ProcessProfileFields: [ "configuration", "change" ],
+        // Verified admin turns Private Content Mode on or off. This mode
+        // lets an admin view the posts in private groups and view private
+        // messages between individual users (or groups of users). Only verified
+        // admins only can perform this operation.
+        SupervisorAdminToggled: [ "configuration", "change" ],
         // User uploads a file.
         FileCreated: [ "file", "creation"],
         // User creates a group.
@@ -726,20 +742,20 @@ function AuditProcessor(tenant_names, debug) {
     }));
 
     builder.Add("extractClientIPPortBrackets", new processor.Dissect({
-        tokenizer: '[%{_ip}]:%{port}',
+        tokenizer: '[%{_ip}]:%{_port}',
         field: 'client.address',
         target_prefix: 'client',
         'when.and': [
-            {'not.has_fields': ['client._ip', 'client.port']},
+            {'not.has_fields': ['client._ip', 'client._port']},
             {'contains.client.address': ']:'},
         ],
     }));
     builder.Add("extractClientIPv4Port", new processor.Dissect({
-        tokenizer: '%{_ip}:%{port}',
+        tokenizer: '%{_ip}:%{_port}',
         field: 'client.address',
         target_prefix: 'client',
         'when.and': [
-            {'not.has_fields': ['client._ip', 'client.port']},
+            {'not.has_fields': ['client._ip', 'client._port']},
             {'contains.client.address': '.'},
             {'contains.client.address': ':'},
             // Best effort to avoid parsing IPv6-mapped IPv4 as ip:port.
@@ -754,12 +770,14 @@ function AuditProcessor(tenant_names, debug) {
             {from: "client.address", to: "client.ip", type: "ip"},
             {from: "server.address", to: "server.ip", type: "ip"},
             {from: "client._ip",     to: "client.ip", type: "ip"},
+            {from: "client._port",   to: "client.port", type: "long"},
         ],
         ignore_missing: true,
         fail_on_error: false
     }));
     builder.Add("removeTempIP", function (evt) {
         evt.Delete("client._ip");
+        evt.Delete("client._port");
     });
     builder.Add("setSrcDstFields", new processor.Convert({
         fields: [

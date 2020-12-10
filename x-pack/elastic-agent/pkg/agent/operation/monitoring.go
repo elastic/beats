@@ -188,6 +188,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
 			},
 			"index": "logs-elastic_agent-default",
 			"processors": []map[string]interface{}{
@@ -217,6 +218,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							"version":  o.agentInfo.Version(),
 							"snapshot": o.agentInfo.Snapshot(),
 						},
+					},
+				},
+				{
+					"drop_fields": map[string]interface{}{
+						"fields": []string{
+							"ecs.version", //coming from logger, already added by libbeat
+						},
+						"ignore_missing": true,
 					},
 				},
 			},
@@ -261,6 +270,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 								"version":  o.agentInfo.Version(),
 								"snapshot": o.agentInfo.Snapshot(),
 							},
+						},
+					},
+					{
+						"drop_fields": map[string]interface{}{
+							"fields": []string{
+								"ecs.version", //coming from logger, already added by libbeat
+							},
+							"ignore_missing": true,
 						},
 					},
 				},

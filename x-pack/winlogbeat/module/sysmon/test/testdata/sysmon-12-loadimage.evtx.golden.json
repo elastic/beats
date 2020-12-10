@@ -45,7 +45,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{9F32B55F-D9DE-5F98-F006-000000000600}",
+      "entity_id": "{9f32b55f-d9de-5f98-f006-000000000600}",
       "executable": "C:\\Windows\\System32\\dllhost.exe",
       "name": "dllhost.exe",
       "pid": 5184
@@ -79,7 +79,7 @@
           "id": 4796
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10685,
       "user": {

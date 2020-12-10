@@ -75,14 +75,15 @@ func (c Config) ICMP() (*common.Config, error) {
 }
 
 type InterfacesConfig struct {
-	Device                string `config:"device"`
-	Type                  string `config:"type"`
-	File                  string `config:"file"`
-	WithVlans             bool   `config:"with_vlans"`
-	BpfFilter             string `config:"bpf_filter"`
-	Snaplen               int    `config:"snaplen"`
-	BufferSizeMb          int    `config:"buffer_size_mb"`
-	EnableAutoPromiscMode bool   `config:"auto_promisc_mode"`
+	Device                string   `config:"device"`
+	Type                  string   `config:"type"`
+	File                  string   `config:"file"`
+	WithVlans             bool     `config:"with_vlans"`
+	BpfFilter             string   `config:"bpf_filter"`
+	Snaplen               int      `config:"snaplen"`
+	BufferSizeMb          int      `config:"buffer_size_mb"`
+	EnableAutoPromiscMode bool     `config:"auto_promisc_mode"`
+	InternalNetworks      []string `config:"internal_networks"`
 	TopSpeed              bool
 	Dumpfile              string
 	OneAtATime            bool

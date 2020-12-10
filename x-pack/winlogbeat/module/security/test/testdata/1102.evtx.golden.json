@@ -3,7 +3,9 @@
     "@timestamp": "2019-11-07T10:34:29.0559196Z",
     "event": {
       "action": "audit-log-cleared",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 1102,
       "kind": "event",
       "module": "security",

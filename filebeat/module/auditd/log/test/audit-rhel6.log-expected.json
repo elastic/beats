@@ -144,6 +144,7 @@
         "host.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 1162,
+        "network.direction": "egress",
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",
         "process.exit_code": 184,
         "process.name": "charon",
@@ -222,12 +223,16 @@
         "auditd.log.sequence": 19623789,
         "auditd.log.ses": "6793",
         "event.action": "user_auth",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1926,
@@ -257,12 +262,16 @@
         "auditd.log.sequence": 19623807,
         "auditd.log.ses": "12286",
         "event.action": "user_auth",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2122,
