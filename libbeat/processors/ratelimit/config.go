@@ -21,17 +21,16 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/ratelimit/algorithm"
 )
 
-// Config for rate limit processor.
-type Config struct {
-	Limit     algorithm.Rate         `config:"limit" validate:"required"`
+// config for rate limit processor.
+type config struct {
+	Limit     rate                   `config:"limit" validate:"required"`
 	Fields    []string               `config:"fields"`
 	Algorithm common.ConfigNamespace `config:"algorithm"`
 }
 
-func (c *Config) SetDefaults() error {
+func (c *config) setDefaults() error {
 	if c.Algorithm.Name() == "" {
 		cfg, err := common.NewConfigFrom(map[string]interface{}{
 			"token_bucket": map[string]interface{}{},

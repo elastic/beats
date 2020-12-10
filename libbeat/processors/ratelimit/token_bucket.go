@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package algorithm
+package ratelimit
 
 import (
 	"sync"
@@ -42,7 +42,7 @@ type bucket struct {
 type tokenBucket struct {
 	mu unison.Mutex
 
-	limit   Rate
+	limit   rate
 	depth   float64
 	buckets sync.Map
 
@@ -74,7 +74,7 @@ type tokenBucketConfig struct {
 	GC tokenBucketGCConfig `config:"gc"`
 }
 
-func newTokenBucket(config Config) (Algorithm, error) {
+func newTokenBucket(config algoConfig) (algorithm, error) {
 	cfg := tokenBucketConfig{
 		BurstMultiplier: 1.0,
 		GC: tokenBucketGCConfig{
@@ -82,13 +82,13 @@ func newTokenBucket(config Config) (Algorithm, error) {
 		},
 	}
 
-	if err := config.Config.Unpack(&cfg); err != nil {
+	if err := config.config.Unpack(&cfg); err != nil {
 		return nil, errors.Wrap(err, "could not unpack token_bucket algorithm configuration")
 	}
 
 	return &tokenBucket{
-		limit:   config.Limit,
-		depth:   config.Limit.value * cfg.BurstMultiplier,
+		limit:   config.limit,
+		depth:   config.limit.value * cfg.BurstMultiplier,
 		buckets: sync.Map{},
 		gc: struct {
 			thresholds tokenBucketGCConfig
@@ -144,7 +144,7 @@ func (b *bucket) withdraw() bool {
 	return true
 }
 
-func (b *bucket) replenish(rate Rate, clock clockwork.Clock) {
+func (b *bucket) replenish(rate rate, clock clockwork.Clock) {
 	secsSinceLastReplenish := clock.Now().Sub(b.lastReplenish).Seconds()
 	tokensToReplenish := secsSinceLastReplenish * rate.valuePerSecond()
 

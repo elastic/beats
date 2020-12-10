@@ -50,7 +50,7 @@ func TestNew(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			config := common.MustNewConfigFrom(test.config)
-			_, err := New(config)
+			_, err := new(config)
 			if test.err == "" {
 				require.NoError(t, err)
 			} else {
@@ -151,7 +151,7 @@ func TestRateLimit(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			p, err := New(common.MustNewConfigFrom(test.config))
+			p, err := new(common.MustNewConfigFrom(test.config))
 			require.NoError(t, err)
 
 			fakeClock := clockwork.NewFakeClock()

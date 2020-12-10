@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package algorithm
+package ratelimit
 
 import (
 	"fmt"
@@ -28,18 +28,18 @@ import (
 
 var registry = make(map[string]constructor, 0)
 
-// Config for rate limit algorithm.
-type Config struct {
-	// Limit is the rate limit to be enforced by the algorithm.
-	Limit Rate
+// algoConfig for rate limit algorithm.
+type algoConfig struct {
+	// limit is the rate limit to be enforced by the algorithm.
+	limit rate
 
-	// Config is any algorithm-specific additional configuration.
-	Config common.Config
+	// config is any algorithm-specific additional configuration.
+	config common.Config
 }
 
-// Algorithm is the interface that all rate limiting algorithms must
+// algorithm is the interface that all rate limiting algorithms must
 // conform to.
-type Algorithm interface {
+type algorithm interface {
 	// IsAllowed accepts a key and returns whether that key is allowed
 	// (true) or not (false). If a key is allowed, it means it is NOT
 	// rate limited. If a key is not allowed, it means it is being rate
@@ -50,15 +50,15 @@ type Algorithm interface {
 	SetClock(clockwork.Clock)
 }
 
-type constructor func(Config) (Algorithm, error)
+type constructor func(algoConfig) (algorithm, error)
 
 func register(id string, ctor constructor) {
 	registry[id] = ctor
 }
 
-// Factory returns the requested rate limiting algorithm, if one is found. If not found,
+// factory returns the requested rate limiting algorithm, if one is found. If not found,
 // an error is returned.
-func Factory(id string, config Config) (Algorithm, error) {
+func factory(id string, config algoConfig) (algorithm, error) {
 	var ctor constructor
 	var found bool
 	if ctor, found = registry[id]; !found {

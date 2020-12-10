@@ -29,37 +29,36 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/ratelimit/algorithm"
 )
 
 func init() {
-	processors.RegisterPlugin(processorName, New)
+	processors.RegisterPlugin(processorName, new)
 }
 
 const processorName = "rate_limit"
 
 type rateLimit struct {
-	config    Config
-	algorithm algorithm.Algorithm
+	config    config
+	algorithm algorithm
 	logger    *logp.Logger
 }
 
-// New constructs a new rate limit processor.
-func New(cfg *common.Config) (processors.Processor, error) {
-	var config Config
+// new constructs a new rate limit processor.
+func new(cfg *common.Config) (processors.Processor, error) {
+	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unpack processor configuration")
 	}
 
-	if err := config.SetDefaults(); err != nil {
+	if err := config.setDefaults(); err != nil {
 		return nil, errors.Wrap(err, "could not set default configuration")
 	}
 
-	algoConfig := algorithm.Config{
-		Limit:  config.Limit,
-		Config: *config.Algorithm.Config(),
+	algoConfig := algoConfig{
+		limit:  config.Limit,
+		config: *config.Algorithm.Config(),
 	}
-	algo, err := algorithm.Factory(config.Algorithm.Name(), algoConfig)
+	algo, err := factory(config.Algorithm.Name(), algoConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not construct rate limiting algorithm")
 	}

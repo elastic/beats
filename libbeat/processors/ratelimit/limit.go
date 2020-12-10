@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package algorithm
+package ratelimit
 
 import (
 	"fmt"
@@ -31,13 +31,13 @@ const (
 	unitPerHour   unit = "h"
 )
 
-type Rate struct {
+type rate struct {
 	value float64
 	unit  unit
 }
 
-// Unpack creates a Rate from the given string
-func (l *Rate) Unpack(str string) error {
+// Unpack creates a rate from the given string
+func (l *rate) Unpack(str string) error {
 	parts := strings.Split(str, "/")
 	if len(parts) != 2 {
 		return fmt.Errorf(`rate in invalid format: %v. Must be specified as "number/unit"`, str)
@@ -68,7 +68,7 @@ func (l *Rate) Unpack(str string) error {
 	return nil
 }
 
-func (l *Rate) valuePerSecond() float64 {
+func (l *rate) valuePerSecond() float64 {
 	switch l.unit {
 	case unitPerSecond:
 		return l.value
