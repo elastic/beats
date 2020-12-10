@@ -24,7 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
-* <<exported-fields-socks6>>
+* <<exported-fields-socks5>>
 * <<exported-fields-summary>>
 * <<exported-fields-tcp>>
 * <<exported-fields-tls>>
@@ -9569,12 +9569,6 @@ Duration in microseconds
 type: long
 
 --
-
-[[exported-fields-socks6]]
-== SOCKS5 proxy fields
-
-None
-
 
 [float]
 === socks5
