@@ -2,7 +2,7 @@
   type: group
   release: ga
   description: >
-    website
+    Website related metrics.
   fields:
     - name: name
       type: keyword
@@ -11,7 +11,7 @@
     - name: network
       type: group
       description: >
-        network
+        The network overview.
       fields:
         - name: bytes_received_per_sec
           type: float

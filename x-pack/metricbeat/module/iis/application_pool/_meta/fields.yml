@@ -2,7 +2,7 @@
   type: group
   release: ga
   description: >
-    application_pool
+    Application pool process stats.
   fields:
     - name: name
       type: keyword
@@ -11,7 +11,7 @@
     - name: process
       type: group
       description: >
-        process details
+        Worker process overview.
       fields:
         - name: handle_count
           type: long
@@ -52,12 +52,12 @@
     - name: net_clr
       type: group
       description: >
-        net clr
+        Common Language Runtime overview.
       fields:
         - name: finallys_per_sec
           type: float
           description: >
-            The nr of finallys per sec.
+            The number of finallys per sec.
         - name: throw_to_catch_depth_per_sec
           type: float
           description: >

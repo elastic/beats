@@ -2,12 +2,12 @@
   type: group
   release: ga
   description: >
-    webserver
+    Webserver related metrics.
   fields:
     - name: process
       type: group
       description: >
-        process details
+        The process related stats.
       fields:
         - name: cpu_usage_perc
           type: float
@@ -52,7 +52,7 @@
     - name: asp_net
       type: group
       description: >
-        net clr
+        Common Language Runtime overview.
       fields:
         - name: application_restarts
           type: float
@@ -65,7 +65,7 @@
     - name: asp_net_application
       type: group
       description: >
-       asp.net application
+       ASP.NET application overview.
       fields:
         - name: errors_total_per_sec
           type: float
@@ -90,7 +90,7 @@
     - name: cache
       type: group
       description: >
-        cache
+        The cache overview.
       fields:
         - name: current_file_cache_memory_usage
           type: float
@@ -151,7 +151,7 @@
     - name: network
       type: group
       description: >
-        network
+        The network related stats.
       fields:
         - name: anonymous_users_per_sec
           type: float
