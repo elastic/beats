@@ -1,23 +1,37 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-http_method: GET
+config_version: "2"
+
 interval: {{ .interval }}
-json_objects_array: value
-split_events_by: alerts..entities
-url: {{ .url }}
 
-oauth2: {{ .oauth2 | tojson }}
-oauth2.provider: azure
-oauth2.azure.resource: https://api.security.microsoft.com
-http_headers:
-  User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
-date_cursor.field: lastUpdateTime
-date_cursor.url_field: '$filter'
-date_cursor.value_template: 'lastUpdateTime gt {{.}}'
-date_cursor.initial_interval: 55m
-date_cursor.date_format: '2006-01-02T15:04:05.9999999Z'
+auth.oauth2: {{ .oauth2 | tojson }}
+auth.oauth2.provider: azure
+auth.oauth2.azure.resource: https://api.securitycenter.windows.com/
 
+request.url: "https://api.security.microsoft.com/api/incidents"
+request.method: GET
+request.transforms:
+  - set:
+      target: "header.User-Agent"
+      value: "MdatpPartner-Elastic-Filebeat/1.0.0"
+  - set:
+      target: "url.params.$filter"
+      value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"]]'
+      default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-55m")) "2006-01-02T15:04:05.9999999Z"]]'
+
+response.split:
+  target: body.value
+  split:
+    target: body.alerts
+    keep_parent: true
+    split:
+      target: body.alerts.entities
+      keep_parent: true
+
+cursor:
+  lastUpdateTime:
+    value: "[[.last_response.body.lastUpdateTime]]"
 
 {{ else if eq .input "file" }}
 

@@ -108,7 +108,8 @@
     {
         "event.action": "CHANGE_SITES_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -160,7 +161,8 @@
     {
         "event.action": "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

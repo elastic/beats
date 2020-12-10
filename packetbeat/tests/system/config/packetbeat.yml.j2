@@ -3,6 +3,8 @@
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
+packetbeat.interfaces.internal_networks:
+  - private
 
 {% if af_packet %}
 packetbeat.interfaces.type: af_packet
