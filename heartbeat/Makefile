@@ -8,12 +8,7 @@ TEST_ENVIRONMENT?=true
 
 # Collects all dependencies and then calls update
 .PHONY: collect
-collect: imports kibana
-
-# Generate imports for all monitors
-.PHONY: imports
-imports:
-	# No-op for heartbeat, kept for compat with other beats
+collect: kibana
 
 # Collects all module dashboards
 .PHONY: kibana

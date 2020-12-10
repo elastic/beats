@@ -268,7 +268,7 @@
                 - name: us
                   type: long
                   description: Duration in microseconds
-- key: socks6
+- key: socks5
   title: "SOCKS5 proxy"
   description:
   fields:
