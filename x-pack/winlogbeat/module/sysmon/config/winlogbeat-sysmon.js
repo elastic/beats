@@ -1564,6 +1564,7 @@ var sysmon = (function () {
             field: "dns.question.name",
             target_field: "dns.question.registered_domain",
             target_subdomain_field: "dns.question.subdomain",
+            target_etld_field: "dns.question.top_level_domain",
         })
         .Add(setRuleName)
         .Add(translateDnsQueryStatus)

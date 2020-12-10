@@ -3,7 +3,7 @@
         "@timestamp": "2020-02-28T09:42:45.000Z",
         "client.address": "79.159.10.151:12345",
         "client.ip": "79.159.10.151",
-        "client.port": "12345",
+        "client.port": 12345,
         "event.action": "GroupCreation",
         "event.category": "iam",
         "event.code": "Yammer",
@@ -54,7 +54,7 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
-        "source.port": "12345",
+        "source.port": 12345,
         "tags": [
             "forwarded"
         ],
@@ -65,7 +65,7 @@
         "@timestamp": "2020-02-28T09:39:20.000Z",
         "client.address": "[fdfd::555]:12346",
         "client.ip": "fdfd::555",
-        "client.port": "12346",
+        "client.port": 12346,
         "event.action": "GroupCreation",
         "event.category": "iam",
         "event.code": "Yammer",
@@ -106,7 +106,7 @@
         "related.ip": "fdfd::555",
         "service.type": "o365",
         "source.ip": "fdfd::555",
-        "source.port": "12346",
+        "source.port": 12346,
         "tags": [
             "forwarded"
         ],
