@@ -102,6 +102,7 @@ func newTokenBucket(config Config) (Algorithm, error) {
 		},
 		clock:  clockwork.NewRealClock(),
 		logger: logp.NewLogger("token_bucket"),
+		mu:     unison.MakeMutex(),
 	}, nil
 }
 
