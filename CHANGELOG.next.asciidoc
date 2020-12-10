@@ -40,12 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change network.direction values to ECS recommended values (inbound, outbound). {issue}12445[12445] {pull}20695[20695]
 - Docker container needs to be explicitly run as user root for auditing. {pull}21202[21202]
 - File integrity dataset no longer includes the leading dot in `file.extension` values (e.g. it will report "png" instead of ".png") to comply with ECS. {pull}21644[21644]
-
-*Filebeat*
-
-
-*Auditbeat*
-
+- Use ECS 1.7 ingress/egress network directions instead of inbound/outbound. {pull}22991[22991]
+- Use ingress/egress instead of inbound/outbound for ECS 1.7 in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
@@ -100,6 +96,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
+- Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
+- Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
 
@@ -119,19 +117,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 - Rename googlecloud module to gcp module. {pull}22246[22246]
+- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
+- Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
+- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 
 *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
-- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
-- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
-- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
-
-*Packetbeat*
-
 - Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 - Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
+- Update how Packetbeat classifies network directionality to bring it in line with ECS 1.7 {pull}22996[22996]
 
 *Winlogbeat*
 
@@ -144,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Powershell processing of downgraded engine events. {pull}18966[18966]
 - Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
 - Remove top level `hash` property from sysmon events {pull}20653[20653]
+- Use ECS 1.7 ingress/egress instead of inbound/outbound network.direction in sysmon. {pull}22997[22997]
 
 *Functionbeat*
 
@@ -220,8 +218,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix FileVersion contained in Windows exe files. {pull}22581[22581]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
+  as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
-
+- Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
 
 *Auditbeat*
 
@@ -344,6 +344,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
+- Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
 
 *Heartbeat*
 
@@ -468,6 +470,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
+- Protect against accessing an undefined variable in Security module. {pull}22937[22937]
 
 *Functionbeat*
 
@@ -538,6 +541,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 - Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
+- Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
+- Improve equals check. {pull}22778[22778]
+- Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
+- Improve event normalization performance {pull}22974[22974]
+- Add tini as init system in docker images {pull}22137[22137]
 
 *Auditbeat*
 
@@ -556,13 +564,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
+- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
 
 *Filebeat*
 
 - Set event.outcome field based on googlecloud audit log output. {pull}15731[15731]
 - Add dashboard for AWS ELB fileset. {pull}15804[15804]
 - Add dashboard for AWS vpcflow fileset. {pull}16007[16007]
-
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
@@ -721,6 +729,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL option to checkpoint module {pull}19560[19560]
 - Add max_number_of_messages config into s3 input. {pull}21993[21993]
 - Update Okta documentation for new stateful restarts. {pull}22091[22091]
+- Added support for MySQL Enterprise audit logs. {pull}22273[22273]
 - Rename googlecloud module to gcp module. {pull}22214[22214]
 - Rename awscloudwatch input to aws-cloudwatch. {pull}22228[22228]
 - Rename google-pubsub input to gcp-pubsub. {pull}22213[22213]
@@ -733,9 +742,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Nats filebeat dashboard. {pull}22726[22726]
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
+- Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
+- Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
+- Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
+- Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
+- Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
+- Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
+- Add `event.category` "configuration" to gsuite module events. {pull}23010[23010]
+- Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
+- Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
+- Add `network.direction` to auditd/log fileset. {pull}23041[23041]
+- Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 
 *Heartbeat*
 
+- Add mime type detection for http responses. {pull}22976[22976]
 
 *Journalbeat*
 
@@ -855,8 +876,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add io.ops in fields exported by system.diskio. {pull}22066[22066]
 - `kibana` module: `stats` metricset no-longer collects usage-related data. {pull}22732[22732]
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
+- Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
+- Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
 
@@ -869,6 +892,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for overriding the published index on a per-protocol/flow basis. {pull}22134[22134]
 - Change build process for x-pack distribution {pull}21979[21979]
 - Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
+- Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 
 *Functionbeat*
 
@@ -885,6 +909,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new winlogbeat security dashboard {pull}18775[18775]
 - Add `event.outcome` to events based on the audit success and audit failure keywords. {pull}20564[20564]
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
+- Add additional event categorization for security and sysmon modules. {pull}22988[22988]
+- Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 
 *Elastic Log Driver*
 
@@ -913,7 +939,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 

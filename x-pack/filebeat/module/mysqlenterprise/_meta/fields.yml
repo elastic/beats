@@ -1,0 +1,10 @@
+- key: mysqlenterprise
+  title: MySQL Enterprise
+  description: >
+    MySQL Enterprise Audit module
+  fields:
+    - name: mysqlenterprise
+      type: group
+      description: >
+        Fields from MySQL Enterprise Logs
+      fields:
