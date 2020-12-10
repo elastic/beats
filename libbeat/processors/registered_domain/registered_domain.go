@@ -108,8 +108,10 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	if p.TargetETLDField != "" {
 		tld, _ := publicsuffix.PublicSuffix(domain)
-		if _, err = event.PutValue(p.TargetETLDField, tld); err != nil && !p.IgnoreFailure {
-			return event, errors.Wrapf(err, "failed to write effective top-level domain to target field [%v]", p.TargetETLDField)
+		if tld != "" {
+			if _, err = event.PutValue(p.TargetETLDField, tld); err != nil && !p.IgnoreFailure {
+				return event, errors.Wrapf(err, "failed to write effective top-level domain to target field [%v]", p.TargetETLDField)
+			}
 		}
 	}
 

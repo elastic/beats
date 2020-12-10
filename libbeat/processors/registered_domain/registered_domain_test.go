@@ -77,12 +77,18 @@ func TestProcessorRun(t *testing.T) {
 		rd, _ := evt.GetValue("registered_domain")
 		assert.Equal(t, tc.RegisteredDomain, rd)
 
-		if tc.Subdomain != "" {
+		if tc.Subdomain == "" {
+			_, err := evt.GetValue("subdomain")
+			assert.NotNil(t, err)
+		} else {
 			subdomain, _ := evt.GetValue("subdomain")
 			assert.Equal(t, tc.Subdomain, subdomain)
 		}
 
-		if tc.ETLD != "" {
+		if tc.ETLD == "" {
+			_, err := evt.GetValue("etld")
+			assert.NotNil(t, err)
+		} else {
 			etld, _ := evt.GetValue("etld")
 			assert.Equal(t, tc.ETLD, etld)
 		}
