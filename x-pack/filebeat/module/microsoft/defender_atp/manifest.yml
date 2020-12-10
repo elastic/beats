@@ -7,14 +7,11 @@ var:
     default: 5m
   - name: date_cursor
     default:
-      value_template: "lastUpdateTime gt {{.}}"
+      cursor_template: "{{.last_response.body.lastUpdateTime}}"
+      value_template: 'lastUpdateTime gt {{formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"}}'
+      default_template: 'lastUpdateTime gt {{formatDate (now (parseDuration "-5m")) "2006-01-02T15:04:05.9999999Z"}}'
   - name: tags
     default: [defender-atp, forwarded]
-  - name: http_headers
-    default:
-      User-Agent: MdatpPartner-Elastic-Filebeat/1.0.0
-  - name: url
-    default: "https://api.securitycenter.windows.com/api/alerts?$expand=evidence"
   - name: oauth2
 
 
