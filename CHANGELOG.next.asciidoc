@@ -486,6 +486,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
 - Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
 - Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
+- Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
+- Add `event.category` "configuration" to gsuite module events. {pull}23010[23010]
+- Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
+- Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
 
 *Heartbeat*
 
