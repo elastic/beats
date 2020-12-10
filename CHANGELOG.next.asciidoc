@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 - Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
+- Update how Packetbeat classifies network directionality to bring it in line with ECS 1.7 {pull}22996[22996]
 
 *Winlogbeat*
 
@@ -487,6 +488,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
 - Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
 - Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
+- Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
+- Add `event.category` "configuration" to gsuite module events. {pull}23010[23010]
+- Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
+- Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
 - Add `network.direction` to auditd/log fileset. {pull}23041[23041]
 
 *Heartbeat*
