@@ -1325,8 +1325,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "tur90.www.home",
-            "ariatu4198.example"
+            "ariatu4198.example",
+            "tur90.www.home"
         ],
         "related.ip": [
             "10.81.202.38"
@@ -2415,8 +2415,8 @@
             "col3570.www.invalid"
         ],
         "related.user": [
-            "rcit",
-            "rroq"
+            "rroq",
+            "rcit"
         ],
         "rsa.email.email_dst": "tsed",
         "rsa.internal.messageid": "sSMTP",

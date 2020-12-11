@@ -26,8 +26,8 @@
             "rci737.www5.example"
         ],
         "related.ip": [
-            "10.206.191.17",
-            "10.176.10.114"
+            "10.176.10.114",
+            "10.206.191.17"
         ],
         "related.user": [
             "sumdo"
@@ -41,8 +41,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntium",
         "rsa.misc.action": [
-            "pisciv",
-            "Blocked"
+            "Blocked",
+            "pisciv"
         ],
         "rsa.misc.category": "umq",
         "rsa.misc.filter": "oremi",
@@ -115,8 +115,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "luptat",
         "rsa.misc.action": [
-            "tur",
-            "Allowed"
+            "Allowed",
+            "tur"
         ],
         "rsa.misc.category": "eius",
         "rsa.misc.filter": "ameaqu",
@@ -404,8 +404,8 @@
             "ollit4105.mail.localdomain"
         ],
         "related.ip": [
-            "10.66.250.92",
-            "10.183.16.166"
+            "10.183.16.166",
+            "10.66.250.92"
         ],
         "related.user": [
             "tessec"
@@ -480,8 +480,8 @@
             "cup1793.local"
         ],
         "related.ip": [
-            "10.243.224.205",
-            "10.123.104.59"
+            "10.123.104.59",
+            "10.243.224.205"
         ],
         "related.user": [
             "xercitat"
@@ -495,8 +495,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lupt",
         "rsa.misc.action": [
-            "dun",
-            "Blocked"
+            "Blocked",
+            "dun"
         ],
         "rsa.misc.category": "rsitamet",
         "rsa.misc.filter": "usmod",
@@ -860,8 +860,8 @@
             "radipisc7020.home"
         ],
         "related.ip": [
-            "10.2.53.125",
-            "10.181.80.139"
+            "10.181.80.139",
+            "10.2.53.125"
         ],
         "related.user": [
             "ihilmo"
@@ -936,8 +936,8 @@
             "uamei2493.www.test"
         ],
         "related.ip": [
-            "10.31.240.6",
-            "10.167.98.76"
+            "10.167.98.76",
+            "10.31.240.6"
         ],
         "related.user": [
             "ratvolu"
@@ -951,8 +951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "catc",
         "rsa.misc.action": [
-            "veni",
-            "Allowed"
+            "Allowed",
+            "veni"
         ],
         "rsa.misc.category": "sBono",
         "rsa.misc.filter": "isnisiu",
@@ -1012,8 +1012,8 @@
             "piscin6866.internal.host"
         ],
         "related.ip": [
-            "10.135.160.125",
-            "10.0.55.9"
+            "10.0.55.9",
+            "10.135.160.125"
         ],
         "related.user": [
             "volupta"
@@ -1240,8 +1240,8 @@
             "upida508.example"
         ],
         "related.ip": [
-            "10.91.126.231",
-            "10.201.171.120"
+            "10.201.171.120",
+            "10.91.126.231"
         ],
         "related.user": [
             "exercita"
@@ -1255,8 +1255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "umdo",
         "rsa.misc.action": [
-            "Blocked",
-            "orumSe"
+            "orumSe",
+            "Blocked"
         ],
         "rsa.misc.category": "tanimid",
         "rsa.misc.filter": "itam",
@@ -1316,8 +1316,8 @@
             "oditem5255.api.localdomain"
         ],
         "related.ip": [
-            "10.107.251.87",
-            "10.135.82.97"
+            "10.135.82.97",
+            "10.107.251.87"
         ],
         "related.user": [
             "str"
@@ -1392,8 +1392,8 @@
             "uamei2389.internal.example"
         ],
         "related.ip": [
-            "10.215.205.216",
-            "10.31.198.58"
+            "10.31.198.58",
+            "10.215.205.216"
         ],
         "related.user": [
             "aturve"
@@ -1407,8 +1407,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "oNemoeni",
         "rsa.misc.action": [
-            "Blocked",
-            "nre"
+            "nre",
+            "Blocked"
         ],
         "rsa.misc.category": "labo",
         "rsa.misc.filter": "tutlab",
@@ -1483,8 +1483,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedi",
         "rsa.misc.action": [
-            "Allowed",
-            "llitanim"
+            "llitanim",
+            "Allowed"
         ],
         "rsa.misc.category": "apariat",
         "rsa.misc.filter": "tasnulap",
@@ -1696,8 +1696,8 @@
             "licabo1493.api.corp"
         ],
         "related.ip": [
-            "10.218.98.29",
-            "10.86.22.67"
+            "10.86.22.67",
+            "10.218.98.29"
         ],
         "related.user": [
             "olori"
@@ -1787,8 +1787,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ulpa",
         "rsa.misc.action": [
-            "Allowed",
-            "gnaal"
+            "gnaal",
+            "Allowed"
         ],
         "rsa.misc.category": "nte",
         "rsa.misc.filter": "pid",
@@ -1848,8 +1848,8 @@
             "sitam5077.internal.host"
         ],
         "related.ip": [
-            "10.179.210.218",
-            "10.32.39.220"
+            "10.32.39.220",
+            "10.179.210.218"
         ],
         "related.user": [
             "boreetdo"
@@ -2015,8 +2015,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mnisiut",
         "rsa.misc.action": [
-            "mod",
-            "Allowed"
+            "Allowed",
+            "mod"
         ],
         "rsa.misc.category": "uiinea",
         "rsa.misc.filter": "aturQu",
@@ -2152,8 +2152,8 @@
             "saquaea6344.www.invalid"
         ],
         "related.ip": [
-            "10.204.214.251",
-            "10.101.38.213"
+            "10.101.38.213",
+            "10.204.214.251"
         ],
         "related.user": [
             "ueipsa"
@@ -2228,8 +2228,8 @@
             "utaliqu4248.www.localhost"
         ],
         "related.ip": [
-            "10.101.85.169",
-            "10.18.226.72"
+            "10.18.226.72",
+            "10.101.85.169"
         ],
         "related.user": [
             "rroqu"
@@ -2243,8 +2243,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "moles",
         "rsa.misc.action": [
-            "vitaed",
-            "Allowed"
+            "Allowed",
+            "vitaed"
         ],
         "rsa.misc.category": "billoi",
         "rsa.misc.filter": "suntex",
@@ -2395,8 +2395,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdolore",
         "rsa.misc.action": [
-            "onproide",
-            "Blocked"
+            "Blocked",
+            "onproide"
         ],
         "rsa.misc.category": "tvolup",
         "rsa.misc.filter": "niam",
@@ -2547,8 +2547,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tec",
         "rsa.misc.action": [
-            "Allowed",
-            "tatema"
+            "tatema",
+            "Allowed"
         ],
         "rsa.misc.category": "emullamc",
         "rsa.misc.filter": "emveleum",
@@ -2608,8 +2608,8 @@
             "ura675.mail.localdomain"
         ],
         "related.ip": [
-            "10.49.242.174",
-            "10.131.246.134"
+            "10.131.246.134",
+            "10.49.242.174"
         ],
         "related.user": [
             "umdolo"
@@ -2623,8 +2623,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tvolup",
         "rsa.misc.action": [
-            "utemvel",
-            "Allowed"
+            "Allowed",
+            "utemvel"
         ],
         "rsa.misc.category": "untutlab",
         "rsa.misc.filter": "dol",
@@ -2699,8 +2699,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ende",
         "rsa.misc.action": [
-            "doconse",
-            "Blocked"
+            "Blocked",
+            "doconse"
         ],
         "rsa.misc.category": "uovolupt",
         "rsa.misc.filter": "litesse",
@@ -2760,8 +2760,8 @@
             "eaque6543.api.domain"
         ],
         "related.ip": [
-            "10.128.184.241",
-            "10.138.188.201"
+            "10.138.188.201",
+            "10.128.184.241"
         ],
         "related.user": [
             "etur"
@@ -2775,8 +2775,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "issu",
         "rsa.misc.action": [
-            "Allowed",
-            "sed"
+            "sed",
+            "Allowed"
         ],
         "rsa.misc.category": "atur",
         "rsa.misc.filter": "iciadese",
@@ -2836,8 +2836,8 @@
             "eufug1756.mail.corp"
         ],
         "related.ip": [
-            "10.213.57.165",
-            "10.53.101.131"
+            "10.53.101.131",
+            "10.213.57.165"
         ],
         "related.user": [
             "isau"
@@ -2851,8 +2851,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ese",
         "rsa.misc.action": [
-            "litanim",
-            "Allowed"
+            "Allowed",
+            "litanim"
         ],
         "rsa.misc.category": "idata",
         "rsa.misc.filter": "urerepre",
@@ -2912,8 +2912,8 @@
             "orp5697.www.invalid"
         ],
         "related.ip": [
-            "10.243.6.41",
-            "10.55.81.14"
+            "10.55.81.14",
+            "10.243.6.41"
         ],
         "related.user": [
             "eiusmo"
@@ -2927,8 +2927,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "idolores",
         "rsa.misc.action": [
-            "lestia",
-            "Blocked"
+            "Blocked",
+            "lestia"
         ],
         "rsa.misc.category": "risni",
         "rsa.misc.filter": "emacc",
@@ -3003,8 +3003,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lit",
         "rsa.misc.action": [
-            "quu",
-            "Blocked"
+            "Blocked",
+            "quu"
         ],
         "rsa.misc.category": "oluptate",
         "rsa.misc.filter": "exercita",
@@ -3079,8 +3079,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Loremip",
         "rsa.misc.action": [
-            "quid",
-            "Allowed"
+            "Allowed",
+            "quid"
         ],
         "rsa.misc.category": "mini",
         "rsa.misc.filter": "uisnos",
@@ -3155,8 +3155,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "voluptas",
         "rsa.misc.action": [
-            "olor",
-            "Allowed"
+            "Allowed",
+            "olor"
         ],
         "rsa.misc.category": "ataevita",
         "rsa.misc.filter": "nderi",
@@ -3307,8 +3307,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "etdol",
         "rsa.misc.action": [
-            "mwrit",
-            "Blocked"
+            "Blocked",
+            "mwrit"
         ],
         "rsa.misc.category": "inim",
         "rsa.misc.filter": "aturQu",
@@ -3368,8 +3368,8 @@
             "etdolore4227.internal.corp"
         ],
         "related.ip": [
-            "10.30.87.51",
-            "10.156.177.53"
+            "10.156.177.53",
+            "10.30.87.51"
         ],
         "related.user": [
             "psaquaea"
@@ -3383,8 +3383,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatno",
         "rsa.misc.action": [
-            "ptatev",
-            "Blocked"
+            "Blocked",
+            "ptatev"
         ],
         "rsa.misc.category": "udexerc",
         "rsa.misc.filter": "ptatemse",
@@ -3459,8 +3459,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "Blocked",
-            "upta"
+            "upta",
+            "Blocked"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3520,8 +3520,8 @@
             "idexeac1655.internal.test"
         ],
         "related.ip": [
-            "10.180.150.47",
-            "10.141.195.13"
+            "10.141.195.13",
+            "10.180.150.47"
         ],
         "related.user": [
             "taliq"
@@ -3670,8 +3670,8 @@
             "tecto708.www5.example"
         ],
         "related.ip": [
-            "10.22.122.43",
-            "10.100.143.226"
+            "10.100.143.226",
+            "10.22.122.43"
         ],
         "related.user": [
             "ute"
@@ -3761,8 +3761,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dexea",
         "rsa.misc.action": [
-            "Blocked",
-            "tinvolup"
+            "tinvolup",
+            "Blocked"
         ],
         "rsa.misc.category": "ende",
         "rsa.misc.filter": "onse",
@@ -3896,8 +3896,8 @@
             "pitl6126.www.localdomain"
         ],
         "related.ip": [
-            "10.243.182.229",
-            "10.229.102.140"
+            "10.229.102.140",
+            "10.243.182.229"
         ],
         "related.user": [
             "duntut"
@@ -3968,8 +3968,8 @@
             "remaper3297.internal.test"
         ],
         "related.ip": [
-            "10.120.138.109",
-            "10.39.46.155"
+            "10.39.46.155",
+            "10.120.138.109"
         ],
         "related.user": [
             "picia"
@@ -4120,8 +4120,8 @@
             "cia5990.api.localdomain"
         ],
         "related.ip": [
-            "10.91.2.225",
-            "10.89.41.97"
+            "10.89.41.97",
+            "10.91.2.225"
         ],
         "related.user": [
             "tem"
@@ -4196,8 +4196,8 @@
             "riatu2467.lan"
         ],
         "related.ip": [
-            "10.7.18.226",
-            "10.221.20.165"
+            "10.221.20.165",
+            "10.7.18.226"
         ],
         "related.user": [
             "uasiarch"
@@ -4287,8 +4287,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inimve",
         "rsa.misc.action": [
-            "Allowed",
-            "niam"
+            "niam",
+            "Allowed"
         ],
         "rsa.misc.category": "perspici",
         "rsa.misc.filter": "uipe",
@@ -4498,8 +4498,8 @@
             "ionu3320.api.localhost"
         ],
         "related.ip": [
-            "10.195.153.42",
-            "10.250.48.82"
+            "10.250.48.82",
+            "10.195.153.42"
         ],
         "related.user": [
             "tsedquia"
@@ -4574,8 +4574,8 @@
             "remips1499.www.local"
         ],
         "related.ip": [
-            "10.60.52.219",
-            "10.252.164.230"
+            "10.252.164.230",
+            "10.60.52.219"
         ],
         "related.user": [
             "gnamali"
@@ -4589,8 +4589,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rroq",
         "rsa.misc.action": [
-            "Blocked",
-            "fdeFin"
+            "fdeFin",
+            "Blocked"
         ],
         "rsa.misc.category": "diduntut",
         "rsa.misc.filter": "ano",
@@ -4661,8 +4661,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dipisc",
         "rsa.misc.action": [
-            "turad",
-            "Allowed"
+            "Allowed",
+            "turad"
         ],
         "rsa.misc.category": "ulpaquio",
         "rsa.misc.filter": "ngelits",
@@ -4722,8 +4722,8 @@
             "iatnulap7662.internal.local"
         ],
         "related.ip": [
-            "10.120.215.174",
-            "10.248.108.55"
+            "10.248.108.55",
+            "10.120.215.174"
         ],
         "related.user": [
             "prehend"
@@ -4737,8 +4737,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rema",
         "rsa.misc.action": [
-            "Allowed",
-            "uatDu"
+            "uatDu",
+            "Allowed"
         ],
         "rsa.misc.category": "ent",
         "rsa.misc.filter": "iscivel",
@@ -4796,8 +4796,8 @@
             "sBonoru1929.example"
         ],
         "related.ip": [
-            "10.51.161.245",
-            "10.15.254.181"
+            "10.15.254.181",
+            "10.51.161.245"
         ],
         "related.user": [
             "abo"
@@ -4872,8 +4872,8 @@
             "onorumet4871.lan"
         ],
         "related.ip": [
-            "10.129.66.196",
-            "10.7.152.238"
+            "10.7.152.238",
+            "10.129.66.196"
         ],
         "related.user": [
             "equamn"
@@ -4963,8 +4963,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "orinrep",
         "rsa.misc.action": [
-            "Blocked",
-            "squirat"
+            "squirat",
+            "Blocked"
         ],
         "rsa.misc.category": "sequa",
         "rsa.misc.filter": "orainci",
@@ -5024,8 +5024,8 @@
             "beataevi7552.api.test"
         ],
         "related.ip": [
-            "10.215.63.248",
-            "10.138.0.214"
+            "10.138.0.214",
+            "10.215.63.248"
         ],
         "related.user": [
             "eavolupt"
@@ -5115,8 +5115,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tNequepo",
         "rsa.misc.action": [
-            "Allowed",
-            "rmagnido"
+            "rmagnido",
+            "Allowed"
         ],
         "rsa.misc.category": "luptatem",
         "rsa.misc.filter": "deritq",
@@ -5176,8 +5176,8 @@
             "quia7214.example"
         ],
         "related.ip": [
-            "10.91.20.27",
-            "10.193.152.42"
+            "10.193.152.42",
+            "10.91.20.27"
         ],
         "related.user": [
             "edict"
@@ -5191,8 +5191,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "plicab",
         "rsa.misc.action": [
-            "Blocked",
-            "umq"
+            "umq",
+            "Blocked"
         ],
         "rsa.misc.category": "eruntmol",
         "rsa.misc.filter": "labore",
@@ -5267,8 +5267,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnisi",
         "rsa.misc.action": [
-            "Allowed",
-            "userro"
+            "userro",
+            "Allowed"
         ],
         "rsa.misc.category": "etd",
         "rsa.misc.filter": "loremeum",
@@ -5480,8 +5480,8 @@
             "agna5654.www.corp"
         ],
         "related.ip": [
-            "10.203.47.23",
-            "10.200.74.101"
+            "10.200.74.101",
+            "10.203.47.23"
         ],
         "related.user": [
             "litesse"
@@ -5556,8 +5556,8 @@
             "ites5711.internal.host"
         ],
         "related.ip": [
-            "10.162.78.48",
-            "10.24.23.209"
+            "10.24.23.209",
+            "10.162.78.48"
         ],
         "related.user": [
             "ntore"
@@ -5784,8 +5784,8 @@
             "tiumtot3611.internal.localdomain"
         ],
         "related.ip": [
-            "10.84.9.150",
-            "10.107.68.114"
+            "10.107.68.114",
+            "10.84.9.150"
         ],
         "related.user": [
             "sequatDu"
@@ -5799,8 +5799,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnis",
         "rsa.misc.action": [
-            "uianonnu",
-            "Allowed"
+            "Allowed",
+            "uianonnu"
         ],
         "rsa.misc.category": "Excepteu",
         "rsa.misc.filter": "enimadmi",
@@ -5860,8 +5860,8 @@
             "gnaa4656.api.example"
         ],
         "related.ip": [
-            "10.124.119.48",
-            "10.26.222.144"
+            "10.26.222.144",
+            "10.124.119.48"
         ],
         "related.user": [
             "nre"
@@ -5875,8 +5875,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lloin",
         "rsa.misc.action": [
-            "ici",
-            "Blocked"
+            "Blocked",
+            "ici"
         ],
         "rsa.misc.category": "quidolor",
         "rsa.misc.filter": "nonproi",
@@ -5951,8 +5951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "antium",
-            "Allowed"
+            "Allowed",
+            "antium"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -6103,8 +6103,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tat",
         "rsa.misc.action": [
-            "Blocked",
-            "nia"
+            "nia",
+            "Blocked"
         ],
         "rsa.misc.category": "turQuis",
         "rsa.misc.filter": "nonp",
@@ -6164,8 +6164,8 @@
             "rsitame4049.internal.corp"
         ],
         "related.ip": [
-            "10.34.98.144",
-            "10.77.102.206"
+            "10.77.102.206",
+            "10.34.98.144"
         ],
         "related.user": [
             "tectobe"
@@ -6392,8 +6392,8 @@
             "uis5050.www.local"
         ],
         "related.ip": [
-            "10.97.202.149",
-            "10.13.125.101"
+            "10.13.125.101",
+            "10.97.202.149"
         ],
         "related.user": [
             "colab"
@@ -6544,8 +6544,8 @@
             "itaspe921.mail.invalid"
         ],
         "related.ip": [
-            "10.10.25.145",
-            "10.224.249.228"
+            "10.224.249.228",
+            "10.10.25.145"
         ],
         "related.user": [
             "mnisiuta"
@@ -6711,8 +6711,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ilmoles",
         "rsa.misc.action": [
-            "tatisetq",
-            "Blocked"
+            "Blocked",
+            "tatisetq"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "liquide",
@@ -6844,8 +6844,8 @@
             "icero1297.internal.domain"
         ],
         "related.ip": [
-            "10.138.193.38",
-            "10.46.71.46"
+            "10.46.71.46",
+            "10.138.193.38"
         ],
         "related.user": [
             "sintocca"
@@ -6916,8 +6916,8 @@
             "oloremeu5047.www5.invalid"
         ],
         "related.ip": [
-            "10.172.159.251",
-            "10.254.119.31"
+            "10.254.119.31",
+            "10.172.159.251"
         ],
         "related.user": [
             "usm"
@@ -6931,8 +6931,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "imadmi",
         "rsa.misc.action": [
-            "Blocked",
-            "tatemacc"
+            "tatemacc",
+            "Blocked"
         ],
         "rsa.misc.category": "tutlabor",
         "rsa.misc.filter": "eturad",
@@ -7007,8 +7007,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "isnost",
         "rsa.misc.action": [
-            "Allowed",
-            "oriosa"
+            "oriosa",
+            "Allowed"
         ],
         "rsa.misc.category": "uis",
         "rsa.misc.filter": "nemul",
@@ -7083,8 +7083,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntut",
         "rsa.misc.action": [
-            "Blocked",
-            "nima"
+            "nima",
+            "Blocked"
         ],
         "rsa.misc.category": "boru",
         "rsa.misc.filter": "umquia",
@@ -7144,8 +7144,8 @@
             "nos4114.api.lan"
         ],
         "related.ip": [
-            "10.198.84.190",
-            "10.31.58.6"
+            "10.31.58.6",
+            "10.198.84.190"
         ],
         "related.user": [
             "unt"
@@ -7220,8 +7220,8 @@
             "oremeum4231.internal.host"
         ],
         "related.ip": [
-            "10.139.90.218",
-            "10.131.81.172"
+            "10.131.81.172",
+            "10.139.90.218"
         ],
         "related.user": [
             "hende"
@@ -7235,8 +7235,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rrorsi",
         "rsa.misc.action": [
-            "exe",
-            "Allowed"
+            "Allowed",
+            "exe"
         ],
         "rsa.misc.category": "mnihi",
         "rsa.misc.filter": "consequa",
@@ -7296,8 +7296,8 @@
             "ueip6097.api.host"
         ],
         "related.ip": [
-            "10.152.217.174",
-            "10.128.43.71"
+            "10.128.43.71",
+            "10.152.217.174"
         ],
         "related.user": [
             "mquiado"
@@ -7311,8 +7311,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.action": [
-            "Blocked",
-            "temvele"
+            "temvele",
+            "Blocked"
         ],
         "rsa.misc.category": "natuser",
         "rsa.misc.filter": "amnihil",
@@ -7372,8 +7372,8 @@
             "fugiatqu7793.www.localdomain"
         ],
         "related.ip": [
-            "10.26.149.221",
-            "10.217.193.148"
+            "10.217.193.148",
+            "10.26.149.221"
         ],
         "related.user": [
             "uisa"
@@ -7448,8 +7448,8 @@
             "onsequ3168.www.corp"
         ],
         "related.ip": [
-            "10.172.17.6",
-            "10.109.192.53"
+            "10.109.192.53",
+            "10.172.17.6"
         ],
         "related.user": [
             "eprehen"
@@ -7463,8 +7463,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "temUte",
         "rsa.misc.action": [
-            "tassit",
-            "Blocked"
+            "Blocked",
+            "tassit"
         ],
         "rsa.misc.category": "ita",
         "rsa.misc.filter": "scive",
@@ -7524,8 +7524,8 @@
             "oremquel3120.internal.localhost"
         ],
         "related.ip": [
-            "10.135.38.213",
-            "10.119.106.108"
+            "10.119.106.108",
+            "10.135.38.213"
         ],
         "related.user": [
             "ore"
@@ -7539,8 +7539,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "exeacomm",
         "rsa.misc.action": [
-            "Blocked",
-            "volup"
+            "volup",
+            "Blocked"
         ],
         "rsa.misc.category": "ten",
         "rsa.misc.filter": "ssecil",

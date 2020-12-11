@@ -553,7 +553,6 @@
         "rsa.investigations.event_cat_name": "System.Alerts",
         "rsa.investigations.event_vcat": " AuditLog",
         "rsa.misc.event_type": "Alert",
-        "rsa.misc.mail_id": "",
         "rsa.network.alias_host": [
             "civeli370.www5.local"
         ],
@@ -1249,7 +1248,6 @@
         "rsa.investigations.event_cat_name": "Policies.Rules.Added",
         "rsa.investigations.event_vcat": " AuditLog",
         "rsa.misc.event_type": "PolicyAdd",
-        "rsa.misc.mail_id": "",
         "rsa.network.alias_host": [
             "torever662.www5.home"
         ],

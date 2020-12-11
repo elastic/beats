@@ -1121,7 +1121,7 @@ var ecs_mappings = {
     "user_id": {to:[{field: "user.id", setter: fld_prio, prio: 0}]},
     "username": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 1}]},
     "version": {to:[{field: "observer.version", setter: fld_set}]},
-    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1}]},
+    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1},{field: "related.hosts", setter: fld_append}]},
     "web_extension": {to:[{field: "file.extension", setter: fld_prio, prio: 0}]},
     "web_query": {to:[{field: "url.query", setter: fld_prio, prio: 1}]},
     "web_ref_domain": {to:[{field: "related.hosts", setter: fld_append}]},
@@ -2017,6 +2017,7 @@ function do_populate(evt, base, targets) {
         var mapping = targets[key];
         if (mapping === undefined) continue;
         var value = base[key];
+        if (value === "") continue;
         if (mapping.convert !== undefined) {
             value = mapping.convert(value);
             if (value === undefined) {

@@ -371,8 +371,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " RECV",
@@ -496,8 +495,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.110.109.5",
-            "10.18.165.35"
+            "10.18.165.35",
+            "10.110.109.5"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,
@@ -958,8 +957,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "equat",
-            "uptat3156.www5.test"
+            "uptat3156.www5.test",
+            "equat"
         ],
         "related.ip": [
             "10.77.137.72"
@@ -1170,8 +1169,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": "deny",
@@ -1645,8 +1643,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.code": "web",
@@ -1849,8 +1846,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " SCAN",
@@ -1866,8 +1862,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "aveni",
-            "oremagna3521.mail.home"
+            "oremagna3521.mail.home",
+            "aveni"
         ],
         "related.ip": [
             "10.29.155.171"
@@ -1934,8 +1930,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " RECV",
@@ -2051,8 +2046,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.code": "reports",
@@ -2727,8 +2721,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": "CHANGE",
@@ -3162,8 +3155,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.178.30.158",
-            "10.1.6.115"
+            "10.1.6.115",
+            "10.178.30.158"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,
@@ -3272,8 +3265,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "der",
-            "piciatis2460.api.host"
+            "piciatis2460.api.host",
+            "der"
         ],
         "related.ip": [
             "10.77.182.191"

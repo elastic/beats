@@ -616,7 +616,6 @@
         "rsa.misc.virusname": "ris",
         "rsa.network.domain": "lamcolab3252.www.invalid",
         "rsa.time.event_time": "2016-08-30T17:48:33.000Z",
-        "rsa.web.fqdn": "",
         "server.domain": "lamcolab3252.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "lamcolab3252",
@@ -1262,8 +1261,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "atise3421.www5.localdomain",
-            "estl5804.internal.local"
+            "estl5804.internal.local",
+            "atise3421.www5.localdomain"
         ],
         "related.ip": [
             "10.73.207.70",
@@ -3129,12 +3128,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevitae6868.www.corp",
-            "modi6930.internal.test"
+            "modi6930.internal.test",
+            "taevitae6868.www.corp"
         ],
         "related.ip": [
-            "10.161.1.146",
-            "10.60.164.100"
+            "10.60.164.100",
+            "10.161.1.146"
         ],
         "rsa.email.email_dst": "nproiden",
         "rsa.email.email_src": "etconse",
@@ -3841,8 +3840,8 @@
             "ncu3839.www.localhost"
         ],
         "related.ip": [
-            "10.251.183.113",
-            "10.201.105.58"
+            "10.201.105.58",
+            "10.251.183.113"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",
@@ -3885,8 +3884,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.132.139.98",
-            "10.209.203.156"
+            "10.209.203.156",
+            "10.132.139.98"
         ],
         "rsa.email.email_dst": "borisnis",
         "rsa.email.email_src": "pariat",
@@ -3901,7 +3900,6 @@
         "rsa.misc.severity": "low",
         "rsa.misc.virusname": "oremagn",
         "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
-        "rsa.web.fqdn": "",
         "service.type": "fortinet",
         "source.ip": [
             "10.209.203.156"

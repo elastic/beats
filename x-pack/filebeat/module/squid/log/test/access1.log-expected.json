@@ -26,8 +26,8 @@
             "login.yahoo.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "209.73.177.115"
+            "209.73.177.115",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -95,8 +95,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -166,8 +166,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -178,8 +178,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -235,8 +235,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -292,8 +292,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -350,8 +350,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -418,8 +418,8 @@
             "www.google-analytics.com"
         ],
         "related.ip": [
-            "66.102.9.147",
-            "10.105.21.199"
+            "10.105.21.199",
+            "66.102.9.147"
         ],
         "related.user": [
             "badeyek"
@@ -560,8 +560,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -643,8 +643,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -771,8 +771,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -824,8 +824,8 @@
             "us.bc.yahoo.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "68.142.213.132"
+            "68.142.213.132",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -891,8 +891,8 @@
             "impgb.tradedoubler.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "217.212.240.172"
+            "217.212.240.172",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -962,8 +962,8 @@
             "4.adbrite.com"
         ],
         "related.ip": [
-            "206.169.136.22",
-            "10.105.21.199"
+            "10.105.21.199",
+            "206.169.136.22"
         ],
         "related.user": [
             "badeyek"
@@ -974,8 +974,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1031,8 +1031,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1239,8 +1239,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1310,8 +1310,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "302",
@@ -1369,8 +1369,8 @@
             "dd.connextra.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "213.160.98.160"
+            "213.160.98.160",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1381,8 +1381,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1437,8 +1437,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1490,8 +1490,8 @@
             "login.yahoo.com"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "209.73.177.115"
+            "209.73.177.115",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1501,8 +1501,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1613,8 +1613,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -1682,8 +1682,8 @@
             "hi5.com"
         ],
         "related.ip": [
-            "10.105.47.218",
-            "204.13.51.238"
+            "204.13.51.238",
+            "10.105.47.218"
         ],
         "related.user": [
             "nazsoau"
@@ -1694,8 +1694,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1827,8 +1827,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1941,8 +1941,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -1998,8 +1998,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -2190,8 +2190,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "216.155.194.239"
+            "216.155.194.239",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2201,8 +2201,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2254,8 +2254,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2400,8 +2400,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2454,8 +2454,8 @@
             "address.yahoo.com"
         ],
         "related.ip": [
-            "209.191.93.51",
-            "10.105.33.214"
+            "10.105.33.214",
+            "209.191.93.51"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2525,8 +2525,8 @@
             "fxfeeds.mozilla.org"
         ],
         "related.ip": [
-            "10.105.21.199",
-            "63.245.209.21"
+            "63.245.209.21",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -2537,8 +2537,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -2592,8 +2592,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.231.252"
+            "68.142.231.252",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2780,8 +2780,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2836,8 +2836,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2947,8 +2947,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2959,8 +2959,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3014,8 +3014,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3148,8 +3148,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -3340,8 +3340,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3396,8 +3396,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3464,8 +3464,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
+            "TCP_REFRESH_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3520,8 +3520,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3588,8 +3588,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3600,8 +3600,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3656,8 +3656,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3839,8 +3839,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3963,8 +3963,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "68.142.231.252",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.231.252"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4215,8 +4215,8 @@
             "us.news1.yimg.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4295,8 +4295,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4488,8 +4488,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -4604,8 +4604,8 @@
             "us.news1.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4752,8 +4752,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4811,8 +4811,8 @@
             "us.a2.yimg.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.152"
+            "213.160.98.152",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4945,8 +4945,8 @@
             "us.bc.yahoo.com"
         ],
         "related.ip": [
-            "68.142.213.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.213.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5011,8 +5011,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5076,8 +5076,8 @@
             "pclick.internal.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "216.109.124.55"
+            "216.109.124.55",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5144,8 +5144,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "304",
@@ -5203,8 +5203,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5215,8 +5215,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -5274,8 +5274,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5286,8 +5286,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5352,8 +5352,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5764,8 +5764,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5878,8 +5878,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5932,8 +5932,8 @@
             "launch.adserver.yahoo.com"
         ],
         "related.ip": [
-            "10.105.33.214",
-            "216.109.125.112"
+            "216.109.125.112",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -6012,8 +6012,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -6195,8 +6195,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -6266,8 +6266,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -6380,8 +6380,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",

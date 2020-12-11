@@ -983,8 +983,8 @@
         "observer.vendor": "F5",
         "process.pid": 4318,
         "related.ip": [
-            "10.169.101.161",
-            "10.122.204.151"
+            "10.122.204.151",
+            "10.169.101.161"
         ],
         "rsa.internal.messageid": "01490500",
         "rsa.misc.log_session_id": "snulap",
@@ -1476,8 +1476,8 @@
         "observer.vendor": "F5",
         "process.pid": 2943,
         "related.ip": [
-            "10.142.213.80",
-            "10.16.181.60"
+            "10.16.181.60",
+            "10.142.213.80"
         ],
         "rsa.internal.messageid": "01490549",
         "rsa.misc.group": "tationu",
