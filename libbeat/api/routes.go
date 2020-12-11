@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -30,21 +32,37 @@ import (
 type handlerFunc func(http.ResponseWriter, *http.Request)
 type lookupFunc func(string) *monitoring.Namespace
 
-var handlerFuncMap = make(map[string]handlerFunc)
+var (
+	routes = &Routes{
+		routes: make(map[string]handlerFunc),
+		smux:   http.NewServeMux(),
+	}
+)
+
+func init() {
+	routes.smux.HandleFunc("/", routes.handle)
+}
 
 // NewWithDefaultRoutes creates a new server with default API routes.
 func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc) (*Server, error) {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", makeRootAPIHandler(makeAPIHandler(ns("info"))))
-	mux.HandleFunc("/state", makeAPIHandler(ns("state")))
-	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
-	mux.HandleFunc("/dataset", makeAPIHandler(ns("dataset")))
-
-	for api, h := range handlerFuncMap {
-		mux.HandleFunc(api, h)
+	defaultRoutes := map[string]handlerFunc{
+		"/":        makeRootAPIHandler(makeAPIHandler(ns("info"))),
+		"/state":   makeAPIHandler(ns("state")),
+		"/stats":   makeAPIHandler(ns("stats")),
+		"/dataset": makeAPIHandler(ns("dataset")),
 	}
-	return New(log, mux, config)
+	for api, h := range defaultRoutes {
+		if err := routes.register(api, h); err != nil {
+			return nil, err
+		}
+	}
+	if log == nil {
+		log = logp.NewLogger("")
+	}
+	if routes.log == nil {
+		routes.log = log
+	}
+	return New(log, routes.smux, config)
 }
 
 func makeRootAPIHandler(handler handlerFunc) handlerFunc {
@@ -80,7 +98,56 @@ func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
 	}
 }
 
-// AddHandlerFunc provides interface to add customized handlerFunc
-func AddHandlerFunc(api string, h handlerFunc) {
-	handlerFuncMap[api] = h
+type Routes struct {
+	routes map[string]handlerFunc
+	log    *logp.Logger
+	smux   *http.ServeMux
+	mux    sync.RWMutex
+}
+
+func (d *Routes) handle(w http.ResponseWriter, r *http.Request) {
+	d.mux.RLock()
+	defer d.mux.RUnlock()
+
+	if h, exist := d.routes[r.URL.Path]; exist {
+		h(w, r)
+		return
+	}
+
+	http.NotFound(w, r)
+}
+
+func (d *Routes) register(api string, h handlerFunc) error {
+	d.mux.Lock()
+	defer d.mux.Unlock()
+	if !strings.HasPrefix(api, "/") {
+		return fmt.Errorf("route should starts with /")
+	}
+	if _, exist := d.routes[api]; exist {
+		err := fmt.Errorf("route %s is already in use", api)
+		d.log.Error(err.Error())
+		return err
+	}
+	d.routes[api] = h
+	return nil
+}
+
+func (d *Routes) deregister(api string) error {
+	d.mux.Lock()
+	defer d.mux.Unlock()
+	if _, exist := d.routes[api]; !exist {
+		return fmt.Errorf("route %s is not registered", api)
+	}
+	delete(d.routes, api)
+	return nil
+}
+
+// Register registers an API and its http handler
+func Register(api string, h handlerFunc) error {
+	return routes.register(api, h)
+}
+
+// Deregister deregisters an API
+func Deregister(api string) error {
+	return routes.deregister(api)
 }
