@@ -26,18 +26,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// ExpandFields de-dots the keys in m by expanding them in-place into a
+// expandFields de-dots the keys in m by expanding them in-place into a
 // nested object structure, merging objects as necessary. If there are any
 // conflicts (i.e. a common prefix where one field is an object and another
 // is a non-object), an error will be returned.
 //
-// Note that ExpandFields is destructive, and in the case of an error the
+// Note that expandFields is destructive, and in the case of an error the
 // map may be left in a semi-expanded state.
-func ExpandFields(m common.MapStr) error {
+func expandFields(m common.MapStr) error {
 	for k, v := range m {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
-			if err := ExpandFields(newMap); err != nil {
+			if err := expandFields(newMap); err != nil {
 				return errors.Wrapf(err, "error expanding %q", k)
 			}
 		}

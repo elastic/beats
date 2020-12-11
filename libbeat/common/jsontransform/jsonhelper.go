@@ -30,7 +30,7 @@ import (
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
 	logger := logp.NewLogger("jsonhelper")
 	if expandKeys {
-		if err := ExpandFields(keys); err != nil {
+		if err := expandFields(keys); err != nil {
 			logger.Errorf("JSON: failed to expand fields: %s", err)
 			event.SetErrorWithOption(createJSONError(err.Error()), addErrKey)
 			return

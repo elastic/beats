@@ -121,7 +121,7 @@ func TestExpand(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		err := ExpandFields(test.Event)
+		err := expandFields(test.Event)
 		if test.Err != "" {
 			require.Error(t, err)
 			assert.Regexp(t, test.Err, err.Error())
