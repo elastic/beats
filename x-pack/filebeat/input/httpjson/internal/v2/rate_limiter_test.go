@@ -24,9 +24,9 @@ func TestGetRateLimitReturns0IfRemainingQuota(t *testing.T) {
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
-	assert.NoError(t, tplLimit.Unpack(`{{.header.Get "X-Rate-Limit-Limit"}}`))
-	assert.NoError(t, tplReset.Unpack(`{{.header.Get "X-Rate-Limit-Reset"}}`))
-	assert.NoError(t, tplRemaining.Unpack(`{{.header.Get "X-Rate-Limit-Remaining"}}`))
+	assert.NoError(t, tplLimit.Unpack(`[[.header.Get "X-Rate-Limit-Limit"]]`))
+	assert.NoError(t, tplReset.Unpack(`[[.header.Get "X-Rate-Limit-Reset"]]`))
+	assert.NoError(t, tplRemaining.Unpack(`[[.header.Get "X-Rate-Limit-Remaining"]]`))
 	rateLimit := &rateLimiter{
 		limit:     tplLimit,
 		reset:     tplReset,
@@ -47,9 +47,9 @@ func TestGetRateLimitReturns0IfEpochInPast(t *testing.T) {
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
-	assert.NoError(t, tplLimit.Unpack(`{{.header.Get "X-Rate-Limit-Limit"}}`))
-	assert.NoError(t, tplReset.Unpack(`{{.header.Get "X-Rate-Limit-Reset"}}`))
-	assert.NoError(t, tplRemaining.Unpack(`{{.header.Get "X-Rate-Limit-Remaining"}}`))
+	assert.NoError(t, tplLimit.Unpack(`[[.header.Get "X-Rate-Limit-Limit"]]`))
+	assert.NoError(t, tplReset.Unpack(`[[.header.Get "X-Rate-Limit-Reset"]]`))
+	assert.NoError(t, tplRemaining.Unpack(`[[.header.Get "X-Rate-Limit-Remaining"]]`))
 	rateLimit := &rateLimiter{
 		limit:     tplLimit,
 		reset:     tplReset,
@@ -74,9 +74,9 @@ func TestGetRateLimitReturnsResetValue(t *testing.T) {
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
-	assert.NoError(t, tplLimit.Unpack(`{{.header.Get "X-Rate-Limit-Limit"}}`))
-	assert.NoError(t, tplReset.Unpack(`{{.header.Get "X-Rate-Limit-Reset"}}`))
-	assert.NoError(t, tplRemaining.Unpack(`{{.header.Get "X-Rate-Limit-Remaining"}}`))
+	assert.NoError(t, tplLimit.Unpack(`[[.header.Get "X-Rate-Limit-Limit"]]`))
+	assert.NoError(t, tplReset.Unpack(`[[.header.Get "X-Rate-Limit-Reset"]]`))
+	assert.NoError(t, tplRemaining.Unpack(`[[.header.Get "X-Rate-Limit-Remaining"]]`))
 	rateLimit := &rateLimiter{
 		limit:     tplLimit,
 		reset:     tplReset,

@@ -3,7 +3,10 @@
     "@timestamp": "2020-04-01T14:35:47.822282Z",
     "event": {
       "action": "scheduled-task-deleted",
-      "category": "iam",
+      "category": [
+        "iam",
+        "configuration"
+      ],
       "code": 4699,
       "kind": "event",
       "module": "security",
