@@ -318,6 +318,10 @@ processors:
       if: "ctx._temp_.cisco.message_id == '302022'"
       field: "message"
       pattern: "Built %{} stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '302023'"
+      field: "message"
+      pattern: "Teardown stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} duration %{_temp_.duration_hms} forwarded bytes %{:network.bytes}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "message"
