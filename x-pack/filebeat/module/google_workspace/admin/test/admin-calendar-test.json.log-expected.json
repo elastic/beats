@@ -356,7 +356,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "UPDATE_CALENDAR_RESOURCE_FEATURE",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -513,7 +514,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CALENDAR_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",

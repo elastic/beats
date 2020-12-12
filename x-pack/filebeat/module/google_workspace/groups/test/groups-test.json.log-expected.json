@@ -277,7 +277,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_basic_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -436,7 +437,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_identity_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -491,7 +493,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "add_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -545,7 +548,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -600,7 +604,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "remove_info_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -654,7 +659,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_new_members_restrictions_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -709,7 +715,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_post_replies_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -764,7 +771,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_spam_moderation_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -819,7 +827,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_topic_setting",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",

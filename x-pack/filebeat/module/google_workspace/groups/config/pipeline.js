@@ -9,7 +9,6 @@ var groups = (function () {
         evt.Put("event.category", ["iam"]);
         evt.Put("event.type", ["group"]);
         switch (evt.Get("event.action")) {
-            case "change_acl_permission":
             case "change_basic_setting":
             case "change_identity_setting":
             case "change_info_setting":
@@ -17,6 +16,10 @@ var groups = (function () {
             case "change_post_replies_setting":
             case "change_spam_moderation_setting":
             case "change_topic_setting":
+                evt.AppendTo("event.category", "configuration");
+                evt.AppendTo("event.type", "change");
+                break;
+            case "change_acl_permission":
                 evt.AppendTo("event.type", "change");
                 break;
             case "accept_invitation":
@@ -38,11 +41,17 @@ var groups = (function () {
                 evt.AppendTo("event.type", "user");
                 break;
             case "create_group":
+                evt.AppendTo("event.type", "creation");
+                break;
             case "add_info_setting":
+                evt.AppendTo("event.category", "configuration");
                 evt.AppendTo("event.type", "creation");
                 break;
             case "delete_group":
+                evt.AppendTo("event.type", "deletion");
+                break;
             case "remove_info_setting":
+                evt.AppendTo("event.category", "configuration");
                 evt.AppendTo("event.type", "deletion");
                 break;
             case "moderate_message":

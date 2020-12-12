@@ -108,7 +108,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_DOCS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",

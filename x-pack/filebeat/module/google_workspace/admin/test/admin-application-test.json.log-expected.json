@@ -3,7 +3,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -60,7 +61,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CREATE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -116,7 +118,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "DELETE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -227,7 +230,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "GPLUS_PREMIUM_FEATURES",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -377,7 +381,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "UPDATE_MANAGED_CONFIGURATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -427,7 +432,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",

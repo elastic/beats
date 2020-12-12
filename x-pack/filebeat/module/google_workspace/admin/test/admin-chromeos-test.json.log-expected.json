@@ -3,7 +3,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_ANDROID_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -112,7 +113,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -268,7 +270,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_DEVICE_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -372,7 +375,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_PUBLIC_SESSION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -722,7 +726,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -774,7 +779,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHROME_OS_USER_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -1031,7 +1037,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
