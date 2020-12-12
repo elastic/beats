@@ -365,6 +365,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add tini as init system in docker images {pull}22137[22137]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
 - Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
+- Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 
 *Auditbeat*
 
