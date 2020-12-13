@@ -89770,6 +89770,17 @@ Module for parsing Kibana logs.
 
 
 
+*`kibana.session_id`*::
++
+--
+The ID of the user session associated with this event. Each login attempt results in a unique session id.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
+
+--
+
 *`kibana.space_id`*::
 +
 --

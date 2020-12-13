@@ -74,6 +74,11 @@ processors:
     field: kibana._audit_temp.error
 
 - rename:
+    if: ctx.kibana._audit_temp.kibana.session_id != null
+    target_field: kibana.session_id
+    field: kibana._audit_temp.kibana.session_id
+
+- rename:
     if: ctx.kibana._audit_temp.kibana.space_id != null
     target_field: kibana.space_id
     field: kibana._audit_temp.kibana.space_id

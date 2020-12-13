@@ -8,6 +8,10 @@
       description: >
         Module for parsing Kibana logs.
       fields:
+        - name: session_id
+          description: The ID of the user session associated with this event. Each login attempt results in a unique session id.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          type: keyword
         - name: space_id
           description: "The id of the space associated with this event."
           example: "default"
