@@ -14,6 +14,12 @@ var:
     default: syslog
   - name: community_id
     default: true
+  - name: internal_zones
+    default:
+      - trust
+  - name: external_zones
+    default:
+      - untrust
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

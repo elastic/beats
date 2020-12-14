@@ -5,6 +5,13 @@ max_message_size: '{{.max_message_size}}'
 expiration_timeout: '{{.expiration_timeout}}'
 queue_size: {{.queue_size}}
 
+{{if .internal_networks}}
+internal_hosts:
+{{range .internal_networks}}
+- '{{ . }}'
+{{end}}
+{{end}}
+
 {{if .timeout}}
 timeout: '{{.timeout}}'
 {{end}}
