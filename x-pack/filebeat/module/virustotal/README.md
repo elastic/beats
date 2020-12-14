@@ -106,9 +106,14 @@ Configure filebeat to use the kafka input as show above, and run it until all ev
 ```bash
 #!/bin/bash
 
-export KIBANA_API_URL='http://127.0.0.1:5601'
+# From the docs: https://www.elastic.co/guide/en/kibana/current/saved-objects-api-get.html#saved-objects-api-get-params
+# Types can be: visualization, dashboard, search, index-pattern, config, timelion-sheet
+# You can also have a map type, which isn't in the docs linked above
+
+export KIBANA_API_URL='http://elastic:password@127.0.0.1:5601'
 export OBJECTS=$(curl "${KIBANA_API_URL}/api/saved_objects/_find?fields=id&type=index-pattern&type=visualization&type=dashboard&type=search&type=index-pattern&type=timelion-sheet&type=map&per_page=1000" | jq -rc '.saved_objects[] | {"type": .type, "id": .id } | @base64')
 
+# Loops through the base64-encoded JSON objects
 for item in ${OBJECTS};
 do
   TYPE=$(echo "${item}" | base64 -d | jq -r '.type')

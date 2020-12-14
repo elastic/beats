@@ -612,6 +612,12 @@
     Fuzzy hash of the file using ssdeep.
   release: beta
   type: keyword
+- name: file.hash.tlsh
+  default_field: false
+  description: >
+    Fuzzy hash of the file using tlsh.
+  release: beta
+  type: keyword
 
 - name: file.elf
   default_field: false
@@ -680,39 +686,59 @@
       description: >
         Number of ELF Section Headers.
       type: long
+
     - name: sections
       default_field: false
       description: >
-        Section information of the ELF file.
+        Section information of the binary executable file.
       release: beta
       type: nested
       fields:
-        - name: flags
-          description: >
-            ELF Section List flags.
-          type: keyword
         - name: name
           description: >
-            ELF Section List name.
+            Binary Section name.
           type: keyword
         - name: physical_offset
           description: >
-            ELF Section List offset.
+            Binary Section offset on disk.
           type: keyword
-        - name: section_type
+        - name: physical_size
           description: >
-            ELF Section List type.
-          type: keyword
-        - name: size
-          description: >
-            ELF Section List size.
-          format: bytes
+            Binary Section size in bytes
           type: long
+          format: bytes
         - name: virtual_address
           description: >
-            ELF Section List virtual address.
+            Binary Section virtual address.
           format: string
           type: long
+        - name: virtual_size
+          description: >
+            Binary Section virtual size in bytes.
+          format: bytes
+          type: long
+        - name: flags
+          description: >
+            Binary Section flags.
+          type: keyword
+        - name: type
+          description: >
+            Binary Section type.
+          type: keyword
+        - name: segment_name
+          description: >
+            Binary Section name of containing segment.
+          type: keyword
+        - name: entropy
+          description: >
+            Binary Section measurement of Shannon entropy.
+          type: float
+        - name: chi2
+          description: >
+            Binary Section measurement of Chi squared distribution.
+          type: float
+
+
     - name: exports
       description: >
         List of exported element names and types
@@ -729,6 +755,7 @@
             Type of exported symbol
           type: keyword
           default_field: false
+
     - name: imports
       description: >
         List of imported element names and types
@@ -745,6 +772,7 @@
             Type of imported symbol
           type: keyword
           default_field: false
+
     - name: shared_libraries
       description: >
         List of shared libraries used by this ELF object
@@ -764,6 +792,7 @@
           description: >
             ELF object segment list.
           type: flattened
+
 - name: file.pe
   type: group
   fields:
@@ -777,37 +806,99 @@
           description: >
             Debug information, if present
           type: flattened
-        - name: import_list
-          default_field: false
-          description: >
-            List of all imported functions
-          type: flattened
-        - name: sections
-          default_field: false
-          description: >
-            Data about sections of compiled binary PE
-          type: flattened
-        - name: resource_details
+
+        - name: resources
           default_field: false
           type: flattened
           description: >
             If the PE contains resources, some info about them
-        - name: resource_languages
-          default_field: false
-          type: flattened
-          description: >
-            Digest of languages found in resources. Key is language (as string) and
-            value is how many resources there are having that language (as integer)
-        - name: resource_types
-          default_field: false
-          type: flattened
-          description: >
-            Digest of resource types. Key is resource type (as string) and value
-            is how many resources there are of that specific type (as integer)
-    - name: exports
-      type: keyword
+
+
+    - name: sections
+      default_field: false
       description: >
-        List of symbols exported by PE
+        Section information of the binary executable file.
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Binary Section name.
+          type: keyword
+        - name: physical_offset
+          description: >
+            Binary Section offset on disk.
+          type: keyword
+        - name: physical_size
+          description: >
+            Binary Section size in bytes
+          type: long
+          format: bytes
+        - name: virtual_address
+          description: >
+            Binary Section virtual address.
+          format: string
+          type: long
+        - name: virtual_size
+          description: >
+            Binary Section virtual size in bytes.
+          format: bytes
+          type: long
+        - name: flags
+          description: >
+            Binary Section flags.
+          type: keyword
+        - name: type
+          description: >
+            Binary Section type.
+          type: keyword
+        - name: segment_name
+          description: >
+            Binary Section name of containing segment.
+          type: keyword
+        - name: entropy
+          description: >
+            Binary Section measurement of Shannon entropy.
+          type: float
+        - name: chi2
+          description: >
+            Binary Section measurement of Chi squared distribution.
+          type: float
+
+
+    - name: exports
+      description: >
+        List of exported element names and types
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of exported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of exported symbol
+          type: keyword
+          default_field: false
+
+    - name: imports
+      description: >
+        List of imported element names and types
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of imported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of imported symbol
+          type: keyword
+          default_field: false
 
     - name: creation_date
       default_field: false
@@ -838,7 +929,8 @@
           description: >
             MD5 hash of raw icon data
           release: beta
-    - name: compiler_product_versions
+
+    - name: compilers
       type: keyword
       description: >
         Version of the compiler product.
@@ -855,6 +947,7 @@
       description: >
         Machine type of the PE file.
       type: keyword
+
     - name: overlay
       description: >
         Overlay information of the PE file.
@@ -886,10 +979,7 @@
             Size of the PE file.
           format: bytes
           type: long
-        - name: rich_pe_header_hash
-          description: >
-            Hash of the header for the PE file.
-          type: keyword
+
 - name: rule
   default_field: false
   description: >
