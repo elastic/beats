@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
+- Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
 
@@ -235,6 +236,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
+- Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 
 *Heartbeat*
 
@@ -363,6 +366,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
 - Add tini as init system in docker images {pull}22137[22137]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
+- Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
+- Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 
 *Auditbeat*
 
@@ -495,6 +500,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `event.category` "configuration" to gsuite module events. {pull}23010[23010]
 - Add `event.category` "configuration" to o365 module events. {pull}23010[23010]
 - Add `event.category` "configuration" to zoom module events. {pull}23010[23010]
+- Add `network.direction` to auditd/log fileset. {pull}23041[23041]
+- Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
+- Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
+- Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
+- Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
+- Add `observer.egress.zone` and `observer.ingress.zone` for cisco/asa and cisco/ftd filesets. {pull}23068[23068]
+- Allow cisco/asa and cisco/ftd filesets to override network directionality based off of zones. {pull}23068[23068]
+- Allow cef and checkpoint modules to override network directionality based off of zones {pull}23066[23066]
+- Add `network.direction` to netflow/log fileset. {pull}23052[23052]
+- Add the ability to override `network.direction` based on interfaces in Fortinet/firewall fileset. {pull}23072[23072]
+- Add `network.direction` override by specifying `internal_networks` in gcp module. {pull}23081[23081]
+- Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
+- Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
 
 *Heartbeat*
 
@@ -584,6 +602,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 - Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
+- Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
+- Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
 
@@ -606,6 +626,7 @@ port. {pull}19209[19209]
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
+- Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 
 *Elastic Log Driver*
 
@@ -635,7 +656,6 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
