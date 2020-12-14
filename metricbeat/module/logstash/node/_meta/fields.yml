@@ -9,12 +9,8 @@
       fields:
         - name: id
           type: keyword
-          description: >
-            TODO
         - name: hash
           type: keyword
-          description: >
-            TODO
     - name: host
       type: alias
       path: host.hostname

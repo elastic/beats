@@ -69,10 +69,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	//commonFields, err := commonFieldsMapping(content)
-	//if err != nil {
-	//	return err
-	//}
 
 	pipelinesContent, overrideClusterUUID, err := logstash.GetPipelines(m.MetricSet)
 	if err != nil {

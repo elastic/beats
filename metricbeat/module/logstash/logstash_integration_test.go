@@ -40,11 +40,11 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	//service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
-			config := getConfig(metricSet, service.Host())
+			config := getConfig(metricSet, "0.0.0.0:32773")
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			events, errs := mbtest.ReportingFetchV2Error(f)
 

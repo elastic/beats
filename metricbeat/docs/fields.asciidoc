@@ -33283,9 +33283,6 @@ node
 *`logstash.node.state.pipeline.id`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
@@ -33293,9 +33290,6 @@ type: keyword
 *`logstash.node.state.pipeline.hash`*::
 +
 --
-TODO
-
-
 type: keyword
 
 --
