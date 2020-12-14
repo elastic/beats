@@ -36,7 +36,7 @@
               type: long
             - name: partition.count
               type: long
-    - name: data.counts
+    - name: data_counts
       type: group
       fields:
         - name: field.processed.count

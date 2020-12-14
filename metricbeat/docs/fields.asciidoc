@@ -20657,49 +20657,49 @@ type: long
 --
 
 
-*`elasticsearch.ml.job.data.counts.field.processed.count`*::
+*`elasticsearch.ml.job.data_counts.field.processed.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.input.bytes`*::
+*`elasticsearch.ml.job.data_counts.input.bytes`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.input.field.count`*::
+*`elasticsearch.ml.job.data_counts.input.field.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.missing_field.count`*::
+*`elasticsearch.ml.job.data_counts.missing_field.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.out_of_order.timestamp.count`*::
+*`elasticsearch.ml.job.data_counts.out_of_order.timestamp.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.invalid_date_count`*::
+*`elasticsearch.ml.job.data_counts.invalid_date_count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.last_data_time`*::
+*`elasticsearch.ml.job.data_counts.last_data_time`*::
 +
 --
 type: long
@@ -20707,28 +20707,28 @@ type: long
 --
 
 
-*`elasticsearch.ml.job.data.counts.bucket.empty.count`*::
+*`elasticsearch.ml.job.data_counts.bucket.empty.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.bucket.sparse.count`*::
+*`elasticsearch.ml.job.data_counts.bucket.sparse.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.bucket.count`*::
+*`elasticsearch.ml.job.data_counts.bucket.count`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.processed_record_count`*::
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
 +
 --
 Processed data events.
@@ -20738,21 +20738,21 @@ type: long
 --
 
 
-*`elasticsearch.ml.job.data.counts.record.earliest.ms`*::
+*`elasticsearch.ml.job.data_counts.record.earliest.ms`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.record.latest.ms`*::
+*`elasticsearch.ml.job.data_counts.record.latest.ms`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ml.job.data.counts.record.input.count`*::
+*`elasticsearch.ml.job.data_counts.record.input.count`*::
 +
 --
 type: long
