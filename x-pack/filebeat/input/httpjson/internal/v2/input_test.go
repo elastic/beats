@@ -162,7 +162,7 @@ func TestInput(t *testing.T) {
 				},
 			},
 			handler:  defaultHandler("GET", ""),
-			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+			expected: []string{},
 		},
 		{
 			name: "Test date cursor",
@@ -308,6 +308,12 @@ func TestInput(t *testing.T) {
 
 			timeout := time.NewTimer(5 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })
+
+			if len(tc.expected) == 0 {
+				cancel()
+				assert.NoError(t, g.Wait())
+				return
+			}
 
 			var receivedCount int
 		wait:
