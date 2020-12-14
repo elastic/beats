@@ -7,6 +7,7 @@ package operation
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/hashicorp/go-multierror"
 
@@ -206,6 +207,16 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 						},
 					},
 				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
+						},
+					},
+				},
 			},
 		},
 	}
@@ -237,6 +248,16 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							"target": "event",
 							"fields": map[string]interface{}{
 								"dataset": fmt.Sprintf("elastic_agent.%s", name),
+							},
+						},
+					},
+					{
+						"add_fields": map[string]interface{}{
+							"target": "elastic_agent",
+							"fields": map[string]interface{}{
+								"id":       o.agentInfo.AgentID(),
+								"version":  o.agentInfo.Version(),
+								"snapshot": o.agentInfo.Snapshot(),
 							},
 						},
 					},
@@ -290,6 +311,16 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 						},
 					},
 				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
+						},
+					},
+				},
 			},
 		})
 	}
@@ -314,9 +345,9 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
+		logPath := a.Monitor().LogPath(a.Spec(), o.pipelineID)
 		if logPath != "" {
-			paths[a.Name()] = append(paths[a.Name()], logPath)
+			paths[strings.ReplaceAll(a.Name(), "-", "_")] = append(paths[a.Name()], logPath)
 		}
 	}
 
@@ -330,9 +361,9 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
+		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Spec(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints[a.Name()] = append(endpoints[a.Name()], metricEndpoint)
+			endpoints[strings.ReplaceAll(a.Name(), "-", "_")] = append(endpoints[a.Name()], metricEndpoint)
 		}
 	}
 

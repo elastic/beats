@@ -10768,6 +10768,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
@@ -11701,15 +11711,6 @@ SIP-specific event fields.
 
 Information about SIP traffic.
 
-
-*`sip.timestamp`*::
-+
---
-Timestamp with nano second precision.
-
-type: date_nanos
-
---
 
 *`sip.code`*::
 +

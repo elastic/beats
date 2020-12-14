@@ -1,0 +1,101 @@
+[[conditions]]
+== Conditions
+
+A condition is a boolean expression that you can specify in your agent policy
+to control whether a configuration is applied to the running {agent}. You can
+set a condition on inputs, streams, or even processors. 
+
+In this example, the input is applied if the host platform is Linux:
+
+[source,yaml]
+----
+inputs:
+  - type: logfile
+    streams:
+      - paths:
+         - /var/log/syslog
+    condition: ${host.platform} == 'linux'
+----
+
+In this example, the stream is applied if the host platform is not Windows:
+
+[source,yaml]
+----
+inputs:
+  - type: system/metrics
+    streams:
+      - metricset: load
+        data_stream.dataset: system.cpu
+        condition: ${host.platform} != 'windows'
+----
+
+In this example, the processor is applied if the host platform is not Windows:
+
+[source,yaml]
+----
+inputs:
+  - type: system/metrics
+    streams:
+      - metricset: load
+        data_stream.dataset: system.cpu
+    processors:
+      - add_fields:
+          fields:
+            platform: ${host.platform}
+          to: host
+        condition: ${host.platform} != 'windows'
+----
+
+[[condition-syntax]]
+=== Condition syntax
+
+The conditions supported by {agent} are based on {ref}/eql-syntax.html[EQL]'s
+boolean syntax, but add support for variables from providers and functions to
+manipulate the values. 
+
+**Supported operators:**
+
+* Full PEMDAS math support for `+ - * / %`.
+* Relational operators `< <= >= > == !=`
+* Logical operators `and` and `or`
+
+
+**Functions:**
+
+* Array functions <<arrayContains-function,`arrayContains`>>
+* Dict functions <<hasKey-function,`hasKey`>> (not in EQL)
+* Length functions <<length-function,`length`>>
+* Math functions <<add-function,`add`>>, <<subtract-function,`subtract`>>,
+<<multiply-function,`multiply`>>, <<divide-function,`divide`>>, <<modulo-function,`modulo`>>
+* String functions <<concat-function,`concat`>>, <<endsWith-function,`endsWith`>>,
+<<indexOf-function,`indexOf`>>, <<match-function,`match`>>, <<number-function,`number`>>,
+<<startsWith-function,`startsWith`>>, <<string-function,`string`>>,
+<<stringContains-function,`stringContains`>>
+
+**Types:**
+
+* Booleans `true` and `false`
+
+[[condition-examples]]
+=== Condition examples
+
+Run only when a specific label is included.
+
+[source,eql]
+----
+arrayContains(${docker.labels}, 'monitor')
+----
+
+Skip on Linux platform or macOS.
+
+[source,eql]
+----
+${host.platform} != "linux" and ${host.platform} != "darwin"
+----
+
+Run only for specific labels.
+
+[source,eql]
+----
+arrayContains(${docker.labels}, 'monitor') or arrayContains(${docker.label}, 'production')
+----
