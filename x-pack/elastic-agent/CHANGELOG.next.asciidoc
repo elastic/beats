@@ -54,3 +54,4 @@
 - Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]
 - Log level reloadable from fleet {pull}22690[22690]
 - Push log level downstream {pull}22815[22815]
+- Add metrics collection for Agent {pull}22793[22793]
