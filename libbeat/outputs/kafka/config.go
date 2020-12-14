@@ -68,6 +68,11 @@ type kafkaConfig struct {
 	Username           string                    `config:"username"`
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
+	Sasl               saslConfig                `config:"sasl"`
+}
+
+type saslConfig struct {
+	SaslMechanism string `config:"mechanism"`
 }
 
 type metaConfig struct {
@@ -89,6 +94,12 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
 }
+
+const (
+	saslTypePlaintext   = sarama.SASLTypePlaintext
+	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
+	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -125,6 +136,36 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
+func (c *saslConfig) configureSarama(config *sarama.Config) error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "":
+		// SASL is not enabled
+		return nil
+	case saslTypePlaintext:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
+	case saslTypeSCRAMSHA256:
+		cfgwarn.Beta("SCRAM-SHA-256 authentication for Kafka is beta.")
+
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
+		}
+	case saslTypeSCRAMSHA512:
+		cfgwarn.Beta("SCRAM-SHA-512 authentication for Kafka is beta.")
+
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
+		}
+	default:
+		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+	}
+
+	return nil
+}
+
 func readConfig(cfg *common.Config) (*kafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -156,7 +197,6 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
-
 	return nil
 }
 
@@ -181,12 +221,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	if err != nil {
 		return nil, err
 	}
+
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
 	}
 
-	if config.Kerberos.IsEnabled() {
+	switch {
+	case config.Kerberos.IsEnabled():
 		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
 
 		k.Net.SASL.Enable = true
@@ -200,12 +242,16 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
 		}
-	}
 
-	if config.Username != "" {
+	case config.Username != "":
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
+		err = config.Sasl.configureSarama(k)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// configure metadata update properties
