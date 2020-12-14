@@ -161,6 +161,65 @@ processors:
 - remove:
     field: fortinet.firewall.tunnelip
     if: "ctx.fortinet?.firewall?.tunnelip == 'N/A'"
+# Handle interface-based network directionality
+- set:
+    field: network.direction
+    value: inbound
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name)
+- set:
+    field: network.direction
+    value: outbound
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: internal
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: external
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+      ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name)
+- set:
+    field: network.direction
+    value: unknown
+    if: >
+      ctx?._temp?.external_interfaces != null &&
+      ctx?._temp?.internal_interfaces != null &&
+      ctx?.observer?.egress?.interface?.name != null &&
+      ctx?.observer?.ingress?.interface?.name != null &&
+      (
+        (
+          !ctx._temp.external_interfaces.contains(ctx.observer.egress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.egress.interface.name)
+        ) ||
+        (
+          !ctx._temp.external_interfaces.contains(ctx.observer.ingress.interface.name) &&
+          !ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
+        )
+      )
 - remove:
     field:
     - _temp

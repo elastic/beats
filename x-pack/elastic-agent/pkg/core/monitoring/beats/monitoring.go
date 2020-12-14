@@ -21,6 +21,11 @@ const (
 	mbEndpointFileFormat = "unix:///tmp/elastic-agent/%s/%s/%s.sock"
 	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
+
+	// args: pipeline name, application name
+	agentMbEndpointFileFormat = "unix:///tmp/elastic-agent/elastic-agent.sock"
+	// args: pipeline name, application name
+	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 )
 
 func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
@@ -41,4 +46,17 @@ func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID 
 		return fmt.Sprintf(logFileFormatWin, paths.Home(), pipelineID, spec.Cmd)
 	}
 	return fmt.Sprintf(logFileFormat, paths.Home(), pipelineID, spec.Cmd)
+}
+
+// AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
+func AgentMonitoringEndpoint(operatingSystem string) string {
+	if operatingSystem == "windows" {
+		return agentMbEndpointFileFormatWin
+	}
+	return agentMbEndpointFileFormat
+}
+
+// AgentPrefixedMonitoringEndpoint returns endpoint with exposed metrics for agent.
+func AgentPrefixedMonitoringEndpoint(operatingSystem string) string {
+	return httpPlusPrefix + AgentMonitoringEndpoint(operatingSystem)
 }
