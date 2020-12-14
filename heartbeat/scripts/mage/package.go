@@ -69,5 +69,5 @@ func Fields() error {
 	if err != nil {
 		return err
 	}
-	return devtools.GenerateFieldsGo("fields.yml", devtools.OSSBeatDir("include/fields.go"))
+	return devtools.GenerateFieldsGo("fields.yml", "include/fields.go")
 }
