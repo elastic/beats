@@ -181,6 +181,12 @@ level in the output document. The default is false.
 values from the decoded JSON object overwrite the fields that {beatname_uc}
 normally adds (type, source, offset, etc.) in case of conflicts.
 
+*`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
+de-dot keys in the decoded JSON, and expand them into a hierarchical object
+structure. For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+This setting should be enabled when the input is produced by an
+https://github.com/elastic/ecs-logging[ECS logger].
+
 *`add_error_key`*:: If this setting is enabled, {beatname_uc} adds a
 "error.message" and "error.type: json" key in case of JSON unmarshalling errors
 or when a `message_key` is defined in the configuration but cannot be used.
@@ -205,5 +211,4 @@ be logged. The default is false.
 Options that control how {beatname_uc} deals with log messages that span
 multiple lines. See <<multiline-examples>> for more information about
 configuring multiline options.
-
 
