@@ -7,21 +7,19 @@
         "event.original": "Jan  3 13:45:36 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:06\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23419 src=2.2.2.2:36701:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 0,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "2.2.2.2"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:06.000Z",
         "service.type": "sonicwall",
         "source.as.number": 3215,
@@ -75,21 +73,19 @@
         "event.original": "Jan  3 13:45:36 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:07\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23420 src=2.2.2.2:36702:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 414,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "2.2.2.2"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
         "source.as.number": 3215,
@@ -124,6 +120,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -151,6 +148,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -178,6 +176,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -205,6 +204,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -224,21 +224,19 @@
         "event.original": "Jan  3 13:45:40 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:10\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23421 src=2.2.2.2:36703:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 1560,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "2.2.2.2"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
         "source.as.number": 3215,
@@ -292,21 +290,19 @@
         "event.original": "Jan  3 13:45:40 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:11\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23422 src=2.2.2.2:36704:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 1974,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "2.2.2.2"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:11.000Z",
         "service.type": "sonicwall",
         "source.as.number": 3215,
@@ -379,6 +375,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -420,21 +417,19 @@
         "event.original": "Jan  3 13:45:44 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:15\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23423 src=1.1.1.1:500:WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 2780,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "1.1.1.1"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
         "source.as.number": 13335,
@@ -481,21 +476,19 @@
         "event.original": "Jan  3 13:45:45 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:15\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23424 src=192.168.115.10:11549:WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 3165,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "192.168.115.10"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
         "source.ip": [
@@ -515,21 +508,19 @@
         "event.original": "Jan  3 13:45:46 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:17\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23425 src=192.168.5.64:3182:LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 3375,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "LAN",
+        "observer.ingress.interface.name": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "192.168.5.64"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "LAN",
+        "rsa.network.sinterface": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "rsa.time.event_time": "2007-01-03T16:48:17.000Z",
         "service.type": "sonicwall",
         "source.ip": [
@@ -557,6 +548,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -584,6 +576,7 @@
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
+        "rsa.internal.event_desc": "Connection Closed",
         "rsa.internal.messageid": "537",
         "rsa.misc.action": [
             "Connection Closed"
@@ -603,21 +596,19 @@
         "event.original": "Jan  3 13:45:50 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:20\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23426 src=192.168.125.75:524:WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 4049,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "192.168.125.75"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "rsa.time.event_time": "2007-01-03T16:48:20.000Z",
         "service.type": "sonicwall",
         "source.ip": [
@@ -637,21 +628,19 @@
         "event.original": "Jan  3 13:45:50 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:21\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23427 src=192.168.6.10:28503:WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "fileset.name": "firewall",
         "input.type": "log",
-        "log.flags": [
-            "dissect_parsing_error"
-        ],
         "log.offset": 4260,
         "log.original": "Connection Opened",
-        "observer.ingress.interface.name": "WAN",
+        "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
             "192.168.6.10"
         ],
+        "rsa.internal.event_desc": "Connection Opened",
         "rsa.internal.messageid": "98",
         "rsa.internal.msg": "Connection Opened",
-        "rsa.network.sinterface": "WAN",
+        "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:21.000Z",
         "service.type": "sonicwall",
         "source.ip": [
