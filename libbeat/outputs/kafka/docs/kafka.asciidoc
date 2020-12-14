@@ -82,6 +82,7 @@ The password for connecting to Kafka.
 beta[]
 
 The SASL mechanism to use when connecting to Kafka. It can be one of:
+
 * `PLAIN` for SASL/PLAIN.
 * `SCRAM-SHA-256` for SCRAM-SHA-256.
 * `SCRAM-SHA-512` for SCRAM-SHA-512.
