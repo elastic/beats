@@ -1400,7 +1400,7 @@
         "user.name": "ciatisun"
     },
     {
-        "@timestamp": "2019-12-15T10:13:24.000Z",
+        "@timestamp": "2020-12-15T10:13:24.000Z",
         "event.code": "COS",
         "event.dataset": "juniper.junos",
         "event.module": "juniper",
@@ -1416,7 +1416,7 @@
         "rsa.internal.event_desc": "Received FC Q map",
         "rsa.internal.messageid": "COS",
         "rsa.time.day": "15",
-        "rsa.time.event_time": "2019-12-15T10:13:24.000Z",
+        "rsa.time.event_time": "2020-12-15T10:13:24.000Z",
         "rsa.time.month": "Dec",
         "service.type": "juniper",
         "tags": [
@@ -2877,7 +2877,7 @@
         ]
     },
     {
-        "@timestamp": "2019-12-14T09:24:31.000Z",
+        "@timestamp": "2020-12-14T09:24:31.000Z",
         "event.action": "udexerci",
         "event.code": "MIB2D_ATM_ERROR",
         "event.dataset": "juniper.junos",
@@ -2896,7 +2896,7 @@
         "rsa.misc.event_type": "udexerci",
         "rsa.misc.result": "failure",
         "rsa.time.day": "14",
-        "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
+        "rsa.time.event_time": "2020-12-14T09:24:31.000Z",
         "rsa.time.month": "Dec",
         "service.name": "voluptat",
         "service.type": "juniper",

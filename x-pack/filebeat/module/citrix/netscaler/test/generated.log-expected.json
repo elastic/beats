@@ -101,8 +101,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.134.175.248",
-            "10.72.11.247"
+            "10.72.11.247",
+            "10.134.175.248"
         ],
         "rsa.counters.dclass_c1": 1279,
         "rsa.db.index": "antium",
@@ -184,11 +184,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.109.68.21",
-            "10.156.210.168",
             "10.21.92.218",
-            "10.83.234.60",
-            "10.96.119.12"
+            "10.156.210.168",
+            "10.109.68.21",
+            "10.96.119.12",
+            "10.83.234.60"
         ],
         "related.user": [
             "picia"
@@ -310,8 +310,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.103.118.137",
             "10.116.193.182",
+            "10.103.118.137",
             "10.92.161.8"
         ],
         "related.user": [
@@ -403,8 +403,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.245.10.170",
-            "10.235.101.253"
+            "10.235.101.253",
+            "10.245.10.170"
         ],
         "related.user": [
             "ulapa"
@@ -1028,8 +1028,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.81.45.174",
             "10.197.6.245",
+            "10.81.45.174",
             "10.82.28.220"
         ],
         "related.user": [
@@ -1332,11 +1332,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.243.226.122",
-            "10.45.114.111",
             "10.117.94.131",
+            "10.180.83.140",
             "10.3.23.172",
-            "10.180.83.140"
+            "10.45.114.111",
+            "10.243.226.122"
         ],
         "related.user": [
             "ehender"
@@ -1457,8 +1457,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.211.163.7",
-            "10.101.172.233"
+            "10.101.172.233",
+            "10.211.163.7"
         ],
         "related.user": [
             "est"
@@ -2085,8 +2085,8 @@
         "observer.vendor": "Citrix",
         "related.ip": [
             "10.225.146.5",
-            "10.80.5.101",
-            "10.41.65.89"
+            "10.41.65.89",
+            "10.80.5.101"
         ],
         "related.user": [
             "picia"
@@ -2208,9 +2208,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.183.26.222",
+            "10.33.231.173",
             "10.22.34.206",
-            "10.33.231.173"
+            "10.183.26.222"
         ],
         "related.user": [
             "abill"
@@ -2478,8 +2478,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.197.128.162",
-            "10.187.86.64"
+            "10.187.86.64",
+            "10.197.128.162"
         ],
         "rsa.internal.messageid": "ICA_SESSION_UPDATE",
         "rsa.misc.msgIdPart1": "ICA",
@@ -2589,11 +2589,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.76.129.136",
-            "10.113.135.78",
             "10.133.153.174",
             "10.148.244.55",
-            "10.8.82.22"
+            "10.8.82.22",
+            "10.113.135.78",
+            "10.76.129.136"
         ],
         "related.user": [
             "asiar"
@@ -2738,9 +2738,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
+            "10.67.233.159",
             "10.215.229.78",
-            "10.213.112.186",
-            "10.67.233.159"
+            "10.213.112.186"
         ],
         "related.user": [
             "emquiav"
@@ -2942,10 +2942,10 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.206.5.50",
-            "10.247.251.223",
             "10.29.202.248",
-            "10.161.218.47"
+            "10.206.5.50",
+            "10.161.218.47",
+            "10.247.251.223"
         ],
         "rsa.internal.event_desc": "A Server side and a Client side TCP connection is delinked. This is not tracked by Netscaler",
         "rsa.internal.messageid": "TCP_OTHERCONN_DELINK",
@@ -3041,9 +3041,9 @@
         "observer.vendor": "Citrix",
         "observer.version": "1.897",
         "related.hosts": [
+            "ptateve165.mail.corp",
             "orisnis403.www.localhost",
-            "hend1170.www5.lan",
-            "ptateve165.mail.corp"
+            "hend1170.www5.lan"
         ],
         "related.ip": [
             "10.111.22.134"
@@ -3085,8 +3085,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.37.99.189",
-            "10.148.72.78"
+            "10.148.72.78",
+            "10.37.99.189"
         ],
         "rsa.crypto.cipher_src": "ritatis",
         "rsa.crypto.ssl_ver_src": "ugitsed",

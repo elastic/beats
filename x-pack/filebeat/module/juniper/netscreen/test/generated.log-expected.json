@@ -1387,8 +1387,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.105.212.51",
-            "10.119.53.68"
+            "10.119.53.68",
+            "10.105.212.51"
         ],
         "rsa.db.index": "giatqu",
         "rsa.internal.messageid": "00042",
@@ -1851,8 +1851,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.193.80.21",
-            "10.51.161.245"
+            "10.51.161.245",
+            "10.193.80.21"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "modi",
@@ -2398,8 +2398,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.166.144.66",
-            "10.119.181.171"
+            "10.119.181.171",
+            "10.166.144.66"
         ],
         "rsa.internal.messageid": "00625",
         "rsa.misc.hardware_id": "dol",

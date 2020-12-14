@@ -365,8 +365,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.155.162.162",
-            "10.66.171.247"
+            "10.66.171.247",
+            "10.155.162.162"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1022,8 +1022,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.168.131.247",
-            "10.136.232.108"
+            "10.136.232.108",
+            "10.168.131.247"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1752,8 +1752,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.28.226.128",
-            "10.122.76.148"
+            "10.122.76.148",
+            "10.28.226.128"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1856,8 +1856,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.98.209.10",
-            "10.31.177.226"
+            "10.31.177.226",
+            "10.98.209.10"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1888,8 +1888,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.44.47.27",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.44.47.27"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2300,8 +2300,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.166.90.130",
-            "10.73.89.189"
+            "10.73.89.189",
+            "10.166.90.130"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",

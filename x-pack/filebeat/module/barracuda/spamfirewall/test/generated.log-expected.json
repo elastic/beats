@@ -495,8 +495,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.18.165.35",
-            "10.110.109.5"
+            "10.110.109.5",
+            "10.18.165.35"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,
@@ -957,8 +957,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "uptat3156.www5.test",
-            "equat"
+            "equat",
+            "uptat3156.www5.test"
         ],
         "related.ip": [
             "10.77.137.72"
@@ -1006,8 +1006,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "vitaedi",
-            "neav6028.internal.domain"
+            "neav6028.internal.domain",
+            "vitaedi"
         ],
         "related.ip": [
             "10.128.114.77"
@@ -1862,8 +1862,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "oremagna3521.mail.home",
-            "aveni"
+            "aveni",
+            "oremagna3521.mail.home"
         ],
         "related.ip": [
             "10.29.155.171"
