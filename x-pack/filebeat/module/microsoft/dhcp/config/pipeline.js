@@ -23,7 +23,7 @@ var dup3 = match("MESSAGE#0:00/1_2", "nwparser.p0", "%{smacaddr},");
 
 var dup4 = match("MESSAGE#0:00/1_3", "nwparser.p0", "%{smacaddr},%{fld6}");
 
-var dup5 = match("MESSAGE#0:00/1_4", "nwparser.p0", "%{smacaddr}");
+var dup5 = match_copy("MESSAGE#0:00/1_4", "nwparser.p0", "smacaddr");
 
 var dup6 = setc("eventcategory","1605020000");
 
@@ -1046,7 +1046,7 @@ var part70 = match("MESSAGE#0:00/1_2", "nwparser.p0", "%{smacaddr},");
 
 var part71 = match("MESSAGE#0:00/1_3", "nwparser.p0", "%{smacaddr},%{fld6}");
 
-var part72 = match("MESSAGE#0:00/1_4", "nwparser.p0", "%{smacaddr}");
+var part72 = match_copy("MESSAGE#0:00/1_4", "nwparser.p0", "smacaddr");
 
 var select2 = linear_select([
 	dup1,
