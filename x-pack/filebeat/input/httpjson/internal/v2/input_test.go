@@ -58,9 +58,9 @@ func TestInput(t *testing.T) {
 			baseConfig: map[string]interface{}{
 				"interval":                     1,
 				"http_method":                  "GET",
-				"request.rate_limit.limit":     `{{.last_request.header.Get "X-Rate-Limit-Limit"}}`,
-				"request.rate_limit.remaining": `{{.last_request.header.Get "X-Rate-Limit-Remaining"}}`,
-				"request.rate_limit.reset":     `{{.last_request.header.Get "X-Rate-Limit-Reset"}}`,
+				"request.rate_limit.limit":     `[[.last_request.header.Get "X-Rate-Limit-Limit"]]`,
+				"request.rate_limit.remaining": `[[.last_request.header.Get "X-Rate-Limit-Remaining"]]`,
+				"request.rate_limit.reset":     `[[.last_request.header.Get "X-Rate-Limit-Reset"]]`,
 			},
 			handler:  rateLimitHandler(),
 			expected: []string{`{"hello":"world"}`},
@@ -162,7 +162,7 @@ func TestInput(t *testing.T) {
 				},
 			},
 			handler:  defaultHandler("GET", ""),
-			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+			expected: []string{},
 		},
 		{
 			name: "Test date cursor",
@@ -187,14 +187,14 @@ func TestInput(t *testing.T) {
 					map[string]interface{}{
 						"set": map[string]interface{}{
 							"target":  "url.params.$filter",
-							"value":   "alertCreationTime ge {{.cursor.timestamp}}",
-							"default": `alertCreationTime ge {{formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"}}`,
+							"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+							"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 						},
 					},
 				},
 				"cursor": map[string]interface{}{
 					"timestamp": map[string]interface{}{
-						"value": `{{index .last_response.body "@timestamp"}}`,
+						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
 			},
@@ -224,7 +224,7 @@ func TestInput(t *testing.T) {
 					map[string]interface{}{
 						"set": map[string]interface{}{
 							"target": "url.params.page",
-							"value":  "{{.last_response.body.nextPageToken}}",
+							"value":  "[[.last_response.body.nextPageToken]]",
 						},
 					},
 				},
@@ -248,7 +248,7 @@ func TestInput(t *testing.T) {
 					map[string]interface{}{
 						"set": map[string]interface{}{
 							"target": "url.params.page",
-							"value":  `{{index (index .last_response.body 0) "nextPageToken"}}`,
+							"value":  `[[index (index .last_response.body 0) "nextPageToken"]]`,
 						},
 					},
 				},
@@ -308,6 +308,12 @@ func TestInput(t *testing.T) {
 
 			timeout := time.NewTimer(5 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })
+
+			if len(tc.expected) == 0 {
+				cancel()
+				assert.NoError(t, g.Wait())
+				return
+			}
 
 			var receivedCount int
 		wait:

@@ -14,6 +14,7 @@ import (
 
 var (
 	errEmptyField       = errors.New("the requested field is empty")
+	errEmptyRootField   = errors.New("the requested root field is empty")
 	errExpectedSplitArr = errors.New("split was expecting field to be an array")
 	errExpectedSplitObj = errors.New("split was expecting field to be an object")
 )
@@ -26,6 +27,7 @@ type split struct {
 	child      *split
 	keepParent bool
 	keyField   string
+	isRoot     bool
 }
 
 func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
@@ -37,11 +39,8 @@ func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if split.targetInfo.Type != targetBody {
-		return nil, fmt.Errorf("invalid target type: %s", split.targetInfo.Type)
-	}
-
+	// we want to be able to identify which split is the root of the chain
+	split.isRoot = true
 	return split, nil
 }
 
@@ -51,6 +50,10 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		return nil, err
 	}
 
+	if ti.Type != targetBody {
+		return nil, fmt.Errorf("invalid target type: %s", ti.Type)
+	}
+
 	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, log)
 	if err != nil {
 		return nil, err
@@ -58,7 +61,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 
 	var s *split
 	if c.Split != nil {
-		s, err = newSplitResponse(c.Split, log)
+		s, err = newSplit(c.Split, log)
 		if err != nil {
 			return nil, err
 		}
@@ -87,6 +90,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 	}
 
 	if v == nil {
+		if s.isRoot {
+			return errEmptyRootField
+		}
 		ch <- maybeMsg{msg: root}
 		return errEmptyField
 	}
@@ -99,6 +105,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(varr) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
 			ch <- maybeMsg{msg: root}
 			return errEmptyField
 		}
@@ -117,6 +126,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(vmap) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
 			ch <- maybeMsg{msg: root}
 			return errEmptyField
 		}

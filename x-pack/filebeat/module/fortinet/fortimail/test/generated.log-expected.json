@@ -44,6 +44,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "sperna884.internal.domain"
+        ],
         "related.ip": [
             "10.165.201.71"
         ],
@@ -283,6 +286,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "uradi7307.internal.corp"
+        ],
         "related.ip": [
             "10.118.96.139"
         ],
@@ -590,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.179.124.125",
-            "10.177.36.38"
+            "10.177.36.38",
+            "10.179.124.125"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -610,8 +616,10 @@
         "rsa.misc.virusname": "ris",
         "rsa.network.domain": "lamcolab3252.www.invalid",
         "rsa.time.event_time": "2016-08-30T17:48:33.000Z",
-        "rsa.web.fqdn": "",
         "server.domain": "lamcolab3252.www.invalid",
+        "server.registered_domain": "www.invalid",
+        "server.subdomain": "lamcolab3252",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.179.124.125"
@@ -789,6 +797,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "str976.internal.localhost"
+        ],
         "related.ip": [
             "10.166.225.26"
         ],
@@ -828,6 +839,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "molli4306.www5.home"
+        ],
         "related.ip": [
             "10.218.243.47"
         ],
@@ -993,9 +1007,12 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "lapariat7287.internal.host"
+        ],
         "related.ip": [
-            "10.140.7.83",
-            "10.68.246.187"
+            "10.68.246.187",
+            "10.140.7.83"
         ],
         "rsa.email.email_dst": "gna",
         "rsa.email.email_src": "icabo",
@@ -1245,11 +1262,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
+            "estl5804.internal.local",
             "atise3421.www5.localdomain"
         ],
         "related.ip": [
-            "10.73.207.70",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.73.207.70"
         ],
         "rsa.email.email_dst": "rumSecti",
         "rsa.email.email_src": "taut",
@@ -1270,6 +1288,9 @@
         "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
         "rsa.web.fqdn": "estl5804.internal.local",
         "server.domain": "atise3421.www5.localdomain",
+        "server.registered_domain": "www5.localdomain",
+        "server.subdomain": "atise3421",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.73.207.70"
@@ -1947,6 +1968,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "edolori3822.api.home"
+        ],
         "related.ip": [
             "10.63.177.46"
         ],
@@ -2145,6 +2169,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "magnam3267.corp"
+        ],
         "related.ip": [
             "10.95.32.86"
         ],
@@ -2437,6 +2464,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "orroquis5179.local"
+        ],
         "related.ip": [
             "10.252.96.71"
         ],
@@ -2477,6 +2507,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "luptasnu757.www.home"
+        ],
         "related.ip": [
             "10.174.210.232"
         ],
@@ -2647,11 +2680,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "mveni5084.internal.local"
+            "mveni5084.internal.local",
+            "taevit4968.mail.local"
         ],
         "related.ip": [
-            "10.144.111.42",
-            "10.62.61.1"
+            "10.62.61.1",
+            "10.144.111.42"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -2672,6 +2706,9 @@
         "rsa.time.event_time": "2018-08-29T16:59:40.000Z",
         "rsa.web.fqdn": "taevit4968.mail.local",
         "server.domain": "mveni5084.internal.local",
+        "server.registered_domain": "internal.local",
+        "server.subdomain": "mveni5084",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.144.111.42"
@@ -2953,6 +2990,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "olaboris3175.internal.home"
+        ],
         "related.ip": [
             "10.250.94.95"
         ],
@@ -3091,11 +3131,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevitae6868.www.corp"
+            "taevitae6868.www.corp",
+            "modi6930.internal.test"
         ],
         "related.ip": [
-            "10.161.1.146",
-            "10.60.164.100"
+            "10.60.164.100",
+            "10.161.1.146"
         ],
         "rsa.email.email_dst": "nproiden",
         "rsa.email.email_src": "etconse",
@@ -3116,6 +3157,9 @@
         "rsa.time.event_time": "2019-01-19T15:25:23.000Z",
         "rsa.web.fqdn": "modi6930.internal.test",
         "server.domain": "taevitae6868.www.corp",
+        "server.registered_domain": "www.corp",
+        "server.subdomain": "taevitae6868",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.60.164.100"
@@ -3191,11 +3235,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
+            "uradip7802.mail.example",
             "tetura7106.www5.corp"
         ],
         "related.ip": [
-            "10.44.35.57",
-            "10.93.239.216"
+            "10.93.239.216",
+            "10.44.35.57"
         ],
         "rsa.email.email_dst": "ciun",
         "rsa.email.email_src": "vento",
@@ -3216,6 +3261,9 @@
         "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "rsa.web.fqdn": "uradip7802.mail.example",
         "server.domain": "tetura7106.www5.corp",
+        "server.registered_domain": "www5.corp",
+        "server.subdomain": "tetura7106",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.44.35.57"
@@ -3793,6 +3841,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "ncu3839.www.localhost"
+        ],
         "related.ip": [
             "10.201.105.58",
             "10.251.183.113"
@@ -3838,8 +3889,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.132.139.98",
-            "10.209.203.156"
+            "10.209.203.156",
+            "10.132.139.98"
         ],
         "rsa.email.email_dst": "borisnis",
         "rsa.email.email_src": "pariat",
@@ -3854,7 +3905,6 @@
         "rsa.misc.severity": "low",
         "rsa.misc.virusname": "oremagn",
         "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
-        "rsa.web.fqdn": "",
         "service.type": "fortinet",
         "source.ip": [
             "10.209.203.156"
@@ -3998,6 +4048,9 @@
         "observer.product": "FortiMail",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "ion3339.www.localdomain"
+        ],
         "related.ip": [
             "10.209.124.81"
         ],

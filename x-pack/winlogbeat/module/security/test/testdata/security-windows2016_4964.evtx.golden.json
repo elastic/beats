@@ -3,7 +3,9 @@
     "@timestamp": "2020-03-21T23:50:34.347458Z",
     "event": {
       "action": "logged-in-special",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4964,
       "kind": "event",
       "module": "security",
@@ -70,7 +72,9 @@
     "@timestamp": "2020-03-24T16:36:59.5703294Z",
     "event": {
       "action": "logged-in-special",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4964,
       "kind": "event",
       "module": "security",

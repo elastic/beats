@@ -3,7 +3,9 @@
     "@timestamp": "2019-12-18T16:22:12.3112534Z",
     "event": {
       "action": "added-computer-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4741,
       "kind": "event",
       "module": "security",
