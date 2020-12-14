@@ -73,8 +73,6 @@ type kafkaConfig struct {
 
 type saslConfig struct {
 	SaslMechanism string `config:"mechanism"`
-	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
-	//SaslPassword  string `config:"password"`
 }
 
 type metaConfig struct {
