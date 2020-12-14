@@ -143,7 +143,7 @@
             },
             "id": "a096b830-4762-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "dashboard": "7.9.3"
+                "dashboard": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -274,7 +274,7 @@
             },
             "id": "2dbb8f90-4760-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -361,7 +361,7 @@
             },
             "id": "3a3914d0-4761-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -455,7 +455,7 @@
             },
             "id": "2b2d58b0-4762-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -528,7 +528,7 @@
             },
             "id": "81d83c70-4762-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -601,7 +601,7 @@
             },
             "id": "8b34a100-4762-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -671,7 +671,7 @@
             },
             "id": "6e3285d0-4763-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
@@ -751,7 +751,7 @@
             },
             "id": "d186fd50-4763-11e9-8062-c98a86cb6f94",
             "migrationVersion": {
-                "visualization": "7.10.0"
+                "visualization": "7.4.2"
             },
             "namespaces": [
                 "default"
