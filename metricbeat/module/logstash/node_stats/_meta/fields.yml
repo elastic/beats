@@ -128,21 +128,6 @@
             - name: queue_push_duration_in_millis
               type: float
               description: queue_push_duration_in_millis
-    - name: os
-      type: group
-      fields:
-        - name: cpu
-          type: group
-          fields:
-            - name: load_average
-              type: group
-              fields:
-                - name: 15m
-                  type: long
-                - name: 1m
-                  type: long
-                - name: 5m
-                  type: long
         - name: cgroup
           type: group
           fields:

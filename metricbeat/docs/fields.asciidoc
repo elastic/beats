@@ -33621,31 +33621,7 @@ type: float
 --
 
 
-
-
-*`logstash.node.stats.os.cpu.load_average.15m`*::
-+
---
-type: long
-
---
-
-*`logstash.node.stats.os.cpu.load_average.1m`*::
-+
---
-type: long
-
---
-
-*`logstash.node.stats.os.cpu.load_average.5m`*::
-+
---
-type: long
-
---
-
-
-*`logstash.node.stats.os.cgroup.cpuacct.usage_nanos`*::
+*`logstash.node.stats.pipelines.cgroup.cpuacct.usage_nanos`*::
 +
 --
 type: long
@@ -33654,21 +33630,21 @@ type: long
 
 
 
-*`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
+*`logstash.node.stats.pipelines.cgroup.cpu.stat.number_of_elapsed_periods`*::
 +
 --
 type: long
 
 --
 
-*`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
+*`logstash.node.stats.pipelines.cgroup.cpu.stat.time_throttled_nanos`*::
 +
 --
 type: long
 
 --
 
-*`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
+*`logstash.node.stats.pipelines.cgroup.cpu.stat.number_of_times_throttled`*::
 +
 --
 type: long
