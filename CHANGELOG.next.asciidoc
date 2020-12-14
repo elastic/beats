@@ -344,8 +344,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 
 *Heartbeat*
 
@@ -541,11 +543,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 - Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
+- Add `expand_keys` option to `decode_json_fields` processor and `json` input, to recusively de-dot and expand json keys into hierarchical object structures {pull}22849[22849]
 - Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
 - Improve equals check. {pull}22778[22778]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
 - Improve event normalization performance {pull}22974[22974]
 - Add tini as init system in docker images {pull}22137[22137]
+- Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
+- Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 
 *Auditbeat*
 
@@ -742,6 +747,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve Nats filebeat dashboard. {pull}22726[22726]
 - Add support for UNIX datagram sockets in `unix` input. {issues}18632[18632] {pull}22699[22699]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
+- Add support for Snyk Vulnerability and Audit API. {pull}22677[22677]
 - Add logic for external network.direction in sophos xg fileset {pull}22973[22973]
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
@@ -755,6 +761,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network.direction` to auditd/log fileset. {pull}23041[23041]
 - Preserve AWS CloudTrail eventCategory in aws.cloudtrail.event_category. {issue}22776[22776] {pull}22805[22805]
 - Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
+- Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
+- Add top_level_domain enrichment for suricata/eve fileset. {pull}23046[23046]
+- Add top_level_domain enrichment for zeek/dns fileset. {pull}23046[23046]
+- Add `observer.egress.zone` and `observer.ingress.zone` for cisco/asa and cisco/ftd filesets. {pull}23068[23068]
+- Allow cisco/asa and cisco/ftd filesets to override network directionality based off of zones. {pull}23068[23068]
+- Add `network.direction` to netflow/log fileset. {pull}23052[23052]
+- Allow cef and checkpoint modules to override network directionality based off of zones {pull}23066[23066]
+- Add the ability to override `network.direction` based on interfaces in Fortinet/firewall fileset. {pull}23072[23072]
+- Add `network.direction` override by specifying `internal_networks` in gcp module. {pull}23081[23081]
+- Migrate okta to httpjson v2 config {pull}23059[23059]
+- Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 
 *Heartbeat*
 
@@ -880,6 +897,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust the Apache status fields in the fleet mode. {pull}22821[22821]
 - Add AWS Fargate overview dashboard. {pull}22941[22941]
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
+- Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 
 *Packetbeat*
@@ -912,6 +930,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
+- Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 
 *Elastic Log Driver*
 
