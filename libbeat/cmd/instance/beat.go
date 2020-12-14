@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -238,7 +239,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Name:            hostname,
 			Hostname:        hostname,
 			ID:              id,
-			EphemeralID:     ephemeralID,
+			EphemeralID:     metrics.EphemeralID(),
 		},
 		Fields: fields,
 	}
@@ -317,7 +318,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = setupMetrics(b.Info.Beat)
+	err = metrics.SetupMetrics(b.Info.Beat)
 	if err != nil {
 		return nil, err
 	}

@@ -15,9 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !windows
+// +build !linux
+// +build !freebsd !cgo
 
-package instance
+package metrics
 
-// Counting number of open handles is only supported on Windows.
-func setupWindowsHandlesMetrics() {}
+// FDUsage is only supported on Linux and FreeBSD.
+func setupLinuxBSDFDMetrics() {}

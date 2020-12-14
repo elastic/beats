@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
+- Adds negative body match. {pull}20728[20728]
 
 *Journalbeat*
 
@@ -494,6 +495,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
+- Add `subbdomain` fields for rsa2elk modules. {pull}23035[23035]
 - Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
 - Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
 - Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
@@ -515,6 +517,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
 - Migrate okta to httpjson v2 config {pull}23059[23059]
 - Add support for Snyk Vulnerability and Audit API. {pull}22677[22677]
+- Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 
 *Heartbeat*
 
