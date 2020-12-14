@@ -7,7 +7,6 @@ package browser
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
 	"sync"
@@ -15,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
