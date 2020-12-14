@@ -68,7 +68,11 @@ func TestPackages() error {
 
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Config)
+	mg.SerialDeps(Fields, Config)
+}
+
+func Fields() error {
+	return heartbeat.Fields()
 }
 
 // Config generates both the short/reference/docker configs.
