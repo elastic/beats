@@ -17,7 +17,7 @@
 
 // +build darwin,cgo freebsd,cgo linux windows
 
-package instance
+package metrics
 
 import (
 	"fmt"
@@ -46,7 +46,7 @@ func init() {
 	systemMetrics = monitoring.Default.NewRegistry("system")
 }
 
-func setupMetrics(name string) error {
+func SetupMetrics(name string) error {
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
 
 	//if the beat name is longer than 15 characters, truncate it so we don't fail process checks later on
@@ -102,6 +102,7 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 	monitoring.ReportInt(V, "memory_total", int64(stats.TotalAlloc))
 	if m == monitoring.Full {
 		monitoring.ReportInt(V, "memory_alloc", int64(stats.Alloc))
+		monitoring.ReportInt(V, "memory_sys", int64(stats.Sys))
 		monitoring.ReportInt(V, "gc_next", int64(stats.NextGC))
 	}
 
