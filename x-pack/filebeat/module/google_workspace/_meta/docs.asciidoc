@@ -1,20 +1,13 @@
-////
-This file is generated! See scripts/docs_collector.py
-////
-
-[[filebeat-module-gsuite]]
 [role="xpack"]
 
-:modulename: gsuite
+:modulename: google_workspace
 :has-dashboards: false
 
-== GSuite module
+== Google Workspace module
 
 beta[]
 
-deprecated::[7.12]
-
-This is a module for ingesting data from the different GSuite audit reports API's.
+This is a module for ingesting data from the different Google Workspace audit reports APIs.
 
 include::../include/gs-link.asciidoc[]
 
@@ -25,7 +18,7 @@ It is compatible with a subset of applications under the https://developers.goog
 
 [options="header"]
 |===========================================================================================================================================================================================================================
-| GSuite Service                                                                                                                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                               |
+| Google Workspace Service                                                                                                                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                               |
 | SAML https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml[api docs] https://support.google.com/a/answer/7007375?hl=en&ref_topic=9027054[help]                        | View users’ successful and failed sign-ins to SAML applications.                                                                                                            |
 | User Accounts https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts[api docs] https://support.google.com/a/answer/9022875?hl=en&ref_topic=9027054[help]      | Audit actions carried out by users on their own accounts including password changes, account recovery details and 2-Step Verification enrollment.                                                    |
 | Login https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login[api docs] https://support.google.com/a/answer/4580120?hl=en&ref_topic=9027054[help]                      | Track user sign-in activity to your domain.                                                                                                                  |
@@ -40,8 +33,8 @@ It is compatible with a subset of applications under the https://developers.goog
 In order for Filebeat to ingest data from the Google Reports API you must:
 
 - Have an *administrator account*.
-- https://support.google.com/gsuitemigrate/answer/9222993?hl=en[Set up a ServiceAccount] using the administrator account.
-- https://support.google.com/gsuitemigrate/answer/9222865?hl=en[Set up access to the Admin SDK API] for the ServiceAccount.
+- https://support.google.com/workspacemigrate/answer/9222993?hl=en[Set up a ServiceAccount] using the administrator account.
+- https://support.google.com/workspacemigrate/answer/9222865?hl=en[Set up access to the Admin SDK API] for the ServiceAccount.
 - https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Enable Domain-Wide Delegation] for your ServiceAccount.
 
 This module will make use of the following *oauth2 scope*:
@@ -56,7 +49,7 @@ you can set up your module:
 
 [source,yaml]
 ----
-- module: gsuite
+- module: google_workspace
   saml:
     enabled: true
     var.jwt_file: "./credentials_file.json"
@@ -102,25 +95,25 @@ Duration of the time limit on HTTP requests made by the module. Defaults to
 
 Duration between requests to the API. Defaults to `2h`.
 
-NOTE: GSuite defaults to a 2 hour polling interval because Google reports can go from
+NOTE: Google Workspace defaults to a 2 hour polling interval because Google reports can go from
 some minutes up to 3 days of delay. For more details on this, you can read more https://support.google.com/a/answer/7061566[here].
 
 *`var.user_key`*::
 
 Specifies the user key to fetch reports from. Defaults to `all`.
 
-*`var.initial_interval`*::
+*`var.cursor_default_tpl`*::
 
-It will poll events up to this time period when the module starts. This is to prevent polling too many or repeated events on module restarts. Defaults to `24h`.
+The template used by the input to define the default initial interval. Defaults to `{{now (parseDuration "-24h")}}`.
 
 [float]
-==== GSuite Reports ECS fields
+==== Google Workspace Reports ECS fields
 
-This is a list of GSuite Reports fields that are mapped to ECS.
+This is a list of Google Workspace Reports fields that are mapped to ECS.
 
 [options="header"]
 |===============================================================================================
-| GSuite Reports               | ECS Fields                                                    |
+| Google Workspace Reports               | ECS Fields                                                    |
 | `items[].id.time`            | `@timestamp`                                                  |
 | `items[].id.uniqueQualifier` | `event.id`                                                    |
 | `items[].id.applicationName` | `event.provider`                                              |
@@ -136,11 +129,3 @@ These are the common ones to all filesets.
 :has-dashboards!:
 
 :modulename!:
-
-
-[float]
-=== Fields
-
-For a description of each field in the module, see the
-<<exported-fields-gsuite,exported fields>> section.
-
