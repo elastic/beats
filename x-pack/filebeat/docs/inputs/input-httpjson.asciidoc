@@ -530,6 +530,11 @@ Valid when used with `type: map`. When not empty, defines a new field where the 
 
 Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
 
+[float]
+==== `response.request_body_on_pagination`
+
+If set to true, the values in `request.body` are sent for pagination requests. Default: `false`.
+
 [[response-pagination]]
 [float]
 ==== `response.pagination`
