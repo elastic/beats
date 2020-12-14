@@ -514,6 +514,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
 - Migrate okta to httpjson v2 config {pull}23059[23059]
 - Add support for Snyk Vulnerability and Audit API. {pull}22677[22677]
+- Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 
 *Heartbeat*
 
