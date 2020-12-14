@@ -349,6 +349,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Fix aws s3 overview dashboard. {pull}23045[23045]
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 
 *Heartbeat*
