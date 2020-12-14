@@ -100,8 +100,32 @@ To see the full list of variables for a module, see the documentation under
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
+[[setup-application-logs]]
+=== Step 4: Ingest application logs
+
+This section is about best practices for ingesting logs from your own applications,
+as well as for off-the-shelf applications for which we don't have suitable built-in modules.
+
+Although you can ingest raw plain-text logs, we recommend you to structure
+your logs on ingest time.
+This lets you extract fields such as the log level and exception stack traces.
+
+If you can change the log output of your application,
+we recommend configuring your application to use the log formatters
+provided by {ecs-logging-ref}/intro.html[ECS logging].
+These plugins format your logs into ECS-compatible JSON.
+This makes the configuration particularly easy as you don't have to
+manually parse your logs.
+
+If it is not possible to configure the logging for your application or if
+there is no appropriate ECS logging plugin for your language or preferred
+logging framework, you will need to manually
+<<configuring-ingest-node, parse the logs using ingest node processors>>.
+
+
+[float]
 [[setup-assets]]
-=== Step 4: Set up assets
+=== Step 5: Set up assets
 
 {beatname_uc} comes with predefined assets for parsing, indexing, and
 visualizing your data. To load these assets:
