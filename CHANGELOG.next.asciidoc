@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
+- Adds negative body match. {pull}20728[20728]
 
 *Journalbeat*
 
