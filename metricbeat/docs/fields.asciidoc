@@ -33461,6 +33461,37 @@ type: long
 --
 
 
+*`logstash.node.stats.os.cgroup.cpuacct.usage_nanos`*::
++
+--
+type: long
+
+--
+
+
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: long
+
+--
+
+
 *`logstash.node.stats.os.cgroup.cpuact.usage_nanos`*::
 +
 --
@@ -33617,37 +33648,6 @@ type: keyword
 queue_push_duration_in_millis
 
 type: float
-
---
-
-
-*`logstash.node.stats.pipelines.cgroup.cpuacct.usage_nanos`*::
-+
---
-type: long
-
---
-
-
-
-*`logstash.node.stats.pipelines.cgroup.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: long
-
---
-
-*`logstash.node.stats.pipelines.cgroup.cpu.stat.time_throttled_nanos`*::
-+
---
-type: long
-
---
-
-*`logstash.node.stats.pipelines.cgroup.cpu.stat.number_of_times_throttled`*::
-+
---
-type: long
 
 --
 

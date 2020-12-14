@@ -60,6 +60,23 @@
         - name: cgroup
           type: group
           fields:
+            - name: cpuacct.usage_nanos
+              type: long
+            - name: cpu
+              type: group
+              fields:
+                - name: stat
+                  type: group
+                  fields:
+                    - name: number_of_elapsed_periods
+                      type: long
+                    - name: time_throttled_nanos
+                      type: long
+                    - name: number_of_times_throttled
+                      type: long
+        - name: cgroup
+          type: group
+          fields:
             - name: cpuact.usage_nanos
               type: long
             - name: cpu
@@ -128,22 +145,5 @@
             - name: queue_push_duration_in_millis
               type: float
               description: queue_push_duration_in_millis
-        - name: cgroup
-          type: group
-          fields:
-            - name: cpuacct.usage_nanos
-              type: long
-            - name: cpu
-              type: group
-              fields:
-                - name: stat
-                  type: group
-                  fields:
-                    - name: number_of_elapsed_periods
-                      type: long
-                    - name: time_throttled_nanos
-                      type: long
-                    - name: number_of_times_throttled
-                      type: long
     - name: queue.events_count
       type: long
