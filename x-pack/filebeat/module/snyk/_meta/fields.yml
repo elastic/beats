@@ -1,0 +1,20 @@
+- key: snyk
+  title: Snyk
+  description: >
+    Snyk module
+  fields:
+    - name: snyk
+      type: group
+      release: beta
+      description: >
+        Module for parsing Snyk project vulnerabilities.
+      fields:
+        - name: projects
+          type: flattened
+          description: >
+            Array with all related projects objects.
+        - name: related.projects
+          type: keyword
+          description: >
+            Array of all the related project ID's.
+
