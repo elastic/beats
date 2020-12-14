@@ -7,7 +7,7 @@
 
 beta[]
 
-This is a module for ingesting data from the different Google Workspace audit reports API's.
+This is a module for ingesting data from the different Google Workspace audit reports APIs.
 
 include::../include/gs-link.asciidoc[]
 
