@@ -33,13 +33,6 @@ func TestGetServiceURI(t *testing.T) {
 		expectedURI        string
 		errExpected        bool
 	}{
-		"xpack_disabled": {
-			currURI:            "/_node/stats",
-			xpackEnabled:       false,
-			graphAPIsAvailable: func() error { return nil },
-			expectedURI:        "/_node/stats",
-			errExpected:        false,
-		},
 		"apis_unavailable": {
 			currURI:            "/_node/stats",
 			xpackEnabled:       true,

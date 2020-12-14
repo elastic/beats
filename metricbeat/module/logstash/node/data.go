@@ -112,6 +112,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 				MetricSetFields: common.MapStr{
 					"state": logstashState,
 				},
+				ModuleFields: common.MapStr{},
 			}
 			event.MetricSetFields.Update(fields)
 
