@@ -163,8 +163,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "eaq",
-            "itquiin"
+            "itquiin",
+            "eaq"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -887,8 +887,8 @@
             "elites4713.www.localhost"
         ],
         "related.ip": [
-            "10.161.51.135",
-            "10.52.190.18"
+            "10.52.190.18",
+            "10.161.51.135"
         ],
         "rsa.internal.event_desc": "portscan",
         "rsa.internal.messageid": "ulogd",
@@ -974,8 +974,8 @@
             "10.232.108.32"
         ],
         "related.user": [
-            "llum",
-            "rsp"
+            "rsp",
+            "llum"
         ],
         "rsa.identity.logon_type": "ntut",
         "rsa.internal.event_desc": "ittenb",
@@ -1029,17 +1029,17 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.5146",
         "related.hosts": [
-            "nostrum6305.internal.localhost",
-            "Duis583.api.local"
+            "Duis583.api.local",
+            "nostrum6305.internal.localhost"
         ],
         "related.ip": [
-            "10.89.41.97",
-            "10.17.51.153"
+            "10.17.51.153",
+            "10.89.41.97"
         ],
         "related.user": [
-            "tio",
             "pteurs",
-            "tcustatuscode=eumiu"
+            "tcustatuscode=eumiu",
+            "tio"
         ],
         "rsa.db.index": "eavolupt",
         "rsa.identity.logon_type": "ursintoc",
@@ -1048,8 +1048,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "iuntN",
-            "deny"
+            "deny",
+            "iuntN"
         ],
         "rsa.misc.comments": "onorume",
         "rsa.misc.content_type": "lapa",
@@ -1351,8 +1351,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sophos",
         "related.hosts": [
-            "reprehe5661.www.lan",
-            "ntore4333.api.invalid"
+            "ntore4333.api.invalid",
+            "reprehe5661.www.lan"
         ],
         "rsa.internal.messageid": "reverseproxy",
         "rsa.misc.context": "iumd",
@@ -1855,8 +1855,8 @@
             "10.98.126.206"
         ],
         "related.user": [
-            "amremapstatuscode=dolorsit",
             "isnostru",
+            "amremapstatuscode=dolorsit",
             "hen"
         ],
         "rsa.db.index": "spernatu",
@@ -2025,18 +2025,18 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.2707",
         "related.hosts": [
-            "iusmo901.www.home",
-            "tenima5715.api.example"
+            "tenima5715.api.example",
+            "iusmo901.www.home"
         ],
         "related.ip": [
-            "10.2.24.156",
-            "10.92.93.236"
+            "10.92.93.236",
+            "10.2.24.156"
         ],
         "related.user": [
-            "ntoccae",
-            "Sedutper",
+            "ulpaq",
             "dolorsistatuscode=acc",
-            "ulpaq"
+            "ntoccae",
+            "Sedutper"
         ],
         "rsa.db.index": "snisiut",
         "rsa.identity.logon_type": "umdol",
@@ -2120,13 +2120,13 @@
             "mni4032.lan"
         ],
         "related.ip": [
-            "10.180.169.49",
-            "10.202.65.2"
+            "10.202.65.2",
+            "10.180.169.49"
         ],
         "related.user": [
-            "iscivelistatuscode=urve",
             "tasu",
-            "atatno"
+            "atatno",
+            "iscivelistatuscode=urve"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -2314,13 +2314,13 @@
             "obea2960.mail.corp"
         ],
         "related.ip": [
-            "10.45.12.53",
-            "10.33.138.154"
+            "10.33.138.154",
+            "10.45.12.53"
         ],
         "related.user": [
-            "porincid",
             "umqustatuscode=ntexpli",
-            "eturadip"
+            "eturadip",
+            "porincid"
         ],
         "rsa.db.index": "dolor",
         "rsa.identity.logon_type": "eturadi",
@@ -2481,8 +2481,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "etconsec",
-            "antium"
+            "antium",
+            "etconsec"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2628,14 +2628,14 @@
             "nisiuta4810.api.test"
         ],
         "related.ip": [
-            "10.210.175.52",
-            "10.85.200.58"
+            "10.85.200.58",
+            "10.210.175.52"
         ],
         "related.user": [
-            "reetd",
+            "rExce",
             "inimastatuscode=emipsum",
-            "Loremi",
-            "rExce"
+            "reetd",
+            "Loremi"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -2644,8 +2644,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "odte",
-            "cancel"
+            "cancel",
+            "odte"
         ],
         "rsa.misc.comments": "emquia",
         "rsa.misc.content_type": "sauteir",
@@ -2707,8 +2707,8 @@
             "itametc1599.api.test"
         ],
         "related.ip": [
-            "10.133.45.45",
-            "10.115.166.48"
+            "10.115.166.48",
+            "10.133.45.45"
         ],
         "rsa.internal.event_desc": "Authentication",
         "rsa.internal.messageid": "ulogd",
@@ -3161,8 +3161,8 @@
         "observer.vendor": "Sophos",
         "process.pid": 2389,
         "related.hosts": [
-            "utemvele1838.mail.test",
-            "seosquir715.local"
+            "seosquir715.local",
+            "utemvele1838.mail.test"
         ],
         "rsa.internal.messageid": "reverseproxy",
         "rsa.misc.comments": "rci",
@@ -3463,8 +3463,8 @@
             "imv1805.api.host"
         ],
         "related.ip": [
-            "10.248.62.55",
-            "10.96.243.231"
+            "10.96.243.231",
+            "10.248.62.55"
         ],
         "rsa.internal.event_desc": "ICMP",
         "rsa.internal.messageid": "ulogd",
