@@ -55,13 +55,13 @@
             "ercit2385.internal.home"
         ],
         "related.ip": [
-            "10.47.202.102",
-            "10.57.170.140"
+            "10.57.170.140",
+            "10.47.202.102"
         ],
         "related.user": [
+            "sunt",
             "dexeac",
-            "icistatuscode=giatquov",
-            "sunt"
+            "icistatuscode=giatquov"
         ],
         "rsa.db.index": "run",
         "rsa.identity.logon_type": "nofdeF",
@@ -70,8 +70,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "ugiatnu",
-            "block"
+            "block",
+            "ugiatnu"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -163,8 +163,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "eaq",
-            "itquiin"
+            "itquiin",
+            "eaq"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -638,8 +638,8 @@
             "10.54.169.175"
         ],
         "related.user": [
-            "scipit",
-            "taspe"
+            "taspe",
+            "scipit"
         ],
         "rsa.identity.logon_type": "olores",
         "rsa.internal.event_desc": "secil",
@@ -974,8 +974,8 @@
             "10.232.108.32"
         ],
         "related.user": [
-            "llum",
-            "rsp"
+            "rsp",
+            "llum"
         ],
         "rsa.identity.logon_type": "ntut",
         "rsa.internal.event_desc": "ittenb",
@@ -1029,12 +1029,12 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.5146",
         "related.hosts": [
-            "nostrum6305.internal.localhost",
-            "Duis583.api.local"
+            "Duis583.api.local",
+            "nostrum6305.internal.localhost"
         ],
         "related.ip": [
-            "10.89.41.97",
-            "10.17.51.153"
+            "10.17.51.153",
+            "10.89.41.97"
         ],
         "related.user": [
             "tio",
@@ -1048,8 +1048,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "iuntN",
-            "deny"
+            "deny",
+            "iuntN"
         ],
         "rsa.misc.comments": "onorume",
         "rsa.misc.content_type": "lapa",
@@ -1351,8 +1351,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sophos",
         "related.hosts": [
-            "reprehe5661.www.lan",
-            "ntore4333.api.invalid"
+            "ntore4333.api.invalid",
+            "reprehe5661.www.lan"
         ],
         "rsa.internal.messageid": "reverseproxy",
         "rsa.misc.context": "iumd",
@@ -1851,12 +1851,12 @@
             "tenbyCi4371.www5.localdomain"
         ],
         "related.ip": [
-            "10.214.167.164",
-            "10.98.126.206"
+            "10.98.126.206",
+            "10.214.167.164"
         ],
         "related.user": [
-            "amremapstatuscode=dolorsit",
             "isnostru",
+            "amremapstatuscode=dolorsit",
             "hen"
         ],
         "rsa.db.index": "spernatu",
@@ -1866,8 +1866,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "block",
-            "nsectetu"
+            "nsectetu",
+            "block"
         ],
         "rsa.misc.comments": "uaer",
         "rsa.misc.content_type": "eaqu",
@@ -2025,16 +2025,16 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.2707",
         "related.hosts": [
-            "iusmo901.www.home",
-            "tenima5715.api.example"
+            "tenima5715.api.example",
+            "iusmo901.www.home"
         ],
         "related.ip": [
             "10.2.24.156",
             "10.92.93.236"
         ],
         "related.user": [
-            "ntoccae",
             "Sedutper",
+            "ntoccae",
             "dolorsistatuscode=acc",
             "ulpaq"
         ],
@@ -2045,8 +2045,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "block",
-            "icons"
+            "icons",
+            "block"
         ],
         "rsa.misc.comments": "porincid",
         "rsa.misc.content_type": "temvele",
@@ -2124,8 +2124,8 @@
             "10.202.65.2"
         ],
         "related.user": [
-            "iscivelistatuscode=urve",
             "tasu",
+            "iscivelistatuscode=urve",
             "atatno"
         ],
         "rsa.db.index": "amrem",
@@ -2135,8 +2135,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "mquisn",
-            "cancel"
+            "cancel",
+            "mquisn"
         ],
         "rsa.misc.comments": "architec",
         "rsa.misc.content_type": "atisetqu",
@@ -2314,12 +2314,12 @@
             "obea2960.mail.corp"
         ],
         "related.ip": [
-            "10.45.12.53",
-            "10.33.138.154"
+            "10.33.138.154",
+            "10.45.12.53"
         ],
         "related.user": [
-            "porincid",
             "umqustatuscode=ntexpli",
+            "porincid",
             "eturadip"
         ],
         "rsa.db.index": "dolor",
@@ -2329,8 +2329,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "doc",
-            "cancel"
+            "cancel",
+            "doc"
         ],
         "rsa.misc.comments": "riosam",
         "rsa.misc.content_type": "iusmo",
@@ -2481,8 +2481,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "etconsec",
-            "antium"
+            "antium",
+            "etconsec"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2632,10 +2632,10 @@
             "10.85.200.58"
         ],
         "related.user": [
-            "reetd",
+            "rExce",
             "inimastatuscode=emipsum",
             "Loremi",
-            "rExce"
+            "reetd"
         ],
         "rsa.db.index": "apa",
         "rsa.identity.logon_type": "sedquia",
@@ -2644,8 +2644,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "odte",
-            "cancel"
+            "cancel",
+            "odte"
         ],
         "rsa.misc.comments": "emquia",
         "rsa.misc.content_type": "sauteir",
@@ -3161,8 +3161,8 @@
         "observer.vendor": "Sophos",
         "process.pid": 2389,
         "related.hosts": [
-            "utemvele1838.mail.test",
-            "seosquir715.local"
+            "seosquir715.local",
+            "utemvele1838.mail.test"
         ],
         "rsa.internal.messageid": "reverseproxy",
         "rsa.misc.comments": "rci",
@@ -3619,8 +3619,8 @@
             "10.96.200.83"
         ],
         "related.user": [
-            "acommod",
-            "lapariat"
+            "lapariat",
+            "acommod"
         ],
         "rsa.identity.logon_type": "remeumf",
         "rsa.internal.event_desc": "dol",
