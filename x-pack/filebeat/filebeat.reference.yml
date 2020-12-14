@@ -461,6 +461,14 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+      # Set internal security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.internal_zones: [ "Internal" ]
+
+      # Set external security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.external_zones: [ "External" ]
+
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
@@ -475,6 +483,14 @@ filebeat.modules:
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -496,6 +512,14 @@ filebeat.modules:
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
+
   ftd:
     enabled: true
 
@@ -513,6 +537,14 @@ filebeat.modules:
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
   ios:
     enabled: true
@@ -766,6 +798,16 @@ filebeat.modules:
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
 
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
+
   clientendpoint:
     enabled: true
 
@@ -843,6 +885,16 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # direction is determined by whether it is between source and destination
+    # instance information rather than IP.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
   firewall:
     enabled: true
 
@@ -860,6 +912,15 @@ filebeat.modules:
     # Credentials file for the service account with authorization to read from
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # is taken from the direction data in the rule_details event payload.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
 
   audit:
     enabled: true
@@ -1340,6 +1401,19 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------- MySQL Enterprise Module ---------------------------
+- module: mysqlenterprise
+  audit:
+    enabled: true
+
+    # Sets the input type. Currently only supports file
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths:
+    #  - /home/user/mysqlauditlogs/audit.*.log
+
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
@@ -1357,6 +1431,11 @@ filebeat.modules:
     var:
       netflow_host: localhost
       netflow_port: 2055
+      # internal_networks specifies which networks are considered internal or private
+      # you can specify either a CIDR block or any of the special named ranges listed
+      # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+      internal_networks:
+        - private
 
 #-------------------------- Arbor Peakflow SP Module --------------------------
 - module: netscout
@@ -1506,6 +1585,15 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Set internal security zones. used to determine network.direction
+    # default "trust"
+    #var.internal_zones:
+
+    # Set external security zones. used to determine network.direction
+    # default "untrust"
+    #var.external_zones:
+
 
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql

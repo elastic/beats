@@ -52,6 +52,8 @@ processors:
       ignore_failure: true
       field: suricata.eve.dns.rrname
       target_field: dns.question.registered_domain
+      target_subdomain_field: dns.question.subdomain
+      target_etld_field: dns.question.top_level_domain
   - add_fields:
       target: ''
       fields:
