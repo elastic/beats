@@ -10,4 +10,40 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.6.0
+        ecs.version: 1.7.0
+  - if:
+      regexp:
+        message: "^{"
+    then:
+      - decode_json_fields:
+          fields: [ "message" ]
+          target: _json
+      - rename:
+          fields:
+            - from: _json.request.body
+              to: _request
+          ignore_missing: true
+      - drop_fields:
+          fields: [ "_json" ]
+    else:
+      - script:
+          lang: javascript
+          id: elasticsearch_audit
+          source: >
+            var requestRegex = new RegExp("request_body=\\\[(.*)\\\]$");
+            function process(event) {
+              var message = event.Get("message");
+              if (message !== null) {
+                var matches = message.match(requestRegex);
+                if (matches && matches.length > 1) {
+                  event.Put("_request", matches[1]);
+                }
+              }
+            }
+  - detect_mime_type:
+      field: _request
+      target: http.request.mime_type
+  - drop_fields:
+      fields: ['_request']
+      ignore_missing: true
+

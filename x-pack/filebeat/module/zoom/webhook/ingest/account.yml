@@ -4,6 +4,10 @@ processors:
     field: event.category
     value: iam
 - append:
+    field: event.category
+    value: configuration
+    if: "['account.settings_updated'].contains(ctx?.event?.action)"
+- append:
     field: event.type
     value: user
 - append:

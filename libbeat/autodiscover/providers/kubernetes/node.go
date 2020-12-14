@@ -168,6 +168,11 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		return
 	}
 
+	// If the node is not in ready state then dont monitor it unless its a stop event
+	if !isNodeReady(node) && flag != "stop" {
+		return
+	}
+
 	eventID := fmt.Sprint(node.GetObjectMeta().GetUID())
 	meta := n.metagen.Generate(node)
 
@@ -233,6 +238,12 @@ func getAddress(node *kubernetes.Node) string {
 
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeInternalIP && address.Address != "" {
+			return address.Address
+		}
+	}
+
+	for _, address := range node.Status.Addresses {
+		if address.Type == v1.NodeHostName && address.Address != "" {
 			return address.Address
 		}
 	}

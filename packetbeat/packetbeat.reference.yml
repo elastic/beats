@@ -13,6 +13,16 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
+# The network CIDR blocks that are considered "internal" networks for
+# the purpose of network perimeter boundary classification. The valid
+# values for internal_networks are the same as those that can be used
+# with processor network conditions.
+#
+# For a list of available values see:
+# https://www.elastic.co/guide/en/beats/packetbeat/current/defining-processors.html#condition-network
+packetbeat.interfaces.internal_networks:
+  - private
+
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
 # not the fastest option.
@@ -1230,6 +1240,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Packetbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'

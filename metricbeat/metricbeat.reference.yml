@@ -671,13 +671,21 @@ metricbeat.modules:
 
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
-  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  metricsets:
+    - "connections"
+    - "routes"
+    - "stats"
+    - "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
   #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1514,6 +1522,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Metricbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
