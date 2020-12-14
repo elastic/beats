@@ -86,6 +86,9 @@ endif::[]
 ifndef::no_include_fields_processor[]
 * <<include-fields,`include_fields`>>
 endif::[]
+ifndef::no_include_rate_limit_processor[]
+* <<rate-limit,`rate_limit`>>
+endif::[]
 ifndef::no_registered_domain_processor[]
 * <<processor-registered-domain,`registered_domain`>>
 endif::[]
