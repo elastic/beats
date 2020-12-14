@@ -596,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.179.124.125",
-            "10.177.36.38"
+            "10.177.36.38",
+            "10.179.124.125"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -619,6 +619,7 @@
         "server.domain": "lamcolab3252.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "lamcolab3252",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.179.124.125"
@@ -1261,12 +1262,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "atise3421.www5.localdomain",
-            "estl5804.internal.local"
+            "estl5804.internal.local",
+            "atise3421.www5.localdomain"
         ],
         "related.ip": [
-            "10.73.207.70",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.73.207.70"
         ],
         "rsa.email.email_dst": "rumSecti",
         "rsa.email.email_src": "taut",
@@ -1289,6 +1290,7 @@
         "server.domain": "atise3421.www5.localdomain",
         "server.registered_domain": "www5.localdomain",
         "server.subdomain": "atise3421",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.73.207.70"
@@ -2678,12 +2680,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "taevit4968.mail.local",
-            "mveni5084.internal.local"
+            "mveni5084.internal.local",
+            "taevit4968.mail.local"
         ],
         "related.ip": [
-            "10.144.111.42",
-            "10.62.61.1"
+            "10.62.61.1",
+            "10.144.111.42"
         ],
         "rsa.email.email_dst": "com",
         "rsa.email.email_src": "lam",
@@ -2706,6 +2708,7 @@
         "server.domain": "mveni5084.internal.local",
         "server.registered_domain": "internal.local",
         "server.subdomain": "mveni5084",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.144.111.42"
@@ -3128,12 +3131,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "modi6930.internal.test",
-            "taevitae6868.www.corp"
+            "taevitae6868.www.corp",
+            "modi6930.internal.test"
         ],
         "related.ip": [
-            "10.161.1.146",
-            "10.60.164.100"
+            "10.60.164.100",
+            "10.161.1.146"
         ],
         "rsa.email.email_dst": "nproiden",
         "rsa.email.email_src": "etconse",
@@ -3156,6 +3159,7 @@
         "server.domain": "taevitae6868.www.corp",
         "server.registered_domain": "www.corp",
         "server.subdomain": "taevitae6868",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.60.164.100"
@@ -3259,6 +3263,7 @@
         "server.domain": "tetura7106.www5.corp",
         "server.registered_domain": "www5.corp",
         "server.subdomain": "tetura7106",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.44.35.57"
@@ -3884,8 +3889,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
-            "10.132.139.98",
-            "10.209.203.156"
+            "10.209.203.156",
+            "10.132.139.98"
         ],
         "rsa.email.email_dst": "borisnis",
         "rsa.email.email_src": "pariat",

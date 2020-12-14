@@ -13,8 +13,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "exe7309.internal.local",
             "byC4864.www.host",
+            "exe7309.internal.local",
             "reprehe"
         ],
         "rsa.internal.event_desc": "rsitam",
@@ -26,6 +26,7 @@
         "server.domain": "byC4864.www.host",
         "server.registered_domain": "www.host",
         "server.subdomain": "byC4864",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "exe7309.internal.local",
         "tags": [
@@ -50,8 +51,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "sitas4259.mail.corp",
-            "rumet5772.mail.corp",
             "iumto",
+            "rumet5772.mail.corp",
             "llam2073.internal.localdomain"
         ],
         "rsa.internal.event_desc": "aboreetd",
@@ -67,6 +68,7 @@
         "server.domain": "rumet5772.mail.corp",
         "server.registered_domain": "mail.corp",
         "server.subdomain": "rumet5772",
+        "server.top_level_domain": "corp",
         "service.type": "symantec",
         "source.address": "sitas4259.mail.corp",
         "tags": [
@@ -101,6 +103,7 @@
         "server.domain": "equa3653.internal.host",
         "server.registered_domain": "internal.host",
         "server.subdomain": "equa3653",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "olupt3702.www.localhost",
         "tags": [
@@ -173,9 +176,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "mdolore2062.mail.host",
             "numqu3768.internal.lan",
-            "den",
-            "mdolore2062.mail.host"
+            "den"
         ],
         "rsa.internal.event_desc": "tutla",
         "rsa.internal.messageid": "302449409",
@@ -186,6 +189,7 @@
         "server.domain": "numqu3768.internal.lan",
         "server.registered_domain": "internal.lan",
         "server.subdomain": "numqu3768",
+        "server.top_level_domain": "lan",
         "service.type": "symantec",
         "source.address": "mdolore2062.mail.host",
         "tags": [
@@ -245,9 +249,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "billo2947.internal.localhost",
             "siut",
-            "dutp6197.www.test"
+            "dutp6197.www.test",
+            "billo2947.internal.localhost"
         ],
         "rsa.internal.event_desc": "tconsect",
         "rsa.internal.messageid": "303235076",
@@ -258,6 +262,7 @@
         "server.domain": "billo2947.internal.localhost",
         "server.registered_domain": "internal.localhost",
         "server.subdomain": "billo2947",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "dutp6197.www.test",
         "tags": [
@@ -281,9 +286,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "nea2083.www5.localhost",
-            "fugia",
             "nBCSedut1502.www5.example",
+            "fugia",
+            "nea2083.www5.localhost",
             "umSe1918.local"
         ],
         "rsa.internal.event_desc": "oditautf",
@@ -299,6 +304,7 @@
         "server.domain": "nea2083.www5.localhost",
         "server.registered_domain": "www5.localhost",
         "server.subdomain": "nea2083",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "nBCSedut1502.www5.example",
         "tags": [
@@ -322,9 +328,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "oreetd7668.www5.localdomain",
-            "temporin7150.mail.local",
             "rationev",
+            "temporin7150.mail.local",
+            "oreetd7668.www5.localdomain",
             "olupt2189.lan"
         ],
         "rsa.internal.event_desc": "rem",
@@ -340,6 +346,7 @@
         "server.domain": "oreetd7668.www5.localdomain",
         "server.registered_domain": "www5.localdomain",
         "server.subdomain": "oreetd7668",
+        "server.top_level_domain": "localdomain",
         "service.type": "symantec",
         "source.address": "temporin7150.mail.local",
         "tags": [
@@ -399,9 +406,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "utfug7095.api.corp",
+            "Except6889.www.corp",
             "asper",
-            "Except6889.www.corp"
+            "utfug7095.api.corp"
         ],
         "rsa.internal.event_desc": "umq",
         "rsa.internal.messageid": "302452736",
@@ -412,6 +419,7 @@
         "server.domain": "utfug7095.api.corp",
         "server.registered_domain": "api.corp",
         "server.subdomain": "utfug7095",
+        "server.top_level_domain": "corp",
         "service.type": "symantec",
         "source.address": "Except6889.www.corp",
         "tags": [
@@ -433,9 +441,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "orroqu472.www.localhost",
             "quatD1370.invalid",
-            "iruredol"
+            "iruredol",
+            "orroqu472.www.localhost"
         ],
         "rsa.internal.event_desc": "veniamqu",
         "rsa.internal.messageid": "302452802",
@@ -446,6 +454,7 @@
         "server.domain": "orroqu472.www.localhost",
         "server.registered_domain": "www.localhost",
         "server.subdomain": "orroqu472",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "quatD1370.invalid",
         "tags": [
@@ -469,9 +478,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "mides4759.api.local",
-            "olup",
             "quaeab2653.mail.localdomain",
+            "olup",
+            "mides4759.api.local",
             "iatqu6203.mail.corp"
         ],
         "rsa.db.index": "itat",
@@ -492,6 +501,7 @@
         "server.domain": "mides4759.api.local",
         "server.registered_domain": "api.local",
         "server.subdomain": "mides4759",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "quaeab2653.mail.localdomain",
         "tags": [
@@ -513,9 +523,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "ctetu",
+            "redol124.mail.invalid",
             "litesseq6785.host",
-            "redol124.mail.invalid"
+            "ctetu"
         ],
         "rsa.internal.event_desc": "orinrep",
         "rsa.internal.messageid": "302450688",
@@ -525,6 +535,7 @@
         "rsa.network.domain": "litesseq6785.host",
         "server.domain": "litesseq6785.host",
         "server.registered_domain": "litesseq6785.host",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "redol124.mail.invalid",
         "tags": [
@@ -559,6 +570,7 @@
         "server.domain": "prehe1037.api.example",
         "server.registered_domain": "api.example",
         "server.subdomain": "prehe1037",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "enim5999.mail.localhost",
         "tags": [
@@ -582,8 +594,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "CSe4501.example",
             "adm",
+            "CSe4501.example",
             "rsitvolu3596.www.test",
             "reseosqu1629.mail.lan"
         ],
@@ -599,6 +611,7 @@
         "rsa.network.domain": "CSe4501.example",
         "server.domain": "CSe4501.example",
         "server.registered_domain": "CSe4501.example",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "rsitvolu3596.www.test",
         "tags": [
@@ -620,9 +633,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "tan3170.api.example",
             "etdol",
-            "nisiuta7623.www.local",
-            "tan3170.api.example"
+            "nisiuta7623.www.local"
         ],
         "rsa.internal.event_desc": "dolorsi",
         "rsa.internal.messageid": "303235081",
@@ -634,6 +647,7 @@
         "server.domain": "nisiuta7623.www.local",
         "server.registered_domain": "www.local",
         "server.subdomain": "nisiuta7623",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "tan3170.api.example",
         "tags": [
@@ -687,9 +701,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "rsin",
+            "itatio6735.api.example",
             "emullam7151.lan",
-            "itatio6735.api.example"
+            "rsin"
         ],
         "rsa.internal.event_desc": "rumSec",
         "rsa.internal.messageid": "302452801",
@@ -699,6 +713,7 @@
         "rsa.network.domain": "emullam7151.lan",
         "server.domain": "emullam7151.lan",
         "server.registered_domain": "emullam7151.lan",
+        "server.top_level_domain": "lan",
         "service.type": "symantec",
         "source.address": "itatio6735.api.example",
         "tags": [
@@ -721,8 +736,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "ainc",
-            "radip163.mail.invalid",
-            "iti7029.www.test"
+            "iti7029.www.test",
+            "radip163.mail.invalid"
         ],
         "rsa.internal.event_desc": "miurerep",
         "rsa.internal.messageid": "302449166",
@@ -733,6 +748,7 @@
         "server.domain": "iti7029.www.test",
         "server.registered_domain": "www.test",
         "server.subdomain": "iti7029",
+        "server.top_level_domain": "test",
         "service.type": "symantec",
         "source.address": "radip163.mail.invalid",
         "tags": [
@@ -761,8 +777,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "rere228.invalid",
             "bore5546.www.local",
+            "rere228.invalid",
             "vol866.api.domain"
         ],
         "related.ip": [
@@ -787,6 +803,7 @@
         "rsa.time.starttime": "2016-11-24T12:03:59.000Z",
         "server.domain": "rere228.invalid",
         "server.registered_domain": "rere228.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "bore5546.www.local",
         "source.ip": [
@@ -832,6 +849,7 @@
         "server.domain": "asnulap2567.www5.invalid",
         "server.registered_domain": "www5.invalid",
         "server.subdomain": "asnulap2567",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "tatemseq5797.home",
         "tags": [
@@ -859,13 +877,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "sequ6424.www.invalid",
             "quiavolu6301.www5.localhost",
+            "sequ6424.www.invalid",
             "enima7673.api.localhost"
         ],
         "related.ip": [
-            "10.139.207.36",
-            "10.217.91.49"
+            "10.217.91.49",
+            "10.139.207.36"
         ],
         "related.user": [
             "lumqui"
@@ -884,6 +902,7 @@
         "server.domain": "quiavolu6301.www5.localhost",
         "server.registered_domain": "www5.localhost",
         "server.subdomain": "quiavolu6301",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "sequ6424.www.invalid",
         "source.ip": [
@@ -916,8 +935,8 @@
         "process.parent.name": "mquis",
         "process.ppid": 5040,
         "related.hosts": [
-            "tatemse4493.mail.local",
             "madminim6826.www.host",
+            "tatemse4493.mail.local",
             "tnulapa7580.www.domain"
         ],
         "related.ip": [
@@ -949,6 +968,7 @@
         "server.domain": "tatemse4493.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "tatemse4493",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "madminim6826.www.host",
         "source.domain": "mquisnos",
@@ -978,8 +998,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "quisn",
-            "eumfu2149.internal.home",
             "caecat4678.www.home",
+            "eumfu2149.internal.home",
             "ici182.invalid"
         ],
         "rsa.internal.event_desc": "rem",
@@ -995,6 +1015,7 @@
         "server.domain": "eumfu2149.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "eumfu2149",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "caecat4678.www.home",
         "tags": [
@@ -1017,8 +1038,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "qua",
-            "beat2952.internal.localhost",
-            "boreet2051.internal.localdomain"
+            "boreet2051.internal.localdomain",
+            "beat2952.internal.localhost"
         ],
         "rsa.internal.event_desc": "iarchite",
         "rsa.internal.messageid": "302449410",
@@ -1029,6 +1050,7 @@
         "server.domain": "boreet2051.internal.localdomain",
         "server.registered_domain": "internal.localdomain",
         "server.subdomain": "boreet2051",
+        "server.top_level_domain": "localdomain",
         "service.type": "symantec",
         "source.address": "beat2952.internal.localhost",
         "tags": [
@@ -1052,9 +1074,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "uames7663.internal.local",
-            "oreeu",
             "imip7160.www.invalid",
+            "oreeu",
+            "uames7663.internal.local",
             "ured3428.www.corp"
         ],
         "rsa.internal.event_desc": "taspe",
@@ -1070,6 +1092,7 @@
         "server.domain": "imip7160.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "imip7160",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "uames7663.internal.local",
         "tags": [
@@ -1104,6 +1127,7 @@
         "server.domain": "qua948.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "qua948",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "velillum6639.www5.local",
         "tags": [
@@ -1128,8 +1152,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "dipisciv",
-            "tiu3570.www.invalid",
             "onoru5767.internal.domain",
+            "tiu3570.www.invalid",
             "dictasun3408.internal.invalid"
         ],
         "rsa.internal.event_desc": "uam",
@@ -1145,6 +1169,7 @@
         "server.domain": "tiu3570.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "tiu3570",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "onoru5767.internal.domain",
         "tags": [
@@ -1197,9 +1222,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "tqui1142.www5.domain",
             "atisu6579.test",
             "Duis583.api.local",
+            "tqui1142.www5.domain",
             "uipe6805.www5.domain"
         ],
         "related.ip": [
@@ -1233,6 +1258,7 @@
         "server.domain": "Duis583.api.local",
         "server.registered_domain": "api.local",
         "server.subdomain": "Duis583",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "atisu6579.test",
         "source.domain": "samvol",
@@ -1300,8 +1326,8 @@
             "udexerci6630.mail.test"
         ],
         "related.ip": [
-            "10.202.55.203",
-            "10.35.89.51"
+            "10.35.89.51",
+            "10.202.55.203"
         ],
         "related.user": [
             "Quis"
@@ -1331,6 +1357,7 @@
         "server.domain": "quinesc4724.www5.host",
         "server.registered_domain": "www5.host",
         "server.subdomain": "quinesc4724",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "isiut4530.localdomain",
         "source.domain": "lupta",
@@ -1429,6 +1456,7 @@
         "server.domain": "cteturad6288.api.home",
         "server.registered_domain": "api.home",
         "server.subdomain": "cteturad6288",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "lumd4298.mail.localdomain",
         "source.domain": "iad",
@@ -1486,8 +1514,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "uptate5787.api.local",
-            "uaera2917.internal.test",
-            "tuserror810.www5.corp"
+            "tuserror810.www5.corp",
+            "uaera2917.internal.test"
         ],
         "related.ip": [
             "10.87.92.95",
@@ -1513,6 +1541,7 @@
         "server.domain": "uaera2917.internal.test",
         "server.registered_domain": "internal.test",
         "server.subdomain": "uaera2917",
+        "server.top_level_domain": "test",
         "service.type": "symantec",
         "source.address": "tuserror810.www5.corp",
         "source.domain": "ati",
@@ -1542,9 +1571,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "etd4695.mail.lan",
             "quaUt",
             "mipsu3757.www5.home",
-            "etd4695.mail.lan",
             "ruredolo7392.internal.host"
         ],
         "rsa.db.index": "oris",
@@ -1561,6 +1590,7 @@
         "server.domain": "etd4695.mail.lan",
         "server.registered_domain": "mail.lan",
         "server.subdomain": "etd4695",
+        "server.top_level_domain": "lan",
         "service.type": "symantec",
         "source.address": "mipsu3757.www5.home",
         "tags": [
@@ -1602,9 +1632,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "ntmo4076.lan",
             "ationula",
-            "mvele7557.corp"
+            "mvele7557.corp",
+            "ntmo4076.lan"
         ],
         "rsa.internal.event_desc": "doconse",
         "rsa.internal.messageid": "302449158",
@@ -1614,6 +1644,7 @@
         "rsa.network.domain": "mvele7557.corp",
         "server.domain": "mvele7557.corp",
         "server.registered_domain": "mvele7557.corp",
+        "server.top_level_domain": "corp",
         "service.type": "symantec",
         "source.address": "ntmo4076.lan",
         "tags": [
@@ -1657,9 +1688,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "henderit3374.internal.invalid",
             "alo6036.www5.local",
             "mdolore",
+            "henderit3374.internal.invalid",
             "amni48.internal.localdomain"
         ],
         "rsa.internal.event_desc": "ita",
@@ -1675,6 +1706,7 @@
         "server.domain": "henderit3374.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "henderit3374",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "alo6036.www5.local",
         "tags": [
@@ -1716,6 +1748,7 @@
         "server.domain": "ingelit3629.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "ingelit3629",
+        "server.top_level_domain": "domain",
         "service.type": "symantec",
         "source.address": "uredo4613.home",
         "tags": [
@@ -1770,6 +1803,7 @@
         "server.domain": "uovo5035.api.example",
         "server.registered_domain": "api.example",
         "server.subdomain": "uovo5035",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "mini3181.api.test",
         "tags": [
@@ -1800,8 +1834,8 @@
         "process.name": "remap",
         "related.hosts": [
             "iduntu7302.www.invalid",
-            "elitsedd",
             "ema7531.api.example",
+            "elitsedd",
             "rsitam2337.mail.localdomain"
         ],
         "related.ip": [
@@ -1828,8 +1862,8 @@
         "rsa.misc.version": "1.3638",
         "rsa.misc.virusname": "isqu",
         "rsa.network.alias_host": [
-            "assit1598.www5.invalid",
-            "rsitam2337.mail.localdomain"
+            "rsitam2337.mail.localdomain",
+            "assit1598.www5.invalid"
         ],
         "rsa.network.domain": "ema7531.api.example",
         "rsa.threat.threat_category": "isqu",
@@ -1838,6 +1872,7 @@
         "server.domain": "ema7531.api.example",
         "server.registered_domain": "api.example",
         "server.subdomain": "ema7531",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "iduntu7302.www.invalid",
         "source.ip": [
@@ -1876,6 +1911,7 @@
         "server.domain": "icero1297.internal.domain",
         "server.registered_domain": "internal.domain",
         "server.subdomain": "icero1297",
+        "server.top_level_domain": "domain",
         "service.type": "symantec",
         "source.address": "equu7361.www5.localdomain",
         "tags": [
@@ -1937,6 +1973,7 @@
         "server.domain": "bor5601.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "bor5601",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "iono5777.invalid",
         "source.domain": "doloremi",
@@ -2042,6 +2079,7 @@
         "rsa.time.starttime": "2018-01-27T05:21:06.000Z",
         "server.domain": "edictasu3521.invalid",
         "server.registered_domain": "edictasu3521.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "adminima6097.corp",
         "source.domain": "umquidol",
@@ -2089,6 +2127,7 @@
         "server.domain": "seosqui7376.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "seosqui7376",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "eratv6521.example",
         "tags": [
@@ -2112,8 +2151,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "iset1992.internal.example",
             "ffic",
+            "iset1992.internal.example",
             "pre865.www5.home",
             "bori7611.invalid"
         ],
@@ -2130,6 +2169,7 @@
         "server.domain": "pre865.www5.home",
         "server.registered_domain": "www5.home",
         "server.subdomain": "pre865",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "iset1992.internal.example",
         "tags": [
@@ -2171,8 +2211,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "iste5901.mail.localhost",
-            "ntin2655.www.localdomain",
-            "itasper"
+            "itasper",
+            "ntin2655.www.localdomain"
         ],
         "rsa.internal.event_desc": "epo",
         "rsa.internal.messageid": "302449413",
@@ -2183,6 +2223,7 @@
         "server.domain": "iste5901.mail.localhost",
         "server.registered_domain": "mail.localhost",
         "server.subdomain": "iste5901",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "ntin2655.www.localdomain",
         "tags": [
@@ -2204,8 +2245,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "dolor1769.lan",
             "siuta395.home",
+            "dolor1769.lan",
             "fugiat"
         ],
         "rsa.internal.event_desc": "iumdolor",
@@ -2216,6 +2257,7 @@
         "rsa.network.domain": "dolor1769.lan",
         "server.domain": "dolor1769.lan",
         "server.registered_domain": "dolor1769.lan",
+        "server.top_level_domain": "lan",
         "service.type": "symantec",
         "source.address": "siuta395.home",
         "tags": [
@@ -2299,6 +2341,7 @@
         "server.domain": "obeata796.www.localhost",
         "server.registered_domain": "www.localhost",
         "server.subdomain": "obeata796",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "vel1911.lan",
         "source.ip": [
@@ -2384,6 +2427,7 @@
         "server.domain": "emipsum4052.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "emipsum4052",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "quisnost7124.api.domain",
         "tags": [
@@ -2418,9 +2462,9 @@
         "observer.vendor": "Symantec",
         "observer.version": "1.132",
         "related.hosts": [
+            "edi6108.internal.domain",
             "madmi2948.internal.lan",
             "ita2191.www5.invalid",
-            "edi6108.internal.domain",
             "iatquovo4868.test"
         ],
         "related.ip": [
@@ -2456,6 +2500,7 @@
         "server.domain": "ita2191.www5.invalid",
         "server.registered_domain": "www5.invalid",
         "server.subdomain": "ita2191",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "madmi2948.internal.lan",
         "source.domain": "iusmodi",
@@ -2524,8 +2569,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "lillumq4387.www5.localhost",
-            "tec4011.mail.home",
-            "turExce"
+            "turExce",
+            "tec4011.mail.home"
         ],
         "rsa.internal.event_desc": "sse",
         "rsa.internal.messageid": "302452743",
@@ -2536,6 +2581,7 @@
         "server.domain": "tec4011.mail.home",
         "server.registered_domain": "mail.home",
         "server.subdomain": "tec4011",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "lillumq4387.www5.localhost",
         "tags": [
@@ -2627,9 +2673,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "sit3373.api.localdomain",
             "ecatcupi4759.internal.local",
             "tenb",
+            "sit3373.api.localdomain",
             "emp42.mail.test"
         ],
         "rsa.internal.event_desc": "ritati",
@@ -2645,6 +2691,7 @@
         "server.domain": "sit3373.api.localdomain",
         "server.registered_domain": "api.localdomain",
         "server.subdomain": "sit3373",
+        "server.top_level_domain": "localdomain",
         "service.type": "symantec",
         "source.address": "ecatcupi4759.internal.local",
         "tags": [
@@ -2700,6 +2747,7 @@
         "server.domain": "antiu4203.www.host",
         "server.registered_domain": "www.host",
         "server.subdomain": "antiu4203",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "ipsu7538.www5.host",
         "tags": [
@@ -2750,13 +2798,13 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "dita2048.www5.home",
             "upta3770.internal.localhost",
-            "iusmo5734.internal.invalid"
+            "iusmo5734.internal.invalid",
+            "dita2048.www5.home"
         ],
         "related.ip": [
-            "10.171.13.85",
-            "10.40.133.90"
+            "10.40.133.90",
+            "10.171.13.85"
         ],
         "related.user": [
             "bor"
@@ -2781,6 +2829,7 @@
         "server.domain": "upta3770.internal.localhost",
         "server.registered_domain": "internal.localhost",
         "server.subdomain": "upta3770",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "iusmo5734.internal.invalid",
         "source.domain": "piscinge",
@@ -2830,9 +2879,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "omm3591.internal.invalid",
-            "lore",
             "inrepr7369.www.domain",
+            "lore",
+            "omm3591.internal.invalid",
             "ngelits2743.www5.host"
         ],
         "rsa.internal.event_desc": "tatemac",
@@ -2848,6 +2897,7 @@
         "server.domain": "omm3591.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "omm3591",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "inrepr7369.www.domain",
         "tags": [
@@ -2871,9 +2921,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "psum",
             "sed1665.internal.local",
             "alorum1804.mail.test",
+            "psum",
             "olupt717.invalid"
         ],
         "rsa.internal.event_desc": "ano",
@@ -2889,6 +2939,7 @@
         "server.domain": "sed1665.internal.local",
         "server.registered_domain": "internal.local",
         "server.subdomain": "sed1665",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "alorum1804.mail.test",
         "tags": [
@@ -3008,6 +3059,7 @@
         "server.domain": "ictas1247.www5.example",
         "server.registered_domain": "www5.example",
         "server.subdomain": "ictas1247",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "upidat1328.internal.localhost",
         "source.domain": "iac",
@@ -3056,9 +3108,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "met",
             "tesseci33.internal.example",
-            "nisiut1750.internal.invalid",
-            "met"
+            "nisiut1750.internal.invalid"
         ],
         "rsa.internal.event_desc": "nost",
         "rsa.internal.messageid": "302452816",
@@ -3069,6 +3121,7 @@
         "server.domain": "nisiut1750.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "nisiut1750",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "tesseci33.internal.example",
         "tags": [
@@ -3090,9 +3143,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "alo7567.www5.test",
             "ptasnula2158.internal.host",
-            "proident",
-            "alo7567.www5.test"
+            "proident"
         ],
         "rsa.internal.event_desc": "quisnos",
         "rsa.internal.messageid": "302452736",
@@ -3103,6 +3156,7 @@
         "server.domain": "ptasnula2158.internal.host",
         "server.registered_domain": "internal.host",
         "server.subdomain": "ptasnula2158",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "alo7567.www5.test",
         "tags": [
@@ -3162,9 +3216,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "emvel4391.localhost",
             "tisetqua6007.api.home",
             "its1301.www.test",
+            "emvel4391.localhost",
             "exer3621.www5.test"
         ],
         "related.ip": [
@@ -3195,6 +3249,7 @@
         "rule.name": "iatisund",
         "server.domain": "emvel4391.localhost",
         "server.registered_domain": "emvel4391.localhost",
+        "server.top_level_domain": "localhost",
         "service.type": "symantec",
         "source.address": "tisetqua6007.api.home",
         "source.domain": "oquisqua",
@@ -3252,6 +3307,7 @@
         "server.domain": "atnu2000.internal.corp",
         "server.registered_domain": "internal.corp",
         "server.subdomain": "atnu2000",
+        "server.top_level_domain": "corp",
         "service.type": "symantec",
         "source.address": "Remote:",
         "source.port": 4012,
@@ -3278,9 +3334,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "num",
-            "uamestqu7272.internal.host",
             "untexpli391.internal.domain",
+            "uamestqu7272.internal.host",
+            "num",
             "umSectio5136.www.local"
         ],
         "rsa.internal.event_desc": "ipitlabo",
@@ -3296,6 +3352,7 @@
         "server.domain": "uamestqu7272.internal.host",
         "server.registered_domain": "internal.host",
         "server.subdomain": "uamestqu7272",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "untexpli391.internal.domain",
         "tags": [
@@ -3364,6 +3421,7 @@
         "server.domain": "cepteur6876.internal.host",
         "server.registered_domain": "internal.host",
         "server.subdomain": "cepteur6876",
+        "server.top_level_domain": "host",
         "service.type": "symantec",
         "source.address": "eniamqu1863.api.lan",
         "source.domain": "nby",
@@ -3403,9 +3461,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "tionul7555.www5.lan",
             "remipsum5485.api.local",
             "tationul5346.internal.localdomain",
+            "tionul7555.www5.lan",
             "ugia146.www5.corp"
         ],
         "related.ip": [
@@ -3438,6 +3496,7 @@
         "server.domain": "tationul5346.internal.localdomain",
         "server.registered_domain": "internal.localdomain",
         "server.subdomain": "tationul5346",
+        "server.top_level_domain": "localdomain",
         "service.type": "symantec",
         "source.address": "tionul7555.www5.lan",
         "source.domain": "aaliqu",
@@ -3536,9 +3595,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
+            "rinrepre",
             "cidun7605.www5.example",
             "asnula6304.internal.example",
-            "rinrepre",
             "odite7850.internal.corp"
         ],
         "related.ip": [
@@ -3571,6 +3630,7 @@
         "server.domain": "asnula6304.internal.example",
         "server.registered_domain": "internal.example",
         "server.subdomain": "asnula6304",
+        "server.top_level_domain": "example",
         "service.type": "symantec",
         "source.address": "cidun7605.www5.example",
         "source.ip": [
@@ -3609,6 +3669,7 @@
         "server.domain": "laboru6211.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "laboru6211",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "ssitasp7492.test",
         "tags": [
@@ -3632,9 +3693,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "rem6392.internal.domain",
-            "ntiumtot6232.api.corp",
             "upt",
+            "ntiumtot6232.api.corp",
+            "rem6392.internal.domain",
             "estq2131.api.localdomain"
         ],
         "rsa.internal.event_desc": "did",
@@ -3650,6 +3711,7 @@
         "server.domain": "ntiumtot6232.api.corp",
         "server.registered_domain": "api.corp",
         "server.subdomain": "ntiumtot6232",
+        "server.top_level_domain": "corp",
         "service.type": "symantec",
         "source.address": "rem6392.internal.domain",
         "tags": [
@@ -3691,6 +3753,7 @@
         "server.domain": "ree4785.internal.localdomain",
         "server.registered_domain": "internal.localdomain",
         "server.subdomain": "ree4785",
+        "server.top_level_domain": "localdomain",
         "service.type": "symantec",
         "source.address": "upi3.www.home",
         "tags": [
@@ -3716,8 +3779,8 @@
         "observer.vendor": "Symantec",
         "related.hosts": [
             "ianonnu4387.www.domain",
-            "5",
             "eprehend3993.internal.test",
+            "5",
             "itess2258.api.lan"
         ],
         "related.ip": [
@@ -3746,6 +3809,7 @@
         "server.domain": "eprehend3993.internal.test",
         "server.registered_domain": "internal.test",
         "server.subdomain": "eprehend3993",
+        "server.top_level_domain": "test",
         "service.type": "symantec",
         "source.address": "ianonnu4387.www.domain",
         "source.ip": [
@@ -3784,9 +3848,9 @@
         "observer.vendor": "Symantec",
         "observer.version": "1.6400",
         "related.hosts": [
-            "tdo6940.mail.local",
             "rin5257.www5.test",
             "ess3012.mail.test",
+            "tdo6940.mail.local",
             "epteur5858.www5.local"
         ],
         "related.ip": [
@@ -3819,6 +3883,7 @@
         "server.domain": "tdo6940.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "tdo6940",
+        "server.top_level_domain": "local",
         "service.type": "symantec",
         "source.address": "rin5257.www5.test",
         "source.domain": "citat",
@@ -3848,9 +3913,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "aed3193.api.lan",
             "sunti",
-            "eumfug6647.home"
+            "eumfug6647.home",
+            "aed3193.api.lan"
         ],
         "rsa.internal.event_desc": "equa",
         "rsa.internal.messageid": "302449409",
@@ -3860,6 +3925,7 @@
         "rsa.network.domain": "eumfug6647.home",
         "server.domain": "eumfug6647.home",
         "server.registered_domain": "eumfug6647.home",
+        "server.top_level_domain": "home",
         "service.type": "symantec",
         "source.address": "aed3193.api.lan",
         "tags": [
@@ -3901,9 +3967,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "evolupt",
             "lillumqu7256.www5.invalid",
-            "rumSec5271.home"
+            "rumSec5271.home",
+            "evolupt"
         ],
         "rsa.internal.event_desc": "unt",
         "rsa.internal.messageid": "302449166",
@@ -3914,6 +3980,7 @@
         "server.domain": "lillumqu7256.www5.invalid",
         "server.registered_domain": "www5.invalid",
         "server.subdomain": "lillumqu7256",
+        "server.top_level_domain": "invalid",
         "service.type": "symantec",
         "source.address": "rumSec5271.home",
         "tags": [
@@ -3975,9 +4042,9 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Symantec",
         "related.hosts": [
-            "ntiu",
             "gnama2349.mail.domain",
             "mol400.domain",
+            "ntiu",
             "oNem5850.www.example"
         ],
         "rsa.internal.event_desc": "ccusan",
@@ -3992,6 +4059,7 @@
         "rsa.network.domain": "mol400.domain",
         "server.domain": "mol400.domain",
         "server.registered_domain": "mol400.domain",
+        "server.top_level_domain": "domain",
         "service.type": "symantec",
         "source.address": "gnama2349.mail.domain",
         "tags": [

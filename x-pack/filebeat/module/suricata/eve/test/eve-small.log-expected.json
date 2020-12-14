@@ -509,6 +509,7 @@
         "event.type": [
             "connection",
             "start",
+            "start",
             "start"
         ],
         "fileset.name": "eve",

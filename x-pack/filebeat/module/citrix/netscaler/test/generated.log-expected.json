@@ -184,11 +184,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
+            "10.83.234.60",
             "10.21.92.218",
-            "10.156.210.168",
-            "10.109.68.21",
             "10.96.119.12",
-            "10.83.234.60"
+            "10.156.210.168",
+            "10.109.68.21"
         ],
         "related.user": [
             "picia"
@@ -310,9 +310,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
+            "10.92.161.8",
             "10.116.193.182",
-            "10.103.118.137",
-            "10.92.161.8"
+            "10.103.118.137"
         ],
         "related.user": [
             "ationemu"
@@ -586,6 +586,7 @@
         "server.domain": "tor4410.api.localhost",
         "server.registered_domain": "api.localhost",
         "server.subdomain": "tor4410",
+        "server.top_level_domain": "localhost",
         "service.type": "citrix",
         "source.ip": [
             "10.206.87.219"
@@ -992,8 +993,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.248.165.185",
-            "10.32.39.220"
+            "10.32.39.220",
+            "10.248.165.185"
         ],
         "related.user": [
             "exeaco"
@@ -1028,8 +1029,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.197.6.245",
             "10.81.45.174",
+            "10.197.6.245",
             "10.82.28.220"
         ],
         "related.user": [
@@ -1332,11 +1333,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.117.94.131",
-            "10.180.83.140",
-            "10.3.23.172",
             "10.45.114.111",
-            "10.243.226.122"
+            "10.117.94.131",
+            "10.243.226.122",
+            "10.180.83.140",
+            "10.3.23.172"
         ],
         "related.user": [
             "ehender"
@@ -1543,8 +1544,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.29.207.55",
-            "10.61.175.217"
+            "10.61.175.217",
+            "10.29.207.55"
         ],
         "related.user": [
             "scip"
@@ -1887,8 +1888,8 @@
         "rsa.db.index": "orem",
         "rsa.internal.messageid": "APPFW_FIELDCONSISTENCY",
         "rsa.misc.action": [
-            "allow",
-            "tesse"
+            "tesse",
+            "allow"
         ],
         "rsa.misc.policy_name": "rsi",
         "rsa.misc.rule": "ntutlab",
@@ -2084,8 +2085,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.225.146.5",
             "10.41.65.89",
+            "10.225.146.5",
             "10.80.5.101"
         ],
         "related.user": [
@@ -2478,8 +2479,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.187.86.64",
-            "10.197.128.162"
+            "10.197.128.162",
+            "10.187.86.64"
         ],
         "rsa.internal.messageid": "ICA_SESSION_UPDATE",
         "rsa.misc.msgIdPart1": "ICA",
@@ -2534,7 +2535,8 @@
         "url.original": "https://www5.example.com/iscivel/rinci.txt?atcupi=eriti#uptateve",
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.com",
-        "url.subdomain": "www5"
+        "url.subdomain": "www5",
+        "url.top_level_domain": "com"
     },
     {
         "destination.ip": [
@@ -2552,8 +2554,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.204.20.8",
-            "10.43.239.97"
+            "10.43.239.97",
+            "10.204.20.8"
         ],
         "rsa.internal.messageid": "ICA_SESSION_UPDATE",
         "rsa.misc.msgIdPart1": "ICA",
@@ -2589,11 +2591,11 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.133.153.174",
-            "10.148.244.55",
+            "10.76.129.136",
             "10.8.82.22",
+            "10.133.153.174",
             "10.113.135.78",
-            "10.76.129.136"
+            "10.148.244.55"
         ],
         "related.user": [
             "asiar"
@@ -2667,8 +2669,8 @@
         "rsa.db.index": "aturE",
         "rsa.internal.messageid": "APPFW_REFERER_HEADER",
         "rsa.misc.action": [
-            "remip",
-            "cancel"
+            "cancel",
+            "remip"
         ],
         "rsa.misc.policy_name": "oNemoeni",
         "rsa.misc.rule": "citation",
@@ -2705,8 +2707,8 @@
         "rsa.db.index": "iat",
         "rsa.internal.messageid": "AF_MALFORMED_REQ_ERR",
         "rsa.misc.action": [
-            "block",
-            "ati"
+            "ati",
+            "block"
         ],
         "rsa.misc.policy_name": "llu",
         "rsa.misc.rule": "etd",
@@ -2738,9 +2740,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.67.233.159",
+            "10.213.112.186",
             "10.215.229.78",
-            "10.213.112.186"
+            "10.67.233.159"
         ],
         "related.user": [
             "emquiav"
@@ -2850,8 +2852,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.96.104.212",
-            "10.73.45.19"
+            "10.73.45.19",
+            "10.96.104.212"
         ],
         "rsa.internal.messageid": "ICA_SESSION_UPDATE",
         "rsa.misc.msgIdPart1": "ICA",
@@ -2942,9 +2944,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Citrix",
         "related.ip": [
-            "10.29.202.248",
             "10.206.5.50",
             "10.161.218.47",
+            "10.29.202.248",
             "10.247.251.223"
         ],
         "rsa.internal.event_desc": "A Server side and a Client side TCP connection is delinked. This is not tracked by Netscaler",
@@ -3041,9 +3043,9 @@
         "observer.vendor": "Citrix",
         "observer.version": "1.897",
         "related.hosts": [
-            "ptateve165.mail.corp",
+            "hend1170.www5.lan",
             "orisnis403.www.localhost",
-            "hend1170.www5.lan"
+            "ptateve165.mail.corp"
         ],
         "related.ip": [
             "10.111.22.134"
@@ -3057,6 +3059,7 @@
         "server.domain": "hend1170.www5.lan",
         "server.registered_domain": "www5.lan",
         "server.subdomain": "hend1170",
+        "server.top_level_domain": "lan",
         "service.type": "citrix",
         "source.address": "orisnis403.www.localhost",
         "source.ip": [

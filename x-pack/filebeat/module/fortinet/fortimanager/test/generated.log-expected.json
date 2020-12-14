@@ -28,9 +28,9 @@
             "modtempo"
         ],
         "related.ip": [
+            "10.20.234.169",
             "10.44.173.44",
-            "10.189.58.145",
-            "10.20.234.169"
+            "10.189.58.145"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -110,8 +110,8 @@
         "rsa.investigations.event_vcat": "eius",
         "rsa.misc.OS": "anonnu",
         "rsa.misc.action": [
-            "accept",
-            "mol"
+            "mol",
+            "accept"
         ],
         "rsa.misc.category": "exe",
         "rsa.misc.client": "radip",
@@ -188,9 +188,9 @@
             "ccaecat"
         ],
         "related.ip": [
-            "10.200.188.142",
+            "10.15.159.80",
             "10.94.103.117",
-            "10.15.159.80"
+            "10.200.188.142"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -338,8 +338,8 @@
         "rsa.investigations.event_vcat": "aveniam",
         "rsa.misc.OS": "oll",
         "rsa.misc.action": [
-            "ali",
-            "allow"
+            "allow",
+            "ali"
         ],
         "rsa.misc.category": "emeumfug",
         "rsa.misc.client": "caecatc",
@@ -415,13 +415,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.152",
         "related.hosts": [
-            "orain",
             "onse",
+            "orain",
             "agna7678.internal.host"
         ],
         "related.ip": [
-            "10.114.150.67",
-            "10.76.73.140"
+            "10.76.73.140",
+            "10.114.150.67"
         ],
         "related.user": [
             "aperia"
@@ -431,8 +431,8 @@
         "rsa.investigations.event_vcat": "mwr",
         "rsa.misc.OS": "imaven",
         "rsa.misc.action": [
-            "accept",
-            "uines"
+            "uines",
+            "accept"
         ],
         "rsa.misc.category": "uidolo",
         "rsa.misc.client": "emips",
@@ -513,8 +513,8 @@
             "equep5085.mail.domain"
         ],
         "related.ip": [
-            "10.95.64.124",
-            "10.195.36.51"
+            "10.195.36.51",
+            "10.95.64.124"
         ],
         "related.user": [
             "nnum"
@@ -524,8 +524,8 @@
         "rsa.investigations.event_vcat": "quae",
         "rsa.misc.OS": "qui",
         "rsa.misc.action": [
-            "iadese",
-            "accept"
+            "accept",
+            "iadese"
         ],
         "rsa.misc.category": "aturve",
         "rsa.misc.client": "utei",
@@ -602,8 +602,8 @@
             "labore"
         ],
         "related.ip": [
-            "10.186.85.3",
             "10.176.216.90",
+            "10.186.85.3",
             "10.114.16.155"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -673,8 +673,8 @@
             "eturadi6608.mail.host"
         ],
         "related.ip": [
-            "10.61.163.4",
-            "10.23.62.94"
+            "10.23.62.94",
+            "10.61.163.4"
         ],
         "related.user": [
             "non"
@@ -761,8 +761,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.2580",
         "related.hosts": [
-            "tani",
             "ecte",
+            "tani",
             "ipsumdol4488.api.localdomain"
         ],
         "related.ip": [
@@ -777,8 +777,8 @@
         "rsa.investigations.event_vcat": "tDuisaut",
         "rsa.misc.OS": "Nequepor",
         "rsa.misc.action": [
-            "deny",
-            "sno"
+            "sno",
+            "deny"
         ],
         "rsa.misc.category": "idolo",
         "rsa.misc.client": "volu",
@@ -855,8 +855,8 @@
             "diconseq"
         ],
         "related.ip": [
-            "10.106.162.153",
             "10.58.214.16",
+            "10.106.162.153",
             "10.238.164.74"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -922,9 +922,9 @@
             "tenimad"
         ],
         "related.ip": [
+            "10.225.141.20",
             "10.217.150.196",
-            "10.110.31.190",
-            "10.225.141.20"
+            "10.110.31.190"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -993,8 +993,8 @@
             "cusant4946.www.domain"
         ],
         "related.ip": [
-            "10.69.103.176",
-            "10.137.56.173"
+            "10.137.56.173",
+            "10.69.103.176"
         ],
         "related.user": [
             "proide"
@@ -1309,9 +1309,9 @@
             "tla"
         ],
         "related.ip": [
+            "10.67.132.242",
             "10.245.187.229",
-            "10.241.132.176",
-            "10.67.132.242"
+            "10.241.132.176"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -1375,8 +1375,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.1847",
         "related.hosts": [
-            "cingel",
             "uii",
+            "cingel",
             "tore7088.www.invalid"
         ],
         "related.ip": [
@@ -1468,8 +1468,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.760",
         "related.hosts": [
-            "rcit",
             "dolorsit",
+            "rcit",
             "mve1890.internal.home"
         ],
         "related.ip": [
@@ -1484,8 +1484,8 @@
         "rsa.investigations.event_vcat": "metcons",
         "rsa.misc.OS": "ehende",
         "rsa.misc.action": [
-            "deny",
-            "umf"
+            "umf",
+            "deny"
         ],
         "rsa.misc.category": "emUte",
         "rsa.misc.client": "archite",
@@ -1561,8 +1561,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4450",
         "related.hosts": [
-            "billoi",
             "saquaea",
+            "billoi",
             "eturad6143.www.home"
         ],
         "related.ip": [
@@ -1659,8 +1659,8 @@
             "orinrep5386.www.corp"
         ],
         "related.ip": [
-            "10.208.21.135",
-            "10.253.228.140"
+            "10.253.228.140",
+            "10.208.21.135"
         ],
         "related.user": [
             "inculp"
@@ -1747,13 +1747,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.1710",
         "related.hosts": [
-            "Nemo",
             "edquia",
+            "Nemo",
             "henderi724.www5.home"
         ],
         "related.ip": [
-            "10.243.226.122",
-            "10.3.23.172"
+            "10.3.23.172",
+            "10.243.226.122"
         ],
         "related.user": [
             "olorem"
@@ -1840,13 +1840,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.5380",
         "related.hosts": [
-            "onse",
             "uei",
+            "onse",
             "reseosqu1629.mail.lan"
         ],
         "related.ip": [
-            "10.106.85.174",
-            "10.94.242.80"
+            "10.94.242.80",
+            "10.106.85.174"
         ],
         "related.user": [
             "lmo"
@@ -2007,8 +2007,8 @@
             "tasnul4179.internal.host"
         ],
         "related.ip": [
-            "10.53.168.187",
-            "10.141.156.217"
+            "10.141.156.217",
+            "10.53.168.187"
         ],
         "related.user": [
             "amqu"
@@ -2018,8 +2018,8 @@
         "rsa.investigations.event_vcat": "illumq",
         "rsa.misc.OS": "idata",
         "rsa.misc.action": [
-            "emacc",
-            "block"
+            "block",
+            "emacc"
         ],
         "rsa.misc.category": "ueporro",
         "rsa.misc.client": "veli",
@@ -2096,8 +2096,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.3402",
         "related.hosts": [
-            "tur",
             "imavenia",
+            "tur",
             "bore5546.www.local"
         ],
         "related.ip": [
@@ -2189,8 +2189,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.91",
         "related.hosts": [
-            "amquisno",
             "Dui",
+            "amquisno",
             "Utenima260.mail.invalid"
         ],
         "related.ip": [
@@ -2376,9 +2376,9 @@
             "uio"
         ],
         "related.ip": [
-            "10.17.209.252",
             "10.37.161.101",
-            "10.111.182.212"
+            "10.111.182.212",
+            "10.17.209.252"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2443,8 +2443,8 @@
             "itautfu"
         ],
         "related.ip": [
-            "10.170.196.181",
             "10.153.166.133",
+            "10.170.196.181",
             "10.158.175.98"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -2514,8 +2514,8 @@
             "con6049.internal.lan"
         ],
         "related.ip": [
-            "10.63.171.91",
-            "10.48.25.200"
+            "10.48.25.200",
+            "10.63.171.91"
         ],
         "related.user": [
             "usanti"
@@ -2525,8 +2525,8 @@
         "rsa.investigations.event_vcat": "enimad",
         "rsa.misc.OS": "olor",
         "rsa.misc.action": [
-            "accept",
-            "nse"
+            "nse",
+            "accept"
         ],
         "rsa.misc.category": "conseq",
         "rsa.misc.client": "mmo",
@@ -2604,8 +2604,8 @@
         ],
         "related.ip": [
             "10.174.17.46",
-            "10.77.105.81",
-            "10.38.168.190"
+            "10.38.168.190",
+            "10.77.105.81"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2671,8 +2671,8 @@
         ],
         "related.ip": [
             "10.166.142.198",
-            "10.36.99.207",
-            "10.225.37.73"
+            "10.225.37.73",
+            "10.36.99.207"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2737,9 +2737,9 @@
             "eturadip"
         ],
         "related.ip": [
-            "10.214.156.161",
+            "10.66.90.225",
             "10.145.194.12",
-            "10.66.90.225"
+            "10.214.156.161"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2805,8 +2805,8 @@
         ],
         "related.ip": [
             "10.156.208.5",
-            "10.163.36.101",
-            "10.6.242.108"
+            "10.6.242.108",
+            "10.163.36.101"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2870,8 +2870,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4713",
         "related.hosts": [
-            "data",
             "epteurs",
+            "data",
             "remeum2641.www5.corp"
         ],
         "related.ip": [
@@ -2963,13 +2963,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4481",
         "related.hosts": [
-            "naaliq",
             "trudex",
+            "naaliq",
             "itaspe3216.localdomain"
         ],
         "related.ip": [
-            "10.116.82.108",
-            "10.94.177.125"
+            "10.94.177.125",
+            "10.116.82.108"
         ],
         "related.user": [
             "ecatc"
@@ -2979,8 +2979,8 @@
         "rsa.investigations.event_vcat": "ihi",
         "rsa.misc.OS": "amquaera",
         "rsa.misc.action": [
-            "nimides",
-            "allow"
+            "allow",
+            "nimides"
         ],
         "rsa.misc.category": "mve",
         "rsa.misc.client": "plica",
@@ -3057,8 +3057,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4442",
         "related.hosts": [
-            "uae",
             "fugi",
+            "uae",
             "mea6298.api.example"
         ],
         "related.ip": [
@@ -3150,13 +3150,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.3804",
         "related.hosts": [
-            "nder",
             "atcupi",
+            "nder",
             "iqu7510.internal.corp"
         ],
         "related.ip": [
-            "10.49.82.45",
-            "10.179.153.97"
+            "10.179.153.97",
+            "10.49.82.45"
         ],
         "related.user": [
             "dictasun"
@@ -3244,9 +3244,9 @@
             "lors"
         ],
         "related.ip": [
-            "10.98.52.184",
+            "10.99.55.115",
             "10.205.83.138",
-            "10.99.55.115"
+            "10.98.52.184"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3388,6 +3388,7 @@
         "server.domain": "ntoccae2859.www.test",
         "server.registered_domain": "www.test",
         "server.subdomain": "ntoccae2859",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "tags": [
             "fortinet.fortimanager",
@@ -3516,8 +3517,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4895",
         "related.hosts": [
-            "ficiade",
             "ipexeac",
+            "ficiade",
             "tatiset4191.localdomain"
         ],
         "related.ip": [
@@ -3610,9 +3611,9 @@
             "teni"
         ],
         "related.ip": [
-            "10.200.12.126",
+            "10.250.231.196",
             "10.14.145.107",
-            "10.250.231.196"
+            "10.200.12.126"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3677,9 +3678,9 @@
             "atuse"
         ],
         "related.ip": [
-            "10.103.36.192",
             "10.21.203.112",
-            "10.225.34.176"
+            "10.225.34.176",
+            "10.103.36.192"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3744,9 +3745,9 @@
             "usantiu"
         ],
         "related.ip": [
-            "10.140.59.161",
             "10.118.111.183",
-            "10.5.67.140"
+            "10.5.67.140",
+            "10.140.59.161"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3810,13 +3811,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4493",
         "related.hosts": [
-            "labor",
             "veleumiu",
+            "labor",
             "nimadmi4084.api.home"
         ],
         "related.ip": [
-            "10.7.70.169",
-            "10.28.212.191"
+            "10.28.212.191",
+            "10.7.70.169"
         ],
         "related.user": [
             "itsed"
@@ -3826,8 +3827,8 @@
         "rsa.investigations.event_vcat": "Loremips",
         "rsa.misc.OS": "eritquii",
         "rsa.misc.action": [
-            "accept",
-            "nostru"
+            "nostru",
+            "accept"
         ],
         "rsa.misc.category": "amnisiu",
         "rsa.misc.client": "rcita",
@@ -3903,8 +3904,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.6506",
         "related.hosts": [
-            "sedqui",
             "ecillum",
+            "sedqui",
             "reprehe3525.www5.example"
         ],
         "related.ip": [
@@ -3919,8 +3920,8 @@
         "rsa.investigations.event_vcat": "uep",
         "rsa.misc.OS": "iatisund",
         "rsa.misc.action": [
-            "nvo",
-            "block"
+            "block",
+            "nvo"
         ],
         "rsa.misc.category": "tenima",
         "rsa.misc.client": "iuntNe",
@@ -3997,8 +3998,8 @@
             "sitv"
         ],
         "related.ip": [
-            "10.251.183.113",
             "10.22.149.132",
+            "10.251.183.113",
             "10.217.145.137"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -4064,8 +4065,8 @@
             "nisi"
         ],
         "related.ip": [
-            "10.51.60.203",
             "10.183.16.252",
+            "10.51.60.203",
             "10.203.66.175"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -4130,8 +4131,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.409",
         "related.hosts": [
-            "doei",
             "magnama",
+            "doei",
             "ursint411.www.lan"
         ],
         "related.ip": [
@@ -4223,13 +4224,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.5475",
         "related.hosts": [
-            "antium",
             "rcita",
+            "antium",
             "ididunt7607.mail.localhost"
         ],
         "related.ip": [
-            "10.242.178.15",
-            "10.217.111.77"
+            "10.217.111.77",
+            "10.242.178.15"
         ],
         "related.user": [
             "nimadmin"
@@ -4316,8 +4317,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.142",
         "related.hosts": [
-            "rsita",
             "ommodoco",
+            "rsita",
             "mco2906.domain"
         ],
         "related.ip": [
@@ -4414,8 +4415,8 @@
             "ntex5135.corp"
         ],
         "related.ip": [
-            "10.234.171.117",
-            "10.239.194.105"
+            "10.239.194.105",
+            "10.234.171.117"
         ],
         "related.user": [
             "tat"
@@ -4425,8 +4426,8 @@
         "rsa.investigations.event_vcat": "uia",
         "rsa.misc.OS": "mquae",
         "rsa.misc.action": [
-            "tenatus",
-            "deny"
+            "deny",
+            "tenatus"
         ],
         "rsa.misc.category": "abo",
         "rsa.misc.client": "umtota",
@@ -4570,13 +4571,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.6905",
         "related.hosts": [
-            "aaliq",
             "rveli",
+            "aaliq",
             "tat1845.internal.invalid"
         ],
         "related.ip": [
-            "10.96.168.24",
-            "10.109.106.194"
+            "10.109.106.194",
+            "10.96.168.24"
         ],
         "related.user": [
             "ommodoc"
@@ -4663,8 +4664,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.1353",
         "related.hosts": [
-            "iatn",
             "nibusB",
+            "iatn",
             "ulamc767.internal.lan"
         ],
         "related.ip": [
@@ -4679,8 +4680,8 @@
         "rsa.investigations.event_vcat": "eiusm",
         "rsa.misc.OS": "emag",
         "rsa.misc.action": [
-            "deny",
-            "velillu"
+            "velillu",
+            "deny"
         ],
         "rsa.misc.category": "litseddo",
         "rsa.misc.client": "aturE",
@@ -4757,9 +4758,9 @@
             "metco"
         ],
         "related.ip": [
-            "10.103.169.94",
+            "10.140.137.17",
             "10.62.241.218",
-            "10.140.137.17"
+            "10.103.169.94"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4824,9 +4825,9 @@
             "litsedq"
         ],
         "related.ip": [
+            "10.90.229.92",
             "10.251.212.166",
-            "10.77.105.160",
-            "10.90.229.92"
+            "10.77.105.160"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4906,8 +4907,8 @@
         "rsa.investigations.event_vcat": "animi",
         "rsa.misc.OS": "tisunde",
         "rsa.misc.action": [
-            "cancel",
-            "aut"
+            "aut",
+            "cancel"
         ],
         "rsa.misc.category": "lamcorpo",
         "rsa.misc.client": "com",
@@ -4983,13 +4984,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.491",
         "related.hosts": [
-            "boru",
             "edutpe",
+            "boru",
             "istenatu3686.invalid"
         ],
         "related.ip": [
-            "10.96.100.84",
-            "10.182.58.108"
+            "10.182.58.108",
+            "10.96.100.84"
         ],
         "related.user": [
             "lpaquiof"
@@ -5077,9 +5078,9 @@
             "cons"
         ],
         "related.ip": [
-            "10.246.41.77",
             "10.157.22.21",
-            "10.228.61.5"
+            "10.228.61.5",
+            "10.246.41.77"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5144,9 +5145,9 @@
             "llumdo"
         ],
         "related.ip": [
-            "10.188.131.18",
+            "10.239.231.168",
             "10.242.119.111",
-            "10.239.231.168"
+            "10.188.131.18"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5210,13 +5211,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.979",
         "related.hosts": [
-            "lorem",
             "iden",
+            "lorem",
             "tru3812.mail.lan"
         ],
         "related.ip": [
-            "10.106.101.87",
-            "10.247.124.74"
+            "10.247.124.74",
+            "10.106.101.87"
         ],
         "related.user": [
             "ainci"
@@ -5290,8 +5291,8 @@
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "mid",
-            "etdol408.internal.home"
+            "etdol408.internal.home",
+            "mid"
         ],
         "related.user": [
             "rehe"
@@ -5314,6 +5315,7 @@
         "server.domain": "etdol408.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "etdol408",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "tags": [
             "fortinet.fortimanager",
@@ -5349,13 +5351,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4342",
         "related.hosts": [
-            "ten",
             "onsequ",
+            "ten",
             "riaturE1644.www5.example"
         ],
         "related.ip": [
-            "10.162.114.52",
-            "10.215.144.167"
+            "10.215.144.167",
+            "10.162.114.52"
         ],
         "related.user": [
             "erspici"
@@ -5536,9 +5538,9 @@
             "reseosqu"
         ],
         "related.ip": [
-            "10.51.106.43",
             "10.137.36.151",
-            "10.75.198.93"
+            "10.75.198.93",
+            "10.51.106.43"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5603,9 +5605,9 @@
             "caecatcu"
         ],
         "related.ip": [
-            "10.7.230.206",
+            "10.249.93.150",
             "10.154.151.111",
-            "10.249.93.150"
+            "10.7.230.206"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5669,13 +5671,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.5718",
         "related.hosts": [
-            "ptatem",
             "quirat",
+            "ptatem",
             "itse5466.api.example"
         ],
         "related.ip": [
-            "10.26.4.3",
-            "10.217.209.221"
+            "10.217.209.221",
+            "10.26.4.3"
         ],
         "related.user": [
             "ciduntut"
@@ -5685,8 +5687,8 @@
         "rsa.investigations.event_vcat": "santiumd",
         "rsa.misc.OS": "oris",
         "rsa.misc.action": [
-            "deny",
-            "rsitame"
+            "rsitame",
+            "deny"
         ],
         "rsa.misc.category": "agnaal",
         "rsa.misc.client": "urmagn",
@@ -5762,8 +5764,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.6603",
         "related.hosts": [
-            "eac",
             "ssuscipi",
+            "eac",
             "dquiac6194.api.lan"
         ],
         "related.ip": [
@@ -5855,13 +5857,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.2052",
         "related.hosts": [
-            "asp",
             "dat",
+            "asp",
             "amco1592.mail.host"
         ],
         "related.ip": [
-            "10.110.99.222",
-            "10.62.140.108"
+            "10.62.140.108",
+            "10.110.99.222"
         ],
         "related.user": [
             "moenimi"
@@ -5948,13 +5950,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.2691",
         "related.hosts": [
-            "ratio",
             "orroqu",
+            "ratio",
             "dicta7226.mail.example"
         ],
         "related.ip": [
-            "10.4.244.115",
-            "10.53.50.77"
+            "10.53.50.77",
+            "10.4.244.115"
         ],
         "related.user": [
             "idolo"
@@ -6202,9 +6204,9 @@
             "nimides"
         ],
         "related.ip": [
-            "10.53.251.202",
+            "10.123.59.69",
             "10.226.255.3",
-            "10.123.59.69"
+            "10.53.251.202"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6270,8 +6272,8 @@
         ],
         "related.ip": [
             "10.29.141.252",
-            "10.3.85.176",
-            "10.212.56.26"
+            "10.212.56.26",
+            "10.3.85.176"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6335,13 +6337,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.95",
         "related.hosts": [
-            "inculp",
             "Utenimad",
+            "inculp",
             "emveleu4029.api.local"
         ],
         "related.ip": [
-            "10.126.11.186",
-            "10.236.175.163"
+            "10.236.175.163",
+            "10.126.11.186"
         ],
         "related.user": [
             "udantiu"
@@ -6351,8 +6353,8 @@
         "rsa.investigations.event_vcat": "ill",
         "rsa.misc.OS": "eabill",
         "rsa.misc.action": [
-            "cancel",
-            "atemqui"
+            "atemqui",
+            "cancel"
         ],
         "rsa.misc.category": "idatatno",
         "rsa.misc.client": "res",
@@ -6429,8 +6431,8 @@
             "mes"
         ],
         "related.ip": [
-            "10.83.98.220",
             "10.11.150.136",
+            "10.83.98.220",
             "10.171.60.173"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -6497,8 +6499,8 @@
         ],
         "related.ip": [
             "10.74.88.209",
-            "10.92.3.166",
-            "10.238.49.73"
+            "10.238.49.73",
+            "10.92.3.166"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6563,8 +6565,8 @@
             "ptate"
         ],
         "related.ip": [
-            "10.84.200.121",
             "10.119.248.36",
+            "10.84.200.121",
             "10.187.107.47"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -6630,9 +6632,9 @@
             "tasu"
         ],
         "related.ip": [
-            "10.167.128.229",
+            "10.30.239.222",
             "10.135.213.17",
-            "10.30.239.222"
+            "10.167.128.229"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6805,8 +6807,8 @@
         "rsa.investigations.event_vcat": "ntexp",
         "rsa.misc.OS": "aconseq",
         "rsa.misc.action": [
-            "oluptate",
-            "block"
+            "block",
+            "oluptate"
         ],
         "rsa.misc.category": "edqu",
         "rsa.misc.client": "ites",
@@ -6950,9 +6952,9 @@
             "oeius"
         ],
         "related.ip": [
+            "10.66.149.234",
             "10.186.253.240",
-            "10.233.128.7",
-            "10.66.149.234"
+            "10.233.128.7"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7017,9 +7019,9 @@
             "irat"
         ],
         "related.ip": [
-            "10.227.133.134",
             "10.46.11.114",
-            "10.173.140.201"
+            "10.173.140.201",
+            "10.227.133.134"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7084,9 +7086,9 @@
             "emp"
         ],
         "related.ip": [
-            "10.205.18.11",
             "10.170.236.123",
-            "10.69.130.207"
+            "10.69.130.207",
+            "10.205.18.11"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7245,8 +7247,8 @@
         ],
         "related.ip": [
             "10.9.41.221",
-            "10.81.58.91",
-            "10.204.98.238"
+            "10.204.98.238",
+            "10.81.58.91"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7321,6 +7323,7 @@
         "server.domain": "xplicabo4308.www.example",
         "server.registered_domain": "www.example",
         "server.subdomain": "xplicabo4308",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "tags": [
             "fortinet.fortimanager",
@@ -7357,9 +7360,9 @@
             "uipex"
         ],
         "related.ip": [
-            "10.35.84.125",
+            "10.212.208.70",
             "10.37.120.29",
-            "10.212.208.70"
+            "10.35.84.125"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7424,9 +7427,9 @@
             "aturvel"
         ],
         "related.ip": [
+            "10.143.65.84",
             "10.207.207.106",
-            "10.199.201.26",
-            "10.143.65.84"
+            "10.199.201.26"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7558,9 +7561,9 @@
             "dents"
         ],
         "related.ip": [
-            "10.185.44.26",
+            "10.246.81.164",
             "10.53.110.111",
-            "10.246.81.164"
+            "10.185.44.26"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7811,8 +7814,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.4674",
         "related.hosts": [
-            "oremeu",
             "ita",
+            "oremeu",
             "luptat2613.internal.localhost"
         ],
         "related.ip": [
@@ -7904,13 +7907,13 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.1386",
         "related.hosts": [
-            "cab",
             "amquisn",
+            "cab",
             "neavo4796.internal.domain"
         ],
         "related.ip": [
-            "10.188.124.185",
-            "10.35.10.19"
+            "10.35.10.19",
+            "10.188.124.185"
         ],
         "related.user": [
             "dolo"
@@ -7920,8 +7923,8 @@
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.OS": "rumw",
         "rsa.misc.action": [
-            "block",
-            "tali"
+            "tali",
+            "block"
         ],
         "rsa.misc.category": "itsedq",
         "rsa.misc.client": "esciu",

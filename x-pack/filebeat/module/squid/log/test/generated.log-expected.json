@@ -18,8 +18,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "example.org"
+            "example.org",
+            "example.net"
         ],
         "related.ip": [
             "10.251.224.219",
@@ -30,8 +30,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "deny",
-            "PROPFIND"
+            "PROPFIND",
+            "deny"
         ],
         "rsa.misc.content_type": "ciade",
         "rsa.misc.result_code": "liqua",
@@ -43,6 +43,7 @@
         "rsa.web.web_ref_query": "nes=eab",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5699,
         "source.ip": [
@@ -57,6 +58,7 @@
         "url.original": "https://example.org/exercita/der.htm?odoco=ria#min",
         "url.path": "https://example.net",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "tation",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -85,20 +87,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www.example.org"
+            "www.example.org",
+            "example.com"
         ],
         "related.ip": [
-            "10.102.123.34",
-            "10.70.36.222"
+            "10.70.36.222",
+            "10.102.123.34"
         ],
         "related.user": [
             "doeiu"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "deny",
-            "PURGE"
+            "PURGE",
+            "deny"
         ],
         "rsa.misc.content_type": "volup",
         "rsa.misc.result_code": "olupt",
@@ -111,6 +113,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 208,
         "source.ip": [
@@ -126,6 +129,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "doeiu",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -154,8 +158,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "example.net"
+            "example.net",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.142.172.64",
@@ -166,8 +170,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "iatu",
         "rsa.misc.result_code": "temvel",
@@ -180,6 +184,7 @@
         "server.domain": "internal.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "internal",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5493,
         "source.ip": [
@@ -195,6 +200,7 @@
         "url.path": "https://example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "tia",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -222,12 +228,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "api.example.org"
+            "api.example.org",
+            "mail.example.com"
         ],
         "related.ip": [
-            "10.81.122.126",
-            "10.44.134.153"
+            "10.44.134.153",
+            "10.81.122.126"
         ],
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
@@ -249,6 +255,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1156,
         "source.ip": [
@@ -264,6 +271,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 9; 5024D_RU Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.92 Mobile Safari/537.36 YaApp_Android/10.61 YaSearchBrowser/10.61",
@@ -295,8 +303,8 @@
             "api.example.net"
         ],
         "related.ip": [
-            "10.171.175.51",
-            "10.160.95.56"
+            "10.160.95.56",
+            "10.171.175.51"
         ],
         "related.user": [
             "onev"
@@ -317,6 +325,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5738,
         "source.ip": [
@@ -332,6 +341,7 @@
         "url.path": "https://api.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "onev",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -364,8 +374,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.12.195.60",
-            "10.175.107.139"
+            "10.175.107.139",
+            "10.12.195.60"
         ],
         "related.user": [
             "mrema"
@@ -375,8 +385,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "HEAD"
+            "HEAD",
+            "accept"
         ],
         "rsa.misc.content_type": "aboris",
         "rsa.misc.result_code": "natura",
@@ -389,6 +399,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2946,
         "source.ip": [
@@ -404,6 +415,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "mrema",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -444,8 +456,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "DELETE",
-            "allow"
+            "allow",
+            "DELETE"
         ],
         "rsa.misc.content_type": "usmodte",
         "rsa.misc.result_code": "mUt",
@@ -458,6 +470,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1296,
         "source.ip": [
@@ -473,6 +486,7 @@
         "url.path": "https://www.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "tsed",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -526,6 +540,7 @@
         "rsa.web.web_ref_query": "erc=taliqu",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1510,
         "source.ip": [
@@ -540,6 +555,7 @@
         "url.original": "https://example.org/tatno/imav.htm?ofdeF=tion#orsitame",
         "url.path": "https://internal.example.net",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "umdo",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -568,8 +584,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.net",
-            "example.org"
+            "example.org",
+            "mail.example.net"
         ],
         "related.ip": [
             "10.90.131.186",
@@ -583,8 +599,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "accept",
-            "HEAD"
+            "HEAD",
+            "accept"
         ],
         "rsa.misc.content_type": "undeo",
         "rsa.misc.result_code": "quu",
@@ -596,6 +612,7 @@
         "rsa.web.web_ref_query": "idolore=onse",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5794,
         "source.ip": [
@@ -610,6 +627,7 @@
         "url.original": "https://example.org/uaera/sitas.txt?aedic=atquovo#iumto",
         "url.path": "https://mail.example.net",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "saute",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -638,8 +656,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.org"
+            "mail.example.org",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.203.172.203",
@@ -666,6 +684,7 @@
         "server.domain": "mail.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "mail",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6884,
         "source.ip": [
@@ -681,6 +700,7 @@
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "Nemoeni",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -712,8 +732,8 @@
             "www.example.org"
         ],
         "related.ip": [
-            "10.158.185.163",
-            "10.71.34.9"
+            "10.71.34.9",
+            "10.158.185.163"
         ],
         "related.user": [
             "aliq"
@@ -734,6 +754,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 987,
         "source.ip": [
@@ -749,6 +770,7 @@
         "url.path": "https://www.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "aliq",
         "user_agent.device.name": "XiaoMi Redmi 4X",
         "user_agent.name": "MiuiBrowser",
@@ -777,8 +799,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.net",
-            "internal.example.net"
+            "internal.example.net",
+            "example.net"
         ],
         "related.ip": [
             "10.201.76.240",
@@ -789,8 +811,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "emips",
         "rsa.misc.result_code": "onse",
@@ -803,6 +825,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2655,
         "source.ip": [
@@ -818,6 +841,7 @@
         "url.path": "https://example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "uines",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -846,8 +870,8 @@
             "www.example.net"
         ],
         "related.ip": [
-            "10.206.136.206",
-            "10.114.138.121"
+            "10.114.138.121",
+            "10.206.136.206"
         ],
         "related.user": [
             "xeac"
@@ -868,6 +892,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6462,
         "source.ip": [
@@ -883,6 +908,7 @@
         "url.path": "https://www.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "xeac",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -911,12 +937,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "mail.example.org"
+            "mail.example.org",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.200.199.166",
-            "10.134.161.118"
+            "10.134.161.118",
+            "10.200.199.166"
         ],
         "related.user": [
             "ipitla"
@@ -937,6 +963,7 @@
         "server.domain": "mail.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "mail",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3458,
         "source.ip": [
@@ -952,6 +979,7 @@
         "url.path": "https://www.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "ipitla",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -980,12 +1008,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www.example.org"
+            "www.example.org",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.76.3.41",
-            "10.122.46.71"
+            "10.122.46.71",
+            "10.76.3.41"
         ],
         "related.user": [
             "aturve"
@@ -1006,6 +1034,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2989,
         "source.ip": [
@@ -1021,6 +1050,7 @@
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "aturve",
         "user_agent.device.name": "VS996",
         "user_agent.name": "Chrome Mobile",
@@ -1061,8 +1091,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "accept"
+            "accept",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "asun",
         "rsa.misc.result_code": "lit",
@@ -1075,6 +1105,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1250,
         "source.ip": [
@@ -1090,6 +1121,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "itame",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -1118,8 +1150,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "api.example.net"
+            "api.example.net",
+            "www5.example.net"
         ],
         "related.ip": [
             "10.61.242.75",
@@ -1147,6 +1179,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3280,
         "source.ip": [
@@ -1162,6 +1195,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "iquidex",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -1216,6 +1250,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2462,
         "source.ip": [
@@ -1231,6 +1266,7 @@
         "url.path": "https://internal.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "etdol",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -1263,8 +1299,8 @@
             "internal.example.net"
         ],
         "related.ip": [
-            "10.49.92.179",
-            "10.89.201.140"
+            "10.89.201.140",
+            "10.49.92.179"
         ],
         "related.user": [
             "isnisiu"
@@ -1288,6 +1324,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3128,
         "source.ip": [
@@ -1303,6 +1340,7 @@
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "isnisiu",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -1331,12 +1369,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "mail.example.net"
+            "mail.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.90.86.89",
-            "10.235.7.92"
+            "10.235.7.92",
+            "10.90.86.89"
         ],
         "related.user": [
             "lapar"
@@ -1357,6 +1395,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5516,
         "source.ip": [
@@ -1372,6 +1411,7 @@
         "url.path": "https://mail.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "lapar",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -1412,8 +1452,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "cancel"
+            "cancel",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "Utenima",
         "rsa.misc.result_code": "uiinea",
@@ -1426,6 +1466,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1612,
         "source.ip": [
@@ -1441,6 +1482,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "volupt",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -1469,8 +1511,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "internal.example.net"
+            "internal.example.net",
+            "example.com"
         ],
         "related.ip": [
             "10.93.123.174",
@@ -1483,8 +1525,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "CONNECT"
+            "CONNECT",
+            "block"
         ],
         "rsa.misc.content_type": "iusmodi",
         "rsa.misc.result_code": "etcons",
@@ -1497,6 +1539,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1563,
         "source.ip": [
@@ -1512,6 +1555,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "reetdolo",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -1540,12 +1584,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "www5.example.net"
+            "www5.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
-            "10.7.46.36",
-            "10.233.48.103"
+            "10.233.48.103",
+            "10.7.46.36"
         ],
         "related.user": [
             "tlab"
@@ -1566,6 +1610,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 584,
         "source.ip": [
@@ -1581,6 +1626,7 @@
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "tlab",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -1609,12 +1655,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.93.220.10",
-            "10.27.58.92"
+            "10.27.58.92",
+            "10.93.220.10"
         ],
         "related.user": [
             "qui"
@@ -1635,6 +1681,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 63,
         "source.ip": [
@@ -1650,6 +1697,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "qui",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -1690,8 +1738,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "block",
-            "PURGE"
+            "PURGE",
+            "block"
         ],
         "rsa.misc.content_type": "untu",
         "rsa.misc.result_code": "loreme",
@@ -1704,6 +1752,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5676,
         "source.ip": [
@@ -1719,6 +1768,7 @@
         "url.path": "https://example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "ntexplic",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -1773,6 +1823,7 @@
         "server.domain": "mail.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "mail",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3780,
         "source.ip": [
@@ -1788,6 +1839,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "mquelau",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -1816,12 +1868,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.org",
-            "example.com"
+            "example.com",
+            "internal.example.org"
         ],
         "related.ip": [
-            "10.161.203.252",
-            "10.21.169.127"
+            "10.21.169.127",
+            "10.161.203.252"
         ],
         "related.user": [
             "ice"
@@ -1844,6 +1896,7 @@
         "server.domain": "internal.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "internal",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2835,
         "source.ip": [
@@ -1859,6 +1912,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "ice",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -1913,6 +1967,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 7124,
         "source.ip": [
@@ -1928,6 +1983,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "edqui",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -1968,8 +2024,8 @@
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "COPY",
-            "accept"
+            "accept",
+            "COPY"
         ],
         "rsa.misc.content_type": "onulam",
         "rsa.misc.result_code": "ugiat",
@@ -1982,6 +2038,7 @@
         "server.domain": "www5.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www5",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1542,
         "source.ip": [
@@ -1997,6 +2054,7 @@
         "url.path": "https://mail.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "onsecte",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -2025,20 +2083,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
-            "10.116.230.217",
-            "10.125.131.91"
+            "10.125.131.91",
+            "10.116.230.217"
         ],
         "related.user": [
             "isis"
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "UNLOCK",
-            "block"
+            "block",
+            "UNLOCK"
         ],
         "rsa.misc.content_type": "emUteni",
         "rsa.misc.result_code": "utlab",
@@ -2050,6 +2108,7 @@
         "rsa.web.web_ref_query": "dolorem=tvolu",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7122,
         "source.ip": [
@@ -2064,6 +2123,7 @@
         "url.original": "https://example.org/uatur/adminimv.gif?exeacom=roidents#tem",
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "isis",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -2090,20 +2150,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "api.example.com"
+            "api.example.com",
+            "mail.example.com"
         ],
         "related.ip": [
-            "10.26.96.202",
-            "10.119.90.128"
+            "10.119.90.128",
+            "10.26.96.202"
         ],
         "related.user": [
             "oraincid"
         ],
         "rsa.internal.messageid": "ICP_QUERY",
         "rsa.misc.action": [
-            "cancel",
-            "ICP_QUERY"
+            "ICP_QUERY",
+            "cancel"
         ],
         "rsa.misc.content_type": "ntsunt",
         "rsa.misc.result_code": "amcorp",
@@ -2116,6 +2176,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4826,
         "source.ip": [
@@ -2131,6 +2192,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "oraincid",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -2174,8 +2236,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "HEAD"
+            "HEAD",
+            "deny"
         ],
         "rsa.misc.content_type": "untutlab",
         "rsa.misc.result_code": "tatem",
@@ -2188,6 +2250,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3386,
         "source.ip": [
@@ -2203,6 +2266,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "upt",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -2243,8 +2307,8 @@
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "MOVE",
-            "deny"
+            "deny",
+            "MOVE"
         ],
         "rsa.misc.content_type": "elites",
         "rsa.misc.result_code": "oremi",
@@ -2257,6 +2321,7 @@
         "server.domain": "internal.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "internal",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1940,
         "source.ip": [
@@ -2272,6 +2337,7 @@
         "url.path": "https://www.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "xeaco",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -2325,6 +2391,7 @@
         "server.domain": "internal.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "internal",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7398,
         "source.ip": [
@@ -2340,6 +2407,7 @@
         "url.path": "https://internal.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "autodit",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -2368,8 +2436,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "www5.example.net"
+            "www5.example.net",
+            "example.org"
         ],
         "related.ip": [
             "10.150.245.88",
@@ -2394,6 +2462,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1738,
         "source.ip": [
@@ -2409,6 +2478,7 @@
         "url.path": "https://example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "reetd",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -2437,8 +2507,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "mail.example.net"
+            "mail.example.net",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.61.92.2",
@@ -2463,6 +2533,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 3023,
         "source.ip": [
@@ -2478,6 +2549,7 @@
         "url.path": "https://mail.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "atu",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -2509,16 +2581,16 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.84.32.178",
-            "10.50.124.116"
+            "10.50.124.116",
+            "10.84.32.178"
         ],
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "allow"
+            "allow",
+            "GET"
         ],
         "rsa.misc.content_type": "numquam",
         "rsa.misc.result_code": "temUt",
@@ -2531,6 +2603,7 @@
         "rsa.web.web_ref_query": "scingeli=isn",
         "server.domain": "example.net",
         "server.registered_domain": "example.net",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2741,
         "source.ip": [
@@ -2545,6 +2618,7 @@
         "url.original": "https://example.net/mven/olorsit.gif?oremag=illu#ruredo",
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
         "user_agent.original": "Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
@@ -2576,16 +2650,16 @@
             "api.example.org"
         ],
         "related.ip": [
-            "10.173.222.131",
-            "10.211.234.224"
+            "10.211.234.224",
+            "10.173.222.131"
         ],
         "related.user": [
             "Duisa"
         ],
         "rsa.internal.messageid": "TRACE",
         "rsa.misc.action": [
-            "TRACE",
-            "accept"
+            "accept",
+            "TRACE"
         ],
         "rsa.misc.content_type": "boNem",
         "rsa.misc.result_code": "aUt",
@@ -2598,6 +2672,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5564,
         "source.ip": [
@@ -2613,6 +2688,7 @@
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "Duisa",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -2641,20 +2717,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "mail.example.net"
+            "mail.example.net",
+            "www5.example.net"
         ],
         "related.ip": [
-            "10.11.83.126",
-            "10.0.157.225"
+            "10.0.157.225",
+            "10.11.83.126"
         ],
         "related.user": [
             "atu"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "deny",
-            "PROPFIND"
+            "PROPFIND",
+            "deny"
         ],
         "rsa.misc.content_type": "tempor",
         "rsa.misc.result_code": "remipsum",
@@ -2667,6 +2743,7 @@
         "server.domain": "mail.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "mail",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1282,
         "source.ip": [
@@ -2682,6 +2759,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "atu",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -2714,8 +2792,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.92.237.93",
-            "10.228.77.21"
+            "10.228.77.21",
+            "10.92.237.93"
         ],
         "related.user": [
             "onse"
@@ -2736,6 +2814,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5107,
         "source.ip": [
@@ -2751,6 +2830,7 @@
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "onse",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -2783,8 +2863,8 @@
             "api.example.com"
         ],
         "related.ip": [
-            "10.20.28.92",
-            "10.102.215.23"
+            "10.102.215.23",
+            "10.20.28.92"
         ],
         "related.user": [
             "ntexpl"
@@ -2793,8 +2873,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "POST"
+            "POST",
+            "allow"
         ],
         "rsa.misc.content_type": "nderiti",
         "rsa.misc.result_code": "litsedq",
@@ -2807,6 +2887,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 409,
         "source.ip": [
@@ -2822,6 +2903,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "ntexpl",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -2860,8 +2942,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "block",
-            "NONE"
+            "NONE",
+            "block"
         ],
         "rsa.misc.content_type": "uamei",
         "rsa.misc.result_code": "ecatcupi",
@@ -2874,6 +2956,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 4595,
         "source.ip": [
@@ -2889,6 +2972,7 @@
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "tionula",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -2917,8 +3001,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.com",
-            "internal.example.com"
+            "internal.example.com",
+            "api.example.com"
         ],
         "related.ip": [
             "10.177.238.45",
@@ -2943,6 +3027,7 @@
         "server.domain": "internal.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "internal",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5704,
         "source.ip": [
@@ -2958,6 +3043,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "rsp",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -2986,12 +3072,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www.example.org"
+            "www.example.org",
+            "example.com"
         ],
         "related.ip": [
-            "10.46.77.76",
-            "10.101.85.169"
+            "10.101.85.169",
+            "10.46.77.76"
         ],
         "related.user": [
             "liquid"
@@ -3001,8 +3087,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "accept"
+            "accept",
+            "GET"
         ],
         "rsa.misc.content_type": "radi",
         "rsa.misc.result_code": "Finibus",
@@ -3015,6 +3101,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5697,
         "source.ip": [
@@ -3030,6 +3117,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "liquid",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Yandex Browser",
@@ -3062,8 +3150,8 @@
             "www5.example.org"
         ],
         "related.ip": [
-            "10.231.7.209",
-            "10.24.54.129"
+            "10.24.54.129",
+            "10.231.7.209"
         ],
         "related.user": [
             "eavol"
@@ -3073,8 +3161,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "block",
-            "HEAD"
+            "HEAD",
+            "block"
         ],
         "rsa.misc.content_type": "scipitl",
         "rsa.misc.result_code": "temaccu",
@@ -3086,6 +3174,7 @@
         "rsa.web.web_ref_query": "litesseq=atcupida",
         "server.domain": "example.net",
         "server.registered_domain": "example.net",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1247,
         "source.ip": [
@@ -3100,6 +3189,7 @@
         "url.original": "https://example.net/edolo/ugiatquo.jpg?eosquira=pta#snos",
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "eavol",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -3142,8 +3232,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "CONNECT"
+            "CONNECT",
+            "allow"
         ],
         "rsa.misc.content_type": "incidid",
         "rsa.misc.result_code": "ugiatquo",
@@ -3156,6 +3246,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2617,
         "source.ip": [
@@ -3171,6 +3262,7 @@
         "url.path": "https://www.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "BCS",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -3199,8 +3291,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "www.example.com"
+            "www.example.com",
+            "mail.example.com"
         ],
         "related.ip": [
             "10.116.146.114",
@@ -3211,8 +3303,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "PROPFIND",
-            "deny"
+            "deny",
+            "PROPFIND"
         ],
         "rsa.misc.content_type": "est",
         "rsa.misc.result_code": "agnaaliq",
@@ -3225,6 +3317,7 @@
         "server.domain": "mail.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1444,
         "source.ip": [
@@ -3240,6 +3333,7 @@
         "url.path": "https://www.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "obea",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -3272,8 +3366,8 @@
             "internal.example.net"
         ],
         "related.ip": [
-            "10.217.222.99",
-            "10.244.108.135"
+            "10.244.108.135",
+            "10.217.222.99"
         ],
         "related.user": [
             "amvolu"
@@ -3294,6 +3388,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2512,
         "source.ip": [
@@ -3309,6 +3404,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "amvolu",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -3337,12 +3433,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "www.example.net"
+            "www.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.4.69.152",
-            "10.150.198.112"
+            "10.150.198.112",
+            "10.4.69.152"
         ],
         "related.user": [
             "mexer"
@@ -3363,6 +3459,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1370,
         "source.ip": [
@@ -3378,6 +3475,7 @@
         "url.path": "https://www.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "mexer",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -3433,6 +3531,7 @@
         "rsa.web.web_ref_query": "nisiut=rumwri",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7490,
         "source.ip": [
@@ -3447,6 +3546,7 @@
         "url.original": "https://example.org/abillo/undeom.html?oraincid=quaer#eetdo",
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "nse",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -3479,16 +3579,16 @@
             "www5.example.net"
         ],
         "related.ip": [
-            "10.205.28.24",
-            "10.49.242.174"
+            "10.49.242.174",
+            "10.205.28.24"
         ],
         "related.user": [
             "untutlab"
         ],
         "rsa.internal.messageid": "TRACE",
         "rsa.misc.action": [
-            "allow",
-            "TRACE"
+            "TRACE",
+            "allow"
         ],
         "rsa.misc.content_type": "pteurs",
         "rsa.misc.result_code": "consecte",
@@ -3501,6 +3601,7 @@
         "server.domain": "mail.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "mail",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 742,
         "source.ip": [
@@ -3516,6 +3617,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "untutlab",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -3544,12 +3646,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "mail.example.com"
+            "mail.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.17.202.219",
-            "10.183.223.149"
+            "10.183.223.149",
+            "10.17.202.219"
         ],
         "related.user": [
             "odoco"
@@ -3559,8 +3661,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "HEAD"
+            "HEAD",
+            "deny"
         ],
         "rsa.misc.content_type": "elites",
         "rsa.misc.result_code": "itseddoe",
@@ -3573,6 +3675,7 @@
         "server.domain": "www5.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www5",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6366,
         "source.ip": [
@@ -3588,6 +3691,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "odoco",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -3612,12 +3716,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "internal.example.org"
+            "internal.example.org",
+            "internal.example.net"
         ],
         "related.ip": [
-            "10.88.172.222",
-            "10.81.140.173"
+            "10.81.140.173",
+            "10.88.172.222"
         ],
         "related.user": [
             "etdol"
@@ -3638,6 +3742,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6695,
         "source.ip": [
@@ -3653,6 +3758,7 @@
         "url.path": "https://internal.example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "etdol",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -3677,8 +3783,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "api.example.net"
+            "api.example.net",
+            "example.com"
         ],
         "related.ip": [
             "10.162.129.196",
@@ -3689,8 +3795,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "accept",
-            "OPTIONS"
+            "OPTIONS",
+            "accept"
         ],
         "rsa.misc.content_type": "eacommo",
         "rsa.misc.result_code": "hend",
@@ -3703,6 +3809,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6835,
         "source.ip": [
@@ -3718,6 +3825,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "identsu",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -3746,16 +3854,16 @@
             "mail.example.com"
         ],
         "related.ip": [
-            "10.110.86.230",
-            "10.172.148.223"
+            "10.172.148.223",
+            "10.110.86.230"
         ],
         "related.user": [
             "enimadm"
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "accept",
-            "UNLOCK"
+            "UNLOCK",
+            "accept"
         ],
         "rsa.misc.content_type": "atc",
         "rsa.misc.result_code": "upta",
@@ -3768,6 +3876,7 @@
         "server.domain": "mail.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 3066,
         "source.ip": [
@@ -3783,6 +3892,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "enimadm",
         "user_agent.device.name": "Android",
         "user_agent.name": "Chrome Mobile",
@@ -3826,8 +3936,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "deny"
+            "deny",
+            "GET"
         ],
         "rsa.misc.content_type": "eriam",
         "rsa.misc.result_code": "sseq",
@@ -3840,6 +3950,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 729,
         "source.ip": [
@@ -3855,6 +3966,7 @@
         "url.path": "https://internal.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "riame",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -3883,8 +3995,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "example.net"
+            "example.net",
+            "api.example.net"
         ],
         "related.ip": [
             "10.55.55.72",
@@ -3909,6 +4021,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2007,
         "source.ip": [
@@ -3924,6 +4037,7 @@
         "url.path": "https://example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "asp",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -3964,8 +4078,8 @@
         ],
         "rsa.internal.messageid": "MOVE",
         "rsa.misc.action": [
-            "deny",
-            "MOVE"
+            "MOVE",
+            "deny"
         ],
         "rsa.misc.content_type": "seos",
         "rsa.misc.result_code": "fugiatqu",
@@ -3978,6 +4092,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5561,
         "source.ip": [
@@ -3993,6 +4108,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "ntorever",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4021,8 +4137,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.org",
-            "internal.example.net"
+            "internal.example.net",
+            "www.example.org"
         ],
         "related.ip": [
             "10.54.44.231",
@@ -4035,8 +4151,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "CONNECT"
+            "CONNECT",
+            "allow"
         ],
         "rsa.misc.content_type": "oreverit",
         "rsa.misc.result_code": "abor",
@@ -4049,6 +4165,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6451,
         "source.ip": [
@@ -4064,6 +4181,7 @@
         "url.path": "https://internal.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "mcorpo",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -4092,16 +4210,16 @@
             "internal.example.org"
         ],
         "related.ip": [
-            "10.181.177.74",
-            "10.130.150.189"
+            "10.130.150.189",
+            "10.181.177.74"
         ],
         "related.user": [
             "nvo"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "accept",
-            "LOCK"
+            "LOCK",
+            "accept"
         ],
         "rsa.misc.content_type": "colabori",
         "rsa.misc.result_code": "tassita",
@@ -4114,6 +4232,7 @@
         "server.domain": "internal.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "internal",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1223,
         "source.ip": [
@@ -4129,6 +4248,7 @@
         "url.path": "https://www.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "nvo",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -4161,8 +4281,8 @@
             "api.example.net"
         ],
         "related.ip": [
-            "10.76.220.3",
-            "10.83.130.95"
+            "10.83.130.95",
+            "10.76.220.3"
         ],
         "related.user": [
             "userror"
@@ -4172,8 +4292,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "deny"
+            "deny",
+            "GET"
         ],
         "rsa.misc.content_type": "liqua",
         "rsa.misc.result_code": "nderi",
@@ -4186,6 +4306,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7030,
         "source.ip": [
@@ -4201,6 +4322,7 @@
         "url.path": "https://api.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "userror",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -4229,12 +4351,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "api.example.com"
+            "api.example.com",
+            "www.example.com"
         ],
         "related.ip": [
-            "10.166.160.217",
-            "10.219.245.58"
+            "10.219.245.58",
+            "10.166.160.217"
         ],
         "related.user": [
             "radip"
@@ -4255,6 +4377,7 @@
         "server.domain": "www.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2429,
         "source.ip": [
@@ -4270,6 +4393,7 @@
         "url.path": "https://api.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "radip",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -4296,8 +4420,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "example.com"
+            "example.com",
+            "www5.example.org"
         ],
         "related.ip": [
             "10.183.243.246",
@@ -4322,6 +4446,7 @@
         "server.domain": "www5.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www5",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3267,
         "source.ip": [
@@ -4337,6 +4462,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "tatio",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -4365,8 +4491,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "www.example.com"
+            "www.example.com",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.54.5.47",
@@ -4377,8 +4503,8 @@
         ],
         "rsa.internal.messageid": "OPTIONS",
         "rsa.misc.action": [
-            "cancel",
-            "OPTIONS"
+            "OPTIONS",
+            "cancel"
         ],
         "rsa.misc.content_type": "umf",
         "rsa.misc.result_code": "obeataev",
@@ -4391,6 +4517,7 @@
         "server.domain": "internal.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "internal",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3141,
         "source.ip": [
@@ -4406,6 +4533,7 @@
         "url.path": "https://www.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "internal",
+        "url.top_level_domain": "net",
         "user.name": "aturv",
         "user_agent.device.name": "Micromax P410i",
         "user_agent.name": "Chrome Mobile",
@@ -4434,8 +4562,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.com",
-            "mail.example.net"
+            "mail.example.net",
+            "mail.example.com"
         ],
         "related.ip": [
             "10.72.99.69",
@@ -4446,8 +4574,8 @@
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "allow",
-            "PROPFIND"
+            "PROPFIND",
+            "allow"
         ],
         "rsa.misc.content_type": "uido",
         "rsa.misc.result_code": "lab",
@@ -4460,6 +4588,7 @@
         "server.domain": "mail.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "mail",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2046,
         "source.ip": [
@@ -4475,6 +4604,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "mail",
+        "url.top_level_domain": "net",
         "user.name": "uatu",
         "user_agent.device.name": "POCOPHONE F1",
         "user_agent.name": "Chrome Mobile",
@@ -4503,8 +4633,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.net",
-            "api.example.org"
+            "api.example.org",
+            "internal.example.net"
         ],
         "related.ip": [
             "10.245.240.47",
@@ -4529,6 +4659,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7795,
         "source.ip": [
@@ -4544,6 +4675,7 @@
         "url.path": "https://internal.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user.name": "odic",
         "user_agent.device.name": "ZTE Blade V1000RU",
         "user_agent.name": "Chrome Mobile",
@@ -4572,12 +4704,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "example.com"
+            "example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.62.188.193",
-            "10.61.110.7"
+            "10.61.110.7",
+            "10.62.188.193"
         ],
         "related.user": [
             "quaU"
@@ -4598,6 +4730,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 508,
         "source.ip": [
@@ -4613,6 +4746,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "quaU",
         "user_agent.device.name": "Spider",
         "user_agent.name": "Other",
@@ -4641,8 +4775,8 @@
             "mail.example.net"
         ],
         "related.ip": [
-            "10.172.139.78",
-            "10.68.198.188"
+            "10.68.198.188",
+            "10.172.139.78"
         ],
         "related.user": [
             "onsectet"
@@ -4663,6 +4797,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2119,
         "source.ip": [
@@ -4678,6 +4813,7 @@
         "url.path": "https://mail.example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "onsectet",
         "user_agent.device.name": "5024D_RU",
         "user_agent.name": "Chrome Mobile",
@@ -4720,8 +4856,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "block"
+            "block",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "teturad",
         "rsa.misc.result_code": "avolu",
@@ -4734,6 +4870,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3465,
         "source.ip": [
@@ -4749,6 +4886,7 @@
         "url.path": "https://api.example.net",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "midestl",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -4775,8 +4913,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.org",
-            "api.example.org"
+            "api.example.org",
+            "example.org"
         ],
         "related.ip": [
             "10.62.10.137",
@@ -4787,8 +4925,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "cancel",
-            "PURGE"
+            "PURGE",
+            "cancel"
         ],
         "rsa.misc.content_type": "laboree",
         "rsa.misc.result_code": "oll",
@@ -4800,6 +4938,7 @@
         "rsa.web.web_ref_query": "rsint=itl",
         "server.domain": "example.org",
         "server.registered_domain": "example.org",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3880,
         "source.ip": [
@@ -4814,6 +4953,7 @@
         "url.original": "https://example.org/itessequ/porissu.html?uip=ectobea#dat",
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.org",
+        "url.top_level_domain": "org",
         "user.name": "deomnisi",
         "user_agent.device.name": "LG-$2",
         "user_agent.name": "Chrome Mobile",
@@ -4842,12 +4982,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.net",
-            "www5.example.com"
+            "www5.example.com",
+            "api.example.net"
         ],
         "related.ip": [
-            "10.255.40.12",
-            "10.176.62.146"
+            "10.176.62.146",
+            "10.255.40.12"
         ],
         "related.user": [
             "oeiusmo"
@@ -4868,6 +5008,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5192,
         "source.ip": [
@@ -4883,6 +5024,7 @@
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "oeiusmo",
         "user_agent.device.name": "U20",
         "user_agent.name": "Chrome Mobile",
@@ -4910,20 +5052,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "api.example.org"
+            "api.example.org",
+            "internal.example.com"
         ],
         "related.ip": [
-            "10.88.98.31",
-            "10.194.198.46"
+            "10.194.198.46",
+            "10.88.98.31"
         ],
         "rsa.internal.messageid": "GET",
         "rsa.investigations.ec_activity": "Request",
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "GET"
+            "GET",
+            "deny"
         ],
         "rsa.misc.content_type": "rured",
         "rsa.misc.result_code": "tuser",
@@ -4937,6 +5079,7 @@
         "server.domain": "api.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "api",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2694,
         "source.ip": [
@@ -4952,6 +5095,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "api",
+        "url.top_level_domain": "org",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 LightSpeed [FBAN/MessengerLiteForiOS;FBAV/266.0.0.32.114;FBBV/216059178;FBDV/iPhone10,6;FBMD/iPhone;FBSN/iOS;FBSV/13.4.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_US;FBOP/0]",
@@ -4979,8 +5123,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "www5.example.com"
+            "www5.example.com",
+            "example.com"
         ],
         "related.ip": [
             "10.1.27.133",
@@ -5004,6 +5148,7 @@
         "rsa.web.web_ref_query": "ratvo=ntutl",
         "server.domain": "example.com",
         "server.registered_domain": "example.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6881,
         "source.ip": [
@@ -5018,6 +5163,7 @@
         "url.original": "https://example.com/beat/rro.jpg?uisau=qua#iarchite",
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "tationu",
         "user_agent.device.name": "Lenovo A2016a40 ",
         "user_agent.name": "Chrome Mobile",
@@ -5046,12 +5192,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.org",
-            "internal.example.com"
+            "internal.example.com",
+            "www5.example.org"
         ],
         "related.ip": [
-            "10.11.73.145",
-            "10.70.244.155"
+            "10.70.244.155",
+            "10.11.73.145"
         ],
         "related.user": [
             "caboNemo"
@@ -5074,6 +5220,7 @@
         "server.domain": "www5.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www5",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2160,
         "source.ip": [
@@ -5089,6 +5236,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "caboNemo",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -5129,8 +5277,8 @@
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "accept",
-            "PURGE"
+            "PURGE",
+            "accept"
         ],
         "rsa.misc.content_type": "uames",
         "rsa.misc.result_code": "moenimip",
@@ -5143,6 +5291,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 7663,
         "source.ip": [
@@ -5158,6 +5307,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "cillumdo",
         "user_agent.device.name": "Samsung SM-S337TL",
         "user_agent.name": "Chrome Mobile",
@@ -5186,8 +5336,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.com",
-            "api.example.net"
+            "api.example.net",
+            "www.example.com"
         ],
         "related.ip": [
             "10.74.115.33",
@@ -5212,6 +5362,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5533,
         "source.ip": [
@@ -5227,6 +5378,7 @@
         "url.path": "https://www.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "roquisq",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -5267,8 +5419,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "deny",
-            "DELETE"
+            "DELETE",
+            "deny"
         ],
         "rsa.misc.content_type": "tdolo",
         "rsa.misc.result_code": "ntu",
@@ -5281,6 +5433,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3872,
         "source.ip": [
@@ -5296,6 +5449,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "isi",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -5324,20 +5478,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "www5.example.org"
+            "www5.example.org",
+            "internal.example.com"
         ],
         "related.ip": [
-            "10.254.10.98",
-            "10.109.88.27"
+            "10.109.88.27",
+            "10.254.10.98"
         ],
         "related.user": [
             "aparia"
         ],
         "rsa.internal.messageid": "PROPATCH",
         "rsa.misc.action": [
-            "accept",
-            "PROPATCH"
+            "PROPATCH",
+            "accept"
         ],
         "rsa.misc.content_type": "epteurs",
         "rsa.misc.result_code": "ccusant",
@@ -5350,6 +5504,7 @@
         "server.domain": "internal.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "internal",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6661,
         "source.ip": [
@@ -5365,6 +5520,7 @@
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "aparia",
         "user_agent.device.name": "Pixel 3",
         "user_agent.name": "Chrome Mobile",
@@ -5397,16 +5553,16 @@
             "mail.example.org"
         ],
         "related.ip": [
-            "10.175.138.42",
-            "10.5.148.114"
+            "10.5.148.114",
+            "10.175.138.42"
         ],
         "related.user": [
             "onemul"
         ],
         "rsa.internal.messageid": "LOCK",
         "rsa.misc.action": [
-            "LOCK",
-            "deny"
+            "deny",
+            "LOCK"
         ],
         "rsa.misc.content_type": "etur",
         "rsa.misc.result_code": "remeum",
@@ -5419,6 +5575,7 @@
         "server.domain": "mail.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 890,
         "source.ip": [
@@ -5434,6 +5591,7 @@
         "url.path": "https://mail.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "onemul",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -5462,12 +5620,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.org",
-            "example.com"
+            "example.com",
+            "internal.example.org"
         ],
         "related.ip": [
-            "10.18.199.203",
-            "10.0.0.240"
+            "10.0.0.240",
+            "10.18.199.203"
         ],
         "related.user": [
             "ittenb"
@@ -5488,6 +5646,7 @@
         "server.domain": "internal.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "internal",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 366,
         "source.ip": [
@@ -5503,6 +5662,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "internal",
+        "url.top_level_domain": "org",
         "user.name": "ittenb",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -5543,8 +5703,8 @@
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "NONE",
-            "allow"
+            "allow",
+            "NONE"
         ],
         "rsa.misc.content_type": "lumquid",
         "rsa.misc.result_code": "serro",
@@ -5557,6 +5717,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5939,
         "source.ip": [
@@ -5572,6 +5733,7 @@
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "ercitati",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -5600,20 +5762,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "www.example.net"
+            "www.example.net",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.153.109.61",
-            "10.22.34.206"
+            "10.22.34.206",
+            "10.153.109.61"
         ],
         "related.user": [
             "mve"
         ],
         "rsa.internal.messageid": "PURGE",
         "rsa.misc.action": [
-            "PURGE",
-            "block"
+            "block",
+            "PURGE"
         ],
         "rsa.misc.content_type": "velites",
         "rsa.misc.result_code": "uasiarch",
@@ -5626,6 +5788,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1745,
         "source.ip": [
@@ -5641,6 +5804,7 @@
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "mve",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",
@@ -5669,12 +5833,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www.example.net",
-            "mail.example.com"
+            "mail.example.com",
+            "www.example.net"
         ],
         "related.ip": [
-            "10.62.168.226",
-            "10.199.103.185"
+            "10.199.103.185",
+            "10.62.168.226"
         ],
         "related.user": [
             "ipsa"
@@ -5683,8 +5847,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "allow"
+            "allow",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "sequamn",
         "rsa.misc.result_code": "eirured",
@@ -5697,6 +5861,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5243,
         "source.ip": [
@@ -5712,6 +5877,7 @@
         "url.path": "https://mail.example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "ipsa",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -5740,8 +5906,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.com",
-            "example.com"
+            "example.com",
+            "www5.example.com"
         ],
         "related.ip": [
             "10.97.33.56",
@@ -5752,8 +5918,8 @@
         ],
         "rsa.internal.messageid": "COPY",
         "rsa.misc.action": [
-            "block",
-            "COPY"
+            "COPY",
+            "block"
         ],
         "rsa.misc.content_type": "utla",
         "rsa.misc.result_code": "umfu",
@@ -5765,6 +5931,7 @@
         "rsa.web.web_ref_query": "equa=apari",
         "server.domain": "example.com",
         "server.registered_domain": "example.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2478,
         "source.ip": [
@@ -5779,6 +5946,7 @@
         "url.original": "https://example.com/tqui/ssequ.gif?emse=emqui#cipitla",
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "ptate",
         "user_agent.device.name": "Asus X01BDA",
         "user_agent.name": "Chrome Mobile",
@@ -5822,8 +5990,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "allow",
-            "HEAD"
+            "HEAD",
+            "allow"
         ],
         "rsa.misc.content_type": "tatis",
         "rsa.misc.result_code": "Sedut",
@@ -5835,6 +6003,7 @@
         "rsa.web.web_ref_query": "toditau=uiad",
         "server.domain": "example.com",
         "server.registered_domain": "example.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 7767,
         "source.ip": [
@@ -5849,6 +6018,7 @@
         "url.original": "https://example.com/caboN/imipsam.jpg?catcupid=ritquiin#quisnost",
         "url.path": "https://www5.example.com",
         "url.registered_domain": "example.com",
+        "url.top_level_domain": "com",
         "user.name": "ore",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -5881,16 +6051,16 @@
             "internal.example.com"
         ],
         "related.ip": [
-            "10.33.112.100",
-            "10.213.100.153"
+            "10.213.100.153",
+            "10.33.112.100"
         ],
         "related.user": [
             "enimad"
         ],
         "rsa.internal.messageid": "PROPFIND",
         "rsa.misc.action": [
-            "block",
-            "PROPFIND"
+            "PROPFIND",
+            "block"
         ],
         "rsa.misc.content_type": "ionev",
         "rsa.misc.result_code": "velillum",
@@ -5903,6 +6073,7 @@
         "server.domain": "www.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1594,
         "source.ip": [
@@ -5918,6 +6089,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "www",
+        "url.top_level_domain": "org",
         "user.name": "enimad",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -5974,6 +6146,7 @@
         "server.domain": "api.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "api",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6127,
         "source.ip": [
@@ -5989,6 +6162,7 @@
         "url.path": "https://example.net",
         "url.registered_domain": "example.net",
         "url.subdomain": "api",
+        "url.top_level_domain": "net",
         "user.name": "oremeu",
         "user_agent.device.name": "Samsung GT-P3100 ",
         "user_agent.name": "Android",
@@ -6021,8 +6195,8 @@
             "www.example.net"
         ],
         "related.ip": [
-            "10.139.195.188",
-            "10.246.115.57"
+            "10.246.115.57",
+            "10.139.195.188"
         ],
         "related.user": [
             "mSecti"
@@ -6046,6 +6220,7 @@
         "server.domain": "www.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5926,
         "source.ip": [
@@ -6061,6 +6236,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.net",
         "url.subdomain": "www",
+        "url.top_level_domain": "net",
         "user.name": "mSecti",
         "user_agent.device.name": "G8142",
         "user_agent.name": "Chrome Mobile",
@@ -6093,16 +6269,16 @@
             "www5.example.com"
         ],
         "related.ip": [
-            "10.82.148.126",
-            "10.60.56.205"
+            "10.60.56.205",
+            "10.82.148.126"
         ],
         "related.user": [
             "ita"
         ],
         "rsa.internal.messageid": "NONE",
         "rsa.misc.action": [
-            "NONE",
-            "block"
+            "block",
+            "NONE"
         ],
         "rsa.misc.content_type": "nder",
         "rsa.misc.result_code": "nihilmol",
@@ -6115,6 +6291,7 @@
         "server.domain": "www5.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "www5",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2214,
         "source.ip": [
@@ -6130,6 +6307,7 @@
         "url.path": "https://api.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "www5",
+        "url.top_level_domain": "com",
         "user.name": "ita",
         "user_agent.device.name": "iPhone",
         "user_agent.name": "Facebook",
@@ -6184,6 +6362,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5930,
         "source.ip": [
@@ -6199,6 +6378,7 @@
         "url.path": "https://www5.example.net",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "tvolu",
         "user_agent.device.name": "QMobile X700 PRO II",
         "user_agent.name": "Chrome Mobile",
@@ -6227,8 +6407,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "mail.example.org",
-            "www5.example.org"
+            "www5.example.org",
+            "mail.example.org"
         ],
         "related.ip": [
             "10.145.25.55",
@@ -6241,8 +6421,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "block"
+            "block",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "iamquisn",
         "rsa.misc.result_code": "lorem",
@@ -6255,6 +6435,7 @@
         "server.domain": "www5.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "www5",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2079,
         "source.ip": [
@@ -6270,6 +6451,7 @@
         "url.path": "https://mail.example.org",
         "url.registered_domain": "example.org",
         "url.subdomain": "www5",
+        "url.top_level_domain": "org",
         "user.name": "lumd",
         "user_agent.device.name": "ZTE BLADE V7",
         "user_agent.name": "Chrome Mobile",
@@ -6324,6 +6506,7 @@
         "server.domain": "mail.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 249,
         "source.ip": [
@@ -6339,6 +6522,7 @@
         "url.path": "https://internal.example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "rem",
         "user_agent.device.name": "Notepad_K10",
         "user_agent.name": "Chrome",
@@ -6367,12 +6551,12 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "example.com",
-            "mail.example.org"
+            "mail.example.org",
+            "example.com"
         ],
         "related.ip": [
-            "10.163.9.35",
-            "10.252.146.132"
+            "10.252.146.132",
+            "10.163.9.35"
         ],
         "related.user": [
             "umq"
@@ -6395,6 +6579,7 @@
         "server.domain": "mail.example.org",
         "server.registered_domain": "example.org",
         "server.subdomain": "mail",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 4562,
         "source.ip": [
@@ -6410,6 +6595,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.org",
         "url.subdomain": "mail",
+        "url.top_level_domain": "org",
         "user.name": "umq",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -6450,8 +6636,8 @@
         ],
         "rsa.internal.messageid": "DELETE",
         "rsa.misc.action": [
-            "deny",
-            "DELETE"
+            "DELETE",
+            "deny"
         ],
         "rsa.misc.content_type": "uameiu",
         "rsa.misc.result_code": "porinc",
@@ -6464,6 +6650,7 @@
         "server.domain": "mail.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4857,
         "source.ip": [
@@ -6479,6 +6666,7 @@
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "mail",
+        "url.top_level_domain": "com",
         "user.name": "upta",
         "user_agent.device.name": "Samsung SM-A260G",
         "user_agent.name": "Chrome Mobile WebView",
@@ -6507,8 +6695,8 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "internal.example.com",
-            "mail.example.org"
+            "mail.example.org",
+            "internal.example.com"
         ],
         "related.ip": [
             "10.140.170.171",
@@ -6533,6 +6721,7 @@
         "server.domain": "internal.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "internal",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1831,
         "source.ip": [
@@ -6548,6 +6737,7 @@
         "url.path": "https://mail.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "internal",
+        "url.top_level_domain": "com",
         "user.name": "tinv",
         "user_agent.device.name": "U307AS",
         "user_agent.name": "Chrome Mobile",
@@ -6601,6 +6791,7 @@
         "rsa.web.web_ref_query": "imveniam=sunte",
         "server.domain": "example.net",
         "server.registered_domain": "example.net",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2155,
         "source.ip": [
@@ -6615,6 +6806,7 @@
         "url.original": "https://example.net/dun/xce.jpg?nsequat=mvol#asiar",
         "url.path": "https://example.com",
         "url.registered_domain": "example.net",
+        "url.top_level_domain": "net",
         "user.name": "squamest",
         "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Opera Mini",
@@ -6653,8 +6845,8 @@
         ],
         "rsa.internal.messageid": "UNLOCK",
         "rsa.misc.action": [
-            "accept",
-            "UNLOCK"
+            "UNLOCK",
+            "accept"
         ],
         "rsa.misc.content_type": "sum",
         "rsa.misc.result_code": "oloremq",
@@ -6667,6 +6859,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6106,
         "source.ip": [
@@ -6682,6 +6875,7 @@
         "url.path": "https://www.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "eatae",
         "user_agent.device.name": "Meizu M6",
         "user_agent.name": "Chrome Mobile",
@@ -6710,20 +6904,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "www5.example.net",
-            "www5.example.org"
+            "www5.example.org",
+            "www5.example.net"
         ],
         "related.ip": [
-            "10.84.107.38",
-            "10.14.29.202"
+            "10.14.29.202",
+            "10.84.107.38"
         ],
         "related.user": [
             "usmod"
         ],
         "rsa.internal.messageid": "MKOL",
         "rsa.misc.action": [
-            "MKOL",
-            "deny"
+            "deny",
+            "MKOL"
         ],
         "rsa.misc.content_type": "itse",
         "rsa.misc.result_code": "qui",
@@ -6736,6 +6930,7 @@
         "server.domain": "www5.example.net",
         "server.registered_domain": "example.net",
         "server.subdomain": "www5",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2097,
         "source.ip": [
@@ -6751,6 +6946,7 @@
         "url.path": "https://www5.example.org",
         "url.registered_domain": "example.net",
         "url.subdomain": "www5",
+        "url.top_level_domain": "net",
         "user.name": "usmod",
         "user_agent.device.name": "Samsung SM-A305FN",
         "user_agent.name": "YandexSearch",
@@ -6783,8 +6979,8 @@
             "example.com"
         ],
         "related.ip": [
-            "10.221.86.133",
-            "10.204.223.184"
+            "10.204.223.184",
+            "10.221.86.133"
         ],
         "related.user": [
             "ptasnul"
@@ -6793,8 +6989,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "deny",
-            "POST"
+            "POST",
+            "deny"
         ],
         "rsa.misc.content_type": "rerepr",
         "rsa.misc.result_code": "mcorpor",
@@ -6807,6 +7003,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6861,
         "source.ip": [
@@ -6822,6 +7019,7 @@
         "url.path": "https://example.com",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "ptasnul",
         "user_agent.device.name": "Samsung SM-A715F",
         "user_agent.name": "Facebook",
@@ -6850,20 +7048,20 @@
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
         "related.hosts": [
-            "api.example.org",
-            "api.example.com"
+            "api.example.com",
+            "api.example.org"
         ],
         "related.ip": [
-            "10.195.4.70",
-            "10.229.39.190"
+            "10.229.39.190",
+            "10.195.4.70"
         ],
         "related.user": [
             "edictas"
         ],
         "rsa.internal.messageid": "PUT",
         "rsa.misc.action": [
-            "PUT",
-            "deny"
+            "deny",
+            "PUT"
         ],
         "rsa.misc.content_type": "exeaco",
         "rsa.misc.result_code": "rmagnido",
@@ -6876,6 +7074,7 @@
         "server.domain": "api.example.com",
         "server.registered_domain": "example.com",
         "server.subdomain": "api",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2574,
         "source.ip": [
@@ -6891,6 +7090,7 @@
         "url.path": "https://api.example.org",
         "url.registered_domain": "example.com",
         "url.subdomain": "api",
+        "url.top_level_domain": "com",
         "user.name": "edictas",
         "user_agent.device.name": "STK-L21",
         "user_agent.name": "Chrome Mobile",

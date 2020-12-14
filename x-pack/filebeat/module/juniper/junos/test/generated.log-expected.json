@@ -708,8 +708,8 @@
         "process.name": "UI_DUPLICATE_UID: restart",
         "process.pid": 3350,
         "related.user": [
-            "naturau",
-            "olorsita"
+            "olorsita",
+            "naturau"
         ],
         "rsa.internal.event_desc": "Users have the same UID",
         "rsa.internal.messageid": "UI_DUPLICATE_UID",

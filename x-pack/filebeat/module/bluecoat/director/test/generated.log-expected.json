@@ -1018,6 +1018,7 @@
         "server.domain": "avol752.www5.test",
         "server.registered_domain": "www5.test",
         "server.subdomain": "avol752",
+        "server.top_level_domain": "test",
         "service.type": "bluecoat",
         "tags": [
             "bluecoat.director",
@@ -1613,6 +1614,7 @@
         "server.domain": "ipsu3680.mail.test",
         "server.registered_domain": "mail.test",
         "server.subdomain": "ipsu3680",
+        "server.top_level_domain": "test",
         "service.type": "bluecoat",
         "tags": [
             "bluecoat.director",

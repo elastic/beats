@@ -49,6 +49,7 @@
         "server.domain": "litesse6379.api.domain",
         "server.registered_domain": "api.domain",
         "server.subdomain": "litesse6379",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.150.92.220"
@@ -110,6 +111,7 @@
         "server.domain": "gnaali6189.internal.localhost",
         "server.registered_domain": "internal.localhost",
         "server.subdomain": "gnaali6189",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.33.212.159"
@@ -147,8 +149,8 @@
             "aqu1628.internal.domain"
         ],
         "related.ip": [
-            "10.118.175.9",
-            "10.173.116.41"
+            "10.173.116.41",
+            "10.118.175.9"
         ],
         "related.user": [
             "uame"
@@ -171,6 +173,7 @@
         "server.domain": "quis1130.internal.corp",
         "server.registered_domain": "internal.corp",
         "server.subdomain": "quis1130",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.173.116.41"
@@ -232,6 +235,7 @@
         "server.domain": "reprehe189.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "reprehe189",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.134.137.177"
@@ -269,8 +273,8 @@
             "rad2103.api.domain"
         ],
         "related.ip": [
-            "10.70.0.60",
-            "10.245.142.250"
+            "10.245.142.250",
+            "10.70.0.60"
         ],
         "related.user": [
             "eos"
@@ -293,6 +297,7 @@
         "server.domain": "enimad2283.internal.domain",
         "server.registered_domain": "internal.domain",
         "server.subdomain": "enimad2283",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.245.142.250"
@@ -330,8 +335,8 @@
             "enim5316.www5.local"
         ],
         "related.ip": [
-            "10.202.72.124",
-            "10.200.188.142"
+            "10.200.188.142",
+            "10.202.72.124"
         ],
         "related.user": [
             "iusmodt"
@@ -354,6 +359,7 @@
         "server.domain": "doloreeu3553.www5.home",
         "server.registered_domain": "www5.home",
         "server.subdomain": "doloreeu3553",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.202.72.124"
@@ -391,8 +397,8 @@
             "reetdolo2770.www5.local"
         ],
         "related.ip": [
-            "10.214.225.125",
-            "10.12.44.169"
+            "10.12.44.169",
+            "10.214.225.125"
         ],
         "related.user": [
             "erep"
@@ -415,6 +421,7 @@
         "server.domain": "iutal13.api.localdomain",
         "server.registered_domain": "api.localdomain",
         "server.subdomain": "iutal13",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.12.44.169"
@@ -452,8 +459,8 @@
             "isiu1114.internal.corp"
         ],
         "related.ip": [
-            "10.198.136.50",
-            "10.66.108.11"
+            "10.66.108.11",
+            "10.198.136.50"
         ],
         "related.user": [
             "uptatev"
@@ -476,6 +483,7 @@
         "server.domain": "uovol492.www.localhost",
         "server.registered_domain": "www.localhost",
         "server.subdomain": "uovol492",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.66.108.11"
@@ -536,6 +544,7 @@
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "osquir6997.corp",
         "server.registered_domain": "osquir6997.corp",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.178.244.31"
@@ -573,8 +582,8 @@
             "tatno4987.www5.localhost"
         ],
         "related.ip": [
-            "10.203.5.162",
-            "10.54.231.100"
+            "10.54.231.100",
+            "10.203.5.162"
         ],
         "related.user": [
             "umdolore"
@@ -597,6 +606,7 @@
         "server.domain": "eniam7007.api.invalid",
         "server.registered_domain": "api.invalid",
         "server.subdomain": "eniam7007",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.231.100"
@@ -658,6 +668,7 @@
         "server.domain": "snulapar3794.api.domain",
         "server.registered_domain": "api.domain",
         "server.subdomain": "snulapar3794",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.65.83.160"
@@ -695,8 +706,8 @@
             "essecill2595.mail.local"
         ],
         "related.ip": [
-            "10.210.213.18",
-            "10.57.40.29"
+            "10.57.40.29",
+            "10.210.213.18"
         ],
         "related.user": [
             "onse"
@@ -718,6 +729,7 @@
         "rsa.network.network_service": "http",
         "server.domain": "liq5883.localdomain",
         "server.registered_domain": "liq5883.localdomain",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.57.40.29"
@@ -778,6 +790,7 @@
         "rsa.network.network_service": "smtp",
         "server.domain": "rsint7026.test",
         "server.registered_domain": "rsint7026.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.144.82.69"
@@ -839,6 +852,7 @@
         "server.domain": "qua2945.www.local",
         "server.registered_domain": "www.local",
         "server.subdomain": "qua2945",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.109.232.112"
@@ -900,6 +914,7 @@
         "server.domain": "luptat6494.www.example",
         "server.registered_domain": "www.example",
         "server.subdomain": "luptat6494",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.22.45"
@@ -937,8 +952,8 @@
             "errorsi6996.www.domain"
         ],
         "related.ip": [
-            "10.70.95.74",
-            "10.76.72.111"
+            "10.76.72.111",
+            "10.70.95.74"
         ],
         "related.user": [
             "ivelits"
@@ -961,6 +976,7 @@
         "server.domain": "moenimi6317.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "moenimi6317",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.70.95.74"
@@ -1021,6 +1037,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "tion1761.home",
         "server.registered_domain": "tion1761.home",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.19.201.13"
@@ -1082,6 +1099,7 @@
         "server.domain": "santium4235.api.local",
         "server.registered_domain": "api.local",
         "server.subdomain": "santium4235",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.78.151.178"
@@ -1143,6 +1161,7 @@
         "server.domain": "CSed2857.www5.example",
         "server.registered_domain": "www5.example",
         "server.subdomain": "CSed2857",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.135.233.146"
@@ -1204,6 +1223,7 @@
         "server.domain": "equep5085.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "equep5085",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.121.219.204"
@@ -1265,6 +1285,7 @@
         "server.domain": "conseq557.mail.lan",
         "server.registered_domain": "mail.lan",
         "server.subdomain": "conseq557",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.191.105.82"
@@ -1326,6 +1347,7 @@
         "server.domain": "ite2026.www.invalid",
         "server.registered_domain": "www.invalid",
         "server.subdomain": "ite2026",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.141.44.153"
@@ -1363,8 +1385,8 @@
             "adol485.example"
         ],
         "related.ip": [
-            "10.153.111.103",
-            "10.6.167.7"
+            "10.6.167.7",
+            "10.153.111.103"
         ],
         "related.user": [
             "eumfug"
@@ -1386,6 +1408,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "lit5929.test",
         "server.registered_domain": "lit5929.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.153.111.103"
@@ -1423,8 +1446,8 @@
             "evita5008.www.localdomain"
         ],
         "related.ip": [
-            "10.248.204.182",
-            "10.134.148.219"
+            "10.134.148.219",
+            "10.248.204.182"
         ],
         "related.user": [
             "uioffi"
@@ -1446,6 +1469,7 @@
         "rsa.network.network_service": "pop3",
         "server.domain": "oru6938.invalid",
         "server.registered_domain": "oru6938.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.248.204.182"
@@ -1506,6 +1530,7 @@
         "rsa.network.network_service": "smtp",
         "server.domain": "etdol5473.local",
         "server.registered_domain": "etdol5473.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.178.77.231"
@@ -1543,8 +1568,8 @@
             "ris3314.mail.invalid"
         ],
         "related.ip": [
-            "10.177.194.18",
-            "10.221.89.228"
+            "10.221.89.228",
+            "10.177.194.18"
         ],
         "related.user": [
             "aliquam"
@@ -1567,6 +1592,7 @@
         "server.domain": "nimid893.mail.corp",
         "server.registered_domain": "mail.corp",
         "server.subdomain": "nimid893",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.177.194.18"
@@ -1627,6 +1653,7 @@
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "rumwritt6003.host",
         "server.registered_domain": "rumwritt6003.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.241.65.49"
@@ -1688,6 +1715,7 @@
         "server.domain": "xeacomm6855.api.corp",
         "server.registered_domain": "api.corp",
         "server.subdomain": "xeacomm6855",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.168.90.81"
@@ -1725,8 +1753,8 @@
             "ris727.api.local"
         ],
         "related.ip": [
-            "10.14.211.43",
-            "10.130.14.60"
+            "10.130.14.60",
+            "10.14.211.43"
         ],
         "related.user": [
             "litse"
@@ -1749,6 +1777,7 @@
         "server.domain": "icabo4125.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "icabo4125",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.14.211.43"
@@ -1786,8 +1815,8 @@
             "stquido5705.api.host"
         ],
         "related.ip": [
-            "10.60.129.15",
-            "10.248.101.25"
+            "10.248.101.25",
+            "10.60.129.15"
         ],
         "related.user": [
             "evolup"
@@ -1810,6 +1839,7 @@
         "server.domain": "ionofdeF5643.www.localhost",
         "server.registered_domain": "www.localhost",
         "server.subdomain": "ionofdeF5643",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.60.129.15"
@@ -1870,6 +1900,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "orem6702.invalid",
         "server.registered_domain": "orem6702.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.72.93.28"
@@ -1931,6 +1962,7 @@
         "server.domain": "oin6780.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "oin6780",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.27.14.168"
@@ -1992,6 +2024,7 @@
         "server.domain": "eprehen3224.www5.localdomain",
         "server.registered_domain": "www5.localdomain",
         "server.subdomain": "eprehen3224",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.75.99.127"
@@ -2029,8 +2062,8 @@
             "lup2134.www.localhost"
         ],
         "related.ip": [
-            "10.245.104.182",
-            "10.201.238.90"
+            "10.201.238.90",
+            "10.245.104.182"
         ],
         "related.user": [
             "ovol"
@@ -2053,6 +2086,7 @@
         "server.domain": "ptasn6599.www.localhost",
         "server.registered_domain": "www.localhost",
         "server.subdomain": "ptasn6599",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.201.238.90"
@@ -2113,6 +2147,7 @@
         "rsa.network.network_service": "http",
         "server.domain": "nisist2752.home",
         "server.registered_domain": "nisist2752.home",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.217.150.196"
@@ -2150,8 +2185,8 @@
             "eumiu765.api.lan"
         ],
         "related.ip": [
-            "10.4.157.1",
-            "10.184.18.202"
+            "10.184.18.202",
+            "10.4.157.1"
         ],
         "related.user": [
             "oditem"
@@ -2174,6 +2209,7 @@
         "server.domain": "gitsedqu2649.mail.lan",
         "server.registered_domain": "mail.lan",
         "server.subdomain": "gitsedqu2649",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.4.157.1"
@@ -2211,8 +2247,8 @@
             "mquelau5326.mail.lan"
         ],
         "related.ip": [
-            "10.255.39.252",
-            "10.113.95.59"
+            "10.113.95.59",
+            "10.255.39.252"
         ],
         "related.user": [
             "persp"
@@ -2235,6 +2271,7 @@
         "server.domain": "entsunt3962.www.example",
         "server.registered_domain": "www.example",
         "server.subdomain": "entsunt3962",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.255.39.252"
@@ -2296,6 +2333,7 @@
         "server.domain": "tut2703.www.host",
         "server.registered_domain": "www.host",
         "server.subdomain": "tut2703",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.27.16.118"
@@ -2333,8 +2371,8 @@
             "inesci6789.test"
         ],
         "related.ip": [
-            "10.167.227.44",
-            "10.38.54.72"
+            "10.38.54.72",
+            "10.167.227.44"
         ],
         "related.user": [
             "riamea"
@@ -2356,6 +2394,7 @@
         "rsa.network.network_service": "http",
         "server.domain": "entorev160.test",
         "server.registered_domain": "entorev160.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.54.72"
@@ -2417,6 +2456,7 @@
         "server.domain": "proide3714.mail.localdomain",
         "server.registered_domain": "mail.localdomain",
         "server.subdomain": "proide3714",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.216.54.184"
@@ -2478,6 +2518,7 @@
         "server.domain": "tot5313.mail.invalid",
         "server.registered_domain": "mail.invalid",
         "server.subdomain": "tot5313",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.9.12.248"
@@ -2515,8 +2556,8 @@
             "ian867.internal.corp"
         ],
         "related.ip": [
-            "10.41.123.102",
-            "10.83.130.226"
+            "10.83.130.226",
+            "10.41.123.102"
         ],
         "related.user": [
             "tenim"
@@ -2539,6 +2580,7 @@
         "server.domain": "rumet3801.internal.domain",
         "server.registered_domain": "internal.domain",
         "server.subdomain": "rumet3801",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.83.130.226"
@@ -2576,8 +2618,8 @@
             "lorin4249.corp"
         ],
         "related.ip": [
-            "10.80.152.108",
-            "10.175.112.197"
+            "10.175.112.197",
+            "10.80.152.108"
         ],
         "related.user": [
             "tametcon"
@@ -2600,6 +2642,7 @@
         "server.domain": "liqua2834.www5.lan",
         "server.registered_domain": "www5.lan",
         "server.subdomain": "liqua2834",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.175.112.197"
@@ -2661,6 +2704,7 @@
         "server.domain": "sequat7273.api.host",
         "server.registered_domain": "api.host",
         "server.subdomain": "sequat7273",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.134.18.114"
@@ -2721,6 +2765,7 @@
         "rsa.network.network_service": "http",
         "server.domain": "uidol4575.localhost",
         "server.registered_domain": "uidol4575.localhost",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.28.118.160"
@@ -2758,8 +2803,8 @@
             "ritin2495.api.corp"
         ],
         "related.ip": [
-            "10.47.28.48",
-            "10.110.114.175"
+            "10.110.114.175",
+            "10.47.28.48"
         ],
         "related.user": [
             "plicab"
@@ -2782,6 +2827,7 @@
         "server.domain": "oremq2000.api.corp",
         "server.registered_domain": "api.corp",
         "server.subdomain": "oremq2000",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.110.114.175"
@@ -2819,8 +2865,8 @@
             "tetur2694.mail.local"
         ],
         "related.ip": [
-            "10.40.251.202",
-            "10.90.33.138"
+            "10.90.33.138",
+            "10.40.251.202"
         ],
         "related.user": [
             "nvolupt"
@@ -2843,6 +2889,7 @@
         "server.domain": "oremi1485.api.localhost",
         "server.registered_domain": "api.localhost",
         "server.subdomain": "oremi1485",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.40.251.202"
@@ -2904,6 +2951,7 @@
         "server.domain": "sequatD5469.www5.lan",
         "server.registered_domain": "www5.lan",
         "server.subdomain": "sequatD5469",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.65.2.106"
@@ -2941,8 +2989,8 @@
             "emqu2846.internal.home"
         ],
         "related.ip": [
-            "10.28.84.106",
-            "10.193.233.229"
+            "10.193.233.229",
+            "10.28.84.106"
         ],
         "related.user": [
             "tla"
@@ -2964,6 +3012,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "item2738.test",
         "server.registered_domain": "item2738.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.193.233.229"
@@ -3001,8 +3050,8 @@
             "dqu6144.api.localhost"
         ],
         "related.ip": [
-            "10.210.89.183",
-            "10.150.245.88"
+            "10.150.245.88",
+            "10.210.89.183"
         ],
         "related.user": [
             "sequa"
@@ -3025,6 +3074,7 @@
         "server.domain": "iosamnis1047.internal.localdomain",
         "server.registered_domain": "internal.localdomain",
         "server.subdomain": "iosamnis1047",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.150.245.88"
@@ -3086,6 +3136,7 @@
         "server.domain": "orroq6677.internal.example",
         "server.registered_domain": "internal.example",
         "server.subdomain": "orroq6677",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.180.195.43"
@@ -3147,6 +3198,7 @@
         "server.domain": "onevo4326.internal.local",
         "server.registered_domain": "internal.local",
         "server.subdomain": "onevo4326",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.207.211.230"
@@ -3208,6 +3260,7 @@
         "server.domain": "itaedict7233.mail.localdomain",
         "server.registered_domain": "mail.localdomain",
         "server.subdomain": "itaedict7233",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.86.11.48"
@@ -3269,6 +3322,7 @@
         "server.domain": "numquam5869.internal.example",
         "server.registered_domain": "internal.example",
         "server.subdomain": "numquam5869",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.118.6.177"
@@ -3330,6 +3384,7 @@
         "server.domain": "onu6137.api.home",
         "server.registered_domain": "api.home",
         "server.subdomain": "onu6137",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.50.233.155"
@@ -3391,6 +3446,7 @@
         "server.domain": "aecatcup2241.www5.test",
         "server.registered_domain": "www5.test",
         "server.subdomain": "aecatcup2241",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.28.82.189"
@@ -3428,8 +3484,8 @@
             "volupta3552.internal.localhost"
         ],
         "related.ip": [
-            "10.6.38.163",
-            "10.31.237.225"
+            "10.31.237.225",
+            "10.6.38.163"
         ],
         "related.user": [
             "olup"
@@ -3452,6 +3508,7 @@
         "server.domain": "labor6360.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "labor6360",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.31.237.225"
@@ -3489,8 +3546,8 @@
             "onse380.internal.localdomain"
         ],
         "related.ip": [
-            "10.125.165.144",
-            "10.226.5.189"
+            "10.226.5.189",
+            "10.125.165.144"
         ],
         "related.user": [
             "mvolu"
@@ -3513,6 +3570,7 @@
         "server.domain": "mveleum4322.www5.host",
         "server.registered_domain": "www5.host",
         "server.subdomain": "mveleum4322",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.226.5.189"
@@ -3550,8 +3608,8 @@
             "queips4947.mail.example"
         ],
         "related.ip": [
-            "10.46.56.204",
-            "10.97.149.97"
+            "10.97.149.97",
+            "10.46.56.204"
         ],
         "related.user": [
             "dolorsit"
@@ -3574,6 +3632,7 @@
         "server.domain": "archite1843.mail.home",
         "server.registered_domain": "mail.home",
         "server.subdomain": "archite1843",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.97.149.97"
@@ -3635,6 +3694,7 @@
         "server.domain": "itanim4024.api.example",
         "server.registered_domain": "api.example",
         "server.subdomain": "itanim4024",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.218.0.197"
@@ -3696,6 +3756,7 @@
         "server.domain": "nreprehe715.api.home",
         "server.registered_domain": "api.home",
         "server.subdomain": "nreprehe715",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.123.199.198"
@@ -3757,6 +3818,7 @@
         "server.domain": "unte893.internal.host",
         "server.registered_domain": "internal.host",
         "server.subdomain": "unte893",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.86.177"
@@ -3794,8 +3856,8 @@
             "aparia1179.www.localdomain"
         ],
         "related.ip": [
-            "10.115.174.107",
-            "10.193.118.163"
+            "10.193.118.163",
+            "10.115.174.107"
         ],
         "related.user": [
             "exeacomm"
@@ -3818,6 +3880,7 @@
         "server.domain": "aspe951.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "aspe951",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.193.118.163"
@@ -3879,6 +3942,7 @@
         "server.domain": "dipiscin4957.www.home",
         "server.registered_domain": "www.home",
         "server.subdomain": "dipiscin4957",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.37.128.49"
@@ -3940,6 +4004,7 @@
         "server.domain": "econs2687.internal.localdomain",
         "server.registered_domain": "internal.localdomain",
         "server.subdomain": "econs2687",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.73.158"
@@ -4001,6 +4066,7 @@
         "server.domain": "tiumto5834.api.lan",
         "server.registered_domain": "api.lan",
         "server.subdomain": "tiumto5834",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.131.126.109"
@@ -4062,6 +4128,7 @@
         "server.domain": "iutal6032.www.test",
         "server.registered_domain": "www.test",
         "server.subdomain": "iutal6032",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.181.247.224"
@@ -4122,6 +4189,7 @@
         "rsa.network.network_service": "http",
         "server.domain": "inculp2078.host",
         "server.registered_domain": "inculp2078.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.235.116.121"
@@ -4183,6 +4251,7 @@
         "server.domain": "mexerc2757.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "mexerc2757",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.149.193.117"
@@ -4220,8 +4289,8 @@
             "deriti6952.mail.domain"
         ],
         "related.ip": [
-            "10.196.96.162",
-            "10.34.131.224"
+            "10.34.131.224",
+            "10.196.96.162"
         ],
         "related.user": [
             "tnonproi"
@@ -4244,6 +4313,7 @@
         "server.domain": "squira4455.api.domain",
         "server.registered_domain": "api.domain",
         "server.subdomain": "squira4455",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.34.131.224"
@@ -4281,8 +4351,8 @@
             "abor1370.www.domain"
         ],
         "related.ip": [
-            "10.97.236.123",
-            "10.77.78.180"
+            "10.77.78.180",
+            "10.97.236.123"
         ],
         "related.user": [
             "nisi"
@@ -4304,6 +4374,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "emveleum3661.localhost",
         "server.registered_domain": "emveleum3661.localhost",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.97.236.123"
@@ -4365,6 +4436,7 @@
         "server.domain": "sedquiac6517.internal.localhost",
         "server.registered_domain": "internal.localhost",
         "server.subdomain": "sedquiac6517",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.82.133.66"
@@ -4426,6 +4498,7 @@
         "server.domain": "veniam3148.www5.home",
         "server.registered_domain": "www5.home",
         "server.subdomain": "veniam3148",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.180.180.230"
@@ -4487,6 +4560,7 @@
         "server.domain": "unt3559.www.home",
         "server.registered_domain": "www.home",
         "server.subdomain": "unt3559",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.5.11.205"
@@ -4548,6 +4622,7 @@
         "server.domain": "rere5274.mail.domain",
         "server.registered_domain": "mail.domain",
         "server.subdomain": "rere5274",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.195.223.82"
@@ -4609,6 +4684,7 @@
         "server.domain": "uaeabi3728.www5.invalid",
         "server.registered_domain": "www5.invalid",
         "server.subdomain": "uaeabi3728",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.138.210.116"
@@ -4646,8 +4722,8 @@
             "dolor7082.internal.localhost"
         ],
         "related.ip": [
-            "10.250.81.189",
-            "10.219.1.151"
+            "10.219.1.151",
+            "10.250.81.189"
         ],
         "related.user": [
             "ori"
@@ -4669,6 +4745,7 @@
         "rsa.network.network_service": "smtp",
         "server.domain": "uamqu2804.test",
         "server.registered_domain": "uamqu2804.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.250.81.189"
@@ -4706,8 +4783,8 @@
             "totam6886.api.localhost"
         ],
         "related.ip": [
-            "10.76.125.70",
-            "10.54.23.133"
+            "10.54.23.133",
+            "10.76.125.70"
         ],
         "related.user": [
             "oloreeu"
@@ -4729,6 +4806,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "olor5201.host",
         "server.registered_domain": "olor5201.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.23.133"
@@ -4790,6 +4868,7 @@
         "server.domain": "eufug3348.www.lan",
         "server.registered_domain": "www.lan",
         "server.subdomain": "eufug3348",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.36.110.69"
@@ -4827,8 +4906,8 @@
             "lup3313.api.home"
         ],
         "related.ip": [
-            "10.183.202.82",
-            "10.47.179.68"
+            "10.47.179.68",
+            "10.183.202.82"
         ],
         "related.user": [
             "umfugi"
@@ -4851,6 +4930,7 @@
         "server.domain": "stquidol239.www5.invalid",
         "server.registered_domain": "www5.invalid",
         "server.subdomain": "stquidol239",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.47.179.68"
@@ -4912,6 +4992,7 @@
         "server.domain": "gia6531.mail.invalid",
         "server.registered_domain": "mail.invalid",
         "server.subdomain": "gia6531",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.73.28.165"
@@ -4949,8 +5030,8 @@
             "udan6536.www5.test"
         ],
         "related.ip": [
-            "10.85.104.146",
-            "10.14.204.36"
+            "10.14.204.36",
+            "10.85.104.146"
         ],
         "related.user": [
             "emp"
@@ -4973,6 +5054,7 @@
         "server.domain": "lamcola4879.www5.localdomain",
         "server.registered_domain": "www5.localdomain",
         "server.subdomain": "lamcola4879",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.85.104.146"
@@ -5010,8 +5092,8 @@
             "rumet6923.www5.lan"
         ],
         "related.ip": [
-            "10.208.18.210",
-            "10.30.246.132"
+            "10.30.246.132",
+            "10.208.18.210"
         ],
         "related.user": [
             "veniam"
@@ -5034,6 +5116,7 @@
         "server.domain": "edquian330.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "edquian330",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.208.18.210"
@@ -5071,8 +5154,8 @@
             "itse522.internal.localdomain"
         ],
         "related.ip": [
-            "10.19.119.17",
-            "10.106.249.91"
+            "10.106.249.91",
+            "10.19.119.17"
         ],
         "related.user": [
             "lit"
@@ -5095,6 +5178,7 @@
         "server.domain": "santi837.api.domain",
         "server.registered_domain": "api.domain",
         "server.subdomain": "santi837",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.106.249.91"
@@ -5132,8 +5216,8 @@
             "amc3059.local"
         ],
         "related.ip": [
-            "10.29.109.126",
-            "10.181.41.154"
+            "10.181.41.154",
+            "10.29.109.126"
         ],
         "related.user": [
             "labo"
@@ -5156,6 +5240,7 @@
         "server.domain": "lpaquiof804.internal.invalid",
         "server.registered_domain": "internal.invalid",
         "server.subdomain": "lpaquiof804",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.29.109.126"
@@ -5193,8 +5278,8 @@
             "enbyCi3813.api.domain"
         ],
         "related.ip": [
-            "10.164.207.42",
-            "10.164.120.197"
+            "10.164.120.197",
+            "10.164.207.42"
         ],
         "related.user": [
             "pta"
@@ -5216,6 +5301,7 @@
         "rsa.network.network_service": "https",
         "server.domain": "nonn4478.host",
         "server.registered_domain": "nonn4478.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.164.207.42"
@@ -5253,8 +5339,8 @@
             "liquipex1155.mail.corp"
         ],
         "related.ip": [
-            "10.183.189.133",
-            "10.154.191.225"
+            "10.154.191.225",
+            "10.183.189.133"
         ],
         "related.user": [
             "ita"
@@ -5277,6 +5363,7 @@
         "server.domain": "amquaer3985.www5.example",
         "server.registered_domain": "www5.example",
         "server.subdomain": "amquaer3985",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.183.189.133"
@@ -5337,6 +5424,7 @@
         "rsa.network.network_service": "smtp",
         "server.domain": "orem6317.local",
         "server.registered_domain": "orem6317.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.29.120.226"
@@ -5398,6 +5486,7 @@
         "server.domain": "velill3230.www.corp",
         "server.registered_domain": "www.corp",
         "server.subdomain": "velill3230",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.133.254.23"
@@ -5435,8 +5524,8 @@
             "onsecte91.www5.localdomain"
         ],
         "related.ip": [
-            "10.126.245.73",
-            "10.91.2.135"
+            "10.91.2.135",
+            "10.126.245.73"
         ],
         "related.user": [
             "olore"
@@ -5459,6 +5548,7 @@
         "server.domain": "orumS757.www5.corp",
         "server.registered_domain": "www5.corp",
         "server.subdomain": "orumS757",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.126.245.73"
@@ -5520,6 +5610,7 @@
         "server.domain": "emi4534.www.localdomain",
         "server.registered_domain": "www.localdomain",
         "server.subdomain": "emi4534",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.183.243.246"
@@ -5581,6 +5672,7 @@
         "server.domain": "inimav1576.mail.example",
         "server.registered_domain": "mail.example",
         "server.subdomain": "inimav1576",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.61.225.196"
@@ -5618,8 +5710,8 @@
             "orroquis284.api.domain"
         ],
         "related.ip": [
-            "10.125.143.153",
-            "10.79.73.195"
+            "10.79.73.195",
+            "10.125.143.153"
         ],
         "related.user": [
             "emip"
@@ -5642,6 +5734,7 @@
         "server.domain": "aturQu7083.mail.host",
         "server.registered_domain": "mail.host",
         "server.subdomain": "aturQu7083",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.125.143.153"
@@ -5703,6 +5796,7 @@
         "server.domain": "lumqui7769.mail.local",
         "server.registered_domain": "mail.local",
         "server.subdomain": "lumqui7769",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.240.216.85"
@@ -5740,8 +5834,8 @@
             "rumSecti111.www5.domain"
         ],
         "related.ip": [
-            "10.222.245.80",
-            "10.87.90.49"
+            "10.87.90.49",
+            "10.222.245.80"
         ],
         "related.user": [
             "ptatemse"
@@ -5764,6 +5858,7 @@
         "server.domain": "siarc6339.internal.corp",
         "server.registered_domain": "internal.corp",
         "server.subdomain": "siarc6339",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.87.90.49"
@@ -5825,6 +5920,7 @@
         "server.domain": "ptatev6552.www.test",
         "server.registered_domain": "www.test",
         "server.subdomain": "ptatev6552",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.143.53.214"
@@ -5886,6 +5982,7 @@
         "server.domain": "byC5766.internal.home",
         "server.registered_domain": "internal.home",
         "server.subdomain": "byC5766",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.204.178.19"
@@ -5946,6 +6043,7 @@
         "rsa.network.network_service": "smtp",
         "server.domain": "hender6628.local",
         "server.registered_domain": "hender6628.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.161.64.168"
@@ -5983,8 +6081,8 @@
             "upt6017.api.localdomain"
         ],
         "related.ip": [
-            "10.120.148.241",
-            "10.100.154.220"
+            "10.100.154.220",
+            "10.120.148.241"
         ],
         "related.user": [
             "rsitam"
@@ -6007,6 +6105,7 @@
         "server.domain": "xercit7649.www5.home",
         "server.registered_domain": "www5.home",
         "server.subdomain": "xercit7649",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.100.154.220"
@@ -6067,6 +6166,7 @@
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "porissu1470.domain",
         "server.registered_domain": "porissu1470.domain",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.116.153.19"
