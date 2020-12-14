@@ -5,22 +5,12 @@ var:
     default: [snyk-vulnerabilities, forwarded]
   - name: input
     default: httpjson
+  - name: first_interval
+    default: "24h"
   - name: interval
     default: 24h
   - name: url
     default: https://snyk.io/api/v1/reporting/issues/?page=1&perPage=10&sortBy=issueTitle&order=asc&groupBy=issue
-  - name: from_params
-    default:
-      target: url.params.from
-      value: '{{ formatDate (now (parseDuration "-24h")) "2006-01-02" }}'
-  - name: to_params
-    default:
-      target: url.params.to
-      value: '{{ formatDate (now) "2006-01-02" }}'
-  - name: link_pagination
-    default:
-      target: url.value
-      value: '{{ getRFC5988Link "next" .last_response.header.Link }}'
   - name: api_token
   - name: ssl
   - name: orgs

@@ -63,6 +63,10 @@ There is also multiple optional configuration options that can be used to filter
 
 include::../include/var-paths.asciidoc[]
 
+*`var.first_interval`*::
+
+How far to look back the first time the module starts, this supports values in full days (24h, 48h etc).
+
 *`var.audit_type`*::
 
 What audit type to collect, can be either "group" or "organization".
@@ -148,6 +152,10 @@ There is also multiple optional configuration options that can be used to filter
 ----
 
 include::../include/var-paths.asciidoc[]
+
+*`var.first_interval`*::
+
+How far to look back the first time the module starts, this supports values in full days (24h, 48h etc).
 
 *`var.api_token`*::
 

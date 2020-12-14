@@ -11,8 +11,16 @@ request.transforms:
 - set:
     target: header.Authorization
     value: token {{ .api_token }}
-- set: {{ .from_params | tojson }}
-- set: {{ .to_params | tojson }}
+- set:
+    target: url.params.to
+    value: '[[ formatDate (now) "2006-01-02" ]]'
+- set:
+    target: url.params.from
+    value: '[[ formatDate (now (parseDuration .cursor.interval)) "2006-01-02" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02" ]]'
+cursor:
+  interval:
+    value: "-24h"
 request.timeout: 120s
 request.body:
   filters:
@@ -49,7 +57,9 @@ request.body:
       max: {{ .max_priority_score }}
 
 response.pagination:
-- set: {{ .link_pagination | tojson }}
+- set:
+    target: url.value
+    value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
 
 response.split:
   target: body.results

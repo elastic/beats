@@ -22,7 +22,12 @@ request.transforms:
     value: '[[ formatDate (now) "2006-01-02" ]]'
 - set:
     target: url.params.from
-    value: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02" ]]'
+    value: '[[ formatDate (now (parseDuration .cursor.interval)) "2006-01-02" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02" ]]'
+cursor:
+  interval:
+    value: "-24h"
+
 request.timeout: 120s
 request.body:
   filters:

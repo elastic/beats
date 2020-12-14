@@ -17,6 +17,8 @@
 
     # How often the API should be polled, defaults to 1 hour.
     #var.interval: 1h
+    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
+    #var.first_interval: 24h
 
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
@@ -43,6 +45,9 @@
     # How often the API should be polled. Data from the Snyk API is automatically updated
     # once per day, so the default interval is 24 hours.
     #var.interval: 24h
+
+    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
+    #var.first_interval: 24h
 
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
