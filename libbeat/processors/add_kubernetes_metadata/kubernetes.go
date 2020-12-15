@@ -178,7 +178,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        "",
+			Node:        config.Host,
 		}
 		if config.Namespace != "" {
 			options.Namespace = config.Namespace
