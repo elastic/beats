@@ -1,7 +1,7 @@
 - key: mssql
   title: "MSSQL"
   description: MS SQL module
-  release: beta
+  release: ga
   fields:
     - name: mssql
       type: group
