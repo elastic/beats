@@ -1,4 +1,4 @@
-[[rate_limit]]
+[[rate-limit]]
 === Rate limit the flow of events
 beta[]
 
