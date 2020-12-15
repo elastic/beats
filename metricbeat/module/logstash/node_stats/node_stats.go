@@ -69,36 +69,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err := m.updateServiceURI(); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
-	if !m.XPack {
-		return eventMapping(r, content)
-	}
-
-	err = eventMappingXPack(r, m, content)
-	if err != nil {
-		m.Logger().Error(err)
+	if err = eventMapping(r, content); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (m *MetricSet) updateServiceURI() error {
-	u, err := getServiceURI(m.GetURI(), m.XPack, m.CheckPipelineGraphAPIsAvailable)
+	u, err := getServiceURI(m.GetURI(), m.CheckPipelineGraphAPIsAvailable)
 	if err != nil {
 		return err
 	}
@@ -108,12 +95,7 @@ func (m *MetricSet) updateServiceURI() error {
 
 }
 
-func getServiceURI(currURI string, xpackEnabled bool, graphAPIsAvailable func() error) (string, error) {
-	if !xpackEnabled {
-		// No need to request pipeline vertices from service API
-		return currURI, nil
-	}
-
+func getServiceURI(currURI string, graphAPIsAvailable func() error) (string, error) {
 	if err := graphAPIsAvailable(); err != nil {
 		return "", err
 	}
