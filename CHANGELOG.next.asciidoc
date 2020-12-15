@@ -243,6 +243,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix aws s3 overview dashboard. {pull}23045[23045]
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 
 *Heartbeat*
 
@@ -670,7 +671,6 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
