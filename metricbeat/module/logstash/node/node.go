@@ -65,6 +65,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	if err := m.CheckPipelineGraphAPIsAvailable(); err != nil {
+		return err
+	}
+	
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err
