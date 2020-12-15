@@ -10,6 +10,9 @@
         "aws.vpcflow.pkt_srcaddr": "52.213.180.42",
         "aws.vpcflow.subnet_id": "subnet-aaaaaaaa012345678",
         "aws.vpcflow.tcp_flags": "2",
+        "aws.vpcflow.tcp_flags_array": [
+            "syn"
+        ],
         "aws.vpcflow.type": "IPv4",
         "aws.vpcflow.version": "3",
         "aws.vpcflow.vpc_id": "vpc-abcdefab012345678",
