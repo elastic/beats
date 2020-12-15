@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 // Configure configures the application with the passed configuration.
@@ -19,6 +20,9 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 		if err != nil {
 			// inject App metadata
 			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
+			a.statusReporter.Update(status.Degraded)
+		} else {
+			a.statusReporter.Update(status.Healthy)
 		}
 	}()
 
@@ -40,5 +44,6 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
+
 	return nil
 }
