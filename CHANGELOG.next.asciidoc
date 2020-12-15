@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add fileset to ingest Kibana's ECS audit logs. {pull}22696[22696]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -351,6 +352,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
 - Fix aws s3 overview dashboard. {pull}23045[23045]
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
+- Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 
 *Heartbeat*
 
@@ -777,6 +779,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate okta to httpjson v2 config {pull}23059[23059]
 - Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 - Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
+- Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
 
 *Heartbeat*
 
@@ -964,7 +967,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
